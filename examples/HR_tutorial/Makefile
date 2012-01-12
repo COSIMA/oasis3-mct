@@ -1,6 +1,6 @@
 #
 include ../../util/make_dir/make.inc
-LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmpp_io.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a
+LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a
 #
 #
 CPPKEYDP=USE_DOUBLE_PRECISION

@@ -1,7 +1,6 @@
 #
 include ../../util/make_dir/make.inc
-#LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmpp_io.a $(ARCHDIR)/lib/libpio.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a
-LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmpp_io.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a
+LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a
 INCPSMILE = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/pio  -I$(LIBBUILD)/mct 
 #
 ##### User configurable options #####
