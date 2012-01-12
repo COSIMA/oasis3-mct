@@ -1,0 +1,775 @@
+ \magnification =\magstep1
+\count0=90
+%definitions
+
+%end of definitions
+
+
+\centerline{ Olivier Thual, June 30$^{\rm th}$ 1992}
+ \bigskip
+
+\centerline{\bf SIMPLE OCEAN-ATMOSPHERE INTERPOLATION.}  
+\centerline{\bf PART B: SOFTWARE IMPLEMENATION}
+
+
+\bigskip
+
+
+A set of FORTRAN subroutines constitutes an implementation the ``naive''
+grid-to-grid interpolation method which has been exposed in the previous
+Part A of this letter. This implementation  is tested  for  both idealized, 
+EMERAUDE or OPA  grids, masks and scalar fields.  These
+subroutines can  be used in the first version the ocean-atmosphere coupler. 
+
+
+
+
+
+\beginsection 1. INTRODUCTION 
+
+Coupling two atmospheric and  oceanic general circulation models (AGCM
+and OGCM) having two different grids and sea-land masks, requires the
+interpolation of fluxes from the atmosphere to the ocean grids and of the
+sea surface temperature (SST) in the reverse direction.  A simple method
+to perform these interpolations have been presented in the previous Epicoa
+Letter [1]  called ``Simple ocean-atmosphere interpolation. Part A: the method'' as a
+particular case of a more general class of interpolations based on
+optimization theory (Lagrangian formalism).   
+
+\medskip
+
+The name  of ``naive method'' which has been given to denote one of the simplest
+interpolation among this class,  comes from the motivations
+which have governed its implementation. It was designed with simplicity
+requirement and short deadlines in order to reach as quickly as possible a
+first version of an ocean-atmosphere coupler. A more ``sovarphisticated
+method'' is beeing studied in parallel by Norman BARTH [2]. This method
+imposes the conservation of the field integral on each mesh of the coarser
+grid, and requires, in order to satisfy these multiple constraints, the
+mutiplication by matrices of the coarser grid size square for each
+interpolation. 
+
+A lot of the concepts which are used in the ``naive method'', comes from
+the ones that are considered in the ``sovarphisticated method'' [3,2], but retain
+only the low cost ones. The coupler will offer the possibility of choosing
+between the ``naive'' or ``sovarphisticated'' methods, depending on various
+constraints (memory space, computer time, efficiency, accuracy, etc...).
+Other methods, like the one of Philippe DANDIN [4], will also be pluged into
+the coupler. 
+
+
+
+
+
+\medskip
+
+
+
+
+
+The ``naive method'' can be summarized in few words:  knowing the values
+of a field on a source grid, the values on a point of the target grid is
+calculated by summing the values if its $L$th closest neighbors, with a
+weight which quicky decreases with the interdistance. 
+
+
+
+\medskip
+
+In Section 2, I recall the definition of the ``naive method'' in a concise
+way. In Section 3, I briefly
+describe the ``naive method library'', which is  the set of FORTRAN
+subroutines that I have written to implement the method, and focus on the
+visible part of the  iceberg that the coupler will need to know.  Some basic
+tests of this method are presented,  showing that there is no trivial bug
+left.   
+
+
+
+
+
+
+
+
+
+\beginsection 2.  THE NAIVE METHOD
+
+In Part A of this letter [1] general considerations about  grid-to-grid
+interpolation have been presented, and a ``simple  ocean-atmosphere  method'' have be
+presented in this general framework. Here I only present the materials
+necessary to its implementation. 
+
+
+
+\beginsection 2.1 Interpolation without constraints (SST) 
+
+Let $(b_j), j=1,N^b$ be the SST (sea surface temperature) on the ocean grid
+B,  defined by the points $(r^b_j), j=1,N^b$. Only the umasked points are
+considered in this definition of the grids and the following formula.  The
+values $(a_i), i=1,N^a$ of the SST on the atmospheric grid A,   defined by
+the points $(r^a_i), i=1,N^a$, are  given, in the naive method, by:
+$$
+a_i={1\over Z^b( r^a_i)} \sum_{m\in J(r_i^a)} b_i \;
+\phi\left( {\left| r_j^b-r_i^a\right| \over \sigma_b } \right) 
+\eqno(2.1)\; ,
+$$
+where $J(r)=\{j_1(r),  j_2(r), ..., j_{L^b}(r)\}$ is the set containing the
+indices of the $L^b$ closest neighbors $r_m^b$ in grid B, of a point $r$
+located anywhere, and the normalizing function $Z^b$, defined for all  grids
+points of the gird A is:
+$$
+ Z^b( r^a_i)= \sum_{m\in J(r_i^a)}  
+\phi\left( {\left| r_j^b-r_i^a\right| \over \sigma_b } \right)  \; .
+\eqno(2.2)
+$$
+
+
+
+In its present implementation the weight function $\phi$ is a gaussian: 
+$$
+\phi(u) = e^{-u^2 \over 2} 
+\eqno(2.3) \;.
+$$
+
+The variance $ \sigma_b$ is of the order one or two times the average
+mesh size  of the grid B.  Other choices of the weight functions are
+discussed below. 
+
+
+
+
+
+
+
+
+
+
+
+\beginsection 2.2 Summary of the Lagrangian formalism
+
+As explained in Part A [1], the extension of the above grid-to-grid
+interpolation to an interpolation with constraints can be defined through a
+formalism in which a Lagrangian functionnal is to be minimized under
+these constraints. 
+
+
+
+In this formalism, both the source grid A (on which $N^a$ values $a_i$ are
+known) and the target grid B (on which $N^b$ values $b_i$ are to be found)
+are associated to an interpolation which reads:
+
+$$
+f(r)= \sum_{i=1}^{N^a} a_i \varphi_i(r) 
+\eqno(2.4)
+$$
+for grid  A, which is made of $N^a$ grid points,  and
+$$
+g(r)= \sum_{j=1}^{N^b} b_j \psi_j(r) 
+\eqno(2.5)
+$$
+for grid  B, which is made of $N^b$ grid points. 
+
+
+
+If we impose that the equality of the integrals of the two functions $f$
+and $g$ (fluxes) on the two respective domains that the two grids are
+covering,  a constrained interpolation method is defined by the
+minimization of the Lagrangian:
+$$
+L(b_1,b_2,...,b_{N^b}) = \int [f(r)-g(r)]^2  \; dr + 
+\lambda \int [f(r)-g(r)] \; dr  
+\eqno(2.6)
+$$
+subject to the constraints $ \int [f(r)-g(r)] \; dr =0$. 
+
+With the matrix notations  $B=(b_j)$, $A=(a_i)$, $H=(\int \psi_j dr)$, $G=(\int
+\varphi_i dr)$ and $V=(\int \psi_m \psi_j dr)$, where $i=1,N^a$ and $j$
+or $m=1,N^b$, the solution of the minimization of $L$, subject to the
+constraint $HB=GA$, is given by $B=B^*-\lambda
+V^{-1}H$, where  $B^*= V^{-1}UA$ is the solution without constraint and
+$\lambda$,  the Lagragian multiplicator,  is given by 
+$$
+\lambda= { HB^*-GA \over HV^{-1}H} 
+\eqno(2.7) \;. 
+$$
+
+
+
+The solution with constraints reads, in its final form
+$$
+\eqalign{
+B=& B^* -{ HB^* - GA \over HV^{-1}H }  V^{-1}H \cr
+=& V^{-1}UA- {HV^{-1}UA - GA\over HV^{-1}H} V^{-1}H }
+\eqno(2.8) \;. 
+$$
+(NB: this expression
+and Equation 2.6 gives the errata of Equations 4.4, 4.6 and 4.7 of the first
+version {\bf 0615}  of the  Part A
+of this letter, now revised [1]). 
+
+\beginsection 2.3 Interpolation with one constraint (Flux)
+
+The easiest implementation of the above interpolation with constraint is
+obtained when $V$ is the unity matrix, that is when the interpolation
+associated with the target grid is the ``closest neighbor'' interpolation
+(see Part A [1] for details). 
+
+
+
+The above naive method, combined with this global conservation constraint
+of the integrals over the two domains (total fluxes) read: 
+
+$$
+b_j=b^*_j - \lambda  h_j  
+\eqno(2.9)
+$$
+where the unconstrained solution is 
+$$
+b^*_j={1\over Z^a( r^b_j)} \sum_{m\in I(r_j^b)} a_i 
+\phi\left( {\left| r_i^a-r_j^b\right| \over \sigma_a } \right) 
+\eqno(2.10)\; ,
+$$ 
+and the Lagrangian multiplier is given by 
+$$
+\lambda =  {\sum_{j=1}^{N^b} h_j b^*_j -   \sum_{i=1}^{N^a} g_i a^*_i 
+\over  \sum_{j=1}^{N^b} h_j h_j  }
+\eqno(2.11) 
+$$
+where $I(r)=\{i_1(r),  i_2(r), ..., i_{L^b}(r)\}$ is the set containing the indices
+of the $L^a$ closest neighbors $r_m^a$ in grid A, of a point $r$ located
+anywhere, and the normalizing function $Z^a$, defined for all  grids points
+of the gird B is:
+$$
+ Z^a( r^b_j)= \sum_{m\in I(r_j^b)}  
+\phi\left( {\left| r_i^a-r_j^b\right| \over \sigma_a } \right)  \; .
+\eqno(2.12)
+$$
+
+
+
+In the above expressions, $h_j$ is the area of the grid B meshes (see Part
+A [1]) and 
+$$
+g_i= \int  {1\over Z^a( r)} \phi\left( {\left|r- r_i^a\right| \over \sigma_a
+}\right)\; dr
+\eqno(2.12)
+$$ 
+
+In the present implementation of the software, these coefficients have been
+approximated by the surface of the meshes, i.e., $g_i$ is 
+ the surface of the set of all the points which admit $r_i^a$ as their
+ closest neighbor.   This is as if the closest neighbor
+interpolation were chosen in the constraint, while another  interpolation is
+chosen in the quadratic term of the Lagrangain.
+ However, in the future evolution of the
+software, more elabored values of $g_i$ will be possible. 
+
+ 
+
+
+
+\vfill\eject
+
+
+
+
+
+
+
+
+
+\beginsection 3. IMPLEMENTATION OF THE METHOD
+
+The above method have been implemented through a set of FORTRAN subroutines
+which constitutes the  ``naive method library''. Some practical details 
+are given in view of its use in the  coupler, or for testing purposes.
+ A first set of basic tests
+is shown, and the future evolution of this library is hinted. 
+
+
+
+\beginsection 3.1 The ``naive method library''
+
+The directory
+ {\tt greenh@cerfacs.fr:/usr1/pub/numlab/naiv} contains a software
+environment and a set of subroutines constituting the current
+implementation of the ``naive'' grid-to-grid interpolation method.  These
+FORTRAN subroutines have been written following the DOCTOR norm [5, 6].
+A main program performs various tests of these subroutines, and give
+examples of the use of theses subroutines.  
+
+
+
+\bigskip
+
+
+
+The initialization of the grids, the masks and the fields is dependant of the
+atmospheric and oceanic GCMs to be coupled, and will communicated by
+them to the coupler independantly of the interpolation task. However, the
+present library also contains subroutines which generates academic grids,
+masks or fields for testing purposes, and, so far, the initialization of a
+128x64 EMERAUDE grid, a 228x94 OPA-Pacific grid and some EMERAUDE
+fluxes. Extension to other realistic grids for testing purposes are planned. 
+
+
+\beginsection 3.2 A first draft for a manual 
+
+ This library is written is such a way that  only a few items
+need to be visible from the coupler. The names of these subroutines 
+start with {\tt NA}. These high level subroutines call basic subroutines
+with, most of the time, 
+a name starting with  {\tt PL}.
+A very preliminary draft is given through the name of these
+subroutines.
+
+
+\medskip
+\medskip
+\noindent{\bf Include files} 
+ \medskip
+
+These are, at first, three include files containing the commons which
+describe the grids:
+
+
+
+\medskip
+
+\item{}{\tt NAGRA.H}, containing the common for the arrays of grid A (e.g.
+atmsopheric). 
+
+
+
+\medskip
+
+\item{}{\tt NAGRB.H}, containing the common for the arrays grid B (e.g.
+ocean). 
+
+
+
+\medskip
+
+\item{}{\tt NAGAB.H}, containing the commons for the weight arrays used
+in  the grid-to-grid interpolations. 
+
+
+
+\medskip
+\medskip
+\noindent{\bf Grid initializations subroutines} 
+ \medskip
+
+The two first sets of commons of {\tt NAGRA.H} and {\tt NABRB.H}, for grid
+A and grid B, can be initialized by the subroutines: 
+
+
+
+\medskip
+
+\item{} {\tt NAGRDA },  to initialize idealized  A grids.
+
+
+
+\medskip
+
+\item{} {\tt NAGRDB },  to initialize idealized  B grids.
+
+
+
+\medskip
+
+\item{} {\tt NAGMRO },  to initialize the A grid from the EMERAUDE
+128x64 global grid. 
+
+
+
+\medskip
+
+\item{} {\tt NAGOPA},  to initialize idealized  B grid from the OPA
+226x94 Pacific grid. 
+
+
+
+
+\medskip
+\medskip
+\noindent{\bf Interpolations subroutines} 
+ \medskip
+
+The last set of common, in {\tt NAGAB.H} are calculated in the subourtine: 
+
+\medskip
+
+\item{} {\tt NASET(amesh,bmesh)},
+ to initialize the weight arrays of the  interpolation, given the variances
+of the weight functions {\tt amesh} and  {\tt amesh}.   
+
+
+\medskip
+
+
+
+Once the three initialisations are done, the grid A to grid B, and  grid  B to
+grid A interpolations are  performed by the two subroutines:
+
+
+
+\medskip
+
+
+
+\item{} {\tt NASST(ssta,sstb)}, to interpolate a field from grid B to
+grid A without constraint
+(e.g. the SST). 
+
+\medskip
+
+\item{} {\tt NAFLUX(fluxb,fluxa)}, to interpolate a field from grid A to
+grid B while conserving
+its average between the two unmasked domains (e.g., fluxes). 
+
+\medskip
+\medskip
+\noindent{\bf Basic subroutines} 
+ \medskip
+
+These suboutines are called by the higher level subroutines, and need not to
+be known by the first time user:
+
+
+{\tt
+PLDIS2.f  PLGPRI.f  PLGRDU.f  PLQQT.f   PLSCAR.f  PLSST.f   PLVISU.f
+
+
+PLFLUX.f  PLGRDC.f  PLINS.f   PLRHAL.f  PLSORT.f  PLSTAT.f
+
+
+PLGAUS.f  PLGRDP.f  PLMASQ.f  PLRHO.f   PLSSPH.f  PLTMRO.f
+
+
+IMPR.f   IMPRI.f
+}
+
+\medskip
+\medskip
+\noindent{\bf Testing  subroutines} 
+ \medskip
+
+
+Examples of the use of these ``coupler-visible'' subroutines (with names
+starting by {\tt NA}), or of the ``basic'' subroutines (with names starting by PL)
+can be found in several test performing subroutines: 
+
+\medskip
+
+\item{} {\tt NATFX(fluxb,fluxa)}:
+ call {\tt NAFLUX} and visualizes the fields.
+
+\medskip
+
+\item{} {\tt NATST(ssta,sstb)}: call {\tt NASST} and visualizes the fields.
+
+\medskip
+
+\item{} {\tt NATES1(flda,fldb,fldaa)}: calls 
+{\tt NASST} and then {\tt NAFLUX}, visualizes the fields, and compares the
+intial and final fields.  
+
+\medskip
+
+\item{} {\tt NATES2(flda,fldb,fldaa)}:  calls
+  {\tt NAFLUX} and then {\tt NASST}, and compares the
+intial and final fields. 
+\medskip
+
+\item{} {\tt NATES3(flda,fldb,fldaa,kvisuo}: calls  
+  {\tt NAFLUX} and  then {\tt NASST} and visualizes the fields in a way that
+allows animations. 
+Typically, the influence of the variance of the weight functions can be
+studied with this subroutine, through animation of the error field. 
+
+\medskip
+\medskip
+
+These testing subroutines  assume
+that the grids and the interpolation coefficients have already been
+initialized. 
+
+
+
+\beginsection 3.3 Tests of the grid-to-grid interpolation
+
+Various tests have been performed to check that the library of subroutines of
+was free of trivial tests. However, systematic tests of the performance of
+the ``naive method'' and its sensibility to its adjustable parameters (shape
+and variance of the weight functions, number of neighbours, relative
+positions of the masks, ...) still remain to be done. 
+
+
+
+\medskip
+
+In the following tests, the weight function $\phi$
+ is a Gaussian, with a uniform
+variance on a given grid. 
+
+\medskip
+
+
+
+The most trivial test was to check that with a one neighbour interpolation,
+and the same grid, the interpolation was giving the same field.  
+
+
+
+\medskip
+
+
+
+The second test has been made with an analytically generated field $f(x,y)=$
+$\cos (k1 x)$ $\cos(k_2 y)$ interpolation  forward (NAFLUX) an backward
+(NASST) between a cartesian square grid and a polar disk grid, with
+non-coincident masks.  Figure show an example in which 
+ small neighbour number has been given
+to the naive method. This test shows that the original field is well
+recovered, excepted, of course, in the regions where the mask are far from
+coincidence. 
+
+\medskip
+
+
+
+
+
+The third test  uses two grids of very different resolutions, with a mask
+defined by an analytical curve.  The case of a circle  is shown on Figure 2,
+and more complex contour should be used in future tests of this kind. 
+
+\medskip
+
+
+
+
+
+The fourth test (Figure 3) studies the interpolation between an
+analytically defined field $f(x,y)$ on the masked EMERAUDE grid
+(Atmospheric GCM) and the unmasked Pacific OPA (Ocean GCM).   In the
+forward interpolation (NAFLUX), the trace of the EMERAUDE mask can be
+seen on the unmasked OPA domain. In the backward direction (NASST), the
+original field is well recovered  on the tropical Pacific, and, of course,
+meaninless far from this region. 
+
+
+
+The last test  (Figure 4) deals with a realistic flux field (stress $\tau_ x$
+in the longitudinal direction) of EMERAUDE and shows it interpolation on
+the Pacific OPA masked grid. Comparison with Philippe Dandin's
+interpolation's method is under progress.                        
+
+
+
+\beginsection 3.4 Future developments
+
+In the  present state of the ``naive method library'',
+ the coupler-visible items  are
+ready  to be used in the coupler. However, they are at the
+stage of a $\beta$-release, and will be improved by furthers tunings.  The
+possibility of choosing weight functions which shape and variance can vary
+with the index of the grid point will be given. This will allow, for instance, 
+to use ``non-smoothing'' function, e.g. the  functions associated to the
+spectral method used on the grid [7]. This will also allow   to pay special
+attention to land-sea regions, or  implement interpolation method based on
+``wavelet decomposition''.  
+
+
+
+%The calculation of the grid surface elements is not yet  properly
+%implemented for spherical grids. 
+
+
+
+\beginsection 4. CONCLUSION 
+
+The present letter can be considered as a first draft of a user manual of
+the ``naive method''. A concise presentation
+ of the  method has been presented, 
+as well ot its possible future evolution. Pratical details for the
+use of the ``naive method library'' have been given in the spirit of its
+integration into the coupler. The names of testing subroutines which can be 
+read as examples have been given. 
+
+
+
+Further steps need to be done in order to reach a clean version of this
+``naive method library'', with a more complete user manual. However, these
+first steps in the organisation of a sofware product, with the respect of
+the DOCTOR norm, the separation between  subroutines ``visible''  from a
+calling code, with a minimal list of argument and extensive use of
+commons, and  ``basic'' subroutines free of commons, can be helpfull  for
+the organization of our future software development. Such an organization
+is also found in the ``Spectral Interface Library'' [8]. 
+
+
+
+\beginsection  Acknowledgments 
+
+I thank Dominique ASTRUC for helping to use his visualization software [9]
+with which the Figure have been produced. 
+
+
+
+
+\beginsection REFERENCES
+
+
+\def\ref{\parskip 12pt \leftskip 20pt \parindent -20pt} 
+\def\endref{\parskip 0pt \leftskip 0pt \parindent 20pt}
+
+
+\ref
+
+[1]
+O. THUAL, Simple  ocean-atmosphere  interpolation. Part A: the method, 
+ {\it Epicoa \ } {\bf 0315}  (1992).
+
+
+
+[2] 
+N. H. BARTH,  A Conservative Scheme for Passing Variables Between
+Coupled Models of the Ocean an Atmosphere
+ {\it Technical Report \ }, CERFACS (1992).
+
+
+
+[3] 
+O. THUAL, Gathering information for a coupler,
+ {\it Epicoa \ } {\bf 0119} (1992).
+
+
+
+
+[4] 
+P. DANDIN, th\`ese de doctorat, in preparation (1992). 
+
+
+
+[5] J. CLOCHARD, Norme de codage ``DOCTOR'' pour le projet ARPEGE,{\it Note de
+travail ``AREPEGE''}  {\bf No. 4} (1988). 
+
+
+
+[6] J. K. GIBSON, The Doctor system - A DOCumentary ORiented programming
+system, {\it ECMWF Technical Memorandum}  {\bf No. 52} (1982). 
+
+
+[7] P. BERNARDET, private communication (1992).
+
+[8]  O. THUAL, Spectral Interfaces Library Version 2.2,  CERFACS (1990).
+
+
+[9]  D. ASTRUC,  Visuo: manuel de l'utilisateur, {\it Internal Report}
+(1990). 
+ 
+\endref
+
+
+\vfill\eject
+\centerline{ Exchange of Projects and Ideas for Coupling Ocean and
+Atmosphere (Epicoa)}
+\centerline{ Appendix to Olivier Thual(8) , June 30$^{\rm th}$ 1992}
+ \bigskip
+
+
+\centerline{\bf  SOURCE OF THE NAIVE METHOD LIBRARY}
+ \bigskip
+
+\centerline{ Version naiv01,  92 06 30 } 
+
+
+
+\bigskip \bigskip
+
+This version is contained in {\tt
+greenh@cerfacs.fr:/usr1/pub/numlab/naiv/cnaiv01}
+
+\bigskip \bigskip
+
+
+
+\beginsection 1. Include files
+
+{\tt
+
+NAGAB.H  NAGRA.H  NAGRB.H
+
+
+}
+
+\beginsection 2. Main Program
+
+
+
+{\tt
+
+ANAIV.f
+
+}
+
+
+
+\beginsection 3. Coupler visible subroutines {\tt NA - - - -} 
+
+
+
+{\tt
+
+NAFLUX.f  NAGMRO.f  NAGRA.H   NAGRDA.f  NASET.f   NATES1.f  NATES3.f  NATST.f
+
+
+NAGAB.H   NAGOPA.f  NAGRB.H   NAGRDB.f  NASST.f   NATES2.f  NATFX.f
+
+
+
+}
+
+
+
+\beginsection 4. Basic  subroutines {\tt PL - - - -} 
+
+
+
+{\tt
+
+PLDIS2.f  PLGPRI.f  PLGRDU.f  PLQQT.f   PLSCAR.f  PLSST.f   PLVISU.f
+
+
+PLFLUX.f  PLGRDC.f  PLINS.f   PLRHAL.f  PLSORT.f  PLSTAT.f
+
+
+PLGAUS.f  PLGRDP.f  PLMASQ.f  PLRHO.f   PLSSPH.f  PLTMRO.f
+
+
+
+
+}
+
+
+
+\beginsection 5. Subroutine stolen from outside 
+
+
+
+{\tt
+
+IMPR.f   IMPRI.f
+
+
+}
+
+
+
+\end
+
+
+

@@ -1,0 +1,71 @@
+#
+# Include file for OASIS3 Makefile for a Linux system using 
+# Portland Group Fortran Compiler and MPICH
+#
+###############################################################################
+#
+# Needed to work with SCE Makefile
+COUPLE          = oasis3-mct
+I4mods          = I
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# PRISMHOME     : path for the root of prism directory tree, can be anywhere
+# ARCHDIR       : directory created when compiling
+# LIBPSMILE     : list of oasis3-mct libraries
+# PSMILE_INCDIR : includes all *o and *mod for each library
+# BINDIR        : directory for executables
+# LIBBUILD      : contains a directory for each library
+#
+PRISMHOME       = $(HOME)/prism
+ARCHDIR         = $(PRISMHOME)/crayx1
+LIBPSMILE	= $(ARCHDIR)/lib/libanaisg.a $(ARCHDIR)/lib/libanaism.a $(ARCHDIR)/lib/libclim.$(CHAN).a $(ARCHDIR)/lib/libpsmile.$(CHAN).a $(ARCHDIR)/lib/libfscint.a $(ARCHDIR)/lib/libscrip.a
+PSMILE_INCDIR   = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/clim.$(CHAN)
+BINDIR          = $(ARCHDIR)/bin
+LIBBUILD        = $(ARCHDIR)/build/lib
+#
+# MPI library
+MPIDIR      = 
+MPIBIN      = 
+MPI_INCLUDE = 
+MPILIB      = 
+#
+# NETCDF library msp
+NETCDF_INCLUDE  = ../netcdf/include
+NETCDF_LIBRARY  = -L../netcdf/lib -lnetcdf
+# Compiling and other commands
+MAKE        = gmake
+#F90         = ftn
+F90         = ftn -sreal64 -dp -ra -Oscalar3,vector3,stream1,task0,inline0 -eZ -F -em -J ../module -p ../module
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = cc -O0
+LD          = ftn
+AR          = ar
+ARFLAGS     = -ruv
+#
+# compiler options and cpp keys
+# 
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DVERBOSE -Ucray -UCRAY -U_CRAY -U_CRAYIEEE
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# For compiling in double precision, put -r8
+# For compiling in single precision, remove -r8 and add -Duse_realtype_single
+# 
+#F90FLAGS  =    -r8 -byteswapio  -O0 $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+F90FLAGS  = $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(F90FLAGS)
+FFLAGS    = $(F90FLAGS)
+fFLAGS    = $(F90FLAGS)
+CCFLAGS   = $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+LDFLAGS   = 
+#
+#  External libraies for linking
+FLIBS     = $(NETCDF_LIBRARY)	
+#
+#
+#############################################################################

@@ -1,0 +1,72 @@
+#
+# Include file for OASIS3 Makefile for a Linux system using 
+# Portland Group Fortran Compiler and MPICH
+#
+###############################################################################
+#
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# COUPLE	: path for oasis3-mct main directory
+COUPLE          = $(HOME)/dev_tcraig/oasis3-mct
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(HOME)/CORAIL
+#
+# MPI library
+MPIDIR      = /opt/intel/impi/4.0.0.028/intel64
+MPIBIN      = $(MPIDIR)/bin
+MPI_INCLUDE = $(MPIDIR)/include
+MPILIB      = -L$(MPIDIR)/lib
+#
+# NETCDF library
+NETCDF_INCLUDE  = /usr/local/include
+NETCDF_LIBRARY  = -L/usr/local/lib -lnetcdf 
+#
+# Compiling and other commands
+MAKE        = /usr/bin/make
+F90         = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = $(MPIBIN)/mpiicc -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/mpiifort $(MPILIB)
+AR          = ar
+ARFLAGS     = -ruv
+#
+# CPP keys and compiler options
+# 
+#CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTREAT_OVERLAY -DTMG_PERF
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTREAT_OVERLAY
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# For compiling in double precision, put -r8
+# For compiling in single precision, remove -r8 and add -Duse_realtype_single
+# 
+#F90FLAGS_1  = -g -check all -CB -traceback -vec-report0 -O0 -fno-alias -ip -align -msse3
+F90FLAGS_1  = -vec-report0 -O0 -fno-alias -ip -align -msse3
+f90FLAGS_1  = $(F90FLAGS_1)
+FFLAGS_1    = $(F90FLAGS_1)
+fFLAGS_1    = $(F90FLAGS_1)
+CCFLAGS_1   = -vec-report0 -O0 -fno-alias -ip -align -msse3
+LDFLAGS     = 
+#
+###################
+#
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+
+F90FLAGS  = $(F90FLAGS_1) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(f90FLAGS_1) $(CPPDEF) -I$(NETCDF_INCLUDE)
+FFLAGS    = $(FFLAGS_1) $(CPPDEF) -I$(NETCDF_INCLUDE)
+fFLAGS    = $(fFLAGS_1) $(CPPDEF) -I$(NETCDF_INCLUDE)
+CCFLAGS   = $(CCFLAGS_1) $(CPPDEF) -I$(NETCDF_INCLUDE)
+#
+#############################################################################

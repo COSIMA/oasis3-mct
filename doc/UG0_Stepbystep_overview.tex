@@ -1,0 +1,135 @@
+\newpage
+\chapter{Introduction}
+\label{sec_step}
+
+In 1991, CERFACS decided to tackle coupled climate modelling and to
+develop a software interface to couple existing numerical General
+Circulation Models of the ocean and of the atmosphere. Today, the
+OASIS3 coupler, which is the result of more than 15 years of evolution
+is used by about 30 modelling groups in Europe, Australia, Asia and
+North America, on the different computing platforms used by the
+climate modelling community. The list of
+coupled models realized with OASIS3 and previous versions and the
+platforms onto which they were run on in the few past years can be
+found in Appendix \ref{sec_couplings}.
+
+OASIS3 sustained development is ensured by a collaboration
+between CERFACS and the Centre National de la Recherche Scientifique
+(CNRS) and its maintainance and user support is presently reinforced
+with additinal resources coming from IS-ENES project funded by the EU (FP7 -
+GA no 228203), into which the parallel OASIS4 version of the
+coupler is also currently being developed. 
+
+OASIS3 is a portable set of Fortran 77, Fortran 90 and C routines.
+Portability and flexibility are OASIS3 key design concepts. At
+run-time, OASIS3 acts as a separate executable, which main function is
+to interpolate the coupling fields exchanged between the component
+models, and as a communication library linked to the component models, the OASIS3
+PRISM Model Interface Library (PSMILe). OASIS3 supports 2D
+coupling fields in the longitude and latitude dimensions. To communicate with OASIS3, or directly with
+another model, or to perform I/O actions, a component model needs to
+include few specific PSMILe calls. OASIS3 PSMILe supports in
+particular parallel communication between a parallel component model
+and OASIS3 interpolation executable based on Message Passing Interface
+(MPI) and file I/O using the mpp\_io library from GFDL. New with this
+version, the OASIS3 interpolation executable can be run on many processes, each process interpolating a
+subset of the coupling fields, resulting in a
+parallelisation of OASIS3 on a field-per-field basis. For each
+coupling exchange, OASIS3 performs the transformations and regridding
+needed to express the source field on the grid of the target model.
+The current OASIS3\_3 version and its toy coupled model TOYOASIS3 were
+compiled and run on NEC SX6, IBM Power4, CRAY XD1, and Linux PC (XXX
+list to be updated).
+
+% To exchange coupling information with other components, a component
+% model needs to call few specific routines of the OASIS coupling
+% library for its initialisation, grid and partition definition, field
+% declaration, field {\bf Get} and {\bf Put} actions (to receive or send
+% a field by respectively) and termination. 
+ 
+% In OASIS, the communication follows the ``end-point'' principle, i.e.
+% there is no reference in the component model code to the origin of a
+% Get action or to the destination of a Put action; the source and
+% target component models (coupling exchange) or the input or output
+% file (I/O) are set externally by the user.  This ensures an easy
+% transition between different coupling configurations, in particular
+% from the coupled mode (Get/Put actions leading to a coupling exchange
+% performed using MPI) to the forced mode (Get/Put action leading to
+% reading/writing from/to a file using the GFDL mpp\_io library, Balaji
+% 2001), totally transparent for the component model itself.
+% Furthermore, the Get/Put routines can be called at each time step in
+% the component model code but the receiving/sending actions will
+% effectively be performed only at appropriate times from/to the
+% appropriate source/target following the configuration externally
+% defined by the user.
+
+% For each coupling exchange, OASIS performs the transformations and
+% regridding needed to express the source field on the grid of the
+% target model. The following 2D regridding algorithms based on the
+% SCRIP library (Jones 1999) are available (for more details, the reader
+% is referred to the SCRIP User Guide available at
+% http://climate.lanl.gov/Software/SCRIP/):
+
+% \begin{itemize}
+% \item N nearest-neighbour: the N closest source neighbours are used.
+%   The weight of each neighbour is inversely proportional to $d$, its
+%   Great Circle distance to the target point, or to $exp(-1/2 \cdot
+%   d^2/\sigma^2)$ where $\sigma^2$ is the variance of a Gaussian function.
+% \item bilinear: the 4 enclosing source neighbour points are used and
+%   their respective weight is evaluated using a general bilinear
+%   iteration in a continuous local coordinate system.
+% \item bicubic: the value of the source field, its gradients and cross
+%   gradient with respect to the local directions {\it i} and {\it j} at
+%   the 4 enclosing source neighbour points are used. For Reduced
+%   Gaussian grid, a standard bicubic algorithm with the 16 enclosing
+%   source neighbours is used.
+% \item 1st order conservative remapping: the weight of a source cell is
+%   proportional to area of the source cell intersected by target cell.
+%   Using the divergence theorem, the SCRIP library evaluates this area
+%   with the line integral along the cell borders enclosing the area. 
+
+% \end{itemize}
+
+% (XXX to be added: a word on subgrid, Interpolation of vectors)
+
+\section{Step-by-step use of OASIS3}
+
+To use OASIS3 for coupling models (and/or perform I/O
+actions), one has to follow these steps:
+\begin{enumerate}
+\item Obtain OASIS3 sources (see chapter \ref{sec_Obtaining}).
+\item Identify the coupling or I/O fields and adapt the component
+  models to allow their exchange with the PSMILe library based on MPI1
+  or MPI2 message passing\footnote{The SIPC, PIPE and GMEM
+    communication techniques available in previous versions are not maintained anymore.}.
+  The PSMILe library is interfaced with the {\tt mpp\_io} library from
+  GFDL \cite{mpp_io} and therefore can be used to perform I/O actions
+  from/to disk files.  For more detail on how to interface a model
+  with the PSMILe, see chapter \ref{sec_modelinterfacing}.
+
+The TOYOASIS3 coupled model gives a practical example of a coupled
+model; the sources are given in directories {\tt
+  /oasis3/examples/toyoasis3/src }; more detail on TOYOASIS3 and
+how to compile and run it can be found in chapter
+\ref{sec_compilationrunning}.
+
+\item Define all coupling and I/O parameters and the transformations
+  required to adapt each coupling field from its source model grid to
+  its target model grid; on this basis, prepare OASIS3 configuring file {\it
+  namcouple} (See chapter \ref{sec_namcouple}). 
+  
+  OASIS3 supports different interpolation algorithms as is described in
+  chapter \ref{sec_transformations}. We strongly recommend that one tests off-line the quality
+  of the chosen transformations and regriddings in the ``testNONE'' environment (see section \ref{subsec_running_testnone}).
+
+\item Generate required auxiliary data files (see chapter
+  \ref{sec_auxiliary}).
+\item Compile OASIS3, the component models and start the coupled
+  experiment. Chapter \ref{sec_compilationrunning} describes how to
+  compile and run OASIS3 and the TOYOASIS3 coupled model.
+
+\end{enumerate}
+
+If you need extra help, do not hesitate to contact us (see contact
+details on the back of the cover page).
+

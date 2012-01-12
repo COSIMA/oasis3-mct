@@ -1,0 +1,97 @@
+\newpage
+\appendix
+\chapter{The grid types for the transformations}
+\label{subsec_gridtypes}
+
+As described in section \ref{sec_transformations}, the different
+transformations in OASIS3 support different types of grids. The
+characteristics of these grids are detailed here.
+
+\begin{enumerate}
+
+\item Grids supported for the {\tt INTERP}
+    interpolations (see section \ref{subsec_interp})
+
+\begin{itemize}
+ 
+\item {\tt `A' grid}: this is a regular Lat-Lon grid covering either
+      the whole globe or an hemisphere, going from South to North and
+      from West to East.  There is no grid point at the
+      pole and at the equator, and the first latitude has an offset of
+      0.5 grid interval. The first longitude is 0$^o$ (the Greenwhich
+      meridian) and is not repeated at the end of the grid ({\tt
+      \$CPER} = P and {\tt \$NPER}= 0).  The latitudinal grid length
+      is 180/NJ for a global grid, 90/NJ otherwise. The longitudinal
+      grid length is 360/NI. 
+
+\item {\tt `B' grid}: this is a regular Lat-Lon grid covering either
+      an hemisphere or the whole globe, going from South to North and
+      from West to East. There is a grid point at the
+      pole and at the equator (if the grid is hemispheric or global
+      with NJ odd). The first longitude is 0$^o$ (the Greenwhich
+      meridian), and is repeated at the end of the grid ({\tt \$CPER}
+      = P and {\tt \$NPER}= 1).  The latitudinal grid length is
+      180/(NJ-1) for a global grid, 90/(NJ-1) otherwise. The
+      longitudinal grid length is 360/(NI-1). 
+
+  
+\item {\tt `G' grid}: this is a irregular Lat-Lon Gaussian grid
+covering either an hemisphere or the whole globe, going from South to
+North and from West to East. This grid is used in spectral models. It
+is very much alike the A grid, except that the latitudes are not
+equidistant. There is no grid point at the pole and at the
+equator. The first longitude is 0$^o$ (the Greenwhich meridian) and is
+not repeated at the end of the grid ({\tt \$CPER} = P and {\tt
+\$NPER}= 0).  The longitudinal grid length is 360/NI.  
+
+
+\item {\tt `L' grid}: this type covers regular Lat-Lon grids in
+      general, going from South to
+North and from West to East.. The grid can be described by the latitude and the
+      longitude of the southwest corner of the grid, and by the
+      latitudinal and longitudinal grid mesh sizes in degrees.
+
+\item {\tt `Z' grid}: this is a Lat-Lon grid with non-constant
+      latitudinal and longitudinal grid mesh sizes, going from South to
+North and from West to East. The deformation of
+      the mesh can be described with the help of 1-dimensional
+      positional records in each direction. This grid is periodical
+      ({\tt \$CPER} = P) with {\tt \$NPER} overlapping grid points.
+
+\item {\tt `Y' grid}: this grid is like `Z' grid except that it is 
+      regional ({\tt \$CPER} = R and {\tt \$NPER} = 0).
+  
+ \end{itemize}
+
+\item Grids supported for the {\tt SCRIPR} interpolations
+
+\begin{itemize}
+
+\item {\tt `LR' grid}: The longitudes and the latitudes of
+  2D Logically-Rectangular (LR) grid points can be described by two arrays
+  {\tt longitude(i,j)} and {\tt latitude(i,j)}, where i and j
+  are respectively the first and second index dimensions. Streched
+  or/and rotated grids are LR grids. Note that A, B, G, L, Y, or Z
+  grids are all particular cases of LR grids.
+
+\item {\tt `U' grid}: Unstructured (U) grids do have any particular
+      structure. The longitudes and the latitudes of 2D Unstructured
+      grid points must be described by two arrays {\tt
+      longitude(nbr\_pts,1)} and {\tt latitude(nbr\_pts,1)}, where nbr\_pts
+      is the total grid size.
+
+\item {\tt `D' grid} The Reduced (D) grid is composed of a certain
+number of latitude circles, each one being divided into a varying
+number of longitudinal segments. In OASIS3, the grid data (longitudes,
+latitudes, etc.) must be described by arrays dimensioned {\tt
+(nbr\_pts,1)}, where {\tt nbr\_pts} is the total number of grid
+points. There is no overlap of the grid, and no grid point at the
+equator nor at the poles. There are grid points on the Greenwich
+meridian.
+ 
+\end{itemize}
+
+\end{enumerate}
+
+
+

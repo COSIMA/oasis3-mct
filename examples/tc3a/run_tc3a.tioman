@@ -1,0 +1,193 @@
+#!/bin/ksh
+#set -x
+######################################################################
+#
+############### User's section #######################################
+##
+## - Define architecture and coupler (oasis3 or oasis4)
+arch=Linux      
+coupler=oasis3
+host=`uname -n`
+user=`whoami`
+#
+run_oasis3_para=0 # = 0 for OASIS3 on one process, 
+                  # = 1 for OASIS3 on two processes
+
+## - Define paths
+srcdir=`pwd`
+datadir=$srcdir/data_oasis3
+
+casename=`basename $srcdir`
+
+## - Define MPIRUN, only used for arch=Linux
+#MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
+MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+
+## - Define names of executables, number of processes for the coupler
+#
+coupler_exe=oasis3.MPI1.x
+#
+# - Case models: Define number of processes to run each executable
+#               and name of executables
+#
+rundir=/space/${user}/work_${casename}
+#name of the executables
+    exe1=model1
+    exe2=model2
+    exe3=model3
+# number of processes for each executable
+    nproc_exe1=2
+    nproc_exe2=3
+    nproc_exe3=1
+# number of processes involved in the coupling for the namcouple
+    ncpl_exe1=$nproc_exe1
+    ncpl_exe2=$nproc_exe2
+    ncpl_exe3=$nproc_exe3
+#
+
+############### End of user's section ################################
+
+echo ''
+echo '*****************************************************************'
+echo '*** '$casename' : '$run
+echo ''
+echo 'Rundir       :' $rundir
+echo 'Architecture :' $arch
+echo 'Host         : '$host
+echo 'User         : '$user
+echo 'Coupler      :' $coupler
+echo ''
+if [ $run_oasis3_para == 0 ]; then
+echo $coupler_exe 'runs on 1 proc'
+else
+echo $coupler_exe 'runs on 2 procs'
+fi
+echo $exe1' runs on '$nproc_exe1 'processes'
+echo $exe2' runs on '$nproc_exe2 'processes'
+echo $exe3' runs on '$nproc_exe3 'processes'
+echo ''
+echo ''
+######################################################################
+###
+### 1. Copy source example directory containing everything needed
+###    into rundir
+
+\rm -fr $rundir
+mkdir -p $rundir
+
+cp -f $srcdir/*nc  $rundir/.
+
+cp -f $datadir/*txt $rundir/.
+cp -f $datadir/*nc  $rundir/.
+cp -f $datadir/*.jnl $rundir/.
+
+cp -f $srcdir/$exe1 $rundir/.
+cp -f $srcdir/$exe2 $rundir/.
+cp -f $srcdir/$exe3 $rundir/.
+
+cp -f $srcdir/oasis3.MPI1.x $rundir/$coupler_exe
+
+if [ $run_oasis3_para == 1 ]; then
+cp -f $datadir/namcouple_0 $rundir/namcouple
+cp -f $datadir/namcouple_1 $rundir/namcouple_1
+cp -f $datadir/*nc  $rundir/.
+else
+cp -f $datadir/namcouple $rundir/.
+cp -f $datadir/fdatm.nc $rundir/.
+cp -f $datadir/fdocn.nc $rundir/.
+fi
+
+ed $rundir/namcouple <<EOF
+g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
+g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
+g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
+g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
+g/nproc_exe3/s/nproc_exe3/$nproc_exe3/
+g/ncpl_exe3/s/ncpl_exe3/$ncpl_exe3/
+w
+q
+EOF
+
+if [ $run_oasis3_para == 1 ]; then
+mv $rundir/namcouple $rundir/namcouple_0
+ed $rundir/namcouple_1 <<EOF
+g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
+g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
+g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
+g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
+g/nproc_exe3/s/nproc_exe3/$nproc_exe3/
+g/ncpl_exe3/s/ncpl_exe3/$ncpl_exe3/
+w
+q
+EOF
+fi
+#
+cd $rundir
+#
+######################################################################
+###
+### 3. Creation of configuration scripts
+
+###---------------------------------------------------------------------
+### Linux
+###---------------------------------------------------------------------
+
+if [ $arch == Linux ] ; then
+  cat <<EOF>> $rundir/appl-linux.conf
+$host 0 $rundir/$coupler_exe
+EOF
+if [ $run_oasis3_para == 1 ]; then
+  cat <<EOF>> $rundir/appl-linux.conf
+$host 1 $rundir/$coupler_exe
+EOF
+fi
+
+  count=0
+  while [[ $count -lt $nproc_exe1 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe1
+EOF
+   (( count += 1 ))
+  done
+
+  count=0
+  while [[ $count -lt $nproc_exe2 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe2
+EOF
+   (( count += 1 ))
+  done
+
+#tcx
+  count=0
+  while [[ $count -lt $nproc_exe3 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe3
+EOF
+   (( count += 1 ))
+  done
+
+else 
+  echo 'For architecture='$arch ' you have to add your execution'
+  exit
+fi 
+
+######################################################################
+###
+### 4. Execute the model
+
+if [ $arch == Linux ] ; then
+
+  echo 'Executing the model using '$MPIRUN 
+  echo "  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err "
+  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+    
+fi
+
+echo $casename 'is executed or submitted to queue.'
+echo 'Results are found in rundir : '$rundir 
+
+######################################################################
+
+
+

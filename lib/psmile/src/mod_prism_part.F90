@@ -1,0 +1,210 @@
+MODULE mod_prism_part
+
+   USE mod_prism_kinds
+   USE mod_prism_data
+   USE mod_prism_parameters
+   USE mod_prism_sys
+   USE mct_mod
+   USE mod_prism_timer
+
+   implicit none
+
+   private
+
+   !--- interfaces ---
+   public :: prism_part_def
+   public :: prism_part_create
+
+   !--- datatypes ---
+   public :: prism_part_type
+
+   integer(kind=ip_intwp_p),parameter :: mpart = 100
+
+   type prism_part_type
+      type(mct_gsmap)        :: gsmap
+      integer(kind=ip_i4_p)  :: gsize
+      integer(kind=ip_i4_p)  :: nx
+      integer(kind=ip_i4_p)  :: ny
+      character(len=ic_med)  :: gridname
+   end type prism_part_type
+
+   integer(kind=ip_intwp_p),public :: prism_npart = 0
+   type(prism_part_type),public :: prism_part(mpart)
+
+CONTAINS
+!
+  SUBROUTINE prism_part_def (id_part, kparal, kinfo)
+!
+!*    *** Def_partition ***   PRISM 1.0
+!
+!     purpose:
+!     --------
+!        define a decomposition
+!
+!     interface:
+!     ----------
+!        id_part : field decomposition id
+!        kparal : type of parallel decomposition
+!	 kinfo	: output status
+!
+!     author:
+!     -------
+!        Arnaud Caubel - FECIT
+!
+!  ----------------------------------------------------------------
+   INTEGER(kind=ip_intwp_p)              ,intent(out) :: id_part
+   INTEGER(kind=ip_intwp_p), DIMENSION(:),intent(in)  :: kparal
+   INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo
+!  ----------------------------------------------------------------
+   integer(kind=ip_intwp_p) :: n,k,nsegs
+   integer(kind=ip_intwp_p),pointer :: start(:),length(:)
+   character(len=*),parameter :: subname = 'prism_part_def'
+!  ----------------------------------------------------------------
+
+   kinfo = PRISM_OK
+
+   call prism_timer_start('map definition')
+
+   if (prism_npart == 0) then  ! first call
+      do n = 1,mpart
+         prism_part(n)%gsize = -1
+         prism_part(n)%nx    = -1
+         prism_part(n)%ny    = -1
+         prism_part(n)%gridname = trim(cspval)
+      enddo
+   endif
+
+   prism_npart = prism_npart + 1
+   id_part = prism_npart
+
+   if (prism_npart > mpart) then
+      write(nulprt,*) subname,' ERROR prism_npart too large ',prism_npart,mpart
+      call prism_sys_abort(compid,subname,'ERROR prism_npart too large')
+   endif
+
+   if (kparal(CLIM_Strategy) == CLIM_Serial) then
+      nsegs = 1
+      allocate(start(nsegs),length(nsegs))
+      start (1) = 1
+      length(1) = kparal(CLIM_Length)
+   elseif (kparal(CLIM_Strategy) == CLIM_Apple) then
+      nsegs = 1
+      allocate(start(nsegs),length(nsegs))
+      start (1) = kparal(CLIM_Offset) + 1
+      length(1) = kparal(CLIM_Length)
+   elseif (kparal(CLIM_Strategy) == CLIM_Box) then
+      nsegs = kparal(CLIM_SizeY)
+      allocate(start(nsegs),length(nsegs))
+      do n = 1,nsegs
+         start (n) = kparal(CLIM_Offset) + (n-1)*kparal(CLIM_LdX) + 1
+         length(n) = kparal(CLIM_SizeX)
+      enddo
+   elseif (kparal(CLIM_Strategy) == CLIM_Orange) then
+      nsegs = kparal(CLIM_Segments)
+      allocate(start(nsegs),length(nsegs))
+      do n = 1,nsegs
+         start(n)  = kparal((n-1)*2 + 3) + 1
+         length(n) = kparal((n-1)*2 + 4)
+      enddo
+   elseif (kparal(CLIM_Strategy) == CLIM_Points) then
+      nsegs = kparal(CLIM_Segments)
+      allocate(start(nsegs),length(nsegs))
+      !--- initialize first segment, nsegs=1,n=1,k=3
+      nsegs = 1
+      n = 1
+      k = n+2
+      start(nsegs)  = kparal(k)
+      length(nsegs) = 1
+      !--- compute rest of segments from n=2,k=4
+      do n = 2,kparal(CLIM_Segments)
+         k = n+2
+         if (kparal(k)-kparal(k-1) == 1) then
+            length(nsegs) = length(nsegs) + 1
+         else
+            nsegs = nsegs + 1
+            start(nsegs)  = kparal(k)
+            length(nsegs) = 1
+         endif
+      enddo
+   else
+      write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
+      call prism_sys_abort(compid,subname,'ERROR part strategy unknown')
+   endif
+
+   call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,mpi_comm_local, &
+      compid,numel=nsegs)
+
+   deallocate(start,length)
+
+   prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
+   prism_part(prism_npart)%nx = -1
+   prism_part(prism_npart)%ny = -1
+  
+   call prism_timer_stop('map definition')
+   
+   if (PRISM_Debug >= 2) then
+      write(nulprt,*) ' '
+      write(nulprt,*) subname,' compid = ',prism_part(prism_npart)%gsmap%comp_id
+      write(nulprt,*) subname,' ngseg  = ',prism_part(prism_npart)%gsmap%ngseg
+      write(nulprt,*) subname,' gsize  = ',prism_part(prism_npart)%gsmap%gsize
+      write(nulprt,*) subname,' start  = ',prism_part(prism_npart)%gsmap%start
+      write(nulprt,*) subname,' length = ',prism_part(prism_npart)%gsmap%length
+      write(nulprt,*) subname,' pe_loc = ',prism_part(prism_npart)%gsmap%pe_loc
+      write(nulprt,*) ' '
+   endif
+
+ END SUBROUTINE prism_part_def
+
+!------------------------------------------------------------
+  SUBROUTINE prism_part_create(id_part,type,gsize)
+
+  IMPLICIT NONE
+
+  integer(ip_i4_p),intent(out) :: id_part
+  character(len=*),intent(in)  :: type
+  integer(ip_i4_p),intent(in)  :: gsize
+  !--------------------------------------------------------
+  integer(ip_i4_p) :: mpicomm
+  integer(ip_i4_p) :: mpirank
+  integer(ip_i4_p) :: mpisize
+  integer(ip_i4_p),pointer :: start(:),length(:)
+  integer(ip_i4_p) :: pts
+  integer(ip_i4_p) :: n
+  character(len=*),parameter :: subname = 'prism_part_create'
+  !--------------------------------------------------------
+
+  mpicomm = mpi_comm_local
+  mpirank = mpi_rank_local
+  mpisize = mpi_size_local
+
+  !--- before initializing another gsmap, check if one exists that will work
+  do n = 1,prism_npart
+     if (prism_part(n)%gsize == gsize) then
+        id_part = n
+        return
+     endif
+  enddo
+
+  if (trim(type) == '1d') then
+     allocate(start(1),length(1))
+     length(1) = gsize/mpisize
+     pts = gsize - length(1)*mpisize
+     if (mpirank < pts) length(1) = length(1) + 1
+     start(1) = gsize/mpisize*(mpirank) + min(mpirank,pts) + 1
+     prism_npart = prism_npart + 1
+     prism_part(prism_npart)%gsize = gsize
+     prism_part(prism_npart)%nx = -1
+     prism_part(prism_npart)%ny = -1
+     call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,0,mpicomm,compid)
+     deallocate(start,length)
+  else
+     write(nulprt,*) subname,' ERROR type unknown ',trim(type)
+     call prism_sys_abort(compid,subname,' ERROR type unknown')
+  endif
+
+  id_part = prism_npart
+
+  END SUBROUTINE prism_part_create
+!------------------------------------------------------------
+
+END MODULE mod_prism_part

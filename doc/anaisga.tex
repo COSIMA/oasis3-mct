@@ -1,0 +1,865 @@
+ \magnification =\magstep1
+\count0=77
+%definitions
+
+%end of definitions
+
+
+\centerline{ Olivier Thual, March 15$^{\rm th}$ 1992}
+\centerline{ Revised version  June 30$^{\rm th}$ 1992}
+ \bigskip
+
+\centerline{\bf SIMPLE OCEAN-ATMOSPHERE INTERPOLATION.}  
+\centerline{\bf PART A: THE METHOD}
+
+\bigskip
+ epi920629-naiva-ot6.tex
+A simple and naive method to interpolate fields between an atmospheric
+and an oceanic grid is presented. This crude method is coded into a set of
+FORTRAN programs, in the expectation  of a more elaborated method which
+takes into account the particular physic of the ocean-atmosphere coupling. 
+
+
+
+\beginsection 1. INTRODUCTION 
+
+The coupling of an atmosphere General Circulation Model (GCM) and an 
+oceanic GCM involves both a temporal coupling,  which  deals  with
+the synchronization and the communication between  the two codes at
+suitable time steps, and a spatial coupling which  deals with the
+interpolations of suitable fields from one GCM grid to another, namely the
+fluxes from the atmospheric to the ocean grid, and the sea surface
+temperature (SST) in the reverse direction.  
+
+
+
+These two aspects of the coupling are presently attacked in parallel in the
+CERFACS Climate Modelling \& Global Change team.  They have started
+with a gathering of all the state of art informations that we have been
+able to record in the Climatic community and that have been summarized
+in [1]. Today, progress has been made  in the two directions.
+
+ In [2], a method based on the communication and synchronization of  UNIX
+processes is developed for the GCMs temporal coupling task. The skeleton
+of a universal ``coupler'' has been written in FORTRAN.
+This software 
+controls all  the exchanges between an oceanic and an atmospheric codes.
+Its present conception allows a simple
+implementation in an already written and tested GCM, with   minimum
+coding changes in it.
+
+
+
+This coupler skeleton includes a black box which will  perform the spatial
+interpolations between the atmospheric and  oceanic grids. Different 
+interpolation schemes can be plugged in this black box, which further
+increases the universality of the coupler.  The fundamental basis for the
+design of an advanced interpolation scheme is presented in [3]. In this
+scheme a particular focus is made on the ``local conservation'' of the
+fluxes when the interpolation from the atmospheric to the oceanic grid is
+performed. It is thought ([3]) than the non-conservation of the fluxes
+might be one of the causes of  the drift problem encountered when two  GCMs,
+individually well tuned, are coupled together. 
+
+
+
+In the expectation of the achievement and coding of this advanced
+interpolation scheme, it has appeared necessary to plug into the coupler
+spatial interpolation black box a simple and quickly written package of
+FORTRAN subroutines  in order to start real size tests of the coupler with
+ GCMs.  The purpose of this letter is to expose the
+``naive'' and crude interpolation method that we have chosen in this spirit.
+It is based on the informations that we have collected in our inquiry on the
+state of the art spread among the climatic community (see [4]) and
+summarized in [1]. 
+
+A basic introduction to the interpolation of data grid points is presented
+in Section 1, and the specific problem of the grid-to-grid interpolation is
+discussed in Section 2. These two sections are finalized by the description
+of the ``naive interpolation method'' that will be plugged into the coupler
+black box. This method have been coded in FORTRAN and is now under a
+testing stage.  The results of the tests will be exposed in Part B of this
+letter. In Section 3, some steps towards the design of a less naive
+grid-to-grid interpolation method are indicated, and could be easily
+implemented in the ``naive method'' FORTRAN software, if they are
+retained as pertinent developments worth the effort.
+
+
+A lot of materials exposed here, at a pedagogical and
+simple level, are presented in a more complete and detailled manner in [3].
+This is the case, for instance, for  the gaussian basis and overlapping of
+Sections 2 and 3, and of the Lagrangian formalism. For furthers details, and
+in particular numerical tests of various interpolation methods in the 1D
+case, the reader is referred to [3].
+
+
+
+
+ 
+
+\beginsection  2.  BASIC FACTS ABOUT INTERPOLATION 
+
+Interpolation is a problem that often occurs in physics, and we all have
+had some experience in it, in a way or another.  Due to the numerous
+approachs that can be found in the literature, I  have chosen to build a
+pedagogical presentation from scratch, restricted to the materials
+necessary to expose the ``naive method''  that I have coded.  Simple
+notations for the indexing of masked grids are given, in order to be used
+in  this presentation. The family  of the linear  interpolations associated to a 
+grid is presented in a formalism focusing  their  functions basis set.
+Several illustrative examples are presented, ending with exposition of the
+``$L$-neighbor naive method''.
+
+
+
+\beginsection 2.1 Grids and masks
+
+Let $r_{lm}= (x _{lm}, y _{lm})$, $ \; l=1,N_1$, $ \; m=1,N_2$ the
+coordinates of a rectangular 2D grid.  In order to define the sea and the
+land, let $M _{lm}$ a $N_1 \times N_2$ matrix called ``mask'' such that,
+for instance,  $M _{lm}=1$ means that  $r_{lm}$ is a ``sea'' grid and  $M
+_{lm}=0$ means that  $r_{lm}$ is a ``land'' grid. In all the present
+discussion, we will only consider the sea points of the grid and discard the
+land points.  If  $N$ is the number of sea grid points  we will denote them
+by $r_i=(x_i, y_i),\; i=1,N$ and no mask  needs to  be mentioned anymore in
+the presentation  of the sea grid. The notion of mask is still useful
+however in the numerical implementation of  algorithms dealing  with
+thoses grids. Another advantage  is the convenient generalization of the
+notations to 1D or 3D grids. 
+
+
+
+
+
+\beginsection 2.2 The linear interpolation family of a grid
+
+The most common meaning of the word interpolation when dealing with a
+grid $(r_i),\;  i=1,N$ with a real  value $(a_i),\; i=1,N$
+ at each point is the
+determination of a function $f(r)$ on the whole space (1D, 2D or 3D
+depending on the case), which allows to extrapolate the values $a_i$'s in
+any point $r$ located on or outside the grid.  
+Note that an interpolation does not necessarily requires $f(r_i)=a_i$. 
+
+
+
+ Any  linear interpolation method can be expressed as
+$$
+f(r)= \sum_{i=1}^{N} a_i \varphi_i(r)
+\eqno(2.1)
+$$
+where the $ \varphi_i(r)$'s are  functions localized around $r_i$ such that,
+for all $r$: 
+$$
+ \sum_{i=1}^{N}\varphi_i(r) dr = 1
+\eqno(2.2)
+$$
+for all $i$. 
+Let us call call these functions ``the basis'' of the interpolation.
+ 
+
+
+For a given grid, the family of all the possible interpolations of the form
+(2.1) is as big as all the possible  choices of the basis functions. 
+The choice of a particular interpolation depends on physical
+considerations, which  depend on  the use that one intends to make 
+of the function $f(r)$. 
+
+
+
+\medskip
+
+Let us  assume that the 
+ general shape of the $ \varphi_i(r)$'s is more or less the same on all
+the grid. This is the case,  for instance, when 
+ a given  $ \varphi_i(r)$ ``covers''
+ roughly the same number of
+neighbors for most of the points of the grid. 
+It  is then  possible to define the ``overlap order'' of an interpolation 
+by looking at 
+how much  the support of the $ \varphi_i(r)$'s overlap, taking into account
+how fast   the absolute  value of $ \varphi_i(r)$.
+
+ There is no need here to
+give a more precise definition that this intuitive concept of ``overlap
+order''. 
+
+\vfill\eject
+
+
+\beginsection 2.3  The ``closest neighbor'' interpolation 
+
+Given a distance in the space where stands the grid, for instance 
+ on  a plane or on a
+sphere),  the ``closest neighbor'' interpolation is such that
+ $f(r)=a_{i(r)}$, where
+  $a_{i(r)}$  is the  value data at the closest neighbor 
+ $r_{i(r)}$, i.e. the grid point which minimizes the
+distances $(|r-r_i|), \; i=1,N$.  
+
+
+
+This  interpolation can be expressed under the form (2.1) with
+$\varphi_i(r)$ being 1 on the open domain $S_i$ of all the points
+$r$ which admit $r_i$ as their closest neighbor and  $|S_i|$  its area.  It
+is  1/2 on the boundary  of this domain for the  points at equal distance
+from 2 grid points, 
+1/4 at the ``corners'' at equal distance of 4 grid points, and so on.
+  It is zero outside of the domain $S_i$. 
+
+
+
+The overlap order of this interpolation is zero, because the support domains
+$S_i$ of the basis functions do not intersect.  The function $f(r)$  of this
+interpolation is discontinuous. 
+
+\vfill\eject
+
+\beginsection 2.4 Familiar Interpolations
+
+The linear interpolation is simple to understand on a 1D grid. Given $N$
+values  $(a_i) i=1,N$ at the  real  points $(x_i),\; i=1,N$ the linear
+interpolation reads:
+$$
+f(x)=(a_{i+1}-a_i) { x-x_i \over x_{i+1} - x_i }  + a_i
+\qquad \hbox{if} \quad x\in [x_i, x_{i+1}] \;,
+\eqno(2.3)
+$$
+i.e.  a piece linear function such that $f(x_i)=a_i$ for all points.
+
+
+
+Simple algebraic manipulations show that  this interpolation  can be put
+under the form (2.1) with 
+$$
+\varphi_i(x)=\left\{\matrix{ 
+{x-x_{i-1}\over  x_{i}-x_{i-1} }
+\qquad \hbox{if} \quad x\in [x_{i-1}, x_{i}]  \cr
+{x-x_{i+1}\over  x_{i}-x_{i+1} }
+\qquad \hbox{if} \quad x\in [x_{i}, x_{i+1}]  \cr
+0
+\qquad \hbox{elsewhere}}  \right.
+\eqno(2.4)
+$$
+This function is equal to one at $x_i$, zero at the point $x_{i-1}$ and
+$x_{i+1}$ and outside $ [x_{i-1}, x_{i+1}]$, and is piecewise linear on two
+intervals. 
+ 
+
+
+
+\bigskip
+
+The linear interpolation on a 2D grid $r_{lm}=(x_{lm},y_{lm})$ can also be
+put under the form
+$$
+f(r)= \sum_{l,m} a_{lm} \varphi_{lm}(r)
+\eqno(2.5)\;,
+$$
+with $\varphi_{lm}(r)$ equal to one at $r_{lm}$, zero at  the four points
+$r_{l-1,m-1}$,  $r_{l+1,m-1}$,  $r_{l+1,m+1}$,  $r_{l-1,m+1}$ and outside
+the  polygon that they form, and piecewise linear on four triangles that
+they make with $r_{lm}$.
+
+
+
+\bigskip
+
+It can be said that the overlap order of the linear interpolation is one,
+as two basis functions can overlap on one grid mesh.  It is intuitive to say
+that the higher the overlap, the smoother the interpolation.  
+I will not try  to consider  here interpolations like quadratic interpolations 
+or splines, which certainly enter into the form (2.1). 
+
+  
+
+\beginsection 2.5 ``Unique weight function'' interpolation 
+
+Instead I will study a very natural interpolation base on the choice  of a
+``weight function''  $\phi(u)$, which can be, as an example, a gaussian:
+$$
+\phi(u)= e^{-{u^2 \over 2\sigma^2}} \;.
+\eqno(2.6)
+$$
+The normalization constant in front of the  exponential can be anything as 
+will be seen below.  
+
+
+
+With the choice of a ``weight function''  one  can define the  interpolation 
+$$
+f(r)= {1\over Z(r)} \sum_{i=1}^{N} a_i\;  \phi(r-r_i)\;,
+\eqno(2.7)
+$$
+where 
+$$
+Z (r)=  \sum_{i=1}^{N}  \phi(r-r_i)\;,
+\eqno(2.8)
+$$
+to ensure (2.2).
+This function $Z(r)$ depends on the geometry of the grid and on the weight
+function $\phi$, and its graphic visualization might give some valuable
+information about the  chosen method.  The same remark holds for the
+individual $ \varphi_i(r) =  \phi(r-r_i) /Z(r)$.
+
+
+\vfill\eject
+
+
+\beginsection 2.6 The ``$L$ neighbors naive interpolation''
+
+The numerical  implementation of the above ``unique weight''  interpolation
+is simple to code, but it costs of order $N$ operation for each   point $r$
+where the value of $f(r)$ is  calculated.  In order to save computing time
+this interpolation can be approximated  or mimiced by what I call the
+``naive method of order $L$'':
+$$
+f(r)={1\over Z(r)}   \sum_{m\in I(r)}  a_i \; \phi(r-r_m)
+\eqno(2.9)
+$$
+where $I(r)=\{ i_1(r), i_2(r), ..., i_L(r) \}  $ is the set containing the 
+indices of the  $L$ closest neighbors of $r$. The function $Z(r)$ ensures,
+as usual, that the sum of the weights is one, and is here:
+ $$
+Z(r)=  \sum_{m\in I(r)}   \phi(r-r_m)
+\eqno(2.10)
+$$
+This function should also be worth graphic plots for various choices of the  
+integer $L$ and the  variance of $\phi$ ($\sigma$ for the gaussian).
+
+
+
+\medskip
+
+This  ``naive interpolation'' can also be expressed  under the form (2.1),
+with 
+$$
+\varphi_i(r) =\left\{\matrix{   \phi(r-r_m)/Z(r) \qquad \hbox{if} \quad
+r \in  S^L_j  \cr
+0  \qquad \qquad \hbox{elsewhere}} \right.   
+\eqno(2.11)
+$$
+where $S_j^L$   is the   domain of all the points $r$ which admit the grid
+point $r_j$ in the list  of the $L$ closest neighbors.  The values at the
+boundary has to be adjusted as for the ``closest neighbor'' interpolation,
+which   is the particular case $L=1$ and $\phi=1$.
+
+
+
+
+
+
+
+\beginsection 3. GRID-TO-GRID INTERPOLATION
+
+There is a big difference between the interpolation from a set of data on a
+grid to a function $f(r)$ defined everywhere, and a grid-to-grid
+interpolation. In a grid-to-grid interpolation, a set of data is given on a
+first grid, the ``source grid'', and the interpolation must generate from
+these a set of data on a new grid, the ``target grid''. This  problems occurs
+in the ocean-atmosphere coupling problem where fluxes must be transmitted
+from the atmospheric grid to the oceanic grid, and sea surface temperature
+(SST) 
+from the oceanic grid to  the atmospheric grid. 
+ Of course, given an interpolation  on the source grid, one can apply the
+interpolated function $f(r)$ at each point of the target grid to define a
+grid-to-grid interpolation. But this choice can be extended through a
+Lagrangian formalism where the grid-to-grid interpolation depends on an
+interpolation on the source grid and also an interpolation of the target
+grid. Indeed the grid-to-grid interpolation depends on what the physicist
+intends to do with the interpolated values, and this can generally be
+expressed through the definition of an interpolation on the target grid. 
+These considerations will guide the choices of the parameters of our ``naive''
+grid-to-grid interpolation (number of neighbors and variance).  
+
+\vfill\eject
+
+
+\beginsection 3.1 Sea domains and Ocean-Atmosphere coupling
+
+The grid of an Atmospheric General Circulation Model (AGCM)  is made  of
+``land points'' and ``sea points''. The grid of an Oceanic General Circulation
+Model (OGCM)  is, by definition, only made of ``oceanic points''.  The AGCM
+``sea points''  and the OGCM ``oceanic points''  generally do not coincide,
+except  when the same grids  has been chosen. 
+
+
+
+The fluxes of the AGCM are known at all  the points, land or sea, and one of
+ the 
+task of the coupler is to interpolate them for  the OGCM grid. 
+This can be done
+either by using all the  grid,  with no distinction between land and sea
+points, or only taking into account the sea points. This last point is still
+under debate.  There is no such a choice
+however when passing the sea surface temperature (SST) of the OGCM  grid
+to the AGCM ``sea points''.
+
+
+
+In all these cases, it is possible to denote by  by $(r^a_i),\; i=1,N^a$ the
+``source grid'' on which are known the data and $(r^b_i),\; i=1,N^b$ the
+``target grid'' on which the interpolated values must be calculated.  The
+two domains of the two grids are likely to  have  a large intersection and
+sometimes a not so small differences (the complementary of  the
+intersection in the reunion of the the two domains).  The influence of the 
+difference set of the two grids in a grid-to-grid interpolation  will be
+investigated in Part B of this letter,  through numerical tests. 
+
+
+
+\beginsection 3.2  Lagrangian formalism
+
+A grid-to-grid interpolation always assumes, even  if  not said, the
+choice of an interpolation  on the  source  grid as well as on the target
+grid.  
+
+
+
+Let 
+$$
+f(r)=\sum_{i=1}^{N^a} a_i \varphi_i(r) 
+\eqno(3.1)
+$$
+a chosen interpolation on the source grid A defined by the points $(r^a_i),\;
+i=1,N^a$,  at which the values $a_i$ are known. 
+
+
+
+Let 
+$$
+g(r)=\sum_{j=1}^{N^b} b_i \psi_j(r) 
+\eqno(3.2)
+$$
+a chosen interpolation on the target grid B defined by the points $(r^b_i),\;
+j=1,N^b$,  at which the values $b_i$ are unknown an to be calculated
+through a grid-to-grid interpolation.  
+
+
+
+Such a grid-to-grid interpolation can be defined by the minimization of
+the Lagrangian:
+$$
+L(b_1, b_2, ..., b_{N^b}) =  \int [f(r)-g(r)]^2  dr \;.
+\eqno(3.3)
+$$
+The integral is on all the domain, owing the fact that the $
+\varphi_i(r)$'s can be zero outside their support. 
+It is natural to minimize this Lagrangian  in order to  have $f(r)$ as close
+as possible of $g(r)$. 
+The set of coefficients $(b_j),\; j=1,N^b$ which  realizes this minimization
+is found by saying that all the partial derivatives $\partial L / \partial
+b_j$ vanish. Some straightforward algebraic manipulations show that this
+lead the  $N^b$ linear equations:
+$$
+2 \sum_{j=1}^{N^b}  < \psi_m | \psi_j > b_j 
+=2 \sum_{i=1}^{N^a}  < \psi_m | \varphi_i> a_i 
+\qquad \hbox{for} \quad m=1,N^b
+\eqno(3.4)
+$$
+where 
+$$
+  < \psi_m  |\psi_j > = \int    \psi_m (r)\psi_j(r) dr  =:  V_{mj}
+\eqno(3.5) 
+$$
+and 
+$$
+  < \psi_m |  \varphi_i > = \int    \psi_m (r)\varphi_i(r) P(r) dr  =:  U_{mi}
+\;.
+\eqno(3.6) 
+$$
+
+
+
+In order to find the $N^b$ values $b_j$'s, one has to invert the linear
+system $VB =  UA$:
+$$
+\sum_{j=1}^{N_b} V_{ml}\;  b_j =   \sum_{i=1}^{N_a}  U_{mi}\;  a_i
+\qquad\hbox{for}\quad m=1,N^b
+\eqno(3.7)
+$$
+
+
+
+The inversion of the $N_b$ x $N_b$  matrix $V$ is  possible if  the
+$\psi_j$'s are a good basis, and the grid-to-grid interpolation finally
+reads: $B=V^{-1}U    A$. 
+
+
+
+
+
+\beginsection 3.3 The choice of the two grid interpolations
+
+
+
+Choosing the ``closest neighbor'' interpolation for the target grid, in the
+above formalism,  lead to a very easy implementation of the method because
+the matrix $V$ is equal to  unity.  The interpolation chosen on the source
+grid (grid A) is  then the  only one  which determines the grid-to-grid
+interpolation and reads:
+$$
+b_j= \sum _{i=1}^{N^a}  a_i  \overline{\varphi_i}^{S_j}(r_j^b)
+\eqno(3.8)
+$$
+where
+$$
+\overline{\varphi_i}^{S_j}(r_j^b)=  \int_{S_j} \varphi_i(r)
+\eqno(3.9)
+$$
+is the  average of   $\varphi$ on the  ``closest neighbor'' cell surrounding
+$r_j$.  When the variance of $\varphi_i$ is large compared to the size of
+this  domain,  this average is close to its value at $r_j$ and we have 
+approximatively $b_j\sim f(r_j)$.  On the contrary, if  this variance is 
+small compared  to the size of the ``closest neighbor''  cells of the  target
+grid (grid B),  the grid-to-grid interpolation is approximatively the trivial
+interpolation for which all the $b_j$'s are equal to the mean value 
+$\sum_i a_i$.
+
+
+
+
+\bigskip
+
+
+Having this in  mind, I want to express here some  intuitive  ideas  about
+the choice of the source and target grid interpolation, when building a
+grid-to-grid interpolation with the above Lagrangian formalism. Let us
+consider three situations.
+
+\medskip
+
+
+
+\item{*} {\bf  Coarse to thin grid}. If the source grid A is coarser that the 
+target grid B, it seems natural  to choose the ``closest neighbor''
+interpolation on grid B. On grid A, one feels that  an smooth interpolation 
+with an ``overlap order'' which is be 2 or 5 times
+ to the thinest ratio of the
+two grids, i.e., the ratio of the average mesh size  of the coarse grid A over
+the average mesh size  of the thin grid B. 
+
+\medskip
+
+ \item{*} {\bf Thin to coarse grid}. It the source grid A is thiner that the 
+target grid B. One can still try to choose the ``closest neighbor''
+interpolation on grid B. 
+On grid A, one feels that  an smooth interpolation  with an ``overlap order''
+which is roughly equal to the coarsest ration of the two grid, i.e., the ratio
+of the average mesh size  of the thin grid A over the average mesh size  of
+the coarse grid B. 
+
+
+
+
+
+\beginsection 3.4 The grid-to-grid  ``naive'' method
+
+All the above considerations have been addressed in order to explain the 
+grid-to-grid  ``naive'' method that is  being build as a temporary  modulus, 
+waiting for a  less naive  method  to be coded. 
+
+
+
+In this naive method the fluxes $b_j$ on the ocean grid B $(r^b_j),\;  j=1,N^b$ 
+are  obtained  from the fluxes $a_i$ of the atmospheric grid A $(r^a_i),\;
+i=1,N^a$  simply by applying the $L^a$ neighbors $\sigma_a$-gaussian
+interpolation with :
+ $$
+b_j={1\over Z^a(r^b_j)}   \sum_{m\in I(r^b_j)}  a_i  e^{-{(r^b_j-r^a_m)^2
+\over 2 \sigma_a^2} }
+\eqno(3.10)
+$$
+where $I(r^b_j)=\{ i_1(r^b_j), i_2(r^b_j), ..., i_{L^a}(r^b_j) \}  $ is the set
+containing the  indices of $L^a$ closest neighbors A-grid points $r^a_m$
+of the B-grid point $r^b_j$, and   
+$$
+Z^a(r^b_j) =  \sum_{m\in I(r^b_j)}   e^{-{(r^b_j-r^a_m)^2 \over 2
+\sigma_a^2} }\;.
+\eqno(3.11)
+$$
+
+
+
+\medskip
+
+When interpolating the SST (sea surface  temperature) for the oceanic grid 
+B to the atmospheric grid, the same principle is applied with 
+the $L^b$ neighbors $\sigma_b$-gaussian interpolation:
+ $$
+a_i={1\over Z^b(r^a_i)}   \sum_{m\in J(r^a_i)}  b_i  e^{-{(r^a_i-r^b_m)^2
+\over 2 \sigma_b^2} }
+\eqno(3.12)
+$$
+where $J(r^a_i)=\{ j_1(r^a_i), j_2(r^a_i), ..., i_{L^b}(r^a_i) \}  $ is the set
+containing the  indices of $L^b$ closest neighbors B-grid points $r^b_m$
+of the A-grid point $r^a_i$, and
+$$   
+Z^b(r^a_i) =  \sum_{m\in J(r^a_i)}   e^{-{(r^a_i-r^b_m)^2 \over 2
+\sigma_b^2} }
+\eqno(3.13)
+$$
+
+\vfill\eject
+
+
+\bigskip 
+
+The adjustable parameters of this ``naive method'' are the two integers
+$L^a$ and $L^b$ and the two variances $\sigma_a$ and $\sigma_b$.  For a
+given couple of grids A and B, their choice can be guided by the above 
+analysis base on the Lagrangian formalism. 
+
+
+
+If Grid B is thiner than Grid A, which is the case for the
+Ocean-Atmosphere coupling, it is reasonable to choose $L^a$ or order 10
+and $\sigma_a$ of the order of the average mesh of grid A. In the  above
+formalism of the Lagrangian interpolation, this choice corresponds to 
+the $L^a$ neighbors $\sigma_a$-gaussian interpolation on Grid A,  i.e.,
+and the ``delta-comb'' interpolation on Grid B, i.e., the choice of delta
+function for the $\psi_j$'s.  The inverse Grid B to Grid A interpolation can
+be expressed the same way, but with a different choice of $L^b$. Indeed, it
+seems natural to choose $L^b$ such that $L^b/L^a$ is of the order of the
+ratio between the A-grid and B-grid average mesh size, and $\sigma_b$ of
+the order of $\sigma_a$. With this choice a composition between a A to B
+and B to A grid interpolation is close to the Identity, which is a reasonable
+criteria to impose when no other information is assumed on the nature of
+the fields to be interpolated. 
+
+
+
+
+
+
+
+\beginsection 4. TOWARD A LESS NAIVE METHOD
+
+For the case of Ocean-Atmosphere coupling, information is known about
+the structure of the flux or SST fields to interpolated, and about the
+geometry of the   grid. The naive method should be thus replaced by
+grid-to-grid interpolations adapted to the specific physical problem of the
+Ocean-Atmosphere coupling. These interpolation have to be  tuned in order
+to answer specific quality criteria, imposed by physical arguments.  This
+tuning can be achieved through the choice of the basis functions  the
+source grid interpolation (the Atmospheric grid when passing fluxes, and
+the Oceanic one when passing the SST).  Constraints like the conservation
+of the global integral of fluxes can be satisfied by adding Lagrange
+multipliers in the Lagrangian  formalism. At last, a choice of the target
+grid  interpolation, different from the ``Dirac comb'' interpolation can be
+necessary. In this last case the inversion of the matrix $V$ of Equation
+(3.6) has to be done once for all, and the multiplication by $V^{-1}$, which
+is generally not sparse, has to  be performed for each new field to be
+interpolated.  The numerical computation of the elements of $U$ by
+Monte-Carlo techniques is briefly discussed.  
+
+
+
+\beginsection 4.2 Inhomogeneous and anisotropic interpolation
+
+The choice of the interpolation basis $\varphi^a_i(r)$ and $\varphi^b_j(r)$
+of the grid A and B considered as source grids (i.e. when interpolating
+fluxes or SST respectively), can be tuned in function of the geometry of
+the two grids, and the knowledge of the  physical structure of the fields to
+interpolate. For instance, some anisotropy could be given to these
+functions if the fields have a higher correlation in a particular direction
+(e.g. in latitudinal direction  on  the sphere).  Near the edges of the two
+grids, i.e. the costs, a special choice of the basis function, adapted to the
+geometry or the physical processes should be performed.  
+
+
+
+\beginsection 4.3 Lagrangian formalism with constraints
+
+When passing the flux of a quantity, like heat for instance, from the
+atmospheric grid to the oceanic grid it might be important to ensure that
+the amount of  the heat lost by the AGCM is  equal to the heat received by
+the OGCM.  This conservation can be implemented by imposed one  or
+several constraints in the definition of the interpolation. 
+
+
+
+Taking the notation of the Langragian formalism of Section 3, the
+constraints 
+$$
+\int f(r) dr = \int g(r) dr
+\eqno(4.1)
+$$
+defines a new grid-to-grid  interpolation  obtained by minimizing
+$$
+L(b_1, b_2, ..., b_{N^b})
+ =  \int [f(r)-g(r)]^2  dr + \lambda \int [f(r)-g(r)]  dr
+\eqno(4.2)
+$$
+where $\lambda$ is a Lagrangian multiplier. 
+
+
+
+With this constraint, Equation (3.4) is now replaced by the system
+$$
+\left\{
+\eqalign{ 
+ 2 \sum_{j=1}^{N^b}  < \psi_m | \psi_j > b_j 
+=&2 \sum_{i=1}^{N^a}  < \psi_m | \varphi_i> a_i - \lambda < \psi_m | 1 > 
+ \qquad \hbox{ for all } \quad m=1,N^b \cr
+ \sum_{j=1}^{N^b}
+  < \psi_j | 1 > b_j  =&  \sum_{i=1}^{N^a}  < \varphi_i | 1 >
+a_i
+} \right. 
+\eqno(4.3)
+$$
+where 
+$$
+< \psi_j | 1 > = \int \psi_j dr = : H_j
+\eqno(4.4) 
+$$
+and 
+$$
+< \varphi_i | 1 > = \int \varphi_i dr = : G_j
+\eqno(4.4) 
+$$
+
+Equation (3.7) is now replaced by a system $VB=UA-\lambda H$ with $HB=
+GA$:
+$$
+\left\{
+\eqalign{
+\sum_{j=1}^{N_b} V_{ml}\;  b_j =&   \sum_{i=1}^{N_a}  U_{mi} \; a_i - \lambda 
+G_m
+\qquad\hbox{for}\quad m=1,N^b  \cr
+\sum_{j=1}^{N^b}  H_j \; b_j  =&  \sum_{i=1}^{N^a}  G_i\; a_i 
+}\right.
+\eqno(4.5)
+$$
+
+
+
+This system is solved by first inverting the matrix $V$, which leads to the
+system $B=V^{-1}UA-\lambda V^{-1}H$ with $HB= GA$, and by
+eliminating $\lambda$. Let us denote $B^*= V^{-1}UA$, which is  the value
+of the coefficients that would be obtained without the constraint, and plug
+$B=B^*- \lambda V^{-1}H$ in the second equation. This gives the value of
+the Lagrange multiplier 
+$$
+\lambda= { H B^* - G A \over G V^{-1}H} \;
+\eqno(4.6)
+$$
+which gives a measure of how strongly the constraint is violated by the first
+guess $B^*$. This violation error is redistributed in the solution of the
+problem:
+$$
+\eqalign{
+B=& B^* - {H B^* - G A \over H V^{-1}H} V^{-1}H  \cr
+=& V^{-1}UA - {H V^{-1}UA - G A \over H V^{-1}H} V^{-1} H   \;.}
+\eqno(4.7)
+$$
+
+
+
+
+
+\beginsection 4.3 Practical considerations
+
+For the practical implementation of the interpolation methods which are
+derived from a Lagrangian formalism, one needs to know the numerical
+values of the quantities $V_{mj}=~~~<\psi_m | \psi_j> $,  $U_{mi}=  <\psi_m |
+\phi_i> $,   $H_m= <\psi_m | 1> $ and $G_i= <\varphi_i | 1> $. Even for the
+next neighbor interpolation basis, the numerical evaluation of these
+numbers is not straightforward. The complexity of this problem, however,
+do not exceed the one of the determination of the double integral  of an
+arbitrary function, which is an often encountered problem in physics. 
+Various methods can be found depending of the particular situation. 
+
+
+One of them is the evaluation of these integrals through Monte-Carlo
+techniques. For instance, if the functions $\psi_m$'s are the next neighbor 
+interpolation basis, the $H_m$'s are the surfaces of the non-intersecting
+domains $S_m$'s (see Section 2.3). If the surfaces of the grid meshes are
+known,  and if the grid is not too distorted (in a sense to be defined later), 
+it is possible to reduce the number of random shootings. Inside each  grid
+mesh formed by the four grid points $r_1$, $r_2$, $r_3$ and $r_4$, one
+can choose at random, with  a uniform probability, a big number of points. 
+For each of these  points $r$, it is only necessary to calculate the four
+values $\psi_1(r)$, $\psi_2(r)$, $\psi_3(r)$ and $\psi_4(r)$, associated to
+the four grid points at the corners of the mesh,   provided that  the grid is
+not too much distorted (by definition).  If so, the random point has to be
+chosen uniformly on a surface larger than the considered mesh. The same
+algorithm can be apply for the calculation the the $U_{mi}$'s. If the
+$\varphi_i$'s are the basis function of the $L$-closest neighbors
+interpolation,  this algorithm can be generalized.
+
+\vfill\eject 
+
+\beginsection 5. CONCLUSION
+
+The goal of this letter was to expose the ``naive'' grid-to-grid 
+interpolation  method that I have coded for the interpolation black box of
+the coupler.  For each point of the target grid, the algorithm search for its
+$L$-closest neighbor and calculates weight coefficients through the
+evaluation of a 
+gaussian function. This has to be done once for all, given a couple of grid,
+the addressed and the weight coefficients being the only information to be
+stored.  If $L$ is not big, this storage is not huge, and  the number of
+operation is also reasonable.  Test of this methods with several type of 
+grids will be presented in Part B. 
+
+In fact, the rough exposition  of the method could have been done quite
+more shortly if this  had been the only  considered goal.  But  the different
+formalisms presented in this letter are candidate to provide a framework
+to the intuitive ideas that one often   generates when dealing with this
+interpolation problem.  It can also be useful to try to translate into these
+formalisms more complicated interpolation methods, and, if not possible, 
+to see which  of their features do not enter in this framework. 
+
+
+
+\bigskip
+
+\noindent {\bf Acknowledgments:}  I thank all the participants of the ``Adm
+\& Science Team Meeting'' of March 11th, for their  remarks which have
+useful for the drafting of  this letter. 
+
+
+
+\beginsection REFERENCES
+
+\def\ref{\parskip 12pt \leftskip 20pt \parindent -20pt} 
+\def\endref{\parskip 0pt \leftskip 0pt \parindent 20pt}
+
+
+
+\ref
+[1]
+O. THUAL, Gathering information for a coupler,
+ {\it Epicoa \ } {\bf 1009} (1991).
+
+
+
+[2]
+ L. TERRAY, A simple communication scheme between coupler and GCM's, 
+ {\it Epicoa \ } {\bf 0203}  (1992). 
+
+
+
+[3]
+N. H. BARTH,  A Conservative Scheme for Passing Variables Between
+Coupled Models of the Ocean an Atmosphere,
+ {\it Technical Report\ }, CERFACS (1992).
+
+
+
+[4] ``Appel d'id\'ees pour la cr\'eation du coupleur du mod\`ele
+ communautaire'', written by  L. Terray,  October 10th 1991. 
+
+
+
+\endref
+
+
+
+\end
+
+
+
+
+

@@ -1,0 +1,26 @@
+
+- should encapsulate var, partition, coupling data in a datatype and
+  make them allocates, not static with max.
+- need to read namcouple and bcast
+- support partitions 0,1,2,3 as before + 4 which is list of points where
+  kparal(1) = 4
+  kparal(2) = npoints
+  kparal(3:npoints+2) = list of points in global index
+- need to fix mpi2 initialization in prism_method_init
+- need time manager
+- need variable seq support
+- initialization order, nulprt, mpi, compid
+
+- do we want private module variables with get/put
+  do we want public module variables with naming convention
+
+fields in namcouple that don't appear in model def_var are ignored.
+fields in def_var that don't appear in namcouple are ignored.
+fields in def_var that don't result in an action via namcouple and other models' def_var are ignored.
+
+
+once a coupling is established, both the get and put sides MUST
+  get and put EVERY variable on at least the coupler period.
+
+want to add mapping option to output and input (needs extensions to namcouple first)
+

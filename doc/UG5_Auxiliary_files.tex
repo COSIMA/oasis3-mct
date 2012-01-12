@@ -1,0 +1,399 @@
+\newpage
+\chapter{OASIS3 auxiliary data files}
+\label{sec_auxiliary}
+
+OASIS3 needs auxiliary data files describing coupling and I/O field
+names and units, defining the grids of the models being coupled,
+containing the field coupling restart values or input data values, as
+well as a number of other auxiliary data files used in specific
+transformations. 
+
+\section{Field names and units}
+\label{subsec_cfnametable}
+
+The text file \texttt{cf\_name\_table.txt}, that can be found in
+directory \texttt{oasis3/examples/toyoasis3/}\newline {\tt input}
+directory, contains a list of CF standard names and associated units
+identified with an index. The appropriate index has to be given by the
+user for each coupling or I/O field as the third entry on the field
+first line (see \ref{subsec_namcouplesecond}). This information will
+be used by OASIS3 for its log messages to {\it cplout} file and by the
+PSMILe to produce CF compliant NetCDF files.
+
+\section{Grid data files}
+\label{subsec_griddata}
+
+The grids of the models being coupled must be given by the user, or
+directly by the model through PSMILe specific calls  in grid data files. Note that if the 
+grid data files exist in the working directory, they are not overwritten by the
+PSMILe specific calls (see section
+\ref{subsubsec_griddef}). These files can be all
+binary or all NetCDF. In \break {\tt
+oasis3/examples/toyoasis3/data},
+Net\-CDF examples can be found.
+
+The
+arrays containing the grid information are dimensioned {\tt (nx, ny)},
+where {\tt nx} and {\tt ny} are the grid first and second dimension,
+except for Unstructured (U) and Reduced (D) grid, for which the
+arrays are dimensioned {\tt (nbr\_pts,1)}, where {\tt nbr\_pts} is the
+total number of grid points. 
+
+\begin{enumerate}
+
+\item {\em grids} or {\em grids.nc}: contains the model grid
+  longitudes, latitudes, and local angles (if any) in single or double
+  precision {\tt REAL} arrays (depending on OASIS3 compilation
+  options). The array names must be composed of a prefix (4
+  characters), given by the user in the {\it namcouple} on the second
+  line of each field (see section \ref{subsec_namcouplesecond}), and
+  of a suffix (4 characters); this suffix is ``.lon'' or ``.lat'' for
+  respectively the grid point longitudes or latitudes (see {\tt
+    oasis3/src/mod\_label.F90}.)
+
+  For {\tt SCRIPR} interpolations, the grid data files must be NetCDF
+  files. If the {\tt SCRIPR/CONSERV} remapping is used, longitudes and
+  latitudes for the source and target grid {\bf corners} must also be
+  available in the {\em grids.nc} file as arrays dimensioned {\tt
+    (nx,ny,4)} or {\tt (nbr\_pts,1,4)} where {\tt 4} is the number
+  of corners (in the counterclockwize sense). The names of the arrays
+  must be composed of the grid prefix and the suffix ``.clo'' or
+  ``.cla'' for respectively the grid corner longitudes or latitudes.
+  As for the other grid information, the corners can be provided in
+  {\em grids.nc} before the run by the user or directly by the model
+  through PSMILe specific calls (see section \ref{subsubsec_griddef}).
+  For source grids of Logically Rectangular LR type only, the
+  grid corners will however be automatically calculated and stored by
+  OASIS if they are not initially available in {\em grids.nc}\footnote{Tip: 
+  to automatically calculate the corners of a Logically Rectangular LR target
+  grid, use the corresponding reverse remapping in which the current
+  target grid becomes the source grid.}.
+ 
+ Longitudes must be given in degrees East in the interval -360.0 to
+ 720.0. Latitudes must be given in degrees North in the interval -90.0
+ to 90.0. Note that if some grid points overlap, it is recommended to
+ define those points with the same number (e.g. 360.0 for both, not
+ 450.0 for one and 90.0 for the other) to ensure automatic detection
+ of overlap by OASIS. 
+ 
+ The corners of a cell cannot be defined modulo
+ 360 degrees. For example, a cell located over Greenwich will have to be defined
+ with corners at -1.0 deg and 1.0 deg but not with corners at 359.0 deg and 1.0 deg.
+ 
+ Cells larger than 180.0 degrees in longitude are not supported. 
+
+ If vector fields are defined on a grid which has a local coordinate
+ system not oriented in the usual zonal and meridional directions, the
+ local angle of the grid coordinate system must be given in {\it
+   grids.nc} file in an array which name must be composed of the grid
+ prefix and the suffix ``.ang''. The angle is defined as the angle
+ between the first component and the zonal direction (which is also
+ the angle between the second component and the meridional direction).
+ For example, the angles of the {\tt torc} grid are given in array {\tt torc.ang} in the grids.nc file in {\tt oasis3/examples/testinterp/} \newline {\tt input}.
+ If one of the {\tt SCRIPR} interpolations is requested for a vector
+ field, OASIS3 automatically performs the rotation from the local
+ coordinate system to the geographic spherical coordinate system for a
+ source grid, or vice-versa for a target grid.
+ 
+ File {\em grids} or {\em grids.nc} must be present with at least the grid
+ point longitudes and latitudes for all component model. 
+
+\item {\em masks} or {\em masks.nc}: contains the masks for all
+  component model grids in {\tt INTEGER} arrays (0 -not masked i.e.
+  active- or 1 -masked i.e. not active- for each grid point). The
+  array names must be composed of the grid prefix and the suffix
+  ``.msk''. This file, {\em masks} or {\em masks.nc}, is mandatory.
+
+\item {\em areas} or {\em areas.nc}: this file contains mesh surfaces
+for the component model grids in single or double precision {\tt REAL}
+arrays (depending on OASIS3 compilation options). The array names must be
+composed of the grid prefix and the suffix ``.srf''.  The surfaces may
+be given in any units but they must be all the same (in {\tt
+INTERP/GAUSSIAN}, it is assumed that the units are $m^2$ but they are
+used for statistics calculations only.) This file {\em areas} or {\em
+areas.nc} is mandatory for {\tt CHECKIN}, {\tt CHECKOUT} or {\tt
+CONSERV}, and used for statistic calculations in {\tt
+INTERP/GAUSSIAN}; it is not required otherwise.
+
+\item {\em maskr} or {\em maskr.nc}: {\it (this file is obsolete with the 
+current OASIS3 version and should not be used anymore)} this file
+  contains Reduced (D) grid mask in {\tt INTEGER} arrays dimensioned
+  {\tt array(nbr\_pts)} where {\tt nbr\_pts} is the total number of the
+  Reduced grid points (0 -not masked- or 1 -masked- for each grid
+  point). This file is required only for grids to which the {\tt
+  REDGLO} or {\tt GLORED} transformation is applied. {\it As mentionned above,
+  these transformations should not be used anymore as interpolations
+  are now available for Reduced grids directly.} If used, the mask
+  array name must be ``MSKRDxxx'' where ``xxx'' is half the number of
+  latitude circles of the reduced grid (032 for a T42 for example).
+  
+\end{enumerate}
+
+If the binary format is used, {\em grids}, {\em masks}, {\em areas},
+and {\em maskr} must have the following structure. The array
+name is first written to
+the file to locate a data set corresponding to a given grid.  The
+data set is then written sequentially after its name.  Let us call
+``brick'' the name and its associated data set.  The order in which
+the bricks are written doesn't matter.  All the bricks are written in
+the grid data file in the following way:
+
+\begin{verbatim}
+        ...
+        WRITE(LU) array_name
+        WRITE(LU) auxildata
+        ...\end{verbatim} where
+\begin{itemize}
+\item {\tt LU} is the associated unit,
+\item {\tt array\_name} is the name of the array (CHARACTER*8),
+\item {\tt auxildata} is the REAL or INTEGER array dimensioned {\tt
+  (nx, ny)} or {\tt (nbr\_pts,1)} containing the grid data.
+\end{itemize}
+
+%subsection{Grid data files}
+
+\section{Coupling restart files}
+\label{subsec_restartdata}
+
+At the beginning of a coupled run, some coupling fields may have to be
+initially read from their coupling restart file on their source grid (see section \ref
+{subsubsec_Algoritms}). When needed, these files are also automatically
+updated by the last {\tt prism\_put\_proto} call of the run (see
+section \ref{prismput}) .  To force the writing of the field in its
+coupling restart file, one can use the routine {\tt
+  prism\_put\_restart\_proto} (see section \ref{subsec:auxiliary}).
+{\bf Warning}: the date is not written or read to/from the restart file;
+therefore, the user has to make sure that the appropriate restart file
+is present in the working directory.
+
+Note that all restart files have to be present in the working directory at the beginning of the
+run even if one model is delayed with respect to the others.
+
+The name of the coupling restart file is
+given by the 6th character string on the first configuring line for
+each field in the {\em namcouple} (see section
+\ref{subsec_namcouplesecond}). Coupling fields coming from different
+models cannot be in the same coupling restart files, but for each
+model, there can be an arbitrary number of fields written in one
+coupling restart file. (Note that in the NONE techniques, output files
+with the same format are also created for writing the resulting field
+after transformation.)
+
+In the coupling restart files, the fields must be provided on the source grid in single or double
+precision REAL arrays (depending on PSMILe and OASIS3 compilation
+options) and, as the grid data files, must be dimensioned {\tt (nx,
+ny)}, where {\tt nx} and {\tt ny} are the grid first and second
+dimension, except for fields given on Unstructured ('U') and Reduced
+('D’) grid, for which the arrays are dimensioned {\tt (nbr\_pts,1)},
+where {\tt nbr\_pts} is the total number of grid points.  The shape
+and orientation of each restart field (and of the corresponding
+coupling fields exchanged during the simulation) must be coherent with
+the shape of its grid data arrays. 
+%The exceptions are for A, B, G,
+%L, Z, or Y grids for which the field may be oriented from North to
+%South and/or from East to West, in which case, {\tt INVERT}
+%transformation will have to be used - see section
+%\ref{subsec_preproc}.
+
+Both binary and NetCDF formats are supported; for NetCDF file the
+suffix .nc is not mandatory. If the coupling restart file
+for the first field is in NetCDF format, OASIS3 will assume that all
+coupling restart files (and output files for {\tt NONE}
+communication techniques) are NetCDF\footnote{Note that even if the grid
+auxiliary data files are in NetCDF format, the restart coupling files
+may be in binary format, or vice-versa.}. 
+
+In the NetCDF restart files, the field arrays must have the source symbolic
+name indicated in the {\em namcouple}, except for {\tt IGNORED} fields for which the target symbolic name must be used.
+(see section \ref{subsec_namcouplesecond}).
+
+In binary restart file, each field is written in the following way:
+\begin{verbatim}
+        ...
+        WRITE(LU) array_name
+        WRITE(LU) restartdata
+        ...\end{verbatim} where
+\begin{itemize}
+\item {\tt LU} is the associated unit,
+\item {\tt array\_name} is the source symbolic name of the field (CHARACTER*8),
+\item {\tt restartdata} is the restart field REAL array dimensioned
+  {\tt (nx, ny)} or {\tt (nbr\_pts,1)}\footnote{If REDGLO is the first
+  transformation applied on a Reduced grid field, the Reduced field
+  must be given is an array {\tt restartdata(nx*ny)} where {\tt nx}
+  and {\tt ny} are the global Gaussian grid dimensions and the Reduced
+  field is completed by trailing zeros. {\it Note that this transformation is
+  obsolete in the current OASIS3 version and should not be used anymore.}}
+\end{itemize}
+
+Note that if using OASIS in the IPSL parallel mode (see section
+\ref{sec_ipslpara_mode}), the different OASIS3 executables cannot
+share the same coupling restart file. The recommendation here is to
+use one separate coupling restart file per coupling field.
+
+%subsection{Restart data files}
+
+\section{Input data files}
+\label{subsec_inputdata}
+
+Fields with status {\tt INPUT} in the {\em namcouple} will, at
+  runtime, simply be read in from a NetCDF input file by the target
+  model PSMILe below the {\tt prism\_get\_proto} call, at appropriate
+  times corresponding to the input period indicated by the user in the
+  {\it namcouple}. 
+
+\vspace*{0.5cm}
+ 
+The name of the file must be the one given on the field first
+configuring line in the {\em namcouple} (see section
+\ref{subsubsec_secondINPUT}). There must be one input file per {\tt
+INPUT} field, containing a time sequence of the field in a single or
+double precision REAL array (depending on PSMILe compilation options),
+named with the field symbolic name in the {\em namcouple} and
+dimensioned {\tt (nx,ny,time)} or {\tt (nbr\_pts,1,time)}.  The time
+variable as to be an array {\tt time(time)} expressed in
+``seconds since beginning of run''. The ``time'' dimension has to
+be the unlimited dimension. 
+For a practical example, see the file SOALBEDO.nc in 
+{\tt oasis3/examples/toyoasis3/data}.
+
+%subsection{Input data files}
+
+\section{Transformation auxiliary data files}
+\label{subsec_transformationdata}
+
+Many transformation need auxiliary data files, such as the
+grid-mapping files used for an interpolation. Some of them are created
+automatically by OASIS3, others have to be generated by the user before
+starting the coupled run.
+
+\subsection{Auxiliary data files for {\tt EXTRAP/NINENN}, 
+{\tt EXTRAP/WEIGHT}, {\tt INTERP/SURFMESH}, {\tt INTERP/GAUSSIAN},
+{\tt MOZAIC}, and {\tt SUBGRID}}
+\label{subsec_auxil_diverse}
+
+The auxiliary data files containing the weights and addresses used
+in these transformations have a similar structure; their names are
+given in Table \ref{tab.fileana}.
+
+\begin{table}[hbtp]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+File name & Description \\
+\hline
+\hline
+{\em  nweights }& weights, addresses and iteration number for
+EXTRAP/NINENN interpolation  \\
+any name        & weights and addresses for EXTRAP/WEIGHT extrapolation \\
+{\em  mweights }& weights and addresses for INTERP/SURFMESH interpolation  \\
+{\em  gweights }& weights and addresses for INTERP/GAUSSIAN interpolation  \\
+any name        & weights and addresses for MOZAIC interpolation \\
+
+any name        & weights and addresses for SUBGRID interpolation \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Analysis auxiliary data files}
+\label{tab.fileana}
+\end{table}
+
+The files {\em nweights}, {\em mweights} and {\em gweights} can be
+created by OASIS3 if their corresponding {\tt \$NIO} = 1 (see {\tt
+EXTRAP/NINENN, INTERP/SURFMESH, INTERP/GAUSSIAN} in sections
+\ref{subsec_preproc} and \ref{subsec_interp}).
+
+The name of the (sub)grid-mapping files for {\tt MOZAIC,
+EXTRAP/WEIGHT} and {\tt SUBGRID} analyses can be chosen by the user
+and have to be indicated in the {\em namcouple} (see respectively
+sections \ref{subsec_preproc} and \ref{subsec_interp} and
+\ref{subsec_cooking}). These files have to be generated by the user before
+starting the coupled run.
+
+\vspace*{0.5cm}
+ 
+The structure of these files is as follows:
+
+\begin{verbatim}
+      ...
+      CHARACTER*8 cladress,clweight
+      INTEGER iadress(jpnb,jpo)
+      REAL weight(jpnb,jpo)
+      OPEN(unit=90, file='at31topa', form='unformatted')
+      WRITE(clweight,'(''WEIGHTS'',I1)') knumb
+      WRITE(cladress,'(''ADRESSE'',I1)') knumb
+      WRITE (90) clweight
+      WRITE (90) weight
+      WRITE (90) cladress
+      WRITE (90) iadress
+\end{verbatim}
+
+where 
+\begin{itemize}
+\item {\tt jpnb} is the maximum number of neighbors used in the transformation
+({\tt \$NVOISIN} in the {\em namcouple})
+\item {\tt jpo} is the total dimension of the target grid
+\item {\tt at31topa} is the name of the grid-mapping data file ({\tt \$CFILE}
+in  {\em namcouple})
+\item {\tt knumb} is the identificator of the data set ({\tt \$NID} in
+{\em namcouple}) 
+\item {\tt cladress} is the locator of the address dataset
+\item {\tt clweight} is the locator of the weight dataset
+\item {\tt iadress (i,j)} is the address on the source grid of the $i^e$
+neighbor used for the mapping of the $j^e$ target grid point. The
+address is the index of a grid point within the total number of grid
+points.
+\item {\tt weight(i,j)} is the weight affected to the $i^e$
+neighbor used for the transformation of the $j^e$ target grid point
+\end{itemize}
+
+For file {\em nweights}, there is an additional brick composed of a
+{\tt CHARACTER*8} variable (formed by the characters {\tt INCREME} and
+by the data set identificator) and of an {\tt INTEGER array(N)} which
+is the iteration number within {\tt EXTRAP/NINENN} at which the
+extrapolation of the $n^e$ grid point is effectively performed.
+
+\subsection{Auxiliary data files for {\tt FILLING}}
+
+For the FILLING analysis, the global data set used can be
+either interannual monthly, climatological monthly or yearly (see
+\ref{subsec_interp}). The name of the global data file 
+can be chosen by the user and has to be indicated in the {\em namcouple}
+have to be given to OASIS through the input file {\em namcouple}. In case of monthly data, the file 
+must be written in the following way:
+\begin{verbatim}
+      ...
+      REAL field_january_year_01(jpi, jpj)
+      ...
+      WRITE(NLU_fil) field_january_year_01
+      WRITE(NLU_fil) field_february_year_01
+      WRITE(NLU_fil) field_march_year_01
+      etc...
+      WRITE(NLU_fil) field_december_year_01
+C
+C if climatology, one stops here
+C
+      WRITE(NLU_fil) field_january_year_02
+      etc...
+\end{verbatim}
+
+where
+\begin{itemize}
+\item  {\tt field\_...} is the global dataset
+\item {\tt jpi} and {\tt jpj} are the dimensions of the grid on which FILLING
+is performed
+\item {\tt NLU\_fil} is the logical unit associated to the global data file and is
+defined in the input file {\em namcouple}
+\end{itemize}
+Note that the first month needs not to be January.
+This is the only file within OASIS in which the fields are not read
+using a locator.
+
+\subsection{Auxiliary data files for {\tt SCRIPR}}
+\label{subsec_auxilscripr}
+
+The NetCDF files containing the weights and addresses for the {\tt
+  SCRIPR} remappings (see section \ref{subsec_interp})  are
+  automatically generated at runtime by OASIS3. Their structure is
+  described in detail in section 2.2.3 of the SCRIP documentation available
+  in {\tt oasis3/doc/SCRIPusers.pdf}.
+

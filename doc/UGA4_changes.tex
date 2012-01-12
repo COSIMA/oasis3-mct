@@ -1,0 +1,710 @@
+\newpage
+
+\chapter{Changes between versions}
+\label{sec_changes}
+
+Here is a list of changes between the different official OASIS3
+versions.
+
+\section{Changes between {\tt oasis3\_3} and {\tt
+oasis3\_prism\_2\_5}}
+
+The changes between version {\tt oasis3\_3} and version {\tt
+  oasis3\_prism\_2\_5} delivered in September 2006 are the following:
+
+\begin{itemize}
+
+\item Bug corrections:
+
+  \begin{itemize}
+
+  \item In {\tt oasis3/lib/scrip/src/remap\_bilinear.f, remap\_bicubic.f,
+      \break remap\_bilinear\_reduced.f, remap\_bicubic\_reduced.F90}:
+    (r2084) we observed a wrong behaviour of routines
+    remap\_bilinear.f and remap\_bicubic.f on the NEC SX9 when
+    compiled with NEC SX compiler revision 400. We got round this
+    problem by adding an explicit instruction to prevent the
+    vectorisation of one loop.
+
+    As remap\_bilinear\_reduced.f and remap\_bicubic\_reduced.F90 have
+    a very similar loop, we introduced the same instruction in these
+    routines, although nothing specific was observed with them.
+  
+  \item {\tt oasis3/lib/scrip/src/remap\_bicubic\_reduced.F90}:
+    (r1883) Two bugfixes: 1) Memory fault when a target point was falling on the
+    before-last latitude circle or in the before-last latitude band of
+    the source reduced grid; 2) Wrong neighbours for target points
+    south of the before-last latitude circle (i.e in the last latitude
+    band or Southern).
+ 
+  \item {\tt oasis3/lib/psmile/src/mod\_psmile\_io.F90}: (r2380)
+    correction to ensure that when {\tt INVERT} is used, the corner
+    latitudes and longitudes are also inverted (and not only the
+    center latitudes and longitudes as before).
+
+  \item {\tt oasis3/lib/scrip/src/scriprmp.F}: (r1547) the calculation
+    of the average for the line of points at the pole was bugged and
+    did not have any effect. It is now debugged but commented.
+
+  \item In {\tt oasis3/lib/scrip/src/vector.F90}: 
+    
+    - correction of
+    wrong sequences in declarations, at least for Intel \& NAG
+    compilers (thanks to L. Kornblueh from MPI); bug fix announced to
+    the mailing list diff-oasis@cerfacs.fr on 31/10/2006.
+    
+    - (r1698 - 2008-08-20) bugfix to
+    make sure that OASIS does not automatically calculates corners of
+    target grid as this calculation is correct only for LR grids and target
+    grid type is not known (thanks to S. Calmanti from
+    M\'et\'eo-France)
+    
+    - Modifications so that last 4 arguments of call to grid\_init are 
+    always arrays even when corners are not defined (error detected with 
+    Intel Fortran V10.1.012 by Mike Rezny, SGI, Australia)
+
+  \item In {\tt oasis3/lib/clim.GSIP/src/CLIM\_Init\_Oasis.F},
+    correction of a wrongly positioned \#endif (thanks to L. Kornblueh
+    from MPI); bug fix announced to the mailing list
+    diff-oasis@cerfacs.fr on 31/10/2006.
+
+  \item In {\tt oasis3/lib/psmile/src/prism\_enddef\_proto.F}, the
+    call to MPI\_Errhandler\_set was moved after the test on the value
+    of mpi\_err returned by MPI\_Buffer\_Detach (thanks to I. Bethke
+    from NERSC); bug
+    fix announced to the mailing list diff-oasis@cerfacs.fr on
+    14/12/2006.
+
+  \item Routine {\tt
+      oasis3/lib/psmile/src/prism\_terminate\_proto.F90} was modified
+    to ensure proper deallocation of all allocated arrays (thanks to
+    Adam Ralph from ICHEC)
+  
+% \item In {\tt prism/src/mod/toyatm/src/atm.F90} near the end of the
+%    routine, toyatm does not detach anymore from the MPI buffer as it
+%    is done automatically in prism\_terminate\_proto (thanks to
+%    C. Henriet from Cray); bug
+%    fix announced to the mailing list diff-oasis@cerfacs.fr on
+%    26/01/2006. 
+
+  \item In {\tt oasis3/lib/scrip/remap\_conserv.F}, small bugfix
+    having no impact on the results, it just avoids misleading
+    messages of type "Error sum wts map1:grid2\_add ..."  to be printed
+    in the cplout log file.
+
+  \item In {\tt oasis3/src/getfld.F}, {\tt givfld.F},
+    {\tt driver.f} and {\tt closerst.F}, correction of a bug observed
+    by A.Caubel from CEA for coupling fields having a sequence index
+    greater than 1. For first iteration, closing of netcdf restart
+    files is done in driver.f by calling new routine closerst.F.
+    Closing is therefore removed from getfld.F.  A minor correction
+    (useless opening and closing of first netcdf restart file) was
+    also added to givfld.F. Bug
+    fix announced to the mailing list diff-oasis@cerfacs.fr on
+    09/02/2006.
+
+  \item In {\tt oasis3/src/inipar.F}, bugfix for SEQMODE
+    greater than 9 (thanks to T. Silva, Oregon State U.) and to
+    avoid array overbound.
+
+  \item In {\tt
+      oasis3/util/make\_dir/TopMakefileOasis3}: typo
+    error: libmpp\_io.a instead of libmppio.a (thanks to J.M. Epitalon
+    from CERFACS)
+
+  \item In {\tt oasis3/lib/psmile/src/prism\_init\_comp\_proto.F}:
+    initialisation of {\tt iprcou} (bug fix thanks to J.M. Epitalon).
+
+  \item In {\tt oasis3/src/filling.f}: rewind of file in
+    the "AN" case (thanks to S. Calmanti from  M\'et\'eo-France)
+
+  \item In {\tt oasis3/lib/psmile/src/mod\_prism\_put\_proto.F90}:
+    bug fix to avoid array overbounds (bug identified T. van Noije
+    from KNMI).
+
+  \item In {\tt oasis3/lib/psmile/src/mod\_psmile\_io.F90}: thanks to
+    A. Caubel from CEA, modification so that the grid point longitudes
+    and latitudes do not have to appear before the corner longitudes
+    and latitudes in the grids.nc file (revision 13/01/2009).
+    
+  \item Bugfix in {\tt
+      oasis3/examples/testNONE/PROG/calc\_errorfield.f90} to use the
+    absolute value of the error in the non masked point mean error
+    calculation.
+ 
+  \item Modifications in {\tt oasis3/lib/clim/src/CLIM\_Init\_Oasis.F}
+    and {\tt oasis3/lib/\break psmile/src/prism\_init\_comp\_proto.F} to
+    allow communication log file (*.prt* files) for OASIS and/or
+    component models to run on up to 9999 processes.
+
+  \end{itemize}
+
+\item Other major modifications
+
+  \begin{itemize}
+
+  \item New directory structure. See section \ref{sec_Obtaining} for details.
+
+  \item Modification of many routines to allow using more than one
+    OASIS3 executable in a coupled model resulting in
+    pseudo-parallelisation of OASIS3 on a field-per-field basis.  See
+    section \ref{sec_pseudopara_mode} for more detail.
+    
+  \item New directory structure and update of compiling environement
+    to work with the new directory structure. In particular, the
+    location of directory created for compilation (see {\tt ARCHDIR}
+    in the Makefile headers {\tt make.xxx} in {\tt
+      oasis3/util/make\_dir}) can be arbitrarily chosen by the user.
+
+  \item Modification of routine {\tt
+      oasis3/lib/scrip/src/remap\_distwgt.F} so that \newline SCRIPR/DISTWGT
+    that has by default the same behaviour than SCRIPR/BILINEAR,
+    /BICUBIC and /CONSERV (with FRACNNEI option) i.e. the non-masked
+    nearest neighbour is used for target grid points having their N
+    nearest neighbour all masked. To reproduce the previous default
+    behaviour, one has to compile with CPP key {\tt
+      NOT\_NNEIGHBOUR}. See section \ref{subsec_interp} for details.
+
+  \item Inclusion of an additional number below the {\tt \$NFIELDS}
+    keyword in the {\it namcouple} (after the total number of fields
+    exchanged, on the same line). This number, corresponding to the
+    maximum number of prism\_def\_var\_proto called by ANY component
+    model in the coupled system, is needed only if it is greater than
+    twice the number of fields listed in the {\it namcouple}; this may
+    be the case if OASIS3 is used in pseudo-parallel mode or if fields
+    declared with prism\_def\_var\_proto call (and corresponding to
+    sending - prism\_put\_proto call- or receiving - prism\_get\_proto
+    call - actions in the component models) do not appear in the {\it
+      namcouple} (in this case, the sending and receiving calls simply
+    return without any action performed).
+
+   \item added options {\tt GLBPOS}, {\tt BASPOS}, {\tt BASBAL} for the 
+  cooking stage transformation {\tt CONSERV}. For details, see section
+      \ref{subsec_cooking}.
+  
+   \item New CPP key {\tt TREAT\_OVERLAY} : to ensure that if two cells
+    of the source grid overlay, at least the one with the greater
+    numerical index is masked (they also can be both masked).  For
+    example, if the grid line with i=1 overlaps the grid line with
+    i=imax, it is the latter that must be masked. When this
+    is not the case with the mask defined in {\it masks.nc}, this CPP key 
+    ensures that these rules are respected. This is mandatory
+    for {\tt SCRIPR/CONSERV} remapping, see section \ref{subsec_interp}.
+
+  \item Optimisation of SCRIPR (XXX to be detailed) interpolation
+    weigths-and-address files, thanks to CMCC. The weights and
+    addresses are now read once per run and stored.
+
+  \item mode stats consommation Eric M (XXX to be detailed)
+    
+  \item mod\_prism\_get\_comm (XXX to be detailed)
+  
+  \item Release of a new toy coupled model TOYOASIS3. This new toy
+    model is described in \ref{sec_coupled_mode}. The toy model
+    sources are available in {\tt oasis3/src/mod/oceoa3/}, {\tt
+      atmoa3}, {\tt cheoa3}. It running environment is available in
+    {\tt oasis3/src/mod/oasis3/examples/toyoasis3}. The grids of the
+    TOYOASIS3 component models and the interpolation performed have
+    been updated compared to the previous toy coupled model TOYCLIM
+    (which is no longer distributed with the official release).
+
+   \item In {\tt oasis3/src/mod/oasis3/src/extrap.F}: optimisation
+     (thanks to T. Schoenemeyer from NEC) and {\tt idoitold} changed
+     from 1000000 to 10000000 to support higher resolution grids
+     (thanks to E.Maisonnave from CERFACS). XXX and CMCC
+
+   \item In {\tt
+       oasis3/lib/psmile/src/mod\_prism\_grids\_writing.F90}:
+       
+     - routine prism\_write\_angle was added to to allow a
+     component model to write the angle of its grid (see section
+     \ref{subsubsec_griddef} for more detail).
+     
+     - changed logical {\tt netcdf} for {\tt l\_netcdf} (to run on NEC
+     SX9, thanks to E. Maisonnave, CERFACS)
+
+  \item In may 2007, we moved from CVS to SVN for source management.
+
+  \end{itemize}
+
+\item Other modifications
+
+  \begin{itemize}
+
+  \item The names of the log files for the communication information
+    {\it *.prt*} are now always ending with 4 digits indicating the
+    rank of the component process (e.g. model1.prt0002 or
+    model1.prt9999) or the rank of the oasis process
+    (e.g. Oasis.prt0001 or Oasis.prt0010).  These modifications
+    impacted routines {\tt oasis3/lib/clim/src/CLIM\_Init\_Oasis.F}
+    and \\ {\tt oasis3/lib/psmile/src/prism\_init\_comp\_proto.F}.
+
+  \item The following routines were modified for the NAG compiler:
+  {\tt oasis3\break /src/getfld.F}, {\tt inipar.F}, {\tt interp.F} and 
+  {\tt oasis3/lib/scrip/src/\break remap\_write.F}
+ 
+  \item Some routines in {\tt oasis3/lib/mpp\_io/src/} were
+  modified so that all debug and log messages are now written to
+  stdout unit and to include modifications done in the OASIS4 version
+  for CRAY pointers and for bundles.
+
+  \item Added CPP key {\tt \_\_SILENT} CPP key to reduce log outputs to
+  .prt files during the psmile library exchanges (thanks to S.
+  Lorenz from MPI)
+
+  \item In {\tt oasis3/src/chkfld.f}, modified
+    misleading comment about masked points written to {\it cplout} log
+    file (thanks to T. Craig from BOM).
+
+  \item In  {\tt oasis3/lib/psmile/src/mpp\_io/src/mpp\_io\_mod\_oa.F90}
+    modified "lowercase" function so to avoid using
+    "transfer" function (thanks to Mike Rezny for SGI Melbourne) which
+   causes problem with pgf90 5.2.4, 6.1.3 or 7.0 in 64 bit mode, and with
+   gfortran 4.2.1 and 4.2.5 SUSE Linux.
+
+  \end{itemize}
+
+\end{itemize}
+
+\section{Changes between {\tt oasis3\_prism\_2\_5} and {\tt
+oasis3\_prism\_2\_4}}
+
+The changes between version {\tt oasis3\_prism\_2\_5} and version {\tt
+  oasis3\_prism\_2\_4} delivered in December 2004 are listed here
+after. Please note that those modifications should not bring any
+difference in the interpolation results, except for SCRIPR/DISTWGT
+(see below).
+
+\begin{itemize}
+
+\item Bug corrections:
+
+  \begin{itemize}
+
+  \item In {\tt prism/src/lib/scrip/src/scriprmp.F}: initialisation of
+    {\tt dst\_array(:)}; bug fix announced to the mailing list
+    diff-oasis@cerfacs.fr on 02/02/2006.
+
+  \item In {\tt prism/src/lib/psmile/src/prism\_enddef\_proto.F} and {\tt
+      prism/src/lib/\break clim/src/CLIM\_Start\_MPI.F}: the call to
+    MPI\_barrier (that created a deadlock when not all processes of a
+    component model were exchanging data with the coupler) was changed
+    for a call to MPI\_wait on the previous MPI\_Isend; bug fix
+    announced to the mailing list diff-oasis@cerfacs.fr on
+    02/23/2006.
+
+  \item For SCRIPR/DISTWGT, in {\tt
+      prism/src/lib/scrip/src/remap\_distwgt.f}: line 190 was repeated
+    without epsilon modification; bug fix announced to the mailing
+    list diff-oasis@cerfacs.fr on 03/21/2006.
+
+  \item In {\tt prism/src/lib/psmile/src/mod\_prism\_put\_proto.F90},
+    for {\tt prism\_put\break \_proto\_r28} and {\tt
+      prism\_put\_proto\_r24}, the reshape of the 2d field was moved
+    after the test checking if the field is defined in the namcouple
+    (thanks to Arnaud Caubel from LSCE).
+
+  \end{itemize}
+
+\item Modification in SCRIP interpolations
+
+  \begin{itemize}
+
+  \item For {\tt SCRIPR} interpolations (see section
+    \ref{subsec_interp}), the value 1.0E+20 is assigned to target grid
+    points for which no value has been calculated if {\tt
+      prism/src/lib/scrip/src/scriprmp.f} or {\tt vector.F90} (for
+    vector interpolation) are compiled with {\tt ll\_weightot =
+      .true.}.
+
+  \item For {\tt SCRIPR/GAUSWGT}: if routine {\tt
+      prism/src/lib/scrip/src/remap\_gauswgt.f} is compiled with {\tt
+      ll\_nnei=.true.}, the non-masked nearest neighbour is used for
+    target point if all original neighbours are masked (see section
+    \ref{subsec_interp}).
+
+  \item For {\tt SCRIPR/BICUBIC} (routine {\tt
+      prism/src/lib/scrip/src/remap\_bicubic.f}), the convergence
+    criteria was modified so to ensure convergence even in single
+    precision.
+
+  \item For {\tt SCRIPR/CONSERV} (routine {\tt
+      prism/src/lib/scrip/src/remap\_conserv.f}), a test was added for
+    non-convex cell so that integration does not stall.
+
+  \item The routine {\tt prism/src/lib/scrip/src/corners.F} was
+    modified so to abort if it is called for the target grid, as the
+    automatic calculation of corners works only for
+    Logically-Rectangular (LR) grids and as the target grid type is
+    unknown. If needed, the reverse remapping, in which the current
+    target grid become the source grid, can be done .
+
+  \end{itemize}
+
+\item Other important modifications
+
+  \begin{itemize}
+
+  \item A new PSMILe routine {\tt
+      prism/src/lib/psmile/src/prism\_get\_freq.F} was added; this
+    routine can be used to retrieve the coupling period of field (see
+    section \ref{subsec:auxiliary}).
+
+  \item The routines of the {\tt mpp\_io} library in {\tt
+      prism/src/lib/mpp\_io} changed name and were merged with the
+    OASIS4 {\tt mpp\_io} library.
+
+  \item Routine {\tt prism/src/mod/oasis3/src/extrap.F} was modified
+    to ensure that the extrapolation works even if the {\tt MASK}
+    value is very big (thanks to J.M. Epitalon).
+
+  \item In the namcouple, there is no need anymore to define a lag
+    greater than 0 (e.g.  LAG=+1) for fields in mode NONE.
+
+  \item Diverse modifications were included for successful compilation
+    with NAGW compiler: non portable use of ``kind'', etc. (thanks to
+    Luis Kornblueh from MPI).
+
+  \item In {\tt prism/src/lib/psmile/mod\_prism\_get\_proto.F90}, a
+    potential deadlock was removed (the master process was sending a
+    message to itself)(thanks to Luis Kornblueh from MPI).
+
+  \item Routine {\tt prism/src/lib/scrip/src/scriprmp\_vector.F90} was
+    completely rewritten for more clarity.
+
+  \item Obsolete transformations INVERT and REVERSE were removed from
+    the toy coupled model TOYCLIM (in file {\tt
+      prism/util/running/toyclim/input/namcouple}. This change does
+    not affect the statistics printed in the {\tt cplout} but changes
+    the orientation of some fields in the NetCDF ouput files (see the
+    results in {\tt prism/data/toyclim/outdata}).
+
+\end{itemize}
+
+\item Other minor modifications:
+
+  \begin{itemize}
+
+  \item In {\tt prism/src/lib/psmile/src/prism\_enddef\_proto.F},
+    allocation is done only for rg\_field\_trans or dg\_field\_trans
+    depending on precision for REAL (but not for both, to save
+    memory).
+
+  \item In few routines in {\tt prism/src/lib/clim} and in {\tt
+      prism/src/mod/oasis3}, parentheses were added to make sure that
+    \&\& has priority over $|$$|$ in CPP instructions (thanks to A.
+    Caubel from LSCE).
+
+%\item corners.f: changed intent(INOUT) grid\_center\_lon/lat 
+% for intent(IN) src\_lon/lat and added case for ymean==0
+%\item In inipar.F, modification so that restart file
+%number and restart file name arrays are not filled up if the field
+%does not have a restart file.
+
+  \item Routines {\tt scrip/src/corners.f}, {\tt netcdf.f}, and {\tt
+      scriprmp.f} were renamed \newline {\tt corners.F}, {\tt netcdf.F}, {\tt
+      scriprmp.F} and the line ``INCLUDE 'netcdf.inc' '' was changed
+    for ``\#include $<$netcdf.inc$>$ ''
+
+  \end{itemize}
+
+\end{itemize}
+
+\section{Changes between {\tt oasis3\_prism\_2\_4} and {\tt
+      oasis3\_prism\_2\_3}}
+
+  The changes between versions tagged {\tt oasis3\_prism\_2\_4} and {\tt
+    oasis3\_prism\_2\_3} delivered in July 2004 are the following:
+
+\begin{itemize}
+
+\item Update of compiling and running environments with version
+  \texttt{prism\_2-4} of PRISM Standard Compiling Environment (SCE) and
+  PRISM Standard Running Environment (SRE), which among other
+  improvements include the environments to compile and run on the CRAY
+  X1 (see the directories with \texttt{<node>=baltic1}), thanks to
+  Charles Henriet from CRAY France, and on a Linux station from
+  Recherche en Pr\'evision Num\'erique (Environnement Canada, Dorval,
+  Canada) (see the directories with \texttt{<node>=armc28}).
+
+\item \texttt{prism/src/mod/oasis3/src/iniiof.F}: the opening of the
+  coupling restart files is done only if the corresponding field has a
+  lag greater than 0; note that this implies that all fields in mode
+  NONE must now have a lag greater than 0 (e.g. LAG=+1) (thanks to
+  Veronika Gayler from M\&D).
+
+\item \texttt{prism/src/lib/psmile/src/prism\_def\_var\_proto.F}:
+ contrary to what was previously described in the documentation,
+ \texttt{PRISM\_Double} is not supported as $7^{th}$ argument to
+ describe the field type; {\tt PRISM\_Real} must be given for single
+ or double precision real arrays.
+
+\item \texttt{prism/src/mod/oasis3/src/inipar.F90}: For upward
+   compatibility of SCRIPR interpolation, ``VECTOR" is still accepted
+   in the namcouple as the field type 
+   and leads to the same behaviour as before (i.e. each vector
+   component is treated as an independent scalar field). To have a
+   real vector treatment, one has to indicate "VECTOR\_I" or "VECTOR\_J"
+   (see section \ref{subsec_interp}).
+
+\item Bug corrections in: 
+\begin{itemize}
+
+\item \texttt{prism/src/lib/scrip/src/scriprmp\_vector.F90}: In some
+ cases, some local variables were not deallocated and variable
+ \texttt{dimid} was declared twice.
+
+\item 
+\texttt{prism/src/lib/psmile/src/mod\_psmile\_io.F90}: correct
+allocation of array hosting the longitudes (thanks to Reiner Vogelsang
+from SGI Germany).
+
+\item
+\texttt{prism/src/lib/psmile/src/write\_file.F90}: to remove a deadlock
+on some architecture (thanks to Luis Kornblueh from MPI).
+
+\item
+\texttt{prism/src/lib/psmile/src/prism\_enddef\_proto.F}: the error
+handler is now explicitely set to \texttt{MPI\_ERRORS\_RETURN} before
+the call to \texttt{MPI\_Buffer\_Detach} to avoid abort on some
+architecture when the component model is not previously attached to
+any buffer (thanks to Luis Kornblueh from MPI). 
+
+
+
+\item 
+  \texttt{prism/src/lib/scrip/src/remap\_conserv.f} (thanks to Veronika
+  Gayler from M\&D).
+
+\item \texttt{prism/src/mod/oasis3/src/inicmc.F}
+
+\item \texttt{prism/src/lib/scrip/src/remap\_distwgt.f}
+
+\end{itemize}
+
+\end{itemize}
+
+\section{Changes between {\tt oasis3\_prism\_2\_3} and {\tt
+oasis3\_prism\_2\_2}}
+
+The changes between versions tagged {\tt oasis3\_prism\_2\_3}
+delivered in July 2004 and {\tt oasis3\_prism\_2\_2} delivered
+in June 2004 are the following:
+
+\begin{itemize}
+
+\item Bug correction of the previous bug fix regarding ordering of grid and
+data information contained in I/O files when {\tt INVERT} or {\tt
+REVERSE} transformations are used: the re-ordering now occurs only for
+source field if {\tt INVERT} is used, and only for target field if
+{\tt REVERSE} is used.
+
+\item LGPL license: OASIS3 is now officially released under a Lesser GNU General Public
+License (LGPL) as published by the Free Software Foundation
+(see {\tt prism/src/mod/oasis3/COPYRIGHT} and {\tt prism/src/mod/oasis3/src/couple.f})
+
+\item Upgrade of compiling and running environments: The compiling and
+running environments have been upgraded to the PRISM Standard
+Compiling and Running Environment version dated August 5th
+2004, that should be very close to ``prism\_2-3''.
+
+\item Treament of vector fields: The interpolation algorithms using the SCRIP library now support
+vector fields, including automatic rotation from local to geographic
+coordinate system, projection in Cartesian coordinate system and
+interpolation of 3 Cartesian components, and support of vector
+components given on different grids. New routines have been added in
+{\tt prism/src/lib/scrip/src}: {\tt scriprmp\_vector.F90} and {\tt rotations.F90}.
+For more detail, see {\tt SCRIPR} in section \ref{subsec_interp}.
+
+\item All include of mpif.h are now written `\#include $<$mpif.h$>$'.
+
+\item The output format of {\tt CHECKIN} and {\tt CHECKOUT} results
+is now E22.7
+
+\end{itemize}
+
+\section{Changes between {\tt oasis3\_prism\_2\_2} and {\tt
+oasis3\_prism\_2\_1}}
+
+The changes between versions tagged {\tt oasis3\_prism\_2\_2}
+delivered in June 2004 and {\tt oasis3\_prism\_2\_1} delivered to
+PRISM in April 2004 are the following:
+
+\begin{itemize}
+
+\item Bug corrections
+
+ \begin{itemize}
+
+ \item {\tt INTERP/GAUSSIAN} and {\tt SCRIPR/GAUSWGT} transformations
+ work for `U' grids.
+
+ \item The grid and data information contained in I/O files output by
+ the PSMILe library have now a coherent ordering even if {\tt INVERT}
+ or {\tt REVERSE} transformations are used.
+
+ \end{itemize}
+
+\item OASIS3 and the TOYCLIM coupled model are ported to IBM Power4 and
+Linux Opteron, which are now included in the Standard Compiling and
+Running Environments (SCE and SRE).
+
+\item SIPC technique communication is re-validated.
+
+\item {\tt Clim\_MaxSegments = 338} in {\tt
+prism/src/lib/clim/src/mod\_clim.F90} and in {\tt
+prism/src/lib/psmile/src/mod\_prism\_proto.F90}. 338 is presently the largest
+value needed by a PRISM model. 
+
+\item {\tt MPI\_BSend}: below the call to {\tt prism\_enddef\_proto},
+the PSMILe tests whether or not the model has already attached to an
+MPI buffer. If it is the case, the PSMILe detaches from the buffer,
+adds the size of the pre-attached buffer to the size needed for the
+coupling exchanges, and reattaches to an MPI buffer. The model own
+call to {\tt MPI\_Buffer\_Attach} must therefore be done before the
+call to {\tt prism\_enddef\_proto}. Furthermore, the model is not
+allowed to call {\tt MPI\_BSend} after the call to {\tt
+prism\_terminate\_proto}, as the PSMILe definitively detaches from the
+MPI buffer in this routine. See the example in the toyatm model in
+{\tt prism/src/mod/toyatm/src}.
+
+\end{itemize}
+
+\section{Changes between {\tt oasis3\_prism\_2\_1} and {\tt
+oasis3\_prism\_1\_2}}
+
+The changes between versions tagged {\tt oasis3\_prism\_1\_2}
+delivered in September 2003 and {\tt oasis3\_prism\_2\_1} delivered to
+PRISM in April 2004 are the following:
+
+\begin{itemize}
+
+\item Bug corrections
+
+ \begin{itemize}
+
+ \item Thanks to Eric Maisonnave, a bug was found and corrected in
+  \- \- \- \- \- \- \- \- 
+  /prism/src/lib/scrip/src/scriprmp.f:
+  ``sou\_mask'' and ``tgt\_mask'' were not properly initialised if weights
+  and addresses were not calculated but read from file.
+
+ \item Some deallocation were missing in prism\_terminate\_proto.F
+  (``ig\_def\_part'', ``ig\_length\_part'', ``cg\_ignout\_field'').
+
+ \item Thanks to Arnaud Caubel, a bug was found and corrected in 
+  \- \- \- \- \- \- \- \- /prism/src/lib/psmile/src/write\_file.F90. In case of parallel
+  communication between a model and OASIS3 main process, the binary
+  coupling restart files were not written properly (NetCDF coupling
+  restart files are OK).
+
+ \end{itemize} 
+
+\item Routines renamed
+
+The routines {\tt preproc.f, extrap.f, iniiof.f} in {\tt
+prism/src/mod/oasis3/src} were renamed to {\tt preproc.F, extrap.F,
+iniiof.F}, as a CPP key `key\_openmp' was added. Please note that this
+key, allowing openMP parallelisation, is not fully tested yet.
+
+\item Modifications in the namcouple
+
+\begin{itemize}
+\item The third entry on the field first line now corresponds to an index in
+the new auxiliary file {\em cf\_name\_table.txt} (see sections
+\ref{subsec_namcouplesecond} and \ref{subsec_cfnametable}).
+
+\item For {\tt IGNORED, IGNOUT} and {\tt OUTPUT} fields, the source
+and target grid locator prefixes must now be given on the field second
+line (see section \ref{subsubsec_secondIGNORED})
+\end{itemize}
+
+\item A new auxiliary file {\em cf\_name\_table.txt}
+
+For each field, the CF standard name used in the OASIS3 log file, {\em
+cplout}, is now defined in an additional auxiliary file {\em
+cf\_name\_table.txt} 
+not in {\tt inipar.F} anymore. This auxiliary file must be
+copied to the working directory at the beginning of the run. The user
+may edit and modify this file at her own risk. In {\em
+cf\_name\_table.txt}, an index is given for each field standard name
+and associated units.  The appropriate index has to be indicated for
+each field in the {\em namcouple} (third entry on the field first
+line, see section \ref{subsec_namcouplesecond}). 
+
+This standard name and the associated units are also used to define the
+field attributes ``long\_name'' and ``units'' in the NetCDF output files
+written by the PSMILe for fields with status {\tt EXPOUT, IGNOUT} and
+{\tt OUTPUT}.
+ 
+For more details on this auxiliary file, see section
+\ref{subsec_cfnametable}.
+
+\item Many timesteps for mode NONE
+
+In mode NONE, OASIS3 can now interpolate at once all time occurrences
+of a field contained in an input NetCDF file. The time variable in the
+input file is recognized by its attribute ``units''. The acceptable
+units for time are listed in the udunits.dat file \cite{udunits}. This
+follows the CF convention.
+
+The keyword {\tt \$RUNTIME} in the namcouple has to be the number of time
+occurrences of the field to interpolate from the input file. The
+``coupling'' period of the field (4th entry on the field first line)
+must be always ``1''. Note that if {\tt \$RUNTIME} is smaller than the
+total number of time ocurrences in the input file, the first {\tt \$RUNTIME} 
+occurrences will be interpolated.
+
+For more details, see section \ref{subsec_interpolator}.
+
+\item Model grid data file writing
+
+The grid data files {\em grids.nc, masks.nc} and {\em areas.nc} can
+now be written directly at run time by the component models, if they
+call the new routines prism\_start\_grids\_writing, prism\_write\_grid,
+prism\_write\_corner prism\_write\_mask, prism\_write\_area,
+prism\_terminate\_grids\_writing. 
+
+The writing of those grid files by the models is driven by the
+coupler. It first checks whether the binary file {\em grids} or the
+netCDF file {\em grids.nc} exists (in that case, it is assumed that
+{\em areas} or {\em areas.nc} and {\em masks} or {\em masks.nc} files
+exist too) or if writing is needed. If {\em grids} or {\em grids.nc}
+exists, it must contain all grid information from all models; if it does not
+exist, each model must write its grid informations in the grid data
+files. 
+
+See section \ref{subsubsec_griddef} for more details.
+
+\item Output of CF compliant files
+
+The NetCDF output files written by the PSMILe for fields with status
+{\tt EXPOUT, IGNOUT} and {\tt OUTPUT} are now fully CF compliant.
+
+In the NetCDF file, the field attributes ``long\_name'' and ``units''
+are the ones corresponding to the field index in {\em
+cf\_name\_table.txt} (see above and section
+\ref{subsec_cfnametable}). The field index must be given by the user
+as the third entry on the field first line in the namcouple.
+
+Also, the latitudes and the longitudes of the fields are now
+automatically read from the grid auxiliary data file {\em grids.nc} and
+written to the output files. If the latitudes and the longitudes of
+the mesh corners are present in {\em grids.nc}, they are also written to the
+ouput files as associated ``bounds'' variable.  This works whether the
+{\em grids.nc} is given initially by the user or written at run time by the
+component models (see above). However, this does not work if the
+user gives the grid definition in a binary file {\em grids}.
+
+\item Removal of pre-compiling key ``key\_BSend''
+
+
+The pre\_compiling key ``key\_BSend'' has been removed.  The default has
+changed: by default, the buffered MPI\_BSend is used, unless {\tt NOBSEND}
+is specified in the namcouple after MPI1 or MPI2, in which case the
+standard blocking send MPI\_Send is used to send the coupling fields.
+
+\end{itemize}
+
+
+

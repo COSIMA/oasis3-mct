@@ -1,0 +1,78 @@
+#
+# Include file for OASIS4 Makefile for a Linux system using Portland Group Fortran Compiler
+# and MPICH
+#
+#######################################################################################
+#
+# Needed to work with SCE Makefile
+COUPLE          = oasis3-mct
+I4mods          = I
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# PRISMHOME     : path for the root of prism directory tree
+# ARCHDIR       : directory created when compiling
+# LIBPSMILE     : list of oasis4 libraries to be linked to the model
+# PSMILE_INCDIR : includes all *o and *mod for each library
+# BINDIR        : directory for the executables
+# LIBBUILD      : contains a directory for each library
+#
+PRISMHOME       = $(HOME)/prism
+ARCHDIR         = $(PRISMHOME)/SX8
+LIBPSMILE	= $(ARCHDIR)/lib/libanaisg.a $(ARCHDIR)/lib/libanaism.a $(ARCHDIR)/lib/libclim.$(CHAN).a $(ARCHDIR)/lib/libpsmile.$(CHAN).a $(ARCHDIR)/lib/libfscint.a $(ARCHDIR)/lib/libscrip.a
+PSMILE_INCDIR   = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/clim.$(CHAN)
+BINDIR          = $(ARCHDIR)/bin
+LIBBUILD        = $(ARCHDIR)/build/lib
+#
+#
+MAKE        = gmake
+MPIDIR      = /SX/opt/mpisx/inst
+MPIBIN      = $(MPIDIR)/bin
+MPI_INCLUDE = $(MPIDIR)/include
+MPILIB      = -L$(MPIDIR)/lib0
+#
+NETCDF_INCLUDE  = /usr/local/lib/NETCDF-3.6.1/include
+NETCDF_LIBRARY  = -L/usr/local/lib/NETCDF-3.6.1/lib -lnetcdf
+#
+XML_INCLUDE =  ./
+LIBXML      =  
+#
+LCPP = /SX/usr/lib/libcpp.a
+#
+F90         = $(MPIBIN)/sxmpif90 -f4 -I$(MPI_INCLUDE)
+F           = $(MPIBIN)/sxmpif90 -f0 -I$(MPI_INCLUDE)
+f90         = $(F90)
+f           = $(F)
+CC          =  $(MPIBIN)/sxmpicc  -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/sxmpif90 $(MPILIB)
+#
+AR        = sxar
+ARFLAGS   = -ruv
+#
+#
+# compiler options and cpp keys
+#
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DSX
+CCPPDEF   = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DSX
+#
+#
+#COMFLAGS  =  -clear -Cvsafe  -Wf"-init stack=nan heap=nan -K a" -EP $(PSMILE_INCDIR)
+#COMFLAGS  =  -clear -Cdebug -g -pi auto nest=3 line=100000 -EP $(PSMILE_INCDIR)
+COMFLAGS  =  -clear -Cvopt $(PSMILE_INCDIR)
+
+#F90FLAGS  = $(COMFLAGS) -Wf"-A idbl4" $(CPPDEF) -I$(NETCDF_INCLUDE)
+F90FLAGS  = $(COMFLAGS) -EP -Wf,-pvctl noassume loopcnt=30000 -dwW -Wf"-A idbl4" -Wf,-P nh $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(F90FLAGS) 
+FFLAGS    = $(F90FLAGS)
+fFLAGS    = $(F90FLAGS)
+CCFLAGS   = $(COMFLAGS) $(CCPPDEF) -I$(NETCDF_INCLUDE)
+
+LDFLAGS   = -Pstack
+#
+FLIBS     = $(NETCDF_LIBRARY) $(LCPP) $(LIBXML)
+#
+#
+#############################################################################################

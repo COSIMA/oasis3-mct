@@ -1,0 +1,71 @@
+#
+# Include file for OASIS3 Makefile adapted to  ECMWF's IBM power4 system.
+#
+###############################################################################
+#
+# Needed to work with SCE Makefile
+COUPLE          = oasis3-mct
+I4mods          = I
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# PRISMHOME     : path for the root of prism directory tree, can be anywhere
+# ARCHDIR       : directory created when compiling
+# LIBPSMILE     : list of oasis3-mct libraries
+# PSMILE_INCDIR : includes all *o and *mod for each library
+# BINDIR        : directory for executables
+# LIBBUILD      : contains a directory for each library
+#
+PRISMHOME       = /workgpfs/rech/eee/reee217/SEB/modipsl/modeles/oasis3-mct
+ARCHDIR         = $(PRISMHOME)/AIX6
+LIBPSMILE	= $(ARCHDIR)/lib/libanaisg.a $(ARCHDIR)/lib/libanaism.a $(ARCHDIR)/lib/libclim.$(CHAN).a $(ARCHDIR)/lib/libpsmile.$(CHAN).a $(ARCHDIR)/lib/libfscint.a $(ARCHDIR)/lib/libscrip.a
+PSMILE_INCDIR   = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/clim.$(CHAN)
+BINDIR          = $(ARCHDIR)/bin
+LIBBUILD        = $(ARCHDIR)/build/lib
+#
+# MPI library
+MPIDIR      = 
+MPIBIN      = 
+MPI_INCLUDE = 
+MPILIB      = 
+#
+#  NETCDF library
+NETCDF_INCLUDE  = /usr/local/pub/NetCDF/3.6.2/include
+NETCDF_LIBRARY  = -L/usr/local/pub/NetCDF/3.6.2/lib -lnetcdf
+#
+# Compiling and other commands
+MAKE        = gmake
+F90         = mpxlf90_r
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = mpcc_r
+LD          = $(F90)
+AR        = ar
+ARFLAGS   = r
+#
+#
+# compiler options and cpp keys
+# 
+CPPDEF    = -WF,-Duse_libMPI -WF,-Duse_netCDF -WF,-Duse_comm_$(CHAN) -WF,-Dbalance -WF,-Duse_oasis_para
+CCPPDEF   = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG
+#
+# For compiling in double precision, put -qrealsize=8
+# For compiling in single precision, remove -qrealsize=8 and add -WF,-Duse_realtype_single in CPPDEF
+COMFLAGS  = -qrealsize=8 -q64 -qextname=flush -O3 $(PSMILE_INCDIR) -I$(NETCDF_INCLUDE)
+F90FLAGS  = -qsuffix=cpp=F90 $(COMFLAGS) $(CPPDEF)
+f90FLAGS  = -qsuffix=cpp=f90 $(COMFLAGS)
+FFLAGS    = -qfixed -qsuffix=cpp=F $(COMFLAGS) $(CPPDEF)
+fFLAGS    = -qfixed -qsuffix=cpp=f $(COMFLAGS)
+CCFLAGS   = -q64 $(CCPPDEF)
+#
+LDFLAGS   = -q64 -bmaxdata:2000000000 -O3
+#
+#  External libraies for linking
+FLIBS     = $(NETCDF_LIBRARY)
+#
+#
+#############################################################################

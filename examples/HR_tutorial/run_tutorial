@@ -1,0 +1,270 @@
+#!/bin/ksh
+#set -x
+######################################################################
+#
+############### User's section #######################################
+##
+## - Define architecture and coupler (oasis3 or oasis4)
+arch=curie      
+coupler=oasis3
+host=`uname -n`
+user=`whoami`
+your_email=valcke@cerfacs.fr
+#
+run_oasis3_para=0 # = 0 for OASIS3 on one process, 
+                  # = 1 for OASIS3 on two processes
+
+## - Define paths
+srcdir=`pwd`
+datadir=$srcdir/data_oasis3
+
+toyname=`basename $srcdir`
+
+## - Define MPIRUN, only used for arch=Linux
+#MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
+#MPIRUN=/usr/local/pgi/linux86/9.0/mpi/mpich/bin/mpirun
+
+## - Define names of executables, number of processes for the coupler
+#
+coupler_exe=oasis3.MPI1.x
+#
+# - Toy models: Define number of processes to run each executable
+#               and name of executables
+#
+#name of the executables
+    exe1=toyocn
+    exe2=toyatm
+# number of processes for each executable
+    nproc_exe1=1
+    nproc_exe2=1
+# number of processes involved in the coupling for the namcouple
+    ncpl_exe1=$nproc_exe1
+    ncpl_exe2=$nproc_exe2
+#
+# - Define working directory
+#
+rundir=/ccc/scratch/cont005/pa0490/maisonne/SOPHIE/${toyname}_${nproc_exe1}${nproc_exe2}
+#
+############### End of user's section ################################
+
+echo ''
+echo '*****************************************************************'
+echo '*** '$toyname' : '$run
+echo ''
+echo 'Rundir       :' $rundir
+echo 'Architecture :' $arch
+echo 'Host         : '$host
+echo 'User         : '$user
+echo 'Coupler      :' $coupler
+echo ''
+if [ $run_oasis3_para == 0 ]; then
+echo $coupler_exe 'runs on 1 proc'
+else
+echo $coupler_exe 'runs on 2 procs'
+fi
+echo $exe1' runs on '$nproc_exe1 'processes'
+echo $exe2' runs on '$nproc_exe2 'processes'
+echo ''
+echo ''
+######################################################################
+###
+### 1. Copy source example directory containing everything needed
+###    into rundir
+
+\rm -fr $rundir
+mkdir -p $rundir
+
+cp -f $srcdir/*nc  $rundir/.
+
+cp -f $datadir/*txt $rundir/.
+cp -f $datadir/*nc  $rundir/.
+cp -f $datadir/*.jnl $rundir/.
+
+cp -f $srcdir/$exe1 $rundir/.
+cp -f $srcdir/$exe2 $rundir/.
+
+cp -f $srcdir/oasis3.MPI1.x $rundir/$coupler_exe
+
+if [ $run_oasis3_para == 1 ]; then
+cp -f $datadir/namcouple_0 $rundir/namcouple
+cp -f $datadir/namcouple_1 $rundir/namcouple_1
+else
+cp -f $datadir/namcouple $rundir/.
+fi
+
+ed $rundir/namcouple <<EOF
+g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
+g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
+g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
+g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
+w
+q
+EOF
+
+if [ $run_oasis3_para == 1 ]; then
+mv $rundir/namcouple $rundir/namcouple_0
+ed $rundir/namcouple_1 <<EOF
+g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
+g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
+g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
+g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
+w
+q
+EOF
+fi
+#
+cd $rundir
+#
+######################################################################
+###
+### 3. Creation of configuration scripts
+
+###---------------------------------------------------------------------
+### Linux
+###---------------------------------------------------------------------
+
+if [ $arch == Linux ] ; then
+  cat <<EOF>> $rundir/appl-linux.conf
+$host 0 $rundir/$coupler_exe
+EOF
+if [ $run_oasis3_para == 1 ]; then
+  cat <<EOF>> $rundir/appl-linux.conf
+$host 1 $rundir/$coupler_exe
+EOF
+fi
+
+  count=0
+  while [[ $count -lt $nproc_exe1 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe1
+EOF
+   (( count += 1 ))
+  done
+
+  count=0
+  while [[ $count -lt $nproc_exe2 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe2
+EOF
+   (( count += 1 ))
+  done
+
+elif [ $arch == corail ] ; then
+
+nproc_oa3=1
+if [ $run_oasis3_para == 1 ]; then
+nproc_oa3=2
+fi
+#nproc_oa3=0
+
+  (( nproc = $nproc_oa3 + $nproc_exe1 + $nproc_exe2 ))
+
+if [ $nproc -le 24 ] ; then
+  node=1
+elif [ $nproc -gt 24 ] && [ $nproc -le 48 ] ; then
+  node=2
+elif [ $nproc -gt 48 ] && [ $nproc -le 72 ] ; then
+  node=3
+elif [ $nproc -gt 72 ] && [ $nproc -le 96 ] ; then
+  node=4
+elif [ $nproc -gt 96 ] && [ $nproc -le 120 ] ; then
+  node=5
+fi 
+  cat <<EOF > $rundir/run_$toyname.$arch
+# Nom du job
+#PBS -N dev_ex
+# Temps limite du job
+#PBS -l walltime=00:10:00
+# Nombre de processus
+#PBS -l select=$node:mpiprocs=24:ncpus=24
+#PBS -l place=scatter:excl
+# adresse email a utiliser
+#PBS -M $your_email
+# Mail envoye a la fin du job
+#PBS -m ae
+
+cd $rundir
+
+source /usr/local/bin/intelmpi.sh
+ulimit -s unlimited
+#
+#########################################################
+#
+mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+#########################################################
+#
+EOF
+elif [ $arch == curie ] ; then
+
+nproc_oa3=1
+   cat <<EOF>> appl-curie.conf
+$nproc_oa3 $rundir/$coupler_exe
+$nproc_exe1 $rundir/$exe1
+$nproc_exe2 $rundir/$exe2
+EOF
+      (( nproc = $nproc_oa3 + $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_test_interp.$arch
+#!/bin/bash
+#MSUB -r tutorial # Request name
+#MSUB -n $nproc # Number of tasks to use
+#MSUB -T 600 # Elapsed time limit in seconds
+#MSUB -o tutorial_%I.o # Standard output. %I is the job id
+#MSUB -e tutorial_%I.e # Error output. %I is the job id
+#MSUB -A pa0492 # Project ID
+set -x
+cd $rundir
+time ccc_mprun -f appl-curie.conf
+EOF
+#
+else 
+  echo 'For architecture='$arch ' you have to add your execution'
+  exit
+fi 
+
+######################################################################
+###
+### 4. Execute the model
+
+if [ $arch == Linux ] ; then
+
+  echo 'Executing the model using '$MPIRUN 
+  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+
+elif [ $arch == corail ]; then
+    echo 'Submitting the job to queue using qsub'
+#    qsub -q debug $rundir/run_$toyname.$arch
+    qsub -q submit $rundir/run_$toyname.$arch
+#
+#    Check differences
+texist=0
+file='out_qstat'
+while [ $texist == 0 ] ; do
+   qstat -u valcke > $file
+   lines=`wc -l < $file`
+   echo "nb lines in $file $lines"
+   if [ $lines == 0 ]; then
+   texist=1
+   else
+   echo "Waiting for running ending..."
+   sleep 10
+   fi
+done 
+ncdump -v FRECVOCN FRECVOCN_toyocn.nc > dump_FRECVOCN
+ncdump -v FRECVATM FRECVATM_toyatm.nc > dump_FRECVATM
+diff dump_FRECVOCN.txt dump_FRECVOCN > res_diff
+diff dump_FRECVATM.txt dump_FRECVATM >> res_diff
+#
+elif [ $arch == curie ]; then
+ccc_msub $rundir/run_test_interp.$arch
+ccc_mpp
+fi
+######################################################################
+### 5. End
+echo $toyname 'is executed or submitted to queue.'
+echo 'Results are found in rundir : '$rundir 
+
+######################################################################
+

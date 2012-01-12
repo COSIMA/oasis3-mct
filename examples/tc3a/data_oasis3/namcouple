@@ -1,0 +1,191 @@
+# This is a typical input file for OASIS 3.0, using netCDF format
+# for restart input files.  Oasis reads in
+# this file at run-time. Don't hesitate to ask precisions or make
+# suggestions (oasishelp@cerfacs.fr). 
+#
+# Any line beginning with # is ignored. Blank lines are not allowed.
+#
+ $SEQMODE
+# This keyword concerns the coupling algorithm. Put here the maximum number
+# of fields that have to be, at one particular coupling timestep,
+# exchanged sequentially in a given order.
+    3
+ $END
+#########################################################################
+ $CHANNEL
+# The communication technique you want to use.
+# Choices are MPI1 or MPI2, NONE.
+# - if you want to use MPI1 or MPI2 message passing, you must write 
+# MPI1 or MPI2 (+ NOBSEND if you do not want to use the default MPI_BSend)
+# on one line 
+# + one line per model giving for the model the total number of procs,
+# the number of procs implied in the coupling and, for MPI2 only, an
+# optional launching argument
+#
+  MPI1
+   nproc_exe1 ncpl_exe1
+   nproc_exe2 ncpl_exe2
+   nproc_exe3 ncpl_exe3
+ $END
+#########################################################################
+ $NFIELDS
+# Put the number of fields exchanged by OASIS.
+# If it is bigger than twice the number of fields exchanged, put also on 
+# the same line the maximum number of prism_def_var_proto
+# called by one component model in the coupled system (optional).
+# For the definition of the fields, see under $STRINGS keyword
+#
+         7
+ $END
+#########################################################################
+ $JOBNAME
+# This is an acronym for this run (3 characters).
+  tc3a
+ $END
+##########################################################################
+ $NBMODEL
+# This gives you the number of models running in this experiment +
+# their names (6 characters) + , in option, the maximum Fortran unit
+# number used by each model; 1024 will be used if none are given.
+#
+   3  model1   model2  model3  99  99  99
+ $END
+###########################################################################
+ $RUNTIME
+# This gives you the total simulated time for this run in seconds (here 6 days)
+#
+  39600
+ $END
+###########################################################################
+ $INIDATE
+# This is the initial date of the run. This is important only if
+# FILLING analysis is used for a coupling field in the run.
+# The format is YYYYMMDD.
+  20000101
+ $END
+###########################################################################
+ $MODINFO
+# Indicates if a header is encapsulated within the field brick 
+# in binary restart files for all communication techniques,  
+# (and for coupling field exchanges for PIPE, SIPC and GMEM.
+# (YES or NOT)
+  NOT
+ $END
+###########################################################################
+ $NLOGPRT
+# Index of printing level in output file cplout: 0 = no printing
+#  1 = main routines and field names when treated, 2 = complete output
+  2
+ $END
+###########################################################################
+ $CALTYPE
+# Calendar type :  0      = 365 day calendar (no leap years)
+#                  1      = 365 day, or 366 days for leap years, calendar
+#                  n (>1) = n day month calendar
+# This is important only if FILLING analysis is used for a coupling
+# field in the run.
+#
+  30
+ $END
+###########################################################################
+ $STRINGS
+#
+# The above variables are the general parameters for the experiment.
+# Everything below has to do with the fields being exchanged.
+#
+############################################################################
+#         M1 -> M2
+#
+# Field 1 : 
+#
+#   First line:
+# 1) and 2) Symbolic names for the field before and after interpolation
+#           (8 characters maximum)
+# 3) Index of field in cf_name_table.txt
+# 4) Exchange frequency for the field in seconds (here 1 day)
+# 5) Number of analysis to be performed
+# 6) Restart input NetCDF file names
+# 7) Field status (EXPORTED, AUXILARY, IGNORED, EXPOUT, IGNOUT, INPUT, OUTPUT)
+#
+M1FLD01 M2FLD03 1 7200  1  rst1.nc EXPOUT
+#
+#   Second line:
+# 1) and 2) locator prefix (4 characters) used to read the source and
+# target grid characteristics in grid auxiliary files, 
+# + possibly LAG and SEQ additional indices if needed 
+#
+182 149 96 72 torc  lmdz  SEQ=1 LAG=-7200
+#
+#   Third line:
+# Source grid characteristic (P or R) and number of overlapping grid points
+# + Target grid characteristic (P or R) and number of overlapping grid points
+P  2  P  0
+#
+# List of analyses
+#
+MAPPING
+#
+# Specific parameters for each analysis
+# SCRIPR: 1) method 2) source grid type 3) field type 4) search restriction
+#         type 5) number of restriction bins 6)number of neighbours used
+ rmp_torc_to_lmdz_BILINEA.nc src
+#
+# Field 2
+M1FLD02 M2FLD04 2 7200 2 rst1.nc EXPOUT
+182 149 96 72 torc  lmdz  SEQ=1  LAG=7200
+P  0  P  2
+#MAPPING
+MAPPING CONSERV
+ rmp_torc_to_lmdz_BILINEA.nc dst
+ GLBPOS
+#
+# Field 5
+M1FLD05 M1FLD05 2 7200 0 OUTPUT
+torc torc SEQ=3
+#MAPPING
+# rmp_torc_to_lmdz_BILINEA.nc dst
+#
+# Field 6
+M1FLD06 M1FLD06 2 7200 1 OUTPUT
+torc  torc SEQ=3
+LOCTRANS
+AVERAGE
+#P  0  P  2
+#MAPPING
+# rmp_torc_to_lmdz_BILINEA.nc dst
+#
+# Field 7
+#M1FLD07 M1FLD07 2 3600 0 OUTPUT
+#torc torc SEQ=3
+M1FLD07 M1FLD07 2 3600 0 M1FLD07_input.nc INPUT
+#182 149 96 72 torc  torc  SEQ=3
+#P  0  P  2
+#
+############################################################################
+#          M2 -> M3
+#
+# Field 1 :
+#
+M2FLD01:M2FLD02 M3FLD03:M3FLD04  3 3600  1  rst2.nc EXPOUT
+#
+96 72 96 72 lmdz lmdz SEQ=2
+#
+P  0  P  2
+#tcx this is just to get namcouple to not abort, scripr doesn't do anything 
+SCRIPR
+ BILINEAR LR SCALAR LATLON 1
+#
+############################################################################
+#          M3 -> M1
+#
+# Field 1 :
+#
+M3FLD01:M3FLD02 M1FLD03:M1FLD04  3 7200  1  rst3.nc EXPOUT
+#
+96 72 182 149  lmdz torc SEQ=3
+#
+P  0  P  2
+MAPPING
+ rmp_lmdz_to_torc_BILINEA.nc src
+#
+ $END

@@ -1,0 +1,72 @@
+#
+# Include file for OASIS3 Makefile for a Linux system using 
+# Portland Group Fortran Compiler and MPICH
+#
+###############################################################################
+#
+# Needed to work with SCE Makefile
+COUPLE          = /lus/nid00030/cht/EC-Earth_2.2/oasis3-mct
+I4mods          = I
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# PRISMHOME     : path for the root of prism directory tree, can be anywhere
+# ARCHDIR       : directory created when compiling
+# LIBPSMILE     : list of oasis3-mct libraries
+# PSMILE_INCDIR : includes all *o and *mod for each library
+# BINDIR        : directory for executables
+# LIBBUILD      : contains a directory for each library
+#
+PRISMHOME       = /lus/nid00030/cht/EC-Earth_2.2/oasis3-mct
+ARCHDIR         = $(PRISMHOME)/crayxt
+LIBPSMILE	= $(ARCHDIR)/lib/libanaisg.a $(ARCHDIR)/lib/libanaism.a $(ARCHDIR)/lib/libclim.$(CHAN).a $(ARCHDIR)/lib/libpsmile.$(CHAN).a $(ARCHDIR)/lib/libfscint.a $(ARCHDIR)/lib/libscrip.a
+PSMILE_INCDIR   = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/clim.$(CHAN)
+BINDIR          = $(ARCHDIR)/bin
+LIBBUILD        = $(ARCHDIR)/build/lib
+#
+# MPI library
+MPIDIR      = 
+MPIBIN      = 
+MPI_INCLUDE = 
+MPILIB      = 
+#
+# NETCDF library
+NETCDFDIR=$(CRAY_NETCDF_DIR)/netcdf-cce-real64
+NETCDF_INCLUDE  = $(NETCDFDIR)/include
+NETCDF_LIBRARY  = -L$(NETCDFDIR)/lib -lnetcdf
+#
+#
+# Compiling and other commands
+MAKE        = make
+F90         = ftn 
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = cc
+LD          = ftn
+AR          = ar
+ARFLAGS     = -ruv
+#
+# compiler options and cpp keys
+# 
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DVERBOSE 
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# For compiling in double precision, put -r8
+# For compiling in single precision, remove -r8 and add -Duse_realtype_single
+# 
+F90FLAGS  = -sreal64 -h byteswapio -O3 $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(F90FLAGS)
+FFLAGS    = $(F90FLAGS)
+fFLAGS    = $(F90FLAGS)
+CCFLAGS   = $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+LDFLAGS   = -sreal64 -h byteswapio -O3
+#
+#  External libraies for linking
+FLIBS     = $(NETCDF_LIBRARY)	
+#
+#
+#############################################################################

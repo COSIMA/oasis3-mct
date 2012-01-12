@@ -1,0 +1,8 @@
+use FOCNWRIT_out.2000-01-01T00:00:00.nc
+
+
+shade BOUNDS_LON[d=1]
+go polymark polygon LON[d=1] LAT[d=1] FOCNWRIT[L=1,d=1] square 0.6
+go polymark polygon LON[d=1] LAT[d=1] FOCNWRIT[L=1,d=1] square 0.6
+
+

@@ -1,0 +1,6 @@
+use FOCNWRIT_out.2000-01-01T00:00:00.nc
+
+
+shade FOCNWRIT[L=1,d=1]
+
+

@@ -1,0 +1,72 @@
+#
+# Include file for OASIS3 Makefile adapted to NEC SX-6 at DKRZ
+#
+##############################################################################
+#
+# Needed to work with SCE Makefile
+COUPLE          = oasis3-mct
+I4mods          = I
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI2
+#
+# Paths for libraries, object files and binaries
+#
+# PRISMHOME     : path for the root of prism directory tree, can be anywhere
+# ARCHDIR       : directory created when compiling
+# LIBPSMILE     : list of oasis3-mct libraries
+# PSMILE_INCDIR : includes all *o and *mod for each library
+# BINDIR        : directory for executables
+# LIBBUILD      : contains a directory for each library
+#
+PRISMHOME       = $(HOME)/prism
+ARCHDIR         = $(PRISMHOME)/SX
+LIBPSMILE	= $(ARCHDIR)/lib/libanaisg.a $(ARCHDIR)/lib/libanaism.a $(ARCHDIR)/lib/libclim.$(CHAN).a $(ARCHDIR)/lib/libpsmile.$(CHAN).a $(ARCHDIR)/lib/libfscint.a $(ARCHDIR)/lib/libscrip.a
+PSMILE_INCDIR   = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/clim.$(CHAN)
+BINDIR          = $(ARCHDIR)/bin
+LIBBUILD        = $(ARCHDIR)/build/lib
+#
+# MPI library
+MPIDIR      = /SX/opt/mpisx/inst
+MPIBIN      = $(MPIDIR)/bin
+MPI_INCLUDE = $(MPIDIR)/include
+MPILIB      = -L$(MPIDIR)/lib -lmpichf90 -lmpich
+#
+# NETCDF library
+NETCDF_INCLUDE  = /pool/SX-6/netcdf/netcdf-3.5.0/include
+NETCDF_LIBRARY  = -L/pool/SX-6/netcdf/netcdf-3.5.0/lib -lnetcdf
+#
+LCPP        = /SX/usr/lib/libcpp.a
+#
+# Compiling and other commands
+MAKE        = gmake
+F90         = $(MPIBIN)/sxmpif90 -I$(MPI_INCLUDE)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = $(MPIBIN)/sxmpic++ -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/sxmpif90
+#
+AR          = sxar
+ARFLAGS     = -r
+#
+#
+# compiler options and cpp keys
+# 
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG
+#
+#
+# For compiling in double precision, put -Wf,-A idbl4
+# For compiling in single precision, remove -Wf,-A idbl4 and add -Duse_realtype_single
+F90FLAGS  = -EP -Pstack  -Wf,-pvctl noassume loopcnt=5000000  -Wl,-h lib_cyclic -Wf,-A idbl4 -Wf,-L fmtlist transform $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(F90FLAGS)
+FFLAGS    = $(F90FLAGS)
+fFLAGS    = $(F90FLAGS)
+CCFLAGS   =     $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+LDFLAGS   = 
+#
+# External libraies for linking
+FLIBS     = $(NETCDF_LIBRARY) $(LCPP) 
+#
+#
+###############################################################################
