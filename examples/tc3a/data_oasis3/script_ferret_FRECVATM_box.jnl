@@ -1,6 +1,0 @@
-use FRECVATM_out.2000-01-01T00:00:00.nc
-
-
-shade/level=(0,16,1) FRECVATM[L=3,d=1]
-
-

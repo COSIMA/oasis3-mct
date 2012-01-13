@@ -1,7 +1,0 @@
-use FRECVOCN_out.2000-01-01T00:00:00.nc
-
-
-shade/level=(0,9,0.5) FRECVOCN[L=2,d=1]
-
-
-

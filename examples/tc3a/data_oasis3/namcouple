@@ -35,7 +35,7 @@
 # called by one component model in the coupled system (optional).
 # For the definition of the fields, see under $STRINGS keyword
 #
-         7
+         6
  $END
 #########################################################################
  $JOBNAME
@@ -157,7 +157,7 @@ AVERAGE
 # Field 7
 #M1FLD07 M1FLD07 2 3600 0 OUTPUT
 #torc torc SEQ=3
-M1FLD07 M1FLD07 2 3600 0 M1FLD07_input.nc INPUT
+#M1FLD07 M1FLD07 2 3600 0 M1FLD07_input.nc INPUT
 #182 149 96 72 torc  torc  SEQ=3
 #P  0  P  2
 #
