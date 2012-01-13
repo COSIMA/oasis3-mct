@@ -34,7 +34,7 @@
 # called by one component model in the coupled system (optional).
 # For the definition of the fields, see under $STRINGS keyword
 #
-             2
+             3
  $END
 #########################################################################
  $JOBNAME
@@ -130,8 +130,8 @@ MAPPING
 rmp_torc_to_lmdz_BILINEA.nc src
 #
 # Field 2
-#FOCNWRIT FOCNWRIT 2 7200 0 OUTPUT
-# torc  torc SEQ=2
+FOCNWRIT FOCNWRIT 2 7200 0 OUTPUT
+ torc  torc SEQ=2
 #
 ############################################################################
 #                      ATMOS  --->>>  OCEAN
