@@ -179,10 +179,10 @@ PROGRAM model3
       clo(i,j,2) = globalgrid_clo(i,2)
       clo(i,j,3) = globalgrid_clo(i,2)
       clo(i,j,4) = globalgrid_clo(i,1)
-      cla(i,j,1) = globalgrid_cla(i,1)
-      cla(i,j,2) = globalgrid_cla(i,1)
-      cla(i,j,3) = globalgrid_cla(i,2)
-      cla(i,j,4) = globalgrid_cla(i,2)
+      cla(i,j,1) = globalgrid_cla(j,1)
+      cla(i,j,2) = globalgrid_cla(j,1)
+      cla(i,j,3) = globalgrid_cla(j,2)
+      cla(i,j,4) = globalgrid_cla(j,2)
     ENDDO
   ENDDO
 
