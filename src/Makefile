@@ -1,4 +1,4 @@
-
+#
 #DEPLIBS=$(ARCHDIR)/lib/libscrip.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a $(ARCHDIR)/lib/libpsmile.$(CHAN).a
 #DEPLIBS=$(ARCHDIR)/lib/libpio.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a $(ARCHDIR)/lib/libpsmile.$(CHAN).a
 DEPLIBS=$(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a $(ARCHDIR)/lib/libpsmile.$(CHAN).a
