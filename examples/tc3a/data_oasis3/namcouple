@@ -35,7 +35,7 @@
 # called by one component model in the coupled system (optional).
 # For the definition of the fields, see under $STRINGS keyword
 #
-         6
+         7
  $END
 #########################################################################
  $JOBNAME
@@ -114,7 +114,7 @@ M1FLD01 M2FLD03 1 7200  1  rst1.nc EXPOUT
 # target grid characteristics in grid auxiliary files, 
 # + possibly LAG and SEQ additional indices if needed 
 #
-182 149 96 72 torc  lmdz  SEQ=1 LAG=-7200
+182 149 96 72 torc  lmdz  SEQ=1 LAG=0
 #
 #   Third line:
 # Source grid characteristic (P or R) and number of overlapping grid points
@@ -157,7 +157,7 @@ AVERAGE
 # Field 7
 #M1FLD07 M1FLD07 2 3600 0 OUTPUT
 #torc torc SEQ=3
-#M1FLD07 M1FLD07 2 3600 0 M1FLD07_input.nc INPUT
+M1FLD07 M1FLD07 2 3600 0 M1FLD07_input2.nc INPUT
 #182 149 96 72 torc  torc  SEQ=3
 #P  0  P  2
 #
@@ -182,7 +182,7 @@ SCRIPR
 #
 M3FLD01:M3FLD02 M1FLD03:M1FLD04  3 7200  1  rst3.nc EXPOUT
 #
-96 72 182 149  lmdz torc SEQ=3
+96 72 182 149  lmdz torc SEQ=3 LAG=-3600
 #
 P  0  P  2
 MAPPING

@@ -5,21 +5,20 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler (oasis3 or oasis4)
-arch=Linux     
+arch=corail
 coupler=oasis3
 host=`uname -n`
 user=`whoami`
-your_email=tcraig@ucar.edu
 #
 ## - Define paths
 srcdir=`pwd`
 datadir=$srcdir/data_oasis3
 
-toyname=`basename $srcdir`
+casename=`basename $srcdir`
 
 ## - Define MPIRUN, only used for arch=Linux
 #MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
-MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+#MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
 
 ## - Define names of executables, number of processes for the coupler
 #
@@ -28,8 +27,8 @@ coupler_exe=oasis3.MPI1.x
 # - Toy models: Define number of processes to run each executable
 #               and name of executables
 #
-#rundir=/lustre/globc/${user}/work_${toyname}
-rundir=/space/${user}/work_${toyname}
+rundir=/lustre/globc/${user}/work_${casename}
+#rundir=/space/${user}/work_${casename}
 #name of the executables
     exe1=toyocn
     exe2=toyatm
@@ -45,7 +44,7 @@ rundir=/space/${user}/work_${toyname}
 
 echo ''
 echo '*****************************************************************'
-echo '*** '$toyname' : '$run
+echo '*** '$casename' : '$run
 echo ''
 echo 'Rundir       :' $rundir
 echo 'Architecture :' $arch
@@ -124,7 +123,7 @@ elif [ $arch == corail ] ; then
 
 nproc_oa3=1
 
-  cat <<EOF > $rundir/run_$toyname.$arch
+  cat <<EOF > $rundir/run_$casename.$arch
 # Nom du job
 #PBS -N dev_ex
 # Temps limite du job
@@ -133,7 +132,7 @@ nproc_oa3=1
 #PBS -l select=1:mpiprocs=24:ncpus=24
 #PBS -l place=scatter:excl
 # adresse email a utiliser
-#PBS -M $your_email
+##PBS -M your_email
 # Mail envoye a la fin du job
 #PBS -m ae
 
@@ -167,12 +166,12 @@ if [ $arch == Linux ] ; then
 
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
-    qsub -q debug $rundir/run_$toyname.$arch
+    qsub -q debug $rundir/run_$casename.$arch
     qstat
     
 fi
 
-echo $toyname 'is executed or submitted to queue.'
+echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 
 
 ######################################################################

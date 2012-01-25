@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler (oasis3 or oasis4)
-arch=Linux      
+arch=corail
 coupler=oasis3
 host=`uname -n`
 user=`whoami`
@@ -18,7 +18,7 @@ casename=`basename $srcdir`
 
 ## - Define MPIRUN, only used for arch=Linux
 #MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
-MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+#MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
 
 ## - Define names of executables, number of processes for the coupler
 #
@@ -27,7 +27,8 @@ coupler_exe=oasis3.MPI1.x
 # - Case models: Define number of processes to run each executable
 #               and name of executables
 #
-rundir=/space/${user}/work_${casename}
+#rundir=/space/${user}/work_${casename}
+rundir=/lustre/globc/${user}/work_${casename}
 #name of the executables
     exe1=model1
     exe2=model2
@@ -70,7 +71,7 @@ mkdir -p $rundir
 
 cp -f $datadir/*txt $rundir/.
 cp -f $datadir/*nc  $rundir/.
-cp -f $datadir/*.jnl $rundir/.
+#cp -f $datadir/*.jnl $rundir/.
 
 cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
@@ -133,9 +134,6 @@ EOF
 elif [ $arch == corail ] ; then
 
 nproc_oa3=1
-if [ $run_oasis3_para == 1 ]; then
-nproc_oa3=2
-fi
 #nproc_oa3=0
 
   cat <<EOF > $rundir/run_$casename.$arch
@@ -147,7 +145,7 @@ fi
 #PBS -l select=1:mpiprocs=24:ncpus=24
 #PBS -l place=scatter:excl
 # adresse email a utiliser
-#PBS -M $your_email
+##PBS -M your_email
 # Mail envoye a la fin du job
 #PBS -m ae
 
@@ -185,7 +183,7 @@ elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
 #    qsub -q debug $rundir/run_$casename.$arch
     qsub -q submit $rundir/run_$casename.$arch
-    qstat
+    qstat | grep $user
      
 fi
 

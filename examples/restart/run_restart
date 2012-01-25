@@ -1,0 +1,294 @@
+#!/bin/ksh
+#set -x
+######################################################################
+#
+############### User's section #######################################
+##
+## - Define architecture and coupler (oasis3 or oasis4)
+arch=corail
+coupler=oasis3
+host=`uname -n`
+user=`whoami`
+#
+## - Define paths
+srcdir=`pwd`
+datadir=$srcdir/data_oasis3
+
+casename=`basename $srcdir`
+
+## - Define MPIRUN, only used for arch=Linux
+#MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
+#MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+
+## - Define names of executables, number of processes for the coupler
+#
+coupler_exe=oasis3.MPI1.x
+#
+# - Case models: Define number of processes to run each executable
+#               and name of executables
+#
+#rundir=/space/${user}/work_${casename}
+rundir=/lustre/globc/${user}/work_${casename}
+#name of the executables
+    exe1=model1
+    exe2=model2
+    exe3=model3
+# number of processes for each executable
+    nproc_exe1=2
+    nproc_exe2=3
+    nproc_exe3=1
+# number of processes involved in the coupling for the namcouple
+    ncpl_exe1=$nproc_exe1
+    ncpl_exe2=$nproc_exe2
+    ncpl_exe3=$nproc_exe3
+#
+
+############### End of user's section ################################
+
+echo ''
+echo '*****************************************************************'
+echo '*** '$casename' : '$run
+echo ''
+echo 'Rundir       :' $rundir
+echo 'Architecture :' $arch
+echo 'Host         : '$host
+echo 'User         : '$user
+echo 'Coupler      :' $coupler
+echo ''
+echo $coupler_exe 'runs on 1 proc'
+echo $exe1' runs on '$nproc_exe1 'processes'
+echo $exe2' runs on '$nproc_exe2 'processes'
+echo $exe3' runs on '$nproc_exe3 'processes'
+echo ''
+echo ''
+######################################################################
+###
+### 1. Copy source example directory containing everything needed
+###    into rundir
+
+\rm -fr $rundir
+mkdir -p $rundir
+
+cp -f $datadir/*txt $rundir/.
+cp -f $datadir/*nc  $rundir/.
+#cp -f $datadir/*.jnl $rundir/.
+
+cp -f $srcdir/$exe1 $rundir/.
+cp -f $srcdir/$exe2 $rundir/.
+cp -f $srcdir/$exe3 $rundir/.
+
+cp -f $srcdir/oasis3.MPI1.x $rundir/$coupler_exe
+
+cp -f $datadir/namcouple $rundir/.
+
+ed $rundir/namcouple <<EOF
+g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
+g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
+g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
+g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
+g/nproc_exe3/s/nproc_exe3/$nproc_exe3/
+g/ncpl_exe3/s/ncpl_exe3/$ncpl_exe3/
+w
+q
+EOF
+#
+cd $rundir
+#
+######################################################################
+###
+### 3. Creation of configuration scripts
+
+###---------------------------------------------------------------------
+### Linux
+###---------------------------------------------------------------------
+
+if [ $arch == Linux ] ; then
+  cat <<EOF>> $rundir/appl-linux.conf
+$host 0 $rundir/$coupler_exe
+EOF
+
+  count=0
+  while [[ $count -lt $nproc_exe1 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe1
+EOF
+   (( count += 1 ))
+  done
+
+  count=0
+  while [[ $count -lt $nproc_exe2 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe2
+EOF
+   (( count += 1 ))
+  done
+
+#tcx
+  count=0
+  while [[ $count -lt $nproc_exe3 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe3
+EOF
+   (( count += 1 ))
+  done
+elif [ $arch == corail ] ; then
+
+nproc_oa3=1
+#nproc_oa3=0
+
+  cat <<EOF > $rundir/run_$casename.$arch
+# Nom du job
+#PBS -N dev_ex
+# Temps limite du job
+#PBS -l walltime=00:10:00
+# Nombre de processus
+#PBS -l select=1:mpiprocs=24:ncpus=24
+#PBS -l place=scatter:excl
+# adresse email a utiliser
+##PBS -M your_email
+# Mail envoye a la fin du job
+#PBS -m ae
+
+cd $rundir
+
+source /usr/local/bin/intelmpi.sh
+ulimit -s unlimited
+#
+#########################################################
+#mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+
+cp namcouple namcouple.base
+cp rst1.nc rst1.nc.base
+cp rst2.nc rst2.nc.base
+cp rst3.nc rst3.nc.base
+
+# initial run
+rm namcouple
+sed -e "s#namcouple_runtime#39600#" < namcouple.base > namcouple
+cat >> model1.timefile.txt << EOF1
+  0
+  12
+  3600
+EOF1
+cat >> model2.timefile.txt << EOF1
+  0
+  12
+  3600
+EOF1
+cat >> model3.timefile.txt << EOF1
+  0
+  12
+  3600
+EOF1
+mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 : -np $nproc_exe3 ./$exe3
+rm -r -f r01
+mkdir r01
+mv pout* r01/
+mv nout* r01/
+mv model*.out* r01/
+mv model*.timers* r01/
+mv M*FLD*_model*.nc r01/
+mv oasis.timer* r01/
+cp rst*.nc r01/
+cp model*.timefile.txt r01/
+cp namcouple r01/
+
+# restart run
+mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 : -np $nproc_exe3 ./$exe3
+rm -r -f r02
+mkdir r02
+mv pout* r02/
+mv nout* r02/
+mv model*.out* r02/
+mv model*.timers* r02/
+mv M*FLD*_model*.nc r02/
+mv oasis.timer* r02/
+cp rst*.nc r02/
+cp model*.timefile.txt r02/
+cp namcouple r02/
+
+# long initial run to compare to initial+restart
+rm namcouple
+sed -e "s#namcouple_runtime#82800#" < namcouple.base > namcouple
+rm model1.timefile.txt
+rm model2.timefile.txt
+rm model3.timefile.txt
+cp rst1.nc.base rst1.nc
+cp rst2.nc.base rst2.nc
+cp rst3.nc.base rst3.nc
+cat >> model1.timefile.txt << EOF1
+  0
+  24
+  3600
+EOF1
+cat >> model2.timefile.txt << EOF1
+  0
+  24
+  3600
+EOF1
+cat >> model3.timefile.txt << EOF1
+  0
+  24
+  3600
+EOF1
+mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 : -np $nproc_exe3 ./$exe3
+rm -r -f r03
+mkdir r03
+mv pout* r03/
+mv nout* r03/
+mv model*.out* r03/
+mv model*.timers* r03/
+mv M*FLD*_model*.nc r03/
+mv oasis.timer* r03/
+cp rst*.nc r03/
+cp model*.timefile.txt r03/
+cp namcouple r03/
+
+! validation
+rm model*.log.*
+grep -h tcx r01/model1.out_101 r02/model1.out_101 > model1.log.a
+grep -h tcx r03/model1.out_101                    > model1.log.b
+grep -h tcx r01/model2.out_103 r02/model2.out_103 > model2.log.a
+grep -h tcx r03/model2.out_103                    > model2.log.b
+grep -h tcx r01/model3.out_106 r02/model3.out_106 > model3.log.a
+grep -h tcx r03/model3.out_106                    > model3.log.b
+
+diff model1.log.a model1.log.b > model1.log.diff
+diff model2.log.a model2.log.b > model2.log.diff
+diff model3.log.a model3.log.b > model3.log.diff
+
+#########################################################
+#
+EOF
+
+else 
+  echo 'For architecture='$arch ' you have to add your execution'
+  exit
+fi 
+
+######################################################################
+###
+### 4. Execute the model
+
+if [ $arch == Linux ] ; then
+
+  echo 'Executing the model using '$MPIRUN 
+  echo "  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err "
+  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+
+elif [ $arch == corail ]; then
+    echo 'Submitting the job to queue using qsub'
+#    qsub -q debug $rundir/run_$casename.$arch
+    qsub -q submit $rundir/run_$casename.$arch
+    qstat | grep $user
+     
+fi
+
+echo $casename 'is executed or submitted to queue.'
+echo 'Results are found in rundir : '$rundir 
+
+######################################################################
+
+
+

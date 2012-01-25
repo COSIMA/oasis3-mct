@@ -15,33 +15,55 @@ MODULE mod_prism_parameters
 !
   USE mod_prism_kinds
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Debug    = 3
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Debug    = PRISM_Debug
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Ok	 = 0 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Ok       = PRISM_Ok
 
 !-----Ports status
 
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_NotDef      = -2 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_NotDef      = PRISM_NotDef
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Out         = 14 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Out         = PRISM_Out
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_In          = 15
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_In          = PRISM_In
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_InOut       = 2 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_InOut       = PRISM_InOut
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Recvd       = 3 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Recvd       = PRISM_Recvd
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Sent        = 4 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Sent        = PRISM_Sent
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_LocTrans    = 5
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_LocTrans    = PRISM_LocTrans
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_ToRest      = 6
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_ToRest      = PRISM_ToRest
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Output      = 7
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Output      = PRISM_Output
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_SentOut     = 8
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_SentOut     = PRISM_SentOut
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_ToRestOut   = 9
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_ToRestOut   = PRISM_ToRestOut
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_FromRest    = 10
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_FromRest    = PRISM_FromRest
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Input       = 11
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Input       = PRISM_Input
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_RecvOut     = 12
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_RecvOut     = PRISM_RecvOut
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_FromRestOut = 13
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_FromRestOut = PRISM_FromRestOut
 
 !-----Coupler Comm Status
 
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_NONE        = 100
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_NONE        = PRISM_NONE
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_COMM_READY  = 101
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_COMM_READY  = PRISM_COMM_READY
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_COMM_WAIT   = 102
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_COMM_WAIT   = PRISM_COMM_WAIT
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_PUT         = 103
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_PUT         = PRISM_PUT
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_GET         = 104
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_GET         = PRISM_GET
 
 !-----Field status
 
@@ -89,7 +111,9 @@ MODULE mod_prism_parameters
 !-----Datatypes
 
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Real   = 4  
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Real   = PRISM_Real
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Double = 8 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Double = PRISM_Double
 
 !-----Quit parameters
 !

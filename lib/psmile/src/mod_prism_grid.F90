@@ -118,6 +118,7 @@ CONTAINS
        prism_grid(:)%mask_set   = .false.
        prism_grid(:)%written    = .false.
     endif
+    iwrite = 1   ! just set grids are needed always
 
     end subroutine prism_grid_start_grids_writing
 

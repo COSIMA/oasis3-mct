@@ -35,10 +35,13 @@ contains
     integer(kind=ip_i4_p) :: msec,kinfo
     type(mct_avect)       :: avtmp  ! data read from restart
     real   (kind=ip_r8_p), allocatable :: array(:) ! data
+    integer(kind=ip_i4_p) :: mseclag   ! model time + lag
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=*),parameter :: subname = 'prism_advance_init'
 
     call prism_timer_start ('advance_init')
+
+    write(nulprt,*) '   subname         at           time  time+lag   act: field '
 
     do cplid = 1,prism_ncoupler
        dt    = prism_coupler(cplid)%dt
@@ -53,8 +56,8 @@ contains
        ! check that lag is reasonable
        !------------------------------------------------
 
-       if (abs(lag) > dt) then
-          write(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
+       if (lag > dt .or. lag <= -dt) then
+          write(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
           call prism_sys_abort(compid,subname,' ERROR lag gt dt')
        endif
 
@@ -63,6 +66,7 @@ contains
        !------------------------------------------------
 
        if (getput == PRISM_PUT .and. lag > 0) then
+          mseclag = msec + lag
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
              call prism_sys_abort(compid,subname,' ERROR restart undefined')
@@ -70,6 +74,8 @@ contains
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
           nflds = mct_aVect_nRAttr(prism_coupler(cplid)%aVect1)
           call mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+          write(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
+             trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
           call prism_io_read_avfile(trim(rstfile),avtmp,prism_part(partid)%gsmap)
           allocate(array(lsize))
           do nf = 1,nflds
@@ -114,7 +120,7 @@ contains
 !    type(mct_avect),pointer  :: avect1, avect2
 !    type(mct_sMatP),pointer  :: sMatP
 !    type(mct_router),pointer :: router
-    character(len=*),parameter :: subname = 'prism_advance_run'
+    character(len=*),parameter :: subname = 'prism_advance_run '
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
 
@@ -126,7 +132,7 @@ contains
     !------------------------------------------------
 
     if (mop /= PRISM_Out .and. mop /= PRISM_In) then
-       write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR:',trim(vname)
+       write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
        write(nulprt,*) subname,' ERROR mop invalid ',mop
        call prism_sys_abort(compid,subname,' ERROR model op invalid')
     endif
@@ -207,7 +213,7 @@ contains
        !------------------------------------------------
 
        if (lcouplertime /= ispval .and. msec < lcouplertime) then
-          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR:',trim(vname)
+          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' ERROR model seems to be running backwards',msec,lcouplertime
           call prism_sys_abort(compid,subname,' ERROR model running backwards')
        endif
@@ -254,7 +260,7 @@ contains
        nsa = size(array)
 
        if (nsav /= nsa) then
-          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR:',trim(vname)
+          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' ERROR sizes ',nsav,nsa
           call prism_sys_abort(compid,subname,'ERROR sizes')
        endif
@@ -326,7 +332,7 @@ contains
           call prism_timer_stop(tstring)
 
           if (PRISM_Debug >= 2 .and. trim(cstring) /= 'none') then
-             write(nulprt,*) subname,' at ',msec,mseclag,' PACK:',trim(cstring),' ',trim(vname)
+             write(nulprt,*) subname,' at ',msec,mseclag,' PACK: ',trim(vname),' ',trim(cstring)
           endif
 
           if (time_now) then
@@ -350,11 +356,11 @@ contains
              if (prism_coupler(cplid)%status(nf) /= PRISM_COMM_READY) then
                 comm_now = .false.
                 if (PRISM_Debug >= 5) then
-                   write(nulprt,*) subname,' at ',msec,mseclag,' STAT:',nf,' NOT READY'
+                   write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' NOT READY'
                 endif
              else
                 if (PRISM_Debug >= 5) then
-                   write(nulprt,*) subname,' at ',msec,mseclag,' STAT:',nf,' READY'
+                   write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' READY'
                 endif
              endif
           enddo
@@ -407,8 +413,8 @@ contains
                    prism_part(partid)%gsmap,nx,ny)
                 call prism_timer_stop(tstring)
                 if (PRISM_Debug > 0) then
-                   write(nulprt,*) subname,' at ',msec,mseclag,' WRST:', &
-                      trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
+                   write(nulprt,*) subname,' at ',msec,mseclag,' WRST: ', &
+                      trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1)),' ',trim(rstfile)
                    call prism_sys_flush(nulprt)
                 endif
              endif
@@ -421,7 +427,7 @@ contains
           if (sndrcv) then
           if (getput == PRISM_PUT) then
              if (PRISM_Debug > 0) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' SEND:', &
+                write(nulprt,*) subname,' at ',msec,mseclag,' SEND: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
@@ -446,7 +452,7 @@ contains
              endif
           elseif (getput == PRISM_GET) then
              if (PRISM_Debug > 0) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' RECV:', &
+                write(nulprt,*) subname,' at ',msec,mseclag,' RECV: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
@@ -475,7 +481,7 @@ contains
              write(tstring,F01) 'wout_',cplid
              call prism_timer_start(tstring)
              if (PRISM_Debug > 0) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' WRIT:', &
+                write(nulprt,*) subname,' at ',msec,mseclag,' WRIT: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
@@ -518,10 +524,10 @@ contains
 
           if (PRISM_Debug >= 5) then
              if (getput == PRISM_PUT) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' SKIP:', &
+                write(nulprt,*) subname,' at ',msec,mseclag,' SKIP: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
              elseif (getput == PRISM_GET) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' SKIP:', &
+                write(nulprt,*) subname,' at ',msec,mseclag,' SKIP: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
              endif
              call prism_sys_flush(nulprt)
@@ -537,7 +543,7 @@ contains
          if (time_now .and. unpack) then
              if (input) then
                 if (PRISM_Debug > 0) then
-                   write(nulprt,*) subname,' at ',msec,mseclag,' READ:', &
+                   write(nulprt,*) subname,' at ',msec,mseclag,' READ: ', &
                       trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                    call prism_sys_flush(nulprt)
                 endif
@@ -552,7 +558,7 @@ contains
                 call prism_timer_stop(tstring)
              endif
              if (PRISM_Debug >= 2) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' UPCK:',trim(vname)
+                write(nulprt,*) subname,' at ',msec,mseclag,' UPCK: ',trim(vname)
              endif
              write(tstring,F01) 'gcpy_',cplid
              call prism_timer_start(tstring)

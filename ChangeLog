@@ -1,6 +1,63 @@
 This file describes what tags were created and why
 ================================================================================
 Originator: tcraig
+Date: Jan 24 2012
+Model: oasis3-mct
+Version: oasis3-mct_120124
+
+ - add mod_oasis and "oasis" parameters and interfaces, "prism" still allowed
+ - add restart test
+ - verify restart working for lags
+ - verify negative lag works and modify lag validation test to -dt < lag >= dt
+ - modify tc3a to test negative lag and oasis interfaces
+ - update some diagnostic output slightly
+ - update psmile Makefile dependencies
+ - change make build path to $(HOME)/oasis3-mct
+ - update tc3a M1FLD07 input file, verify "input" option works
+	
+M      lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_parameters.F90
+A      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/Makefile
+M      util/make_dir/make.intel_corail
+M      util/make_dir/make.inc
+M      examples/tutorial/run_tutorial
+A      examples/restart
+A      examples/restart/model2.F90
+A      examples/restart/model3.F90
+A      examples/restart/go.csh
+A      examples/restart/decomp_def.F90
+A      examples/restart/routine_hdlerr.F90
+A      examples/restart/flddiag.F90
+A      examples/restart/read_dim_irreg.F90
+A      examples/restart/data_oasis3
+A      examples/restart/data_oasis3/rmp_torc_to_lmdz_BILINEA.nc
+A      examples/restart/data_oasis3/rmp_lmdz_to_torc_BILINEA.nc
+A      examples/restart/data_oasis3/namcouple
+A      examples/restart/data_oasis3/grid_model1.nc
+A      examples/restart/data_oasis3/grid_model2.nc
+A      examples/restart/data_oasis3/grid_model3.nc
+A      examples/restart/data_oasis3/rst1.nc
+A      examples/restart/data_oasis3/rst2.nc
+A      examples/restart/data_oasis3/rst3.nc
+A      examples/restart/data_oasis3/M1FLD07_input3.nc
+A      examples/restart/data_oasis3/cf_name_table.txt
+A      examples/restart/read_dim_reg.F90
+A      examples/restart/read_grid_irreg.F90
+A      examples/restart/run_restart
+A      examples/restart/read_grid_reg.F90
+A      examples/restart/function_sent.F90
+A      examples/restart/oasis3_local_grid.F90
+A      examples/restart/Makefile
+A      examples/restart/model1.F90
+M      examples/tc3a/model2.F90
+M      examples/tc3a/data_oasis3/namcouple
+A      examples/tc3a/data_oasis3/M1FLD07_input2.nc
+M      examples/tc3a/run_tc3a
+	
+================================================================================
+Originator: tcraig
 Date: Dec 14 2011
 Model: oasis3-mct
 Version: dev_tcraig_111214
