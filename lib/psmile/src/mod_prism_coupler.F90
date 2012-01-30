@@ -39,6 +39,9 @@ MODULE mod_prism_coupler
      !--- fixed at initialization ---
      type(mct_sMatP)       :: sMatP       ! mapper
      character(len=ic_long):: file
+     character(len=ic_med) :: loc         ! location: src,dst
+     character(len=ic_med) :: opt         ! optimization: bfb,sum,opt
+     character(len=ic_med) :: optval      ! mct map option: src,dst
      logical               :: init
      integer(kind=ip_i4_p) :: spart ! src partition
      integer(kind=ip_i4_p) :: dpart ! dst partition
@@ -72,6 +75,12 @@ MODULE mod_prism_coupler
      logical               :: sndrcv   ! send recv flag
      logical               :: output   ! output flag
      logical               :: input    ! input flag
+     logical               :: snddiag  ! diagnose src fields as part of coupling
+     logical               :: rcvdiag  ! diagnose rcv fields as part of coupling
+     real(kind=ip_double_p):: sndmult  ! field multiplier term
+     real(kind=ip_double_p):: sndadd   ! field addition term
+     real(kind=ip_double_p):: rcvmult  ! field multiplier term
+     real(kind=ip_double_p):: rcvadd   ! field addition term
      !--- time varying info ---
      integer(kind=ip_i4_p) :: ltime    ! time at last coupling
      integer(kind=ip_i4_p),pointer :: avcnt(:)  ! counter for averaging
@@ -171,6 +180,9 @@ CONTAINS
   allocate(prism_mapper(prism_mmapper))
   prism_nmapper = 0
   prism_mapper(:)%file  = ""
+  prism_mapper(:)%loc   = ""
+  prism_mapper(:)%opt   = ""
+  prism_mapper(:)%optval= ""
   prism_mapper(:)%init  = .false.
   prism_mapper(:)%spart = ispval
   prism_mapper(:)%dpart = ispval
@@ -202,6 +214,12 @@ CONTAINS
   prism_coupler(:)%trans   = ip_instant
   prism_coupler(:)%conserv = ip_cnone
   prism_coupler(:)%ltime   = ispval
+  prism_coupler(:)%snddiag = .false.
+  prism_coupler(:)%rcvdiag = .false.
+  prism_coupler(:)%sndmult = 1.0_ip_double_p
+  prism_coupler(:)%sndadd  = 0.0_ip_double_p
+  prism_coupler(:)%rcvmult = 1.0_ip_double_p
+  prism_coupler(:)%rcvadd  = 0.0_ip_double_p
 
   lcouplerid   = ispval
   lcouplertime = ispval
@@ -273,6 +291,7 @@ CONTAINS
         enddo
      enddo
      write(nulprt,*) ' '
+     call prism_sys_flush(nulprt)
      call prism_mpi_barrier(mpi_comm_global)
   endif
 
@@ -295,11 +314,20 @@ CONTAINS
   do nns = 1,nnamcpl
      nn = namfldsort(nns)
 
+     !--- tcx require for run time error on corail ????----
+     call prism_mpi_barrier(mpi_comm_global)
+     write(nulprt,*) subname,' check nam ',nns
+     call prism_sys_flush(nulprt)
+
      !--------------------------------
      ! for all my variables
      !--------------------------------
 
      do nv1 = 1,nallvar(compid)
+
+        !--- tcx require for run time error on corail ????----
+        write(nulprt,*) subname,' check var ',nns,nv1
+        call prism_sys_flush(nulprt)
 
         !--------------------------------
         ! get my parition and fld
@@ -371,6 +399,10 @@ CONTAINS
            do nm = 1,prism_nmodels
            do nv = 1,nallvar(nm)
 
+              !--- tcx require for run time error on corail ????----
+              write(nulprt,*) subname,' check mod ',nns,nv1,nm,nv
+              call prism_sys_flush(nulprt)
+
               otfld  = trim(allvar(nv,nm))
               otfldi = -1
 
@@ -388,6 +420,8 @@ CONTAINS
               !--------------------------------
 
               if (otfldi == myfldi) then
+
+                 write(nulprt,*) subname,' check fld ',nns,nv1,nm,nv,otfldi
 
                  if (PRISM_Debug >= 5) then
                     write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,nv,otfldi,' ',trim(otfld)
@@ -494,12 +528,19 @@ CONTAINS
                  prism_coupler(nc)%sndrcv = .false.
                  prism_coupler(nc)%output = .false.
                  prism_coupler(nc)%input  = .false.
+                 prism_coupler(nc)%sndmult= namfldsmu(nn)
+                 prism_coupler(nc)%sndadd = namfldsad(nn)
+                 prism_coupler(nc)%rcvmult= namflddmu(nn)
+                 prism_coupler(nc)%rcvadd = namflddad(nn)
+                 prism_coupler(nc)%snddiag= namchecki(nn)
+                 prism_coupler(nc)%rcvdiag= namchecko(nn)
 
                  !--------------------------------
                  ! prism_coupler input and output flags
                  ! prism_coupler comm flags, need for tags to match up on both sides
                  ! tags assume up to 1000 namcouple inputs and 100 models
                  !--------------------------------
+
 
                  if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
                     prism_coupler(nc)%output = .true.
@@ -536,15 +577,16 @@ CONTAINS
                  !--------------------------------
 
                  if (trim(nammapfil(nn)) /= 'idmap') then
-                 if ((flag == PRISM_In  .and. trim(nammapopt(nn)) == 'dst') .or. &
-                     (flag == PRISM_Out .and. trim(nammapopt(nn)) == 'src')) then
+                 if ((flag == PRISM_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
+                     (flag == PRISM_Out .and. trim(nammaploc(nn)) == 'src')) then
                     !--------------------------------
                     ! try to reuse mapper already defined
                     ! must match mapping file and partition
                     !--------------------------------
                     mapid = -1
                     do n = 1,prism_nmapper
-                       if (trim(prism_mapper(n)%file) == trim(nammapfil(nn))) then
+                       if (trim(prism_mapper(n)%file) == trim(nammapfil(nn)) .and. &
+                           trim(prism_mapper(n)%opt ) == trim(nammapopt(nn))) then
                           if (flag == PRISM_In  .and. prism_mapper(n)%dpart == part1) mapid = n
                           if (flag == PRISM_Out .and. prism_mapper(n)%spart == part1) mapid = n
                        endif
@@ -560,11 +602,13 @@ CONTAINS
                        endif
                        mapid = prism_nmapper
                        prism_mapper(mapid)%file = trim(nammapfil(nn))
+                       prism_mapper(mapid)%loc  = trim(nammaploc(nn))
+                       prism_mapper(mapid)%opt  = trim(nammapopt(nn))
                        if (flag == PRISM_In ) prism_mapper(mapID)%dpart = part1
                        if (flag == PRISM_Out) prism_mapper(mapID)%spart = part1
                     endif
                     prism_coupler(nc)%mapperID = mapid
-                 endif  ! flag and nammapopt match
+                 endif  ! flag and nammaploc match
                  endif  ! nammapfil
 
                  !--------------------------------
@@ -717,12 +761,30 @@ CONTAINS
            endif
            spart = prism_mapper(mapID)%spart
            dpart = prism_mapper(mapID)%dpart
+
            !--- cstring sets whether src or dst are rearranged in remap
-           if (prism_part(spart)%gsize > prism_part(dpart)%gsize) then
+           !--- src = rearrange and map (bfb), dst = map and rearrange (partial sum)
+           if (prism_mapper(mapID)%opt == 'opt') then
+              if (prism_part(spart)%gsize > prism_part(dpart)%gsize) then
+                 cstring = 'dst'
+              else
+                 cstring = 'src'
+              endif
+           elseif (prism_mapper(mapID)%opt == 'bfb') then
+              cstring = 'src'
+           elseif (prism_mapper(mapID)%opt == 'sum') then
               cstring = 'dst'
            else
-              cstring = 'src'
+              write(nulprt,*) subname,' ERROR mapper opt invalid ',trim(prism_mapper(mapID)%opt)
+              call prism_sys_abort(compid,subname,' ERROR mapper opt invalid')
            endif
+           if (prism_mapper(mapID)%optval /= '' .and. &
+               prism_mapper(mapID)%optval /= trim(cstring)) then
+              write(nulprt,*) subname,' ERROR mapper opt changed',trim(prism_mapper(mapID)%optval),' ',trim(cstring)
+              call prism_sys_abort(compid,subname,' ERROR mapper opt changed')
+           endif
+           prism_mapper(mapID)%optval = trim(cstring)
+
            call prism_timer_start('cpl_smatrd')
            call prism_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
               trim(cstring),trim(prism_mapper(mapid)%file),mpi_rank_local,mpi_comm_local)
@@ -869,13 +931,18 @@ CONTAINS
      write(nulprt,*) subname,'   to model     ',prism_coupler(cplid)%comp
      write(nulprt,*) subname,'   using router ',rouid
      write(nulprt,*) subname,'   transform    ',prism_coupler(cplid)%trans
-     write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
+     write(nulprt,*) subname,'   snd diagnose ',prism_coupler(cplid)%snddiag
+     write(nulprt,*) subname,'   snd fld mult ',prism_coupler(cplid)%sndmult
+     write(nulprt,*) subname,'   snd fld add  ',prism_coupler(cplid)%sndadd
   endif
   if (prism_coupler(cplid)%getput == PRISM_GET) then
      write(nulprt,*) subname,'   recv fields  ',trim(prism_coupler(cplid)%fldlist)
      write(nulprt,*) subname,'   from model   ',prism_coupler(cplid)%comp
      write(nulprt,*) subname,'   to model     ',compid
      write(nulprt,*) subname,'   using router ',rouid
+     write(nulprt,*) subname,'   rcv diagnose ',prism_coupler(cplid)%rcvdiag
+     write(nulprt,*) subname,'   rcv fld mult ',prism_coupler(cplid)%rcvmult
+     write(nulprt,*) subname,'   rcv fld add  ',prism_coupler(cplid)%rcvadd
   endif
      write(nulprt,*) subname,'   namcouple op ',prism_coupler(cplid)%ops
      write(nulprt,*) subname,'   namcouple id ',namid
@@ -896,6 +963,9 @@ CONTAINS
      write(nulprt,*) subname,'   use map      ',mapid,trim(prism_mapper(mapid)%file)
      spart = prism_mapper(mapid)%spart
      dpart = prism_mapper(mapid)%dpart
+     write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
+     write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
+     write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',trim(prism_mapper(mapid)%optval)
      write(nulprt,*) subname,'   s/d partids  ',spart,dpart
      if (dpart > 0) &
      write(nulprt,*) subname,'   from/to      ',trim(prism_part(spart)%gridname),' ',&
@@ -958,6 +1028,7 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    type(mct_gsMap) ,intent(in) ,target    :: SgsMap  ! src gsmap
    type(mct_gSMap) ,intent(in) ,target    :: DgsMap  ! dst gsmap
    character(*)    ,intent(in)            :: newdom  ! type of sMat (src or dst)
+        ! src = rearrange and map (bfb), dst = map and rearrange (partial sums)
    character(*)    ,intent(in)            :: filename! netCDF file to read
    integer(IN)     ,intent(in)            :: mytask   ! processor id
    integer(IN)     ,intent(in)            :: mpicom  ! communicator

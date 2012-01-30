@@ -37,9 +37,16 @@ MODULE mod_prism_namcouple
   INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldtrn(:)  ! fields transform, ip_instant,...
   integer(kind=ip_i4_p)   ,public,pointer :: namfldcon(:)  ! conserv fld operation
   character(len=ic_long)  ,public,pointer :: nammapfil(:)  ! mapping file name
-  character(len=ic_med)   ,public,pointer :: nammapopt(:)  ! mapping option (src or dst pes)
+  character(len=ic_med)   ,public,pointer :: nammaploc(:)  ! mapping location (src or dst pes)
+  character(len=ic_med)   ,public,pointer :: nammapopt(:)  ! mapping option (bfb, sum, or opt)
   character(len=ic_med)   ,public,pointer :: namrstfil(:)  ! restart file name
   character(len=ic_med)   ,public,pointer :: naminpfil(:)  ! input file name
+  logical                 ,public,pointer :: namchecki(:)  ! checkin flag
+  logical                 ,public,pointer :: namchecko(:)  ! checkout flag
+  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsmu(:)  ! src multiplier term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsad(:)  ! src additive term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namflddmu(:)  ! dst multipler term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namflddad(:)  ! dst additive term
 
   !--- derived ---
   INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldsort(:) ! sorted namcpl list based on seq
@@ -253,6 +260,7 @@ MODULE mod_prism_namcouple
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cmap_method
   CHARACTER(len=ic_long), DIMENSION(:),ALLOCATABLE :: cmap_file
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cmaptyp
+  CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cmapopt
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: corder
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cnorm_opt
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cfldtype
@@ -299,7 +307,7 @@ CONTAINS
 
   !-----------------------------------------------------------
   integer(kind=ip_i4_p) :: n, nv, n1, loc
-  integer(kind=ip_i4_p) :: ja, jf
+  integer(kind=ip_i4_p) :: ja, jf, jc
   integer(kind=ip_i4_p) :: il_iost
   integer(kind=ip_i4_p) :: maxunit
   character(len=*),parameter :: subname='prism_namcouple_init'
@@ -372,6 +380,9 @@ CONTAINS
   allocate(nammapfil(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "nammapfil" allocation of experiment module',il_err,1)
 
+  allocate(nammaploc(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "nammaploc" allocation of experiment module',il_err,1)
+
   allocate(nammapopt(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "nammapopt" allocation of experiment module',il_err,1)
 
@@ -383,6 +394,24 @@ CONTAINS
 
   allocate(namfldsort(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namfldsort" allocation of experiment module',il_err,1)
+
+  allocate(namchecki(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namchecki" allocation of experiment module',il_err,1)
+
+  allocate(namchecko(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namchecko" allocation of experiment module',il_err,1)
+
+  allocate(namfldsmu(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namfldsmu" allocation of experiment module',il_err,1)
+
+  allocate(namfldsad(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namfldsad" allocation of experiment module',il_err,1)
+
+  allocate(namflddmu(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namflddmu" allocation of experiment module',il_err,1)
+
+  allocate(namflddad(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namflddad" allocation of experiment module',il_err,1)
 
   prism_modnam(:) = trim(cspval)
   namsrcfld(:) = trim(cspval)
@@ -400,9 +429,16 @@ CONTAINS
   namflddti(:) = -1
   namfldlag(:) = 0
   nammapfil(:) = "idmap"
-  nammapopt(:) = "src"
+  nammaploc(:) = "src"
+  nammapopt(:) = "bfb"
   namrstfil(:) = trim(cspval)
   naminpfil(:) = trim(cspval)
+  namchecki(:) = .false.
+  namchecko(:) = .false.
+  namfldsmu(:) = 1.0_ip_realwp_p
+  namfldsad(:) = 0.0_ip_realwp_p
+  namflddmu(:) = 1.0_ip_realwp_p
+  namflddad(:) = 0.0_ip_realwp_p
 
   maxunit = maxval(iga_unitmod)
   write(nulprt,*) subname,' maximum unit number = ',maxunit
@@ -452,8 +488,10 @@ CONTAINS
         do ja = 1, ig_ntrans(ig_number_field(jf))
            if (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
               nammapfil(jf) = trim(cmap_file(ig_number_field(jf)))
-              nammapopt(jf) = trim(cmaptyp(ig_number_field(jf)))
+              nammaploc(jf) = trim(cmaptyp(ig_number_field(jf)))
+              nammapopt(jf) = trim(cmapopt(ig_number_field(jf)))
            endif
+
            if (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') then
               namfldcon(jf) = ip_cnone
               if (cconmet(ig_number_field(jf)) .EQ. 'GLOBAL') namfldcon(jf) = ip_cglobal
@@ -465,9 +503,36 @@ CONTAINS
                  call prism_sys_abort(compid,subname,'ERROR in CONSERV option')
               endif
            endif
-     enddo
-     endif
-  enddo
+
+           if (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) namchecki(jf) = .true.
+           if (canal(ja,ig_number_field(jf)) .EQ. 'CHECKOUT') namchecko(jf) = .true.
+
+           if (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD')THEN
+              namfldsmu(jf) = afldcobo(ig_number_field(jf))
+              do jc = 1, nbofld(ig_number_field(jf))
+                 if (trim(cbofld(jc,ig_number_field(jf))) == 'CONSTANT') then
+                    namfldsad(jf) = abocoef(jc,ig_number_field(jf))
+                 else
+                    write(nulprt,*) subname,jf,'ERROR: BLASOLD only supports CONSTANTS: '//trim(cbofld(jc,ig_number_field(jf)))
+                    call prism_sys_abort(compid,subname,'ERROR in BLASOLD option')
+                 endif
+              enddo
+           endif
+
+           if (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW')THEN
+              namflddmu(jf) = afldcobn(ig_number_field(jf))
+              do jc = 1, nbnfld(ig_number_field(jf))
+                 if (trim(cbnfld(jc,ig_number_field(jf))) == 'CONSTANT') then
+                    namflddad(jf) = abncoef(jc,ig_number_field(jf))
+                 else
+                    write(nulprt,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//trim(cbofld(jc,ig_number_field(jf)))
+                    call prism_sys_abort(compid,subname,'ERROR in BLASNEW option')
+                 endif
+              enddo
+           endif
+        enddo  ! ig_ntrans
+     endif   ! ig_number_field
+  enddo   ! ig_total_nfield
 
   write(nulprt,*) ' '
   do n = 1,nnamcpl
@@ -486,12 +551,18 @@ CONTAINS
      write(nulprt,*) subname,n,'namflddti ',namflddti(n)
      write(nulprt,*) subname,n,'namfldlag ',namfldlag(n)
      write(nulprt,*) subname,n,'nammapfil ',trim(nammapfil(n))
+     write(nulprt,*) subname,n,'nammaploc ',trim(nammaploc(n))
      write(nulprt,*) subname,n,'nammapopt ',trim(nammapopt(n))
      write(nulprt,*) subname,n,'namrstfil ',trim(namrstfil(n))
      write(nulprt,*) subname,n,'naminpfil ',trim(naminpfil(n))
+     write(nulprt,*) subname,n,'namchecki ',namchecki(n)
+     write(nulprt,*) subname,n,'namchecko ',namchecko(n)
+     write(nulprt,*) subname,n,'namfldsmu ',namfldsmu(n)
+     write(nulprt,*) subname,n,'namfldsad ',namfldsad(n)
+     write(nulprt,*) subname,n,'namflddmu ',namflddmu(n)
+     write(nulprt,*) subname,n,'namflddad ',namflddad(n)
      write(nulprt,*) ' '
   enddo
-
 
   !--- compute seq sort ---
   namfldsort(:) = -1
@@ -1822,7 +1893,7 @@ CONTAINS
       LOGICAL llseq, lllag, ll_exist
       INTEGER lastplace
       integer (kind=ip_intwp_p) :: ib,ilind1,ilind2,ilind
-      integer (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen
+      integer (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
       integer (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
       integer (kind=ip_intwp_p) :: icofld,imodel
       character(len=*),parameter :: subname='mod_prism_namecouple:inipar'
@@ -2671,15 +2742,24 @@ CONTAINS
 !* Get mapping filename
                  CALL parse(clline, clvari, 1, jpeighty, ilen)
                  cmap_file(ig_number_field(jf)) = trim(clvari)
-!* Get mapping location, src or dst
-                 CALL parse(clline, clvari, 2, jpeighty, ilen)
-                 cmaptyp(ig_number_field(jf)) = trim(clvari)
-                 if (trim(cmaptyp(ig_number_field(jf))) /= 'src' .and. &
-                     trim(cmaptyp(ig_number_field(jf))) /= 'dst') then
-                    call prtout ('ERROR in namcouple for mapping type',jf,1)
-                    write(nulprt,*) 'ERROR MAPPING map type not supported ',trim(cmaptyp(ig_number_field(jf)))
-                    call prism_sys_abort(compid,subname,'STOP in inipar cmaptyp')
-                 endif
+!* Get mapping location and/or mapping optimization; src (default), dst; bfb (default), sum, opt
+                 cmaptyp(ig_number_field(jf)) = 'src'
+                 cmapopt(ig_number_field(jf)) = 'bfb'
+                 do idum = 2,3
+                    CALL parse(clline, clvari, idum, jpeighty, ilen)
+                    if (ilen > 0) then
+                       if (trim(clvari) == 'src' .or. trim(clvari) == 'dst') then
+                          cmaptyp(ig_number_field(jf)) = trim(clvari)
+                       elseif (trim(clvari) == 'opt' .or. trim(clvari) == 'bfb' &
+                          .or. trim(clvari) == 'sum') then
+                          cmapopt(ig_number_field(jf)) = trim(clvari)
+                       else
+                          call prtout ('ERROR in namcouple mapping argument',jf,1)
+                          write(nulprt,*) 'ERROR in namcouple mapping argument ',trim(clvari)
+                          call prism_sys_abort(compid,subname,'STOP in inipar cmaptyp or loc')
+                       endif
+                    endif
+                 enddo
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'SCRIPR') THEN
 !* Get Scrip remapping method
                  CALL parse(clline, clvari, 1, jpeighty, ilen)
@@ -3212,7 +3292,8 @@ CONTAINS
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') THEN
               write(UNIT = nulprt,FMT = 3048) &
                     trim(cmap_file(ig_number_field(jf))), &
-                    trim(cmaptyp(ig_number_field(jf)))
+                    trim(cmaptyp(ig_number_field(jf))), &
+                    trim(cmapopt(ig_number_field(jf)))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'SCRIPR') THEN
               WRITE(UNIT = nulprt,FMT = 3045)  &
                     cmap_method(ig_number_field(jf)),  &
@@ -3447,7 +3528,8 @@ CONTAINS
  3046 FORMAT(5X,' Order of remapping is             = ',A8)
  3047 FORMAT(5X,' Local transformation  = ',A8) 
  3048 FORMAT(5X,' Remapping filename is             = ',A, &
-           /,5X,' Mapping type is                   = ',A8)
+           /,5X,' Mapping location is               = ',A8, &
+           /,5X,' Mapping optimization is           = ',A8)
 
 
 !*    4. End of routine
@@ -3800,6 +3882,9 @@ CONTAINS
   ALLOCATE (cmaptyp(ig_nfield),stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cmaptyp" allocation of inipar_alloc',il_err,1)
   cmaptyp(:)=' '
+  ALLOCATE (cmapopt(ig_nfield),stat=il_err)
+  IF (il_err.NE.0) CALL prtout ('Error in "cmapopt" allocation of inipar_alloc',il_err,1)
+  cmapopt(:)=' '
   ALLOCATE (cfldtype(ig_nfield),stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cfldtype"allocation of inipar_alloc',il_err,1)
   cfldtype(:)=' '
@@ -4035,6 +4120,8 @@ CONTAINS
   IF (il_err.NE.0) CALL prtout ('Error in "cmap_file" deallocation of inipar_alloc',il_err,1)
   DEALLOCATE (cmaptyp,stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cmaptyp" deallocation of inipar_alloc',il_err,1)
+  DEALLOCATE (cmapopt,stat=il_err)
+  IF (il_err.NE.0) CALL prtout ('Error in "cmapopt" deallocation of inipar_alloc',il_err,1)
   DEALLOCATE (cfldtype,stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cfldtype"deallocation of inipar_alloc',il_err,1)
   DEALLOCATE (crsttype,stat=il_err)

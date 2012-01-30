@@ -41,7 +41,8 @@ contains
 
     call prism_timer_start ('advance_init')
 
-    write(nulprt,*) '   subname         at           time  time+lag   act: field '
+    write(nulprt,*) '   subname         at         time    time+lag   act: field '
+    write(nulprt,*) '   diags :     fldname    min      max      sum '
 
     do cplid = 1,prism_ncoupler
        dt    = prism_coupler(cplid)%dt
@@ -106,6 +107,8 @@ contains
     integer(kind=ip_i4_p) :: nfav,nsav,nsa,n,nc,nf
     integer(kind=ip_i4_p) :: tag,dt,ltime,lag,getput,maxtime,conserv
     logical               :: sndrcv,output,input,unpack
+    logical               :: snddiag,rcvdiag
+    real(kind=ip_double_p):: sndmult,sndadd,rcvmult,rcvadd
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=ic_xl)  :: inpfile   ! input filename
     integer(kind=ip_i4_p) :: nx,ny
@@ -142,26 +145,32 @@ contains
     !------------------------------------------------
 
     do nc = 1,prism_var(varid)%ncpl
-       cplid = prism_var(varid)%cpl(nc)
-       rouid = prism_coupler(cplid)%routerid
-       mapid = prism_coupler(cplid)%mapperid
-       tag   = prism_coupler(cplid)%tag
-       dt    = prism_coupler(cplid)%dt
-       lag   = prism_coupler(cplid)%lag
-       ltime = prism_coupler(cplid)%ltime
-       getput= prism_coupler(cplid)%getput
-       sndrcv= prism_coupler(cplid)%sndrcv
-       rstfile=trim(prism_coupler(cplid)%rstfile)
-       inpfile=trim(prism_coupler(cplid)%inpfile)
+       cplid   = prism_var(varid)%cpl(nc)
+       rouid   = prism_coupler(cplid)%routerid
+       mapid   = prism_coupler(cplid)%mapperid
+       tag     = prism_coupler(cplid)%tag
+       dt      = prism_coupler(cplid)%dt
+       lag     = prism_coupler(cplid)%lag
+       ltime   = prism_coupler(cplid)%ltime
+       getput  = prism_coupler(cplid)%getput
+       sndrcv  = prism_coupler(cplid)%sndrcv
+       rstfile =trim(prism_coupler(cplid)%rstfile)
+       inpfile =trim(prism_coupler(cplid)%inpfile)
        maxtime = prism_coupler(cplid)%maxtime
-       output= prism_coupler(cplid)%output
-       input = prism_coupler(cplid)%input
-       partid= prism_coupler(cplid)%partID
+       output  = prism_coupler(cplid)%output
+       input   = prism_coupler(cplid)%input
+       partid  = prism_coupler(cplid)%partID
        conserv = prism_coupler(cplid)%conserv
-!      avect1 => prism_coupler(cplid)%avect1
-!      avect2 => prism_coupler(cplid)%avect2
-!      sMatP  => prism_mapper(mapid)%sMatP
-!      router => prism_router(rouid)%router
+       snddiag = prism_coupler(cplid)%snddiag
+       rcvdiag = prism_coupler(cplid)%rcvdiag
+       sndadd  = prism_coupler(cplid)%sndadd
+       sndmult = prism_coupler(cplid)%sndmult
+       rcvadd  = prism_coupler(cplid)%rcvadd
+       rcvmult = prism_coupler(cplid)%rcvmult
+!      avect1  => prism_coupler(cplid)%avect1
+!      avect2  => prism_coupler(cplid)%avect2
+!      sMatP   => prism_mapper(mapid)%sMatP
+!      router  => prism_router(rouid)%router
 
        unpack = (sndrcv .or. input)
 
@@ -431,6 +440,10 @@ contains
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
+             if (sndadd /= 0.0_ip_double_p .or. sndmult /= 1.0_ip_double_p) then
+                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*sndmult + sndadd
+             endif
+             if (snddiag) call prism_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
              if (mapid > 0) then
                 write(tstring,F01) 'pmap_',cplid
                 call prism_timer_start(tstring)
@@ -474,6 +487,10 @@ contains
                 call mct_recv(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
                 call prism_timer_stop(tstring)
              endif
+             if (rcvadd /= 0.0_ip_double_p .or. rcvmult /= 1.0_ip_double_p) then
+                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*rcvmult + rcvadd
+             endif
+             if (rcvdiag) call prism_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
           endif  ! getput
           endif  ! sndrcv
 
@@ -485,7 +502,7 @@ contains
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
-             fstring = '_'//trim(compnm)
+             write(fstring,'(A,I2.2)') '_'//trim(compnm)//'_',cplid
              call prism_io_write_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap, &
                 nx,ny,msec,fstring)
              call prism_timer_stop(tstring)
@@ -793,6 +810,100 @@ contains
     deallocate(lwts)
 
   END SUBROUTINE prism_advance_avsum
+
+!-------------------------------------------------------------------
+
+  SUBROUTINE prism_advance_avdiag(av,mpicom,mask,wts)
+
+    implicit none
+    type(mct_aVect)      ,intent(in)    :: av    ! av
+    integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpicom
+    integer(kind=ip_i4_p),intent(in),optional :: mask(:) ! mask to apply to av
+    real(kind=ip_r8_p)   ,intent(in),optional :: wts(:)  ! wts to apply to av
+
+    integer(kind=ip_i4_p) :: n,m,ierr,mype
+    integer(kind=ip_i4_p) :: lsize,fsize        ! local size of av, number of flds in av
+    logical               :: first_call  
+    real(kind=ip_r8_p)    :: lval               ! local temporary
+    real(kind=ip_r8_p),allocatable  :: lsum(:)  ! local sum
+    real(kind=ip_r8_p),allocatable  :: lmin(:)  ! local min
+    real(kind=ip_r8_p),allocatable  :: lmax(:)  ! local max
+    real(kind=ip_r8_p),allocatable  :: gsum(:)  ! global sum
+    real(kind=ip_r8_p),allocatable  :: gmin(:)  ! global min
+    real(kind=ip_r8_p),allocatable  :: gmax(:)  ! global max
+    real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
+    type(mct_string) :: mstring     ! mct char type
+    character(len=64):: itemc       ! string converted to char
+    character(len=*),parameter :: subname = 'prism_advance_avdiag'
+
+    fsize = mct_avect_nRattr(av)
+    lsize = mct_avect_lsize(av)
+
+    allocate(lsum(fsize))
+    allocate(lmin(fsize))
+    allocate(lmax(fsize))
+    allocate(gsum(fsize))
+    allocate(gmin(fsize))
+    allocate(gmax(fsize))
+
+    allocate(lwts(lsize))
+    lwts = 1.0_ip_r8_p
+
+    if (present(mask)) then
+       if (size(mask) /= lsize) then
+          call prism_sys_abort(compid,subname,' ERROR: size mask ne size av')
+       endif
+       do n = 1,lsize
+          if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
+       enddo
+    endif
+
+    if (present(wts)) then
+       if (size(wts) /= lsize) then
+          call prism_sys_abort(compid,subname,' ERROR: size wts ne size av')
+       endif
+       do n = 1,lsize
+          lwts(n) = lwts(n) * wts(n)
+       enddo
+    endif
+
+    lsum = 0.0_ip_r8_p
+    first_call = .true.
+    do n = 1,lsize
+    do m = 1,fsize
+       lval = av%rAttr(m,n)*lwts(n)
+       lsum(m) = lsum(m) + lval
+       if (lwts(n) /= 0.0_ip_r8_p) then
+          if (first_call) then
+             lmin(m) = lval
+             lmax(m) = lval
+             first_call = .false.
+          else
+             lmin(m) = min(lmin(m),lval)
+             lmax(m) = max(lmax(m),lval)
+          endif
+       endif
+    enddo
+    enddo
+
+    call MPI_COMM_RANK(mpicom,mype,ierr)
+    call prism_mpi_sum(lsum,gsum,mpicom,string=trim(subname)//':sum',all=.false.)
+    call prism_mpi_min(lmin,gmin,mpicom,string=trim(subname)//':min',all=.false.)
+    call prism_mpi_max(lmax,gmax,mpicom,string=trim(subname)//':max',all=.false.)
+    if (mype == 0) then
+       do m = 1,fsize
+         call mct_aVect_getRList(mstring,m,av)
+         itemc = mct_string_toChar(mstring)
+         call mct_string_clean(mstring)
+         write(nulprt,'(a,a16,3g21.12)') '   diags: ',trim(itemc),gmin(m),gmax(m),gsum(m)
+       enddo
+    endif
+
+    deallocate(lsum,lmin,lmax)
+    deallocate(gsum,gmin,gmax)
+    deallocate(lwts)
+
+  END SUBROUTINE prism_advance_avdiag
 
 !-------------------------------------------------------------------
 END MODULE mod_prism_advance

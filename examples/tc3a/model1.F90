@@ -63,7 +63,7 @@ PROGRAM model1
      (/'M1FLD01 ','M1FLD02 ','M1FLD03 ','M1FLD04 ','M1FLD05 ', &
        'M1FLD06 ','M1FLD07 ','M1FLD08 ','M1FLD09 ','M1FLD10 '/)
   logical, parameter :: var_out(mvar) = &
-     (/.true.,.true.,.false.,.false.,.true., &
+     (/.true.,.true.,.false.,.false.,.false., &
        .true.,.false.,.false.,.true.,.true./)
 
   INTEGER                       :: var_id(mvar) 

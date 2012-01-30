@@ -158,7 +158,6 @@ ulimit -s unlimited
 #
 mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 : -np $nproc_exe3 ./$exe3
 #mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
-fi
 #
 #########################################################
 #

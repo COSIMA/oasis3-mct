@@ -145,7 +145,6 @@ ulimit -s unlimited
 #
 mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
-fi
 #
 #########################################################
 #
@@ -166,7 +165,8 @@ if [ $arch == Linux ] ; then
 
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
-    qsub -q debug $rundir/run_$casename.$arch
+#    qsub -q debug $rundir/run_$casename.$arch
+    qsub -q submit $rundir/run_$casename.$arch
     qstat
     
 fi

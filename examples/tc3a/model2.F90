@@ -58,10 +58,13 @@ PROGRAM model2
 
   ! Used in oasis_def_var and oasis_def_var_proto
   integer, parameter :: mvar = 10
-  integer, parameter :: nvar = 4
+  integer, parameter :: nvar = 5
   character(len=8),parameter :: var_name(mvar) =  &
      (/'M2FLD01 ','M2FLD02 ','M2FLD03 ','M2FLD04 ','M2FLD05 ', &
        'M2FLD06 ','M2FLD07 ','M2FLD08 ','M2FLD09 ','M2FLD10 '/)
+  logical, parameter :: var_out(mvar) = &
+     (/.true.,.true.,.false.,.false.,.false., &
+       .false.,.false.,.false.,.false.,.false./)
   INTEGER                       :: var_id(mvar) 
   INTEGER                       :: var_nodims(2) 
   INTEGER                       :: var_type
@@ -297,7 +300,7 @@ PROGRAM model2
   ! Declaration of the field associated with the partition
 
   do n = 1,nvar
-     if (n <= nvar/2) then
+     if (var_out(n)) then
         CALL oasis_def_var_proto (var_id(n),var_name(n), part_id, &
            var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
      else
@@ -357,7 +360,7 @@ PROGRAM model2
 !                       field,ib)
 
      do n = 1,nvar
-        if (n <= nvar/2) then
+        if (var_out(n)) then
            DO j=1,var_actual_shape(4)
            DO i=1,var_actual_shape(2)
               field(i,j) =  200 + (n-1)*10 + ib + (cos(float(i)/10.)*sin(float(j)/10.))

@@ -130,8 +130,10 @@ MAPPING
 rmp_torc_to_lmdz_BILINEA.nc src
 #
 # Field 2
-FOCNWRIT FOCNWRIT 2 7200 0 OUTPUT
+FOCNWRIT FOCNWRIT 2 7200 1 OUTPUT
  torc  torc SEQ=2
+LOCTRANS
+  AVERAGE
 #
 ############################################################################
 #                      ATMOS  --->>>  OCEAN

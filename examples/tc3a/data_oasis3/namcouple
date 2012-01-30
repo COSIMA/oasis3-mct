@@ -9,7 +9,7 @@
 # This keyword concerns the coupling algorithm. Put here the maximum number
 # of fields that have to be, at one particular coupling timestep,
 # exchanged sequentially in a given order.
-    3
+    4
  $END
 #########################################################################
  $CHANNEL
@@ -35,7 +35,7 @@
 # called by one component model in the coupled system (optional).
 # For the definition of the fields, see under $STRINGS keyword
 #
-         7
+         8
  $END
 #########################################################################
  $JOBNAME
@@ -128,22 +128,20 @@ MAPPING
 # Specific parameters for each analysis
 # SCRIPR: 1) method 2) source grid type 3) field type 4) search restriction
 #         type 5) number of restriction bins 6)number of neighbours used
- rmp_torc_to_lmdz_BILINEA.nc src
+ rmp_torc_to_lmdz_BILINEA.nc src opt
 #
 # Field 2
-M1FLD02 M2FLD04 2 7200 2 rst1.nc EXPOUT
+M1FLD02 M2FLD04 2 7200 5 rst1.nc EXPOUT
 182 149 96 72 torc  lmdz  SEQ=1  LAG=7200
 P  0  P  2
 #MAPPING
-MAPPING CONSERV
- rmp_torc_to_lmdz_BILINEA.nc dst
+MAPPING CONSERV CHECKIN CHECKOUT BLASOLD
+ rmp_torc_to_lmdz_BILINEA.nc dst opt
  GLBPOS
-#
-# Field 5
-M1FLD05 M1FLD05 2 7200 0 OUTPUT
-torc torc SEQ=3
-#MAPPING
-# rmp_torc_to_lmdz_BILINEA.nc dst
+ INT=1
+ INT=1
+ 2.0 1
+   CONSTANT 9000.0
 #
 # Field 6
 M1FLD06 M1FLD06 2 7200 1 OUTPUT
@@ -167,25 +165,40 @@ M1FLD07 M1FLD07 2 3600 0 M1FLD07_input2.nc INPUT
 # Field 1 :
 #
 M2FLD01:M2FLD02 M3FLD03:M3FLD04  3 3600  1  rst2.nc EXPOUT
-#
 96 72 96 72 lmdz lmdz SEQ=2
-#
 P  0  P  2
 #tcx this is just to get namcouple to not abort, scripr doesn't do anything 
 SCRIPR
  BILINEAR LR SCALAR LATLON 1
 #
 ############################################################################
-#          M3 -> M1
+#          M3 -> M1/M2
 #
 # Field 1 :
 #
 M3FLD01:M3FLD02 M1FLD03:M1FLD04  3 7200  1  rst3.nc EXPOUT
-#
 96 72 182 149  lmdz torc SEQ=3 LAG=-3600
-#
 P  0  P  2
 MAPPING
  rmp_lmdz_to_torc_BILINEA.nc src
+#
+M3FLD05 M1FLD05  3 7200  3  rst3.nc  EXPOUT
+96 72 182 149  lmdz torc SEQ=4
+P  0  P  2
+MAPPING CHECKIN BLASNEW
+ rmp_lmdz_to_torc_BILINEA.nc src
+ INT=1
+ -1.0 1
+    CONSTANT -8000.0
+#
+M3FLD05 M2FLD05  3 10800  2  rst3.nc  EXPOUT
+96 72 182 149  lmdz lmdz SEQ=4
+P  0  P  2
+#tcx this is just to get namcouple to not abort, scripr doesn't do anything 
+#SCRIPR
+# BILINEAR LR SCALAR LATLON 1
+LOCTRANS CHECKOUT
+ AVERAGE
+ INT=1
 #
  $END

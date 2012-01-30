@@ -25,6 +25,7 @@ MODULE mod_prism_method
 #else
    integer(kind=ip_intwp_p),parameter :: debug=1
 #endif
+   logical,save :: lg_mpiflag
 
 CONTAINS
 
@@ -37,7 +38,6 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   logical :: lg_mpiflag
    integer(kind=ip_intwp_p) :: mpi_err
    integer(kind=ip_intwp_p) :: n,iu
    integer(kind=ip_intwp_p) :: icolor,ikey
@@ -62,7 +62,7 @@ CONTAINS
       WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
       CALL MPI_INIT ( mpi_err )
    else
-      WRITE (0,FMT='(A)') subname//': No call of MPI_Init'
+      WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
    ENDIF
 
 #ifdef use_comm_MPI1
@@ -208,7 +208,12 @@ CONTAINS
    call prism_timer_print()
 
    CALL MPI_BARRIER (mpi_comm_global, mpi_err)
-   CALL MPI_Finalize ( mpi_err )
+   IF ( .NOT. lg_mpiflag ) THEN
+      WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
+      CALL MPI_Finalize ( mpi_err )
+   else
+      WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
+   ENDIF
 
    write(nulprt,*) subname,' SUCCESSFUL RUN'
 

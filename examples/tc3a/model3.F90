@@ -53,10 +53,13 @@ PROGRAM model3
 
   ! Used in prism_def_var and prism_def_var_proto
   integer, parameter :: mvar = 10
-  integer, parameter :: nvar = 4
+  integer, parameter :: nvar = 5
   character(len=8),parameter :: var_name(mvar) =  &
      (/'M3FLD01 ','M3FLD02 ','M3FLD03 ','M3FLD04 ','M3FLD05 ', &
        'M3FLD06 ','M3FLD07 ','M3FLD08 ','M3FLD09 ','M3FLD10 '/)
+  logical, parameter :: var_out(mvar) = &
+     (/.true.,.true.,.false.,.false.,.true., &
+       .false.,.false.,.false.,.true.,.true./)
   INTEGER                       :: var_id(mvar) 
   INTEGER                       :: var_nodims(2) 
   INTEGER                       :: var_type
@@ -99,6 +102,7 @@ PROGRAM model3
   !
   !!!!!!!!!!!!!!!!! PRISM_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
+  call MPI_INIT(ierror)
   CALL prism_init_comp_proto (comp_id, comp_name, ierror )
   IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_init_comp_proto', 'Pb in model3')
   !
@@ -245,7 +249,7 @@ PROGRAM model3
   ! Declaration of the field associated with the partition
 
   do n = 1,nvar
-     if (n <= nvar/2) then
+     if (var_out(n)) then
         CALL prism_def_var_proto (var_id(n),var_name(n), part_id, &
            var_nodims, PRISM_Out, var_actual_shape, var_type, ierror)
      else
@@ -305,7 +309,7 @@ PROGRAM model3
 !                       field,ib)
 
      do n = 1,nvar
-        if (n <= nvar/2) then
+        if (var_out(n)) then
            DO j=1,var_actual_shape(4)
            DO i=1,var_actual_shape(2)
               field(i,j) =  300 + (n-1)*10 + ib + (cos(float(i)/10.)*sin(float(j)/10.))
@@ -340,6 +344,7 @@ PROGRAM model3
   !
   CALL prism_terminate_proto (ierror)
   IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_terminate_proto', 'Pb in model3')
+  call MPI_Finalize(ierror)
   !
 END PROGRAM MODEL3
 !
