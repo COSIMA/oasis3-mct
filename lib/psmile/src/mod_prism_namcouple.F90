@@ -110,7 +110,7 @@ MODULE mod_prism_namcouple
 !  INTEGER(kind=ip_intwp_p) :: nddeb
 !  INTEGER(kind=ip_intwp_p) :: nadeb
 !  INTEGER(kind=ip_intwp_p) :: nmdeb
-1  INTEGER(kind=ip_intwp_p) :: njdeb
+!  INTEGER(kind=ip_intwp_p) :: njdeb
 !  INTEGER(kind=ip_intwp_p) :: ig_date(6)
 ! --- mod_timestep
   INTEGER (kind=ip_intwp_p) :: ntime
