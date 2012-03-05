@@ -8,7 +8,7 @@ PROGRAM model2
   ! Use for netCDF library
   USE netcdf
   ! Use for OASIS communication library
-  USE mod_prism
+  USE mod_oasis
   !
   IMPLICIT NONE
 
@@ -54,7 +54,7 @@ PROGRAM model2
   CHARACTER(len=8), PARAMETER :: var_name1 = 'FRECVATM' ! 8 characters field received by the atmosphere from the ocean
   CHARACTER(len=8), PARAMETER :: var_name2 = 'FSENDATM' ! 8 characters field sent by the atmosphere to the ocean
   !
-  ! Used in prism_def_var and prism_def_var_proto
+  ! Used in oasis_def_var and oasis_def_var
   INTEGER                       :: var_id(3) 
   INTEGER                       :: var_nodims(2) 
   INTEGER                       :: var_type
@@ -76,7 +76,7 @@ PROGRAM model2
   !
   ! Grid parameter definition
   INTEGER                       :: part_id  ! use to connect the partition to the variables
-                                            ! in prism_def_var_proto
+                                            ! in oasis_def_var
   INTEGER                       :: var_actual_shape(4) ! local dimensions of the arrays to the pe
                                                        ! 2 x field rank (= 4 because fields are of rank = 2)
   !
@@ -87,7 +87,7 @@ PROGRAM model2
   DOUBLE PRECISION, POINTER     :: clo(:,:,:),cla(:,:,:)
   !
   ! Exchanged local fields arrays
-  ! used in routines prism_put_proto and prism_get_proto
+  ! used in routines oasis_put and oasis_get
   REAL (kind=wp), POINTER       :: field1_recv(:,:)
   REAL (kind=wp), POINTER       :: field2_send(:,:)
   !
@@ -95,14 +95,14 @@ PROGRAM model2
   !   INITIALISATION
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!! PRISM_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!! OASIS_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL prism_init_comp_proto (comp_id, comp_name, ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_init_comp_proto', 'Pb in model2')
+  CALL oasis_init_comp (comp_id, comp_name, ierror )
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_init_comp', 'Pb in model2')
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'MPI_Comm_Rank','Pb in model2')
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Rank','Pb in model2')
   !
   !
   w_unit=100+rank
@@ -116,17 +116,17 @@ PROGRAM model2
   WRITE (w_unit,*) '----------------------------------------------------------'
   CALL flush(w_unit)
   !
-  !!!!!!!!!!!!!!!!! PRISM_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL prism_get_localcomm_proto ( localComm, ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id,'prism_get_localcomm_proto','Pb in model2')
+  CALL oasis_get_localcomm ( localComm, ierror )
+  IF (ierror /= 0) CALL oasis_abort(comp_id,'oasis_get_localcomm','Pb in model2')
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'MPI_Comm_Size','Pb in model2')
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Size','Pb in model2')
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'MPI_Comm_Rank','Pb in model2')
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Rank','Pb in model2')
   !
   WRITE(w_unit,*) 'I am the', TRIM(comp_name), ' ',' comp', comp_id, ' local rank ', mype
   CALL flush(w_unit)
@@ -188,11 +188,11 @@ PROGRAM model2
   ENDDO
   IF (mype == 0) THEN
       !
-      CALL prism_start_grids_writing(il_flag)
-      CALL prism_write_grid('lmdz', nlon, nlat, lon, lat)
-      CALL prism_write_corner('lmdz', nlon, nlat, 4, clo, cla)
-      CALL prism_write_mask('lmdz', nlon, nlat, indice_mask(:,:))
-      CALL prism_terminate_grids_writing()
+      CALL oasis_start_grids_writing(il_flag)
+      CALL oasis_write_grid('lmdz', nlon, nlat, lon, lat)
+      CALL oasis_write_corner('lmdz', nlon, nlat, 4, clo, cla)
+      CALL oasis_write_mask('lmdz', nlon, nlat, indice_mask(:,:))
+      CALL oasis_terminate_grids_writing()
   ENDIF
   WRITE(w_unit,*) 'After grids writing'
   call flush(w_unit)
@@ -201,7 +201,7 @@ PROGRAM model2
   !  PARTITION DEFINITION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
-  ! Definition of the partition of the grid (calling prism_def_partition_proto)
+  ! Definition of the partition of the grid (calling oasis_def_partition)
   ntot=nlon*nlat
 #ifdef DECOMP_APPLE
   il_size = 3
@@ -215,19 +215,19 @@ PROGRAM model2
   CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
-  CALL prism_def_partition_proto (part_id, il_paral, ierror)
+  CALL oasis_def_partition (part_id, il_paral, ierror)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! DEFINITION OF THE LOCAL FIELDS  
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!!! PRISM_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Define transient variables
   !
   var_nodims(1) = 2    ! Rank of the field array is 2
   var_nodims(2) = 1    ! Bundles always 1 for OASIS3
-  var_type = PRISM_Real
+  var_type = OASIS_Real
   !
   var_actual_shape(1) = 1
   var_actual_shape(2) = il_paral(3)
@@ -238,24 +238,24 @@ PROGRAM model2
   var_actual_shape(4) = il_paral(4)
 #endif
   ! Declaration of the field associated with the partition of the grid
-  CALL prism_def_var_proto (var_id(1),var_name1, part_id, &
-     var_nodims, PRISM_In, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_def_var_proto','Pb in model2')
+  CALL oasis_def_var (var_id(1),var_name1, part_id, &
+     var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_def_var','Pb in model2')
   !
-  CALL prism_def_var_proto (var_id(2),var_name2, part_id, &
-     var_nodims, PRISM_Out, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_def_var_proto','Pb in model2')
+  CALL oasis_def_var (var_id(2),var_name2, part_id, &
+     var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_def_var','Pb in model2')
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  !  All processes involved in the coupling must call prism_enddef_proto; 
+  !  All processes involved in the coupling must call oasis_enddef; 
   !  here all processes are involved in coupling
   !
-  !!!!!!!!!!!!!!!!!! PRISM_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL prism_enddef_proto ( ierror )
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_enddef_proto','Pb in model2')
+  CALL oasis_enddef ( ierror )
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_enddef','Pb in model2')
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! SEND AND RECEIVE ARRAYS 
@@ -283,7 +283,7 @@ PROGRAM model2
   !
   DEALLOCATE(il_paral)
   !
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!PRISM_PUT/PRISM_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Data exchange
   !
@@ -298,31 +298,33 @@ PROGRAM model2
     !
     ! Get the field FRECVATM
     field1_recv=field_ini
-    CALL prism_get_proto(var_id(1),itap_sec, field1_recv, ierror)
+    CALL oasis_get(var_id(1),itap_sec, field1_recv, ierror)
     write(w_unit,*) 'tcx recvf1 ',itap_sec,minval(field1_recv),maxval(field1_recv)
-    IF ( ierror .NE. PRISM_Ok .AND. ierror .LT. PRISM_Recvd) &
-    CALL prism_abort_proto(comp_id, 'prism_get_proto','Pb in model2')
+    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) &
+    CALL oasis_abort(comp_id, 'oasis_get','Pb in model2')
     !
     ! Send the field FSENDATM
     write(w_unit,*) 'tcx sendf2 ',itap_sec,minval(field2_send),maxval(field2_send)
-    CALL prism_put_proto(var_id(2),itap_sec, field2_send, ierror)
-    IF ( ierror .NE. PRISM_Ok .AND. ierror .LT. PRISM_Sent) &
-    CALL prism_abort_proto(comp_id, 'prism_put_proto','Pb in model2')
+    CALL oasis_put(var_id(2),itap_sec, field2_send, ierror)
+    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) &
+    CALL oasis_abort(comp_id, 'oasis_put','Pb in model2')
     !
   ENDDO
   !
+  WRITE (w_unit,*) 'End of the program, before oasis_terminate'
+  CALL flush(w_unit)
   CLOSE(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!!! PRISM_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Collective call to terminate the coupling exchanges
   !
-  CALL prism_terminate_proto (ierror)
-  IF (ierror /= 0) CALL prism_abort_proto(comp_id, 'prism_terminate_proto', 'Pb in model1')
+  CALL oasis_terminate (ierror)
+  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_terminate', 'Pb in model1')
   !
 END PROGRAM MODEL2
 !
