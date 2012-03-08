@@ -6,7 +6,9 @@
 ##
 ## - Define architecture and coupler (oasis3 or oasis4)
 arch=Linux    #Linux/corail
-coupler=oasis3
+coupler=oasis3 
+compiler=intel  #pgi/intel
+MPILIB=openmpi  #mpich/openmpi
 host=`uname -n`
 user=`whoami`
 #
@@ -16,8 +18,11 @@ datadir=$srcdir/data_oasis3
 casename=`basename $srcdir`
 #
 if [ ${arch} == Linux ]; then
-#MPIRUN=/usr/local/mpich-1.2.7/bin/mpirun
-MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+    if [ ${compiler} == pgi ] && [ ${MPILIB} == mpich ]; then
+	MPIRUN=/usr/local/pgi/linux86-64/9.0/mpi/mpich/bin/mpirun
+    elif [ ${compiler} == intel ] && [ ${MPILIB} == openmpi ]; then
+	MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
+    fi
 rundir=/space/${user}/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == corail ]; then
 rundir=/lustre/globc/${user}/oasis3-mct/examples/tutorial/work_${casename}
@@ -155,9 +160,13 @@ fi
 ### 4. Execute the model
 
 if [ $arch == Linux ] ; then
-
-  echo 'Executing the model using '$MPIRUN 
-  $MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+    if [ ${compiler} == pgi ] && [ $MPILIB == mpich ]; then
+	echo 'Executing the model using '$MPIRUN 
+	$MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+    elif [ ${compiler} == intel ] && [ $MPILIB == openmpi ]; then
+	echo 'Executing the model using '$MPIRUN 
+	$MPIRUN -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+    fi
 
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
