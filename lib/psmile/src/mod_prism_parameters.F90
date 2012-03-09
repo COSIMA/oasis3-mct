@@ -61,9 +61,9 @@ MODULE mod_prism_parameters
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_COMM_WAIT   = 102
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_COMM_WAIT   = PRISM_COMM_WAIT
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_PUT         = 103
-  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_PUT         = PRISM_PUT
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS3_PUT         = PRISM_PUT
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_GET         = 104
-  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_GET         = PRISM_GET
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS3_GET         = PRISM_GET
 
 !-----Field status
 

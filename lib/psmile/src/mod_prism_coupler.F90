@@ -172,6 +172,8 @@ CONTAINS
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
 
+  lnn=-1
+
   prism_mrouter = nnamcpl
   allocate(prism_router(prism_mrouter))
   prism_nrouter = 0
