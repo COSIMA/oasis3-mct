@@ -522,6 +522,16 @@
             }}}
       }
 
+      \PRISMDOCDebugBox{\put(0,9){\dashbox{0.1}(15,5.2)[t]{}}}
+      \put(0,9){\makebox(15,5.2)[t]{
+          \parbox{15cm}{
+            {\PRISMDOCFont{T1}{ptm}{b}{n}{12pt}{14pt}
+              How to get documentation ?\\[0.5ex]}
+            \PRISMDOCFont{T1}{ptm}{m}{n}{11pt}{13pt}
+            The documentation can be downloaded from the OASIS web site under the URL : \\
+            https://verc.enes.org/models/software-tools/oasis \\
+            }}}
+
       \PRISMDOCDebugBox{\put(0,16.2){\dashbox{0.1}(15,5.2)[t]{}}}
       \put(0,16.2){\makebox(15,5.2)[t]{
           \parbox{15cm}{

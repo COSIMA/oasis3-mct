@@ -33,14 +33,13 @@ The following commands are available:
 \begin{itemize}
 \item {\tt make -f TopMakefileOasis3} 
 
-  compiles OASIS3 libraries {\it clim}, {\it anaisg}, {\it anaism},
-  {\it fscint}, {\it scrip} and main sources and creates
+  compiles OASIS3 libraries {\it mct} and {\it scrip} and main sources and creates
   OASIS3 main executable {\tt oasis3.\$CHAN.x} (where {\tt \$CHAN} is
   {\tt MPI1}, {\tt MPI2} or {\tt NONE}) ;
 
 \item {\tt make -f TopMakefileOasis3 oasis3\_psmile}
 
-  creates OASIS3 main executable as above, and compiles {\it mpp\_io} and {\it
+  creates OASIS3 main executable as above, and compiles {\it
     psmile} sources to create the PSMILe library {\tt libpsmile.\$CHAN.a} (where {\tt \$CHAN} is
   {\tt MPI1}, {\tt MPI2}) that needs to be linked to the component executables;
 
@@ -80,30 +79,30 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   The previous SIPC, PIPE and GMEM communication techniques are not 
   available anymore.
 
-\item Mandatory when linking OASIS3 and PSMILe with a netCDF library (which is
-  highly recommended\footnote{Linking with netCDF is mandatory when
-    using SCRIPR transformations (see section \ref{subsec_interp}).})
-  \begin{itemize}
-  \item{\tt use\_netCDF}
-  \end{itemize}
+%\item Mandatory when linking OASIS3 and PSMILe with a netCDF library (which is
+%  highly recommended\footnote{Linking with netCDF is mandatory when
+%    using SCRIPR transformations (see section \ref{subsec_interp}).})
+%  \begin{itemize}
+%  \item{\tt use\_netCDF}
+%  \end{itemize}
 
-\item Mandatory for compiling the {\it mpp\_io} and {\it psmile}
-  libraries:
-  \begin{itemize}
-  \item{\tt use\_libMPI}
-  \end{itemize}
+%\item Mandatory for compiling the {\it mpp\_io} and {\it psmile}
+%  libraries:
+%  \begin{itemize}
+%  \item{\tt use\_libMPI}
+%  \end{itemize}
 
-\item Mandatory for compiling the {\it mpp\_io} library if LAM
-  implementation of MPI is used:
-  \begin{itemize}
-  \item{\tt use\_LAM\_MPI}
-  \end{itemize}
+%\item Mandatory for compiling the {\it mpp\_io} library if LAM
+%  implementation of MPI is used:
+%  \begin{itemize}
+%  \item{\tt use\_LAM\_MPI}
+%  \end{itemize}
 
-\item To compile OASIS3 in IPSL or CMCC pseudo-parallel mode (see section
-  \ref{sec_pseudopara_mode} for details and restrictions). 
-  \begin{itemize}
-  \item {\tt use\_oasis\_para} or {\tt use\_oasis\_cmcc\_para}
-  \end{itemize}
+%\item To compile OASIS3 in IPSL or CMCC pseudo-parallel mode (see section
+%  \ref{sec_pseudopara_mode} for details and restrictions). 
+%  \begin{itemize}
+%  \item {\tt use\_oasis\_para} or {\tt use\_oasis\_cmcc\_para}
+%  \end{itemize}
   
 \item To ensure, in {\tt SCRIPR/CONSERV} remapping (see section
   \ref{subsec_interp}), that if two cells of the source grid overlay,
@@ -138,49 +137,49 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   Note that if {\tt use\_realtype\_single} is activated the compiling
   option promoting reals should be removed from {\tt F90FLAGS\_1}.
 
-\item For more information in {\it cplout} and in log files {\it
-    *.prt*} during the psmile library exchanges (in particular,
-    a message is printed when entering and leaving each main routine):
-  \begin{itemize}
-  \item{\tt \_\_VERBOSE}
-  \end{itemize}
+%\item For more information in {\it cplout} and in log files {\it
+%    *.prt*} during the psmile library exchanges (in particular,
+%    a message is printed when entering and leaving each main routine):
+%  \begin{itemize}
+%  \item{\tt \_\_VERBOSE}
+%  \end{itemize}
 
-\item For more debugging information to the log files {\it *.prt*}  from the
-  {\it mpp\_io} library:
-  \begin{itemize}
-  \item{\tt DEBUG}
-  \end{itemize}
+%\item For more debugging information to the log files {\it *.prt*}  from the
+%  {\it mpp\_io} library:
+%  \begin{itemize}
+%  \item{\tt DEBUG}
+%  \end{itemize}
 
-\item The CPP key {\tt \_\_DEBUG} to activate :
-
-  \begin{itemize}
-
-  \item deadlock detection in {\it clim} and {\it psmile} librairies
-    at reception of a coupling field: a (non-standard) sleep function
-    is called for one second in a loop testing if the field has been
-    received; the code aborts after {\tt icountmax} seconds if not (the length of
-    the loop can be ajusted with the value of {\tt icountmax} in
-    CLIM\_Import.F and mod\_prism\_get\_proto.F90).
-  \item more debugging information in log files {\it *.prt*} during
-    the {\it psmile} library I/Os;
-  \item in SCRIPR vector transformation, for writing the resulting
-    vertical component in the spherical coordinate system after
-    interpolation to a file {\tt projection.nc} (see section
-    \ref{subsec_interp}).
-  \end{itemize}
-
-\item To get some statistics on the wall clock time spent in the coupling
-  \begin{itemize}
-  \item{\tt balance}
-  \end{itemize}
-
-\item To compile the PSMILe communication library without the I/O
-  functionality (see section \ref{subsec_namcouplesecond}), i.e to
-  compile only empty routines in {\tt oasis3/lib/mpp\_io}:
-  \begin{itemize}
-  \item{\tt key\_noIO}
-  \end{itemize}
-
+%\item The CPP key {\tt \_\_DEBUG} to activate :
+%
+%  \begin{itemize}
+%
+%  \item deadlock detection in {\it clim} and {\it psmile} librairies
+%    at reception of a coupling field: a (non-standard) sleep function
+%    is called for one second in a loop testing if the field has been
+%    received; the code aborts after {\tt icountmax} seconds if not (the length of
+%    the loop can be ajusted with the value of {\tt icountmax} in
+%    CLIM\_Import.F and mod\_prism\_get\_proto.F90).
+%  \item more debugging information in log files {\it *.prt*} during
+%    the {\it psmile} library I/Os;
+%  \item in SCRIPR vector transformation, for writing the resulting
+%    vertical component in the spherical coordinate system after
+%    interpolation to a file {\tt projection.nc} (see section
+%    \ref{subsec_interp}).
+%  \end{itemize}
+%
+%\item To get some statistics on the wall clock time spent in the coupling
+%  \begin{itemize}
+%  \item{\tt balance}
+%  \end{itemize}
+%
+%\item To compile the PSMILe communication library without the I/O
+%  functionality (see section \ref{subsec_namcouplesecond}), i.e to
+%  compile only empty routines in {\tt oasis3/lib/mpp\_io}:
+%  \begin{itemize}
+%  \item{\tt key\_noIO}
+%  \end{itemize}
+%
 \item For compiling without linking the SCRIP interpolation library:
   \begin{itemize}
   \item {\tt key\_noSCRIP}
@@ -207,14 +206,14 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
 
 If you experience problems while running your coupled model with OASIS3, you can obtain more information on what is happening with:
 \begin{itemize}
-\item Putting {\tt \$NLOGPRT = 2} in your namcouple (see section \ref{subsec_namcouplefirst})
-\item Compiling with CPP key {\tt \_\_VERBOSE} which will result in
-  more information printed in {\it cplout} and in log files {\it
-    *.prt*} during the psmile library exchanges (in particular, a
-  message is printed when entering and leaving each main routine)
-\item Compiling with CPP key {\tt DEBUG} which will result in
-  more information printed in the log files {\it *.prt*}  from the
-  {\it mpp\_io} library
+\item Putting {\tt \$NLOGPRT = 20} in your namcouple (see section \ref{subsec_namcouplefirst})
+%\item Compiling with CPP key {\tt \_\_VERBOSE} which will result in
+%  more information printed in {\it cplout} and in log files {\it
+%    *.prt*} during the psmile library exchanges (in particular, a
+%  message is printed when entering and leaving each main routine)
+%\item Compiling with CPP key {\tt DEBUG} which will result in
+%  more information printed in the log files {\it *.prt*}  from the
+%  {\it mpp\_io} library
 \end{itemize}
 
 %\subsection{Compilation using the PRISM Standard Compiling Environment (SCE)}
@@ -338,89 +337,89 @@ If you experience problems while running your coupled model with OASIS3, you can
 %
 %\end{enumerate}
 
-\section{Running OASIS3 in parallel mode}
-\label{sec_pseudopara_mode}
-
-Two modes of parallelisation, both working on a field-per-field basis, 
-were developed concurrently for OASIS3, one by IPSL finalized by CERFACS, and 
-one by CMCC. These modes allows different OASIS3 processes to treat
-different subsets of coupling fields.
-These parallelisation modes can be applied with
-any number of OASIS3 processes; they are in fact only limited by the number
-of coupling fields exchanged within the coupled model.
-
-With both modes, OASIS3 log file (i.e. {\it cplout\_x}) and auxiliary 
-files for transformations {\tt EXTRAP/NINENN}, {\tt INTERP/SURFMESH} and 
-{\tt INTERP/GAUSSIAN} ( i.e. {\it mweights\_x}, {\it nweights\_x}, {\it gweights\_x},
-{\it anaisout\_x}, see \ref{subsec_auxil_diverse}) , and for {\tt SCRIPR} (see
-\ref{subsec_auxilscripr}) are suffixed with the number of the
-corresponding OASIS3 process performing the transformation. This is done automatically
-by the OASIS3 process when the file is created by OASIS3 or has to do so by the user
-if he provides the file before hand.
-
-Note that if the CPP keys {\tt use\_oasis\_para} or {\tt use\_oasis\_cmcc\_para}
-are not activate, these new parallelisation modes have no impact on the use of
-OASIS3. Here are the details on the two modes.
-
-\subsection{IPSL parallelisation}
-\label{sec_ipslpara_mode}
-
-To run the OASIS3 executable on more than one process in IPSL 
-parallelisation mode, OASIS3 must be compiled with the CPP key 
-{\tt use\_oasis\_para} (see \ref{subsec_CPP}).
-
-With IPSL parallelisation mode, each OASIS3 process is totally 
-independent of the others. Therefore, the user has to provide one separate
-configuration file per process and the different files must be named 
-{\it namcouple\_x} where x is the number of the corresponding OASIS3 process. 
-Each OASIS3 process will receive, treat, and send the coupling fields described 
-in its configuration file {\it namcouple\_x}. Note that if OASIS3 was 
-   compiled with the CPP key {\tt use\_oasis\_para}, the configuration file suffix is 
-   mandatory, even if OASIS3 runs in fact with only one process - in this case, 
-   the suffix is {\_0}. 
- 
-Although this parallelisation mode presents the advantage of removing the
-bottleneck that can appear when only one OASIS process receives and sends all
-the coupling fields, there are few constraints associated:
-
-\begin{itemize}
-\item As stated above, the configuration file {\tt namcouple} has to be splitted
-   into different {\tt namcouple\_x}, one per process. In one {\tt namcouple\_x} 
-   the total number of coupling fields treated by OASIS3 process {\tt x} must be 
-   given on the line below the {\tt \$NFIELDS} keyword and only these coupling 
-   fields must be detailed. 
-   
-   If the maximum number of
-  prism\_def\_var\_proto called by ANY component model in the coupled
-  system is greater than twice the number of
-  fields listed in the {\it namcouple\_x} (which is often the case when
-  OASIS3 is used in parallel mode), {\bf this maximum number of
-  prism\_def\_var\_proto has to be specified on the same line}
-  (below the {\tt \$NFIELDS} keyword) after the total number of fields
-  exchanged (see also section
-  \ref{subsec_namcouplefirst}).
- 
-\item This mode is available only with the {\tt MPI1} CLIM communication 
-  technique (see \ref{subsec_namcouplefirst}).
- 
-\item In this mode, the grid data files have to be created
-  by the user before the run (see also \ref{subsubsec_griddef}). 
-
-\item Binary restart files do not work with this mode; NetCDF files have to be used
-
-\item The different OASIS3 executables cannot share the same
-  coupling restart file (see section \ref{subsec_restartdata}). 
-  Therefore, the same coupling restart file cannot be indicated in 
-  different {\it namcouple\_x} configuration files. The recommendation 
-  here is to use one separate coupling restart file per coupling field.
-
-\end{itemize}
-
-\subsection{CMCC parallelisation}
-\label{sec_cmccpara_mode}
-To run the OASIS3 executable on more than one process in CMCC 
-parallelisation mode, OASIS3 must be compiled with the CPP key 
-{\tt use\_oasis\_cmcc\_para} (see \ref{subsec_CPP}). (XXX to be completed)
+%\section{Running OASIS3 in parallel mode}
+%\label{sec_pseudopara_mode}
+%
+%Two modes of parallelisation, both working on a field-per-field basis, 
+%were developed concurrently for OASIS3, one by IPSL finalized by CERFACS, and 
+%one by CMCC. These modes allows different OASIS3 processes to treat
+%different subsets of coupling fields.
+%These parallelisation modes can be applied with
+%any number of OASIS3 processes; they are in fact only limited by the number
+%of coupling fields exchanged within the coupled model.
+%
+%With both modes, OASIS3 log file (i.e. {\it cplout\_x}) and auxiliary 
+%files for transformations {\tt EXTRAP/NINENN}, {\tt INTERP/SURFMESH} and 
+%{\tt INTERP/GAUSSIAN} ( i.e. {\it mweights\_x}, {\it nweights\_x}, {\it gweights\_x},
+%{\it anaisout\_x}, see \ref{subsec_auxil_diverse}) , and for {\tt SCRIPR} (see
+%\ref{subsec_auxilscripr}) are suffixed with the number of the
+%corresponding OASIS3 process performing the transformation. This is done automatically
+%by the OASIS3 process when the file is created by OASIS3 or has to do so by the user
+%if he provides the file before hand.
+%
+%Note that if the CPP keys {\tt use\_oasis\_para} or {\tt use\_oasis\_cmcc\_para}
+%are not activate, these new parallelisation modes have no impact on the use of
+%OASIS3. Here are the details on the two modes.
+%
+%\subsection{IPSL parallelisation}
+%\label{sec_ipslpara_mode}
+%
+%To run the OASIS3 executable on more than one process in IPSL 
+%parallelisation mode, OASIS3 must be compiled with the CPP key 
+%{\tt use\_oasis\_para} (see \ref{subsec_CPP}).
+%
+%With IPSL parallelisation mode, each OASIS3 process is totally 
+%independent of the others. Therefore, the user has to provide one separate
+%configuration file per process and the different files must be named 
+%{\it namcouple\_x} where x is the number of the corresponding OASIS3 process. 
+%Each OASIS3 process will receive, treat, and send the coupling fields described 
+%in its configuration file {\it namcouple\_x}. Note that if OASIS3 was 
+%   compiled with the CPP key {\tt use\_oasis\_para}, the configuration file suffix is 
+%   mandatory, even if OASIS3 runs in fact with only one process - in this case, 
+%   the suffix is {\_0}. 
+% 
+%Although this parallelisation mode presents the advantage of removing the
+%bottleneck that can appear when only one OASIS process receives and sends all
+%the coupling fields, there are few constraints associated:
+%
+%\begin{itemize}
+%\item As stated above, the configuration file {\tt namcouple} has to be splitted
+%   into different {\tt namcouple\_x}, one per process. In one {\tt namcouple\_x} 
+%   the total number of coupling fields treated by OASIS3 process {\tt x} must be 
+%   given on the line below the {\tt \$NFIELDS} keyword and only these coupling 
+%   fields must be detailed. 
+%   
+%   If the maximum number of
+%  prism\_def\_var\_proto called by ANY component model in the coupled
+%  system is greater than twice the number of
+%  fields listed in the {\it namcouple\_x} (which is often the case when
+%  OASIS3 is used in parallel mode), {\bf this maximum number of
+%  prism\_def\_var\_proto has to be specified on the same line}
+%  (below the {\tt \$NFIELDS} keyword) after the total number of fields
+%  exchanged (see also section
+%  \ref{subsec_namcouplefirst}).
+% 
+%\item This mode is available only with the {\tt MPI1} CLIM communication 
+%  technique (see \ref{subsec_namcouplefirst}).
+% 
+%\item In this mode, the grid data files have to be created
+%  by the user before the run (see also \ref{subsubsec_griddef}). 
+%
+%\item Binary restart files do not work with this mode; NetCDF files have to be used
+%
+%\item The different OASIS3 executables cannot share the same
+%  coupling restart file (see section \ref{subsec_restartdata}). 
+%  Therefore, the same coupling restart file cannot be indicated in 
+%  different {\it namcouple\_x} configuration files. The recommendation 
+%  here is to use one separate coupling restart file per coupling field.
+%
+%\end{itemize}
+%
+%\subsection{CMCC parallelisation}
+%\label{sec_cmccpara_mode}
+%To run the OASIS3 executable on more than one process in CMCC 
+%parallelisation mode, OASIS3 must be compiled with the CPP key 
+%{\tt use\_oasis\_cmcc\_para} (see \ref{subsec_CPP}). (XXX to be completed)
 
 \section{Running OASIS3 in coupled mode with TOYOASIS3}
 \label{sec_coupled_mode}
@@ -780,75 +779,75 @@ Power4, CRAYX1, CRAYXD1 and CRAYXT platforms (see {\tt arch}
 variable). If your platform is not supported, the script will
 have to be adapted.
 
-Different modes can be tested. 
-\begin{itemize}
-\item To run in the classic (not parallel) mode, compile
-  without the CPP key {\tt use\_oasis\_para} or {\tt
-    use\_oasis\_cmcc\_para}, and set {\tt ipsl\_comp\_para=0} and {\tt
-    cmcc\_comp\_para=0} in the running script. One can now choose
-  between running atmoa3 and cheoa3 toy models on one process only
-  ({\tt nproc\_atmche=1} and {\tt ncpl\_atmche=1}) or on 3 processes
-  each ({\tt nproc\_atmche=3} and {\tt ncpl\_atmche=3}). The results
-  for the first and second cases are respectively available in {\tt
-    oasis3/examples/toyoasis3/outdata/results\_mono\_111} and \break
-  {\tt oasis3/examples/toyoasis3/outdata/results\_mono\_313} 
-  (XXX this last directory is not updated yet).
-
- Atmoa3 can run on 1 or 3 processes,
-depending on the value of the variable {\tt nproc\_atmche} in script {\tt run\_toyoasis3}. 
-When running on 3 processes, atmoa3 can either exchange coupling data
-through its 3 processes ( {\tt ncpl\_atmche = 3} in {\tt run\_toyoasis3} and  {\tt il\_nbcplproc = 3} in atmoa3.F90) or only 
-through the master process ( {\tt ncpl\_atmche = 1} in {\tt run\_toyoasis3} and  {\tt il\_nbcplproc = 1} in atmoa3.F90). 
-When atmoa3 runs or exchanges data with only one process, it defines
-one Serial partition containing the 96X48 grid points. If it runs and exchanges
-coupling data with 3 processes, its decomposition
-depends on the {\tt cdec} parameter hard coded in routine {\tt decomp\_def.F90}.
-When {\tt cdec = APPLE}, each of the 3 atmoa3 processes calls the PSMILe
-prism\_def\_partition routine to define 1 segment of an APPLE
-decomposition (1536 grid points per segment). If {\tt cdec = BOX}, each process will define 1
-`box' of a BOX decomposition and will treat a box of
-32X48 points.
-If the user hardcodes {\tt cdec = ORANGE}, each process will define a
-partition of two segments of 768 points distant of 1536 points.
-
-\item Setting {\tt gridswr=1} in the script {\tt run\_toyoasis3} will make
-the toy models to create the grid data files {\em grids.nc, masks.nc}
-and {\em areas.nc} and to write their grids, corners, areas and masks
-in these files using the {\tt prism\_write\_grid}, {\tt
-  prism\_write\_corner}, {\tt prism\_write\_mask} and {\tt
-  prism\_write\_area} routines (see \ref{subsubsec_griddef}). This
-does not change the results.
-
-\item To run in IPSL parallelisation mode, set {\tt ipsl\_comp\_para=1}. In this case,
-make sure that the CPP key {\tt use\_oasis\_para} was used for
-compilation. The script will launch OASIS3 on two processes treating
-each one a subset of the coupling fields; the first OASIS3 process
-will treat the coupling fields listed in {\it namcouple\_0} while the
-second will treat the coupling fields listed in {\it namcouple\_1}.
-For more details in the IPSL parallelisation mode, see section
-\ref{sec_ipslpara_mode}.  The results one should get with {\tt
-  ipsl\_comp\_para=1} (in the case the atmoa3 and cheoa3 toy models run on
-one process only) are available in {\tt
-  oasis3/examples/toyoasis3/outdata/results\_para}. (XXX This last directory is not updated yet XXX).
-
-\item To run in CMCC parallelisation mode, set {\tt
-    cmcc\_comp\_para=1}. In this case, make sure that the CPP key {\tt
-    use\_oasis\_cmcc\_para} was used for compilation.  For more
-  details in the CMCC parallelisation mode, see section
-  \ref{sec_cmccpara_mode}. The results one should get with {\tt
-    cmcc\_comp\_para=1} are available in ... (XXX to be completed)
-
-\end{itemize}
-
-\section{Running OASIS3 in interpolator-only mode}
-
-OASIS3 can be used in an interpolator-only mode, in which case it
-transforms fields without running any model (see section
-\ref{subsec_interpolator}). Two test-cases are provided with OASIS3 to
-illustrate its uses in this mode, the ``testinterp'' test-case (see
-section \ref{subsec_running_testinterp}) and the ``testNONE''
-test-case (see section \ref{subsec_running_testnone}). 
-
+%Different modes can be tested. 
+%\begin{itemize}
+%\item To run in the classic (not parallel) mode, compile
+%  without the CPP key {\tt use\_oasis\_para} or {\tt
+%    use\_oasis\_cmcc\_para}, and set {\tt ipsl\_comp\_para=0} and {\tt
+%    cmcc\_comp\_para=0} in the running script. One can now choose
+%  between running atmoa3 and cheoa3 toy models on one process only
+%  ({\tt nproc\_atmche=1} and {\tt ncpl\_atmche=1}) or on 3 processes
+%  each ({\tt nproc\_atmche=3} and {\tt ncpl\_atmche=3}). The results
+%  for the first and second cases are respectively available in {\tt
+%    oasis3/examples/toyoasis3/outdata/results\_mono\_111} and \break
+%  {\tt oasis3/examples/toyoasis3/outdata/results\_mono\_313} 
+%  (XXX this last directory is not updated yet).
+%
+% Atmoa3 can run on 1 or 3 processes,
+%depending on the value of the variable {\tt nproc\_atmche} in script {\tt run\_toyoasis3}. 
+%When running on 3 processes, atmoa3 can either exchange coupling data
+%through its 3 processes ( {\tt ncpl\_atmche = 3} in {\tt run\_toyoasis3} and  {\tt il\_nbcplproc = 3} in atmoa3.F90) or only 
+%through the master process ( {\tt ncpl\_atmche = 1} in {\tt run\_toyoasis3} and  {\tt il\_nbcplproc = 1} in atmoa3.F90). 
+%When atmoa3 runs or exchanges data with only one process, it defines
+%one Serial partition containing the 96X48 grid points. If it runs and exchanges
+%coupling data with 3 processes, its decomposition
+%depends on the {\tt cdec} parameter hard coded in routine {\tt decomp\_def.F90}.
+%When {\tt cdec = APPLE}, each of the 3 atmoa3 processes calls the PSMILe
+%prism\_def\_partition routine to define 1 segment of an APPLE
+%decomposition (1536 grid points per segment). If {\tt cdec = BOX}, each process will define 1
+%`box' of a BOX decomposition and will treat a box of
+%32X48 points.
+%If the user hardcodes {\tt cdec = ORANGE}, each process will define a
+%partition of two segments of 768 points distant of 1536 points.
+%
+%\item Setting {\tt gridswr=1} in the script {\tt run\_toyoasis3} will make
+%the toy models to create the grid data files {\em grids.nc, masks.nc}
+%and {\em areas.nc} and to write their grids, corners, areas and masks
+%in these files using the {\tt prism\_write\_grid}, {\tt
+%  prism\_write\_corner}, {\tt prism\_write\_mask} and {\tt
+%  prism\_write\_area} routines (see \ref{subsubsec_griddef}). This
+%does not change the results.
+%
+%\item To run in IPSL parallelisation mode, set {\tt ipsl\_comp\_para=1}. In this case,
+%make sure that the CPP key {\tt use\_oasis\_para} was used for
+%compilation. The script will launch OASIS3 on two processes treating
+%each one a subset of the coupling fields; the first OASIS3 process
+%will treat the coupling fields listed in {\it namcouple\_0} while the
+%second will treat the coupling fields listed in {\it namcouple\_1}.
+%For more details in the IPSL parallelisation mode, see section
+%\ref{sec_ipslpara_mode}.  The results one should get with {\tt
+%  ipsl\_comp\_para=1} (in the case the atmoa3 and cheoa3 toy models run on
+%one process only) are available in {\tt
+%  oasis3/examples/toyoasis3/outdata/results\_para}. (XXX This last directory is not updated yet XXX).
+%
+%\item To run in CMCC parallelisation mode, set {\tt
+%    cmcc\_comp\_para=1}. In this case, make sure that the CPP key {\tt
+%    use\_oasis\_cmcc\_para} was used for compilation.  For more
+%  details in the CMCC parallelisation mode, see section
+%  \ref{sec_cmccpara_mode}. The results one should get with {\tt
+%    cmcc\_comp\_para=1} are available in ... (XXX to be completed)
+%
+%\end{itemize}
+%
+%\section{Running OASIS3 in interpolator-only mode}
+%
+%OASIS3 can be used in an interpolator-only mode, in which case it
+%transforms fields without running any model (see section
+%\ref{subsec_interpolator}). Two test-cases are provided with OASIS3 to
+%illustrate its uses in this mode, the ``testinterp'' test-case (see
+%section \ref{subsec_running_testinterp}) and the ``testNONE''
+%test-case (see section \ref{subsec_running_testnone}). 
+%
 \subsection{The ``testinterp'' test-case}
 \label{subsec_running_testinterp}
 
@@ -861,8 +860,8 @@ different target grids.
 All files needed to run this test-case can be found in
 {\tt oasis3/examples/testinterp/input} and {\tt oasis3/examples/testinterp/restart}.
 
-To run ``testinterp'', OASIS3 first has to be compiled in
-interpolator-only mode NONE, i.e. with CPP key {\tt use\_comm\_NONE} and 
+To run ``testinterp'', OASIS3 first has to be compiled (see section \ref{sec_notSCE}) in
+interpolator-only mode NONE, i.e. by putting 
 {\tt CHAN = NONE} in the TopMakefileOasis3 header file. Then
 the programs that will calculate the interpolation error, i.e. {\tt
   gen\_error.f90} and {\tt gen\_error\_vector.f90} (for vector
@@ -894,53 +893,54 @@ match the ones in {\tt oasis3/examples/\break testinterp/outdata}.
 (XXX this directory is not updated yet).
 
 \subsection{The ``testNONE'' test-case}
-\label{subsec_running_testnone}
-
-All files to run the ``testNONE'' test-case can be found in {\tt
-  oasis3/examples/testNONE}. This test-case provides a flexible
-environnement to test the interpolation specified in the {\tt
-  INPUT/namcouple} configuration file from a source grid to a target
-grid, both grids being defined in regular OASIS3 grid data files {\it
-  grids.nc}, {\it masks.nc}, {\it areas.nc} (see section
-\ref{subsec_griddata}). 
-
-To run ``testNONE'', OASIS3 first has to be compiled in
-interpolator-only mode NONE, i.e. with CPP key {\tt use\_comm\_NONE} and 
-{\tt CHAN = NONE} in the TopMakefileOasis3 header file. The user then has to adapt the ``User specifications''
-part of the running script {\tt sc\_run\_NONE}. In particular, he has
-to specify:
-\begin{itemize}
-\item {\tt DIRWORK} : the directory where to run the test-case
-\item {\tt BINDIR} : the directory containing OASIS3 executable
-\item {\tt SRCROOT} : the source of the {\tt oasis3} directory
-\item {\tt ARCH} : the platform onto which the test-case will run
-\item {\tt DIR\_GRD} : the directory for the grid data files
-\item {\tt DIR\_INP} : the directory for the {\tt namcouple} and {\tt cf\_name\_table.txt} files  
-\item {\tt SRC\_GRID} and {\tt TGT\_GRID} : the source
-and target grid prefixes in the {\tt namcouple} and in the grid data
-files (see section \ref{subsubsec_secondEXPORTED}), 
-\item {\tt FLD\_NBR} : the number of the analytic function chosen, 
-\item {\tt MASKERROR} : whether or not the error on the target grid will be
-calculated on all points ({\tt MASKERROR=NOT}) or only on non masked
-points ({\tt MASKERROR=YES}).
-\end{itemize}
-
-When launched, the running script {\tt sc\_run\_NONE}:
-\begin{itemize}
-\item creates a working directory
-\item compiles and runs the program {\tt
-    PROG/create\_inputfield.f90} that creates an input field using the
-  chosen analytical function on the specified source grid in file
-  {\tt fldin.nc}
-\item copy all required input and data file to the working directory 
-\item run OASIS3 that interpolates the analytical field from {\tt
-    fldin.nc} with the interpolation specified in the {\tt namcouple}
-\item compile and run the program {\tt PROG/create\_errorfield.f90}
-  that calculates the error between the resulting interpolated field
-  and the field defined by the chosen analytical function on the
-  specified target grid, and writes it to the file {\tt error.nc}
-\end{itemize}
-
+%\label{subsec_running_testnone}
+%
+%All files to run the ``testNONE'' test-case can be found in {\tt
+%  oasis3/examples/testNONE}. This test-case provides a flexible
+%environnement to test the interpolation specified in the {\tt
+%  INPUT/namcouple} configuration file from a source grid to a target
+%grid, both grids being defined in regular OASIS3 grid data files {\it
+%  grids.nc}, {\it masks.nc}, {\it areas.nc} (see section
+%\ref{subsec_griddata}). 
+%
+%To run ``testNONE'', OASIS3 first has to be compiled (see section \ref{sec_notSCE}) in
+%interpolator-only mode NONE, i.e. by putting 
+%{\tt CHAN = NONE} in the TopMakefileOasis3 header file. 
+%The user then has to adapt the ``User specifications''
+%part of the running script {\tt sc\_run\_NONE}. In particular, he has
+%to specify:
+%\begin{itemize}
+%\item {\tt DIRWORK} : the directory where to run the test-case
+%\item {\tt BINDIR} : the directory containing OASIS3 executable
+%\item {\tt SRCROOT} : the source of the {\tt oasis3} directory
+%\item {\tt ARCH} : the platform onto which the test-case will run
+%\item {\tt DIR\_GRD} : the directory for the grid data files
+%\item {\tt DIR\_INP} : the directory for the {\tt namcouple} and {\tt cf\_name\_table.txt} files  
+%\item {\tt SRC\_GRID} and {\tt TGT\_GRID} : the source
+%and target grid prefixes in the {\tt namcouple} and in the grid data
+%files (see section \ref{subsubsec_secondEXPORTED}), 
+%\item {\tt FLD\_NBR} : the number of the analytic function chosen, 
+%\item {\tt MASKERROR} : whether or not the error on the target grid will be
+%calculated on all points ({\tt MASKERROR=NOT}) or only on non masked
+%points ({\tt MASKERROR=YES}).
+%\end{itemize}
+%
+%When launched, the running script {\tt sc\_run\_NONE}:
+%\begin{itemize}
+%\item creates a working directory
+%\item compiles and runs the program {\tt
+%    PROG/create\_inputfield.f90} that creates an input field using the
+%  chosen analytical function on the specified source grid in file
+%  {\tt fldin.nc}
+%\item copy all required input and data file to the working directory 
+%\item run OASIS3 that interpolates the analytical field from {\tt
+%    fldin.nc} with the interpolation specified in the {\tt namcouple}
+%\item compile and run the program {\tt PROG/create\_errorfield.f90}
+%  that calculates the error between the resulting interpolated field
+%  and the field defined by the chosen analytical function on the
+%  specified target grid, and writes it to the file {\tt error.nc}
+%\end{itemize}
+%
 \section{Known problems when compiling or running OASIS3 on specific platforms}
 
 \begin{itemize}

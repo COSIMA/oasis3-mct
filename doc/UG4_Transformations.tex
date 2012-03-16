@@ -7,60 +7,62 @@ Different transformations and 2D interpolations are available in
 OASIS3 to adapt the coupling fields from a source model grid to a target
 model grid. They are divided into five general classes that have
 precedence one over the other in the following order: time
-transformation (with {\tt CLIM/MPI1-MPI2} communication technique only), pre-processing, 
+transformation, pre-processing, 
 interpolation, ``cooking'', and post-processing. This order of
 precedence is conceptually logical, but is also constrained by the 
 OASIS3 software internal structure.
 
-In the following paragraphs, it is first described how to use OASIS3
-in an interpolator-only mode. Then a description of each
+In the following paragraphs, a description of each
 transformation with its corresponding configuring lines is given.
+Features that are now deprecated (non functional) compared
+to prior versions will be noted with the string NON\_FUNCTIONAL
+but not described.
 
-\section{Using OASIS3 in the interpolator-only mode}
-\label{subsec_interpolator}
-
-OASIS3 can be used in an interpolator-only mode, in which case it 
- transforms fields without running any model.  It is
- recommended to use first OASIS3 in this mode
- to test different transformations and interpolations without
- having to run the whole coupled system. In the interpolator-only mode,
- all transformations, except the time transformations, are available.
-
-To run OASIS3 in an interpolator-only mode, the user has to prepare
-the {\it namcouple} as indicated in sections
-\ref{subsec_namcouplefirst} and \ref{subsec_namcouplesecond}. In
-particular, {\tt NONE} has to be chosen below the keyword {\tt
-\$CHANNEL}; ``0'' (without any model name and Fortran unit number)
-must be given below the keyword {\tt \$NBMODEL}; {\tt \$RUNTIME} has
-to be the number of time occurrences of the field to interpolate from
-the NetCDF input file\footnote{For binary input file, only one time
-occurence may be interpolated}; finally, the ``coupling'' period of
-the field (4th entry on the field first line) must be always ``1''.
-Note that if {\tt \$RUNTIME} is smaller than the total number of time
-ocurrences in the input file, the first {\tt \$RUNTIME} occurrences
-will be interpolated.
-
-The name of the input file which contains the fields to interpolate is
-given by the 6th entry on the field first line (see
-\ref{subsec_namcouplesecond}). After their transformation, OASIS3
-writes them to their output file which name is the 7th entry on the
-first line. Note that there must be one input file and one output file
-per field.
-
-The time variable in the input file, if any, is recognized by the its
-attribute "units".  The acceptable units for time are listed in the
-udunits.dat file \cite{udunits}.  This follows the CF convention.
-
-To compile OASIS3 in interpolator-only mode, see section \ref{sec_notSCE}.
-Practical examples on how to use OASIS3 in a interpolator-only mode are
-given in {\tt oasis3/examples/testinterp} (see also
-section \ref{subsec_running_testinterp}) and {\tt
-  oasis3/examples/testNONE} (see also section
-\ref{subsec_running_testnone})
-
-The configuring parameters that have to be defined in the {\it
-namcouple} for each transformation in the interpolator-only mode or in
-the coupling mode are described here after.
+%\section{Using OASIS3 in the interpolator-only mode}
+%\label{subsec_interpolator}
+%
+%OASIS3 can be used in an interpolator-only mode, in which case it 
+% transforms fields without running any model.  It is
+% recommended to use first OASIS3 in this mode
+% to test different transformations and interpolations without
+% having to run the whole coupled system. In the interpolator-only mode,
+% all transformations, except the time transformations, are available.
+%
+%To run OASIS3 in an interpolator-only mode, the user has to prepare
+%the {\it namcouple} as indicated in sections
+%\ref{subsec_namcouplefirst} and \ref{subsec_namcouplesecond}. In
+%particular, {\tt NONE} has to be chosen below the keyword {\tt
+%\$CHANNEL}; ``0'' (without any model name and Fortran unit number)
+%must be given below the keyword {\tt \$NBMODEL}; {\tt \$RUNTIME} has
+%to be the number of time occurrences of the field to interpolate from
+%the NetCDF input file\footnote{For binary input file, only one time
+%occurence may be interpolated}; finally, the ``coupling'' period of
+%the field (4th entry on the field first line) must be always ``1''.
+%Note that if {\tt \$RUNTIME} is smaller than the total number of time
+%ocurrences in the input file, the first {\tt \$RUNTIME} occurrences
+%will be interpolated.
+%
+%The name of the input file which contains the fields to interpolate is
+%given by the 6th entry on the field first line (see
+%\ref{subsec_namcouplesecond}). After their transformation, OASIS3
+%writes them to their output file which name is the 7th entry on the
+%first line. Note that there must be one input file and one output file
+%per field.
+%
+%The time variable in the input file, if any, is recognized by the its
+%attribute "units".  The acceptable units for time are listed in the
+%udunits.dat file \cite{udunits}.  This follows the CF convention.
+%
+%To compile OASIS3 in interpolator-only mode, see section \ref{sec_notSCE}.
+%Practical examples on how to use OASIS3 in a interpolator-only mode are
+%given in {\tt oasis3/examples/testinterp} (see also
+%section \ref{subsec_running_testinterp}) and {\tt
+%  oasis3/examples/testNONE} (see also section
+%\ref{subsec_running_testnone})
+%
+%The configuring parameters that have to be defined in the {\it
+%namcouple} for each transformation in the interpolator-only mode or in
+%the coupling mode are described here after.
  
 %{Running OASIS3 in the interpolator-only mode}
 
@@ -72,6 +74,16 @@ Transformation {\tt LOCTRANS}\footnote{Note that LOCTRANS cannot be
   techniques.} requires one configuring line on which a time
 transformation, automatically performed below the call to PSMILe {\tt
   prism\_put\_proto}, should be indicated:
+
+Non INSTANT time transformations are now supported more generally
+with use of a restart file.  The restart file allows the partial
+time transformation to be saved at the end of the run for exact
+restart at the start of the next run.  For that reason, restart
+filenames are now required for all namcouple transforms that use
+LOCTRANS with non INSTANT values.  In this mode, oasis will exit
+gracefully with an error message if a restart filename is not provided.
+This is the reason an optional restart file is now provided on the
+OUTPUT namcouple input line.
 
 \begin{itemize}
 \item {\tt INSTANT}: no time transformation, the instantaneous field is
@@ -104,159 +116,155 @@ OASIS3, controlled by {\tt preproc.f}.
  
 \begin{itemize}
 
-\item {\bf REDGLO}
+\item {\bf REDGLO} NON\_FUNCTIONAL
    
-  {\it This transformation is deprecated in the current OASIS3 version as
-  interpolations for Gaussian Reduced grid now exist; this transformation
-  should not be used anymore.}
+%  {\it This transformation is deprecated in the current OASIS3 version as
+%  interpolations for Gaussian Reduced grid now exist; this transformation
+%  should not be used anymore.}
 
- {\tt REDGLO} (routine {\tt redglo.f}) performs the interpolation from a
- Reduced grid to a Gaussian one. The interpolation is linear and
- performed latitude circle per
- latitude circle. When present, REDGLO must be the first pre-processing
- transformation performed.
- The configuring line is as follows:
- \begin{verbatim}
- # REDGLO operation
-     $NNBRLAT  $CDMSK \end{verbatim}where {\tt \$NNBRLAT} is NOxxx 
- where xxx is half the number of latitude circles of the Gaussian
- grid. For example, for a T42 with 64 latitude circles, {\tt
- \$NNBRLAT} is ``NO32''. In the current version, it can be either
- NO16, NO24, NO32, NO48, NO80, NO160. {\tt \$CDMSK} is a flag
- indicating if non-masked values have to be extended to masked areas
- before interpolation ({\tt \$CDMSK = SEALAND}) using the Reduced grid
- mask (see section \ref{subsec_griddata}) or if the opposite has to be
- performed ({\tt \$CDMSK = LANDSEA}).  If {\tt \$CDMSK = NOEXTRAP},
- then no extrapolation is performed.
+% {\tt REDGLO} (routine {\tt redglo.f}) performs the interpolation from a
+% Reduced grid to a Gaussian one. The interpolation is linear and
+% performed latitude circle per
+% latitude circle. When present, REDGLO must be the first pre-processing
+% transformation performed.
+% The configuring line is as follows:
+% \begin{verbatim}
+% # REDGLO operation
+%     $NNBRLAT  $CDMSK \end{verbatim}where {\tt \$NNBRLAT} is NOxxx 
+% where xxx is half the number of latitude circles of the Gaussian
+% grid. For example, for a T42 with 64 latitude circles, {\tt
+% \$NNBRLAT} is ``NO32''. In the current version, it can be either
+% NO16, NO24, NO32, NO48, NO80, NO160. {\tt \$CDMSK} is a flag
+% indicating if non-masked values have to be extended to masked areas
+% before interpolation ({\tt \$CDMSK = SEALAND}) using the Reduced grid
+% mask (see section \ref{subsec_griddata}) or if the opposite has to be
+% performed ({\tt \$CDMSK = LANDSEA}).  If {\tt \$CDMSK = NOEXTRAP},
+% then no extrapolation is performed.
 
-\item {\bf INVERT}: 
+\item {\bf INVERT}: NON\_FUNCTIONAL
 
-  {\it This transformation is deprecated in the current OASIS version
-    and should be used anymore. The fields and corresponding grids can
-    be given in any direction as long as they are coherent.}
+%  {\it This transformation is deprecated in the current OASIS version
+%    and should be used anymore. The fields and corresponding grids can
+%    be given in any direction as long as they are coherent.}
+%
+% {\tt INVERT} (routine {\tt invert.f}) reorders a field so that it
+% goes from south to north and from west to east (the first point will
+% be the southern and western most one; then it goes parallel by parallel
+% going from south to north). Note that {\tt INVERT} does not transform the
+% associated grid or mask. {\tt INVERT} should be used only for
+% fields associated to A, B, G, L, Z, or Y grids (see annexe
+% \ref{subsec_gridtypes}) but produced by the source model from North to
+% South and/or from East to West. {\tt INVERT} does not work for
+% Reduced ('D') or unstructured ('U') grids (see annexe
+% \ref{subsec_gridtypes}).
+%
+% The generic input line is as follows:
+% \begin{verbatim}
+% # INVERT operation
+%     $CORLAT  $CORLON \end{verbatim} where
+% {\tt \$CORLAT = NORSUD} or {\tt SUDNOR} and {\tt \$CORLON = ESTWST}
+% or {\tt WSTEST} describes the orientation of the source field in
+% longitude and latitude, respectively. 
 
- {\tt INVERT} (routine {\tt invert.f}) reorders a field so that it
- goes from south to north and from west to east (the first point will
- be the southern and western most one; then it goes parallel by parallel
- going from south to north). Note that {\tt INVERT} does not transform the
- associated grid or mask. {\tt INVERT} should be used only for
- fields associated to A, B, G, L, Z, or Y grids (see annexe
- \ref{subsec_gridtypes}) but produced by the source model from North to
- South and/or from East to West. {\tt INVERT} does not work for
- Reduced ('D') or unstructured ('U') grids (see annexe
- \ref{subsec_gridtypes}).
-
- The generic input line is as follows:
- \begin{verbatim}
- # INVERT operation
-     $CORLAT  $CORLON \end{verbatim} where
- {\tt \$CORLAT = NORSUD} or {\tt SUDNOR} and {\tt \$CORLON = ESTWST}
- or {\tt WSTEST} describes the orientation of the source field in
- longitude and latitude, respectively. 
-
-\item {\bf MASK}: 
+\item {\bf MASK}: NON\_FUNCTIONAL
  
- {\tt MASK} (routine {\tt masq.f}) is used before the analysis {\tt
- EXTRAP}.  A given {\tt REAL} value {\tt VALMASK} is assigned to all masked
- points following the source grid mask (see section
- \ref{subsec_griddata}), so they can be detected by {\tt EXTRAP}.
+% {\tt MASK} (routine {\tt masq.f}) is used before the analysis {\tt
+% EXTRAP}.  A given {\tt REAL} value {\tt VALMASK} is assigned to all masked
+% points following the source grid mask (see section
+% \ref{subsec_griddata}), so they can be detected by {\tt EXTRAP}.
+%
+% The generic input line is as follows:
+% \begin{verbatim}
+% # MASK operation
+%     $VALMASK \end{verbatim}
+%   Make sure that \$VALMASK conforms to a {\tt REAL} value, e.g. ``99999999." not ``99999999" . Problems may arise if the value chosen
+% approaches the maximum value that your computing platform can
+% represent; choose a value well outside the range of
+% your field values but not too large.
 
- The generic input line is as follows:
- \begin{verbatim}
- # MASK operation
-     $VALMASK \end{verbatim}
-   Make sure that \$VALMASK conforms to a {\tt REAL} value, e.g. ``99999999." not ``99999999" . Problems may arise if the value chosen
- approaches the maximum value that your computing platform can
- represent; choose a value well outside the range of
- your field values but not too large.
+\item {\bf EXTRAP}: NON\_FUNCTIONAL
 
-\item {\bf EXTRAP}: 
-
- {\tt EXTRAP} (routine {\tt extrap.f}) performs the extrapolation of a
- field over its masked points.  The analysis {\tt MASK} must be used
- just before, so that {\tt EXTRAP} can identify masked points. Note
- that {\tt EXTRAP} does not work for Reduced ('D') or unstructured
- ('U') grids (see appendix \ref{subsec_gridtypes}).
-
- Two methods of extrapolation are available. With {\tt NINENN}, a
- N-nearest-neighbour method is used. The procedure is iterative and the
- set of remaining masked points evolves at each iteration.  The
- configuring line is:
- \begin{verbatim}
- # EXTRAP operation for $CMETH = NINENN
-     $CMETH  $NV  $NIO  $NID\end{verbatim} where
- {\tt \$CMETH = NINENN}; {\tt \$NV} is the minimum number
- of neighbours required to perform the extrapolation (with a maximum
- of 4)\footnote{For some grids, the extrapolation may not converge if
- {\tt \$NV} is too large.}; {\tt \$NIO} is the flag that
- indicates if the weight-address-and-iteration-number dataset will be
- calculated and written by OASIS3 ({\tt \$NIO}= 1), or only read ({\tt
- \$NIO}= 0) in file {\em nweights} (see section
- \ref{subsec_transformationdata}); {\tt \$NID} is the identificator for
- the weight-address-iteration-number dataset in all the different
- {\tt EXTRAP/NINENN} datasets in the present coupling.\footnote{An
- {\tt EXTRAP/NINENN} analysis is automatically performed within {\tt GLORED}
- analysis but the corresponding datasets have to be distinct; this is 
- automatically checked by OASIS3 at the beginning of the run.}
-
- With {\tt \$CMETH = WEIGHT}, an N-weighted-neighbour extrapolation
- is performed. In that case, the user has to build the grid-mapping
- file, giving for each target grid point the weights and addresses
- of the source grid points used in the extrapolation; the structure of this
- file has to follow the OASIS3 generic structure for transformation
- auxiliary data files (see section \ref{subsec_transformationdata}).
-
- The configuring line is:
- \begin{verbatim}
- # EXTRAP operation for $CMETH = WEIGHT
-     $CMETH  $NV  $CFILE  $NUMLU  $NID\end{verbatim} where
- {\tt \$CMETH = WEIGHT}; {\tt \$NV} is the maximum number of
- neighbours required by the extrapolation operation; {\tt \$CFILE} and
- {\tt \$NUMLU} are the grid-mapping file name and associated logical
- unit; {\tt \$NID} is the identificator for the relevant grid-mapping
- dataset in all different {\tt EXTRAP/WEIGHT} transformations in the present
- coupling.
+% {\tt EXTRAP} (routine {\tt extrap.f}) performs the extrapolation of a
+% field over its masked points.  The analysis {\tt MASK} must be used
+% just before, so that {\tt EXTRAP} can identify masked points. Note
+% that {\tt EXTRAP} does not work for Reduced ('D') or unstructured
+% ('U') grids (see appendix \ref{subsec_gridtypes}).
+%
+% Two methods of extrapolation are available. With {\tt NINENN}, a
+% N-nearest-neighbour method is used. The procedure is iterative and the
+% set of remaining masked points evolves at each iteration.  The
+% configuring line is:
+% \begin{verbatim}
+% # EXTRAP operation for $CMETH = NINENN
+%     $CMETH  $NV  $NIO  $NID\end{verbatim} where
+% {\tt \$CMETH = NINENN}; {\tt \$NV} is the minimum number
+% of neighbours required to perform the extrapolation (with a maximum
+% of 4)\footnote{For some grids, the extrapolation may not converge if
+% {\tt \$NV} is too large.}; {\tt \$NIO} is the flag that
+% indicates if the weight-address-and-iteration-number dataset will be
+% calculated and written by OASIS3 ({\tt \$NIO}= 1), or only read ({\tt
+% \$NIO}= 0) in file {\em nweights} (see section
+% \ref{subsec_transformationdata}); {\tt \$NID} is the identificator for
+% the weight-address-iteration-number dataset in all the different
+% {\tt EXTRAP/NINENN} datasets in the present coupling.\footnote{An
+% {\tt EXTRAP/NINENN} analysis is automatically performed within {\tt GLORED}
+% analysis but the corresponding datasets have to be distinct; this is 
+% automatically checked by OASIS3 at the beginning of the run.}
+%
+% With {\tt \$CMETH = WEIGHT}, an N-weighted-neighbour extrapolation
+% is performed. In that case, the user has to build the grid-mapping
+% file, giving for each target grid point the weights and addresses
+% of the source grid points used in the extrapolation; the structure of this
+% file has to follow the OASIS3 generic structure for transformation
+% auxiliary data files (see section \ref{subsec_transformationdata}).
+%
+% The configuring line is:
+% \begin{verbatim}
+% # EXTRAP operation for $CMETH = WEIGHT
+%     $CMETH  $NV  $CFILE  $NUMLU  $NID\end{verbatim} where
+% {\tt \$CMETH = WEIGHT}; {\tt \$NV} is the maximum number of
+% neighbours required by the extrapolation operation; {\tt \$CFILE} and
+% {\tt \$NUMLU} are the grid-mapping file name and associated logical
+% unit; {\tt \$NID} is the identificator for the relevant grid-mapping
+% dataset in all different {\tt EXTRAP/WEIGHT} transformations in the present
+% coupling.
 
 
- 
 \item {\bf CHECKIN}:
 
- {\tt CHECKIN} (routine {\tt chkfld.f}) calculates the mean and extremum
- values of the source field and prints them to the coupler log file
- {\em cplout} (this operation does not transform the field).
+ {\tt CHECKIN} calculates the mean and extremum
+ values of the source field and prints them to the oasis log files
+ (this operation does not transform the field).
 
  The generic input line is as follows:
  \begin{verbatim}
  # CHECKIN operation
-     INT=$NINT   \end{verbatim} where
+     $INT = $NINT  \end{verbatim} where
  {\tt \$NINT} = 1 or 0, depending on whether or not the source
  field integral is also calculated and printed.
 
-\item {\bf CORRECT}:
+\item {\bf CORRECT}: NON\_FUNCTIONAL
  
- {\tt CORRECT} (routine {\tt correct.f}) reads external fields from binary
- files and uses them to modify the coupling field. This transformation
- can be used, for example, to perform flux correction on the field.
-
- This transformation requires at least one configuration line with two
- parameters:
- \begin{verbatim}
- # CORRECT operation 
-     $XMULT  $NBFIELDS \end{verbatim} where
- {\tt \$XMULT} is the multiplicative coefficient of the current
- field, and {\tt \$NBFIELDS} the number of additional fields to be
- combined with the current field.  For each additional field, an
- additional configuring line is required:
- \begin{verbatim}
- # nbfields lines
-     $CLOC  $AMULT  $CFILE  $NUMLU \end{verbatim} where
- {\tt \$CLOC} and {\tt \$AMULT}, {\tt \$CFILE} and {\tt \$NUMLU}
- are respectively the symbolic name, the multiplicative coefficient,
- the file name and the associated logical unit on which the additional
- field is going to be read. The structure of the file has to follow
- the structure of OASIS3 binary coupling restart files (see section
- \ref{subsec_restartdata}).
-
+% {\tt CORRECT} allows users to scale and add a scalar to a
+% field.  The ability to  read external fields and to use them
+% to modify the coupling field is no longer available. This transformation
+% can be used, for example, to change units on the field.
+%
+% This transformation requires at least one configuration line with two
+% parameters:
+% \begin{verbatim}
+% # CORRECT operation 
+%     $XMULT  $NBFIELDS \end{verbatim} where
+% {\tt \$XMULT} is the multiplicative coefficient of the current
+% field, and {\tt \$NBFIELDS} is NON\_FUNCTIONAL and must be set to 1.
+% \begin{verbatim}
+% # nbfields lines
+%     $CLOC  $AMULT  $CFILE  $NUMLU \end{verbatim} where
+% {\tt \$AMULT} specifies the additive value.  
+% {\tt \$CLOC} (string), {\tt \$CFILE} (string) and {\tt \$NUMLU} (integer)
+% are all NON\_FUNCTIONAL but still required for parsing.  
+% \ref{subsec_restartdata}).
+%
 \end{itemize}
 
 %subsection{The pre-processing transformations}
@@ -264,25 +272,25 @@ OASIS3, controlled by {\tt preproc.f}.
 \section{The interpolation}
 \label{subsec_interp}
 
-The following transformations, controlled by {\tt interp.f}, are
-available in OASIS3.
+The following transformations are available in OASIS3.
 
 \begin{itemize}
 
 \item {\bf BLASOLD}: 
 
-{\tt BLASOLD} (routine {\tt blasold.f}) performs a linear combination of the
-current coupling field with other coupling fields or with a constant
-before the interpolation {\it per se}.
+{\tt BLASOLD} allows the source fields to be scaled and allows
+a scalar to be added to the field.  The prior ability to perform 
+a linear combination of the current coupling field with other coupling fields 
+has been deprecated.  This transform occurs before the interpolation {\it per se}.
 
 This transformation requires at least one configuring line with two
 parameters:
-\begin{verbatim}
- # BLASOLD operation 
-     $XMULT     $NBFIELDS\end{verbatim}where
+ \begin{verbatim}
+# BLASOLD operation
+     $XMULT   $NBFIELDS \end{verbatim} where
 {\tt \$XMULT} is the multiplicative coefficient of the current
-field, and {\tt \$NBFIELDS} the number of additional fields to be
-combined with the current field.  For each additional field, an
+field, and {\tt \$NBFIELDS} is NON\_FUNCTIONAL and should be
+set to 0 or 1.  For each additional field, an
 additional input line is required:
 \begin{verbatim}
 # nbfields lines
@@ -294,7 +302,33 @@ constant value to the original field, put {\tt \$XMULT} = 1, {\tt
 \$NBFIELDS} = 1, {\tt \$CNAME = CONSTANT}, {\tt \$AMULT} = value to
 add.
 
-\item {\bf SCRIPR}:
+\item {\bf MAPPING}: 
+
+\begin{verbatim}
+     $MAPNAME  $MAPLOC  $MAPSTRATEGY
+\end{verbatim}
+
+\begin{itemize}
+  \item \$MAPNAME is the name of the mapping file to read.  This is a netcdf
+  file consistent with the OASIS mapping format.
+
+  \item \$MAPLOC is either src or dst.  With src, the mapping will be done
+  in parallel on the source processors before communication on the destination
+  grid to the destination model and processors.  With dst, the mapping is 
+  done on the destination processors after the data is sent from the source
+  model on the source grid.  src is default.  This field is optional.
+
+  \item \$MAPSTRATEGY is either bfb, sum, or opt.  In bfb mode, the mapping is
+  done using a strategy that produces bit-for-bit identical results regardless
+  of the grid decompositions with leveraging a partial sum computation.  With
+  sum, the transform is done using the partial sum approach which generally
+  introduces roundoff level changes in the results on different processor
+  counts.  opt allows the couplng layer to choose either approach based on
+  an analysis of which strategy is likely to run faster.
+
+\end{itemize}
+
+\item {\bf SCRIPR}: NON\_FUNCTIONAL for now
  
   {\tt SCRIPR} gathers the interpolation techniques offered by Los
   Alamos National Laboratory SCRIP 1.4 library\footnote{See the
@@ -392,7 +426,9 @@ add.
   The configuring line is:
   \begin{verbatim}
  # SCRIPR/GAUSWGT
-$CMETH  $CGRS  $CFTYP  $REST  $NBIN  $NV $VAR $ASSCMP $PROJCART\end{verbatim} where all entries are as for  {\tt DISTWGT}, except that:
+ $CMETH  $CGRS  $CFTYP  $REST  $NBIN  $NV $VAR $ASSCMP $PROJCART 
+  \end{verbatim} where:
+  all entries are as for  {\tt DISTWGT}, except that:
   \begin{itemize} 
    \item {\tt \$CMETH = GAUSWGT}
    \item {\tt \$VAR}, which must be given as a
@@ -425,9 +461,17 @@ $CMETH  $CGRS  $CFTYP  $REST  $NBIN  $NV $VAR $ASSCMP $PROJCART\end{verbatim} wh
   nearest neighbour algorithm using the remaining non masked source
   points is applied.
 
-  \item Non-masked target grid points having all of the source points
-  normally used in the bilinear or bicubic interpolation masked: the
-  nearest non-masked source neighbour is used.
+  \item Non-masked target grid points having their N nearest neighbours all
+  masked: 
+  the zero value will
+  be associated to these target points.  The
+  value 1.0E+20 will however be assigned to these non-masked target
+  grid points if routines {\tt scriprmp.f} or {\tt vector.F90} (for
+  vector interpolation) in {\tt oasis3/lib/scrip/src/} are compiled
+  with \newline {\tt ll\_weightot=.true.}.  Furthermore, if {\tt
+  oasis3/lib/scrip/src/remap\_bicubic.f or remap\_bilinear.f} is 
+  compiled with {\tt ll\_nnei=.true.}, the non-masked nearest neighbour 
+  value will be given to these target grid points.
   \end{itemize} 
  
   The configuring line is:
@@ -645,7 +689,7 @@ performed by the routines \newline {\tt scriprmp\_vector.F90} and {\tt
 \end{itemize}
 
 \vspace{1cm}
-\item {\bf INTERP}: 
+\item {\bf INTERP}: NON\_FUNCTIONAL
 
 %-Note sur le traitement des points masqués dans OASIS:
 %Note: Le champ interpolé fldnew est initialisé à zéro. La valeur du 
@@ -766,152 +810,152 @@ performed by the routines \newline {\tt scriprmp\_vector.F90} and {\tt
     \end{itemize}
 \end{itemize}
 
-\item {\bf MOZAIC}: 
+\item {\bf MOZAIC}: NON\_FUNCTIONAL
 
-{\tt MOZAIC} performs the mapping of a field from a source to a target
-grid. The grid-mapping dataset, i.e. the weights and addresses of the
-source grid points used to calculate the value of each target grid
-point are defined by the user in a file (see section
-\ref{subsec_transformationdata}).  The configuring line is:
-\begin{verbatim}
-# MOZAIC operation
-     $CFILE  $NUMLU  $NID  $NV
-\end{verbatim}where 
-\begin{itemize}
-\item{\tt \$CFILE} and {\tt \$NUMLU} are the grid-mapping file name
-and associated logical unit on which the grid-mapping dataset is going
-to be read),
-\item {\tt \$NID} the identificator for this grid-mapping dataset in
-all {\tt MOZAIC} grid-mapping datasets in the present coupling
-\item {\tt \$NV} is the maximum number of target grid points use
-in the mapping.
-\end{itemize}
+%{\tt MOZAIC} performs the mapping of a field from a source to a target
+%grid. The grid-mapping dataset, i.e. the weights and addresses of the
+%source grid points used to calculate the value of each target grid
+%point are defined by the user in a file (see section
+%\ref{subsec_transformationdata}).  The configuring line is:
+%\begin{verbatim}
+%# MOZAIC operation
+%     $CFILE  $NUMLU  $NID  $NV
+%\end{verbatim}where 
+%\begin{itemize}
+%\item{\tt \$CFILE} and {\tt \$NUMLU} are the grid-mapping file name
+%and associated logical unit on which the grid-mapping dataset is going
+%to be read),
+%\item {\tt \$NID} the identificator for this grid-mapping dataset in
+%all {\tt MOZAIC} grid-mapping datasets in the present coupling
+%\item {\tt \$NV} is the maximum number of target grid points use
+%in the mapping.
+%\end{itemize}
+%
+%\item {\bf NOINTERP}: 
+%
+%{\tt NOINTERP} is the analysis that has to be chosen when no other
+%transformation from the interpolation class is chosen.
+%There is no configuring line.
 
-\item {\bf NOINTERP}: 
+\item {\bf FILLING}: NON\_FUNCTIONAL
 
-{\tt NOINTERP} is the analysis that has to be chosen when no other
-transformation from the interpolation class is chosen.
-There is no configuring line.
-
-\item {\bf FILLING}: 
-
-{\tt FILLING} (routine {\tt oasis3/src/filling.f})
-performs the blending of a regional data set with a climatological
-global one for a Sea Surface Temperature (SST) or a Sea Ice Extent
-field. This occurs when coupling a non-global ocean model with a
-global atmospheric model. {\tt FILLING} can only handle
-fields on Logically Rectangular grid (LR, but also A, B,
-G, L, Y, and Z grids, see section \ref{subsec_gridtypes}.
-
-The global data set has to be a set of SST
-given in Celsius degrees (for the filling of a Sea Ice Extent field,
-the presence or absence of ice is deduced from the value of the
-SST). The frequency of the global set can be interannual monthly,
-climatological monthly or yearly.
-
-The blending can be smooth or abrupt. If the blending is abrupt, only
-model values are used within the model domain, and only the global
-data set values are used outside. If the blending is smooth, a linear
-interpolation is performed between the two fields within the model
-domain over narrow bands along the boundaries. The linear
-interpolation can also be performed giving a different weight to the
-regional or and global fields. 
-
- The smoothing is defined by parameters in {\tt
-oasis3/src/mod\_smooth.F90}. The lower smoothing band
-in the global model second dimension is defined by {\em nsltb}
-(outermost point) and {\em nslte} (innermost point); the upper
-smoothing band in the global model second dimension is defined by {\em
-nnltb} (outermost point) and {\em nnlte} (innermost point). The
-parameter {\em qalfa} controls the weights given to the regional and
-to the global fields in the linear interpolation. {\em qalfa} has to
-be $1/(nslte-nsltb)$ or $1/(nnltb-nnlte)$. For the outermost points
-({\em nsltb} or {\em nnltb}) in the smoothing band, the weight given
-to the regional and global fields will respectively be 0 and 1; for
-the innermost points ({\em nslte} or {\em nnlte}) in the smoothing
-band, the weight given to the regional and global fields will
-respectively be 1 and 0; within the smoothing band, the weights will
-be a linear interpolation of the outermost and innermost weights.
-
-The smoothing band in the global model first dimension will be a band
-of {\em nliss} points following the coastline. To calculate this band,
-OASIS3 needs {\em nwlgmx}, the greater first dimension index of the
-lower coastline and {\em nelgmx}, the smaller first dimension index on
-the upper coastline. The parameter {\em qbeta} controls the weights
-given to the regional and to the global fields in the linear
-interpolation. {\em qbeta} has to be $1/(nliss-1)$. The weights given
-to the regional and global fields in the global model first dimension
-smoothing bands will be calculated as for the second dimension.
-
-The user must provide the climatological data file with
-a specific format described in \ref{subsec_transformationdata}. 
-When one uses {\tt FILLING} for SST with smooth blending, thermodynamics 
-consistency requires to modify the heat fluxes over the blending 
-regions. The correction term is proportional to the difference between
-the blended SST and the original SST interpolated on the atmospheric 
-grid and can be written out on a file to be read later, for analysis
-{\tt CORRECT} for example. In that case, the symbolic name of the flux
-correction term read through the input file {\em namcouple} must 
-correspond in {\tt FILLING} and {\tt CORRECT} analyses.
-
-In case the regional ocean model includes a coastal part or islands, a
-sea-land mask mismatch may occur and a coastal point correction can be
-performed if the field has been previously interpolated with {\tt
-INTER/SURFMESH}. In fact, the
-mismatch could result in the atmosphere undesirably ``seeing''
-climatological SST's directly adjacent to ocean model SST's.  Where
-this situation arises, the coastal correction consists in identifying
-the suitable ocean model grid points that can be used to extrapolate
-the field, excluding climatological grid points.
-
-This analysis requires one configuring line with 3, 4 or 6 arguments.
-
-\begin{enumerate}
-\item If FILLING performs the blending of a regional data set with a
-global one for the Sea Ice Extent, the 3-argument input line is:
-\begin{verbatim}
-# Sea Ice Extent FILLING operation
-     $CFILE  $NUMLU  $CMETH\end{verbatim} where {\tt \$CFILE} is 
-the file name for the global data set, {\tt \$NUMLU} the associated
-logical unit. {\tt \$CMETH}, the {\tt FILLING} technique, is a {\tt
-CHARACTER*8} variable: the first 3 characters are either {\tt SMO},
-smooth filling, or {\tt RAW}, no smoothing ; the next three characters
-must be {\tt SIE} for a Sea Ice Extent filling operation; the last two
-define the time characteristics of the global data file, respectively
-{\tt MO}, {\tt SE} and {\tt AN} for interannual monthly,
-climatological monthly and yearly. Note that in all cases, the global
-data file has to be a Sea Surface Temperature field in Celsius
-degrees.
-
-\item If FILLING performs the blending of a regional data set with a
-global one for the Sea Surface Temperature without any smoothing, the
-4-argument input line is:
-\begin{verbatim}
-#Sea Surface Temperature FILLING operation without smoothing
-     $CFILE  $NUMLU  $CMETH  $NFCOAST\end{verbatim} where 
-{\tt \$CFILE}, {\tt \$NUMLU} are as for the SIE filling. In this
-case however, {\tt \$CMETH(1:3) = RAW}, {\tt \$CMETH(4:6) = SST}, 
-and the last two characters define the time characteristics of the 
-global data file, as for the SIE filling. {\tt \$NFCOAST} is  
-the flag for the calculation of the coastal correction ( 0 no, 1 yes).
-
-\item If FILLING performs the blending of a regional data set with a
-global one for the Sea Surface Temperature with smoothing, the
-6-argument input line is:
-\begin{verbatim}
-#Sea Surface Temperature FILLING operation with smoothing
-     $CFILE  $NUMLU  $CMETH  $NFCOAST  $CNAME  $NUNIT\end{verbatim}
-     where {\tt \$CFILE}, {\tt \$NUMLU} and {\tt \$NFCOAST} are as for the SST
-filling without smoothing. In this case, {\tt \$CMETH(1:3) = SMO},
-{\tt \$CMETH(4:6) = SST}, and the last two characters define the
-time characteristics of the global data file, as for the SIE
-filling. {\tt \$CNAME} is the symbolic name for the correction
-term that is calculated by OASIS3 and {\tt \$NUNIT} the logical
-unit on which it is going to be written. 
-
-\end{enumerate}
-
-\end{itemize}
+%{\tt FILLING} (routine {\tt oasis3/src/filling.f})
+%performs the blending of a regional data set with a climatological
+%global one for a Sea Surface Temperature (SST) or a Sea Ice Extent
+%field. This occurs when coupling a non-global ocean model with a
+%global atmospheric model. {\tt FILLING} can only handle
+%fields on Logically Rectangular grid (LR, but also A, B,
+%G, L, Y, and Z grids, see section \ref{subsec_gridtypes}.
+%
+%The global data set has to be a set of SST
+%given in Celsius degrees (for the filling of a Sea Ice Extent field,
+%the presence or absence of ice is deduced from the value of the
+%SST). The frequency of the global set can be interannual monthly,
+%climatological monthly or yearly.
+%
+%The blending can be smooth or abrupt. If the blending is abrupt, only
+%model values are used within the model domain, and only the global
+%data set values are used outside. If the blending is smooth, a linear
+%interpolation is performed between the two fields within the model
+%domain over narrow bands along the boundaries. The linear
+%interpolation can also be performed giving a different weight to the
+%regional or and global fields. 
+%
+% The smoothing is defined by parameters in {\tt
+%oasis3/src/mod\_smooth.F90}. The lower smoothing band
+%in the global model second dimension is defined by {\em nsltb}
+%(outermost point) and {\em nslte} (innermost point); the upper
+%smoothing band in the global model second dimension is defined by {\em
+%nnltb} (outermost point) and {\em nnlte} (innermost point). The
+%parameter {\em qalfa} controls the weights given to the regional and
+%to the global fields in the linear interpolation. {\em qalfa} has to
+%be $1/(nslte-nsltb)$ or $1/(nnltb-nnlte)$. For the outermost points
+%({\em nsltb} or {\em nnltb}) in the smoothing band, the weight given
+%to the regional and global fields will respectively be 0 and 1; for
+%the innermost points ({\em nslte} or {\em nnlte}) in the smoothing
+%band, the weight given to the regional and global fields will
+%respectively be 1 and 0; within the smoothing band, the weights will
+%be a linear interpolation of the outermost and innermost weights.
+%
+%The smoothing band in the global model first dimension will be a band
+%of {\em nliss} points following the coastline. To calculate this band,
+%OASIS3 needs {\em nwlgmx}, the greater first dimension index of the
+%lower coastline and {\em nelgmx}, the smaller first dimension index on
+%the upper coastline. The parameter {\em qbeta} controls the weights
+%given to the regional and to the global fields in the linear
+%interpolation. {\em qbeta} has to be $1/(nliss-1)$. The weights given
+%to the regional and global fields in the global model first dimension
+%smoothing bands will be calculated as for the second dimension.
+%
+%The user must provide the climatological data file with
+%a specific format described in \ref{subsec_transformationdata}. 
+%When one uses {\tt FILLING} for SST with smooth blending, thermodynamics 
+%consistency requires to modify the heat fluxes over the blending 
+%regions. The correction term is proportional to the difference between
+%the blended SST and the original SST interpolated on the atmospheric 
+%grid and can be written out on a file to be read later, for analysis
+%{\tt CORRECT} for example. In that case, the symbolic name of the flux
+%correction term read through the input file {\em namcouple} must 
+%correspond in {\tt FILLING} and {\tt CORRECT} analyses.
+%
+%In case the regional ocean model includes a coastal part or islands, a
+%sea-land mask mismatch may occur and a coastal point correction can be
+%performed if the field has been previously interpolated with {\tt
+%INTER/SURFMESH}. In fact, the
+%mismatch could result in the atmosphere undesirably ``seeing''
+%climatological SST's directly adjacent to ocean model SST's.  Where
+%this situation arises, the coastal correction consists in identifying
+%the suitable ocean model grid points that can be used to extrapolate
+%the field, excluding climatological grid points.
+%
+%This analysis requires one configuring line with 3, 4 or 6 arguments.
+%
+%\begin{enumerate}
+%\item If FILLING performs the blending of a regional data set with a
+%global one for the Sea Ice Extent, the 3-argument input line is:
+%\begin{verbatim}
+%# Sea Ice Extent FILLING operation
+%     $CFILE  $NUMLU  $CMETH\end{verbatim} where {\tt \$CFILE} is 
+%the file name for the global data set, {\tt \$NUMLU} the associated
+%logical unit. {\tt \$CMETH}, the {\tt FILLING} technique, is a {\tt
+%CHARACTER*8} variable: the first 3 characters are either {\tt SMO},
+%smooth filling, or {\tt RAW}, no smoothing ; the next three characters
+%must be {\tt SIE} for a Sea Ice Extent filling operation; the last two
+%define the time characteristics of the global data file, respectively
+%{\tt MO}, {\tt SE} and {\tt AN} for interannual monthly,
+%climatological monthly and yearly. Note that in all cases, the global
+%data file has to be a Sea Surface Temperature field in Celsius
+%degrees.
+%
+%\item If FILLING performs the blending of a regional data set with a
+%global one for the Sea Surface Temperature without any smoothing, the
+%4-argument input line is:
+%\begin{verbatim}
+%#Sea Surface Temperature FILLING operation without smoothing
+%     $CFILE  $NUMLU  $CMETH  $NFCOAST\end{verbatim} where 
+%{\tt \$CFILE}, {\tt \$NUMLU} are as for the SIE filling. In this
+%case however, {\tt \$CMETH(1:3) = RAW}, {\tt \$CMETH(4:6) = SST}, 
+%and the last two characters define the time characteristics of the 
+%global data file, as for the SIE filling. {\tt \$NFCOAST} is  
+%the flag for the calculation of the coastal correction ( 0 no, 1 yes).
+%
+%\item If FILLING performs the blending of a regional data set with a
+%global one for the Sea Surface Temperature with smoothing, the
+%6-argument input line is:
+%\begin{verbatim}
+%#Sea Surface Temperature FILLING operation with smoothing
+%     $CFILE  $NUMLU  $CMETH  $NFCOAST  $CNAME  $NUNIT\end{verbatim}
+%     where {\tt \$CFILE}, {\tt \$NUMLU} and {\tt \$NFCOAST} are as for the SST
+%filling without smoothing. In this case, {\tt \$CMETH(1:3) = SMO},
+%{\tt \$CMETH(4:6) = SST}, and the last two characters define the
+%time characteristics of the global data file, as for the SIE
+%filling. {\tt \$CNAME} is the symbolic name for the correction
+%term that is calculated by OASIS3 and {\tt \$NUNIT} the logical
+%unit on which it is going to be written. 
+%
+%\end{enumerate}
+%
+%\end{itemize}
 
 %subsection{The interpolation}
 
@@ -919,7 +963,7 @@ unit on which it is going to be written.
 \label{subsec_cooking}
 
 The following transformations are available in the ``cooking'' part of
-OASIS3, controlled by {\tt cookart.f}.
+OASIS3.
 
 \begin{itemize}
 
@@ -931,10 +975,10 @@ OASIS3, controlled by {\tt cookart.f}.
 
   This analysis requires one input line with one argument:
 
-\begin{verbatim}
+ \begin{verbatim}
 # CONSERV operation
-     $CMETH\end{verbatim}
-   where {\tt \$CMETH} is the method required:
+     $CMETH\end{verbatim}  where {\tt \$CMETH} is the method required:
+
    \begin{itemize}
 
    \item with {\tt \$CMETH = GLOBAL}, the field is integrated on both
@@ -967,92 +1011,95 @@ OASIS3, controlled by {\tt cookart.f}.
 {\it Note that for this operation to be correct, overlapping grid cells 
 on the source grid or on the target grid must be masked.} 
 
-\item {\bf SUBGRID}: 
+\item {\bf SUBGRID}: NON\_FUNCTIONAL
 
-{\tt SUBGRID} can be used to interpolate a field from a coarse grid to a
-finer target grid (the target grid must be finer over the whole
-domain). Two types of subgrid interpolation can be performed,
-depending on the type of the field.
-
-For solar type of flux field ({\tt \$SUBTYPE = SOLAR}), the operation
-performed is:
-$$\Phi_{i} = \frac{1-\alpha_i}{1-\alpha} F$$ where $\Phi_{i}$ ($F$) is
-the flux on the fine (coarse) grid, $\alpha_i$ ($\alpha$) an auxiliary
-field on the fine (coarse) grid (e.g. the albedo).  The whole
-operation is interpolated from the coarse grid with a grid-mapping type
-of interpolation; the dataset of weights and addresses has to be given
-by the user.
-
-For non-solar type of field ({\tt \$SUBTYPE = NONSOLAR}), a
-first-order Taylor expansion of the field on the fine grid relatively
-to a state variable is performed (for instance, an expansion of the
-total heat flux relatively to the SST):
-$$\Phi_{i} = F + \frac{\partial F}{\partial T} ( T_i - T ) $$ where
-$\Phi_{i}$ ($F$) is the heat flux on the fine (coarse) grid, $T_i$
-($T$) an auxiliary field on the fine (coarse) grid (e.g. the SST) and
-$\frac{\partial F}{\partial T}$ the derivative of the flux versus the
-auxiliary field on the coarse grid. This operation is interpolated
-from the coarse grid with a grid-mapping type of interpolation; the
-dataset of weights and addresses has to be given by the user.
-
-This analysis requires one input line with 7 or 8
-arguments depending on the type of subgrid interpolation.
-
-\begin{enumerate}
-\item If the the {\tt SUBGRID} operation is performed on a solar flux,
-the 7-argument input line is:
-\begin{verbatim}
-# SUBGRID operation with $SUBTYPE=SOLAR 
-  $CFILE  $NUMLU  $NID  $NV  $SUBTYPE  $CCOARSE $CFINE\end{verbatim}where
-{\tt \$CFILE} and {\tt \$NUMLU} are the subgrid-mapping file name and
-associated logical unit (see section \ref{subsec_transformationdata} for the
-structure of this file); {\tt \$NID} the identificator for this
-subgrid-mapping dataset within the file build by OASIS based on all
-the different {\tt SUBGRID} analyses in the present coupling; {\tt
-\$NV} is the maximum number of target grid points use in the
-subgrid-mapping; {\tt \$SUBTYPE = SOLAR} is the type of subgrid
-  interpolation; {\tt \$CCOARSE} is the
-auxiliary field name on the coarse grid (corresponding to $\alpha$)
-and {\tt \$CFINE} is the auxiliary field name on fine grid
-(corresponding to $\alpha_i$).
-These two fields needs to be exchanged between their original model
-and OASIS3 main process, at least as {\tt AUXILARY} fields.
-This analysis is performed from the coarse grid with a grid-mapping type
-of interpolation based on the {\tt \$CFILE} file.
-
-\item If the the SUBGRID operation is performed on a nonsolar flux,
-the 8-argument input line is:
-\begin{verbatim}
-# SUBGRID operation with $SUBTYPE=NONSOLAR
-  $CFILE $NUMLU $NID $NV $SUBTYPE $CCOARSE $CFINE $CDQDT
-\end{verbatim} where {\tt \$CFILE},  {\tt \$NUMLU},  {\tt \$NID},  
-{\tt \$NV} are as for a solar subgrid interpolation; {\tt
-\$SUBTYPE = NONSOLAR}; {\tt \$CCOARSE} is the auxiliary
-field name on the coarse grid (corresponding to $T$) and {\tt \$CFINE}
-is the auxiliary field name on fine grid (corresponding to $T_i$); the
-additional argument {\tt \$CDQDT} is the coupling ratio on the coarse
-grid (corresponding to $\frac{\partial F}{\partial T}$) These three
-fields need to be exchanged between their original model and OASIS3
-main process as {\tt AUXILARY} fields. This operation is performed from the
-coarse grid with a grid-mapping type of interpolation based on the {\tt
-\$CFILE} file.
-
-\end{enumerate}
+%{\tt SUBGRID} can be used to interpolate a field from a coarse grid to a
+%finer target grid (the target grid must be finer over the whole
+%domain). Two types of subgrid interpolation can be performed,
+%depending on the type of the field.
+%
+%For solar type of flux field ({\tt \$SUBTYPE = SOLAR}), the operation
+%performed is:
+%$$\Phi_{i} = \frac{1-\alpha_i}{1-\alpha} F$$ where $\Phi_{i}$ ($F$) is
+%the flux on the fine (coarse) grid, $\alpha_i$ ($\alpha$) an auxiliary
+%field on the fine (coarse) grid (e.g. the albedo).  The whole
+%operation is interpolated from the coarse grid with a grid-mapping type
+%of interpolation; the dataset of weights and addresses has to be given
+%by the user.
+%
+%For non-solar type of field ({\tt \$SUBTYPE = NONSOLAR}), a
+%first-order Taylor expansion of the field on the fine grid relatively
+%to a state variable is performed (for instance, an expansion of the
+%total heat flux relatively to the SST):
+%$$\Phi_{i} = F + \frac{\partial F}{\partial T} ( T_i - T ) $$ where
+%$\Phi_{i}$ ($F$) is the heat flux on the fine (coarse) grid, $T_i$
+%($T$) an auxiliary field on the fine (coarse) grid (e.g. the SST) and
+%$\frac{\partial F}{\partial T}$ the derivative of the flux versus the
+%auxiliary field on the coarse grid. This operation is interpolated
+%from the coarse grid with a grid-mapping type of interpolation; the
+%dataset of weights and addresses has to be given by the user.
+%
+%This analysis requires one input line with 7 or 8
+%arguments depending on the type of subgrid interpolation.
+%
+%\begin{enumerate}
+%\item If the the {\tt SUBGRID} operation is performed on a solar flux,
+%the 7-argument input line is:
+%\begin{verbatim}
+%# SUBGRID operation with $SUBTYPE=SOLAR 
+%  $CFILE  $NUMLU  $NID  $NV  $SUBTYPE  $CCOARSE $CFINE\end{verbatim}where
+%{\tt \$CFILE} and {\tt \$NUMLU} are the subgrid-mapping file name and
+%associated logical unit (see section \ref{subsec_transformationdata} for the
+%structure of this file); {\tt \$NID} the identificator for this
+%subgrid-mapping dataset within the file build by OASIS based on all
+%the different {\tt SUBGRID} analyses in the present coupling; {\tt
+%\$NV} is the maximum number of target grid points use in the
+%subgrid-mapping; {\tt \$SUBTYPE = SOLAR} is the type of subgrid
+%  interpolation; {\tt \$CCOARSE} is the
+%auxiliary field name on the coarse grid (corresponding to $\alpha$)
+%and {\tt \$CFINE} is the auxiliary field name on fine grid
+%(corresponding to $\alpha_i$).
+%These two fields needs to be exchanged between their original model
+%and OASIS3 main process, at least as {\tt AUXILARY} fields.
+%This analysis is performed from the coarse grid with a grid-mapping type
+%of interpolation based on the {\tt \$CFILE} file.
+%
+%\item If the the SUBGRID operation is performed on a nonsolar flux,
+%the 8-argument input line is:
+%\begin{verbatim}
+%# SUBGRID operation with $SUBTYPE=NONSOLAR
+%  $CFILE $NUMLU $NID $NV $SUBTYPE $CCOARSE $CFINE $CDQDT
+%\end{verbatim} where {\tt \$CFILE},  {\tt \$NUMLU},  {\tt \$NID},  
+%{\tt \$NV} are as for a solar subgrid interpolation; {\tt
+%\$SUBTYPE = NONSOLAR}; {\tt \$CCOARSE} is the auxiliary
+%field name on the coarse grid (corresponding to $T$) and {\tt \$CFINE}
+%is the auxiliary field name on fine grid (corresponding to $T_i$); the
+%additional argument {\tt \$CDQDT} is the coupling ratio on the coarse
+%grid (corresponding to $\frac{\partial F}{\partial T}$) These three
+%fields need to be exchanged between their original model and OASIS3
+%main process as {\tt AUXILARY} fields. This operation is performed from the
+%coarse grid with a grid-mapping type of interpolation based on the {\tt
+%\$CFILE} file.
+%
+%\end{enumerate}
 
 \vspace{1cm}
 
 \item {\bf BLASNEW}:
  
-{\tt BLASNEW} (routine {\tt oasis3/src/blasnew.f}) performs a linear combination of the
+{\tt BLASNEW} (routine {\tt oasis3/src/blasnew.f}) performs a scalar
+multiply or scalar add to any destination field.  This is the equivalent
+of BLASOLD on the destination side.  The prior feature that supported
+linear combinations of the
 current coupling field with any other fields after the
-interpolation. These can be other coupling fields or constant fields.
+interpolation has been deprecated.
 
 This analysis requires the same input line as {\tt BLASOLD}.
 
-\item {\bf MASKP}:
+\item {\bf MASKP}: NON\_FUNCTIONAL
 
-A new analysis {\tt MASKP} can be used to mask the fields after
-interpolation. {\tt MASKP} has the same generic input line as {\tt MASK}.
+%A new analysis {\tt MASKP} can be used to mask the fields after
+%interpolation. {\tt MASKP} has the same generic input line as {\tt MASK}.
 
 \end{itemize}
 
@@ -1066,59 +1113,59 @@ OASIS3, controlled by {\tt oasis3/src/postpro.f}.
 
 \begin{itemize}
 
-\item {\bf REVERSE}: 
+\item {\bf REVERSE}: NON\_FUNCTIONAL
 
- {\it This transformation is obsolete in the current OASIS version.}
+% {\it This transformation is obsolete in the current OASIS version.}
 
-{\tt REVERSE} (routine {\tt oasis3/src/reverse.f})
-reorders a field. 
+%{\tt REVERSE} (routine {\tt oasis3/src/reverse.f})
+%reorders a field. 
 
-This analysis requires the same input line as {\tt INVERT}, with {\tt
-  \$CORLON} and {\tt \$CORLAT} being now the resulting orientation.
-{\tt REVERSE} does not work for U and D grids (see appendix
-\ref{subsec_gridtypes}). Note that {\tt INVERT} does not transform the
-associated grid or mask.
+%This analysis requires the same input line as {\tt INVERT}, with {\tt
+%  \$CORLON} and {\tt \$CORLAT} being now the resulting orientation.
+%{\tt REVERSE} does not work for U and D grids (see appendix
+%\ref{subsec_gridtypes}). Note that {\tt INVERT} does not transform the
+%associated grid or mask.
 
 \item {\bf CHECKOUT}: 
 
-{\tt CHECKOUT} (routine {\tt oasis3/src/chkfld.f}) calculates
+{\tt CHECKOUT} calculates
 the mean and extremum values of an output field and prints them to the
-coupler output {\em cplout} (this operation does not transform the field).
+oasis output files (this operation does not transform the field).
 
 The generic input line is as for {\tt CHECKIN} (see above).
 
-\item {\bf GLORED} 
+\item {\bf GLORED}: NON\_FUNCTIONAL
 
- {\it This transformation is obsolete in the current OASIS version as
- coupling fields can be directly interpolated to a target Reduced
- grid, if needed; this transformation should not be used anymore.} 
+% {\it This transformation is obsolete in the current OASIS version as
+% coupling fields can be directly interpolated to a target Reduced
+% grid, if needed; this transformation should not be used anymore.} 
+%
+%{\tt GLORED} performs a linear interpolation of field from a full
+%Gaussian grid to a Reduced grid. When present, {\tt GLORED} must be the last
+%analysis performed.
+%
+%Before doing the interpolation, non-masked values are automatically
+%extrapolated to masked points with {\tt EXTRAP/NINENN} method (see
+%above); to do so, the masked grid points are first replaced with a
+%predefined value.  The required global grid mask must be
+%present in data file {\tt masks} or {\tt masks.nc} (see section
+%\ref{subsec_griddata}).
+%
+%The generic input line is as follows:
+%\begin{verbatim}
+%# GLORED operation
+%     $NNBRLAT  $NV   $NIO   $NID\end{verbatim} where {\tt \$NNBRLAT} 
+%is as for {\tt REDGLO} (see {\tt REDGLO} description above). 
+%The next 3 parameters refer to the {\tt EXTRAP/NINENN} extrapolation
+%(see {\tt EXTRAP/NINENN} description above).  The value assigned to
+%all land points before interpolation is given by {\tt amskred} in {\tt
+%oasis3/src/blkdata.f}; as for the {\tt \$VALMASK} in
+%{\tt MASK} analysis, it has to be chosen well outside the range of
+%your field values but not too large to avoid any representation problem. 
+%
+%\end{itemize}
 
-{\tt GLORED} performs a linear interpolation of field from a full
-Gaussian grid to a Reduced grid. When present, {\tt GLORED} must be the last
-analysis performed.
+subsection{The post-processing}
 
-Before doing the interpolation, non-masked values are automatically
-extrapolated to masked points with {\tt EXTRAP/NINENN} method (see
-above); to do so, the masked grid points are first replaced with a
-predefined value.  The required global grid mask must be
-present in data file {\tt masks} or {\tt masks.nc} (see section
-\ref{subsec_griddata}).
-
-The generic input line is as follows:
-\begin{verbatim}
-# GLORED operation
-     $NNBRLAT  $NV   $NIO   $NID\end{verbatim} where {\tt \$NNBRLAT} 
-is as for {\tt REDGLO} (see {\tt REDGLO} description above). 
-The next 3 parameters refer to the {\tt EXTRAP/NINENN} extrapolation
-(see {\tt EXTRAP/NINENN} description above).  The value assigned to
-all land points before interpolation is given by {\tt amskred} in {\tt
-oasis3/src/blkdata.f}; as for the {\tt \$VALMASK} in
-{\tt MASK} analysis, it has to be chosen well outside the range of
-your field values but not too large to avoid any representation problem. 
-
-\end{itemize}
-
-%subsection{The post-processing}
-
-%subsection{Input line(s) for each transformation}
+subsection{Input line(s) for each transformation}
 

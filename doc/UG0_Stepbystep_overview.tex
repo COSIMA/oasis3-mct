@@ -100,10 +100,8 @@ actions), one has to follow these steps:
 \item Obtain OASIS3 sources (see chapter \ref{sec_Obtaining}).
 \item Identify the coupling or I/O fields and adapt the component
   models to allow their exchange with the PSMILe library based on MPI1
-  or MPI2 message passing\footnote{The SIPC, PIPE and GMEM
-    communication techniques available in previous versions are not maintained anymore.}.
-  The PSMILe library is interfaced with the {\tt mpp\_io} library from
-  GFDL \cite{mpp_io} and therefore can be used to perform I/O actions
+  or MPI2\footnote{not yet available} message passing.
+  The PSMILe library uses NetCDF and therefore can be used to perform I/O actions
   from/to disk files.  For more detail on how to interface a model
   with the PSMILe, see chapter \ref{sec_modelinterfacing}.
 

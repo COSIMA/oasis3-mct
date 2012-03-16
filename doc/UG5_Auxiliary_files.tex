@@ -232,6 +232,18 @@ use one separate coupling restart file per coupling field.
 
 %subsection{Restart data files}
 
+\section{Mapping files}
+\label{subsec_mapdata}
+
+The mapping files to be read using the MAPPING option are consistent
+with the files generated in OASIS3.  The files are netcdf and the
+key fields are num\_links (the number of weights for each grid pair), src\_grid\_size
+(the 2d size of the source grid), dst\_grid\_size
+(the 2d size of the destination grid), num\_wgts (the
+total number of weights), remap\_matrix (the weights), dst\_address
+(the global destination index for the weight), src\_address (the global
+source index for the weight).
+
 \section{Input data files}
 \label{subsec_inputdata}
 

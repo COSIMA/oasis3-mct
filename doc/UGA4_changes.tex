@@ -6,6 +6,44 @@
 Here is a list of changes between the different official OASIS3
 versions.
 
+\section{Changes between {\tt oasis3\_3} and {\tt oasis3-mct}}
+
+Much of the underlying implementation was refactored to leverage
+the Model Coupling Toolkit (MCT).  All communication is now parallel
+and direct between models.  The central oasis coupler running
+on it's own processors no longer plays a role.  MCT is used to
+carry out interpolation in parallel on either the source or destination
+processors before or after communication.  This location of the
+interpolation is set by the user as is the parallelization strategy.  
+Several namcouple features have been
+deprecated in this version, but this version supports a namcouple
+format that is nearly 100 percent backwards compatable with OASIS3.
+The ability to read mapping files is now provided with the namcouple
+transformation MAPPING.  Several other changes are highlighted below.
+
+\begin{itemize}
+
+\item General Features:
+
+%  \begin{itemize}
+%
+%  \end{itemize}
+
+\item Coupling Interfaces:
+
+%  \begin{itemize}
+%
+%  \end{itemize}
+
+\item Namcouple Changes:
+
+%  \begin{itemize}
+%
+%  \end{itemize}
+
+\end{itemize}
+
+
 \section{Changes between {\tt oasis3\_3} and {\tt
 oasis3\_prism\_2\_5}}
 
