@@ -41,6 +41,7 @@ SAVE
 ! !PUBLIC DATA MEMBERS:
 !
   INTEGER(kind=ip_i4_p)	:: nulprt
+  INTEGER(kind=ip_i4_p)	:: prism_debug
 !
 ! !DESCRIPTION:
 ! This modules contains the parameters defining the precision used for 

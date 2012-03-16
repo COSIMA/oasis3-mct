@@ -112,6 +112,8 @@ integer function prism_string_countChar(str,char,rc)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    count = 0
    do n = 1, len_trim(str)
       if (str(n:n) == char) count = count + 1
@@ -119,6 +121,8 @@ integer function prism_string_countChar(str,char,rc)
    prism_string_countChar = count
 
    if (present(rc)) rc = 0
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_countChar
 
@@ -155,6 +159,8 @@ function prism_string_toUpper(str)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    LowerToUpper = iachar("A") - iachar("a")
 
    do i = 1, len(str)
@@ -164,6 +170,8 @@ function prism_string_toUpper(str)
            ctmp = achar(aseq + LowertoUpper)
       prism_string_toUpper(i:i) = ctmp
    end do
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_toUpper
 
@@ -199,6 +207,8 @@ function prism_string_toLower(str)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    UpperToLower = iachar("a") - iachar("A")
 
    do i = 1, len(str)
@@ -208,6 +218,8 @@ function prism_string_toLower(str)
            ctmp = achar(aseq + UpperToLower)
       prism_string_toLower(i:i) = ctmp
    end do
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_toLower
 
@@ -241,6 +253,8 @@ function prism_string_getParentDir(str)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    nlen = len_trim(str)
    if ( str(nlen:nlen) == "/" ) nlen = nlen - 1
    i = index( str(1:nlen), "/", back=.true. )
@@ -250,6 +264,8 @@ function prism_string_getParentDir(str)
       prism_string_getParentDir = str(1:i-1)
    end if
    
+   call prism_sys_debug_exit(subname)
+
 end function prism_string_getParentDir
 
 !===============================================================================
@@ -289,9 +305,13 @@ integer function prism_string_lastIndex(string,substr,rc)
 ! - "new" F90 back option to index function makes this home-grown solution obsolete
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    prism_string_lastIndex = index(string,substr,.true.)
 
    if (present(rc)) rc = 0
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_lastIndex
 
@@ -334,6 +354,8 @@ integer function prism_string_endIndex(string,substr,rc)
 ! * do we need this function?
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    i = index(trim(string),trim(substr))
    if ( i == 0 ) then
       prism_string_endIndex = 0  ! substr is not in string
@@ -348,6 +370,8 @@ integer function prism_string_endIndex(string,substr,rc)
 !  -------------------------------------------------------------------
 
    if (present(rc)) rc = 0
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_endIndex
 
@@ -397,8 +421,12 @@ subroutine prism_string_leftAlign(str,rc)
 !  !! (len_trim(str) == 0 ) rCode = 1  ! ?? appropriate ??
 !  -------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    str = adjustL(str)
    if (present(rc)) rc = 0
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_leftAlign
 
@@ -438,6 +466,8 @@ subroutine prism_string_alphanum(str,rc)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    icnt = 0
    do n=1,len_trim(str)
      if ((str(n:n) >= 'a' .and. str(n:n) <= 'z') .or.  &
@@ -452,6 +482,8 @@ subroutine prism_string_alphanum(str,rc)
    enddo
 
    if (present(rc)) rc = 0
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_alphanum
 
@@ -496,6 +528,8 @@ subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
 ! * assumes the leading/trailing white space is not part of start & end tags
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    iStart = prism_string_endIndex(string,trim(adjustL(startTag))) ! end of start tag
    iEnd   =               index(string,trim(adjustL(endTag  ))) ! start of end tag
 
@@ -534,6 +568,8 @@ subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
    end if
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_betweenTags
 
@@ -587,6 +623,8 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
 ! o assume length of CF-1.0 time attribute char string  < ic_long
 !   This is a reasonable assumption.
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    unit = 'none'
    bdate = 0
@@ -666,12 +704,13 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
    if (present(rc)) rc = 0
 
+   call prism_sys_debug_exit(subname)
    return
 
 200  continue
    write(nulprt,F00) 'ERROR 200 on char num read '
    call prism_string_abort(subName//' ERROR on char num read')
-   return
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_parseCFtunit
 
@@ -711,9 +750,13 @@ subroutine prism_string_clean(string,rc)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
    string = '       '
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_clean
 
@@ -753,6 +796,8 @@ logical function prism_string_listIsValid(list,rc)
 ! check that the list conforms to the list format
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
    prism_string_listIsValid = .true.
 
@@ -775,6 +820,8 @@ logical function prism_string_listIsValid(list,rc)
    endif
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_listIsValid
 
@@ -818,6 +865,8 @@ subroutine prism_string_listGetName(list,k,name,rc)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    !--- check that this is a valid list ---
@@ -854,6 +903,8 @@ subroutine prism_string_listGetName(list,k,name,rc)
    name = list(i0:i1)//"   "
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listGetName
 
@@ -896,6 +947,8 @@ subroutine prism_string_listIntersect(list1,list2,listout,rc)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    nf = prism_string_listGetNum(list1)
@@ -909,6 +962,8 @@ subroutine prism_string_listIntersect(list1,list2,listout,rc)
    enddo
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listIntersect
 
@@ -951,6 +1006,8 @@ subroutine prism_string_listUnion(list1,list2,listout,rc)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    call prism_string_clean(listout)
@@ -974,6 +1031,8 @@ subroutine prism_string_listUnion(list1,list2,listout,rc)
    enddo
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listUnion
 
@@ -1016,6 +1075,8 @@ subroutine prism_string_listMerge(list1,list2,listout,rc)
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    !--- make sure temp strings are large enough ---
@@ -1039,6 +1100,8 @@ subroutine prism_string_listMerge(list1,list2,listout,rc)
    endif
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listMerge
 
@@ -1080,6 +1143,8 @@ subroutine prism_string_listAppend(list,listadd,rc)
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    !--- make sure temp string is large enough ---
@@ -1099,6 +1164,8 @@ subroutine prism_string_listAppend(list,listadd,rc)
    endif
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listAppend
 
@@ -1142,6 +1209,8 @@ subroutine prism_string_listPrepend(listadd,list,rc)
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    rCode = 0
 
    !--- make sure temp string is large enough ---
@@ -1162,6 +1231,8 @@ subroutine prism_string_listPrepend(listadd,list,rc)
    endif
 
    if (present(rc)) rc = rCode
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listPrepend
 
@@ -1199,8 +1270,12 @@ integer function prism_string_listGetIndexF(string,fldStr)
 
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    call prism_string_listGetIndex(string,fldStr,k,print=.false.,rc=rc)
    prism_string_listGetIndexF = k
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_listGetIndexF
 
@@ -1246,6 +1321,8 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
 
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    if (present(rc)) rc = 0
 
@@ -1318,6 +1395,8 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
       if (present(rc)) rc = 1
    end if
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_string_listGetIndex
 
 !===============================================================================
@@ -1352,12 +1431,16 @@ integer function prism_string_listGetNum(str)
 ! Notes:
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    prism_string_listGetNum = 0
 
    if (len_trim(str) > 0) then
       count = prism_string_countChar(str,listDel)
       prism_string_listGetNum = count + 1
    endif
+
+   call prism_sys_debug_exit(subname)
 
 end function prism_string_listGetNum
 
@@ -1390,9 +1473,13 @@ subroutine prism_string_listSetDel(cflag)
 
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    if (debug > 0 .and. PRISM_Debug > 0) write(nulprt,F00) 'changing listDel from '//trim(listDel)//' to '//trim(cflag)
    listDel = trim(cflag)
    listDel2 = listDel//listDel
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listSetDel
 
@@ -1425,7 +1512,11 @@ subroutine prism_string_listGetDel(del)
 
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    del = trim(listDel)
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_listGetDel
 
@@ -1458,6 +1549,8 @@ subroutine prism_string_setAbort(flag)
 
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    if (debug > 0 .and. PRISM_Debug > 0) then
       if (flag) then
          write(nulprt,F00) 'setting abort to true'
@@ -1467,6 +1560,8 @@ subroutine prism_string_setAbort(flag)
    endif
 
    doabort = flag
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_setAbort
 
@@ -1504,8 +1599,12 @@ subroutine prism_string_setDebug(iFlag)
 ! NTOE: write statement can be expensive if called many times.
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
 !   if (PRISM_Debug > 0) write(nulprt,F01) 'changing debug level from ',debug,' to ',iflag
    debug = iFlag
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_setDebug
 
@@ -1532,6 +1631,8 @@ subroutine prism_string_abort(string)
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    lstring = ''
    if (present(string)) lstring = string
 
@@ -1540,6 +1641,8 @@ subroutine prism_string_abort(string)
    else
       write(nulprt,F00) ' no abort:'//trim(lstring)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_string_abort
 

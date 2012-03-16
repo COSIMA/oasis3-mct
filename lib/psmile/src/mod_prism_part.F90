@@ -61,6 +61,8 @@ CONTAINS
    character(len=*),parameter :: subname = 'prism_part_def'
 !  ----------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    kinfo = PRISM_OK
 
    call prism_timer_start('map definition')
@@ -153,6 +155,8 @@ CONTAINS
       write(nulprt,*) ' '
    endif
 
+   call prism_sys_debug_exit(subname)
+
  END SUBROUTINE prism_part_def
 
 !------------------------------------------------------------
@@ -173,6 +177,8 @@ CONTAINS
   character(len=*),parameter :: subname = 'prism_part_create'
   !--------------------------------------------------------
 
+  call prism_sys_debug_enter(subname)
+
   mpicomm = mpi_comm_local
   mpirank = mpi_rank_local
   mpisize = mpi_size_local
@@ -181,6 +187,7 @@ CONTAINS
   do n = 1,prism_npart
      if (prism_part(n)%gsize == gsize) then
         id_part = n
+        call prism_sys_debug_exit(subname)
         return
      endif
   enddo
@@ -203,6 +210,8 @@ CONTAINS
   endif
 
   id_part = prism_npart
+
+  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_part_create
 !------------------------------------------------------------

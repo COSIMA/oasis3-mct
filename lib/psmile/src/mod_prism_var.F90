@@ -49,6 +49,8 @@
      character(len=*),parameter :: subname = 'prism_var_def'
 !    ---------------------------------------------------------------
 
+     call prism_sys_debug_enter(subname)
+
      kinfo = PRISM_Ok
 
      do n = 1,prism_nvar
@@ -82,19 +84,20 @@
     !----------------------------------
     !--- some diagnostics
     !----------------------------------
+     if (PRISM_DEBUG >= 2) then
+        write(nulprt,*) ' '
+        write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
+        write(nulprt,*) subname,' varname = ',prism_nvar,trim(prism_var(prism_nvar)%name)
+        write(nulprt,*) subname,' varpart = ',prism_nvar,prism_var(prism_nvar)%part
+        write(nulprt,*) subname,' varndim = ',prism_nvar,prism_var(prism_nvar)%ndim
+        write(nulprt,*) subname,' varnum  = ',prism_nvar,prism_var(prism_nvar)%num
+        write(nulprt,*) subname,' varops  = ',prism_nvar,prism_var(prism_nvar)%ops
+        write(nulprt,*) subname,' vartype = ',prism_nvar,prism_var(prism_nvar)%type
+        write(nulprt,*) subname,' varsize = ',prism_nvar,prism_var(prism_nvar)%size
+        write(nulprt,*) ' '
+     endif
 
-     write(nulprt,*) ' '
-     write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
-     write(nulprt,*) subname,' varname = ',prism_nvar,trim(prism_var(prism_nvar)%name)
-     write(nulprt,*) subname,' varpart = ',prism_nvar,prism_var(prism_nvar)%part
-     write(nulprt,*) subname,' varndim = ',prism_nvar,prism_var(prism_nvar)%ndim
-     write(nulprt,*) subname,' varnum  = ',prism_nvar,prism_var(prism_nvar)%num
-     write(nulprt,*) subname,' varops  = ',prism_nvar,prism_var(prism_nvar)%ops
-     write(nulprt,*) subname,' vartype = ',prism_nvar,prism_var(prism_nvar)%type
-     write(nulprt,*) subname,' varsize = ',prism_nvar,prism_var(prism_nvar)%size
-     write(nulprt,*) ' '
-
-     RETURN
+     call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_var_def
 

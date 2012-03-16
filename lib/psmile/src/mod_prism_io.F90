@@ -3,6 +3,7 @@ MODULE mod_prism_io
    USE mod_prism_kinds
    USE mod_prism_data
    USE mod_prism_parameters
+   USE mod_prism_mpi
    USE mod_prism_sys
    USE mod_prism_ioshr
    USE mct_mod
@@ -16,8 +17,10 @@ MODULE mod_prism_io
    public :: prism_io_read_avfld
    public :: prism_io_read_avfile
    public :: prism_io_write_avfile
-   public :: prism_io_write_avfbf
+   public :: prism_io_read_array
+   public :: prism_io_write_array
    public :: prism_io_read_avfbf
+   public :: prism_io_write_avfbf
    public :: prism_io_write_2dgridint_fromroot
    public :: prism_io_write_2dgridfld_fromroot
    public :: prism_io_write_3dgridfld_fromroot
@@ -65,7 +68,11 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
 
    ! empty filename, just return
 
-   if (len_trim(filename) < 1) return
+   call prism_sys_debug_enter(subname)
+   if (len_trim(filename) < 1) then
+      call prism_sys_debug_exit(subname)
+      return
+   endif
 
    mpicom = mpi_comm_local
    master_task = 0
@@ -90,7 +97,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
          status = nf90_open(trim(filename),NF90_NOWRITE,ncid)
          if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
       else
-         write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
+         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
          call prism_sys_abort(compid,subname,'ERROR: file missing')
       endif
 
@@ -155,6 +162,8 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       call mct_aVect_clean(av_g)
    endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_read_avfld
 
 !===============================================================================
@@ -192,9 +201,14 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    ! empty filename, just return
 
-   if (len_trim(rstfile) < 1) return
+   if (len_trim(rstfile) < 1) then
+      call prism_sys_debug_exit(subname)
+      return
+   endif
 
    mpicom = mpi_comm_local
    master_task = 0
@@ -284,11 +298,13 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
 
    endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_write_avfile
 
 !===============================================================================
 
-subroutine prism_io_read_avfile(rstfile,av,gsmap)
+subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
 
    ! ---------------------------------------
    ! Reads all fields for av from file
@@ -299,6 +315,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap)
    character(len=*), intent(in) :: rstfile    ! restart filename
    type(mct_aVect) , intent(inout) :: av      ! avect
    type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
+   logical         , intent(in),optional :: abort   ! abort on fail flag
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -313,6 +330,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap)
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
+   logical             :: labort      ! local abort flag
    real(ip_double_p),allocatable :: array2(:,:)
 
    character(len=*),parameter :: subname = 'prism_io_read_avfile'
@@ -321,9 +339,19 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap)
 !
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    ! empty filename, just return
 
-   if (len_trim(rstfile) < 1) return
+   if (len_trim(rstfile) < 1) then
+      call prism_sys_debug_exit(subname)
+      return
+   endif
+
+   labort = .true.
+   if (present(abort)) then
+      labort = abort
+   endif
 
    mpicom = mpi_comm_local
    master_task = 0
@@ -334,56 +362,62 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap)
    if (iam == master_task) then
 
       inquire(file=trim(rstfile),exist=exists)
-      if (exists) then
+      if (.not.exists) then
+         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
+         if (labort) call prism_sys_abort(compid,subname,'ERROR: file missing')
+      else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
          if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
-      else
-         write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
-         call prism_sys_abort(compid,subname,'ERROR: file missing')
-      endif
 
-      do n = 1,mct_aVect_nRAttr(av_g)
-         call mct_aVect_getRList(mstring,n,av_g)
-         itemc = mct_string_toChar(mstring)
-         call mct_string_clean(mstring)
+         do n = 1,mct_aVect_nRAttr(av_g)
+            call mct_aVect_getRList(mstring,n,av_g)
+            itemc = mct_string_toChar(mstring)
+            call mct_string_clean(mstring)
 
-         status = nf90_inq_varid(ncid,trim(itemc),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
-         status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
-         if (dlen /= 2) then
-            write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
-            call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 2')
-         endif
-         status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
-         status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            status = nf90_inq_varid(ncid,trim(itemc),varid)
 
-         if (size(av_g%rAttr,dim=2) /= nx*ny) then
-            write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-            call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
-         endif
+            if (status /= nf90_noerr) then
+               write(nulprt,*) subname,':',trim(itemc),':',trim(nf90_strerror(status))
+               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
 
-         allocate(array2(nx,ny))
+            else
+               status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (dlen /= 2) then
+                  write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
+                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 2')
+               endif
+               status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
 
-         status = nf90_get_var(ncid,varid,array2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (size(av_g%rAttr,dim=2) /= nx*ny) then
+                  write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
+                  call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+               endif
 
-         n1 = 0
-         do j = 1,ny
-         do i = 1,nx
-            n1 = n1 + 1
-            av_g%rAttr(n,n1) = array2(i,j)
+               allocate(array2(nx,ny))
+
+               status = nf90_get_var(ncid,varid,array2)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+               n1 = 0
+               do j = 1,ny
+               do i = 1,nx
+                  n1 = n1 + 1
+                  av_g%rAttr(n,n1) = array2(i,j)
+               enddo
+               enddo
+
+               deallocate(array2)
+            endif  ! varid valid
          enddo
-         enddo
 
-         deallocate(array2)
-      enddo
+         status = nf90_close(ncid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
 
-      status = nf90_close(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
-
+      endif  ! file exists
    endif
 
    call mct_aVect_scatter(av_g,av,gsmap,master_task,mpicom)
@@ -391,7 +425,286 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap)
       call mct_aVect_clean(av_g)
    endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_read_avfile
+
+!===============================================================================
+
+subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
+
+   ! ---------------------------------------
+   ! Writes all fields from av to file
+   ! ---------------------------------------
+
+   implicit none
+
+   character(len=*), intent(in) :: rstfile    ! restart filename
+   integer(ip_i4_p), intent(inout),optional :: iarray(:) ! data on root
+   character(len=*), intent(in),optional :: ivarname     ! variable name on file
+   real(ip_double_p),intent(inout),optional :: rarray(:) ! data on root
+   character(len=*), intent(in),optional :: rvarname     ! variable name on file
+   logical         , intent(in),optional :: abort        ! abort flag
+
+   !--- local ---
+   integer(ip_i4_p)    :: ncnt
+   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: ncid,dimid,dimid1(1),varid ! netcdf info
+   integer(ip_i4_p)    :: dlen        ! dimension length
+   integer(ip_i4_p)    :: status      ! error code
+   logical             :: exists      ! file existance
+   logical             :: labort      ! local abort flag
+
+   character(len=*),parameter :: subname = 'prism_io_read_array'
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+
+   ! empty filename, just return
+
+   if (len_trim(rstfile) < 1) then
+      call prism_sys_debug_exit(subname)
+      return
+   endif
+
+   labort = .true.
+   if (present(abort)) then
+      labort = abort
+   endif
+
+   mpicom = mpi_comm_local
+   master_task = 0
+   iam = mpi_rank_local
+
+   if (iam == master_task) then
+
+      inquire(file=trim(rstfile),exist=exists)
+      if (.not.exists) then
+         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
+         if (labort) call prism_sys_abort(compid,subname,'ERROR: file missing')
+      else
+         status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+         if (present(iarray)) then
+            if (.not. present(ivarname)) then
+               write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
+               call prism_sys_abort(compid,subname,' ERROR: ivarname unset')
+            endif
+
+            ncnt = size(iarray)
+
+            status = nf90_inq_varid(ncid,trim(ivarname),varid)
+            if (status /= nf90_noerr) then
+               write(nulprt,*) subname,':',trim(ivarname),':',trim(nf90_strerror(status))
+               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
+            else
+               status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (dlen /= 1) then
+                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(ivarname),dlen
+                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 1')
+               endif
+               status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+               if (ncnt /= dlen) then
+                  write(nulprt,*) subname,' ERROR: iarray ncnt dlen mismatch ',ncnt,dlen
+                  call prism_sys_abort(compid,subname,'ERROR: iarray ncnt dlen mismatch')
+               endif
+
+               status = nf90_get_var(ncid,varid,iarray)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            endif
+         endif
+
+         if (present(rarray)) then
+            if (.not. present(rvarname)) then
+               write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
+               call prism_sys_abort(compid,subname,' ERROR: rvarname unset')
+            endif
+
+            ncnt = size(rarray)
+
+            status = nf90_inq_varid(ncid,trim(rvarname),varid)
+            if (status /= nf90_noerr) then
+               write(nulprt,*) subname,':',trim(rvarname),':',trim(nf90_strerror(status))
+               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
+            else
+               status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (dlen /= 1) then
+                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(rvarname),dlen
+                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 1')
+               endif
+               status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+               if (ncnt /= dlen) then
+                  write(nulprt,*) subname,' ERROR: rarray ncnt dlen mismatch ',ncnt,dlen
+                  call prism_sys_abort(compid,subname,'ERROR: rarray ncnt dlen mismatch')
+               endif
+
+               status = nf90_get_var(ncid,varid,rarray)
+               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            endif
+         endif
+
+         status = nf90_close(ncid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+      endif
+   endif
+
+   if (present(iarray)) then
+      call prism_mpi_bcast(iarray,mpicom,trim(subname)//':iarray',master_task)
+   endif
+
+   if (present(rarray)) then
+      call prism_mpi_bcast(rarray,mpicom,trim(subname)//':rarray',master_task)
+   endif
+
+   call prism_sys_debug_exit(subname)
+
+end subroutine prism_io_read_array
+
+!===============================================================================
+
+subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
+
+   ! ---------------------------------------
+   ! Writes all fields from av to file
+   ! ---------------------------------------
+
+   implicit none
+
+   character(len=*), intent(in) :: rstfile    ! restart filename
+   integer(ip_i4_p), intent(in),optional :: iarray(:)   ! data on root
+   character(len=*), intent(in),optional :: ivarname    ! variable name on file
+   real(ip_double_p),intent(in),optional :: rarray(:)   ! data on root
+   character(len=*), intent(in),optional :: rvarname    ! variable name on file
+
+   !--- local ---
+   integer(ip_i4_p)    :: ncnt
+   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: ncid,dimid,dimid1(1),varid ! netcdf info
+   integer(ip_i4_p)    :: dlen        ! dimension length
+   integer(ip_i4_p)    :: status      ! error code
+   logical             :: exists      ! file existance
+
+   character(len=*),parameter :: subname = 'prism_io_write_array'
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+
+   ! empty filename, just return
+
+   if (len_trim(rstfile) < 1) then
+      call prism_sys_debug_exit(subname)
+      return
+   endif
+
+   mpicom = mpi_comm_local
+   master_task = 0
+   iam = mpi_rank_local
+
+   if (iam == master_task) then
+
+      inquire(file=trim(rstfile),exist=exists)
+      if (exists) then
+         status = nf90_open(trim(rstfile),NF90_WRITE,ncid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         status = nf90_redef(ncid)
+      else
+         status = nf90_create(trim(rstfile),NF90_CLOBBER,ncid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      endif
+
+      if (present(iarray)) then
+         if (.not. present(ivarname)) then
+            write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
+            call prism_sys_abort(compid,subname,' ERROR: ivarname unset')
+         endif
+
+         ncnt = size(iarray)
+
+         status = nf90_inq_dimid(ncid,trim(ivarname)//'_ncnt',dimid1(1))
+         if (status /= nf90_noerr) then
+            status = nf90_def_dim(ncid,trim(ivarname)//'_ncnt',ncnt,dimid1(1))
+         endif
+
+         status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (dlen /= ncnt) then
+            write(nulprt,*) subname,' ERROR: iarray dlen ne ncnt ',dlen,ncnt
+            call prism_sys_abort(compid,subname,' ERROR: dlen ne ncnt')
+         endif
+
+         status = nf90_inq_varid(ncid,trim(ivarname),varid)
+         if (status /= nf90_noerr) then
+            status = nf90_def_var(ncid,trim(ivarname),NF90_INT,dimid1,varid)
+            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         endif
+      endif
+
+      if (present(rarray)) then
+         if (.not. present(rvarname)) then
+            write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
+            call prism_sys_abort(compid,subname,' ERROR: rvarname unset')
+         endif
+
+         ncnt = size(rarray)
+
+         status = nf90_inq_dimid(ncid,trim(rvarname)//'_ncnt',dimid1(1))
+         if (status /= nf90_noerr) then
+            status = nf90_def_dim(ncid,trim(rvarname)//'_ncnt',ncnt,dimid1(1))
+         endif
+
+         status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (dlen /= ncnt) then
+            write(nulprt,*) subname,' ERROR: rarray dlen ne ncnt ',dlen,ncnt
+            call prism_sys_abort(compid,subname,' ERROR: dlen ne ncnt')
+         endif
+
+         status = nf90_inq_varid(ncid,trim(rvarname),varid)
+         if (status /= nf90_noerr) then
+            status = nf90_def_var(ncid,trim(rvarname),NF90_DOUBLE,dimid1,varid)
+            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         endif
+      endif
+
+      status = nf90_enddef(ncid)
+      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+      if (present(iarray)) then
+         status = nf90_inq_varid(ncid,trim(ivarname),varid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         status = nf90_put_var(ncid,varid,iarray)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      endif
+
+      if (present(rarray)) then
+         status = nf90_inq_varid(ncid,trim(rvarname),varid)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         status = nf90_put_var(ncid,varid,rarray)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      endif
+
+      status = nf90_close(ncid)
+      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+   endif
+
+   call prism_sys_debug_exit(subname)
+
+end subroutine prism_io_write_array
 
 !===============================================================================
 
@@ -437,6 +750,8 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lmsec = 0
    if (present(msec)) then
@@ -559,6 +874,8 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
 
 #endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_write_avfbf
 
 !===============================================================================
@@ -604,6 +921,8 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lmsec = 0
    if (present(msec)) then
@@ -703,6 +1022,8 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
       call mct_aVect_clean(av_g)
    endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_read_avfbf
 
 !===============================================================================
@@ -734,6 +1055,8 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -788,6 +1111,8 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
 !   endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_write_2dgridfld_fromroot
 
 !===============================================================================
@@ -819,6 +1144,8 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -873,6 +1200,8 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
 !   endif
 
+   call prism_sys_debug_exit(subname)
+
 end subroutine prism_io_write_2dgridint_fromroot
 
 !===============================================================================
@@ -905,6 +1234,8 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -965,6 +1296,8 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
     if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
 
 !   endif
+
+   call prism_sys_debug_exit(subname)
 
 end subroutine prism_io_write_3dgridfld_fromroot
 

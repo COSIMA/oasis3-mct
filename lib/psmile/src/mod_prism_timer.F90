@@ -345,18 +345,16 @@ module mod_prism_timer
 !            deallocate(iarr,stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error iarr'
 
-! tcraig this works but requires lots of gather calls, what a waste
+! tcraig this works but requires lots of gather calls, could be better
             allocate(rarr(comm_size),iarr(comm_size),carr(comm_size),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error rarr'
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
-!               write(nulprt,*) subname,' tcx1 ',n,trim(cval)
                call MPI_Gather(cval,len(cval),MPI_CHARACTER,carr(1),len(cval),MPI_CHARACTER,root,comm_timer,ierror)
                if (comm_rank == root) then
                   do m = 1,comm_size
                      label_global_tmp(n,m) = trim(carr(m))
-!                     write(nulprt,*) subname,' tcx2 ',n,m,trim(label_global_tmp(n,m))
                   enddo
                endif
 
@@ -404,7 +402,6 @@ module mod_prism_timer
             if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error label_list'
             do k = 1,nlabels
                label_list(k) = trim(carr(k))
-!               write(nulprt,*) subname,' tcx3 ',k,trim(label_list(k))
             enddo
             deallocate(carr,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error carr'

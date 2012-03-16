@@ -50,13 +50,16 @@ contains
     character(len=*),parameter :: subname = 'prism_put_proto_r14'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -73,6 +76,8 @@ contains
     call prism_advance_run(PRISM_Out,nfld,kstep,array,kinfo)
 
     deallocate(array)
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_put_proto_r14
 
@@ -92,13 +97,16 @@ contains
     character(len=*),parameter :: subname = 'prism_put_proto_r18'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -115,6 +123,8 @@ contains
     call prism_advance_run(PRISM_Out,nfld,kstep,array,kinfo)
 
     deallocate(array)
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_put_proto_r18
 
@@ -134,13 +144,16 @@ contains
     character(len=*),parameter :: subname = 'prism_put_proto_r24'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -161,6 +174,8 @@ contains
     call prism_advance_run(PRISM_Out,nfld,kstep,array,kinfo)
 
     deallocate(array)
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_put_proto_r24
 
@@ -180,13 +195,16 @@ contains
     character(len=*),parameter :: subname = 'prism_put_proto_r28'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -207,6 +225,8 @@ contains
     call prism_advance_run(PRISM_Out,nfld,kstep,array,kinfo)
 
     deallocate(array)
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_put_proto_r28
 
@@ -227,13 +247,16 @@ contains
     character(len=*),parameter :: subname = 'prism_get_proto_r14'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -250,6 +273,8 @@ contains
           rd_field(ni) = array(n)
        enddo
     endif
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_get_proto_r14
 
@@ -269,13 +294,16 @@ contains
     character(len=*),parameter :: subname = 'prism_get_proto_r18'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -292,6 +320,8 @@ contains
           rd_field(ni) = array(n)
        enddo
     endif
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_get_proto_r18
 
@@ -311,13 +341,16 @@ contains
     character(len=*),parameter :: subname = 'prism_get_proto_r24'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -338,6 +371,8 @@ contains
        enddo
        enddo
     endif
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_get_proto_r24
 
@@ -357,13 +392,16 @@ contains
     character(len=*),parameter :: subname = 'prism_get_proto_r28'
     !-------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     kinfo = PRISM_OK
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       call prism_sys_debug_exit(subname)
        return
     endif
 
@@ -384,6 +422,8 @@ contains
        enddo
        enddo
     endif
+
+    call prism_sys_debug_exit(subname)
 
   end subroutine prism_get_proto_r28
 

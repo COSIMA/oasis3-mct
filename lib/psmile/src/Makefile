@@ -55,8 +55,8 @@ mod_psmile_io.o: mod_psmile_io.F90
 mod_prism_kinds.o: 
 mod_prism_parameters.o: mod_prism_kinds.o
 mod_prism_data.o: mod_prism_kinds.o 
-mod_prism_mpi.o: mod_prism_kinds.o mod_prism_data.o
 mod_prism_sys.o: mod_prism_kinds.o mod_prism_data.o
+mod_prism_mpi.o: mod_prism_kinds.o mod_prism_sys.o
 mod_prism_timer.o: mod_prism_kinds.o mod_prism_sys.o mod_prism_mpi.o mod_prism_data.o
 mod_prism_string.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o
@@ -69,7 +69,7 @@ mod_prism_part.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
 mod_prism_ioshr.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_mpi.o
 mod_prism_io.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o mod_prism_ioshr.o
+        mod_prism_parameters.o mod_prism_ioshr.o mod_prism_mpi.o
 mod_prism_grid.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_io.o
 mod_prism_coupler.o: mod_prism_kinds.o  mod_prism_data.o mod_prism_sys.o \

@@ -6,7 +6,7 @@ MODULE mod_prism_mpi
 !-------------------------------------------------------------------------------
 
    use mod_prism_kinds
-   use mod_prism_data, only: nulprt
+   use mod_prism_sys, only: prism_sys_debug_enter, prism_sys_debug_exit
 
    implicit none
    private
@@ -106,7 +106,7 @@ SUBROUTINE prism_mpi_chkerr(rcode,string)
    character(*),         intent(in) :: string ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_chkerr) '
+   character(*),parameter           :: subName = 'prism_mpi_chkerr'
    character(MPI_MAX_ERROR_STRING)  :: lstring
    integer(ip_i4_p)             :: len
    integer(ip_i4_p)             :: ierr
@@ -115,12 +115,16 @@ SUBROUTINE prism_mpi_chkerr(rcode,string)
 ! PURPOSE: layer on MPI error checking
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    lstring = ' '
    if (rcode /= MPI_SUCCESS) then
      call MPI_ERROR_STRING(rcode,lstring,len,ierr)
      write(nulprt,*) trim(subName),":",lstring(1:len)
      call prism_mpi_abort(string,rcode)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_chkerr
 
@@ -139,13 +143,15 @@ SUBROUTINE prism_mpi_sendi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sendi0) '
+   character(*),parameter           :: subName = 'prism_mpi_sendi0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Send a single integer
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
 
@@ -155,6 +161,8 @@ SUBROUTINE prism_mpi_sendi0(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sendi0
 
@@ -173,13 +181,15 @@ SUBROUTINE prism_mpi_sendi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sendi1) '
+   character(*),parameter           :: subName = 'prism_mpi_sendi1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Send a vector of integers
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(lvec)
 
@@ -189,6 +199,8 @@ SUBROUTINE prism_mpi_sendi1(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sendi1
 
@@ -207,13 +219,15 @@ SUBROUTINE prism_mpi_sendr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sendr0) '
+   character(*),parameter           :: subName = 'prism_mpi_sendr0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Send a real scalar
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
 
@@ -223,6 +237,8 @@ SUBROUTINE prism_mpi_sendr0(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sendr0
 
@@ -241,13 +257,15 @@ SUBROUTINE prism_mpi_sendr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sendr1) '
+   character(*),parameter           :: subName = 'prism_mpi_sendr1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Send a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(lvec)
 
@@ -257,6 +275,8 @@ SUBROUTINE prism_mpi_sendr1(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sendr1
 
@@ -275,13 +295,15 @@ SUBROUTINE prism_mpi_sendr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sendr3) '
+   character(*),parameter           :: subName = 'prism_mpi_sendr3'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Send a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(array)
 
@@ -291,6 +313,8 @@ SUBROUTINE prism_mpi_sendr3(array,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sendr3
 
@@ -309,7 +333,7 @@ SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_recvi0) '
+   character(*),parameter           :: subName = 'prism_mpi_recvi0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -317,6 +341,8 @@ SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
 
@@ -326,6 +352,8 @@ SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_recvi0
 
@@ -344,7 +372,7 @@ SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_recvi1) '
+   character(*),parameter           :: subName = 'prism_mpi_recvi1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -352,6 +380,8 @@ SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(lvec)
 
@@ -361,6 +391,8 @@ SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_recvi1
 
@@ -379,7 +411,7 @@ SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_recvr0) '
+   character(*),parameter           :: subName = 'prism_mpi_recvr0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -387,6 +419,8 @@ SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
 
@@ -396,6 +430,8 @@ SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_recvr0
 
@@ -414,7 +450,7 @@ SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_recvr1) '
+   character(*),parameter           :: subName = 'prism_mpi_recvr1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -422,6 +458,8 @@ SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(lvec)
 
@@ -431,6 +469,8 @@ SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_recvr1
 
@@ -449,7 +489,7 @@ SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_recvr3) '
+   character(*),parameter           :: subName = 'prism_mpi_recvr3'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -457,6 +497,8 @@ SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(array)
 
@@ -466,6 +508,8 @@ SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_recvr3
 
@@ -483,7 +527,7 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcasti0) '
+   character(*),parameter             :: subName = 'prism_mpi_bcasti0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -491,6 +535,8 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast an integer
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -502,6 +548,8 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcasti0
 
@@ -519,7 +567,7 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastl0) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastl0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -527,6 +575,8 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a logical
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -538,6 +588,8 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastl0
 
@@ -555,7 +607,7 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastc0) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastc0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -563,6 +615,8 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a character string
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = len(vec)
    lpebcast = 0
@@ -574,6 +628,8 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastc0
 
@@ -591,7 +647,7 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastc1) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastc1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -599,6 +655,8 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a character string
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(vec)*len(vec)
    lpebcast = 0
@@ -610,6 +668,8 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastc1
 
@@ -627,7 +687,7 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastr0) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastr0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -635,6 +695,8 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a real
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -646,6 +708,8 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastr0
 
@@ -663,7 +727,7 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcasti1) '
+   character(*),parameter             :: subName = 'prism_mpi_bcasti1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -671,6 +735,8 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a vector of integers
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -682,6 +748,8 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcasti1
 
@@ -699,7 +767,7 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastl1) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastl1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -707,6 +775,8 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a logical
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -718,6 +788,8 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastl1
 
@@ -735,7 +807,7 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_bcastr1) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastr1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -743,6 +815,8 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a vector of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -754,6 +828,8 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastr1
 
@@ -776,11 +852,13 @@ SUBROUTINE prism_mpi_bcastr2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_bcastr2) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastr2'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -792,6 +870,8 @@ SUBROUTINE prism_mpi_bcastr2(arr,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastr2
 
@@ -814,11 +894,13 @@ SUBROUTINE prism_mpi_bcasti2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_bcasti2) '
+   character(*),parameter             :: subName = 'prism_mpi_bcasti2'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of integers
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -830,6 +912,8 @@ SUBROUTINE prism_mpi_bcasti2(arr,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcasti2
 
@@ -852,11 +936,13 @@ SUBROUTINE prism_mpi_bcastr3(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_bcastr3) '
+   character(*),parameter             :: subName = 'prism_mpi_bcastr3'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 3d array of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -868,6 +954,8 @@ SUBROUTINE prism_mpi_bcastr3(arr,comm,string,pebcast)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_bcastr3
 
@@ -900,11 +988,13 @@ SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    integer(ip_i4_p)               :: maxSize       ! Maximum size
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_gathScatvInitr1) '
+   character(*),parameter             :: subName = 'prism_mpi_gathScatvInitr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Setup arrays for a gatherv/scatterv operation
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    locSize = size(locarr)
    call prism_mpi_commsize( comm, npes )
@@ -952,6 +1042,8 @@ SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
          call prism_mpi_abort( subName//" : Error, displacement array values too big" )
    end if
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_gathScatvInitr1
 
 !===============================================================================
@@ -976,11 +1068,13 @@ SUBROUTINE prism_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, roo
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_gathervr1) '
+   character(*),parameter             :: subName = 'prism_mpi_gathervr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Gather a 1D array of reals
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_GATHERV( locarr, locSize, MPI_REAL8, glob1Darr, globSize, displs, &
                      MPI_REAL8, rootid, comm, ierr )
@@ -989,6 +1083,8 @@ SUBROUTINE prism_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, roo
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_gathervr1
 
@@ -1014,12 +1110,13 @@ SUBROUTINE prism_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, ro
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = '(prism_mpi_scattervr1) '
+   character(*),parameter             :: subName = 'prism_mpi_scattervr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Scatter a 1D array of reals
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
 
    call MPI_SCATTERV( glob1Darr, globSize, displs, MPI_REAL8, locarr, locSize, &
                       MPI_REAL8, rootid, comm, ierr )
@@ -1028,6 +1125,8 @@ SUBROUTINE prism_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, ro
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_scattervr1
 
@@ -1047,7 +1146,7 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumi0) '
+   character(*),parameter           :: subName = 'prism_mpi_sumi0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1059,6 +1158,8 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1086,6 +1187,8 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumi0
 
@@ -1104,7 +1207,7 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumi1) '
+   character(*),parameter           :: subName = 'prism_mpi_sumi1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1116,6 +1219,8 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1143,6 +1248,8 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumi1
 
@@ -1161,7 +1268,7 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumb0) '
+   character(*),parameter           :: subName = 'prism_mpi_sumb0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1173,6 +1280,8 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1200,6 +1309,8 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER8,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumb0
 
@@ -1218,7 +1329,7 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumb1) '
+   character(*),parameter           :: subName = 'prism_mpi_sumb1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1230,6 +1341,8 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1258,6 +1371,8 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_sumb1
 
 !===============================================================================
@@ -1275,7 +1390,7 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumr0) '
+   character(*),parameter           :: subName = 'prism_mpi_sumr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1287,6 +1402,8 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1314,6 +1431,8 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumr0
 
@@ -1332,7 +1451,7 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumr1) '
+   character(*),parameter           :: subName = 'prism_mpi_sumr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1344,6 +1463,8 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1371,6 +1492,8 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumr1
 
@@ -1389,7 +1512,7 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumr2) '
+   character(*),parameter           :: subName = 'prism_mpi_sumr2'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1401,6 +1524,8 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1428,6 +1553,8 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_sumr2
 
@@ -1446,7 +1573,7 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_sumr3) '
+   character(*),parameter           :: subName = 'prism_mpi_sumr3'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1458,6 +1585,8 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds sum of a distributed vector of values, assume local sum
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1486,6 +1615,8 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_sumr3
 
 !===============================================================================
@@ -1503,7 +1634,7 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_mini0) '
+   character(*),parameter           :: subName = 'prism_mpi_mini0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1515,6 +1646,8 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds min of a distributed vector of values, assume local min
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1542,6 +1675,8 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_mini0
 
@@ -1560,7 +1695,7 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_mini1) '
+   character(*),parameter           :: subName = 'prism_mpi_mini1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1572,6 +1707,8 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds min of a distributed vector of values, assume local min
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1599,6 +1736,8 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_mini1
 
@@ -1617,7 +1756,7 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_minr0) '
+   character(*),parameter           :: subName = 'prism_mpi_minr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1629,6 +1768,8 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds min of a distributed vector of values, assume local min
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1656,6 +1797,8 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_minr0
 
@@ -1674,7 +1817,7 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_minr1) '
+   character(*),parameter           :: subName = 'prism_mpi_minr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1686,6 +1829,8 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds min of a distributed vector of values, assume local min
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1714,6 +1859,8 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_minr1
 
 !===============================================================================
@@ -1731,7 +1878,7 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_maxi0) '
+   character(*),parameter           :: subName = 'prism_mpi_maxi0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1743,6 +1890,8 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds max of a distributed vector of values, assume local max
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1770,6 +1919,8 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_maxi0
 
@@ -1788,7 +1939,7 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_maxi1) '
+   character(*),parameter           :: subName = 'prism_mpi_maxi1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1800,6 +1951,8 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds max of a distributed vector of values, assume local max
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1828,6 +1981,8 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_maxi1
 
 !===============================================================================
@@ -1845,7 +2000,7 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_maxr0) '
+   character(*),parameter           :: subName = 'prism_mpi_maxr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1857,6 +2012,8 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds max of a distributed vector of values, assume local max
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1885,6 +2042,8 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_maxr0
 
 !===============================================================================
@@ -1902,7 +2061,7 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = '(prism_mpi_maxr1) '
+   character(*),parameter           :: subName = 'prism_mpi_maxr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1914,6 +2073,8 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
 ! PURPOSE: Finds max of a distributed vector of values, assume local max
 !          already computed
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1942,6 +2103,8 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
      call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
+   call prism_sys_debug_exit(subname)
+
 END SUBROUTINE prism_mpi_maxr1
 
 !===============================================================================
@@ -1957,12 +2120,14 @@ SUBROUTINE prism_mpi_commsize(comm,size,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_commsize) '
+   character(*),parameter             :: subName = 'prism_mpi_commsize'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI commsize
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_COMM_SIZE(comm,size,ierr)
    if (present(string)) then
@@ -1970,6 +2135,8 @@ SUBROUTINE prism_mpi_commsize(comm,size,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_commsize
 
@@ -1986,12 +2153,14 @@ SUBROUTINE prism_mpi_commrank(comm,rank,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_commrank) '
+   character(*),parameter             :: subName = 'prism_mpi_commrank'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI commrank
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_COMM_RANK(comm,rank,ierr)
    if (present(string)) then
@@ -1999,6 +2168,8 @@ SUBROUTINE prism_mpi_commrank(comm,rank,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_commrank
 
@@ -2014,12 +2185,14 @@ SUBROUTINE prism_mpi_initialized(flag,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_initialized) '
+   character(*),parameter             :: subName = 'prism_mpi_initialized'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI initialized
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_INITIALIZED(flag,ierr)
    if (present(string)) then
@@ -2027,6 +2200,8 @@ SUBROUTINE prism_mpi_initialized(flag,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_initialized
 
@@ -2041,13 +2216,17 @@ SUBROUTINE prism_mpi_wtime(wtime)
    real(ip_r8_p), intent(out) :: wtime  ! time
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_wtime) '
+   character(*),parameter             :: subName = 'prism_mpi_wtime'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI wtime
 !-------------------------------------------------------------------------------
 
+   call prism_sys_debug_enter(subname)
+
    wtime = MPI_WTIME()
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_wtime
 
@@ -2063,13 +2242,15 @@ SUBROUTINE prism_mpi_abort(string,rcode)
    integer,optional,intent(in)        :: rcode    ! optional code
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_abort) '
+   character(*),parameter             :: subName = 'prism_mpi_abort'
    integer(ip_i4_p)                   :: ierr
    integer                            :: rc       ! return code
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI abort
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    if ( present(string) .and. present(rcode) ) then
       write(nulprt,*) trim(subName),":",trim(string),rcode
@@ -2080,6 +2261,8 @@ SUBROUTINE prism_mpi_abort(string,rcode)
       rc = 1001
    end if
    call MPI_ABORT(MPI_COMM_WORLD,rcode,ierr)
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_abort
 
@@ -2095,12 +2278,14 @@ SUBROUTINE prism_mpi_barrier(comm,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_barrier) '
+   character(*),parameter             :: subName = 'prism_mpi_barrier'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI barrier
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_BARRIER(comm,ierr)
    if (present(string)) then
@@ -2108,6 +2293,8 @@ SUBROUTINE prism_mpi_barrier(comm,string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_barrier
 
@@ -2122,12 +2309,14 @@ SUBROUTINE prism_mpi_init(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_init) '
+   character(*),parameter             :: subName = 'prism_mpi_init'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI init
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_INIT(ierr)
    if (present(string)) then
@@ -2135,6 +2324,8 @@ SUBROUTINE prism_mpi_init(string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_init
 
@@ -2149,12 +2340,14 @@ SUBROUTINE prism_mpi_finalize(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = '(prism_mpi_finalize) '
+   character(*),parameter             :: subName = 'prism_mpi_finalize'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI finalize
 !-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
 
    call MPI_BARRIER(MPI_COMM_WORLD,ierr)
    call MPI_FINALIZE(ierr)
@@ -2163,6 +2356,8 @@ SUBROUTINE prism_mpi_finalize(string)
    else
      call prism_mpi_chkerr(ierr,subName)
    endif
+
+   call prism_sys_debug_exit(subname)
 
 END SUBROUTINE prism_mpi_finalize
 

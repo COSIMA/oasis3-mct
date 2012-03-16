@@ -18,6 +18,8 @@ MODULE mod_prism_method
    public prism_method_init
    public prism_method_terminate
    public prism_method_getlocalcomm
+   public prism_method_getdebug
+   public prism_method_setdebug
    public prism_method_enddef
 
 #ifdef __VERBOSE
@@ -49,7 +51,9 @@ CONTAINS
    character(len=*),parameter :: subname = 'prism_method_init'
 !  ---------------------------------------------------------
 
-   kinfo = PRISM_OK
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
    call prism_data_zero()
 
    !------------------------
@@ -59,10 +63,10 @@ CONTAINS
    lg_mpiflag = .FALSE.
    CALL MPI_Initialized ( lg_mpiflag, mpi_err )
    IF ( .NOT. lg_mpiflag ) THEN
-      WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
+      if (PRISM_DEBUG > 0) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
       CALL MPI_INIT ( mpi_err )
    else
-      WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
+      if (PRISM_DEBUG > 0) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
    ENDIF
 
 #ifdef use_comm_MPI1
@@ -89,6 +93,7 @@ CONTAINS
    !------------------------
 
    call prism_namcouple_init()
+   prism_debug = namlogprt
 
    !------------------------
    !--- Set compid (need namcouple model names)
@@ -144,6 +149,9 @@ CONTAINS
    write(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
    open(nulprt,file=filename)
 
+   write(nulprt,*) subname,' OPEN pout file'
+   call prism_sys_debug_enter(subname)
+
    !------------------------
    !--- MCT
    !------------------------
@@ -173,21 +181,26 @@ CONTAINS
    !--- Diagnostics
    !------------------------
 
-   write(nulprt,*) subname,' compid         = ',compid
-   write(nulprt,*) subname,' compnm         = ',trim(compnm)
-   write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
-   write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
-   write(nulprt,*) subname,'     size_global= ',mpi_size_global
-   write(nulprt,*) subname,'     rank_global= ',mpi_rank_global
-   write(nulprt,*) subname,' mpi_comm_local = ',mpi_comm_local
-   write(nulprt,*) subname,'     size_local = ',mpi_size_local
-   write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
-   write(nulprt,*) subname,'     root_local = ',mpi_root_local
-   call prism_sys_flush(nulprt)
+   if (PRISM_DEBUG >= 2)  then
+      write(nulprt,*) subname,' compid         = ',compid
+      write(nulprt,*) subname,' compnm         = ',trim(compnm)
+      write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
+      write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
+      write(nulprt,*) subname,'     size_global= ',mpi_size_global
+      write(nulprt,*) subname,'     rank_global= ',mpi_rank_global
+      write(nulprt,*) subname,' mpi_comm_local = ',mpi_comm_local
+      write(nulprt,*) subname,'     size_local = ',mpi_size_local
+      write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
+      write(nulprt,*) subname,'     root_local = ',mpi_root_local
+      write(nulprt,*) subname,' prism_debug    = ',prism_debug
+      call prism_sys_flush(nulprt)
+   endif
 
-   if (PRISM_Debug >= 2) then
+   if (PRISM_Debug >= 4) then
       call mpi_barrier(mpi_comm_global,mpi_err)
    endif
+
+   call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_init
 
@@ -202,20 +215,25 @@ CONTAINS
    character(len=*),parameter :: subname = 'prism_method_terminate'
 !  ---------------------------------------------------------
 
-   kinfo = PRISM_OK
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
 
    call prism_timer_stop('total after init')
    call prism_timer_print()
 
    CALL MPI_BARRIER (mpi_comm_global, mpi_err)
    IF ( .NOT. lg_mpiflag ) THEN
-      WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
+      if (PRISM_DEBUG > 0) WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
       CALL MPI_Finalize ( mpi_err )
    else
-      WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
+      if (PRISM_DEBUG > 0) WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
    ENDIF
 
    write(nulprt,*) subname,' SUCCESSFUL RUN'
+
+   call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_terminate
 
@@ -230,12 +248,62 @@ CONTAINS
    character(len=*),parameter :: subname = 'prism_method_getlocalcomm'
 !  ---------------------------------------------------------
 
-   kinfo = PRISM_OK
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
 
    ! from prism_data
    localcomm = mpi_comm_local
 
+   call prism_sys_debug_exit(subname)
+
    END SUBROUTINE prism_method_getlocalcomm
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_getdebug(debug,kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(out)   :: debug
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+!  ---------------------------------------------------------
+   character(len=*),parameter :: subname = 'prism_method_getdebug'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   debug = prism_debug
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_getdebug
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_setdebug(debug,kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(in)   :: debug
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+!  ---------------------------------------------------------
+   character(len=*),parameter :: subname = 'prism_method_setdebug'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   prism_debug = debug
+   if (PRISM_Debug >= 2) then
+      write(nulprt,*) subname,' set prism_debug to ',prism_debug
+   endif
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_setdebug
 !----------------------------------------------------------------------
    SUBROUTINE prism_method_enddef(kinfo)
 
@@ -246,12 +314,17 @@ CONTAINS
    character(len=*),parameter :: subname = 'prism_method_enddef'
 !  ---------------------------------------------------------
 
-   kinfo = PRISM_OK
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
 
    CALL MPI_BARRIER (mpi_comm_global, mpi_err)
 
    call prism_coupler_setup()
    call prism_advance_init()
+
+   call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_enddef
 !----------------------------------------------------------------------

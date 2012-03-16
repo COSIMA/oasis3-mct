@@ -156,6 +156,7 @@ CONTAINS
   ! Figure out the global rank of each model's root
   !----------------------------------------------------------
 
+  call prism_sys_debug_enter(subname)
   call prism_timer_start('cpl_setup')
 
   allocate(model_root(prism_nmodels))
@@ -167,12 +168,13 @@ CONTAINS
         subname//':cg',.true.)
   enddo
 
-  write(nulprt,*) subname,' model_root = ',model_root(1:prism_nmodels)
+  if (PRISM_DEBUG > 0) write(nulprt,*) subname,' model_root = ',model_root(1:prism_nmodels)
 
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
 
   lnn=-1
+  call prism_sys_debug_note(subname//' set defaults for datatypes')
 
   prism_mrouter = nnamcpl
   allocate(prism_router(prism_mrouter))
@@ -200,7 +202,7 @@ CONTAINS
      allocate(prism_coupler(nc)%varid(1))
      prism_coupler(nc)%varid(:) = ispval
   enddo
-  write(nulprt,*) subname,' initialize %varid ',nnamcpl,size(prism_coupler(nnamcpl)%varid)
+  if (PRISM_DEBUG > 0) write(nulprt,*) subname,' initialize %varid ',nnamcpl,size(prism_coupler(nnamcpl)%varid)
   prism_coupler(:)%ops     = ispval
   prism_coupler(:)%comp    = ispval
   prism_coupler(:)%routerID  = ispval
@@ -235,6 +237,8 @@ CONTAINS
      call prism_sys_flush(nulprt)
      call prism_mpi_barrier(mpi_comm_global)
   endif
+
+  call prism_sys_debug_note(subname//' share var info between models')
 
   allocate(allvar(100,prism_nmodels))
   allocate(nallvar(prism_nmodels))
@@ -313,12 +317,15 @@ CONTAINS
   ! for all namcoupler input
   !--------------------------------
 
+  call prism_sys_debug_note(subname//' compare vars and namcouple')
+  call prism_sys_debug_note(subname//' setup couplers')
+
   do nns = 1,nnamcpl
      nn = namfldsort(nns)
 
      !--- tcx require for run time error on corail ????----
      call prism_mpi_barrier(mpi_comm_global)
-     write(nulprt,*) subname,' check nam ',nns
+     if (PRISM_DEBUG > 0) write(nulprt,*) subname,' check nam ',nns
      call prism_sys_flush(nulprt)
 
      !--------------------------------
@@ -328,7 +335,7 @@ CONTAINS
      do nv1 = 1,nallvar(compid)
 
         !--- tcx require for run time error on corail ????----
-        write(nulprt,*) subname,' check var ',nns,nv1
+        if (PRISM_DEBUG > 0) write(nulprt,*) subname,' check var ',nns,nv1
         call prism_sys_flush(nulprt)
 
         !--------------------------------
@@ -363,7 +370,6 @@ CONTAINS
            !--------------------------------
 
            if (flag == PRISM_In) then
-!               write(nulprt,*) 'tcx1 ',subname,part1,nn,prism_part(part1)%nx,namdst_nx(nn),namdst_ny(nn),trim(namdstgrd(nn))
               if (prism_part(part1)%nx < 1) then
                  prism_part(part1)%nx = namdst_nx(nn)
                  prism_part(part1)%ny = namdst_ny(nn)
@@ -371,7 +377,6 @@ CONTAINS
               endif
            endif
            if (flag == PRISM_Out) then
-!               write(nulprt,*) 'tcx2 ',subname,part1,nn,prism_part(part1)%nx,namsrc_nx(nn),namsrc_ny(nn),trim(namsrcgrd(nn))
               if (prism_part(part1)%nx < 1) then
                  prism_part(part1)%nx = namsrc_nx(nn)
                  prism_part(part1)%ny = namsrc_ny(nn)
@@ -402,7 +407,7 @@ CONTAINS
            do nv = 1,nallvar(nm)
 
               !--- tcx require for run time error on corail ????----
-              write(nulprt,*) subname,' check mod ',nns,nv1,nm,nv
+              if (PRISM_DEBUG > 0) write(nulprt,*) subname,' check mod ',nns,nv1,nm,nv
               call prism_sys_flush(nulprt)
 
               otfld  = trim(allvar(nv,nm))
@@ -423,7 +428,7 @@ CONTAINS
 
               if (otfldi == myfldi) then
 
-                 write(nulprt,*) subname,' check fld ',nns,nv1,nm,nv,otfldi
+                 if (PRISM_DEBUG > 0) write(nulprt,*) subname,' check fld ',nns,nv1,nm,nv,otfldi
 
                  if (PRISM_Debug >= 5) then
                     write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,nv,otfldi,' ',trim(otfld)
@@ -633,11 +638,12 @@ CONTAINS
 
   deallocate(allvar,nallvar,allops)
 
-  if (PRISM_Debug >= 5) then
+  if (PRISM_Debug >= 20) then
      write(nulprt,*) ' '
      write(nulprt,*) subname,' couplers setup'
      do nc = 1,prism_ncoupler
-        call prism_coupler_print(nc)
+!tcx can't write here, something uninitialized???
+!        call prism_coupler_print(nc)
      enddo
      write(nulprt,*) ' '
   endif
@@ -651,9 +657,11 @@ CONTAINS
   ! Initialize coupling infrastructure based on couplers above
   !----------------------------------------------------------
 
+  call prism_sys_debug_note(subname//' initialize coupling datatypes')
+
   do nc = 1,prism_ncoupler
      if (PRISM_Debug >= 5) then
-        write(nulprt,*) subname,' ci:initialize coupler ',nc
+        write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc
         call prism_sys_flush(nulprt)
      endif
 
@@ -672,18 +680,18 @@ CONTAINS
 
      gsize = mct_gsmap_gsize(prism_part(part1)%gsmap)
      lsize = mct_gsmap_lsize(prism_part(part1)%gsmap,mpi_comm_local)
-     if (PRISM_Debug >= 5) then
-        write(nulprt,'(1x,2a,4i12)') subname,' ci:part1 info ',part1,mapid,gsize,lsize
-        write(nulprt,'(1x,2a,4i12)') subname,' ci:part1a',prism_part(part1)%gsmap%ngseg,prism_part(part1)%gsmap%gsize
+     if (PRISM_Debug >= 15) then
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapid,gsize,lsize
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,prism_part(part1)%gsmap%gsize
         do n1 = 1,prism_part(part1)%gsmap%ngseg
-           write(nulprt,'(1x,2a,4i12)') subname,' ci:part1b',n1,prism_part(part1)%gsmap%start(n1),prism_part(part1)%gsmap%length(n1),prism_part(part1)%gsmap%pe_loc(n1)
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,prism_part(part1)%gsmap%start(n1),prism_part(part1)%gsmap%length(n1),prism_part(part1)%gsmap%pe_loc(n1)
         enddo
         call prism_sys_flush(nulprt)
      endif
      call mct_avect_init(prism_coupler(nc)%avect1,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
      call mct_avect_zero(prism_coupler(nc)%avect1)
-     if (PRISM_Debug >= 5) then
-        write(nulprt,*) subname,' ci:avect1 initialized '
+     if (PRISM_Debug >= 15) then
+        write(nulprt,*) subname,' DEBUG ci:avect1 initialized '
         call prism_sys_flush(nulprt)
      endif
 
@@ -721,8 +729,8 @@ CONTAINS
            ! get gsmap for non local grid
            ! read mapping weights and initialize sMatP
            !--------------------------------
-           if (PRISM_Debug >= 5) then
-              write(nulprt,*) subname,' ci:read mapfile ',trim(prism_mapper(mapid)%file)
+           if (PRISM_Debug >= 15) then
+              write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapid)%file)
               call prism_sys_flush(nulprt)
            endif
            if (mpi_rank_local == 0) then
@@ -814,17 +822,18 @@ CONTAINS
               call prism_io_read_avfld('areas.nc',prism_mapper(mapid)%av_md, &
                  prism_part(dpart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
 
-! tcx debug
-!              write(nulprt,*) subname,' tcx msi ',minval(prism_mapper(mapid)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%iAttr(:,:)),sum(prism_mapper(mapid)%av_ms%iAttr(:,:))
-!              write(nulprt,*) subname,' tcx msr ',minval(prism_mapper(mapid)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%rAttr(:,:)),sum(prism_mapper(mapid)%av_ms%rAttr(:,:))
-!              write(nulprt,*) subname,' tcx mdi ',minval(prism_mapper(mapid)%av_md%iAttr(:,:)),maxval(prism_mapper(mapid)%av_md%iAttr(:,:)),sum(prism_mapper(mapid)%av_md%iAttr(:,:))
-!              write(nulprt,*) subname,' tcx mdr ',minval(prism_mapper(mapid)%av_md%rAttr(:,:)),maxval(prism_mapper(mapid)%av_md%rAttr(:,:)),sum(prism_mapper(mapid)%av_md%rAttr(:,:))
+              if (PRISM_DEBUG >= 30) then
+                 write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapid)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%iAttr(:,:)),sum(prism_mapper(mapid)%av_ms%iAttr(:,:))
+                 write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapid)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%rAttr(:,:)),sum(prism_mapper(mapid)%av_ms%rAttr(:,:))
+                 write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapid)%av_md%iAttr(:,:)),maxval(prism_mapper(mapid)%av_md%iAttr(:,:)),sum(prism_mapper(mapid)%av_md%iAttr(:,:))
+                 write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapid)%av_md%rAttr(:,:)),maxval(prism_mapper(mapid)%av_md%rAttr(:,:)),sum(prism_mapper(mapid)%av_md%rAttr(:,:))
+              endif
            endif
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
-           if (PRISM_Debug >= 5) then
-              write(nulprt,*) subname," ci:done initializing prism_mapper",mapID," nElements = ",lsize
+           if (PRISM_Debug >= 15) then
+              write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID," nElements = ",lsize
               call prism_sys_flush(nulprt)
            endif
            call mct_sMat_Clean(sMati)
@@ -835,18 +844,18 @@ CONTAINS
         !--------------------------------
 
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
-        if (PRISM_Debug >= 5) then
-           write(nulprt,'(1x,2a,4i12)') subname,' ci:part2 info ',part2,mapid,gsize,lsize
-           write(nulprt,'(1x,2a,4i12)') subname,' ci:part2a',prism_part(part2)%gsmap%ngseg,prism_part(part2)%gsmap%gsize
+        if (PRISM_Debug >= 15) then
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapid,gsize,lsize
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,prism_part(part2)%gsmap%gsize
            do n1 = 1,prism_part(part2)%gsmap%ngseg
-              write(nulprt,'(1x,2a,4i12)') subname,' ci:part2b',n1,prism_part(part2)%gsmap%start(n1),prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
+              write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
            enddo
            call prism_sys_flush(nulprt)
         endif
         call mct_avect_init(prism_coupler(nc)%avect2,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
         call mct_avect_zero(prism_coupler(nc)%avect2)
-        if (PRISM_Debug >= 5) then
-           write(nulprt,*) subname,' ci:avect2 initialized '
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname,' DEBUG ci:avect2 initialized '
            call prism_sys_flush(nulprt)
         endif
 
@@ -872,16 +881,16 @@ CONTAINS
 
      if (prism_coupler(nc)%sndrcv) then
 
-        if (PRISM_Debug >= 5) then
-           write(nulprt,*) subname,' ci:initialize router ',prism_coupler(nc)%routerID,prism_coupler(nc)%comp,rpart
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname,' DEBUG ci:initialize router ',prism_coupler(nc)%routerID,prism_coupler(nc)%comp,rpart
            call prism_sys_flush(nulprt)
         endif
 
         call mct_router_init(prism_coupler(nc)%comp,prism_part(rpart)%gsmap, &
            mpi_comm_local,prism_router(prism_coupler(nc)%routerID)%router)
 
-        if (PRISM_Debug >= 5) then
-           write(nulprt,*) subname," ci:done initializing prism_router",prism_coupler(nc)%routerID
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname," DEBUG ci:done initializing prism_router",prism_coupler(nc)%routerID
            call prism_sys_flush(nulprt)
         endif
      endif
@@ -892,12 +901,14 @@ CONTAINS
   ! Diagnostics
   !----------------------------------------------------------
 
-  write(nulprt,*) ' '
-  write(nulprt,*) subname,' couplers initialized'
-  do nc = 1,prism_ncoupler
-     call prism_coupler_print(nc)
-  enddo
-  write(nulprt,*) ' '
+  if (PRISM_DEBUG > 0) then
+     write(nulprt,*) ' '
+     write(nulprt,*) subname,' couplers initialized'
+     do nc = 1,prism_ncoupler
+        call prism_coupler_print(nc)
+     enddo
+     write(nulprt,*) ' '
+  endif
 
   call prism_timer_stop('cpl_setup')
 
@@ -905,6 +916,8 @@ CONTAINS
      call prism_sys_flush(nulprt)
      call prism_mpi_barrier(mpi_comm_global,subname//' barrier2')
   endif
+
+  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_coupler_setup
 
@@ -918,6 +931,8 @@ CONTAINS
   integer(ip_i4_p) :: mapid, rouid, parid, namid, nflds
   integer(ip_i4_p) :: spart,dpart
   character(len=*),parameter :: subname = 'prism_coupler_print'
+
+  call prism_sys_debug_enter(subname)
 
   mapid = prism_coupler(cplid)%mapperid
   rouid = prism_coupler(cplid)%routerid
@@ -978,6 +993,8 @@ CONTAINS
   endif
 
   call prism_sys_flush(nulprt)
+
+  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_coupler_print
 
@@ -1065,7 +1082,6 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    integer(IN)           :: nread   ! number of reads 
    logical               :: mywt    ! does this weight belong on my pe
    integer(IN)           :: dims(2) 
-   integer(IN),parameter :: loglevel = 2
 
    !--- buffers for i/o ---
    real(R8)   ,allocatable :: rtemp(:) ! real temporary
@@ -1112,14 +1128,15 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 !
 !-------------------------------------------------------------------------------
 
+ call prism_sys_debug_enter(subname)
  call prism_mpi_commsize(mpicom,commsize)
  if (mytask == 0) then
-   if (loglevel > 0) write(nulprt,F00) "reading mapping matrix data decomposed..."
+   if (PRISM_DEBUG > 0) write(nulprt,F00) "reading mapping matrix data decomposed..."
 
    !----------------------------------------------------------------------------
    ! open & read the file
    !----------------------------------------------------------------------------
-   if (loglevel > 0) write(nulprt,F00) "* file name                  : ",trim(fileName)
+   if (PRISM_DEBUG > 0) write(nulprt,F00) "* file name                  : ",trim(fileName)
    status = nf_open(filename,NF_NOWRITE,fid)
    if (status /= NF_NOERR) then
       write(nulprt,F00) trim(nf_strerror(status))
@@ -1158,8 +1175,8 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       nj_o = dims(2)
    end if
 
-   if (loglevel > 0) write(nulprt,F01) "* matrix dims src x dst      : ",na,' x',nb
-   if (loglevel > 0) write(nulprt,F01) "* number of non-zero elements: ",ns
+   if (PRISM_DEBUG > 0) write(nulprt,F01) "* matrix dims src x dst      : ",na,' x',nb
+   if (PRISM_DEBUG > 0) write(nulprt,F01) "* number of non-zero elements: ",ns
 
  endif
  
@@ -1169,17 +1186,17 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call mct_aVect_init(areasrc0,' ',areaAV_field,na)
 !     status = nf_inq_varid     (fid,'area_a',vid)
       status = nf_inq_varid     (fid,'src_grid_area',vid)
-      if (status /= NF_NOERR) write(6,F00) trim(nf_strerror(status))
+      if (status /= NF_NOERR) write(nulprt,F00) trim(nf_strerror(status))
       status = nf_get_var_double(fid, vid, areasrc0%rAttr)
-      if (status /= NF_NOERR) write(6,F00) trim(nf_strerror(status))
+      if (status /= NF_NOERR) write(nulprt,F00) trim(nf_strerror(status))
    endif
    call mct_aVect_scatter(areasrc0, areasrc, SgsMap, 0, mpicom, status)
    if (status /= 0) call mct_die(subname,"Error on scatter of areasrc0")
    if (mytask == 0) then
 !      if (present(dbug)) then
 !         if (dbug > 2) then
-!            write(6,*) subName,'Size of src ',mct_aVect_lSize(areasrc0)
-!            write(6,*) subName,'min/max src ',minval(areasrc0%rAttr(1,:)),maxval(areasrc0%rAttr(1,:))
+!            write(nulprt,*) subName,'Size of src ',mct_aVect_lSize(areasrc0)
+!            write(nulprt,*) subName,'min/max src ',minval(areasrc0%rAttr(1,:)),maxval(areasrc0%rAttr(1,:))
 !         endif
 !      end if
       call mct_aVect_clean(areasrc0)
@@ -1192,17 +1209,17 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call mct_aVect_init(areadst0,' ',areaAV_field,nb)
 !     status = nf_inq_varid     (fid,'area_b',vid)
       status = nf_inq_varid     (fid,'dst_grid_area',vid)
-      if (status /= NF_NOERR) write(6,F00) trim(nf_strerror(status))
+      if (status /= NF_NOERR) write(nulprt,F00) trim(nf_strerror(status))
       status = nf_get_var_double(fid, vid, areadst0%rAttr)
-      if (status /= NF_NOERR) write(6,F00) trim(nf_strerror(status))
+      if (status /= NF_NOERR) write(nulprt,F00) trim(nf_strerror(status))
    endif
    call mct_aVect_scatter(areadst0, areadst, DgsMap, 0, mpicom, status)
    if (status /= 0) call mct_die(subname,"Error on scatter of areadst0")
    if (mytask == 0) then
 !      if (present(dbug)) then
 !         if (dbug > 2) then
-!            write(6,*) subName,'Size of dst ',mct_aVect_lSize(areadst0)
-!            write(6,*) subName,'min/max dst ',minval(areadst0%rAttr(1,:)),maxval(areadst0%rAttr(1,:))
+!            write(nulprt,*) subName,'Size of dst ',mct_aVect_lSize(areadst0)
+!            write(nulprt,*) subName,'min/max dst ',minval(areadst0%rAttr(1,:)),maxval(areadst0%rAttr(1,:))
 !         endif
 !      end if
       call mct_aVect_clean(areadst0)
@@ -1299,17 +1316,17 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 !        status = nf_get_vara_double(fid,vid,start,count,Sbuf)
          status = nf_get_vara_double(fid,vid,start2,count2,remaps)
          Sbuf(:) = remaps(1,:)
-         if (status /= NF_NOERR .and. loglevel > 0) write(nulprt,F00) trim(nf_strerror(status))
+         if (status /= NF_NOERR .and. PRISM_DEBUG > 0) write(nulprt,F00) trim(nf_strerror(status))
 
 !        status = nf_inq_varid      (fid,'row',vid)
          status = nf_inq_varid      (fid,'dst_address',vid)
          status = nf_get_vara_int   (fid,vid,start,count,Rbuf)
-         if (status /= NF_NOERR .and. loglevel > 0) write(nulprt,F00) trim(nf_strerror(status))
+         if (status /= NF_NOERR .and. PRISM_DEBUG > 0) write(nulprt,F00) trim(nf_strerror(status))
 
 !        status = nf_inq_varid      (fid,'col',vid)
          status = nf_inq_varid      (fid,'src_address',vid)
          status = nf_get_vara_int   (fid,vid,start,count,Cbuf)
-         if (status /= NF_NOERR .and. loglevel > 0) write(nulprt,F00) trim(nf_strerror(status))
+         if (status /= NF_NOERR .and. PRISM_DEBUG > 0) write(nulprt,F00) trim(nf_strerror(status))
       endif
 
       !--- send S, row, col to all pes
@@ -1343,7 +1360,7 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
                deallocate(Snew,Rnew,Cnew,stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate new',status)
                bsize = 1.5 * bsize
-               if (loglevel > 1) write(nulprt,F01) ' reallocate bsize to ',bsize
+               if (PRISM_DEBUG > 15) write(nulprt,F01) ' reallocate bsize to ',bsize
                allocate(Snew(bsize),Rnew(bsize),Cnew(bsize),stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
 
@@ -1392,8 +1409,10 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    if (mytask == 0) then
       status = nf_close(fid)
-      if (loglevel > 0) write(nulprt,F00) "... done reading file"
+      if (PRISM_DEBUG > 0) write(nulprt,F00) "... done reading file"
    endif
+
+  call prism_sys_debug_exit(subname)
 
 end subroutine prism_coupler_sMatReaddnc
 
@@ -1437,10 +1456,14 @@ logical function check_myindex(index,starti,counti)
 !
 !-------------------------------------------------------------------------------
 
+!   call prism_sys_debug_enter(subname)
    check_myindex = .false.
 
    lsize = size(starti)
-   if (lsize < 1) return
+   if (lsize < 1) then
+!     call prism_sys_debug_exit(subname)
+      return
+   endif
 
    nl = 0
    nr = lsize + 1
@@ -1453,6 +1476,7 @@ logical function check_myindex(index,starti,counti)
          nl = nc
       else
          check_myindex = .true.
+!        call prism_sys_debug_exit(subname)
          return
       endif
       ncprev = nc
@@ -1461,7 +1485,8 @@ logical function check_myindex(index,starti,counti)
    enddo
 
    check_myindex = .false.
-   return
+
+!   call prism_sys_debug_exit(subname)
 
 end function check_myindex
 

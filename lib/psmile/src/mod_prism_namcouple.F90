@@ -22,6 +22,8 @@ MODULE mod_prism_namcouple
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       ! number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     ! namcouple runtime
+  INTEGER(kind=ip_i4_p)   ,public :: namlogprt     ! namcouple nlogprt value
+ 
   character(len=ic_lvar)  ,public,pointer :: namsrcfld(:)  ! list of src fields
   character(len=ic_lvar)  ,public,pointer :: namdstfld(:)  ! list of dst fields
   character(len=ic_lvar)  ,public,pointer :: namsrcgrd(:)  ! src grid name
@@ -313,6 +315,8 @@ CONTAINS
   character(len=*),parameter :: subname='prism_namcouple_init'
   !-----------------------------------------------------------
 
+  call prism_sys_debug_enter(subname)
+
   call prism_sys_unitget(nulin)
   OPEN (UNIT = nulin,FILE =cl_namcouple,STATUS='OLD', &
         FORM ='FORMATTED', IOSTAT = il_iost)
@@ -457,6 +461,7 @@ CONTAINS
 
   nnamcpl = ig_total_nfield
   namruntim = ntime
+  namlogprt = nlogprt
   do jf = 1,ig_total_nfield
      namsrcfld(jf) = cg_input_field(jf)
      namdstfld(jf) = cg_output_field(jf)
@@ -595,6 +600,8 @@ CONTAINS
 
   call dealloc()
 
+  call prism_sys_debug_exit(subname)
+
   END SUBROUTINE prism_namcouple_init
 
 !===============================================================================
@@ -666,9 +673,11 @@ CONTAINS
       integer (kind=ip_intwp_p) :: ja,jz,jm,jf,ilen
       integer (kind=ip_intwp_p) :: ig_clim_maxport
       logical :: lg_bsend
-      character(len=*),parameter :: subname='mod_prism_namecouple:inipar_alloc'
+      character(len=*),parameter :: subname='mod_prism_namcouple:inipar_alloc'
 
 !* ---------------------------- Poema verses --------------------------
+
+  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -754,8 +763,6 @@ CONTAINS
        IF (il_err.NE.0) CALL prtout & 
           ('Error in iga_unitmod allocation of experiment module',il_err,1)
        iga_unitmod(:)=0
-
-!tcx
 
 ! --> Get the message passing technique we are using
 
@@ -1004,6 +1011,10 @@ CONTAINS
                     ig_number_field(jf) = ig_nfield
                     ig_total_state(jf) = ip_exported
 !* Get restart file name
+                ELSEIF (clvari(1:6) .eq. 'OUTPUT' ) THEN
+                    ig_direct_nfield = ig_direct_nfield + 1
+                    lg_state(jf) = .false.
+                    ig_total_state(jf) = ip_output
                     CALL parse(clline, clvari, 6, jpeighty, ilen)
                     cg_restart_file(jf) = clvari
                 ELSEIF (clvari(1:7) .eq. 'IGNORED' ) THEN
@@ -1742,6 +1753,7 @@ CONTAINS
       WRITE(UNIT = nulprt,FMT = *)'-- End of ROUTINE inipar_alloc --'
       CALL FLUSH (nulprt)
 
+      call prism_sys_debug_exit(subname)
       RETURN
 
 !*    Error branch output
@@ -1786,6 +1798,8 @@ CONTAINS
           ' We STOP!!! Check the file namcouple'
       WRITE (UNIT = nulprt,FMT = *) ' '
       CALL prism_sys_abort(compid,subname,'STOP in inipar_alloc')
+
+      call prism_sys_debug_exit(subname)
 
       END SUBROUTINE inipar_alloc
 
@@ -1896,9 +1910,11 @@ CONTAINS
       integer (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
       integer (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
       integer (kind=ip_intwp_p) :: icofld,imodel
-      character(len=*),parameter :: subname='mod_prism_namecouple:inipar'
+      character(len=*),parameter :: subname='mod_prism_namcouple:inipar'
 
 !* ---------------------------- Poema verses --------------------------
+
+  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2230,6 +2246,7 @@ CONTAINS
  198  CONTINUE
       READ (UNIT = nulin,FMT = 1001,END = 199) clword
       IF (clword .NE. clprint) GO TO 198
+      nlogprt = 2
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
@@ -2238,7 +2255,7 @@ CONTAINS
               ' Nothing on input for $NLOGPRT '
           WRITE (UNIT = nulprt,FMT = *) ' Default value 2 will be used '
           WRITE (UNIT = nulprt,FMT = *) ' '
-      ELSE IF (ilen .NE. 1) THEN
+      ELSE IF (ilen .gt. 8) THEN
           WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
           WRITE (UNIT = nulprt,FMT = *)  &
               ' Input variable length is incorrect'
@@ -2249,7 +2266,7 @@ CONTAINS
               ' Check $NLOGPRT variable spelling '
           WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
       ELSE
-          READ (clvari,FMT = 1003) nlogprt
+          READ (clvari,FMT = 1004) nlogprt
       ENDIF
 
 !* Print out the printing level
@@ -2481,7 +2498,7 @@ CONTAINS
               DO 245 ilind=ilind1, ilind2
                  CALL parse(clline, clvari, ilind, jpeighty, ilen)
                  IF(ilen .eq. -1) THEN
-                    IF (nlogprt .EQ. 2) THEN 
+                    IF (nlogprt .GE. 2) THEN 
                        IF(.not. lllag) WRITE (UNIT=nulprt,FMT=3043) jf
                     ENDIF
                     IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
@@ -3202,7 +3219,7 @@ CONTAINS
          ENDIF
       ENDIF
 !* Warning: no indentation for the next if (nightmare ...)
-        IF (nlogprt .EQ. 2) THEN
+        IF (nlogprt .GE. 2) THEN
 !* Warning: no indentation for the next if (nightmare ...)            
         IF (.not. lg_state(jf)) THEN
            IF (ig_total_state(jf) .eq. ip_ignored .or.  &
@@ -3540,6 +3557,7 @@ CONTAINS
           WRITE(UNIT = nulprt,FMT = *)'------ End of ROUTINE inipar ----'
           CALL FLUSH (nulprt)
       ENDIF
+      call prism_sys_debug_exit(subname)
       RETURN
 
 !* Error branch output
@@ -3712,12 +3730,18 @@ CONTAINS
            'give a coupling period longer than the total run time.'
       CALL prism_sys_abort(compid,subname,'STOP in inipar.f') 
 
+      call prism_sys_debug_exit(subname)
+
       END SUBROUTINE inipar
 !===============================================================================
  
   SUBROUTINE alloc()
 
   IMPLICIT NONE
+
+  character(len=*),parameter :: subname='mod_prism_namcouple:alloc'
+
+  call prism_sys_debug_enter(subname)
 
   allocate(nbtotproc(ig_nmodel),stat=il_err)
   if (il_err.ne.0) call prtout('error in "nbtotproc"allocation of experiment module',il_err,1)
@@ -4003,11 +4027,17 @@ CONTAINS
   cstate(:)=' '
   ENDIF
 
+  call prism_sys_debug_exit(subname)
+
   END SUBROUTINE alloc
 !===============================================================================
   SUBROUTINE dealloc
 
   IMPLICIT NONE
+
+  character(len=*),parameter :: subname='mod_prism_namcouple:dealloc'
+
+  call prism_sys_debug_enter(subname)
 
   deallocate(nbtotproc,stat=il_err)
   if (il_err.ne.0) call prtout('error in "nbtotproc"deallocation of experiment module',il_err,1)
@@ -4208,6 +4238,8 @@ CONTAINS
   IF (il_err.NE.0) CALL prtout ('Error in "cstate"deallocation of string module',il_err,1)
   ENDIF
 
+  call prism_sys_debug_exit(subname)
+
   END SUBROUTINE dealloc
 !===============================================================================
 
@@ -4276,8 +4308,11 @@ CONTAINS
       character(len=*),PARAMETER :: cbase = '-'
       character(len=*),PARAMETER :: cprpt = '* ===>>> :'
       character(len=*),PARAMETER :: cdots = '  ------  '
+      character(len=*),parameter :: subname='mod_prism_namcouple:prtout'
 
 !* ---------------------------- Poema verses ----------------------------
+
+  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -4303,6 +4338,8 @@ CONTAINS
 !        --------------
 
       CALL prism_sys_flush(nulprt)
+
+      call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prtout
 
@@ -4373,6 +4410,7 @@ CONTAINS
       character(len=*), PARAMETER :: cpbase = '-'
       character(len=*), PARAMETER :: cprpt = '* ===>>> :'
       character(len=*), PARAMETER :: cpdots = '  ------  ' 
+      character(len=*),parameter :: subname='mod_prism_namcouple:prcout'
 !
 !* ---------------------------- Poema verses ----------------------------
 !
@@ -4381,6 +4419,8 @@ CONTAINS
 !*    1. Print character string + character value
 !        ----------------------------------------
 !
+  call prism_sys_debug_enter(subname)
+
       IF ( kstyle .EQ. 1 .OR. kstyle .EQ. 2) THEN
           cline = ' '
           ilen = len(cdtext)
@@ -4401,6 +4441,8 @@ CONTAINS
 !        --------------
 !
       CALL prism_sys_flush(nulprt)
+
+      call prism_sys_debug_exit(subname)
 
       END SUBROUTINE prcout
 !===============================================================================
@@ -4473,8 +4515,12 @@ CONTAINS
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
+  character(len=*),parameter :: subname='mod_prism_namcouple:parse'
 !
 !* ---------------------------- Poema verses ----------------------------
+
+  call prism_sys_debug_enter(subname)
+
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -4504,6 +4550,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
+      call prism_sys_debug_exit(subname)
       RETURN
   END IF
 !
@@ -4520,6 +4567,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
+            call prism_sys_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -4536,7 +4584,7 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 !
-  RETURN
+  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE parse
 
@@ -4606,8 +4654,12 @@ CONTAINS
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
+  character(len=*),parameter :: subname='mod_prism_namcouple:parseblk'
 !
 !* ---------------------------- Poema verses ----------------------------
+
+  call prism_sys_debug_enter(subname)
+
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
@@ -4647,6 +4699,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
+      call prism_sys_debug_exit(subname)
       RETURN
   END IF
 !
@@ -4671,6 +4724,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
+            call prism_sys_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -4687,7 +4741,8 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 !
-  RETURN
+
+  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE parseblk
 !===============================================================================
@@ -4739,9 +4794,12 @@ CONTAINS
   INTEGER (kind=ip_intwp_p) :: ib
   CHARACTER(len=80) :: cl_line
   CHARACTER(len=1) :: cl_two
+  character(len=*),parameter :: subname='mod_prism_namcouple:skip'
 !
 !*-----------------------------------------------------------------------
 !
+  call prism_sys_debug_enter(subname)
+
   cl_two='#'
 100 IF (cd_one(1:1) .NE. cl_two) GO TO 120
   READ (UNIT = nulin, FMT = 1001) cl_line
@@ -4752,6 +4810,8 @@ CONTAINS
 !
 !*-----------------------------------------------------------------------
 !
+  call prism_sys_debug_exit(subname)
+
   END SUBROUTINE skip
 !
 !*========================================================================

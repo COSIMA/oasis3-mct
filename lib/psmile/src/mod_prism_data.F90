@@ -45,6 +45,7 @@ CONTAINS
   character(len=*),parameter :: subname = 'prism_data_zero'
 
   nulprt = 6
+  prism_debug = 2
   compid = -1
   compnm = trim(cspval)
   mpi_comm_global = -1

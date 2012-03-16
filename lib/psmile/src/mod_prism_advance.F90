@@ -37,13 +37,19 @@ contains
     real   (kind=ip_r8_p), allocatable :: array(:) ! data
     integer(kind=ip_i4_p) :: mseclag   ! model time + lag
     character(len=ic_xl)  :: rstfile   ! restart filename
+    character(len=ic_med) :: vstring   ! temporary string
     character(len=*),parameter :: subname = 'prism_advance_init'
+
+    call prism_sys_debug_enter(subname)
 
     call prism_timer_start ('advance_init')
 
-    write(nulprt,*) '   subname         at         time    time+lag   act: field '
-    write(nulprt,*) '   diags :     fldname    min      max      sum '
+    if (PRISM_Debug >= 2) then
+       write(nulprt,*) '   subname         at         time    time+lag   act: field '
+       write(nulprt,*) '   diags :     fldname    min      max      sum '
+    endif
 
+    call prism_sys_debug_note(subname//' loop over cplid')
     do cplid = 1,prism_ncoupler
        dt    = prism_coupler(cplid)%dt
        lag   = prism_coupler(cplid)%lag
@@ -51,7 +57,30 @@ contains
        getput= prism_coupler(cplid)%getput
        rstfile=trim(prism_coupler(cplid)%rstfile)
        partid= prism_coupler(cplid)%partID
-       msec = 0-lag   ! effective model time of restart
+       msec = 0   ! reasonable default to start with
+       mseclag = msec
+
+       !------------------------------------------------
+       ! read restart for LOCTRANS fields
+       !------------------------------------------------
+
+       call prism_sys_debug_note(subname//' check for loctrans restart')
+       if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+          if (len_trim(rstfile) < 1) then
+             write(nulprt,*) subname,' ERROR restart undefined'
+             call prism_sys_abort(compid,subname,' ERROR restart undefined')
+          endif
+          if (PRISM_Debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' RTRN: ',&
+                trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
+          endif
+          call prism_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,abort=.false.)
+          write(vstring,'(a,i4.4)') 'avcnt_',prism_coupler(cplid)%namid
+          call prism_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring),abort=.false.)
+          if (PRISM_DEBUG >= 20) then
+             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,prism_coupler(cplid)%avcnt
+          endif
+       endif
 
        !------------------------------------------------
        ! check that lag is reasonable
@@ -66,7 +95,9 @@ contains
        ! read restart and call advance for the current fields
        !------------------------------------------------
 
+       call prism_sys_debug_note(subname//' check for lag restart')
        if (getput == PRISM_PUT .and. lag > 0) then
+          msec = 0-lag   ! effective model time of restart
           mseclag = msec + lag
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
@@ -75,8 +106,10 @@ contains
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
           nflds = mct_aVect_nRAttr(prism_coupler(cplid)%aVect1)
           call mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          write(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
-             trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
+          if (PRISM_Debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
+                trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
+          endif
           call prism_io_read_avfile(trim(rstfile),avtmp,prism_part(partid)%gsmap)
           allocate(array(lsize))
           do nf = 1,nflds
@@ -87,8 +120,11 @@ contains
           deallocate(array)
           call mct_avect_clean(avtmp)
        endif
+
     enddo ! cplid
     call prism_timer_stop ('advance_init')
+
+    call prism_sys_debug_exit(subname)
 
   end SUBROUTINE prism_advance_init
 !---------------------------------------------------------------------
@@ -117,6 +153,7 @@ contains
     character(len=ic_med) :: tstring   ! timer label string
     character(len=ic_med) :: fstring   ! output file string
     character(len=ic_med) :: cstring   ! temporary string
+    character(len=ic_med) :: vstring   ! temporary string
     logical               :: comm_now  ! time to communicate
     logical               :: time_now  ! coupling time
     type(mct_avect)       :: avtest    ! temporary
@@ -126,6 +163,8 @@ contains
     character(len=*),parameter :: subname = 'prism_advance_run '
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
+
+    call prism_sys_debug_enter(subname)
 
     kinfo = PRISM_OK
     vname = prism_var(varid)%name
@@ -144,6 +183,7 @@ contains
     ! for all the couplers associated with this var
     !------------------------------------------------
 
+    call prism_sys_debug_note(subname//' loop over var ncpl')
     do nc = 1,prism_var(varid)%ncpl
        cplid   = prism_var(varid)%cpl(nc)
        rouid   = prism_coupler(cplid)%routerid
@@ -174,12 +214,17 @@ contains
 
        unpack = (sndrcv .or. input)
 
+       call prism_sys_debug_note(subname//' set nx and ny')
        if (prism_part(partid)%nx >= 1) then
           nx = prism_part(partid)%nx
           ny = prism_part(partid)%ny
        else
           nx = prism_part(partid)%gsize
           ny = 1
+       endif
+
+       if (PRISM_DEBUG >= 20) then
+          write(nulprt,*) subname,'  DEBUG nx, ny = ',nx,ny
        endif
 
        !------------------------------------------------
@@ -208,14 +253,29 @@ contains
        ! set time now, is it a coupling period?
        !------------------------------------------------
 
+       call prism_sys_debug_note(subname//' set mseclag')
        if (getput == PRISM_PUT) then
           mseclag = msec + lag
        elseif (getput == PRISM_GET) then
           mseclag = msec
        endif
 
+       if (PRISM_DEBUG >= 20) then
+          write(nulprt,*) subname,'  DEBUG msec,mseclag = ',msec,mseclag
+       endif
+
        time_now = .false.
        if (mod(mseclag,dt) == 0) time_now = .true.
+
+       !------------------------------------------------
+       ! check that model hasn't gone past maxtime
+       !------------------------------------------------
+
+       if (msec >= maxtime) then
+          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
+          write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',msec,maxtime
+          call prism_sys_abort(compid,subname,' ERROR model time beyond maxtime')
+       endif
 
        !------------------------------------------------
        ! check that model isn't going backwards
@@ -264,9 +324,14 @@ contains
        ! compute field index and check sizes
        !------------------------------------------------
 
+       call prism_sys_debug_note(subname//' compute field index and sizes')
        nfav = mct_avect_indexra(prism_coupler(cplid)%avect1,trim(vname))
        nsav = mct_avect_lsize(prism_coupler(cplid)%avect1)
        nsa = size(array)
+
+       if (PRISM_DEBUG >= 20) then
+          write(nulprt,*) subname,'  DEBUG nfav,nsav,nsa = ',nfav,nsav,nsa
+       endif
 
        if (nsav /= nsa) then
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
@@ -281,6 +346,7 @@ contains
 
        if (getput == PRISM_PUT) then
 
+          call prism_sys_debug_note(subname//' loctrans operation')
           write(tstring,F01) 'pcpy_',cplid
           call prism_timer_start(tstring)
 
@@ -344,6 +410,10 @@ contains
              write(nulprt,*) subname,' at ',msec,mseclag,' PACK: ',trim(vname),' ',trim(cstring)
           endif
 
+          if (PRISM_DEBUG >= 20) then
+             write(nulprt,*) subname,'  DEBUG loctrans update ',cplid,' ',trim(cstring),prism_coupler(cplid)%avcnt(nfav)
+          endif
+
           if (time_now) then
              prism_coupler(cplid)%status(nfav) = PRISM_COMM_READY
              kinfo = PRISM_sent
@@ -358,17 +428,18 @@ contains
        ! from last get.
        !------------------------------------------------
 
+       call prism_sys_debug_note(subname//' comm_now compute')
        comm_now = .false.
        if (time_now) then
           comm_now = .true.
           do nf = 1,prism_coupler(cplid)%nflds
              if (prism_coupler(cplid)%status(nf) /= PRISM_COMM_READY) then
                 comm_now = .false.
-                if (PRISM_Debug >= 5) then
+                if (PRISM_Debug >= 15) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' NOT READY'
                 endif
              else
-                if (PRISM_Debug >= 5) then
+                if (PRISM_Debug >= 15) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' READY'
                 endif
              endif
@@ -376,6 +447,8 @@ contains
        endif
 
        if (comm_now) then
+
+          call prism_sys_debug_note(subname//' comm_now')
 
           !------------------------------------------------
           ! this is the time critical bit, we need to make sure the
@@ -393,6 +466,7 @@ contains
           !------------------------------------------------
 
           if (getput == PRISM_PUT) then
+             call prism_sys_debug_note(subname//' loctrans calc')
              write(tstring,F01) 'pavg_',cplid
              call prism_timer_start(tstring)
              do nf = 1,prism_coupler(cplid)%nflds
@@ -402,20 +476,25 @@ contains
                       prism_coupler(cplid)%avect1%rAttr(nf,n) = prism_coupler(cplid)%avect1%rAttr(nf,n) * rcnt
                    enddo             
                 endif
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,prism_coupler(cplid)%avcnt(nf)
+                   write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,minval(prism_coupler(cplid)%avect1%rAttr(nf,:)),maxval(prism_coupler(cplid)%avect1%rAttr(nf,:))
+                endif
              enddo             
              call prism_timer_stop(tstring)
           endif
 
           !------------------------------------------------
           ! past namcouple runtime (maxtime) no communication
-          ! do restart
+          ! do restart if time+lag = maxtime, this assumes coupling
+          ! period and lag and maxtime are all nicely consistent
           !------------------------------------------------
 
-          if (mseclag > maxtime) then
+          if (mseclag >= maxtime) then
              sndrcv = .false.   ! turn off communication
              unpack = .false.   ! nothing to unpack
-             if (getput == PRISM_PUT .and. lag > 0) then
-!tcx generate restart always       if (getput == PRISM_PUT) then
+             if (getput == PRISM_PUT .and. lag > 0 .and. mseclag == maxtime) then
+                call prism_sys_debug_note(subname//' lag restart write')
                 write(tstring,F01) 'wrst_',cplid
                 call prism_timer_start(tstring)
                 call prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
@@ -435,66 +514,103 @@ contains
 
           if (sndrcv) then
           if (getput == PRISM_PUT) then
+             call prism_sys_debug_note(subname//' put section')
              if (PRISM_Debug > 0) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' SEND: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
              if (sndadd /= 0.0_ip_double_p .or. sndmult /= 1.0_ip_double_p) then
+                call prism_sys_debug_note(subname//' apply sndmult sndadd')
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG sndmult,add = ',sndmult,sndadd
+                   write(nulprt,*) subname,'  DEBUG put b4 sndmult,add = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
                 prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*sndmult + sndadd
              endif
              if (snddiag) call prism_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
              if (mapid > 0) then
                 write(tstring,F01) 'pmap_',cplid
+                call prism_sys_debug_note(subname//' put map')
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG put b4 map = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
                 call prism_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect2)
                 call prism_advance_map(prism_coupler(cplid)%avect1, &
                      prism_coupler(cplid)%avect2,prism_mapper(mapid),conserv)
                 call prism_timer_stop(tstring)
                 write(tstring,F01) 'psnd_',cplid
+                call prism_sys_debug_note(subname//' put send')
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,minval(prism_coupler(cplid)%avect2%rAttr),maxval(prism_coupler(cplid)%avect2%rAttr)
+                endif
                 call prism_timer_start(tstring)
                 call mct_waitsend(prism_router(rouid)%router)
                 call mct_isend(prism_coupler(cplid)%avect2,prism_router(rouid)%router,tag)
                 call prism_timer_stop(tstring)
              else
                 write(tstring,F01) 'psnd_',cplid
+                call prism_sys_debug_note(subname//' put send')
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
                 call prism_timer_start(tstring)
                 call mct_waitsend(prism_router(rouid)%router)
                 call mct_isend(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
                 call prism_timer_stop(tstring)
              endif
           elseif (getput == PRISM_GET) then
+             call prism_sys_debug_note(subname//' get section')
              if (PRISM_Debug > 0) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' RECV: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
                 call prism_sys_flush(nulprt)
              endif
              if (mapid > 0) then
+                call prism_sys_debug_note(subname//' get recv')
                 write(tstring,F01) 'grcv_',cplid
                 call prism_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect2)
                 call mct_recv(prism_coupler(cplid)%avect2,prism_router(rouid)%router,tag)
                 call prism_timer_stop(tstring)
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,minval(prism_coupler(cplid)%avect2%rAttr),maxval(prism_coupler(cplid)%avect2%rAttr)
+                endif
+                call prism_sys_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
                 call prism_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect1)
                 call prism_advance_map(prism_coupler(cplid)%avect2, &
                      prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv)
                 call prism_timer_stop(tstring)
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG get af map = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
              else
                 write(tstring,F01) 'grcv_',cplid
+                call prism_sys_debug_note(subname//' get recv')
                 call prism_timer_start(tstring)
                 call mct_recv(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
                 call prism_timer_stop(tstring)
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
              endif
+             call prism_sys_debug_note(subname//' apply rcvmult rcvadd')
              if (rcvadd /= 0.0_ip_double_p .or. rcvmult /= 1.0_ip_double_p) then
                 prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*rcvmult + rcvadd
+                if (PRISM_DEBUG >= 20) then
+                   write(nulprt,*) subname,'  DEBUG rcvmult,add = ',rcvmult,rcvadd
+                   write(nulprt,*) subname,'  DEBUG get af rcvmult,add = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                endif
              endif
              if (rcvdiag) call prism_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
           endif  ! getput
           endif  ! sndrcv
 
           if (output) then
+             call prism_sys_debug_note(subname//' output')
              write(tstring,F01) 'wout_',cplid
              call prism_timer_start(tstring)
              if (PRISM_Debug > 0) then
@@ -506,31 +622,38 @@ contains
              call prism_io_write_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap, &
                 nx,ny,msec,fstring)
              call prism_timer_stop(tstring)
-!tcx test-----------
-             if (PRISM_Debug >= 5) then
+
+             if (PRISM_Debug >= 30) then
                 call mct_avect_init(avtest,prism_coupler(cplid)%avect1,mct_aVect_lsize(prism_coupler(cplid)%avect1))
                 write(tstring,F01) 'rinp_',cplid
                 call prism_timer_start(tstring)
                 call prism_io_read_avfbf(avtest,prism_part(partid)%gsmap,msec,fstring)
-                write(nulprt,*) subname,' tcx test avfbf should be zero ',sum(prism_coupler(cplid)%avect1%rAttr-avtest%rAttr)
+                write(nulprt,*) subname,' DEBUG write/read test avfbf should be zero ',sum(prism_coupler(cplid)%avect1%rAttr-avtest%rAttr)
                 call mct_avect_clean(avtest)
                 call prism_timer_stop(tstring)
              endif
-!tcx test------------
+
           endif
 
           !------------------------------------------------
           ! set avcnt, avect1, ltime, and status
           !------------------------------------------------
 
+          call prism_sys_debug_note(subname//' reset status')
           if (getput == PRISM_PUT) then
              prism_coupler(cplid)%ltime = msec
              prism_coupler(cplid)%status(:) = PRISM_COMM_WAIT
              prism_coupler(cplid)%avcnt(:) = 0
              call mct_avect_zero(prism_coupler(cplid)%avect1)
+             if (PRISM_DEBUG >= 20) then
+                write(nulprt,*) subname,'  DEBUG put reset status = '
+             endif
           elseif (getput == PRISM_GET) then
              prism_coupler(cplid)%ltime = msec
              prism_coupler(cplid)%status(:) = PRISM_COMM_WAIT
+             if (PRISM_DEBUG >= 20) then
+                write(nulprt,*) subname,'  DEBUG get reset status = '
+             endif
           endif
 
        else
@@ -539,7 +662,7 @@ contains
           ! no action, document
           !------------------------------------------------
 
-          if (PRISM_Debug >= 5) then
+          if (PRISM_Debug >= 15) then
              if (getput == PRISM_PUT) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' SKIP: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
@@ -548,6 +671,26 @@ contains
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
              endif
              call prism_sys_flush(nulprt)
+          endif
+
+          !------------------------------------------------
+          ! sav non-instant loctrans operations for future restart
+          !------------------------------------------------
+
+          call prism_sys_debug_note(subname//' loctrans restart write')
+          if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+             write(tstring,F01) 'wtrn_',cplid
+             call prism_timer_start(tstring)
+             call prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
+                prism_part(partid)%gsmap,nx,ny)
+             write(vstring,'(a,i4.4)') 'avcnt_',prism_coupler(cplid)%namid
+             call prism_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring))
+             call prism_timer_stop(tstring)
+             if (PRISM_Debug > 0) then
+                write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
+                   trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1)),' ',trim(rstfile)
+                call prism_sys_flush(nulprt)
+             endif
           endif
 
        endif   ! comm_now
@@ -559,6 +702,7 @@ contains
        if (getput == PRISM_GET) then
          if (time_now .and. unpack) then
              if (input) then
+                call prism_sys_debug_note(subname//' input')
                 if (PRISM_Debug > 0) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' READ: ', &
                       trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1))
@@ -578,11 +722,15 @@ contains
                 write(nulprt,*) subname,' at ',msec,mseclag,' UPCK: ',trim(vname)
              endif
              write(tstring,F01) 'gcpy_',cplid
+             call prism_sys_debug_note(subname//' get copy to array')
              call prism_timer_start(tstring)
              do n = 1,nsav
                 array(n) = prism_coupler(cplid)%avect1%rAttr(nfav,n)
              enddo
              call prism_timer_stop(tstring)
+             if (PRISM_DEBUG >= 20) then
+                write(nulprt,*) subname,'  DEBUG array copy = ',cplid,minval(array),maxval(array)
+             endif
              kinfo = PRISM_recvd
           else
              array(:) = 0.
@@ -600,7 +748,7 @@ contains
 
     enddo  ! nc = 1,var%ncpl
 
-    return
+    call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_advance_run
 
@@ -625,16 +773,20 @@ contains
     character(len=ic_med) :: tstring   ! timer label string
     character(len=*),parameter :: subname = 'prism_advance_map'
 
+    call prism_sys_debug_enter(subname)
+
     if (mct_avect_nRattr(avs) /= mct_avect_nRattr(avd)) then
        call prism_sys_abort(compid,subname,' ERROR in av num of flds')
     endif
 
     write(tstring,'(A)') 'map_smat'
+    call prism_sys_debug_note(subname//' map')
     call prism_timer_start(tstring)
     call mct_sMat_avMult(avs, mapper%sMatP, avd)
     call prism_timer_stop(tstring)
 
     if (present(conserv)) then
+    call prism_sys_debug_note(subname//' conserv')
     if (conserv /= ip_cnone) then
        write(tstring,'(A)') 'map_conserv'
        call prism_timer_start(tstring)
@@ -673,12 +825,13 @@ contains
        enddo
        call prism_mpi_sum(sumtmp,wts_sumd,mpi_comm_local,string=subname//':wts_sumd',all=.true.)
 
-       ! tcx debug
-       write(nulprt,*) subname,'tcxms ',minval(imasks),maxval(imasks),sum(imasks)
-       write(nulprt,*) subname,'tcxmd ',minval(imaskd),maxval(imaskd),sum(imaskd)
-       write(nulprt,*) subname,'tcxas ',minval(areas),maxval(areas),sum(areas)
-       write(nulprt,*) subname,'tcxad ',minval(aread),maxval(aread),sum(aread)
-       write(nulprt,*) subname,'tcxwsums  ',wts_sums,wts_sumd
+       if (PRISM_DEBUG >= 30) then
+          write(nulprt,*) subname,' DEBUG conserve src mask ',minval(imasks),maxval(imasks),sum(imasks)
+          write(nulprt,*) subname,' DEBUG conserve dst mask ',minval(imaskd),maxval(imaskd),sum(imaskd)
+          write(nulprt,*) subname,' DEBUG conserve src area ',minval(areas),maxval(areas),sum(areas)
+          write(nulprt,*) subname,' DEBUG conserve dst area ',minval(aread),maxval(aread),sum(aread)
+          write(nulprt,*) subname,' DEBUG conserve wts_sum  ',wts_sums,wts_sumd
+       endif
 
        !-------------------
        ! compute global sums of avs
@@ -686,9 +839,10 @@ contains
        call prism_advance_avsum(avs,av_sums,mpi_comm_local,mask=imasks,wts=areas)
        call prism_advance_avsum(avd,av_sumd,mpi_comm_local,mask=imaskd,wts=aread)
 
-       ! tcx debug
-       write(nulprt,*) subname,' tcx1avs ',av_sums
-       write(nulprt,*) subname,' tcx1avd ',av_sumd
+       if (PRISM_DEBUG >= 20) then
+          write(nulprt,*) subname,' DEBUG src sum b4 conserve ',av_sums
+          write(nulprt,*) subname,' DEBUG dst sum b4 conserve ',av_sumd
+       endif
 
        if (conserv == ip_cglobal) then
           if (wts_sumd == 0.0_ip_r8_p) then
@@ -736,17 +890,20 @@ contains
           call prism_sys_abort(compid,subname,' ERROR: conserv option')
        endif
 
-       ! tcx debug
-       call prism_advance_avsum(avs,av_sums,mpi_comm_local,mask=imasks,wts=areas)
-       call prism_advance_avsum(avd,av_sumd,mpi_comm_local,mask=imaskd,wts=aread)
-       write(nulprt,*) subname,' tcx2avs ',av_sums
-       write(nulprt,*) subname,' tcx2avd ',av_sumd
+       if (PRISM_DEBUG >= 20) then
+          call prism_advance_avsum(avs,av_sums,mpi_comm_local,mask=imasks,wts=areas)
+          call prism_advance_avsum(avd,av_sumd,mpi_comm_local,mask=imaskd,wts=aread)
+          write(nulprt,*) subname,' DEBUG src sum af conserve ',av_sums
+          write(nulprt,*) subname,' DEBUG dst sum af conserve ',av_sumd
+       endif
 
        deallocate(imasks,imaskd,areas,aread)
        deallocate(av_sums,av_sumd)
        call prism_timer_stop(tstring)
     endif
     endif
+
+    call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_advance_map
 
@@ -766,6 +923,8 @@ contains
     real(kind=ip_r8_p),allocatable  :: lsum(:)  ! local sums
     real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
     character(len=*),parameter :: subname = 'prism_advance_avsum'
+
+    call prism_sys_debug_enter(subname)
 
     fsize = mct_avect_nRattr(av)
     lsize = mct_avect_lsize(av)
@@ -809,6 +968,8 @@ contains
     deallocate(lsum)
     deallocate(lwts)
 
+    call prism_sys_debug_exit(subname)
+
   END SUBROUTINE prism_advance_avsum
 
 !-------------------------------------------------------------------
@@ -835,6 +996,8 @@ contains
     type(mct_string) :: mstring     ! mct char type
     character(len=64):: itemc       ! string converted to char
     character(len=*),parameter :: subname = 'prism_advance_avdiag'
+
+    call prism_sys_debug_enter(subname)
 
     fsize = mct_avect_nRattr(av)
     lsize = mct_avect_lsize(av)
@@ -902,6 +1065,8 @@ contains
     deallocate(lsum,lmin,lmax)
     deallocate(gsum,gmin,gmax)
     deallocate(lwts)
+
+    call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_advance_avdiag
 

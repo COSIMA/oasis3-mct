@@ -22,6 +22,7 @@ module mod_prism_ioshr
   use mod_prism_kinds, only: cl => ic_long
   use mod_prism_data
   use mod_prism_sys
+  use mod_prism_string, only: prism_string_toupper
   use mod_prism_mpi
   use mct_mod           ! mct wrappers
   use pio
@@ -176,7 +177,7 @@ contains
      character(len=len(itypename)) :: typename
      character(*),parameter :: subName =   '(prism_ioshr_getiotypefromname) '
 
-     typename = prism_sys_toUpper(itypename)
+     typename = prism_string_toUpper(itypename)
      if      ( typename .eq. 'NETCDF' ) then
         iotype = pio_iotype_netcdf
      else if ( typename .eq. 'PNETCDF') then

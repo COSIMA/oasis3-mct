@@ -12,16 +12,20 @@ MODULE mod_prism_sys
    public prism_sys_unitsetmin
    public prism_sys_unitget
    public prism_sys_unitfree
-   public prism_sys_toUpper
-   public prism_sys_toLower
+   public prism_sys_debug_enter
+   public prism_sys_debug_exit
+   public prism_sys_debug_note
 
    integer(ip_intwp_p),parameter :: muni = 20
-   integer(ip_intwp_p) :: unitno(muni) = -1
-   integer(ip_intwp_p) :: maxion
+   integer(ip_intwp_p),save :: unitno(muni) = -1
+   integer(ip_intwp_p),save :: maxion
+   integer(ip_intwp_p),parameter :: tree_delta = 2
+   integer(ip_intwp_p),save :: tree_indent = 0
 
 !--------------------------------------------------------------------
 CONTAINS
 !--------------------------------------------------------------------
+
    SUBROUTINE prism_sys_abort(id_compid, cd_routine, cd_message)
 
    IMPLICIT NONE
@@ -52,7 +56,7 @@ CONTAINS
 
    END SUBROUTINE prism_sys_abort
 
-!--------------------------------------------------------------------
+!==========================================================================
    SUBROUTINE prism_sys_flush(nu)
 
    IMPLICIT NONE
@@ -67,7 +71,7 @@ CONTAINS
 
    END SUBROUTINE prism_sys_flush
 
-!--------------------------------------------------------------------
+!==========================================================================
    SUBROUTINE prism_sys_unitget(uio)
 
    IMPLICIT NONE
@@ -88,7 +92,7 @@ CONTAINS
          found = .true.
          uio = n1 + maxion
          unitno(n1) = uio
-         write(nulprt,*) subname,n1,uio
+         if (PRISM_DEBUG >= 2) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
@@ -99,7 +103,7 @@ CONTAINS
      
    END SUBROUTINE prism_sys_unitget
 
-!--------------------------------------------------------------------
+!==========================================================================
    SUBROUTINE prism_sys_unitsetmin(uio)
 
    IMPLICIT NONE
@@ -111,11 +115,11 @@ CONTAINS
 !--------------------------------------------------------------------
 
    maxion = uio
-   write(nulprt,*) subname,maxion
+   if (PRISM_DEBUG >= 20) write(nulprt,*) subname,maxion
      
    END SUBROUTINE prism_sys_unitsetmin
 
-!--------------------------------------------------------------------
+!==========================================================================
    SUBROUTINE prism_sys_unitfree(uio)
 
    IMPLICIT NONE
@@ -130,102 +134,63 @@ CONTAINS
    do n1 = 1,muni
       if (unitno(n1) == uio) then
          unitno(n1) = -1
-         write(nulprt,*) subname,n1,uio
+         if (PRISM_DEBUG >= 20) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
    END SUBROUTINE prism_sys_unitfree
 
-!===============================================================================
-!BOP ===========================================================================
-! !IROUTINE: prism_sys_toUpper -- Convert string to upper case
-!
-! !DESCRIPTION:
-!     Convert the input string to upper-case.
-!     Use achar and iachar intrinsics to ensure use of ascii collating sequence.
-!
-! !REVISION HISTORY:
-!
-! !INTERFACE: ------------------------------------------------------------------
+!=========================================================================
+!==========================================================================
+subroutine prism_sys_debug_enter(string)
 
-function prism_sys_toUpper(str)
+   IMPLICIT NONE
 
-   implicit none
+!--------------------------------------------------------------------
+   CHARACTER(len=*), INTENT(in) :: string
+   character(len=*),parameter :: subname = 'prism_sys_debug_enter'
 
-! !INPUT/OUTPUT PARAMETERS:
-   character(len=*), intent(in) :: str      ! String to convert to upper case
-   character(len=len(str))      :: prism_sys_toUpper
+   if (PRISM_DEBUG >= 10) then
+      write(nulprt,'(<tree_indent>x,2a)') '**TREE ENTER ',trim(string)
+      tree_indent = tree_indent + tree_delta
+      call prism_sys_flush(nulprt)
+   endif
 
-   !----- local -----
-   integer(ip_intwp_p) :: i             ! Index
-   integer(ip_intwp_p) :: aseq          ! ascii collating sequence
-   integer(ip_intwp_p) :: LowerToUpper  ! integer to convert case
-   character(len=1)     :: ctmp          ! Character temporary
+end subroutine prism_sys_debug_enter
 
-   !----- formats -----
-   character(*),parameter :: subName =   "prism_sys_toUpper"
+!==========================================================================
+subroutine prism_sys_debug_exit(string)
 
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
+   IMPLICIT NONE
 
-   LowerToUpper = iachar("A") - iachar("a")
+!--------------------------------------------------------------------
+   CHARACTER(len=*), INTENT(in) :: string
+   character(len=*),parameter :: subname = 'prism_sys_debug_exit'
 
-   do i = 1, len(str)
-      ctmp = str(i:i)
-      aseq = iachar(ctmp)
-      if ( aseq >= iachar("a") .and. aseq <= iachar("z") ) &
-           ctmp = achar(aseq + LowertoUpper)
-      prism_sys_toUpper(i:i) = ctmp
-   end do
+   if (PRISM_DEBUG >= 10) then
+      tree_indent = max(0,tree_indent - tree_delta)
+      write(nulprt,'(<tree_indent>x,2a)') '**TREE EXIT  ',trim(string)
+      call prism_sys_flush(nulprt)
+   endif
 
-end function prism_sys_toUpper
+end subroutine prism_sys_debug_exit
 
-!===============================================================================
-!BOP ===========================================================================
-! !IROUTINE: prism_sys_toLower -- Convert string to lower case
-!
-! !DESCRIPTION:
-!     Convert the input string to lower-case.
-!     Use achar and iachar intrinsics to ensure use of ascii collating sequence.
-!
-! !REVISION HISTORY:
-!
-! !INTERFACE: ------------------------------------------------------------------
+!==========================================================================
+subroutine prism_sys_debug_note(string)
 
-function prism_sys_toLower(str)
+   IMPLICIT NONE
 
-   implicit none
+!--------------------------------------------------------------------
+   CHARACTER(len=*), INTENT(in) :: string
+   character(len=*),parameter :: subname = 'prism_sys_debug_note'
 
-! !INPUT/OUTPUT PARAMETERS:
-   character(len=*), intent(in) :: str      ! String to convert to lower case
-   character(len=len(str))      :: prism_sys_toLower
+   if (PRISM_DEBUG >= 12) then
+      write(nulprt,'(<tree_indent>x,2a)') '**TREE NOTE  ',trim(string)
+      call prism_sys_flush(nulprt)
+   endif
 
-   !----- local -----
-   integer(ip_intwp_p) :: i            ! Index
-   integer(ip_intwp_p) :: aseq         ! ascii collating sequence
-   integer(ip_intwp_p) :: UpperToLower ! integer to convert case
-   character(len=1)     :: ctmp         ! Character temporary
+end subroutine prism_sys_debug_note
 
-   !----- formats -----
-   character(*),parameter :: subName =   "prism_sys_toLower"
-
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
-
-   UpperToLower = iachar("a") - iachar("A")
-
-   do i = 1, len(str)
-      ctmp = str(i:i)
-      aseq = iachar(ctmp)
-      if ( aseq >= iachar("A") .and. aseq <= iachar("Z") ) &
-           ctmp = achar(aseq + UpperToLower)
-      prism_sys_toLower(i:i) = ctmp
-   end do
-
-end function prism_sys_toLower
-!-------------------------------------------------------------------------------
-
+!==========================================================================
 
 END MODULE mod_prism_sys

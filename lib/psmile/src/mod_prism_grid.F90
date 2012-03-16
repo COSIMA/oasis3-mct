@@ -108,7 +108,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_start_grids_writing'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     if (prism_ngrid == 0) then  ! first call
        prism_grid(:)%grid_set   = .false.
@@ -119,6 +119,8 @@ CONTAINS
        prism_grid(:)%written    = .false.
     endif
     iwrite = 1   ! just set grids are needed always
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_start_grids_writing
 
@@ -144,6 +146,8 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_write_grid'
     !-------------------------------------------------
 
+    call prism_sys_debug_enter(subname)
+
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%lon(nx,ny),stat=ierror)
@@ -153,6 +157,8 @@ CONTAINS
     prism_grid(gridID)%lon = lon
     prism_grid(gridID)%lat = lat
     prism_grid(gridID)%grid_set = .true.
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_write_grid
 
@@ -175,7 +181,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_write_angle'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
@@ -183,6 +189,8 @@ CONTAINS
     if (ierror /= 0) write(nulprt,*) subname,' WARNING angle alloc'
     prism_grid(gridID)%angle = angle
     prism_grid(gridID)%angle_set = .true.
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_write_angle
 
@@ -208,7 +216,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_write_corner'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
@@ -220,6 +228,8 @@ CONTAINS
     prism_grid(gridID)%clon = clon
     prism_grid(gridID)%clat = clat
     prism_grid(gridID)%corner_set = .true.
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_write_corner
 
@@ -243,7 +253,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_write_mask'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
@@ -251,6 +261,8 @@ CONTAINS
     if (ierror /= 0) write(nulprt,*) subname,' WARNING mask alloc'
     prism_grid(gridID)%mask = mask
     prism_grid(gridID)%mask_set = .true.
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_write_mask
 
@@ -274,7 +286,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_write_area'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
@@ -282,6 +294,8 @@ CONTAINS
     if (ierror /= 0) write(nulprt,*) subname,' WARNING area alloc'
     prism_grid(gridID)%area = area
     prism_grid(gridID)%area_set = .true.
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_write_area
 
@@ -305,7 +319,7 @@ CONTAINS
     character(len=*),parameter :: subname = 'prism_grid_terminate_grids_writing'
     !-------------------------------------------------
 
-!    write(nulprt,*) subname,' enter'
+    call prism_sys_debug_enter(subname)
 
     do n = 1,prism_ngrid
        cgrid = trim(prism_grid(n)%gridname)
@@ -350,6 +364,8 @@ CONTAINS
        endif
     enddo
 
+    call prism_sys_debug_exit(subname)
+
     end subroutine prism_grid_terminate_grids_writing
 !--------------------------------------------------------------------------
 
@@ -368,6 +384,8 @@ CONTAINS
     integer(kind=ip_intwp_p) :: n
     character(len=*),parameter :: subname = 'prism_grid_findgrid'
     !-------------------------------------------------
+
+    call prism_sys_debug_enter(subname)
 
     gridID = -1
     do n = 1,prism_ngrid
@@ -390,6 +408,8 @@ CONTAINS
     prism_grid(gridID)%gridname = trim(cgrid)
     prism_grid(gridID)%nx = nx
     prism_grid(gridID)%ny = ny
+
+    call prism_sys_debug_exit(subname)
 
     end subroutine prism_grid_findgrid
 !--------------------------------------------------------------------------

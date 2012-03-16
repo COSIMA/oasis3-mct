@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler (oasis3 or oasis4)
-arch=Linux    #Linux/corail
+arch=corail    #Linux/corail
 coupler=oasis3 
 compiler=intel  #pgi/intel
 MPILIB=openmpi  #mpich/openmpi
@@ -69,6 +69,7 @@ echo ''
 ### 1. Copy source example directory containing everything needed
 ###    into rundir
 
+\rm -fr $rundir
 mkdir -p $rundir
 
 cp -f $datadir/*txt $rundir/.

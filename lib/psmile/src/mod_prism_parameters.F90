@@ -14,8 +14,7 @@ MODULE mod_prism_parameters
 !@
 !
   USE mod_prism_kinds
-  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Debug    = 3
-  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Debug    = PRISM_Debug
+! INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Debug    = 3 ! moved to mod_prism_kinds
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Ok	 = 0 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Ok       = PRISM_Ok
 
