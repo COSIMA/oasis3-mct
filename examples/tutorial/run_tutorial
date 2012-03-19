@@ -7,6 +7,7 @@
 ## - Define architecture and coupler (oasis3 or oasis4)
 arch=Linux    #Linux/corail
 coupler=oasis3 
+# Define compiler and MPILIB for Linux
 compiler=pgi  #pgi/intel
 MPILIB=mpich  #mpich/openmpi
 host=`uname -n`
@@ -40,8 +41,8 @@ nproc_oa3=1
     exe1=toyocn
     exe2=toyatm
 # number of processes for each executable
-    nproc_exe1=4
-    nproc_exe2=3
+    nproc_exe1=1
+    nproc_exe2=1
 # number of processes involved in the coupling for the namcouple
     ncpl_exe1=$nproc_exe1
     ncpl_exe2=$nproc_exe2
