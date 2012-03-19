@@ -1,0 +1,7 @@
+use FSENDATM_toyatm_02.nc
+
+
+shade/level=(0,12,0.5) FSENDATM[L=2,d=1]
+
+
+

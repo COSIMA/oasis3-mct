@@ -186,16 +186,17 @@ PROGRAM model2
       cla(i,j,4) = globalgrid_cla(j,1)
     ENDDO
   ENDDO
-  IF (mype == 0) THEN
-      !
-      CALL oasis_start_grids_writing(il_flag)
-      CALL oasis_write_grid('lmdz', nlon, nlat, lon, lat)
-      CALL oasis_write_corner('lmdz', nlon, nlat, 4, clo, cla)
-      CALL oasis_write_mask('lmdz', nlon, nlat, indice_mask(:,:))
-      CALL oasis_terminate_grids_writing()
-  ENDIF
-  WRITE(w_unit,*) 'After grids writing'
-  call flush(w_unit)
+  ! This functionality is indeed not covered by OASIS3-MCT yet.
+!!$  IF (mype == 0) THEN
+!!$      !
+!!$      CALL oasis_start_grids_writing(il_flag)
+!!$      CALL oasis_write_grid('lmdz', nlon, nlat, lon, lat)
+!!$      CALL oasis_write_corner('lmdz', nlon, nlat, 4, clo, cla)
+!!$      CALL oasis_write_mask('lmdz', nlon, nlat, indice_mask(:,:))
+!!$      CALL oasis_terminate_grids_writing()
+!!$  ENDIF
+!!$  WRITE(w_unit,*) 'After grids writing'
+!!$  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  PARTITION DEFINITION 

@@ -155,22 +155,23 @@ PROGRAM model1
                                  indice_mask)
   !
   ! (Global) grid definition for OASIS3
-  ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in 
-  IF (mype == 0) THEN
-      !
-      ! Half of the line j=148 is masked 
-      DO i=92,182
-        indice_mask(i,148)=1
-      ENDDO
-      !
-      CALL oasis_start_grids_writing(il_flag)
-      CALL oasis_write_grid('torc', nlon, nlat, globalgrid_lon, globalgrid_lat)
-      CALL oasis_write_corner('torc', nlon, nlat, 4, globalgrid_clo, globalgrid_cla)
-      CALL oasis_write_mask('torc', nlon, nlat, indice_mask(:,:))
-      CALL oasis_terminate_grids_writing()
-  ENDIF
-  WRITE(w_unit,*) 'After grids writing'
-  call flush(w_unit)
+  ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in
+  ! This functionality is indeed not covered by OASIS3-MCT yet.
+!!$  IF (mype == 0) THEN
+!!$      !
+!!$      ! Half of the line j=148 is masked 
+!!$      DO i=92,182
+!!$        indice_mask(i,148)=1
+!!$      ENDDO
+!!$      !
+!!$      CALL oasis_start_grids_writing(il_flag)
+!!$      CALL oasis_write_grid('torc', nlon, nlat, globalgrid_lon, globalgrid_lat)
+!!$      CALL oasis_write_corner('torc', nlon, nlat, 4, globalgrid_clo, globalgrid_cla)
+!!$      CALL oasis_write_mask('torc', nlon, nlat, indice_mask(:,:))
+!!$      CALL oasis_terminate_grids_writing()
+!!$  ENDIF
+!!$  WRITE(w_unit,*) 'After grids writing'
+!!$  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  PARTITION DEFINITION 

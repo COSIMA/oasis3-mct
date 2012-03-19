@@ -1,0 +1,6 @@
+use FRECVATM_toyatm_01.nc
+
+
+shade/level=(0,5,0.1) FRECVATM[L=3,d=1]
+
+

@@ -1,9 +1,0 @@
-use FRECVATM_out.2000-01-01T00:00:00.nc
-
-
-shade BOUNDS_LON[d=1]
-go polymark polygon LON[d=1] LAT[d=1] FRECVATM[L=1,d=1] square 0.6
-go polymark polygon/level=(0,16,1) LON[d=1] LAT[d=1] FRECVATM[L=3,d=1] square 0.6
-
-
-

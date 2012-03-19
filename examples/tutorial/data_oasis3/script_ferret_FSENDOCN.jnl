@@ -1,0 +1,7 @@
+use FSENDOCN_toyocn_01.nc
+
+
+shade/level=(0,5,0.1) FSENDOCN[L=3,d=1]
+
+
+
