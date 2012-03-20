@@ -53,6 +53,7 @@ module mod_prism_grid
   public prism_grid_write_mask
   public prism_grid_write_area
   public prism_grid_terminate_grids_writing
+  public prism_grid_write2files
 
   !--- datatypes ---
   public :: prism_grid_type
@@ -70,6 +71,7 @@ module mod_prism_grid
      logical                :: area_set
      logical                :: mask_set
      logical                :: written
+     logical                :: terminated
      real(kind=ip_realwp_p),allocatable :: lon(:,:)     ! longitudes
      real(kind=ip_realwp_p),allocatable :: lat(:,:)     ! latitudes
      real(kind=ip_realwp_p),allocatable :: clon(:,:,:)  ! corner longitudes
@@ -110,6 +112,11 @@ CONTAINS
 
     call prism_sys_debug_enter(subname)
 
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
     if (prism_ngrid == 0) then  ! first call
        prism_grid(:)%grid_set   = .false.
        prism_grid(:)%corner_set = .false.
@@ -148,6 +155,11 @@ CONTAINS
 
     call prism_sys_debug_enter(subname)
 
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%lon(nx,ny),stat=ierror)
@@ -183,6 +195,11 @@ CONTAINS
 
     call prism_sys_debug_enter(subname)
 
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%angle(nx,ny),stat=ierror)
@@ -217,6 +234,11 @@ CONTAINS
     !-------------------------------------------------
 
     call prism_sys_debug_enter(subname)
+
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
@@ -255,6 +277,11 @@ CONTAINS
 
     call prism_sys_debug_enter(subname)
 
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%mask(nx,ny),stat=ierror)
@@ -288,6 +315,11 @@ CONTAINS
 
     call prism_sys_debug_enter(subname)
 
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%area(nx,ny),stat=ierror)
@@ -301,10 +333,39 @@ CONTAINS
 
 !--------------------------------------------------------------------------
     subroutine prism_grid_terminate_grids_writing()
+    !-------------------------------------------------
+    ! Routine to terminate the grids writing.
+    !-------------------------------------------------
+
+    implicit none
+    integer(kind=ip_i4_p) :: n
+    character(len=*),parameter :: subname = 'prism_grid_terminate_grids_writing'
+
+    call prism_sys_debug_enter(subname)
+
+    if (mpi_rank_local /= mpi_root_local) then
+       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
+       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+    endif
+
+    do n = 1,prism_ngrid
+       prism_grid(n)%terminated = .true.
+    enddo
+
+! moved to prism_method_enddef for synchronization
+!    call prism_grid_write2files()
+
+    call prism_sys_debug_exit(subname)
+
+    end subroutine prism_grid_terminate_grids_writing
+
+!--------------------------------------------------------------------------
+    subroutine prism_grid_write2files()
 
     !-------------------------------------------------
-    ! Routine to terminate the grids writing. This is where the
-    ! grid info is written
+    ! Write fields to grid files.
+    ! Only write fields that have been buffered and
+    ! if prism_grid_terminate_grids_writing has been called
     !-------------------------------------------------
 
     implicit none
@@ -316,12 +377,13 @@ CONTAINS
     logical :: exists                  ! check if file exists
     integer(kind=ip_i4_p) :: n         ! counter
     integer(kind=ip_i4_p) :: nx,ny,nc  ! grid size
-    character(len=*),parameter :: subname = 'prism_grid_terminate_grids_writing'
+    character(len=*),parameter :: subname = 'prism_grid_write2files'
     !-------------------------------------------------
 
     call prism_sys_debug_enter(subname)
 
     do n = 1,prism_ngrid
+    if (prism_grid(n)%terminated) then
        cgrid = trim(prism_grid(n)%gridname)
        prism_grid(n)%written = .true.
 
@@ -362,11 +424,13 @@ CONTAINS
           fldname  = trim(cgrid)//'.msk'
           call prism_io_write_2dgridint_fromroot(filename,fldname,prism_grid(n)%mask,nx,ny)
        endif
+
+    endif  ! terminated
     enddo
 
     call prism_sys_debug_exit(subname)
 
-    end subroutine prism_grid_terminate_grids_writing
+    end subroutine prism_grid_write2files
 !--------------------------------------------------------------------------
 
     subroutine prism_grid_findgrid(cgrid,nx,ny,gridID)

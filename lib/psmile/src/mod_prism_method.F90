@@ -9,6 +9,7 @@ MODULE mod_prism_method
    USE mod_prism_advance
    USE mod_prism_timer
    USE mod_prism_ioshr
+   USE mod_prism_grid
    USE mct_mod
 
    IMPLICIT NONE
@@ -311,6 +312,7 @@ CONTAINS
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
+   integer (kind=ip_intwp_p) :: n
    character(len=*),parameter :: subname = 'prism_method_enddef'
 !  ---------------------------------------------------------
 
@@ -320,6 +322,14 @@ CONTAINS
    endif
 
    CALL MPI_BARRIER (mpi_comm_global, mpi_err)
+
+   ! write grid info to files one model at a time
+   do n = 1,prism_nmodels
+      if (compid == n .and. mpi_rank_local == mpi_root_local) then
+         call prism_grid_write2files()
+      endif
+      CALL MPI_BARRIER (mpi_comm_global, mpi_err)
+   enddo
 
    call prism_coupler_setup()
    call prism_advance_init()

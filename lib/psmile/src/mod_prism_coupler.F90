@@ -283,6 +283,7 @@ CONTAINS
      allops(:,n) = myops(:)
   enddo
 
+  deallocate(model_root)
   deallocate(myvar,myops)
 
   if (PRISM_Debug >= 2) then
