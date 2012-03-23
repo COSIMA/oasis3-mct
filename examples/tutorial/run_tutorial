@@ -4,9 +4,8 @@
 #
 ############### User's section #######################################
 ##
-## - Define architecture and coupler (oasis3 or oasis4)
-arch=Linux    #Linux/corail
-coupler=oasis3 
+## - Define architecture and coupler 
+arch=corail    #Linux/corail
 # Define compiler and MPILIB for Linux
 compiler=pgi  #pgi/intel
 MPILIB=mpich  #mpich/openmpi
@@ -29,11 +28,6 @@ elif [ ${arch} == corail ]; then
 rundir=/lustre/globc/${user}/oasis3-mct/examples/tutorial/work_${casename}
 fi
 
-## - Define names of executables, number of processes for the coupler
-#
-coupler_exe=oasis3.MPI1.x
-nproc_oa3=1
-#
 # - Toy models: Define number of processes to run each executable
 #               and name of executables
 #
@@ -58,9 +52,7 @@ echo 'Rundir       :' $rundir
 echo 'Architecture :' $arch
 echo 'Host         : '$host
 echo 'User         : '$user
-echo 'Coupler      :' $coupler
 echo ''
-echo $coupler_exe 'runs on 1 proc'
 echo $exe1' runs on '$nproc_exe1 'processes'
 echo $exe2' runs on '$nproc_exe2 'processes'
 echo ''
@@ -79,8 +71,6 @@ cp -f $datadir/*.jnl $rundir/.
 
 cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
-
-cp -f $srcdir/oasis3.MPI1.x $rundir/$coupler_exe
 
 cp -f $datadir/namcouple $rundir/.
 cp -f $datadir/*nc  $rundir/.
@@ -105,14 +95,10 @@ cd $rundir
 ###---------------------------------------------------------------------
 
 if [ $arch == Linux ] ; then
-  cat <<EOF>> $rundir/appl-linux.conf
-$host 0 $rundir/$coupler_exe
-EOF
-
   count=0
   while [[ $count -lt $nproc_exe1 ]];do
    cat <<EOF >> $rundir/appl-linux.conf
-$host 1 $rundir/$exe1
+$host 0 $rundir/$exe1
 EOF
    (( count += 1 ))
   done
@@ -149,7 +135,7 @@ source /usr/local/bin/intelmpi.sh
 ulimit -s unlimited
 #
 #
-time mpirun -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
 else 
@@ -164,10 +150,10 @@ fi
 if [ $arch == Linux ] ; then
     if [ ${compiler} == pgi ] && [ $MPILIB == mpich ]; then
 	echo 'Executing the model using '$MPIRUN 
-	$MPIRUN -p4pg appl-linux.conf ./$coupler_exe > runjob.err
+	$MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
     elif [ ${compiler} == intel ] && [ $MPILIB == openmpi ]; then
 	echo 'Executing the model using '$MPIRUN 
-	$MPIRUN -np $nproc_oa3 ./$coupler_exe : -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+	$MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
     fi
 
 elif [ $arch == corail ]; then

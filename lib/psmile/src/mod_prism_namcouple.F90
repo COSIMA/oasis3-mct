@@ -448,11 +448,16 @@ CONTAINS
   write(nulprt,*) subname,' maximum unit number = ',maxunit
   call prism_sys_unitsetmin(maxunit)
 
-  prism_nmodels = ig_nmodel+1
+! without oasis coupler
+  prism_nmodels = ig_nmodel
+
+! with oasis coupler
+!  prism_nmodels = ig_nmodel+1
+!  prism_modnam(ig_nmodel+1) = "oasis"
+
   do n = 1,ig_nmodel
      prism_modnam(n) = trim(cmodnam(n))
   enddo
-  prism_modnam(ig_nmodel+1) = "oasis"
 
   write(nulprt,*) subname,' total number of models = ',prism_nmodels
   do n = 1,prism_nmodels

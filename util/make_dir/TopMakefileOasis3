@@ -29,7 +29,6 @@ oasis3_psmile:
 	$(MAKEf) makemct
 	$(MAKEf) makelibs
 	$(MAKEf) makepsmile
-	$(MAKEf) makeoasis
 #
 realclean:
 	$(MAKEf) cleanlibs
@@ -42,10 +41,8 @@ makedirs:
 	@mkdir -p $(ARCHDIR)/build/lib/mctdir
 	@mkdir -p $(ARCHDIR)/build/lib/mct
 	@mkdir -p $(ARCHDIR)/build/lib/psmile.$(CHAN)
-	@mkdir -p $(ARCHDIR)/build/mod/oasis3.$(CHAN)
 	@mkdir -p $(ARCHDIR)/bin
 	@mkdir -p $(ARCHDIR)/lib
-	@mkdir -p $(ARCHDIR)/lib/oasis3
 #
 # Rules for compiling mpeu/mct library
 # 
@@ -71,13 +68,6 @@ makepsmile:
          cp -f $(LIBSRC)/psmile/src/Makefile . ; $(modifmakefile) ; \
          $(MAKE) all 1>> $(LOG) 2>> $(ERR) )
 #
-# Rules for compiling oasis3
-#
-makeoasis:
-	@echo "=> Compiling OASIS3"
-	(cd $(ARCHDIR)/build/mod/oasis3.$(CHAN); cp -f $(MODSRC)/Makefile .;\
-         $(modifmakefile) ; $(MAKE) all 1>> $(LOG) 2>> $(ERR) ) 
-#
 # Rules for cleaning
 #
 cleanlibs:
@@ -91,13 +81,6 @@ cleanlibs:
 	rm -f $(ARCHDIR)/lib/libmpeu.a
 	rm -f $(ARCHDIR)/lib/libpio.a
 	rm -f $(ARCHDIR)/lib/libpsmile.$(CHAN).a
-#
-cleanoasis:
-	rm -f $(LOG) $(ERR)
-	@echo cleaning oasis3
-	rm -f $(ARCHDIR)/build/mod/oasis3.$(CHAN)/*
-	rm -f $(ARCHDIR)/lib/oasis3/liboasis3.$(CHAN).a
-	rm -f $(ARCHDIR)/bin/oasis3.$(CHAN).x
 #
 ## Some rules to modify/add variables in makefiles
 #

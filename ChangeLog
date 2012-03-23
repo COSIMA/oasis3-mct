@@ -1,6 +1,18 @@
 This file describes what tags were created and why
 ================================================================================
 Originator: tcraig
+Date: March 23 2012
+Model: oasis3-mct
+Version: oasis3-mct_120323
+
+- remove compilation of oasis executable and use of oasis
+  central coupler in examples.  oasis src still in repository.
+
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      util/make_dir/TopMakefileOasis3
+M      examples/tutorial/run_tutorial
+================================================================================
+Originator: tcraig
 Date: March 20 2012
 Model: oasis3-mct
 Version: oasis3-mct_120320
