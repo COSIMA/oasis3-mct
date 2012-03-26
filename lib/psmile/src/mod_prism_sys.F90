@@ -149,11 +149,17 @@ subroutine prism_sys_debug_enter(string)
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
    character(len=*),parameter :: subname = 'prism_sys_debug_enter'
+   CHARACTER(len=1), pointer :: ch_blank(:)
+   CHARACTER(len=500) :: tree_enter
 
    if (PRISM_DEBUG >= 10) then
-      write(nulprt,'(<tree_indent>x,2a)') '**TREE ENTER ',trim(string)
-      tree_indent = tree_indent + tree_delta
-      call prism_sys_flush(nulprt)
+       ALLOCATE (ch_blank(tree_indent))
+       ch_blank='-'
+       tree_enter='**TREE ENTER '//TRIM(string)
+       WRITE(nulprt,*) ch_blank,TRIM(tree_enter)
+       tree_indent = tree_indent + tree_delta
+       DEALLOCATE (ch_blank)
+       CALL prism_sys_flush(nulprt)
    endif
 
 end subroutine prism_sys_debug_enter
@@ -166,12 +172,18 @@ subroutine prism_sys_debug_exit(string)
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
    character(len=*),parameter :: subname = 'prism_sys_debug_exit'
+   CHARACTER(len=1), pointer :: ch_blank(:)
+   CHARACTER(len=500)        :: tree_exit
 
-   if (PRISM_DEBUG >= 10) then
-      tree_indent = max(0,tree_indent - tree_delta)
-      write(nulprt,'(<tree_indent>x,2a)') '**TREE EXIT  ',trim(string)
-      call prism_sys_flush(nulprt)
-   endif
+   IF (PRISM_DEBUG >= 10) THEN
+       tree_indent = MAX(0,tree_indent - tree_delta)
+       ALLOCATE (ch_blank(tree_indent))
+       ch_blank='-'
+       tree_exit='**TREE EXIT '//trim(string)
+       WRITE(nulprt,*) ch_blank,TRIM(tree_exit)
+       DEALLOCATE (ch_blank)
+       CALL prism_sys_flush(nulprt)
+   ENDIF
 
 end subroutine prism_sys_debug_exit
 
@@ -183,9 +195,15 @@ subroutine prism_sys_debug_note(string)
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
    character(len=*),parameter :: subname = 'prism_sys_debug_note'
+   CHARACTER(len=1), pointer :: ch_blank(:)
+   CHARACTER(len=500) :: tree_note
 
    if (PRISM_DEBUG >= 12) then
-      write(nulprt,'(<tree_indent>x,2a)') '**TREE NOTE  ',trim(string)
+       ALLOCATE (ch_blank(tree_indent))
+       ch_blank='-'
+       tree_note='**TREE NOTE '//TRIM(string)
+       WRITE(nulprt,*) ch_blank,TRIM(tree_note)
+      DEALLOCATE(ch_blank)
       call prism_sys_flush(nulprt)
    endif
 
