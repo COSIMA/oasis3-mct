@@ -22,6 +22,12 @@ LOG = $(COUPLE)/util/make_dir/COMP.log
 ERR = $(COUPLE)/util/make_dir/COMP.err
 #
 #######
+default: 
+	 rm -f $(LOG) $(ERR)
+	 $(MAKEf) makedirs
+	 $(MAKEf) makemct
+	 $(MAKEf) makelibs
+	 $(MAKEf) makepsmile
 #
 oasis3_psmile:
 	rm -f $(LOG) $(ERR)
