@@ -32,7 +32,6 @@ oasis3_psmile:
 #
 realclean:
 	$(MAKEf) cleanlibs
-	$(MAKEf) cleanoasis
 #
 # Rules for creating build, library and binary directories
 #
