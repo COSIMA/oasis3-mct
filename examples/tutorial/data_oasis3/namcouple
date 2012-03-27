@@ -74,7 +74,7 @@
  $NLOGPRT
 # Index of printing level in output file cplout: 0 = no printing
 #  1 = main routines and field names when treated, 2 = complete output
-  2
+  5
  $END
 ###########################################################################
  $CALTYPE
@@ -113,7 +113,7 @@ FSENDOCN FRECVATM 1 7200  1  fdocn.nc EXPOUT
 # target grid characteristics in grid auxiliary files, 
 # + possibly LAG and SEQ additional indices if needed 
 #
-182 149 96 72 torc  lmdz  SEQ=1
+182 149 96 72 torc  lmdz  SEQ=1 
 #
 #   Third line:
 # Source grid characteristic (P or R) and number of overlapping grid points
@@ -142,7 +142,7 @@ LOCTRANS
 #
 FSENDATM  FRECVOCN  3 7200  1  fdatm.nc EXPOUT
 #
-96 72 182 149  lmdz torc SEQ=2
+96 72 182 149  lmdz torc SEQ=2 
 #
 P  0  P  2
 MAPPING

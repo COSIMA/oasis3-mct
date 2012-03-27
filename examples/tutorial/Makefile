@@ -32,11 +32,9 @@ default: all
 #
 all: oasis3_psmile toyocn toyatm 
 #
-# Compile and link oasis3 and libaries
+# Compile and link libaries
 oasis3_psmile:
-	-rm -f oasis3.$(CHAN).x
 	(cd ../../util/make_dir ; $(MAKE) oasis3_psmile -f TopMakefileOasis3)
-	ln -sf $(BINDIR)/oasis3.$(CHAN).x oasis3.$(CHAN).x
 #
 #
 #-------------------------------------------------------------------------------
@@ -76,9 +74,9 @@ function_sent_m2.o :		function_sent.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o function_sent_m2.o -c function_sent.F90
 
 model1.o :	model1.F90 Makefile
-		$(F90) $(F90FLAGS) -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/mct -I$(LIBBUILD)/pio $(CPPLOCAL_M1) -c model1.F90
+		$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c model1.F90
 model2.o :	model2.F90 Makefile
-		$(F90) $(F90FLAGS) -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/mct -I$(LIBBUILD)/pio $(CPPLOCAL_M2) -c model2.F90
+		$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -c model2.F90
 #
 #-------------------------------------------------------------------------------
 # Utilities

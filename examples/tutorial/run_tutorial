@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler 
-arch=corail    #Linux/corail
+arch=Linux    #Linux/corail
 # Define compiler and MPILIB for Linux
 compiler=pgi  #pgi/intel
 MPILIB=mpich  #mpich/openmpi
@@ -94,14 +94,24 @@ cd $rundir
 ### Linux
 ###---------------------------------------------------------------------
 
-if [ $arch == Linux ] ; then
-  count=0
-  while [[ $count -lt $nproc_exe1 ]];do
+if [ $arch == Linux ] && [ $compiler == pgi ]; then
+if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1
 EOF
+else
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 0 $rundir/$exe1
+EOF
+
+  count=0
+  while [[ $count -lt $nproc_exe1 ]];do
+   cat <<EOF >> $rundir/appl-linux.conf
+$host 1 $rundir/$exe1
+EOF
    (( count += 1 ))
   done
+fi
 
   count=0
   while [[ $count -lt $nproc_exe2 ]];do
@@ -138,9 +148,6 @@ ulimit -s unlimited
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
-else 
-  echo 'For architecture='$arch ' you have to add your execution'
-  exit
 fi 
 
 ######################################################################
