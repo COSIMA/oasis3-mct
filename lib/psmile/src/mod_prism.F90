@@ -15,6 +15,8 @@ module mod_prism
    use mod_prism_method ,only: prism_init_comp_proto     => prism_method_init
    use mod_prism_method ,only: prism_terminate_proto     => prism_method_terminate
    use mod_prism_method ,only: prism_get_localcomm_proto => prism_method_getlocalcomm
+   use mod_prism_method ,only: prism_get_intracomm       => prism_method_get_intracomm
+   use mod_prism_method ,only: prism_get_intercomm       => prism_method_get_intercomm
    use mod_prism_method, only: prism_set_debug           => prism_method_setdebug
    use mod_prism_method, only: prism_get_debug           => prism_method_getdebug
    use mod_prism_method ,only: prism_enddef_proto        => prism_method_enddef

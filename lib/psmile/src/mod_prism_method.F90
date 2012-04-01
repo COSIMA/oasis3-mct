@@ -10,6 +10,7 @@ MODULE mod_prism_method
    USE mod_prism_timer
    USE mod_prism_ioshr
    USE mod_prism_grid
+   USE mod_prism_mpi
    USE mct_mod
 
    IMPLICIT NONE
@@ -21,6 +22,8 @@ MODULE mod_prism_method
    public prism_method_getlocalcomm
    public prism_method_getdebug
    public prism_method_setdebug
+   public prism_method_get_intercomm
+   public prism_method_get_intracomm
    public prism_method_enddef
 
 #ifdef __VERBOSE
@@ -34,6 +37,8 @@ CONTAINS
 
 !----------------------------------------------------------------------
    SUBROUTINE prism_method_init(mynummod,cdnam,kinfo)
+
+   ! This is COLLECTIVE, all pes must call
 
    IMPLICIT NONE
 
@@ -49,6 +54,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
    integer(kind=ip_intwp_p) :: pio_numtasks
+   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'prism_method_init'
 !  ---------------------------------------------------------
 
@@ -139,6 +145,19 @@ CONTAINS
    CALL MPI_Comm_Rank(mpi_comm_local,mpi_rank_local,mpi_err)
    mpi_root_local = 0
 
+   allocate(mpi_root_global(prism_nmodels))
+   allocate(tmparr(prism_nmodels))
+   tmparr = -1
+   do n = 1,prism_nmodels
+      if (trim(cdnam) == trim(prism_modnam(n)) .and. &
+          mpi_rank_local == mpi_root_local) then
+         tmparr(n) = mpi_rank_global
+      endif
+   enddo
+   call prism_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
+      string=subname//':mpi_root_global',all=.true.)
+   deallocate(tmparr)
+
    !------------------------
    !--- pout file
    !------------------------
@@ -194,6 +213,10 @@ CONTAINS
       write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
       write(nulprt,*) subname,'     root_local = ',mpi_root_local
       write(nulprt,*) subname,' prism_debug    = ',prism_debug
+      write(nulprt,*) subname,' prism models: '
+      do n = 1,prism_nmodels
+      write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+      enddo
       call prism_sys_flush(nulprt)
    endif
 
@@ -305,6 +328,76 @@ CONTAINS
    call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_setdebug
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_get_intercomm(new_comm, cdnam, kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm
+   CHARACTER(len=*),intent(in) :: cdnam
+   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo
+
+   INTEGER (kind=ip_intwp_p)	:: n, il, ierr, tag
+   LOGICAL :: found
+!  ---------------------------------------------------------
+   character(len=*),parameter :: subname = 'prism_method_get_intercomm'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   found = .false.
+   do n = 1,prism_nmodels
+      if (trim(cdnam) == trim(prism_modnam(n))) then
+         if (found) then
+            write(nulprt,*) subname,' ERROR: found same model name twice'
+            call prism_sys_abort(compid,subname,'found same model name twice')
+         endif
+         il = n
+         found = .true.
+      endif
+   enddo
+
+   if (.not. found) then
+      write(nulprt,*) subname,' ERROR: input model name not found'
+      call prism_sys_abort(compid,subname,'input model name not found')
+   endif
+
+   tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))
+   CALL mpi_intercomm_create(mpi_comm_local, 0, MPI_COMM_WORLD, mpi_root_global(il), tag, new_comm, ierr)
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_get_intercomm
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_get_intracomm(new_comm, cdnam, kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm
+   CHARACTER(len=*),intent(in) :: cdnam
+   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo
+
+   INTEGER (kind=ip_intwp_p)	:: tmp_intercomm
+   INTEGER (kind=ip_intwp_p)	:: ierr
+!  ---------------------------------------------------------
+   character(len=*),parameter :: subname = 'prism_method_get_intracomm'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   call prism_method_get_intercomm(tmp_intercomm, cdnam, kinfo)
+
+   CALL mpi_intercomm_merge(tmp_intercomm,.FALSE., new_comm, ierr)
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_get_intracomm
 !----------------------------------------------------------------------
    SUBROUTINE prism_method_enddef(kinfo)
 
