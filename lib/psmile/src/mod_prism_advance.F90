@@ -77,6 +77,7 @@ contains
           call prism_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,abort=.false.)
           write(vstring,'(a,i4.4)') 'avcnt_',prism_coupler(cplid)%namid
           call prism_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring),abort=.false.)
+
           if (PRISM_DEBUG >= 20) then
              write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,prism_coupler(cplid)%avcnt
           endif
