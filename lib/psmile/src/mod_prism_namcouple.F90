@@ -1015,6 +1015,9 @@ CONTAINS
                     lg_state(jf) = .true.
                     ig_number_field(jf) = ig_nfield
                     ig_total_state(jf) = ip_exported
+                    CALL parse(clline, clvari, 6, jpeighty, ilen)
+!* Get restart file name               
+                    cg_restart_file(jf) = clvari
 !* Get restart file name
                 ELSEIF (clvari(1:6) .eq. 'OUTPUT' ) THEN
                     ig_direct_nfield = ig_direct_nfield + 1
