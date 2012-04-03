@@ -50,6 +50,15 @@ MODULE mod_prism_namcouple
   REAL (kind=ip_realwp_p) ,public,pointer :: namflddmu(:)  ! dst multipler term
   REAL (kind=ip_realwp_p) ,public,pointer :: namflddad(:)  ! dst additive term
 
+  character(len=ic_med)   ,public,pointer :: namscrmet(:)  ! scrip method (CONSERV, DISTWGT, BILINEAR, BICUBIC, GAUSWGT)
+  character(len=ic_med)   ,public,pointer :: namscrnor(:)  ! scrip conserv normalization (FRACAREA, DESTAREA, FRACNNEI)
+  character(len=ic_med)   ,public,pointer :: namscrtyp(:)  ! scrip mapping type (SCALAR, VECTOR, VECTOR_I, VECTOR_J)
+  character(len=ic_med)   ,public,pointer :: namscrord(:)  ! scrip conserve order (FIRST, SECOND)
+  character(len=ic_med)   ,public,pointer :: namscrres(:)  ! scrip search restriction (LATLON, LATITUDE)
+  REAL (kind=ip_realwp_p) ,public,pointer :: namscrvam(:)  ! scrip gauss weight distance weighting for GAUSWGT
+  integer(kind=ip_i4_p)   ,public,pointer :: namscrnbr(:)  ! scrip number of neighbors for GAUSWGT and DISTWGT
+  integer(kind=ip_i4_p)   ,public,pointer :: namscrbin(:)  ! script number of search bins
+
   !--- derived ---
   INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldsort(:) ! sorted namcpl list based on seq
 
@@ -417,6 +426,30 @@ CONTAINS
   allocate(namflddad(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namflddad" allocation of experiment module',il_err,1)
 
+  allocate(namscrmet(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrmet" allocation of experiment module',il_err,1)
+
+  allocate(namscrnor(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrnor" allocation of experiment module',il_err,1)
+
+  allocate(namscrtyp(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrtyp" allocation of experiment module',il_err,1)
+
+  allocate(namscrord(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrord" allocation of experiment module',il_err,1)
+
+  allocate(namscrres(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrres" allocation of experiment module',il_err,1)
+
+  allocate(namscrvam(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrvam" allocation of experiment module',il_err,1)
+
+  allocate(namscrnbr(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrnbr" allocation of experiment module',il_err,1)
+
+  allocate(namscrbin(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namscrbin" allocation of experiment module',il_err,1)
+
   prism_modnam(:) = trim(cspval)
   namsrcfld(:) = trim(cspval)
   namdstfld(:) = trim(cspval)
@@ -443,6 +476,15 @@ CONTAINS
   namfldsad(:) = 0.0_ip_realwp_p
   namflddmu(:) = 1.0_ip_realwp_p
   namflddad(:) = 0.0_ip_realwp_p
+
+  namscrmet(:) = trim(cspval)
+  namscrnor(:) = trim(cspval)
+  namscrtyp(:) = trim(cspval)
+  namscrord(:) = trim(cspval)
+  namscrres(:) = trim(cspval)
+  namscrvam(:) = 1.0_ip_realwp_p
+  namscrnbr(:) = -1
+  namscrbin(:) = -1
 
   maxunit = maxval(iga_unitmod)
   write(nulprt,*) subname,' maximum unit number = ',maxunit
@@ -496,13 +538,27 @@ CONTAINS
         namdst_nx(jf) = nlonaf(ig_number_field(jf))
         namdst_ny(jf) = nlataf(ig_number_field(jf))
         do ja = 1, ig_ntrans(ig_number_field(jf))
-           if (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
+
+           if (canal(ja,ig_number_field(jf)) .EQ. 'SCRIPR') then
+              namscrmet(jf) = trim(cmap_method(ig_number_field(jf)))
+              namscrnor(jf) = trim(cnorm_opt  (ig_number_field(jf)))
+              namscrtyp(jf) = trim(cfldtype   (ig_number_field(jf)))
+              namscrord(jf) = trim(corder     (ig_number_field(jf)))
+              namscrres(jf) = trim(crsttype   (ig_number_field(jf)))
+              namscrvam(jf) =      varmul     (ig_number_field(jf))
+              namscrnbr(jf) =      nscripvoi  (ig_number_field(jf))
+              namscrbin(jf) =      nbins      (ig_number_field(jf))
+              if (trim(namscrtyp(jf)) /= 'SCALAR') then
+                 write(nulprt,*) subname,jf,'WARNING: SCRIPR weights generation temporarily supported only for SCALAR mapping, not '//trim(namscrtyp(jf))
+                 call prism_sys_abort(compid,subname,'ERROR in SCRIPR CFTYP option')
+              endif
+
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
               nammapfil(jf) = trim(cmap_file(ig_number_field(jf)))
               nammaploc(jf) = trim(cmaptyp(ig_number_field(jf)))
               nammapopt(jf) = trim(cmapopt(ig_number_field(jf)))
-           endif
 
-           if (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') then
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') then
               namfldcon(jf) = ip_cnone
               if (cconmet(ig_number_field(jf)) .EQ. 'GLOBAL') namfldcon(jf) = ip_cglobal
               if (cconmet(ig_number_field(jf)) .EQ. 'GLBPOS') namfldcon(jf) = ip_cglbpos
@@ -512,12 +568,14 @@ CONTAINS
                  write(nulprt,*) subname,jf,'WARNING: CONSERV option not supported: '//trim(cconmet(ig_number_field(jf)))
                  call prism_sys_abort(compid,subname,'ERROR in CONSERV option')
               endif
-           endif
 
-           if (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) namchecki(jf) = .true.
-           if (canal(ja,ig_number_field(jf)) .EQ. 'CHECKOUT') namchecko(jf) = .true.
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) then
+              namchecki(jf) = .true.
 
-           if (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD')THEN
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'CHECKOUT') then
+              namchecko(jf) = .true.
+
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD') then
               namfldsmu(jf) = afldcobo(ig_number_field(jf))
               do jc = 1, nbofld(ig_number_field(jf))
                  if (trim(cbofld(jc,ig_number_field(jf))) == 'CONSTANT') then
@@ -527,9 +585,8 @@ CONTAINS
                     call prism_sys_abort(compid,subname,'ERROR in BLASOLD option')
                  endif
               enddo
-           endif
 
-           if (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW')THEN
+           elseif (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW') then
               namflddmu(jf) = afldcobn(ig_number_field(jf))
               do jc = 1, nbnfld(ig_number_field(jf))
                  if (trim(cbnfld(jc,ig_number_field(jf))) == 'CONSTANT') then
@@ -539,7 +596,8 @@ CONTAINS
                     call prism_sys_abort(compid,subname,'ERROR in BLASNEW option')
                  endif
               enddo
-           endif
+
+           endif  ! canal
         enddo  ! ig_ntrans
      endif   ! ig_number_field
   enddo   ! ig_total_nfield
@@ -571,6 +629,14 @@ CONTAINS
      write(nulprt,*) subname,n,'namfldsad ',namfldsad(n)
      write(nulprt,*) subname,n,'namflddmu ',namflddmu(n)
      write(nulprt,*) subname,n,'namflddad ',namflddad(n)
+     write(nulprt,*) subname,n,'namscrmet ',trim(namscrmet(n))
+     write(nulprt,*) subname,n,'namscrnor ',trim(namscrnor(n))
+     write(nulprt,*) subname,n,'namscrtyp ',trim(namscrtyp(n))
+     write(nulprt,*) subname,n,'namscrord ',trim(namscrord(n))
+     write(nulprt,*) subname,n,'namscrres ',trim(namscrres(n))
+     write(nulprt,*) subname,n,'namscrvam ',namscrvam(n)
+     write(nulprt,*) subname,n,'namscrnbr ',namscrnbr(n)
+     write(nulprt,*) subname,n,'namscrbin ',namscrbin(n)
      write(nulprt,*) ' '
   enddo
 

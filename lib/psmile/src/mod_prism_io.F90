@@ -168,7 +168,7 @@ end subroutine prism_io_read_avfld
 
 !===============================================================================
 
-subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
+subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    ! ---------------------------------------
    ! Writes all fields from av to file
@@ -181,12 +181,14 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
    type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
    integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
    integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
+   character(len=*), intent(in),optional :: nampre  ! name prepend string
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
    type(mct_aVect)     :: av_g        ! avect global data
    type(mct_string)    :: mstring     ! mct char type
    character(ic_med)   :: itemc       ! string converted to char
+   character(ic_med)   :: lnampre     ! local nampre
    character(ic_med)   :: lstring     ! local filename
    integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid ! netcdf info
@@ -208,6 +210,11 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
    if (len_trim(rstfile) < 1) then
       call prism_sys_debug_exit(subname)
       return
+   endif
+
+   lnampre = ""
+   if (present(nampre)) then
+      lnampre = trim(nampre)
    endif
 
    mpicom = mpi_comm_local
@@ -235,6 +242,7 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
       do n = 1,mct_aVect_nRAttr(av_g)
          call mct_aVect_getRList(mstring,n,av_g)
          itemc = mct_string_toChar(mstring)
+         itemc = trim(lnampre)//trim(itemc)
          call mct_string_clean(mstring)
 
          status = nf90_inq_dimid(ncid,trim(itemc)//'_nx',dimid2(1))
@@ -276,6 +284,7 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny)
       do n = 1,mct_aVect_nRAttr(av_g)
          call mct_aVect_getRList(mstring,n,av_g)
          itemc = mct_string_toChar(mstring)
+         itemc = trim(lnampre)//trim(itemc)
          call mct_string_clean(mstring)
          n1 = 0
          do j = 1,ny
@@ -304,7 +313,7 @@ end subroutine prism_io_write_avfile
 
 !===============================================================================
 
-subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
+subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
 
    ! ---------------------------------------
    ! Reads all fields for av from file
@@ -316,6 +325,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
    type(mct_aVect) , intent(inout) :: av      ! avect
    type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
    logical         , intent(in),optional :: abort   ! abort on fail flag
+   character(len=*), intent(in),optional :: nampre  ! name prepend string
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -324,6 +334,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
    type(mct_aVect)     :: av_g        ! avect global data
    type(mct_string)    :: mstring     ! mct char type
    character(ic_med)   :: itemc       ! string converted to char
+   character(ic_med)   :: lnampre     ! local nampre
    character(ic_med)   :: lstring     ! local filename
    integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid ! netcdf info
@@ -353,6 +364,11 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
       labort = abort
    endif
 
+   lnampre = ""
+   if (present(nampre)) then
+      lnampre = trim(nampre)
+   endif
+
    mpicom = mpi_comm_local
    master_task = 0
    iam = mpi_rank_local
@@ -372,6 +388,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort)
          do n = 1,mct_aVect_nRAttr(av_g)
             call mct_aVect_getRList(mstring,n,av_g)
             itemc = mct_string_toChar(mstring)
+            itemc = trim(lnampre)//trim(itemc)
             call mct_string_clean(mstring)
 
             status = nf90_inq_varid(ncid,trim(itemc),varid)

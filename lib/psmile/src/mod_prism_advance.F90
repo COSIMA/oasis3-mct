@@ -61,29 +61,6 @@ contains
        mseclag = msec
 
        !------------------------------------------------
-       ! read restart for LOCTRANS fields
-       !------------------------------------------------
-
-       call prism_sys_debug_note(subname//' check for loctrans restart')
-       if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
-          if (len_trim(rstfile) < 1) then
-             write(nulprt,*) subname,' ERROR restart undefined'
-             call prism_sys_abort(compid,subname,' ERROR restart undefined')
-          endif
-          if (PRISM_Debug >= 2) then
-             write(nulprt,*) subname,' at ',msec,mseclag,' RTRN: ',&
-                trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
-          endif
-          call prism_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,abort=.false.)
-          write(vstring,'(a,i4.4)') 'avcnt_',prism_coupler(cplid)%namid
-          call prism_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring),abort=.false.)
-
-          if (PRISM_DEBUG >= 20) then
-             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,prism_coupler(cplid)%avcnt
-          endif
-       endif
-
-       !------------------------------------------------
        ! check that lag is reasonable
        !------------------------------------------------
 
@@ -116,10 +93,37 @@ contains
           do nf = 1,nflds
              varid = prism_coupler(cplid)%varid(nf)
              array(1:lsize) = avtmp%rAttr(nf,1:lsize)
-             call prism_advance_run(PRISM_Out,varid,msec,array,kinfo)
+             call prism_advance_run(PRISM_Out,varid,msec,array,kinfo,readrest=.true.)
           enddo
           deallocate(array)
           call mct_avect_clean(avtmp)
+       endif
+
+       !------------------------------------------------
+       ! read restart for LOCTRANS fields
+       ! do after restart and advance above because prism_advance_run
+       ! fills in the avect with the array info
+       !------------------------------------------------
+
+       call prism_sys_debug_note(subname//' check for loctrans restart')
+       if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+          if (len_trim(rstfile) < 1) then
+             write(nulprt,*) subname,' ERROR restart undefined'
+             call prism_sys_abort(compid,subname,' ERROR restart undefined')
+          endif
+          if (PRISM_Debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' RTRN: ',&
+                trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
+          endif
+          write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
+          call prism_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring))
+          write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
+          call prism_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring),abort=.false.)
+
+          if (PRISM_DEBUG >= 20) then
+             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,prism_coupler(cplid)%avcnt
+             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+          endif
        endif
 
     enddo ! cplid
@@ -129,7 +133,7 @@ contains
 
   end SUBROUTINE prism_advance_init
 !---------------------------------------------------------------------
-  SUBROUTINE prism_advance_run(mop,varid,msec,array,kinfo)
+  SUBROUTINE prism_advance_run(mop,varid,msec,array,kinfo,readrest)
 
     IMPLICIT none
 !   ----------------------------------------------------------------
@@ -138,6 +142,7 @@ contains
     INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
     REAL   (kind=ip_r8_p), intent(inout) :: array(:) ! data
     INTEGER(kind=ip_i4_p), intent(out)   :: kinfo    ! status
+    logical              , intent(in),optional :: readrest  ! special flag to indicate this is called from the advance_init method for restart
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     integer(kind=ip_i4_p) :: cplid,rouid,mapid,partid
@@ -157,6 +162,7 @@ contains
     character(len=ic_med) :: vstring   ! temporary string
     logical               :: comm_now  ! time to communicate
     logical               :: time_now  ! coupling time
+    logical               :: lreadrest ! local readrest
     type(mct_avect)       :: avtest    ! temporary
 !    type(mct_avect),pointer  :: avect1, avect2
 !    type(mct_sMatP),pointer  :: sMatP
@@ -169,6 +175,11 @@ contains
 
     kinfo = PRISM_OK
     vname = prism_var(varid)%name
+
+    lreadrest = .false.
+    if (present(readrest)) then
+       lreadrest = readrest
+    endif
 
     !------------------------------------------------
     ! validate mop
@@ -343,6 +354,7 @@ contains
        !------------------------------------------------
        ! update avect1 on put side, apply appropriate transform
        ! if its coupling time, set status of this var to ready
+       ! on restart, treat as instant value
        !------------------------------------------------
 
        if (getput == PRISM_PUT) then
@@ -352,7 +364,16 @@ contains
           call prism_timer_start(tstring)
 
           cstring = 'none'
-          if (prism_coupler(cplid)%trans == ip_average) then
+          if (lreadrest .or. prism_coupler(cplid)%trans == ip_instant) then
+             if (time_now) then
+                cstring = 'instant'
+                do n = 1,nsav
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
+                enddo
+                prism_coupler(cplid)%avcnt(nfav) = 1
+             endif
+
+          elseif (prism_coupler(cplid)%trans == ip_average) then
              cstring = 'average'
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
@@ -391,15 +412,6 @@ contains
                 endif
              enddo
              prism_coupler(cplid)%avcnt(nfav) = 1
-
-          elseif (prism_coupler(cplid)%trans == ip_instant) then
-             if (time_now) then
-                cstring = 'instant'
-                do n = 1,nsav
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
-                enddo
-                prism_coupler(cplid)%avcnt(nfav) = 1
-             endif
 
           else
              write(nulprt,*) subname,' ERROR: trans not known ',prism_coupler(cplid)%trans
@@ -682,15 +694,20 @@ contains
           if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
              write(tstring,F01) 'wtrn_',cplid
              call prism_timer_start(tstring)
+             write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
              call prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
-                prism_part(partid)%gsmap,nx,ny)
-             write(vstring,'(a,i4.4)') 'avcnt_',prism_coupler(cplid)%namid
+                prism_part(partid)%gsmap,nx,ny,nampre=trim(vstring))
+             write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
              call prism_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring))
              call prism_timer_stop(tstring)
              if (PRISM_Debug > 0) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
                    trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1)),' ',trim(rstfile)
                 call prism_sys_flush(nulprt)
+             endif
+             if (PRISM_DEBUG >= 20) then
+                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,prism_coupler(cplid)%avcnt
+                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
              endif
           endif
 

@@ -140,8 +140,9 @@ CONTAINS
   integer(kind=ip_i4_p) :: otfldi
   integer(kind=ip_i4_p) :: nx,ny
   character(len=ic_lvar):: gridname
+  character(len=ic_long):: tmp_mapfile
   integer(kind=ip_i4_p) :: flag
-  logical               :: found
+  logical               :: found, exists
   integer(kind=ip_i4_p) :: mynvar
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
@@ -584,7 +585,17 @@ CONTAINS
                  ! prism_coupler mapper
                  !--------------------------------
 
-                 if (trim(nammapfil(nn)) /= 'idmap') then
+                 tmp_mapfile = nammapfil(nn)
+
+                 if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
+                    if (trim(namscrmet(nn)) == 'CONSERV') then
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
+                    else
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//'_'//trim(namscrmet(nn))//'.nc'
+                    endif
+                 endif
+
+                 if (trim(tmp_mapfile) /= 'idmap') then
                  if ((flag == PRISM_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
                      (flag == PRISM_Out .and. trim(nammaploc(nn)) == 'src')) then
                     !--------------------------------
@@ -593,7 +604,7 @@ CONTAINS
                     !--------------------------------
                     mapid = -1
                     do n = 1,prism_nmapper
-                       if (trim(prism_mapper(n)%file) == trim(nammapfil(nn)) .and. &
+                       if (trim(prism_mapper(n)%file) == trim(tmp_mapfile) .and. &
                            trim(prism_mapper(n)%opt ) == trim(nammapopt(nn))) then
                           if (flag == PRISM_In  .and. prism_mapper(n)%dpart == part1) mapid = n
                           if (flag == PRISM_Out .and. prism_mapper(n)%spart == part1) mapid = n
@@ -605,15 +616,19 @@ CONTAINS
                     if (mapid < 1) then
                        prism_nmapper = prism_nmapper + 1
                        if (prism_nmapper > prism_mmapper) then
-                          write(nulprt,*) subname,' ERROR prism_nmapper to large',prism_nmapper,prism_mmapper
+                          write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,prism_mmapper
                           call prism_sys_abort(compid,subname,' ERROR prism_nmapper too large')
                        endif
                        mapid = prism_nmapper
-                       prism_mapper(mapid)%file = trim(nammapfil(nn))
+                       prism_mapper(mapid)%file = trim(tmp_mapfile)
                        prism_mapper(mapid)%loc  = trim(nammaploc(nn))
                        prism_mapper(mapid)%opt  = trim(nammapopt(nn))
                        if (flag == PRISM_In ) prism_mapper(mapID)%dpart = part1
                        if (flag == PRISM_Out) prism_mapper(mapID)%spart = part1
+                       if (PRISM_DEBUG > 15) then
+                          write(nulprt,*) subname,' DEBUG new mapper for file ',trim(prism_mapper(mapid)%file)
+                          call prism_sys_flush(nulprt)
+                       endif
                     endif
                     prism_coupler(nc)%mapperID = mapid
                  endif  ! flag and nammaploc match
@@ -725,7 +740,8 @@ CONTAINS
            gsize = mct_gsmap_gsize(prism_part(part2)%gsmap)
         else
            !--------------------------------
-           ! create mapper
+           ! instantiate mapper
+           ! read/generate mapping file
            ! read non local grid size
            ! get gsmap for non local grid
            ! read mapping weights and initialize sMatP
@@ -735,6 +751,27 @@ CONTAINS
               call prism_sys_flush(nulprt)
            endif
            if (mpi_rank_local == 0) then
+              inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
+              if (PRISM_Debug >= 15) then
+                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile',trim(prism_mapper(mapID)%file),exists
+                 call prism_sys_flush(nulprt)
+              endif
+              if (.not.exists) then
+                 if (trim(namscrmet(namID)) /= trim(cspval)) then
+                    !--------------------------------
+                    ! generate mapping file on root pe
+                    ! taken from oasis3 scriprmp
+                    !--------------------------------
+                    call prism_coupler_genmap(mapid,namID)
+                 else
+                    write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',trim(prism_mapper(mapID)%file)
+                    call prism_sys_abort(compid,subname,' ERROR map file does not exist')
+                 endif
+              endif
+
+              !--------------------------------
+              ! open mapping file
+              !--------------------------------
               status = nf_open(trim(prism_mapper(mapid)%file),nf_nowrite,ncid)
               if (prism_coupler(nc)%getput == PRISM_PUT) &
                  status = nf_inq_dimid(ncid,'dst_grid_size',dimid)
@@ -998,6 +1035,77 @@ CONTAINS
   call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_coupler_print
+
+!------------------------------------------------------------
+  SUBROUTINE prism_coupler_genmap(mapid,namid)
+
+  IMPLICIT NONE
+
+  integer(ip_i4_p), intent(in) :: mapid
+  integer(ip_i4_p), intent(in) :: namid
+  !----------------------------------------------------------
+
+  integer(ip_i4_p)             :: src_size,src_rank, ncrn_src
+  integer(ip_i4_p),allocatable :: src_dims(:),src_mask(:),src_lon(:),src_lat(:)
+  integer(ip_i4_p),allocatable :: src_corner_lon(:,:),src_corner_lat(:,:)
+  integer(ip_i4_p)             :: dst_size,dst_rank, ncrn_dst
+  integer(ip_i4_p),allocatable :: dst_dims(:),dst_mask(:),dst_lon(:),dst_lat(:)
+  integer(ip_i4_p),allocatable :: dst_corner_lon(:,:),dst_corner_lat(:,:)
+  logical :: lextrapdone
+  character(len=*),parameter :: subname = 'prism_coupler_genmap'
+
+  call prism_sys_debug_enter(subname)
+
+  lextrapdone = .false.
+
+!  src_size = 
+!  dst_size = 
+!  src_rank = 
+!  dst_rank = 
+  allocate(src_dims(src_rank),dst_dims(dst_rank))
+!  src_dims = 
+!  dst_dims =
+!  ncrn_src = 
+!  ncrn_dst = 
+
+  allocate(src_mask(src_size))
+  allocate(src_lon (src_size))
+  allocate(src_lat (src_size))
+  allocate(src_corner_lon(ncrn_src,src_size))
+  allocate(src_corner_lat(ncrn_src,src_size))
+  allocate(dst_mask(dst_size))
+  allocate(dst_lon (dst_size))
+  allocate(dst_lat (dst_size))
+  allocate(dst_corner_lon(ncrn_dst,dst_size))
+  allocate(dst_corner_lat(ncrn_dst,dst_size))
+
+!  call grid_init(namscrmet(namID),namscrtyp(namID),namscrbin(namID),  &
+!       src_size, dst_size, src_dims, dst_dims, &
+!       src_rank, dst_rank, ncrn_src, ncrn_dst, &
+!       src_mask, dst_mask, namsrcgrd(namID), namdstgrd(namID), &
+!       src_lat,  src_lon,  dst_lat,  dst_lon, &
+!       src_corner_lat, src_corner_lon, &
+!       dst_corner_lat, dst_corner_lon)
+!  call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
+!             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
+
+  deallocate(src_dims, dst_dims)
+  deallocate(src_mask)
+  deallocate(src_lon)
+  deallocate(src_lat)
+  deallocate(src_corner_lon)
+  deallocate(src_corner_lat)
+  deallocate(dst_mask)
+  deallocate(dst_lon)
+  deallocate(dst_lat)
+  deallocate(dst_corner_lon)
+  deallocate(dst_corner_lat)
+
+  call prism_sys_flush(nulprt)
+
+  call prism_sys_debug_exit(subname)
+
+  END SUBROUTINE prism_coupler_genmap
 
 !------------------------------------------------------------
 

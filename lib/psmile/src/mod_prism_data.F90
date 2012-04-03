@@ -28,7 +28,7 @@ MODULE mod_prism_data
   INTEGER(kind=ip_i4_p) :: mpi_err
   INTEGER(kind=ip_i4_p),allocatable :: mpi_root_global(:)  ! for each model, the rank in comm_world of the root process
 
-  character(len=*) ,parameter :: cspval = "undef"
+  character(len=*) ,parameter :: cspval = "spval_undef"
   real(ip_double_p),parameter :: rspval = 1.0e36
   integer(ip_i4_p) ,parameter :: ispval = -999999
 
