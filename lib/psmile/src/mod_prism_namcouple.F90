@@ -3817,10 +3817,6 @@ CONTAINS
 
   call prism_sys_debug_enter(subname)
 
-  allocate(nbtotproc(ig_nmodel),stat=il_err)
-  if (il_err.ne.0) call prtout('error in "nbtotproc"allocation of experiment module',il_err,1)
-  nbtotproc(:)=0
-
   !--- alloc_anais1
   ALLOCATE (varmul(ig_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "varmul"allocation of anais module',il_err,1)
