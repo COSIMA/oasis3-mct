@@ -42,40 +42,31 @@ $(LIBRARY): $(OBJS1)  $(OBJS3) $(OBJS4)
 # ALL dependencies ...
 #
 
-remap_bicubic_reduced.o: constants.o grids.o mod_kinds_oasis.o mod_unit.o \
-	remap_vars.o
-rotations.o: constants.o grids.o kinds_mod.o mod_parameter.o mod_printing.o \
-	mod_unit.o mod_unitncdf.o vector.o
+remap_bicubic_reduced.o: constants.o grids.o remap_vars.o
+rotations.o: constants.o grids.o kinds_mod.o vector.o
 scriprmp_vector.o: grids.o remap_vars.o rotations.o vector.o
-vector.o: constants.o grids.o kinds_mod.o mod_parameter.o mod_printing.o \
-	mod_unit.o mod_unitncdf.o
-corners.o: kinds_mod.o mod_label.o mod_parameter.o mod_printing.o mod_unit.o \
-	mod_unitncdf.o
-netcdf.o: constants.o kinds_mod.o mod_unit.o
+vector.o: constants.o grids.o kinds_mod.o 
+corners.o: kinds_mod.o 
+netcdf.o: constants.o kinds_mod.o 
 remap_conserv.o: constants.o grids.o kinds_mod.o remap_vars.o timers.o
-remap_distwgt.o: constants.o grids.o kinds_mod.o mod_unit.o remap_vars.o
+remap_distwgt.o: constants.o grids.o kinds_mod.o remap_vars.o
 remap_vars.o: constants.o grids.o kinds_mod.o
 scrip.o: constants.o grids.o iounits.o kinds_mod.o remap_bicubic.o \
 	remap_bicubic_reduced.o remap_bilinear.o remap_bilinear_reduced.o \
 	remap_conserv.o remap_distwgt.o remap_gauswgt.o remap_vars.o \
 	remap_write.o timers.o
-scriprmp.o: grids.o mod_parameter.o mod_printing.o mod_scrip.o mod_unit.o \
-	remap_vars.o
+scriprmp.o: grids.o remap_vars.o
 constants.o: kinds_mod.o
 distance.o: constants.o kinds_mod.o
-fracnnei.o: constants.o grids.o kinds_mod.o mod_printing.o mod_unit.o \
-	remap_vars.o
-gradient.o: constants.o kinds_mod.o mod_printing.o mod_unit.o
-gradient_bicubic.o: constants.o kinds_mod.o mod_printing.o mod_unit.o 
-grids.o: constants.o iounits.o kinds_mod.o mod_printing.o mod_unit.o
-iounits.o: kinds_mod.o mod_printing.o mod_unit.o
-kinds_mod.o: mod_kinds_oasis.o
-remap_bicubic.o: constants.o grids.o kinds_mod.o mod_printing.o mod_unit.o \
-	remap_vars.o
-remap_bilinear.o: constants.o grids.o kinds_mod.o mod_printing.o mod_unit.o \
-	remap_vars.o
-remap_bilinear_reduced.o: constants.o grids.o kinds_mod.o mod_printing.o \
-	mod_unit.o remap_vars.o
+fracnnei.o: constants.o grids.o kinds_mod.o remap_vars.o
+gradient.o: constants.o kinds_mod.o 
+gradient_bicubic.o: constants.o kinds_mod.o 
+grids.o: constants.o iounits.o kinds_mod.o 
+iounits.o: kinds_mod.o 
+kinds_mod.o: 
+remap_bicubic.o: constants.o grids.o kinds_mod.o remap_vars.o
+remap_bilinear.o: constants.o grids.o kinds_mod.o remap_vars.o
+remap_bilinear_reduced.o: constants.o grids.o kinds_mod.o remap_vars.o
 remap_gauswgt.o: constants.o grids.o kinds_mod.o remap_vars.o
-remap_write.o: constants.o grids.o kinds_mod.o netcdf.o remap_vars.o mod_printing.o
+remap_write.o: constants.o grids.o kinds_mod.o netcdf.o remap_vars.o 
 timers.o: kinds_mod.o

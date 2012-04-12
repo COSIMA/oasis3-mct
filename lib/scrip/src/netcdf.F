@@ -38,7 +38,6 @@
 
       use kinds_mod
       use constants
-      USE mod_unit
 
       implicit none
 

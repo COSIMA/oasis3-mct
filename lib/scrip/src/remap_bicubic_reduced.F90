@@ -6,13 +6,12 @@ MODULE remap_bicubic_reduced
 ! !MODULE: remap_bicubic_reduced
 ! 
 ! !USES:
-  USE mod_kinds_oasis       ! defines common data types      
+  USE kinds_mod             ! defines common data types      
   USE constants             ! defines common constants      
   USE grids                 ! module containing grid info
   USE remap_vars            ! module containing remap info
 
 ! !PUBLIC TYPES:
-  USE mod_unit
   IMPLICIT NONE  
 ! !PUBLIC MEMBER FUNCTIONS:
 !  
@@ -56,40 +55,40 @@ CONTAINS
     LOGICAL, INTENT(in) :: &
        ld_extrapdone              ! logical, true if EXTRAP done on field
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4,4) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4,4) :: &
        ila_src_add                ! address for source points non-masked  
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4) :: &
        ila_nbr_found              ! nrb of points found on each latitude
     
-    INTEGER (KIND=ip_intwp_p) :: &
+    INTEGER (KIND=int_kind) :: &
        ib_i, &                    ! iter index
        ib_dst_add, &              ! destination address, target point
        il_count, &                ! nbr of latitudes with found points   
        il_min, il_max, bin        ! begin and end for distances calculation
     
-    REAL (KIND=ip_realwp_p), DIMENSION(4,4) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4,4) :: &
        rla_src_lons, &            ! longitudes for the points 'ila_src_add'
        rla_weight, &              ! bicubic weights for the points 'ila_src_add'
        rla_wght_lon               ! temp. weights
     
-    REAL (KIND=ip_realwp_p), DIMENSION(4) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4) :: &
        rla_src_lats, &            ! latitudes for the points 'ila_src_add'
        rla_lats_temp, &           ! temp. latitudes
        rla_wght_lat, rla_wght_temp! temp. weights
     
-    REAL (KIND=ip_realwp_p) :: &
+    REAL (KIND=dbl_kind) :: &
        rl_plat, rl_plon         ! latitude and longitude for destination address
     
-    REAL (KIND=ip_realwp_p) :: &     ! variables for distances calculation
+    REAL (KIND=dbl_kind) :: &     ! variables for distances calculation
        rl_coslat_dst, rl_sinlat_dst, &
        rl_coslon_dst, rl_sinlon_dst, &
        rl_distance, arg           
 
-    REAL (KIND=ip_realwp_p), DIMENSION(2) :: &
+    REAL (KIND=dbl_kind), DIMENSION(2) :: &
        rla_dist                   ! lat distances to point cible     
 
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4) :: &
        ila_add_dist               ! temporary addr. for distances       
 
     LOGICAL :: ll_linear          ! flag
@@ -461,35 +460,35 @@ CONTAINS
 !  
 ! !RETURN VALUE:
 !    
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4,4), INTENT(out) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4,4), INTENT(out) :: &
        ida_src_add    ! searched addresses of the unmasked points enclosing
                       ! target point
       
-    REAL (KIND=ip_realwp_p), DIMENSION(4,4), INTENT(out) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4,4), INTENT(out) :: &
        rda_src_lons   ! longitudes of the searched points
 
-    REAL (KIND=ip_realwp_p), DIMENSION(4), INTENT(out) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4), INTENT(out) :: &
        rda_src_lats   ! latitudes  of the searched points 
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4), INTENT(out) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4), INTENT(out) :: &
        ida_nbr_found  ! indicates for each line how many points found
     
-    INTEGER (KIND=ip_intwp_p), INTENT(out) :: &
+    INTEGER (KIND=int_kind), INTENT(out) :: &
        bin            ! actual bin for target point
 !    
 ! !PARAMETERS:
 !  
-    REAL (KIND=ip_realwp_p), INTENT(in) :: &
+    REAL (KIND=dbl_kind), INTENT(in) :: &
        rd_plat, &     ! latitude  of the target point
        rd_plon      ! longitude of the target point
           
     LOGICAL, INTENT(in) :: ld_extrapdone ! true if extrapolation done
     
-    INTEGER (KIND=ip_intwp_p) :: &
+    INTEGER (KIND=int_kind) :: &
        ib_k, ib_j, ib_i, &        ! iteration indices
        il_min, il_max, il_inter   ! begin and end for actual bin
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4,2) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4,2) :: &
        ila_corners                ! temp addresses for bins   
                        
 !
@@ -709,18 +708,18 @@ CONTAINS
 !		       
 ! !RETURN VALUE:
 !  
-    REAL (KIND=ip_realwp_p), DIMENSION(4), INTENT(out) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4), INTENT(out) :: &
        rda_wght   ! array of weights for the points x
 !      
 ! !PARAMETERS:
 ! 
-    REAL (KIND=ip_realwp_p), DIMENSION(4), INTENT(in) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4), INTENT(in) :: &
        rda_x ! array of positions on source grid, lat or lon
       
-    REAL (KIND=ip_realwp_p),INTENT(in) :: &
+    REAL (KIND=dbl_kind),INTENT(in) :: &
        rd_pt  ! position of target point to interpolate
        
-    REAL (KIND=ip_realwp_p) :: &
+    REAL (KIND=dbl_kind) :: &
        rl_t1, rl_t2, rl_t3, rl_t4, rl_t5, rl_t6, rl_t7, rl_t8, rl_t9, &
        rl_u1, rl_u2, rl_u3, rl_u4, &
        rl_k1, rl_k2, rl_k3, &
@@ -881,18 +880,18 @@ CONTAINS
   
 ! !RETURN VALUE:
  
-    REAL (KIND=ip_realwp_p), DIMENSION(3), INTENT(out) :: &
+    REAL (KIND=dbl_kind), DIMENSION(3), INTENT(out) :: &
        rda_wght         ! array of weights for the points x
     
 ! !PARAMETERS:
 
-    REAL (KIND=ip_realwp_p), DIMENSION(3), INTENT(in) :: &
+    REAL (KIND=dbl_kind), DIMENSION(3), INTENT(in) :: &
        rda_x         ! array of positions on source grid, lat or lon
     
-    REAL (KIND=ip_realwp_p), INTENT(in) :: &
+    REAL (KIND=dbl_kind), INTENT(in) :: &
        rd_pt        ! position of target point to interpolate
     
-    REAL (KIND=ip_realwp_p) :: &
+    REAL (KIND=dbl_kind) :: &
        rl_c1, rl_c2, rl_c3, &
        rl_a1, rl_a2, rl_a3, &
        rl_b1, rl_b2, rl_b3, &
@@ -987,18 +986,18 @@ CONTAINS
 		       
 ! !RETURN VALUE:
   
-    REAL (KIND=ip_realwp_p), DIMENSION(2), INTENT(out) :: &
+    REAL (KIND=dbl_kind), DIMENSION(2), INTENT(out) :: &
        rda_wght      ! array of weights for the points x
      
 ! !PARAMETERS:
 
-    REAL (KIND=ip_realwp_p), DIMENSION(2), INTENT(in) :: &
+    REAL (KIND=dbl_kind), DIMENSION(2), INTENT(in) :: &
        rda_x      ! array of positions on source grid, lat or lon
       
-    REAL (KIND=ip_realwp_p), INTENT(in) :: &
+    REAL (KIND=dbl_kind), INTENT(in) :: &
        rd_pt     ! position of target point to interpolate
     
-    REAL (KIND=ip_realwp_p) :: rl_b1, rl_b2, rl_a1, rl_a2
+    REAL (KIND=dbl_kind) :: rl_b1, rl_b2, rl_a1, rl_a2
     		       
 ! !DESCRIPTION:
 !  Calculates a the weights of 2 points for a linair interpolation.
@@ -1050,22 +1049,22 @@ CONTAINS
 
 ! !PARAMETERS:
 
-    INTEGER (KIND=ip_intwp_p), INTENT(in) :: &
+    INTEGER (KIND=int_kind), INTENT(in) :: &
        id_dst_add    ! address on destination grid
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(4,4), INTENT(in) :: &
+    INTEGER (KIND=int_kind), DIMENSION(4,4), INTENT(in) :: &
        ida_src_add   ! addresses for links on source grid
     
-    REAL (KIND=ip_realwp_p), DIMENSION(4,4), INTENT(in) :: &
+    REAL (KIND=dbl_kind), DIMENSION(4,4), INTENT(in) :: &
        rda_wght      ! array of remapping weights for these links
       
-    INTEGER (KIND=ip_intwp_p) :: ib_i, &
+    INTEGER (KIND=int_kind) :: ib_i, &
        il_num_links_old  ! placeholder for old link number
     
-    INTEGER (KIND=ip_intwp_p), DIMENSION(16) :: &
+    INTEGER (KIND=int_kind), DIMENSION(16) :: &
        ila_src_add   ! reshaped addresses
     
-    REAL (KIND=ip_realwp_p), DIMENSION(16) :: &
+    REAL (KIND=dbl_kind), DIMENSION(16) :: &
        rla_wght      ! reshaped weights
     
 ! !DESCRIPTION:

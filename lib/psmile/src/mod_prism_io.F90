@@ -24,6 +24,7 @@ MODULE mod_prism_io
    public :: prism_io_write_2dgridint_fromroot
    public :: prism_io_write_2dgridfld_fromroot
    public :: prism_io_write_3dgridfld_fromroot
+   public :: prism_io_read_field_fromroot
 
 !===========================================================================
 CONTAINS
@@ -1042,6 +1043,113 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
    call prism_sys_debug_exit(subname)
 
 end subroutine prism_io_read_avfbf
+
+!===============================================================================
+
+subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,nz)
+
+   ! ---------------------------------------
+   ! Write real fld on rootpe to file
+   ! Designed to work with oasis3 write_grid 
+   ! ---------------------------------------
+
+   implicit none
+
+   character(len=*) , intent(in) :: filename
+   character(len=*) , intent(in) :: fldname
+   integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)
+   real(ip_realwp_p), intent(inout),optional :: fld2(:,:)
+   real(ip_realwp_p), intent(inout),optional :: fld3(:,:,:)
+   integer(ip_i4_p) , intent(inout),optional :: nx         ! global size nx
+   integer(ip_i4_p) , intent(inout),optional :: ny         ! global size ny
+   integer(ip_i4_p) , intent(inout),optional :: nz         ! global size nz
+
+   !--- local ---
+   integer(ip_i4_p)    :: ncid,varid  ! cdf info
+   integer(ip_i4_p)    :: n,ndims,xtype
+   integer(ip_i4_p),allocatable :: dimid(:),nd(:)
+   integer(ip_i4_p)    :: status      ! error code
+   integer(ip_i4_p)    :: ind         ! string index
+   logical             :: exists      ! file existance
+   character(len=ic_med) :: gridname  ! grid name derived from fldname
+
+   character(len=*),parameter :: subname = 'prism_io_read_field_fromroot'
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+
+!   expects to run only on 1 pe.
+!   if (iam == master_task) then
+
+   inquire(file=trim(filename),exist=exists)
+   if (exists) then
+      status = nf90_open(filename,NF90_NOWRITE,ncid)
+      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      status = nf90_redef(ncid)
+   else
+      write(nulprt,*) subname,' ERROR: in filename ',trim(filename)
+      call prism_sys_abort(compid,subname,' ERROR filename does not exist')
+   endif
+
+   status = nf90_inq_varid(ncid,trim(fldname),varid)
+   if (status /= nf90_noerr) then
+      write(nulprt,*) subname,' ERROR: in variable name ',trim(fldname)
+      call prism_sys_abort(compid,subname,' ERROR variable name does not exist')
+   endif
+
+   status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
+   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+   allocate(dimid(ndims),nd(ndims))
+
+   status = nf90_inquire_variable(ncid,varid,dimids=dimid)
+   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+   do n = 1,ndims
+      status = nf90_inquire_dimension(ncid,dimid(n),len=nd(n))
+      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+   enddo
+
+   if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
+      if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
+         status = nf90_get_var(ncid,varid,ifld2)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
+         status = nf90_get_var(ncid,varid,fld2)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
+         status = nf90_get_var(ncid,varid,fld3)
+         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      else
+         write(nulprt,*) subname,' ERROR: mismatch in field and data'
+         call prism_sys_abort(compid,subname,' ERROR mismatch in field and data')
+      endif
+   endif
+    
+   status = nf90_close(ncid)
+   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+
+   if (present(nx)) then
+      nx = nd(1)
+   endif
+
+   if (present(ny)) then
+      ny = nd(2)
+   endif
+
+   if (present(nz)) then
+      nz = nd(3)
+   endif
+
+   deallocate(dimid,nd)
+
+!   endif
+
+   call prism_sys_debug_exit(subname)
+
+end subroutine prism_io_read_field_fromroot
 
 !===============================================================================
 

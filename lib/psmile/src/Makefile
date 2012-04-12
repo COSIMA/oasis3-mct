@@ -24,6 +24,7 @@ $(LIBRARY): $(OBJS1) $(OBJS2) $(OBJS3)
 
 INCLS = -I$(COUPLE)/lib/psmile/include \
         -I$(ARCHDIR)/build/lib/mct \
+        -I$(ARCHDIR)/build/lib/scrip \
         -I$(ARCHDIR)/build/lib/pio
 
 INCLSC = -I$(COUPLE)/lib/psmile/include

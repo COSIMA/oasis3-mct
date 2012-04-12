@@ -38,8 +38,6 @@
 !-----------------------------------------------------------------------
 
       use kinds_mod   ! defines data types
-      USE mod_unit
-      USE mod_printing
 
       implicit none
 

@@ -3,9 +3,7 @@ MODULE rotations
 
   USE kinds_mod             ! defines common data types      
   USE constants             ! defines common constants      
-  USE mod_parameter
   USE grids
-  USE mod_unitncdf
   USE vector
 
   IMPLICIT NONE
@@ -44,7 +42,7 @@ CONTAINS
     
     INTEGER (KIND=int_kind) :: &
          il_stat, il_varid, il_vtype, &     ! netcdf variables
-         icount, ilenstr, i
+         icount, ilenstr, i, nc_grdid
     
 !RETURN VALUE:
 

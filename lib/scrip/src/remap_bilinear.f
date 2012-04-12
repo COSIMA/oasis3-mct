@@ -103,7 +103,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 !-----------------------------------------------------------------------
 
-      integer (kind=int_kind) :: n,icount, i,
+      integer (kind=int_kind) :: n,icount, i, k,
      &     dst_add,        ! destination address
      &     iter,           ! iteration counter
      &     nmap            ! index of current map being computed
@@ -247,9 +247,16 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
           ELSE
             write(nulou,*)'Point coords: ',plat,plon
-            write(nulou,*)'Dest grid lats: ',src_lats
-            write(nulou,*)'Dest grid lons: ',src_lons
-            write(nulou,*)'Dest grid addresses: ',src_add
+            do k = 1,size(src_add)
+               if (src_add(k) > 0) then
+                  write(nulou,*)'Dest grid info: ',
+     &               src_add(k),src_lats(k),src_lons(k),
+     &               grid1_mask(src_add(k))
+               else
+                  write(nulou,*)'Dest grid info: ',
+     &               src_add(k),src_lats(k),src_lons(k)
+               endif
+            enddo
             write(nulou,*)'Current i,j : ',iguess, jguess
             write(nulou,*)'Iteration for i,j exceed max iteration count'
             stop 

@@ -62,8 +62,6 @@ C***********************************************************************
       use kinds_mod    ! defines data types
       use constants    ! common constants
       use iounits      ! I/O unit manager
-      USE mod_unit
-      USE mod_printing
 
       implicit none
 
@@ -167,7 +165,8 @@ C***********************************************************************
      &                     src_mask, dst_mask, src_name, dst_name,
      &                     src_lat,  src_lon,  dst_lat,  dst_lon,
      &                     src_corner_lat, src_corner_lon,
-     &                     dst_corner_lat, dst_corner_lon)
+     &                     dst_corner_lat, dst_corner_lon, 
+     &                     logunit)
 
 !-----------------------------------------------------------------------
 !
@@ -194,6 +193,9 @@ C***********************************************************************
      &     ncrn_dst,            ! number of corners of a target grid cell
      &     src_mask(src_size),  ! source grid mask (master mask)
      &     dst_mask(dst_size)   ! target grid mask 
+
+      integer(kind=int_kind), intent(in), optional ::
+     &     logunit
 
       character*8, intent(in) ::
      &     m_method,            ! remapping method
@@ -230,9 +232,14 @@ C***********************************************************************
 
       real (kind=dbl_kind), dimension(4) ::
      &  tmp_lats, tmp_lons  ! temps for computing bounding boxes
+      character(len=*),parameter :: subname = 'scrip:grid_init '
 !
 !-----------------------------------------------------------------------
 !
+      if (present(logunit)) then
+         nulou = logunit
+      endif
+
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine grid_init'
@@ -245,7 +252,10 @@ C***********************************************************************
 !     allocate grid coordinates/masks and read data
 !
 !-----------------------------------------------------------------------
-      
+
+!      write(nulou,*) subname,trim(m_method)
+!      write(nulou,*) subname,src_size,dst_size,src_rank,dst_rank
+
       select case(m_method)
       case ('CONSERV')
         luse_grid_centers = .false.
@@ -288,7 +298,7 @@ C***********************************************************************
 !     copy input data to module data
 !
 !-----------------------------------------------------------------------
-      
+
       restrict_type    = rst_type
       num_srch_bins    = n_srch_bins
       grid1_size       = src_size
@@ -324,7 +334,6 @@ c      endif
       grid1_frac = zero
       grid2_area = zero
       grid2_frac = zero
-
 
 !-----------------------------------------------------------------------
 !
@@ -577,7 +586,7 @@ C
       select case (restrict_type)
 
       case ('LATITUDE')
-        write(stdout,*) 'Using latitude bins to restrict search.'
+        write(nulou,*) 'Using latitude bins to restrict search.'
 
         allocate(bin_addr1(2,num_srch_bins))
         allocate(bin_addr2(2,num_srch_bins))
@@ -618,7 +627,7 @@ C
         end do
 
       case ('LATLON')
-        write(stdout,*) 'Using lat/lon boxes to restrict search.'
+        write(nulou,*) 'Using lat/lon boxes to restrict search.'
 
         dlat = pi /num_srch_bins
         dlon = pi2/num_srch_bins
@@ -671,9 +680,9 @@ C
         end do
 
       case ('REDUCED')
-        write(stdout,*) 
+        write(nulou,*) 
      &  '|  Using reduced bins to restrict search. Reduced grids with'
-        write(stdout,*) 
+        write(nulou,*) 
      &  '| a maximum of 500*NBRBINS latitude circles can be treated'
 
         allocate(bin_addr2(2,num_srch_bins))

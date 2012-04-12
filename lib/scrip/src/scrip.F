@@ -295,8 +295,6 @@ C***********************************************************************
 
       use kinds_mod     ! defines common data types
       use constants     ! defines common scalar constants
-      use mod_unit
-      use mod_printing
 
       implicit none
 

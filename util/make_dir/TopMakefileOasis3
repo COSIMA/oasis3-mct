@@ -42,7 +42,7 @@ realclean:
 # Rules for creating build, library and binary directories
 #
 makedirs:
-#	@mkdir -p $(ARCHDIR)/build/lib/scrip
+	@mkdir -p $(ARCHDIR)/build/lib/scrip
 	@mkdir -p $(ARCHDIR)/build/lib/mctdir
 	@mkdir -p $(ARCHDIR)/build/lib/mct
 	@mkdir -p $(ARCHDIR)/build/lib/psmile.$(CHAN)
@@ -63,9 +63,9 @@ makemct:
 # Rules for compiling the libraries scrip and psmile
 #
 makelibs:
-	@echo "=> NOT Compiling library scrip"
-#	(cd $(ARCHDIR)/build/lib/scrip; cp -f $(LIBSRC)/scrip/src/Makefile .;\
-#         $(modifmakefile) ; $(MAKE) all 1>> $(LOG) 2>> $(ERR) )
+	@echo "=> Compiling library scrip"
+	(cd $(ARCHDIR)/build/lib/scrip; cp -f $(LIBSRC)/scrip/src/Makefile .;\
+         $(modifmakefile) ; $(MAKE) all 1>> $(LOG) 2>> $(ERR) )
 
 makepsmile:
 	@echo "=> Compiling library psmile"

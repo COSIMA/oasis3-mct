@@ -97,8 +97,6 @@ C* ---------------------------- Modules used ----------------------------
 C
       USE grids
       USE remap_vars
-      USE mod_parameter
-      USE mod_scrip
 C
 C* ---------------------------- Implicit --------------------------------
 C
@@ -366,7 +364,6 @@ C
 C*    2. Calculate SCRIP remapping matrix
 C        --------------------------------
 C
-          write(nulou,*) "scriprmp tcx1 generating weights"
           SELECT CASE (normalize_opt)
           CASE ('FRACNNEI')
               normalize_opt = 'FRACAREA'
@@ -476,7 +473,6 @@ c* CMCC - flag for managing read from netcdf input files.
 c*        'sweight_flag' flag is set to TRUE after the first
 c*        read
       IF (.NOT. sweight_flag(jf)) THEN
-        write(nulou,*) 'scriprmp tcx2 sweight_flag false'
 
         CALL hdlerr(NF_INQ_DIMID
      $           (nc_scpid, 'num_links', dimid), 'scriprmp')
@@ -556,7 +552,6 @@ C
       ll_weightot  = .false.
       weightot(:)  = 0.0
       dst_array(:) = 0.0
-      write(nulou,*) 'scriprmp tcx3 matrix mult'
       SELECT CASE (map_method)
 C
       CASE ('CONSERV')     ! conservative remapping 

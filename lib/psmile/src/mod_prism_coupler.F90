@@ -13,6 +13,7 @@ MODULE mod_prism_coupler
   USE mod_prism_io
   USE mod_prism_timer
   USE mct_mod
+  USE grids    ! scrip
 
   IMPLICIT NONE
 
@@ -1045,49 +1046,231 @@ CONTAINS
   integer(ip_i4_p), intent(in) :: namid
   !----------------------------------------------------------
 
-  integer(ip_i4_p)             :: src_size,src_rank, ncrn_src
-  integer(ip_i4_p),allocatable :: src_dims(:),src_mask(:),src_lon(:),src_lat(:)
-  integer(ip_i4_p),allocatable :: src_corner_lon(:,:),src_corner_lat(:,:)
-  integer(ip_i4_p)             :: dst_size,dst_rank, ncrn_dst
-  integer(ip_i4_p),allocatable :: dst_dims(:),dst_mask(:),dst_lon(:),dst_lat(:)
-  integer(ip_i4_p),allocatable :: dst_corner_lon(:,:),dst_corner_lat(:,:)
+  integer(ip_i4_p)              :: src_size,src_rank, ncrn_src
+  integer(ip_i4_p) ,allocatable :: src_dims(:),src_mask(:)
+  real(ip_double_p),allocatable :: src_lon(:),src_lat(:)
+  real(ip_double_p),allocatable :: src_corner_lon(:,:),src_corner_lat(:,:)
+  integer(ip_i4_p)              :: dst_size,dst_rank, ncrn_dst
+  integer(ip_i4_p) ,allocatable :: dst_dims(:),dst_mask(:)
+  real(ip_double_p),allocatable :: dst_lon(:),dst_lat(:)
+  real(ip_double_p),allocatable :: dst_corner_lon(:,:),dst_corner_lat(:,:)
+  integer(ip_i4_p) ,allocatable :: ifld2(:,:)
+  real(ip_double_p),allocatable :: fld2(:,:),fld3(:,:,:)
+  integer(ip_i4_p) :: i,j,k,icnt,nx,ny,nc
   logical :: lextrapdone
+  logical :: do_corners
+  character(len=ic_med) :: filename
+  character(len=ic_med) :: fldname
   character(len=*),parameter :: subname = 'prism_coupler_genmap'
 
   call prism_sys_debug_enter(subname)
 
   lextrapdone = .false.
+  nx = -1  ! must be read
+  ny = -1  ! must be read
+  nc =  1  ! might not be read, set to something reasonable
 
-!  src_size = 
-!  dst_size = 
-!  src_rank = 
-!  dst_rank = 
-  allocate(src_dims(src_rank),dst_dims(dst_rank))
-!  src_dims = 
-!  dst_dims =
-!  ncrn_src = 
-!  ncrn_dst = 
+  !--- checks first ---
 
+  if (trim(namscrtyp(namID)) /= 'SCALAR') then
+     write(nulprt,*) subname,' ERROR: only scrip type SCALAR mapping supported'
+     call prism_sys_abort(compid,subname,'ERROR scrip SCALAR mapping only')
+  endif
+
+  if (trim(namscrmet(namID)) == 'CONSERV' .and. trim(namscrord(namID)) /= 'FIRST') then
+     write(nulprt,*) subname,' ERROR: only FIRST ORDER mapping supported'
+     call prism_sys_abort(compid,subname,'ERROR scrip SCALAR mapping only')
+  endif
+
+  if (trim(namscrmet(namID)) == 'BICUBIC') then
+     write(nulprt,*) subname,' ERROR: BICUBIC mapping not yet supported'
+     call prism_sys_abort(compid,subname,'ERROR scrip SCALAR mapping only')
+  endif
+  
+  do_corners = .false.
+  if (trim(namscrmet(namID)) == 'CONSERV') then
+     do_corners = .true.
+  endif
+
+  !--- src data ---
+
+  filename = 'grids.nc'
+  if (do_corners) then
+     fldname = trim(namsrcgrd(namID))//'.clo'
+     call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny,nz=nc)
+  else
+     fldname = trim(namsrcgrd(namID))//'.lon'
+     call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
+  endif
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc,do_corners
+  src_rank = 2
+  src_size = nx*ny
+  allocate(src_dims(src_rank))
+  src_dims(1) = nx
+  src_dims(2) = ny
+  ncrn_src = nc
   allocate(src_mask(src_size))
   allocate(src_lon (src_size))
   allocate(src_lat (src_size))
   allocate(src_corner_lon(ncrn_src,src_size))
   allocate(src_corner_lat(ncrn_src,src_size))
+
+  allocate(ifld2(nx,ny))
+  filename = 'masks.nc'
+  fldname = trim(namsrcgrd(namID))//'.msk'
+  call prism_io_read_field_fromroot(filename,fldname,ifld2=ifld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     src_mask(icnt) = ifld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_mask),maxval(src_mask)
+  deallocate(ifld2)
+
+  allocate(fld2(nx,ny))
+  filename = 'grids.nc'
+  fldname = trim(namsrcgrd(namID))//'.lon'
+  call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     src_lon(icnt) = fld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_lon),maxval(src_lon)
+  fldname = trim(namsrcgrd(namID))//'.lat'
+  call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     src_lat(icnt) = fld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_lat),maxval(src_lat)
+  deallocate(fld2)
+
+  if (do_corners) then
+     allocate(fld3(nx,ny,nc))
+     filename = 'grids.nc'
+     fldname = trim(namsrcgrd(namID))//'.clo'
+     call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
+     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+        do k = 1,nc
+           src_corner_lon(k,icnt) = fld3(i,j,k)
+        enddo
+     enddo; enddo
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(src_corner_lon),maxval(src_corner_lon)
+     fldname = trim(namsrcgrd(namID))//'.cla'
+     call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
+     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+        do k = 1,nc
+           src_corner_lat(k,icnt) = fld3(i,j,k)
+        enddo
+     enddo; enddo
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(src_corner_lat),maxval(src_corner_lat)
+     deallocate(fld3)
+  else
+     src_corner_lon = -9999.
+     src_corner_lat = -9999.
+  endif
+
+  !--- dst data ---
+
+  filename = 'grids.nc'
+  if (do_corners) then
+     fldname = trim(namdstgrd(namID))//'.clo'
+     call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny,nz=nc)
+  else
+     fldname = trim(namdstgrd(namID))//'.lon'
+     call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
+  endif
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc
+  dst_rank = 2
+  dst_size = nx*ny
+  allocate(dst_dims(dst_rank))
+  dst_dims(1) = nx
+  dst_dims(2) = ny
+  ncrn_dst = nc
   allocate(dst_mask(dst_size))
   allocate(dst_lon (dst_size))
   allocate(dst_lat (dst_size))
   allocate(dst_corner_lon(ncrn_dst,dst_size))
   allocate(dst_corner_lat(ncrn_dst,dst_size))
 
-!  call grid_init(namscrmet(namID),namscrtyp(namID),namscrbin(namID),  &
-!       src_size, dst_size, src_dims, dst_dims, &
-!       src_rank, dst_rank, ncrn_src, ncrn_dst, &
-!       src_mask, dst_mask, namsrcgrd(namID), namdstgrd(namID), &
-!       src_lat,  src_lon,  dst_lat,  dst_lon, &
-!       src_corner_lat, src_corner_lon, &
-!       dst_corner_lat, dst_corner_lon)
-!  call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
-!             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
+  allocate(ifld2(nx,ny))
+  filename = 'masks.nc'
+  fldname = trim(namdstgrd(namID))//'.msk'
+  call prism_io_read_field_fromroot(filename,fldname,ifld2=ifld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     dst_mask(icnt) = ifld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_mask),maxval(dst_mask)
+  deallocate(ifld2)
+
+  allocate(fld2(nx,ny))
+  filename = 'grids.nc'
+  fldname = trim(namdstgrd(namID))//'.lon'
+  call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     dst_lon(icnt) = fld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_lon),maxval(dst_lon)
+  fldname = trim(namdstgrd(namID))//'.lat'
+  call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
+  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+     dst_lat(icnt) = fld2(i,j)
+  enddo; enddo
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_lat),maxval(dst_lat)
+  deallocate(fld2)
+
+  if (do_corners) then
+     allocate(fld3(nx,ny,nc))
+     filename = 'grids.nc'
+     fldname = trim(namdstgrd(namID))//'.clo'
+     call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
+     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+        do k = 1,nc
+           dst_corner_lon(k,icnt) = fld3(i,j,k)
+        enddo
+     enddo; enddo
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(dst_corner_lon),maxval(dst_corner_lon)
+     fldname = trim(namdstgrd(namID))//'.cla'
+     call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
+     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
+        do k = 1,nc
+           dst_corner_lat(k,icnt) = fld3(i,j,k)
+        enddo
+     enddo; enddo
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(dst_corner_lat),maxval(dst_corner_lat)
+     deallocate(fld3)
+  else
+     dst_corner_lon = -9999.
+     dst_corner_lat = -9999.
+  endif
+
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' call grid_init '
+  call prism_sys_flush(nulprt)
+
+  !--- 0/1 mask convention opposite in scrip vs oasis
+  src_mask = 1 - src_mask
+  dst_mask = 1 - dst_mask
+  call grid_init(namscrmet(namID),namscrres(namID),namscrbin(namID),  &
+       src_size, dst_size, src_dims, dst_dims, &
+       src_rank, dst_rank, ncrn_src, ncrn_dst, &
+       src_mask, dst_mask, namsrcgrd(namID), namdstgrd(namID), &
+       src_lat,  src_lon,  dst_lat,  dst_lon, &
+       src_corner_lat, src_corner_lon, &
+       dst_corner_lat, dst_corner_lon, &
+       logunit=nulprt)
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' done scrip '
+
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' call scrip '
+  call prism_sys_flush(nulprt)
+  call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
+             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' done scrip '
 
   deallocate(src_dims, dst_dims)
   deallocate(src_mask)

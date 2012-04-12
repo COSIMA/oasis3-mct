@@ -32,7 +32,6 @@
 !***********************************************************************
 
       module kinds_mod
-      USE mod_kinds_oasis
 
 !-----------------------------------------------------------------------
 
@@ -41,12 +40,42 @@
 
 !-----------------------------------------------------------------------
 
-      integer(kind=ip_intwp_p), parameter :: char_len  = 80
-      integer(kind=ip_intwp_p), parameter :: int_kind  = ip_intwp_p
-      integer(kind=ip_intwp_p), parameter :: log_kind  = kind(.true.)
-      integer(kind=ip_intwp_p), parameter :: real_kind = ip_realwp_p
-      integer(kind=ip_intwp_p), parameter :: dbl_kind  = ip_realwp_p
+      integer, parameter :: char_len  = 80
+      integer, parameter :: int_kind  = SELECTED_INT_KIND(9)
+      integer, parameter :: log_kind  = kind(.true.)
+      integer, parameter :: real_kind = SELECTED_REAL_KIND(12,307)
+      integer, parameter :: dbl_kind  = SELECTED_REAL_KIND(12,307)
 !-----------------------------------------------------------------------
+! hardwire for now, tcraig
+
+      integer,save :: nlogprt = 1
+      integer,save :: nulou = 6
+      logical,parameter :: ll_single = .false.   ! single reals
+      logical,parameter :: lncdfgrd = .true.     ! grid files netcdf
+      integer,parameter :: jpeight = 8
+      character(len=*),parameter :: cgrdnam = 'grids'
+      character(len=*),parameter :: cglonsuf  = '.lon'
+      character(len=*),parameter :: cglatsuf  = '.lat'
+      character(len=*),parameter :: crnlonsuf = '.clo'
+      character(len=*),parameter :: crnlatsuf = '.cla'
+
+      INTEGER, DIMENSION (:), ALLOCATABLE :: snum_links, snum_wgts
+      LOGICAL, DIMENSION (:), ALLOCATABLE :: sweight_flag
+
+      TYPE wp
+         REAL(kind=dbl_kind), POINTER :: warray(:,:)
+      END TYPE wp
+      type(wp), allocatable :: sweigth(:)
+
+      TYPE sp
+        INTEGER, POINTER :: srcarray(:)
+      END TYPE sp
+      type(sp), allocatable :: ssrc_addr(:)
+
+      TYPE dp
+        INTEGER, POINTER :: dstarray(:)
+      END TYPE dp
+      type(dp), allocatable :: sdst_addr(:)
 
       end module kinds_mod
 

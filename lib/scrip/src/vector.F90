@@ -12,9 +12,7 @@ MODULE vector
 !
   USE kinds_mod 
   USE constants 
-  USE mod_parameter
   USE grids
-  USE mod_unitncdf
   
   IMPLICIT NONE
 

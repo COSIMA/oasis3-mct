@@ -51,11 +51,6 @@ C
 C* ---------------------------- Modules --------------------------------
 C
       USE kinds_mod
-      USE mod_parameter
-      USE mod_unitncdf
-      USE mod_label
-      USE mod_printing
-      USE mod_unit
 C
 C* ---------------------------- Implicit --------------------------------
 C
@@ -98,8 +93,9 @@ C
      $     i, j, c, ij,         ! looping indicees: lon, lat, corner
      $     ip1, im1, jp1, jm1,  !
      $     c1, c2, c3, c4,
-     $     icount,               ! number of characters in string
-     $     ilenstr              ! external function
+     $     icount,              ! number of characters in string
+     $     ilenstr,             ! external function
+     $     nc_grdid             ! netcdf file id
 C
       REAL (kind=dbl_kind)  :: 
      $     aux(IC,IX,IY),
