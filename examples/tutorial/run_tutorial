@@ -104,7 +104,7 @@ else
 $host 0 $rundir/$exe1
 EOF
 
-  count=0
+  count=1
   while [[ $count -lt $nproc_exe1 ]];do
    cat <<EOF >> $rundir/appl-linux.conf
 $host 1 $rundir/$exe1
