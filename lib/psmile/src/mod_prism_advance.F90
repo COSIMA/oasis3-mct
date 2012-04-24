@@ -688,10 +688,12 @@ contains
 
           !------------------------------------------------
           ! sav non-instant loctrans operations for future restart
+          !   at the end of the run only
           !------------------------------------------------
 
-          call prism_sys_debug_note(subname//' loctrans restart write')
-          if (getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+          if (mseclag + dt >= maxtime .and. &
+             getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+             call prism_sys_debug_note(subname//' loctrans restart write')
              write(tstring,F01) 'wtrn_',cplid
              call prism_timer_start(tstring)
              write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
