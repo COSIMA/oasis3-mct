@@ -2543,7 +2543,8 @@ CONTAINS
               llseq=.FALSE.
               lllag=.FALSE.
               WRITE (UNIT=nulprt,FMT=3043) jf
-              IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
+!tcraig, nmseq irrelevant
+!              IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
            ELSE 
               READ(clvari,FMT = 2011) clind, clequa, iind
               IF (clind .EQ. 'SEQ' .or. clind .EQ. 'LAG' .and. &
@@ -2575,21 +2576,23 @@ CONTAINS
                     IF (nlogprt .GE. 2) THEN 
                        IF(.not. lllag) WRITE (UNIT=nulprt,FMT=3043) jf
                     ENDIF
-                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
+!tcraig, nmseq irrelevant
+!                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
                     GO TO 247
                  ELSE
                     READ(clvari,FMT = 2011) clind, clequa, iind
                     IF (clind .EQ. 'SEQ') THEN
-                       IF (iind .gt. nmseq) THEN
-                          GO TO 232
-                       ELSE IF (iind .eq. 0) THEN
-                          GO TO 234
-                       ELSE
+!tcraig, nmseq irrelevant
+!                       IF (iind .gt. nmseq) THEN
+!                          GO TO 232
+!                       ELSE IF (iind .eq. 0) THEN
+!                          GO TO 234
+!                       ELSE
                           ig_total_nseqn(jf)=iind
                           IF (lg_state(jf)) &
                               nseqn(ig_number_field(jf)) = iind
                           llseq=.TRUE.
-                       ENDIF
+!                       ENDIF
                     ELSE IF (clind .eq. 'LAG') THEN
                        ig_lag(jf)=iind
                        IF (lg_state(jf)) &
