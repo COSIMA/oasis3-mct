@@ -22,26 +22,27 @@ Compiling OASIS3 can be done in directory {\tt oasis3/util/make\_dir}
 with Makefile \\ {\tt TopMakefileOasis3} which must be completed with a header file {\tt
   make.{\it your\_platform}} specific to the compiling platform used
 and specified in {\tt oasis3/util/make\_dir/make.inc}.  One of the
-header files distributed with the release can by used as a template.  The root of the OASIS3 tree
-can be anywere and must be set in the variable {\tt COUPLE} in the
-{\tt make.{\it your\_platform}} file. The choice of MPI1, MPI2 or NONE
-(interpolator-only mode, see section \ref{subsec_interpolator}) is
-done by prescribing the value of {\tt CHAN} and by activating the CPP key {\tt -Duse\_comm\_\$(CHAN)} in the {\tt make.{\it your\_platform}} header file.
+header files distributed with the release can by used as a template.  The root 
+of the OASIS3 tree
+can be anywhere and must be set in the variable {\tt COUPLE} in the
+{\tt make.{\it your\_platform}} file. 
+%The choice of MPI1, MPI2 or NONE
+%(interpolator-only mode, see section \ref{subsec_interpolator}) is
+%done by prescribing the value of {\tt CHAN} and by activating the CPP key {\tt -Duse\_comm\_\$%(CHAN)} in the {\tt make.{\it your\_platform}} header file.
 
 The following commands are available:
 
 \begin{itemize}
 \item {\tt make -f TopMakefileOasis3} 
 
-  compiles OASIS3 libraries {\it mct} and {\it scrip} and main sources and creates
-  OASIS3 main executable {\tt oasis3.\$CHAN.x} (where {\tt \$CHAN} is
-  {\tt MPI1}, {\tt MPI2} or {\tt NONE}) ;
+  compiles OASIS3 libraries {\it mct} and {\it scrip} 
 
-\item {\tt make -f TopMakefileOasis3 oasis3\_psmile}
-
-  creates OASIS3 main executable as above, and compiles {\it
-    psmile} sources to create the PSMILe library {\tt libpsmile.\$CHAN.a} (where {\tt \$CHAN} is
-  {\tt MPI1}, {\tt MPI2}) that needs to be linked to the component executables;
+%\item {\tt make -f TopMakefileOasis3 oasis3\_psmile}
+%
+%  creates OASIS3 main executable as above, and compiles {\it
+%    psmile} sources to create the PSMILe library {\tt libpsmile.\$CHAN.a} 
+% (where {\tt \$CHAN} is
+%  {\tt MPI1}, {\tt MPI2}) that needs to be linked to the component executables;
 
 \item {\tt make realclean -f  TopMakefileOasis3}: 
 
@@ -68,16 +69,16 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
 
 \begin{itemize}
 
-\item Mandatory to indicate which communication technique will be used
-  (see sections \ref{subsubsec_Initialisation} and \ref{subsec_namcouplefirst}):
-  \begin{itemize}
-  \item {\tt use\_comm\_MPI2} (by default): CLIM/MPI2 
-  \item {\tt use\_comm\_MPI1} : CLIM/MPI1
-  \item {\tt use\_comm\_NONE} : no communication technique for OASIS
-    (interpolator-only mode NONE)
-  \end{itemize}
-  The previous SIPC, PIPE and GMEM communication techniques are not 
-  available anymore.
+%\item Mandatory to indicate which communication technique will be used
+%  (see sections \ref{subsubsec_Initialisation} and \ref{subsec_namcouplefirst}):
+%  \begin{itemize}
+%  \item {\tt use\_comm\_MPI2} (by default): CLIM/MPI2 
+%  \item {\tt use\_comm\_MPI1} : CLIM/MPI1
+%  \item {\tt use\_comm\_NONE} : no communication technique for OASIS
+%    (interpolator-only mode NONE)
+%  \end{itemize}
+%  The previous SIPC, PIPE and GMEM communication techniques are not 
+%  available anymore.
 
 %\item Mandatory when linking OASIS3 and PSMILe with a netCDF library (which is
 %  highly recommended\footnote{Linking with netCDF is mandatory when
@@ -125,17 +126,17 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   \item {\tt NOT\_NNEIGHBOUR}
   \end{itemize} 
   
-\item To indicate the precision for REAL variables:
-
-  \begin{itemize}
-  \item {\tt use\_realtype\_double} (by default): to exchange double
-    precision coupling fields declared as {\tt
-      REAL(kind=SELECTED\_REAL\_KIND(12,307))}
-  \item {\tt use\_realtype\_single}: to exchange single precision coupling
-    fields declared as \newline {\tt REAL(kind=SELECTED\_REAL\_KIND(6,37))}
-  \end{itemize}
-  Note that if {\tt use\_realtype\_single} is activated the compiling
-  option promoting reals should be removed from {\tt F90FLAGS\_1}.
+%\item To indicate the precision for REAL variables:
+%
+%  \begin{itemize}
+%  \item {\tt use\_realtype\_double} (by default): to exchange double
+%    precision coupling fields declared as {\tt
+%      REAL(kind=SELECTED\_REAL\_KIND(12,307))}
+%  \item {\tt use\_realtype\_single}: to exchange single precision coupling
+%    fields declared as \newline {\tt REAL(kind=SELECTED\_REAL\_KIND(6,37))}
+%  \end{itemize}
+%  Note that if {\tt use\_realtype\_single} is activated the compiling
+%  option promoting reals should be removed from {\tt F90FLAGS\_1}.
 
 %\item For more information in {\it cplout} and in log files {\it
 %    *.prt*} during the psmile library exchanges (in particular,
@@ -179,25 +180,25 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
 %  \begin{itemize}
 %  \item{\tt key\_noIO}
 %  \end{itemize}
-%
-\item For compiling without linking the SCRIP interpolation library:
-  \begin{itemize}
-  \item {\tt key\_noSCRIP}
-  \end{itemize}
 
-\item To compile on NEC SX platforms (optimisation in {\tt
-    oasis3/src/extrap.F} and proper value for {\tt ip\_i8\_p} in {\tt
-    oasis3/lib/psmile/src/mod\_kinds\_model.F90} and \newline {\tt
-    oasis3/lib/mpp\_io/src/mod\_kinds\_mpp.F90}:
-  \begin{itemize}
-  \item {\tt SX}
-  \end{itemize}
+%\item For compiling without linking the SCRIP interpolation library:
+%  \begin{itemize}
+%  \item {\tt key\_noSCRIP}
+%  \end{itemize}
 
-\item Other platform dependent CPP keys are used in {\tt
-    oasis3/lib/mpp\_io/include/os.h},\\ {\tt
-    oasis3/lib/psmile/include/psmile\_os.h} and {\tt
-    oasis3/src/mod\_kinds\_oasis.F90}; they should be automatically
-  activated on the corresponding platforms.
+%\item To compile on NEC SX platforms (optimisation in {\tt
+%    oasis3/src/extrap.F} and proper value for {\tt ip\_i8\_p} in {\tt
+%    oasis3/lib/psmile/src/mod\_kinds\_model.F90} and \newline {\tt
+%    oasis3/lib/mpp\_io/src/mod\_kinds\_mpp.F90}:
+%  \begin{itemize}
+%  \item {\tt SX}
+%  \end{itemize}
+
+%\item Other platform dependent CPP keys are used in {\tt
+%    oasis3/lib/mpp\_io/include/os.h},\\ {\tt
+%    oasis3/lib/psmile/include/psmile\_os.h} and {\tt
+%    oasis3/src/mod\_kinds\_oasis.F90}; they should be automatically
+%  activated on the corresponding platforms.
 
 
 \end{itemize}
@@ -206,7 +207,7 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
 
 If you experience problems while running your coupled model with OASIS3, you can obtain more information on what is happening with:
 \begin{itemize}
-\item Putting {\tt \$NLOGPRT = 20} in your namcouple (see section \ref{subsec_namcouplefirst})
+\item Increaing {\tt \$NLOGPRT} in your {\it namcouple} (see section \ref{subsec_namcouplefirst})
 %\item Compiling with CPP key {\tt \_\_VERBOSE} which will result in
 %  more information printed in {\it cplout} and in log files {\it
 %    *.prt*} during the psmile library exchanges (in particular, a
@@ -383,8 +384,8 @@ If you experience problems while running your coupled model with OASIS3, you can
 %the coupling fields, there are few constraints associated:
 %
 %\begin{itemize}
-%\item As stated above, the configuration file {\tt namcouple} has to be splitted
-%   into different {\tt namcouple\_x}, one per process. In one {\tt namcouple\_x} 
+%\item As stated above, the configuration file {\it namcouple} has to be splitted
+%   into different {\it namcouple\_x}, one per process. In one {\it namcouple\_x} 
 %   the total number of coupling fields treated by OASIS3 process {\tt x} must be 
 %   given on the line below the {\tt \$NFIELDS} keyword and only these coupling 
 %   fields must be detailed. 
@@ -728,8 +729,8 @@ run.
 
 $Field_{10}$ and $Field_{11}$ are exchanged respectively from atmoa3 to
 cheoa3 and from cheoa3 to atmoa3. The
-fields status chosen by the user for those fields in the {\it
-namcouple} should therefore be \texttt{IGNORED} (or \texttt{IGNOUT} if
+fields status chosen by the user for those fields in the 
+{\it namcouple} should therefore be \texttt{IGNORED} (or \texttt{IGNOUT} if
 the user wants the fields also automatically be written to files below
 the prism\_put and after the prism\_get). At the beginning of the run
 (i.e. at time = 0), the oceoa3 prism\_get called to receive those
@@ -761,8 +762,8 @@ Subdirectory {\tt /data} contains auxiliary grid data files (see
 {\tt cf\_name\_table.txt} (see \ref{subsec_cfnametable}) the
 configuration file (see chapter \ref{sec_namcouple}) used in the
 classic (not parallel) mode, {\it namcouple}, and the
-configuration files used in the IPSL parallel mode, {\it
-  namcouple\_0} and {\it namcouple\_1}.
+configuration files used in the IPSL parallel mode, 
+{\it namcouple\_0} and {\it namcouple\_1}.
 
 To run TOYOASIS3, first compile OASIS3 and the 3 TOYOASIS3 component
 models (see section \ref{subsec_compile}). 
@@ -848,51 +849,51 @@ have to be adapted.
 %section \ref{subsec_running_testinterp}) and the ``testNONE''
 %test-case (see section \ref{subsec_running_testnone}). 
 %
-\subsection{The ``testinterp'' test-case}
-\label{subsec_running_testinterp}
-
-The ``testinterp'' test-case can be run to test the interpolation of
-different source fields corresponding to analytical functions 
-and to evaluate the error between the
-interpolated fields and the same analytical functions calculated on the
-different target grids.
-
-All files needed to run this test-case can be found in
-{\tt oasis3/examples/testinterp/input} and {\tt oasis3/examples/testinterp/restart}.
-
-To run ``testinterp'', OASIS3 first has to be compiled (see section \ref{sec_notSCE}) in
-interpolator-only mode NONE, i.e. by putting 
-{\tt CHAN = NONE} in the TopMakefileOasis3 header file. Then
-the programs that will calculate the interpolation error, i.e. {\tt
-  gen\_error.f90} and {\tt gen\_error\_vector.f90} (for vector
-fields) in directory {\tt oasis3/examples/testinterp/error} have to
-be compiled (see script {\tt sc\_comp\_error}).
-
-Then, one has to adapt and execute the running script {\tt
-  oasis3/examples/testinterp/\break sc\_run\_testinterp}.
-With {\tt TIME=ONE}, the configuration file {\tt
-  oasis3/examples/testinterp/\break input/namcouple\_ONE}, the input files
-{\tt flda1.nc, flda2.nc, flda3.nc, fldb1.nc,} \newline {\tt fldo1.nc}
-and {\tt fldz1.nc} from {\tt oasis3/examples/testinterp/restart} and the
-input files {\tt aaIin.nc} and {\tt caJin.nc} from {\tt
-  oasis3/examples/testinterp/restart/vector} are used.  This example also
-shows one vector interpolation (field components {\tt a\_at42\_I} and
-{\tt c\_at42\_J}).  The test-case automatically writes the error
-fields in {\tt error\_*.nc} files and error statistics in {\tt log\_*}
-files.
-
-To run the example into which OASIS3 interpolates many time
-occurrences from one input file, put {\tt TIME=MANY} in {\tt
-  sc\_run\_testinterp}.  The configuration file {\tt
-  oasis3/examples/testinterp/\break input/namcouple\_MANY} and the input
-file {\tt fldin.nc} in {\tt oasis3/examples/testinterp/\break restart} are then
-used.
-
-The results obtained after running the testinterp test-case should
-match the ones in {\tt oasis3/examples/\break testinterp/outdata}.
-(XXX this directory is not updated yet).
-
-\subsection{The ``testNONE'' test-case}
+%\subsection{The ``testinterp'' test-case}
+%\label{subsec_running_testinterp}
+%
+%The ``testinterp'' test-case can be run to test the interpolation of
+%different source fields corresponding to analytical functions 
+%and to evaluate the error between the
+%interpolated fields and the same analytical functions calculated on the
+%different target grids.
+%
+%All files needed to run this test-case can be found in
+%{\tt oasis3/examples/testinterp/input} and {\tt oasis3/examples/testinterp/restart}.
+%
+%To run ``testinterp'', OASIS3 first has to be compiled (see section \ref{sec_notSCE}) in
+%interpolator-only mode NONE, i.e. by putting 
+%{\tt CHAN = NONE} in the TopMakefileOasis3 header file. Then
+%the programs that will calculate the interpolation error, i.e. {\tt
+%  gen\_error.f90} and {\tt gen\_error\_vector.f90} (for vector
+%fields) in directory {\tt oasis3/examples/testinterp/error} have to
+%be compiled (see script {\tt sc\_comp\_error}).
+%
+%Then, one has to adapt and execute the running script {\tt
+%  oasis3/examples/testinterp/\break sc\_run\_testinterp}.
+%With {\tt TIME=ONE}, the configuration file {\tt
+%  oasis3/examples/testinterp/\break input/namcouple\_ONE}, the input files
+%{\tt flda1.nc, flda2.nc, flda3.nc, fldb1.nc,} \newline {\tt fldo1.nc}
+%and {\tt fldz1.nc} from {\tt oasis3/examples/testinterp/restart} and the
+%input files {\tt aaIin.nc} and {\tt caJin.nc} from {\tt
+%  oasis3/examples/testinterp/restart/vector} are used.  This example also
+%shows one vector interpolation (field components {\tt a\_at42\_I} and
+%{\tt c\_at42\_J}).  The test-case automatically writes the error
+%fields in {\tt error\_*.nc} files and error statistics in {\tt log\_*}
+%files.
+%
+%To run the example into which OASIS3 interpolates many time
+%occurrences from one input file, put {\tt TIME=MANY} in {\tt
+%  sc\_run\_testinterp}.  The configuration file {\tt
+%  oasis3/examples/testinterp/\break input/namcouple\_MANY} and the input
+%file {\tt fldin.nc} in {\tt oasis3/examples/testinterp/\break restart} are then
+%used.
+%
+%The results obtained after running the testinterp test-case should
+%match the ones in {\tt oasis3/examples/\break testinterp/outdata}.
+%(XXX this directory is not updated yet).
+%
+%\subsection{The ``testNONE'' test-case}
 %\label{subsec_running_testnone}
 %
 %All files to run the ``testNONE'' test-case can be found in {\tt
@@ -915,9 +916,9 @@ match the ones in {\tt oasis3/examples/\break testinterp/outdata}.
 %\item {\tt SRCROOT} : the source of the {\tt oasis3} directory
 %\item {\tt ARCH} : the platform onto which the test-case will run
 %\item {\tt DIR\_GRD} : the directory for the grid data files
-%\item {\tt DIR\_INP} : the directory for the {\tt namcouple} and {\tt cf\_name\_table.txt} files  
+%\item {\tt DIR\_INP} : the directory for the {\it namcouple} and {\tt cf\_name\_table.txt} files  
 %\item {\tt SRC\_GRID} and {\tt TGT\_GRID} : the source
-%and target grid prefixes in the {\tt namcouple} and in the grid data
+%and target grid prefixes in the {\it namcouple} and in the grid data
 %files (see section \ref{subsubsec_secondEXPORTED}), 
 %\item {\tt FLD\_NBR} : the number of the analytic function chosen, 
 %\item {\tt MASKERROR} : whether or not the error on the target grid will be
@@ -934,7 +935,7 @@ match the ones in {\tt oasis3/examples/\break testinterp/outdata}.
 %  {\tt fldin.nc}
 %\item copy all required input and data file to the working directory 
 %\item run OASIS3 that interpolates the analytical field from {\tt
-%    fldin.nc} with the interpolation specified in the {\tt namcouple}
+%    fldin.nc} with the interpolation specified in the {\it namcouple}
 %\item compile and run the program {\tt PROG/create\_errorfield.f90}
 %  that calculates the error between the resulting interpolated field
 %  and the field defined by the chosen analytical function on the

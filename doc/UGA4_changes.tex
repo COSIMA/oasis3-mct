@@ -15,31 +15,126 @@ on it's own processors no longer plays a role.  MCT is used to
 carry out interpolation in parallel on either the source or destination
 processors before or after communication.  This location of the
 interpolation is set by the user as is the parallelization strategy.  
-Several namcouple features have been
-deprecated in this version, but this version supports a namcouple
-format that is nearly 100 percent backwards compatable with OASIS3.
-The ability to read mapping files is now provided with the namcouple
+Several {\it namcouple} features have been
+deprecated in this version, but this version supports a {\it namcouple}
+format that mostly backwards compatable with OASIS3.
+The ability to read mapping files is now provided with the {\it namcouple}
 transformation MAPPING.  Several other changes are highlighted below.
 
 \begin{itemize}
 
 \item General Features:
 
-%  \begin{itemize}
-%
-%  \end{itemize}
+\begin{itemize}
+\item MPI2 job launching is NOT supported.  Only MPI1 is allowed.
+\item All coupling is now direct.  gets are blocking, puts are 
+  non-blocking.  get and put calls between models must match
+  adequately to avoid deadlocks.
+\item like oasis3, the first coupling occurs at time=0 and the
+  final coupling occurs at (ncouplings-1)*dt.
+\item all input and output files must be netcdf, binary not supported
+\item ability to send and receive more than 1 field with a coupling
+  operation.  use colon delimited field names in {\it namcouple} input.
+\item a model output field (put) can be associated with more than one
+  destination model (get).  In that case, the source model only
+  needs to put the data once and that data will arrive at multiple
+  destinations as specified by {\it namcouple} input file.  Different
+  coupling frequencies and transforms are allowed for different
+  coupling interactions of the same field.  In addition, a single
+  coupling field can be sent to the same destination model using
+  multiple transforms as long as the destination field name is
+  unique.  For example
+\begin{itemize}
+\item    TSURF from model 1 -> TSURF in model 2
+\item    TSURF from model 1 -> TSURFAVG in model2
+\item    TSURF from model 1 -> TSURF in model 3 
+\end{itemize}
+  TSURF only needs to be put from model 1 ``once'' per timestep and
+  the data will arrive at the destination at the coupling
+  frequency and with transforms specified in the {\it namcouple} file
+  for each coupling interaction.
+  The inverse of this coupling feature is not allowed, a single
+  destination (get) field CANNOT be associated with multiple source (put)
+  fields.
+\item Only first order mapping methods are supported.  Second order
+  conserv and bicubic mapping is not supported.
+\item Vector mapping is currently not supported.
+\item Grid corners will NOT be compute automatically for LR grids if they are
+  needed but not provided.
+\end{itemize}
 
 \item Coupling Interfaces:
 
-%  \begin{itemize}
-%
-%  \end{itemize}
+\begin{itemize}
+\item use mod\_prism OR use mod\_oasis instead of many use statements
+\begin{itemize}
+  \item mod\_prism retains prior interface names
+  \item mod\_oasis has updated interface names, changing ``prism'' to ``oasis'' and
+    dropping ``\_proto'' in the interface name
+\end{itemize}
+\item NO MPI2 support yet
+\item prism\_put\_inquire not supported yet
+\item prism\_put\_restart\_proto not supported yet
+\item prism\_get\_freq not supported yet
+\end{itemize}
 
-\item Namcouple Changes:
+\item {\it namcouple} Changes:
 
-%  \begin{itemize}
-%
-%  \end{itemize}
+\begin{itemize}
+\item {\it namcouple} should be mostly backwards compatable, but several things
+  are NOT used or supported and are ignored
+\begin{itemize}
+  \item INIDATE is not used yet
+  \item CALTYPE is not used
+  \item AUXILARY is not used
+  \item ONCE time transformation not supported
+  \item REDGLO not supported
+  \item INVERT not supported
+  \item MASK not supported
+  \item EXTRAP not supported
+  \item CORRECT not supported
+  \item INTERP not supported
+  \item MOZAIC not supported
+  \item FILLING not supported
+  \item SUBGRID not supported
+  \item MASKP not supported
+  \item REVERSE not supported
+  \item GLORED not supported
+\end{itemize}
+\item BLASOLD and BLASNEW only supports multiplication and addition
+  terms to the fields, not field combinations.
+\item IGNORED and INGOUT no longer needed, redundant with EXPORTED and EXPOUT
+  use of IGNORED and INGOUT converts to EXPORTED and EXPOUT respectively
+\item NLOGPRT sets debugging output levels for the coupling software
+  and will lead to output to all log files.
+\item non-instant LOCTRANS options will use a restart file now
+\item fields of type OUTPUT now support a restart file argument to be
+  compatable with LOCTRANS restart files
+\item SEQ setting has a slightly different meaning.  it is no longer
+  needed to ensure correct coupling sequencing.  that is dependent
+  only on the order of get and put calls in models.  SEQ is never
+  required.  use of SEQ allows the coupling layer to detect
+  potential deadlocks before they happen and to exit gracefully.
+  use of SEQ is recommended when it makes sense to do so.
+\item there is a new MAPPING transform that allows use of previously generated
+  mapping file for interpolation to be read in.
+\item support to couple multiple fields at a time.  this is supported through
+  colon delmited field lists in the {\it namcouple} input, for example
+  ATMTAUX:ATMTAUY:ATMHFLUX:ATMPREC TAUX:TAUY:HEATFLUX:FWFLUX in a single
+  {\it namcouple} definition.  all fields will use the {\it namcouple} settings for
+  that definition.  the prism\_get and prism\_put interfaces still only
+  support sending (put) or receiving (get) one field at a time.  inside
+  oasis, the fields are stored and and a single send or recieve is 
+  executed for all fields.  this is useful in cases where multiple fields
+  have the same coupling transforms or to reduce communication costs
+  by aggregating multiple fields into a single communication.  this only
+  works if there are no temporal dependencies between any of the fields
+  in the field list.  in other words, all fields in the field list must
+  be couple-able with the same sequence value.
+\item only support for a subset of scrip map generation including bilinear,
+  first order conserv, distwgt, and gausswgt.  No second order mapping is
+  supported.
+\end{itemize}
 
 \end{itemize}
 
@@ -212,8 +307,8 @@ The changes between version {\tt oasis3\_3} and version {\tt
     be the case if OASIS3 is used in pseudo-parallel mode or if fields
     declared with prism\_def\_var\_proto call (and corresponding to
     sending - prism\_put\_proto call- or receiving - prism\_get\_proto
-    call - actions in the component models) do not appear in the {\it
-      namcouple} (in this case, the sending and receiving calls simply
+    call - actions in the component models) do not appear in the 
+    {\it namcouple} (in this case, the sending and receiving calls simply
     return without any action performed).
 
    \item added options {\tt GLBPOS}, {\tt BASPOS}, {\tt BASBAL} for the 
@@ -339,7 +434,7 @@ difference in the interpolation results, except for SCRIPR/DISTWGT
   \item In {\tt prism/src/lib/psmile/src/mod\_prism\_put\_proto.F90},
     for {\tt prism\_put\break \_proto\_r28} and {\tt
       prism\_put\_proto\_r24}, the reshape of the 2d field was moved
-    after the test checking if the field is defined in the namcouple
+    after the test checking if the field is defined in the {\it namcouple}
     (thanks to Arnaud Caubel from LSCE).
 
   \end{itemize}
@@ -396,7 +491,7 @@ difference in the interpolation results, except for SCRIPR/DISTWGT
     to ensure that the extrapolation works even if the {\tt MASK}
     value is very big (thanks to J.M. Epitalon).
 
-  \item In the namcouple, there is no need anymore to define a lag
+  \item In the {\it namcouple}, there is no need anymore to define a lag
     greater than 0 (e.g.  LAG=+1) for fields in mode NONE.
 
   \item Diverse modifications were included for successful compilation
@@ -479,7 +574,7 @@ difference in the interpolation results, except for SCRIPR/DISTWGT
 
 \item \texttt{prism/src/mod/oasis3/src/inipar.F90}: For upward
    compatibility of SCRIPR interpolation, ``VECTOR" is still accepted
-   in the namcouple as the field type 
+   in the {\it namcouple} as the field type 
    and leads to the same behaviour as before (i.e. each vector
    component is treated as an independent scalar field). To have a
    real vector treatment, one has to indicate "VECTOR\_I" or "VECTOR\_J"
@@ -645,7 +740,7 @@ prism/src/mod/oasis3/src} were renamed to {\tt preproc.F, extrap.F,
 iniiof.F}, as a CPP key `key\_openmp' was added. Please note that this
 key, allowing openMP parallelisation, is not fully tested yet.
 
-\item Modifications in the namcouple
+\item Modifications in the {\it namcouple}
 
 \begin{itemize}
 \item The third entry on the field first line now corresponds to an index in
@@ -667,7 +762,7 @@ copied to the working directory at the beginning of the run. The user
 may edit and modify this file at her own risk. In {\em
 cf\_name\_table.txt}, an index is given for each field standard name
 and associated units.  The appropriate index has to be indicated for
-each field in the {\em namcouple} (third entry on the field first
+each field in the {\it namcouple} (third entry on the field first
 line, see section \ref{subsec_namcouplesecond}). 
 
 This standard name and the associated units are also used to define the
@@ -686,7 +781,7 @@ input file is recognized by its attribute ``units''. The acceptable
 units for time are listed in the udunits.dat file \cite{udunits}. This
 follows the CF convention.
 
-The keyword {\tt \$RUNTIME} in the namcouple has to be the number of time
+The keyword {\tt \$RUNTIME} in the {\it namcouple} has to be the number of time
 occurrences of the field to interpolate from the input file. The
 ``coupling'' period of the field (4th entry on the field first line)
 must be always ``1''. Note that if {\tt \$RUNTIME} is smaller than the
@@ -723,7 +818,7 @@ In the NetCDF file, the field attributes ``long\_name'' and ``units''
 are the ones corresponding to the field index in {\em
 cf\_name\_table.txt} (see above and section
 \ref{subsec_cfnametable}). The field index must be given by the user
-as the third entry on the field first line in the namcouple.
+as the third entry on the field first line in the {\it namcouple}.
 
 Also, the latitudes and the longitudes of the fields are now
 automatically read from the grid auxiliary data file {\em grids.nc} and
@@ -739,7 +834,7 @@ user gives the grid definition in a binary file {\em grids}.
 
 The pre\_compiling key ``key\_BSend'' has been removed.  The default has
 changed: by default, the buffered MPI\_BSend is used, unless {\tt NOBSEND}
-is specified in the namcouple after MPI1 or MPI2, in which case the
+is specified in the {\it namcouple} after MPI1 or MPI2, in which case the
 standard blocking send MPI\_Send is used to send the coupling fields.
 
 \end{itemize}

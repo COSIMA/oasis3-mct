@@ -2,7 +2,7 @@
 \chapter{The OASIS3 configuration file {\it namcouple}}
 \label{sec_namcouple}
 
-The OASIS3 configuration file {\em namcouple} contains, below
+The OASIS3 configuration file {\it namcouple} contains, below
 pre-defined keywords, all user's
 defined information necessary to configure a particular coupled
 run. 
@@ -19,9 +19,8 @@ non-significant;
 comments.
 \item {\bf blank lines are not allowed.}
 \end{itemize}
-\vspace*{0.5cm}
 
-The first part of {\em namcouple } is devoted to configuration of
+The first part of {\it namcouple } is devoted to configuration of
 general parameters such as the number of models involved in the
 simulation, the number of fields, the communication technique, etc.
 The second part gathers specific information on each coupling or I/O
@@ -30,20 +29,16 @@ interpolations to be performed by OASIS3 and associated
 configuring lines (described in more details in chapter
 \ref{sec_transformations}), etc.
 
-\vspace*{0.5cm}
-
-Several namcouple inputs have been deprecated (become non-functional)
-in the current version,  but for backwards compatability, they are still 
+Several {\it namcouple} inputs have been deprecated (become unsupported
+or unused) in the current version,  but for backwards compatability, they are still 
 allowed.  These inputs will be noted in the following text using the
-notation ``NON\_FUNCTIONAL'' and not fully described.
-
-\vspace*{0.5cm}
+notation ``UNUSED'' and not fully described.
 
 In the next sections, a simple {\it namcouple} example is given and
 all configuring parameters are described. The additional lines
 containing the different parameters required for each transformation
 are described in section \ref{sec_transformations}. An example of a
-realistic {\em namcouple} can be found in 
+realistic {\it namcouple} can be found in 
 {\tt
 oasis3/examples/toyoasis3/input/} directory.
 % XXX and {\tt
@@ -68,7 +63,7 @@ the ocean.
  $SEQMODE
     1
 #
- $CHANNEL (NON_FUNCTIONAL)
+ $CHANNEL
     MPI2    NOBSEND
     1    1   arg1
     3    1   arg2
@@ -89,13 +84,13 @@ the ocean.
  $INIDATE
     00010101
 #
- $MODINFO (NON_FUNCTIONAL)
+ $MODINFO
     NOT
 #
  $NLOGPRT
    2
 #
- $CALTYPE (NON_FUNCTIONAL)
+ $CALTYPE
    1
 #
 ######################################################################
@@ -142,7 +137,7 @@ the ocean.
 #####################################################################
 \end{verbatim}
 
-%section{An example of a simple {\em namcouple}}
+%section{An example of a simple {\it namcouple}}
 
 \section{ First section of {\it namcouple} file}
 \label{subsec_namcouplefirst}
@@ -154,12 +149,12 @@ are described hereafter:
 
 \begin{itemize}
 
-\item {\tt \$SEQMODE}: On the line below this keyword is the maximum value of the coupling field SEQ index
-specified in the {\it namcouple}
-(or 1 if no SEQ indices are specified for the coupling fields, see below and also section
+\item {\tt \$SEQMODE}: UNUSED.  On the line below this keyword is an integer that plays no
+role in the implementation in the current version.
   \ref{subsubsec_Algoritms}).
 
-\item {\tt \$CHANNEL}: NON\_FUNCTIONAL
+\item {\tt \$CHANNEL}: UNUSED.  On the line below this keyword should be the string
+MPI1 but this plays no role in the implementation.
 %On the line below this keyword is the
 %communication technique chosen. Choices are {\tt MPI1} or {\tt MPI2}
 %for the CLIM communication technique and related PSMILe library.  
@@ -232,31 +227,20 @@ specified in the {\it namcouple}
 number of fields exchanged and described in the second part of
 the {\it namcouple}. 
 
-In some cases, an additional number has to be specified on the same line after the total number of fields
-exchanged. This number, corresponding to the maximum
-number of prism\_def\_var\_proto called by ANY component model in the
-coupled system, is mandatory if it is greater than twice the
-number of fields listed in the {\it namcouple}; this may be the case
-if OASIS3 is used in IPSL parallel mode (see section
-\ref{sec_ipslpara_mode}) or if fields declared with
-prism\_def\_var\_proto call in the component code are not activated in the {\it namcouple}
-(in this case, the corresponding sending and receiving calls in the component code simply return without
-any action performed).
-
 \item {\tt \$JOBNAME}: On the line below this keyword is a {\tt
 CHARACTER$\star$3} or {\tt CHARACTER$\star$4} variable giving an
 acronym for the given simulation.
 
 \item {\tt \$NBMODEL}: On the line below this keyword is the number of
 models running in the given experiment followed by {\tt
-CHARACTER$\star$6} variables giving their names, which must correspond to the name announced by each model when calling {\tt prism\_init\_comp\_proto} (second argument, see section \ref{subsubsec_Initialisation}). In {\tt MPI2} mode, these names also have to correspond to the model executable names. 
+CHARACTER$\star$6} variables giving their names, which must correspond to the name announced by each model when calling {\tt prism\_init\_comp\_proto} (second argument, see section \ref{subsubsec_Initialisation}). 
 
 Then the user may
 indicate the maximum Fortran unit number used by the models. In  the
 example, Fortran units above 55, 70, and 99 are free for respectively
 the ocean, atmosphere, and atmospheric chemistry models. If no
 maximum unit numbers are indicated, OASIS3 PSMILe will suppose that units
-above 1024 are free. 
+above 1024 are free.  The unit number information is currently not used.
 %If {\tt \$CHANNEL}
 %is {\tt NONE}, {\tt \$NBMODEL} has to be 0 and there should be no
 %model name and no unit number.
@@ -272,7 +256,8 @@ simulated time of the run, expressed in seconds.
 %  for the {\tt FILLING} transformation and 
   for printing information in OASIS3 log file {\it cplout}.
 
-\item {\tt \$MODINFO}: NON\_FUNCTIONAL
+\item {\tt \$MODINFO}: UNUSED.  On the line below this keyword should
+be the string NOT.
 %  If coupling restart files are binary files (see
 %  section \ref{subsec_restartdata}), the line below this keyword
 %  indicates if a header is encapsulated or not: it can be {\tt
@@ -282,11 +267,13 @@ simulated time of the run, expressed in seconds.
   amount of information that will be written to the OASIS log files
   for each model and processor.  With 0, there is practically no output
   written to the cplout; A value of 5 is typical for production, 10
-  provides additional debug information, 20 provides a trace of the
-  oasis calls, and 30 provides the full debug information.  This
-  value can be changed at runtime with the prism\_set\_proto method.
+  provides a trace of the calls, 
+  20 provides additional debug information, and 
+  30 provides the full debug information.  This
+  value can be changed at runtime with the {\tt prism\_set\_debug} method.
 
-\item {\tt \$CALTYPE}: NON\_FUNCTIONAL
+\item {\tt \$CALTYPE}: UNUSED.  The line below this keyword contains
+an integer that plays not role in the implementation.
 %  This keyword gives the type of calendar
 %  used. The calendar type is important only if {\tt FILLING}
 %  analysis is used for a coupling field in the run and for printing
@@ -318,7 +305,7 @@ INPUT} in the example above). The field may be :
 %{\tt CLIM/MPI1} or {\tt CLIM/MPI2} communication technique):
 
 \begin{itemize}
-\item {\tt AUXILARY}: NON\_FUNCTIONAL
+\item {\tt AUXILARY}: UNUSED
 %  sent by the source component, received and used by
 %  OASIS3  for the transformation of other fields, but not sent to any target component.
 \item {\tt EXPORTED}: exchanged between component models and
@@ -328,8 +315,8 @@ INPUT} in the example above). The field may be :
   below the {\tt prism\_put\_proto} call, and one after the receiving
   action in the target model below the {\tt prism\_get\_proto} call (should
   be used when debugging the coupled model only)
-\item {\tt IGNORED}: this input is now equivalent to EXPORTED
-\item {\tt IGNOUT}: this input is now equivalent to EXPOUT
+\item {\tt IGNORED}: this setting is equivalent to and converted to EXPORTED
+\item {\tt IGNOUT}: this setting is equivalent to and converted to EXPOUT
 \item {\tt INPUT}: simply read in from the input file by the target
   model PSMILe below the {\tt prism\_get\_proto} call at appropriate
   times corresponding to the input period indicated by the user in the
@@ -371,16 +358,17 @@ INPUT} in the example above). The field may be :
               declaration in the target model; see {\tt
               prism\_def\_var\_proto} in section
               \ref{subsubsec_Declaration}.
-        \item 1 : index in auxiliary file cf\_name\_table.txt used by OASIS3 and PSMILe to identify corresponding CF standard name and units (see \ref{subsec_cfnametable}).
+        \item 1 : thie feature is not currently supported, but it is meant to be the
+              index in auxiliary file cf\_name\_table.txt used by OASIS3 and PSMILe to 
+              identify corresponding CF standard name and units (see \ref{subsec_cfnametable}).
         \item 86400 : coupling and/or I/O period for the field, in
-        seconds. If {\tt \$CHANNEL} is {\tt NONE} (see section
-\ref{subsec_interpolator}), put ``1''.
+        seconds. 
         \item 5 : number of transformations to be performed by OASIS3 on this field.  
         \item sstoc.nc : name of the coupling restart file for the
           field ({\tt CHARACTER*8}); 
           mandatory even if no coupling restart file is effectively
           used. (for more detail, see section \ref{subsec_restartdata});
-        \item sstat.nc : NON\_FUNCTIONAL but still required for parsing
+        \item sstat.nc : UNUSED but still required for parsing
 %          name of the field output file\footnote{In interplator-only mode (i.e. {\tt \$CHANNEL = NONE}), there must be one input file and one output file per field.}, may be indicated for
 %	  {\tt NONE} (and {\tt PIPE}) communication techniques only. It
 %	  may be a binary of netCDF file (see section
@@ -461,8 +449,7 @@ The name of the output file is automatically determined by the PSMILe.
 
 The third line is {\tt LOCTRANS} if this transformation is chosen for
 the field. Note that {\tt LOCTRANS} is the only transformation
-supported for {\tt OUTPUT} fields (see section
-\ref{subsubsec_secondIGNORED}).
+supported for {\tt OUTPUT} fields.
 
 \subsection{Second section of {\it namcouple} for {\tt
   INPUT} fields}

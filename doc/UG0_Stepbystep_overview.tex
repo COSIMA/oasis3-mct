@@ -5,7 +5,7 @@
 In 1991, CERFACS decided to tackle coupled climate modelling and to
 develop a software interface to couple existing numerical General
 Circulation Models of the ocean and of the atmosphere. Today, the
-OASIS3 coupler, which is the result of more than 15 years of evolution
+OASIS3 coupler, which is the result of more than 20 years of evolution
 is used by about 30 modelling groups in Europe, Australia, Asia and
 North America, on the different computing platforms used by the
 climate modelling community. The list of
@@ -17,29 +17,49 @@ OASIS3 sustained development is ensured by a collaboration
 between CERFACS and the Centre National de la Recherche Scientifique
 (CNRS) and its maintainance and user support is presently reinforced
 with additinal resources coming from IS-ENES project funded by the EU (FP7 -
-GA no 228203), into which the parallel OASIS4 version of the
-coupler is also currently being developed. 
+GA no 228203).
 
 OASIS3 is a portable set of Fortran 77, Fortran 90 and C routines.
 Portability and flexibility are OASIS3 key design concepts. At
-run-time, OASIS3 acts as a separate executable, which main function is
+run-time, OASIS3 acts as a coupling layer, which main function is
 to interpolate the coupling fields exchanged between the component
-models, and as a communication library linked to the component models, the OASIS3
-PRISM Model Interface Library (PSMILe). OASIS3 supports 2D
-coupling fields in the longitude and latitude dimensions. To communicate with OASIS3, or directly with
+models, and as a communication library linking component models, via the OASIS3
+PRISM Model Interface Library (PSMILe). OASIS3 supports 
+coupling of general two dimensional fields.  Unstructured grids are also supported
+using a one dimension degeneration of the two dimensional structures.
+To communicate directly with
 another model, or to perform I/O actions, a component model needs to
-include few specific PSMILe calls. OASIS3 PSMILe supports in
-particular parallel communication between a parallel component model
-and OASIS3 interpolation executable based on Message Passing Interface
-(MPI) and file I/O using the mpp\_io library from GFDL. New with this
-version, the OASIS3 interpolation executable can be run on many processes, each process interpolating a
-subset of the coupling fields, resulting in a
-parallelisation of OASIS3 on a field-per-field basis. For each
-coupling exchange, OASIS3 performs the transformations and regridding
-needed to express the source field on the grid of the target model.
-The current OASIS3\_3 version and its toy coupled model TOYOASIS3 were
-compiled and run on NEC SX6, IBM Power4, CRAY XD1, and Linux PC (XXX
-list to be updated).
+include few specific PSMILe calls. OASIS3 PSMILe supports 
+parallel communication between parallel component models
+as well as parallel interpolation via Message Passing Interface
+(MPI) and file I/O using netcdf.  
+
+This version has been significantly refactored.  There is no
+longer a separate OASIS coupler component.  All coupling is now
+direct and all transforms are executed in parallel on a set
+of component processes.  This version of OASIS3 leverages the
+Argonne National Laboratory's Model Coupling Toolkit (MCT)
+in the coupling layer.  In spite of the significant changes
+in underlying implementation, usage has largely remained unchanged.
+The prism fortran interfaces used in component models are unchanged.  The use 
+statement has been updated and now requires a single ``use\ mod\_prism''
+statement instead of the various use statements required in prior
+OASIS3 versions.  The {\it namcouple} spec is also largely unchanged
+relative to OASIS3, although several options are either not used
+or not supported.  There are a few new keywords in {\it namcouple}
+including {\tt MAPPING} which allows a user to specify a mapping
+file generated externally.  Some features like vector mapping
+and second order mapping have been delayed in implementation
+while other new features like parallel mapping have been added.
+And currently, only MPI1 job launching is supported.
+
+See appendix \ref{sec_changes} for a more detailed list of changes in this version.
+
+%For each coupling exchange, OASIS3 performs the transformations and regridding
+%needed to express the source field on the grid of the target model.
+%The current OASIS3 version and its example coupled model, tutorial, were
+%compiled and run on NEC SX6, IBM Power4, CRAY XD1, and Linux PC (XXX
+%list to be updated).
 
 % To exchange coupling information with other components, a component
 % model needs to call few specific routines of the OASIS coupling
@@ -97,28 +117,29 @@ list to be updated).
 To use OASIS3 for coupling models (and/or perform I/O
 actions), one has to follow these steps:
 \begin{enumerate}
-\item Obtain OASIS3 sources (see chapter \ref{sec_Obtaining}).
+\item Obtain OASIS3 source code (see chapter \ref{sec_Obtaining}).
 \item Identify the coupling or I/O fields and adapt the component
   models to allow their exchange with the PSMILe library based on MPI1
-  or MPI2\footnote{not yet available} message passing.
+  message passing.
   The PSMILe library uses NetCDF and therefore can be used to perform I/O actions
   from/to disk files.  For more detail on how to interface a model
   with the PSMILe, see chapter \ref{sec_modelinterfacing}.
 
-The TOYOASIS3 coupled model gives a practical example of a coupled
+The tutorial coupled model gives a practical example of a coupled
 model; the sources are given in directories {\tt
-  /oasis3/examples/toyoasis3/src }; more detail on TOYOASIS3 and
+  examples/tutorial }; more detail on the tutorial and
 how to compile and run it can be found in chapter
 \ref{sec_compilationrunning}.
 
 \item Define all coupling and I/O parameters and the transformations
   required to adapt each coupling field from its source model grid to
-  its target model grid; on this basis, prepare OASIS3 configuring file {\it
-  namcouple} (See chapter \ref{sec_namcouple}). 
+  its target model grid; on this basis, prepare OASIS3 configuring file 
+  {\it namcouple} (See chapter \ref{sec_namcouple}). 
   
   OASIS3 supports different interpolation algorithms as is described in
-  chapter \ref{sec_transformations}. We strongly recommend that one tests off-line the quality
-  of the chosen transformations and regriddings in the ``testNONE'' environment (see section \ref{subsec_running_testnone}).
+  chapter \ref{sec_transformations}.  Regridding files can be compute
+  online using the SCRIP options or offline and read using the MAPPING
+  transformation.
 
 \item Generate required auxiliary data files (see chapter
   \ref{sec_auxiliary}).

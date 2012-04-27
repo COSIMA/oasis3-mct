@@ -10,16 +10,13 @@ developed. The technique used for one particular run is defined by the
 user with the keyword \$CHANNEL in the configuration file {\it namcouple} 
 (see chapter
 \ref{sec_namcouple}). In OASIS3, direct coupling is supported 
-based on MPI1 or MPI2 (not yet supported) message passing implementation
+based on MPI1 message passing implementation
 using the associated model interface library PSMILe.  For
-a practical toy model using the PSMILe library, see the sources in
-{\tt /oasis3/examples/toyoasis3/src} and more details in
+a practical test case using the PSMILe library, see the sources in
+{\tt examples/tutorial} and more details in
 chapter \ref{sec_compilationrunning}.
 
-
-%\vspace*{0.5cm}
-
- To communicate with OASIS3 or directly with another component model
+ To communicate directly with another component model
   or to perform I/O actions, a component model needs to be interfaced
   with the PRISM System Model Interface library, PSMILe, which sources
   can be found in {\tt oasis3/lib/psmile} directory. PSMILe supports:
@@ -69,19 +66,17 @@ To use prism, a user needs to add
 \end{itemize}
 
 Both use statements are valid and use of just one or the other
-is recommended in a particular model.  Different models in a single 
-coupled configuration can use either prism or oasis interfaces.  
+is recommended in a particular component model.  
 A single use statement now provides all the methods
-that previously required multiple use statements.  The interface,
-methods, datatypes, and capabilities are identical for either the
+that previously required multiple use statements.  The 
+methods, datatypes, and capabilities are identical for both the
 mod\_prism or mod\_oasis interfaces.  The only difference is the name
 of the interface.  mod\_prism is provided
-for backwards compatability with prior versions of oasis.  mod\_oasis
+for backwards compatability with prior versions of OASIS.  mod\_oasis
 provides a set of updated interface names that will continue to evolve
 in the future.  In the following sections, both the mod\_prism
-and mod\_oasis name will be identified but descriptions will be based
-on the mod\_prism interface.  the mod\_oasis interface names can be user 
-interchangably in those descriptions.
+and mod\_oasis interface names will be defined and a single description
+of the interface arguments will be provided.
 
 \section{Initialisation}
 \label{subsubsec_Initialisation}
@@ -115,25 +110,26 @@ model also has to call MPI\_Finalize explicitly, but only after calling
  \begin{itemize}
    \item {\tt local\_comm [INTEGER; OUT]}: value of local communicator
    \item {\tt ierror [INTEGER; OUT]}: returned error code.
-  \end{itemize}
+ \end{itemize}
 
   If needed, routine called by all model processes  
   to get the value of a local communicator to be used by the
-  model for its internal parallelisation (CLIM-MPI1 communication technique only). 
+  model for its internal parallelisation.
 
-  With CLIM-MPI1, all component models started in a
+  With MPI1, all component models started in a
   pseudo-MPMD mode share automatically the same MPI\_COMM\_WORLD
   communicator.  Another communicator has to be used for the internal
   parallelisation of each model. OASIS3 creates this model local
   communicator based on the name of the calling model; its value is returned
   as the first argument of prism\_get\_localcomm\_proto routine.
 
-  With CLIM-MPI2, OASIS3 executable spawns the component model executables at the
-  beginning of the run; 
-  the components keep their internal parallelisation context unchanged 
-  with respect to their standalone mode. In this case, calling the prism\_get\_localcomm\_proto 
-  routine is useless but if called, the communicator MPI\_COMM\_WORLD will be returned as
-  local communicator.
+%  With CLIM-MPI2, OASIS3 executable spawns the component model executables at the
+%  beginning of the run; 
+%  the components keep their internal parallelisation context unchanged 
+%  with respect to their standalone mode. In this case, calling the 
+%  prism\_get\_localcomm\_proto 
+%  routine is useless but if called, the communicator MPI\_COMM\_WORLD will be returned as
+%  local communicator.
 
 \end{itemize}
 
@@ -142,48 +138,45 @@ model also has to call MPI\_Finalize explicitly, but only after calling
 
 The grid data files {\em grids.nc, masks.nc} and {\em areas.nc} can be
 created by the user before the run or can be written directly at run
-time by the master process of each component model (except when
-  OASIS3 is used in ``IPSL'' parallel mode, see section
-  \ref{sec_ipslpara_mode}).
+time by the master process of each component model.  Fields can be
+added to the grid files by the model but fields on the grid file
+are NEVER overwritten.
 
-  If written by the component models, the writing of those grid files
-  is driven by OASIS3 main process. It first checks whether the binary
-  file {\em grids} or the netCDF file {\em grids.nc} exists (if it is
-  the case, it assumes that {\em areas} or {\em areas.nc} and {\em
-    masks} or {\em masks.nc} files exist too), or if writing is
-  needed. If {\em grids} or {\em grids.nc} exists, it must contain all
-  grid information from all models; the file will not be completed or
-  overwritten even if the following routines are explicitely
-  called. If {\em grids} or {\em grids.nc} does not exist, each model
-  must write its grid, mask and area definition in the grid data files
-  with the following routines.
+%  If written by the component models, the writing of those grid files
+%  is driven by OASIS3 main process. It first checks whether the binary
+%  file {\em grids} or the netCDF file {\em grids.nc} exists (if it is
+%  the case, it assumes that {\em areas} or {\em areas.nc} and {\em
+%    masks} or {\em masks.nc} files exist too), or if writing is
+%  needed. If {\em grids} or {\em grids.nc} exists, it must contain all
+%  grid information from all models; the file will not be completed or
+%  overwritten even if the following routines are explicitely
+%  called. If {\em grids} or {\em grids.nc} does not exist, each model
+%  must write its grid, mask and area definition in the grid data files
+%  with the following routines.
 
-The coupler sends the information on whether or not writing is needed
-to the mo\-dels following an OASIS3 internal order (below
-prism\_start\_grids\_writing called by the component master process). 
-If the grid data files already exist in the working directory, nothing
-happens when the component model calls the {\tt prism\_write\_grid}, 
-{\tt prism\_write\_corner}, {\tt prism\_write\_ang}, 
-{\tt prism\_write\_mask}, \newline{\tt prism\_write\_area} routines;
-the grid information is NOT overwritten in the grid files. If
-writing is needed, the first model creates the files, writes the data
-arrays when calling the appropriate routines,
-and then sends a termination flag to the coupler (below \break {\tt
-prism\_terminate\_grids\_writing} call). The coupler will then send the
-starting flag to the next model; this ensures that only one model
-accesses the files at a time.
+%The coupler sends the information on whether or not writing is needed
+%to the mo\-dels following an OASIS3 internal order (below
+%prism\_start\_grids\_writing called by the component master process). 
+%If the grid data files already exist in the working directory, nothing
+%happens when the component model calls the {\tt prism\_write\_grid}, 
+%{\tt prism\_write\_corner}, {\tt prism\_write\_ang}, 
+%{\tt prism\_write\_mask}, \newline{\tt prism\_write\_area} routines;
+%the grid information is NOT overwritten in the grid files. If
+%writing is needed, the first model creates the files, writes the data
+%arrays when calling the appropriate routines,
+%and then sends a termination flag to the coupler (below \break {\tt
+%prism\_terminate\_grids\_writing} call). The coupler will then send the
+%starting flag to the next model; this ensures that only one model
+%accesses the files at a time.
 
 This section describes the PSMILe routines to be called by the
-master process of each component model to write, at run time, the whole
+master process of each component model to write, at run time,
 grid information to the grid data files. These routines have to
-be called just after {\tt prism\_init\_comp\_proto}.
+be called just after {\tt prism\_init\_comp}.
 
-As an example, see the TOYOASIS3 coupled model components that 
+As an example, see the tutorial test case
 use these routines to write the grid data
-files (effective if \texttt{gridswr=1} in the running script
-\texttt{run\_toyoasis3},  
-%XXXXX or \texttt{RUN\_toyclim\_$<$expid$>$} 
-see section \ref{sec_coupled_mode}).
+files.
 
 %To run a toy experiment
 %into which the component models write those files, execute the
@@ -195,10 +188,8 @@ see section \ref{sec_coupled_mode}).
 \item {\tt CALL  oasis\_start\_grids\_writing (flag)}
         
   \begin{itemize}
-    \item {\tt flag [INTEGER; OUT]}:  returns 1 or 0 if grids writing is
-    needed or not needed
+    \item {\tt flag [INTEGER; OUT]}:  UNUSED
   \end{itemize}
-Initialisation of grids writing.
 
 \item {\tt CALL prism\_write\_grid (cgrid, nx, ny, lon, lat)}
 \item {\tt CALL oasis\_write\_grid (cgrid, nx, ny, lon, lat)}
@@ -292,8 +283,7 @@ area information is needed only for some transformations (see section
 \item {\tt CALL prism\_terminate\_grids\_writing()}
 \item {\tt CALL oasis\_terminate\_grids\_writing()}
 
-Termination of grids writing. A flag stating that all needed grid
-information was written will be sent to OASIS3 main process.
+Termination of grids writing.  This call is required.
 
 \end{itemize}
 
@@ -302,10 +292,7 @@ information was written will be sent to OASIS3 main process.
 
 When a component of the coupled system is a parallel code, each
 coupling field is usually scattered among the different
-processes. With the PSMILe library, each process can send
-directly its partition to OASIS3 interpolation executable, or directly to the
-other component model if no transformation and no repartition are
-required.  To do so, each process exchanging coupling data has to
+processes. With the PSMILe library, each process exchanging coupling data has to
 define its local partition in the global index space.
 
 \begin{itemize}
@@ -387,8 +374,6 @@ processes.
   
 \subsection{Orange partition}
 
-{\it {\bf WARNING:} I/O do not work for Orange partition; therefore, fields having an Orange partition cannot have {\tt EXPOUT}, {\tt IGNOUT}, {\tt INPUT},{\tt OUTPUT} field status (see section \ref{subsec_namcouplesecond}).}
-
 Each partition is an ensemble of segments of the global domain. Each
 segment is described by its global offset and its local extent.  In
 this case, we have {\tt ig\_paral(1:N)} where {\tt N = 2 + 2*number of
@@ -450,20 +435,9 @@ or receive during the simulation.
    dimension.
  \item {\tt var\_type [INTEGER; IN]}: type of coupling field array;
    put {\tt PRISM\_Real} for single or double precision real
-   arrays\footnote{PRISM standard is to exchange coupling fields
-   declared {\tt REAL(kind=SELECTED\_REAL\_KIND(12,307))}. By default,
-   all real variables are declared as such in OASIS3. To exchange
-   single precision coupling fields, OASIS3 has to be compiled with
-   the CPP key {\tt use\_realtype\_single}, and the coupling fields
-   must be declared {\tt REAL(kind=SELECTED\_REAL\_KIND(6,37))} in the
-   component models (see also chapter \ref{sec_compilationrunning}).}. 
-   Note that no automatic conversion is implemented;
-   therefore, all coupling fields exchanged through OASIS3 main
-   process must be of same type
-   % type\footnote{Coupling fields exchanged
-   % directly between two component models can have a type different
-   % from the ones exchanged through OASIS3 main process, as long as
-   % they are single or double precision real arrays in both models.}.
+   arrays.  All coupling data is treated as double precision in the
+   coupling layer, but conversion to or from single precision data
+   is supported in this interface.
  \item {\tt ierror [INTEGER; OUT]}: returned error code. 
 \end{itemize}
 \end{itemize}
@@ -501,20 +475,20 @@ sends its part of the I/O or coupling field.
 \item {\tt date [INTEGER; IN]}: number of seconds in the run at the
 time of the call
 \item {\tt field\_array [REAL, IN]}: I/O or coupling field array 
-\item {\tt info [INTEGER; OUT]}: returned info code i.e.
-   \begin{itemize} 
-      \item PRISM\_Sent(=4) if the field was sent to another model 
-      (directly or via OASIS3 main process)
-      \item PRISM\_LocTrans (=5) if the field was only used in a time
-       transformation (not sent, not output)
-      \item PRISM\_ToRest (=6) if the field was written to a restart file only
-      \item PRISM\_Output (=7) if the field was written to an output file only
-      \item PRISM\_SentOut (=8) if the field was both written to an output file
-       and sent to another model (directly or via OASIS3 main process)
-      \item PRISM\_ToRestOut (=9) if the field was written both to a
-       restart file and to an output file.
-      \item PRISM\_Ok (=0) otherwise and no error occurred.
-   \end{itemize}
+\item {\tt info [INTEGER; OUT]}: returned info code, current unused.
+%   \begin{itemize} 
+%      \item PRISM\_Sent(=4) if the field was sent to another model 
+%      (directly or via OASIS3 main process)
+%      \item PRISM\_LocTrans (=5) if the field was only used in a time
+%       transformation (not sent, not output)
+%      \item PRISM\_ToRest (=6) if the field was written to a restart file only
+%      \item PRISM\_Output (=7) if the field was written to an output file only
+%      \item PRISM\_SentOut (=8) if the field was both written to an output file
+%       and sent to another model (directly or via OASIS3 main process)
+%      \item PRISM\_ToRestOut (=9) if the field was written both to a
+%       restart file and to an output file.
+%      \item PRISM\_Ok (=0) otherwise and no error occurred.
+%   \end{itemize}
 \end{itemize}
 \end{itemize}
 
@@ -531,26 +505,17 @@ If a local time transformation is indicated for the field by
 the user in the namcouple (INSTANT, AVERAGE, ACCUMUL, T\_MIN or T\_MAX,
 see section \ref{sec_transformations}), it is automatically performed
 and the resulting field is finally sent at the coupling or I/O
-frequency.
+frequency.  For non-instant transformations, partially transformed
+fields will be written to the restart file at the end of the run
+for use on the next model startup.
 
 For a coupling field with a positive lag (see
 \ref{subsubsec_Algoritms}), the OASIS3 restart file (see section
 \ref{subsec_restartdata}) is automatically written by the
 last {\tt prism\_put\_proto} call of the run, if its argument {\tt date}
-+ the field lag corresponds to a coupling or I/O period. To
-force the writing of the field in its coupling restart file, one can
-use {\tt prism\_put\_restart\_proto} (see below).
-
-This routine can use the buffered MPI\_BSend (by default) or the
-standard send MPI\_Send (if {\tt NOBSEND} is specified in the
-namcouple -see {\tt \$CHANNEL} section
-\ref{subsec_namcouplefirst}) to send the coupling fields.
-
-\vspace*{0.5cm}
++ the field lag corresponds to a coupling or I/O period. 
 
 \subsection{Receiving a coupling field}
-
-\vspace*{0.5cm}
 
 In the model time stepping loop, each process
 receives its part of the I/O-coupling field. 
@@ -565,22 +530,22 @@ receives its part of the I/O-coupling field.
 \item {\tt date [INTEGER; IN]}: number of seconds in the run at the
 time of the call
 \item {\tt field\_array [REAL, OUT]}: I/O or coupling field array 
-\item {\tt info [INTEGER; OUT]}: returned info code
-   \begin{itemize} 
-      \item PRISM\_Recvd(=3) if the field was received from another model
-       (directly or via OASIS3 main process)
-      \item PRISM\_FromRest (=10) if the field was read from a restart
-       file only (directly or via OASIS3 main process)
-      \item PRISM\_Input (=11) if the field was read from an input
-       file only
-      \item PRISM\_RecvOut (=12) if the field was both received from
-       another model (directly or via OASIS3 main process) and written to
-       an output file
-      \item PRISM\_FromRestOut (=13) if the field was both read from a
-       restart file (directly or via OASIS3 main process) and written to an
-       output file
-      \item PRISM\_Ok (=0) otherwise and no error occurred.
-   \end{itemize}
+\item {\tt info [INTEGER; OUT]}: returned info code, current unused
+%   \begin{itemize} 
+%      \item PRISM\_Recvd(=3) if the field was received from another model
+%       (directly or via OASIS3 main process)
+%      \item PRISM\_FromRest (=10) if the field was read from a restart
+%       file only (directly or via OASIS3 main process)
+%      \item PRISM\_Input (=11) if the field was read from an input
+%       file only
+%      \item PRISM\_RecvOut (=12) if the field was both received from
+%       another model (directly or via OASIS3 main process) and written to
+%       an output file
+%      \item PRISM\_FromRestOut (=13) if the field was both read from a
+%       restart file (directly or via OASIS3 main process) and written to an
+%       output file
+%      \item PRISM\_Ok (=0) otherwise and no error occurred.
+%   \end{itemize}
 \end{itemize}
 \end{itemize}
 
@@ -595,7 +560,7 @@ than the total run time.
 \subsection{Auxiliary routines}
 \label{subsec:auxiliary}
 
-Auxiliary routines available in oasis3 are not yet available.
+Not all auxiliary routines available in oasis3\_3 are available.
 
 \begin{itemize} 
 \item {\tt CALL prism\_get\_debug(debug\_value)}
@@ -611,7 +576,6 @@ levels and the user wants to return the debug value later to
 its prior value, or if a user wants to key off the oasis
 debug level for model debug diagnostics.
 
-
 \begin{itemize} 
 \item {\tt CALL prism\_set\_debug(debug\_value)}
 \item {\tt CALL oasis\_set\_debug(debug\_value)}
@@ -625,6 +589,40 @@ The debug level is initially set for all processors and all models
 by the NLOGPRT namcouple input.  This method allows users to vary 
 the debug level by model, task, or at different points in the model
 integration.
+
+\begin{itemize} 
+\item {\tt CALL prism\_get\_intercomm(new\_comm, cdnam, kinfo)}
+\item {\tt CALL oasis\_get\_intercomm(new\_comm, cdnam, kinfo)}
+\begin{itemize}
+\item {\tt new\_comm [INTEGER; OUT]}: mpi intercomm communicator
+\item {\tt cdnam [CHARACTER*; IN]}: other model name 
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+\end{itemize}
+
+This routine sets up an MPI intercomm communicator between the root
+processors of two components, the local component and the component
+associated with cdnam.  This must be called by both components at
+the same time otherwise a deadlock will occur.  In addition, this call
+is collective across the tasks of the two components but other
+components are not involved.
+
+\begin{itemize} 
+\item {\tt CALL prism\_get\_intracomm(new\_comm, cdnam, kinfo)}
+\item {\tt CALL oasis\_get\_intracomm(new\_comm, cdnam, kinfo)}
+\begin{itemize}
+\item {\tt new\_comm [INTEGER; OUT]}: mpi intracomm communicator
+\item {\tt cdnam [CHARACTER*; IN]}: other model name 
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+\end{itemize}
+
+This routine sets up an MPI intracomm communicator between the root
+processors of two components, the local component and the component
+associated with cdnam.  This must be called by both components at
+the same time otherwise a deadlock will occur.  In addition, this call
+is collective across the tasks of the two components but other
+components are not involved.
 
 
 %\begin{itemize} 
@@ -712,17 +710,15 @@ integration.
   also call {\tt MPI\_Finalize} explicitly, but only after calling
   {\tt prism\_terminate\_proto}.} (normal termination). OASIS3 will
   terminate after all processes called
-  prism\_terminate\_proto. With MPI2, the run may be considered
-  finished when OASIS3 terminates; to avoid problem, place the call
-  to prism\_terminate\_proto at the very end in the component model code.
+  prism\_terminate\_proto.
 
 \item {\tt CALL prism\_abort\_proto(compid, routine\_name, abort\_message)}
 \item {\tt CALL oasis\_abort       (compid, routine\_name, abort\_message)}
 \begin{itemize}
   \item {\tt compid [INTEGER; IN]}: component model ID (from
 prism\_init\_comp\_proto) 
-  \item {\tt routine\_name; IN]}: name of calling routine
-  \item {\tt abort\_message; IN]}: message to be written out.
+  \item {\tt routine\_name[CHARACTER*; IN]}: name of calling routine
+  \item {\tt abort\_message[CHARACTER*; IN]}: message to be written out.
 \end{itemize}
 
  If a process needs to abort voluntarily, it should do so by
@@ -772,7 +768,7 @@ period with the given lag on the send side, and then the final coupling
 data on the source side is written to the restart file for use in the
 next run.  
 
-The order of coupling operations is the system is now determined solely
+The order of coupling operations in the system is determined solely
 by the order of calls to send (put) and receive (get) data in the models
 in conjunction with the setting of the lag in the namcouple.  Data that is
 received (get) is always blocking while data that is sent (put) is non-blocking
@@ -787,7 +783,7 @@ models compared to the SEQ specified in the namcouple.  If there are any
 inconsistencies, the model will abort gracefully with a useable error
 message before the system deadlocks.  If there are any coupling dependencies
 in the system, use of the SEQ index is recommended for diagnosis, but again,
-it has no impact on the ultimate solution.
+it has no impact on the ultimate solution and is NOT required.
 
 The lag concept and indices are explained in more detail below and some
 examples are provided.
@@ -803,8 +799,6 @@ receiving actions will actually be performed, below the {\tt
 {\tt date} argument on both sides matches an integer number of
 coupling periods.
  
-\vspace*{0.5cm}
-
 To match a {\tt prism\_put\_proto} called by the source model at a
 particular {\tt date} with a {\tt prism\_get\_proto} called by the target
 model at a different {\tt date}, the user has to define in the {\it
@@ -939,8 +933,58 @@ read by OASIS3 from a coupling restart file.
 
 \subsection{The sequence concept}
 
-*** Add some new description and examples ***
- 
+The sequence input, SEQ, in the namcouple provides information to
+the coupling layer about the expected sequence of events.  It is
+optional and has no impact on the solution.  It is used to detect
+potential deadlocks before they happen so the coupling layer can
+abort gracefully.
+
+Take the following two examples.  In both examples, there are two
+models, each sending a field to the other at every coupling period
+without any lags.  In the first case, there is no dependency and 
+each model sends (puts) the data first and then receives the data
+second at each timestep.
+
+\begin{verbatim}
+     model1        model2
+     ------        ------
+    put(fld1)     put(fld2)
+    get(fld2)     get(fld1)
+\end{verbatim}
+
+The put from model1 for fld1 is received by the get in model2 and the
+put from model2 for fld2 is received by the get in model1.  In this case,
+there is no sequencing dependency and the value of SEQ must be
+identical (or unset) in the namcouple description of the fld1
+and fld2 coupling.  If SEQ is set to 1 for fld1 and 2 for fld2 in this case, then
+the model will abort because at runtime, the coupling will detect, in model 2, that 
+fld2 was sent before fld1 was received which is out of sequence
+as defined by the SEQ settings.
+
+In the next example, there is a dependency in the sequencing.
+
+\begin{verbatim}
+     model1        model2
+     ------        ------
+    put(fld1)     get(fld1)
+                  fld2=g(fld1)
+    get(fld2)     put(fld2)
+\end{verbatim}
+
+In model2, fld2 depends on fld1.  If this dependency is known, then
+there is a benefit in using SEQ=1 for fld1 and SEQ=2 for fld2.  At
+runtime, if the sequencing of both model1 and model2 do not match
+the above diagram, the model will abort gracefully.  For instance,
+if model2 has the dependency shown above but model1 does not have
+consistent ordering of the put and get as required by model2,
+then if SEQ is unused, the model will deadlock and hang.  if SEQ
+is set properly, the coupling layer will detect that the required
+sequence has not been followed and will exit gracefully with an
+error message.  
+
+Again, the SEQ namecouple setting is only diagnostic and is
+not required.
+
 %To exchange the coupling fields going through OASIS3 main process
 %(i.e. with status EXPORTED, AU-\newline XILARY, or EXPOUT, see section
 %\ref{sec_namcouple}), in a given order at each coupling timestep, a
