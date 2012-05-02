@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler 
-arch=corail    #Linux/corail
+arch=Linux    #Linux/corail
 # Define compiler and MPILIB for Linux
 compiler=pgi  #pgi/intel
 MPILIB=mpich  #mpich/openmpi

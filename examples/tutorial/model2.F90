@@ -98,11 +98,17 @@ PROGRAM model2
   !!!!!!!!!!!!!!!!! OASIS_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   CALL oasis_init_comp (comp_id, comp_name, ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_init_comp', 'Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE(0,*) 'oasis_init_comp abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Rank','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   !
   w_unit=100+rank
@@ -119,14 +125,23 @@ PROGRAM model2
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   CALL oasis_get_localcomm ( localComm, ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id,'oasis_get_localcomm','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'oasis_get_localcomm abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Size','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE(w_unit,*) 'MPI_comm_size abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'MPI_Comm_Rank','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   WRITE(w_unit,*) 'I am the', TRIM(comp_name), ' ',' comp', comp_id, ' local rank ', mype
   CALL flush(w_unit)
@@ -240,11 +255,17 @@ PROGRAM model2
   ! Declaration of the field associated with the partition of the grid
   CALL oasis_def_var (var_id(1),var_name1, part_id, &
      var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_def_var','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   CALL oasis_def_var (var_id(2),var_name2, part_id, &
      var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_def_var','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
@@ -255,7 +276,10 @@ PROGRAM model2
   !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   CALL oasis_enddef ( ierror )
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_enddef','Pb in model2')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'oasis_enddef abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! SEND AND RECEIVE ARRAYS 
@@ -300,14 +324,18 @@ PROGRAM model2
     field1_recv=field_ini
     CALL oasis_get(var_id(1),itap_sec, field1_recv, ierror)
     write(w_unit,*) 'tcx recvf1 ',itap_sec,minval(field1_recv),maxval(field1_recv)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) &
-    CALL oasis_abort(comp_id, 'oasis_get','Pb in model2')
+    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
+        WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
+        CALL oasis_abort()
+    ENDIF
     !
     ! Send the field FSENDATM
     write(w_unit,*) 'tcx sendf2 ',itap_sec,minval(field2_send),maxval(field2_send)
     CALL oasis_put(var_id(2),itap_sec, field2_send, ierror)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) &
-    CALL oasis_abort(comp_id, 'oasis_put','Pb in model2')
+    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN
+        WRITE (w_unit,*) 'oasis_put abort by model2 compid ',comp_id
+        CALL oasis_abort()
+    ENDIF
     !
   ENDDO
   !
@@ -324,7 +352,10 @@ PROGRAM model2
   ! Collective call to terminate the coupling exchanges
   !
   CALL oasis_terminate (ierror)
-  IF (ierror /= 0) CALL oasis_abort(comp_id, 'oasis_terminate', 'Pb in model1')
+  IF (ierror /= 0) THEN
+      WRITE (w_unit,*) 'oasis_terminate abort by model2 compid ',comp_id
+      CALL oasis_abort()
+  ENDIF
   !
 END PROGRAM MODEL2
 !
