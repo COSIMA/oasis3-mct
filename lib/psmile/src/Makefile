@@ -56,40 +56,44 @@ mod_psmile_io.o: mod_psmile_io.F90
 mod_prism_kinds.o: 
 mod_prism_parameters.o: mod_prism_kinds.o
 mod_prism_data.o: mod_prism_kinds.o 
-mod_prism_sys.o: mod_prism_kinds.o mod_prism_data.o
-mod_prism_mpi.o: mod_prism_kinds.o mod_prism_sys.o
-mod_prism_timer.o: mod_prism_kinds.o mod_prism_sys.o mod_prism_mpi.o mod_prism_data.o
+mod_oasis_print.o: mod_prism_kinds.o mod_prism_data.o
+mod_prism_sys.o: mod_prism_kinds.o mod_prism_data.o mod_oasis_print.o
+mod_prism_mpi.o: mod_prism_kinds.o mod_prism_sys.o mod_oasis_print.o
+mod_prism_timer.o: mod_prism_kinds.o mod_prism_sys.o mod_prism_mpi.o mod_prism_data.o \
+         mod_oasis_print.o
 mod_prism_string.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o
-mod_prism_namcoupler.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
+        mod_prism_parameters.o mod_oasis_print.o
+mod_prism_namcouple.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o mod_prism_mpi.o mod_prism_string.o
 mod_prism_var.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o
+        mod_prism_parameters.o mod_oasis_print.o
 mod_prism_part.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o mod_prism_timer.o
+        mod_prism_parameters.o mod_prism_timer.o mod_oasis_print.o
 mod_prism_ioshr.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_mpi.o
 mod_prism_io.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o mod_prism_ioshr.o mod_prism_mpi.o
+        mod_prism_parameters.o mod_prism_ioshr.o mod_prism_mpi.o \
+        mod_oasis_print.o
 mod_prism_grid.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_io.o
+        mod_prism_io.o mod_oasis_print.o
 mod_prism_coupler.o: mod_prism_kinds.o  mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o mod_prism_mpi.o mod_prism_var.o mod_prism_part.o  \
-        mod_prism_string.o mod_prism_namcouple.o mod_prism_timer.o mod_prism_io.o
+        mod_prism_string.o mod_prism_namcouple.o mod_prism_timer.o mod_prism_io.o \
+        mod_oasis_print.o
 mod_prism_advance.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o mod_prism_var.o mod_prism_part.o \
-        mod_prism_coupler.o mod_prism_timer.o mod_prism_io.o
-mod_prism_method.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
+        mod_prism_coupler.o mod_prism_timer.o mod_prism_io.o mod_oasis_print.o
+mod_prism_method.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o mod_oasis_print.o \
         mod_prism_parameters.o mod_prism_coupler.o mod_prism_namcouple.o \
         mod_prism_timer.o mod_prism_ioshr.o mod_prism_advance.o mod_prism_grid.o \
-        mod_prism_mpi.o
+        mod_prism_mpi.o mod_oasis_print.o
 mod_prism_getput_interface.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_parameters.o mod_prism_var.o mod_prism_advance.o
+        mod_prism_parameters.o mod_prism_var.o mod_prism_advance.o mod_oasis_print.o
 mod_prism.o: mod_prism_kinds.o mod_prism_part.o mod_prism_sys.o \
 	mod_prism_getput_interface.o mod_prism_parameters.o \
 	mod_prism_grid.o mod_prism_method.o mod_prism_var.o
 mod_oasis.o: mod_prism_kinds.o mod_prism_part.o mod_prism_sys.o \
 	mod_prism_getput_interface.o mod_prism_parameters.o \
-	mod_prism_grid.o mod_prism_method.o mod_prism_var.o
+	mod_prism_grid.o mod_prism_method.o mod_prism_var.o 
 
 

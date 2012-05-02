@@ -2,6 +2,7 @@
 
   USE mod_prism_kinds
   USE mod_prism_data
+  USE mod_oasis_print
   USE mod_prism_parameters
   USE mod_prism_sys
 
@@ -55,8 +56,10 @@
 
      do n = 1,prism_nvar
         if (trim(cdport) == trim(prism_var(n)%name)) then
-           write(nulprt,*) subname,' variable already defined with var_def ',trim(cdport)
-           call prism_sys_abort(compid,subname,' ERROR variable already defined')
+           CALL oasis_pprintc(subname,2,'  variable already defined with var_def ',char1=trim(cdport))
+           CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+           CALL oasis_pprintc(subname,2,' error :',char1=' variable already defined')
+           call prism_sys_abort()
         endif
      enddo
 
@@ -64,8 +67,10 @@
      id_nports = prism_nvar
 
      if (prism_nvar > mvar) then
-        write(nulprt,*) subname,' ERROR prism_nvar too large ',prism_nvar,mvar
-        call prism_sys_abort(compid,subname,'ERROR prism_nvar too large')
+        CALL oasis_pprinti(subname,2,' ERROR prism_nvar too large ',int1=prism_nvar,int2=mvar)
+        CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+        CALL oasis_pprintc(subname,2,' error :',char1=' prism_nvar too large')
+        call prism_sys_abort()
      endif
 
      prism_var(prism_nvar)%name = trim(cdport)
@@ -84,18 +89,17 @@
     !----------------------------------
     !--- some diagnostics
     !----------------------------------
-     if (PRISM_DEBUG >= 2) then
-        write(nulprt,*) ' '
-        write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
-        write(nulprt,*) subname,' varname = ',prism_nvar,trim(prism_var(prism_nvar)%name)
-        write(nulprt,*) subname,' varpart = ',prism_nvar,prism_var(prism_nvar)%part
-        write(nulprt,*) subname,' varndim = ',prism_nvar,prism_var(prism_nvar)%ndim
-        write(nulprt,*) subname,' varnum  = ',prism_nvar,prism_var(prism_nvar)%num
-        write(nulprt,*) subname,' varops  = ',prism_nvar,prism_var(prism_nvar)%ops
-        write(nulprt,*) subname,' vartype = ',prism_nvar,prism_var(prism_nvar)%type
-        write(nulprt,*) subname,' varsize = ',prism_nvar,prism_var(prism_nvar)%size
-        write(nulprt,*) ' '
-     endif
+
+     CALL oasis_pprintc(subname,2,' : ',char1=' Begin infos ')
+     CALL oasis_pprinti(subname,2,' prism_nvar             = ',int1=prism_nvar)
+     CALL oasis_pprintc(subname,2,' varname                = ',char1=trim(prism_var(prism_nvar)%name))
+     CALL oasis_pprinti(subname,2,' prism_nvar, varpart    = ',int1=prism_nvar,int2=prism_var(prism_nvar)%part)
+     CALL oasis_pprinti(subname,2,' prism_nvar, varndim    = ',int1=prism_nvar,int2=prism_var(prism_nvar)%ndim)
+     CALL oasis_pprinti(subname,2,' prism_nvar, varnum     = ',int1=prism_nvar,int2=prism_var(prism_nvar)%num)
+     CALL oasis_pprinti(subname,2,' prism_nvar, varops     = ',int1=prism_nvar,int2=prism_var(prism_nvar)%ops)
+     CALL oasis_pprinti(subname,2,' prism_nvar, vartype    = ',int1=prism_nvar,int2=prism_var(prism_nvar)%type)
+     CALL oasis_pprinti(subname,2,' prism_nvar, varsize    = ',int1=prism_nvar,int2=prism_var(prism_nvar)%size)
+     CALL oasis_pprintc(subname,2,' : ',char1=' End infos ')
 
      call prism_sys_debug_exit(subname)
 

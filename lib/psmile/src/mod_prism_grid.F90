@@ -40,6 +40,7 @@ module mod_prism_grid
 
 ! !USES:
   use mod_prism_data
+  use mod_oasis_print
   use mod_prism_io
   use mod_prism_sys
   
@@ -113,8 +114,9 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       CALL prism_sys_abort()
     endif
 
     if (prism_ngrid == 0) then  ! first call
@@ -156,16 +158,17 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       call prism_sys_abort()
     endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%lon(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING lon alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING lon alloc')
     allocate(prism_grid(gridID)%lat(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING lat alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING lat alloc')
     prism_grid(gridID)%lon = lon
     prism_grid(gridID)%lat = lat
     prism_grid(gridID)%grid_set = .true.
@@ -196,14 +199,15 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       call prism_sys_abort()
     endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%angle(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING angle alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING angle alloc')
     prism_grid(gridID)%angle = angle
     prism_grid(gridID)%angle_set = .true.
 
@@ -236,16 +240,17 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+        CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+        CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+        CALL prism_sys_abort()
     endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%clon(nx,ny,nc),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING clon alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING clon alloc')
     allocate(prism_grid(gridID)%clat(nx,ny,nc),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING clat alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING clat alloc')
     prism_grid(gridID)%nc = nc
     prism_grid(gridID)%clon = clon
     prism_grid(gridID)%clat = clat
@@ -278,14 +283,15 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       call prism_sys_abort()
     endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%mask(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING mask alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING mask alloc')
     prism_grid(gridID)%mask = mask
     prism_grid(gridID)%mask_set = .true.
 
@@ -316,14 +322,15 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       call prism_sys_abort()
     endif
 
     call prism_grid_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%area(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' WARNING area alloc'
+    if (ierror /= 0) CALL oasis_pprintc(subname,2,' : ',char1=' WARNING area alloc')
     prism_grid(gridID)%area = area
     prism_grid(gridID)%area_set = .true.
 
@@ -344,8 +351,9 @@ CONTAINS
     call prism_sys_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       call prism_sys_abort(compid,subname,' ERROR: called by non root processor')
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1='subroutine call by non root processor')
+       call prism_sys_abort()
     endif
 
     do n = 1,prism_ngrid
@@ -457,9 +465,12 @@ CONTAINS
           gridID = n
           ! since grid is defined before, make sure nx,ny match
           if (nx /= prism_grid(gridID)%nx .or. ny /= prism_grid(gridID)%ny) then
-             write(nulprt,*) subname,' ERROR in predefined grid size',nx,ny, &
-                prism_grid(gridID)%nx,prism_grid(gridID)%ny
-             call prism_sys_abort(compid,subname,' ERROR: prism grid sizes')
+             CALL oasis_pprinti(subname,2,' ERROR in predefined grid size nx,ny : ',int1=nx,int2=ny)
+             CALL oasis_pprinti(subname,2,' ERROR in predefined grid size : ',int1=prism_grid(gridID)%nx,&
+                                           int2=prism_grid(gridID)%ny)
+             CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+             CALL oasis_pprintc(subname,2,' error :',char1='prism grid sizes')
+             call prism_sys_abort()
           endif
        endif
     enddo

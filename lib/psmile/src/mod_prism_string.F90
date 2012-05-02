@@ -20,6 +20,7 @@ module mod_prism_string
    use mod_prism_kinds
    use mod_prism_parameters
    use mod_prism_data
+   USE mod_oasis_print
    use mod_prism_sys
 
    implicit none
@@ -537,34 +538,28 @@ subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
    substr = ""
 
    if (iStart < 1) then
-      if (PRISM_Debug > 0) then
-         write(nulprt,F00) "ERROR: can't find start tag in string"
-         write(nulprt,F00) "ERROR: start tag = ",trim(startTag)
-         write(nulprt,F00) "ERROR: string    = ",trim(string)
-      endif
+       CALL oasis_pprintc(subname,2,' : ',char1='ERROR: can not find start tag in string')
+       CALL oasis_pprintc(subname,2,'ERROR: start tag = ',char1=trim(startTag))
+       CALL oasis_pprintc(subname,2,'ERROR: string = ',char1=trim(string))
       rCode = 1
    else if (iEnd < 1) then
-      if (PRISM_Debug > 0) then
-         write(nulprt,F00) "ERROR: can't find end tag in string"
-         write(nulprt,F00) "ERROR: end   tag = ",trim(  endTag)
-         write(nulprt,F00) "ERROR: string    = ",trim(string)
-      endif
+       CALL oasis_pprintc(subname,2,' : ',char1='ERROR: can not find end tag in string')
+       CALL oasis_pprintc(subname,2,'ERROR: end tag = ',char1=trim(endTag))
+       CALL oasis_pprintc(subname,2,'ERROR: string = ',char1=TRIM(string))
       rCode = 2
    else if ( iEnd <= iStart) then
-      if (PRISM_Debug > 0) then
-         write(nulprt,F00) "ERROR: start tag not before end tag"
-         write(nulprt,F00) "ERROR: start tag = ",trim(startTag)
-         write(nulprt,F00) "ERROR: end   tag = ",trim(  endTag)
-         write(nulprt,F00) "ERROR: string    = ",trim(string)
-      endif
+       CALL oasis_pprintc(subname,2,' : ',char1='ERROR: start tag not before end tag')
+       CALL oasis_pprintc(subname,2,'ERROR: start tag = ',char1=trim(startTag))
+       CALL oasis_pprintc(subname,2,'ERROR: end tag = ',char1=trim(endTag))
+       CALL oasis_pprintc(subname,2,'ERROR: string = ',char1=TRIM(string))
       rCode = 3
    else if ( iStart+1 == iEnd ) then
       substr = ""
-      if (PRISM_Debug > 0) write(nulprt,F00) "WARNING: zero-length substring found in ",trim(string)
+      CALL oasis_pprintc(subname,2,' WARNING: zero-length substring found in ',char1=TRIM(string))
    else
       substr = string(iStart+1:iEnd-1)
-      if (len_trim(substr) == 0 .and. PRISM_Debug > 0) &
-         & write(nulprt,F00) "WARNING: white-space substring found in ",trim(string)
+      if (len_trim(substr) == 0) &
+      CALL oasis_pprintc(subname,2,' WARNING: white-space substring found in ',char1=TRIM(string))
    end if
 
    if (present(rc)) rc = rCode
@@ -640,21 +635,21 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
    if (i > 0) unit = 'seconds'
 
    if (trim(unit) == 'none') then
-     write(nulprt,F00) ' ERROR time unit unknown'
+     CALL oasis_pprintc(subName,2,' : ',char1=' ERROR time unit unknown')
      call prism_string_abort(subName//' time unit unknown')
    endif
 
    i = prism_string_lastIndex(string,' since ')
    if (i < 1) then
-     write(nulprt,F00) ' ERROR since does not appear in unit attribute for time '
+     CALL oasis_pprintc(subName,2,' : ',char1=' ERROR since does not appear in unit attribute for time ')
      call prism_string_abort(subName//' no since in attr name')
    endif
    tbase = trim(string(i+6:))
    call prism_string_leftAlign(tbase)
 
    if (debug > 0 .and. nulprt > 0) then
-     write(nulprt,*) trim(subName)//' '//'unit '//trim(unit)
-     write(nulprt,*) trim(subName)//' '//'tbase '//trim(tbase)
+       CALL oasis_pprintc(subName,2,' unit : ',char1=TRIM(unit))
+       CALL oasis_pprintc(subName,2,' tbase : ',char1=TRIM(tbase))
    endif
 
    yr=0; mo=0; da=0; hr=0; min=0; sec=0
@@ -696,7 +691,11 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
 100  continue
 
-   if (debug > 0 .and. PRISM_Debug > 0) write(nulprt,*) trim(subName),'ymdhms:',yr,mo,da,hr,min,sec
+   IF (debug > 0) THEN
+       CALL oasis_pprinti(subName,2,' ymd : ',int1=yr,int2=mo,int3=da)
+       CALL oasis_pprinti(subName,2,' hms : ',int1=hr,int2=min)
+       CALL oasis_pprintr(subName,2,' sec : ',r1=sec)
+   ENDIF
 
    bdate = abs(yr)*10000 + mo*100 + da
    if (yr < 0) bdate = -bdate
@@ -708,7 +707,7 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
    return
 
 200  continue
-   write(nulprt,F00) 'ERROR 200 on char num read '
+   CALL oasis_pprintc(subName,2,' : ',char1='ERROR 200 on char num read ')
    call prism_string_abort(subName//' ERROR on char num read')
    call prism_sys_debug_exit(subname)
 
@@ -816,7 +815,7 @@ logical function prism_string_listIsValid(list,rc)
    
    if (rCode /= 0) then
       prism_string_listIsValid = .false.
-      if (PRISM_Debug > 0) write(nulprt,F00) "WARNING: invalid list = ",trim(list)
+      CALL oasis_pprintc(subName,2,' WARNING: invalid list = ',char1=trim(list))
    endif
 
    if (present(rc)) rc = rCode
@@ -871,15 +870,15 @@ subroutine prism_string_listGetName(list,k,name,rc)
 
    !--- check that this is a valid list ---
    if (.not. prism_string_listIsValid(list,rCode) ) then
-      write(nulprt,F00) "ERROR: invalid list = ",trim(list)
+      CALL oasis_pprintc(subName,2,' WARNING: invalid list = ',char1=trim(list))
       call prism_string_abort(subName//" ERROR: invalid list = "//trim(list))
    end if
 
    !--- check that this is a valid index ---
    kFlds = prism_string_listGetNum(list)
    if (k<1 .or. kFlds<k) then
-      write(nulprt,*) subName,"ERROR: invalid index = ",k
-      write(nulprt,*) subName,"ERROR:          list = ",trim(list)
+      CALL oasis_pprinti(subName,2,' ERROR: invalid index = ',int1=k)
+      CALL oasis_pprintc(subName,2,' ERROR: list = ',char1=TRIM(list))
       call prism_string_abort(subName//" ERROR: invalid index")
    end if
 
@@ -1331,7 +1330,7 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
 
    !--- confirm proper size of input data ---
    if (len_trim(fldStr) < 1) then
-      if (lprint) write(nulprt,F00) "ERROR: input field name has 0 length"
+      if (lprint) CALL oasis_pprintc(subName,2,' : ',char1='ERROR: input field name has 0 length')
       call prism_string_abort(subName//"invalid field name")
    end if
 
@@ -1391,7 +1390,8 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
    !--- not finding a field is not a fatal error ---
    if (.not. found) then
       kFld = 0
-      if (lprint .and. PRISM_Debug > 0) write(nulprt,F00) "FYI: field ",trim(fldStr)," not found in list ",trim(string)
+      IF (lprint) CALL oasis_pprintc(subName,2,' FYI: field ',char1=TRIM(fldStr),char2=' not found in list: ',&
+                                                 char3=trim(string))
       if (present(rc)) rc = 1
    end if
 
@@ -1475,7 +1475,8 @@ subroutine prism_string_listSetDel(cflag)
 
    call prism_sys_debug_enter(subname)
 
-   if (debug > 0 .and. PRISM_Debug > 0) write(nulprt,F00) 'changing listDel from '//trim(listDel)//' to '//trim(cflag)
+   if (debug > 0) CALL oasis_pprintc(subName,2,' changing listDel from ',char1=trim(listDel),char2=' to: ',&
+                                                 char3=trim(cflag)) 
    listDel = trim(cflag)
    listDel2 = listDel//listDel
 
@@ -1551,11 +1552,11 @@ subroutine prism_string_setAbort(flag)
 
    call prism_sys_debug_enter(subname)
 
-   if (debug > 0 .and. PRISM_Debug > 0) then
+   if (debug > 0) then
       if (flag) then
-         write(nulprt,F00) 'setting abort to true'
+         CALL oasis_pprintc(subName,2,' : ',char1=' setting abort to true')
       else
-         write(nulprt,F00) 'setting abort to false'
+         CALL oasis_pprintc(subName,2,' : ',char1=' setting abort to false')
       endif
    endif
 
@@ -1637,9 +1638,11 @@ subroutine prism_string_abort(string)
    if (present(string)) lstring = string
 
    if (doabort) then
-      call prism_sys_abort(compid,subname,trim(lstring))
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1=TRIM(lstring))
+       CALL prism_sys_abort()
    else
-      write(nulprt,F00) ' no abort:'//trim(lstring)
+       CALL oasis_pprintc(subname,2,' no abort ',char1=TRIM(lstring))
    endif
 
    call prism_sys_debug_exit(subname)

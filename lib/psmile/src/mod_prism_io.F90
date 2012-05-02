@@ -2,6 +2,7 @@ MODULE mod_prism_io
 
    USE mod_prism_kinds
    USE mod_prism_data
+   use mod_oasis_print
    USE mod_prism_parameters
    USE mod_prism_mpi
    USE mod_prism_sys
@@ -85,7 +86,9 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       if (trim(fldtype) == 'int')  ifldtype = 1
       if (trim(fldtype) == 'real') ifldtype = 2
       if (ifldtype == 0) then
-         call prism_sys_abort(compid,subname,' ERROR in fldtype argument')
+          CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+          CALL oasis_pprintc(subname,2,' error :',char1=' in fldtype argument')
+          CALL prism_sys_abort()
       endif
    endif
 
@@ -96,37 +99,47 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       inquire(file=trim(filename),exist=exists)
       if (exists) then
          status = nf90_open(trim(filename),NF90_NOWRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       else
-         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
-         call prism_sys_abort(compid,subname,'ERROR: file missing')
+         CALL oasis_pprintc(subname,2,' ERROR: file missing ',char1=TRIM(filename))
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' file missing')
+         call prism_sys_abort()
       endif
 
       status = nf90_inq_varid(ncid,trim(filefld),varid)
       if (status /= nf90_noerr) then
-         write(nulprt,*) subname,':',trim(nf90_strerror(status))
-         call prism_sys_abort(compid,subname,' ERROR: filefld variable not found '//trim(filefld))
+         CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)),char2=trim(filefld))
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' filefld variable not found')
+         call prism_sys_abort()
       endif
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       if (dlen /= 2) then
-         write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(filefld),dlen
-         call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 2')
+         CALL oasis_pprinti(subname,2,' ERROR: variable ndims ne 2, dlen =  ',int1=dlen)
+         CALL oasis_pprintc(subname,2,' ERROR: variable ndims ne 2 ',char1=trim(filefld))
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' variable ndims ne 2')
+         call prism_sys_abort()
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-         call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+         CALL oasis_pprinti(subname,2,' ERROR: av gsize nx ny mismatch ',int1=SIZE(av_g%rAttr,dim=2),&
+                               int2=nx,int3=ny)
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' av_g gsize nx ny mismatch')
+         CALL prism_sys_abort()
       endif
 
       if (ifldtype == 1) then
          allocate(array2i(nx,ny))
          status = nf90_get_var(ncid,varid,array2i)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          n = mct_avect_indexIA(av_g,trim(avfld))
          n1 = 0
@@ -140,7 +153,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       else
          allocate(array2(nx,ny))
          status = nf90_get_var(ncid,varid,array2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          n = mct_avect_indexRA(av_g,trim(avfld))
          n1 = 0
@@ -154,7 +167,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       endif
 
       status = nf90_close(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
    endif
 
@@ -226,18 +239,21 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-         call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+         CALL oasis_pprinti(subname,2,' ERROR: av gsize nx ny mismatch ',int1=SIZE(av_g%rAttr,dim=2),&
+                               int2=nx,int3=ny)
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' av_g gsize nx ny mismatch')
+         CALL prism_sys_abort()
       endif
 
       inquire(file=trim(rstfile),exist=exists)
       if (exists) then
          status = nf90_open(trim(rstfile),NF90_WRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_redef(ncid)
       else
          status = nf90_create(trim(rstfile),NF90_CLOBBER,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       endif
 
       do n = 1,mct_aVect_nRAttr(av_g)
@@ -257,29 +273,33 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(1),len=dlen)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          if (dlen /= nx) then
-            write(nulprt,*) subname,' ERROR: dlen ne nx ',dlen,nx
-            call prism_sys_abort(compid,subname,' ERROR: dlen ne nx')
+            CALL oasis_pprinti(subname,2,' ERROR: dlen ne nx ',int1=dlen,int2=nx)
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' dlen ne nx')
+            call prism_sys_abort()
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          if (dlen /= ny) then
-            write(nulprt,*) subname,' ERROR: dlen ne ny ',dlen,ny
-            call prism_sys_abort(compid,subname,' ERROR: dlen ne ny')
+            CALL oasis_pprinti(subname,2,' ERROR: dlen ne nx ',int1=dlen,int2=ny)
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' dlen ne ny')
+            call prism_sys_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(itemc),NF90_DOUBLE,dimid2,varid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          endif
 
       enddo
 
       status = nf90_enddef(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
       allocate(array2(nx,ny))
       do n = 1,mct_aVect_nRAttr(av_g)
@@ -296,15 +316,15 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          enddo
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_put_var(ncid,varid,array2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       enddo
       deallocate(array2)
       call mct_aVect_clean(av_g)
 
       status = nf90_close(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
    endif
 
@@ -380,11 +400,15 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
 
       inquire(file=trim(rstfile),exist=exists)
       if (.not.exists) then
-         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
-         if (labort) call prism_sys_abort(compid,subname,'ERROR: file missing')
+         CALL oasis_pprintc(subname,2,' ERROR: file missing ',char1=trim(rstfile))
+         IF (labort) THEN
+             CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+             CALL oasis_pprintc(subname,2,' error :',char1=' file missing')
+             CALL prism_sys_abort()
+         ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          do n = 1,mct_aVect_nRAttr(av_g)
             call mct_aVect_getRList(mstring,n,av_g)
@@ -395,30 +419,40 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
             status = nf90_inq_varid(ncid,trim(itemc),varid)
 
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(itemc),':',trim(nf90_strerror(status))
-               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
+               CALL oasis_pprintc(subname,2,' : ',char1=TRIM(itemc),char2=' :',char3=trim(nf90_strerror(status)))
+               IF (labort) THEN
+                   CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                   CALL oasis_pprintc(subname,2,' error :',char1=' var missing')
+                   CALL prism_sys_abort()
+               ENDIF
 
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
                if (dlen /= 2) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
-                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 2')
+                  CALL oasis_pprintc(subname,2,' ERROR: variable ndims ne 2 ',char1=trim(itemc))
+                  CALL oasis_pprinti(subname,2, ' ERROR dlen : ',int1=dlen)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' variable ndims ne 2')
+                  call prism_sys_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
                status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
-                  write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-                  call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+                  CALL oasis_pprinti(subname,2,' ERROR: av gsize nx ny mismatch ',int1=SIZE(av_g%rAttr,dim=2),&
+                                                 int2=nx,int3=ny)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' av_g gsize nx ny mismatch')
+                  call prism_sys_abort()
                endif
 
                allocate(array2(nx,ny))
 
                status = nf90_get_var(ncid,varid,array2)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
                n1 = 0
                do j = 1,ny
@@ -433,7 +467,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
          enddo
 
          status = nf90_close(ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
       endif  ! file exists
    endif
@@ -501,78 +535,104 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
 
       inquire(file=trim(rstfile),exist=exists)
       if (.not.exists) then
-         if (PRISM_DEBUG > 0) write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
-         if (labort) call prism_sys_abort(compid,subname,'ERROR: file missing')
+         CALL oasis_pprintc(subname,2,' ERROR: file missing ',char1=trim(rstfile))
+         IF (labort) THEN
+             CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+             CALL oasis_pprintc(subname,2,' error :',char1=' file missing')
+             CALL prism_sys_abort()
+         ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          if (present(iarray)) then
             if (.not. present(ivarname)) then
-               write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
-               call prism_sys_abort(compid,subname,' ERROR: ivarname unset')
+               CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+               CALL oasis_pprintc(subname,2,' error :',char1=' iarray must have ivarname set')
+               call prism_sys_abort()
             endif
 
             ncnt = size(iarray)
 
             status = nf90_inq_varid(ncid,trim(ivarname),varid)
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(ivarname),':',trim(nf90_strerror(status))
-               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
+               CALL oasis_pprintc(subname,2,' : ',char1=trim(ivarname),char2=':',&
+                                             char3=trim(nf90_strerror(status)))
+               IF (labort) THEN
+                   CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                   CALL oasis_pprintc(subname,2,' error :',char1=' var missing')
+                   CALL prism_sys_abort()
+               ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
                if (dlen /= 1) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(ivarname),dlen
-                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 1')
+                  CALL oasis_pprintc(subname,2,' ERROR: variable ndims ne 1 ',char1=trim(ivarname))
+                  CALL oasis_pprinti(subname,2,' ERROR dlen :',int1=dlen)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' variable ndims ne 1')
+                  call prism_sys_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
                if (ncnt /= dlen) then
-                  write(nulprt,*) subname,' ERROR: iarray ncnt dlen mismatch ',ncnt,dlen
-                  call prism_sys_abort(compid,subname,'ERROR: iarray ncnt dlen mismatch')
+                  CALL oasis_pprinti(subname,2,' ERROR: iarray ncnt dlen mismatch ',int1=ncnt,int2=dlen)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' iarray ncnt dlen mismatch')
+                  call prism_sys_abort()
                endif
 
                status = nf90_get_var(ncid,varid,iarray)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             endif
          endif
 
          if (present(rarray)) then
             if (.not. present(rvarname)) then
-               write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
-               call prism_sys_abort(compid,subname,' ERROR: rvarname unset')
+               CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+               CALL oasis_pprintc(subname,2,' error :',char1=' rarray must have rvarname set')
+               call prism_sys_abort()
             endif
 
             ncnt = size(rarray)
 
             status = nf90_inq_varid(ncid,trim(rvarname),varid)
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(rvarname),':',trim(nf90_strerror(status))
-               if (labort) call prism_sys_abort(compid,subname,'ERROR: var missing')
+               CALL oasis_pprintc(subname,2,' : ',char1=trim(rvarname),char2=' : ',&
+                                            char3=trim(nf90_strerror(status)))
+               IF (labort) THEN
+                   CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                   CALL oasis_pprintc(subname,2,' error :',char1=' var missing')
+                   CALL prism_sys_abort()
+               ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
                if (dlen /= 1) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(rvarname),dlen
-                  call prism_sys_abort(compid,subname,' ERROR: variable ndims ne 1')
+                  CALL oasis_pprintc(subname,2,' ERROR: variable ndims ne 1 ',char1=trim(rvarname))
+                  CALL oasis_pprinti(subname,2,' ERROR dlen : ',int1=dlen)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' variable ndims ne 1')
+                  call prism_sys_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
                if (ncnt /= dlen) then
-                  write(nulprt,*) subname,' ERROR: rarray ncnt dlen mismatch ',ncnt,dlen
-                  call prism_sys_abort(compid,subname,'ERROR: rarray ncnt dlen mismatch')
+                  CALL oasis_pprinti(subname,2,' ERROR: rarray ncnt dlen mismatch ',int1=ncnt,int2=dlen)
+                  CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+                  CALL oasis_pprintc(subname,2,' error :',char1=' rarray ncnt dlen mismatch')
+                  call prism_sys_abort()
                endif
 
                status = nf90_get_var(ncid,varid,rarray)
-               if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+               if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             endif
          endif
 
          status = nf90_close(ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
       endif
    endif
@@ -637,17 +697,18 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
       inquire(file=trim(rstfile),exist=exists)
       if (exists) then
          status = nf90_open(trim(rstfile),NF90_WRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_redef(ncid)
       else
          status = nf90_create(trim(rstfile),NF90_CLOBBER,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       endif
 
       if (present(iarray)) then
          if (.not. present(ivarname)) then
-            write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
-            call prism_sys_abort(compid,subname,' ERROR: ivarname unset')
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' iarray must have ivarname set')
+            call prism_sys_abort()
          endif
 
          ncnt = size(iarray)
@@ -658,23 +719,26 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          if (dlen /= ncnt) then
-            write(nulprt,*) subname,' ERROR: iarray dlen ne ncnt ',dlen,ncnt
-            call prism_sys_abort(compid,subname,' ERROR: dlen ne ncnt')
+            CALL oasis_pprinti(subname,2,' ERROR: iarray dlen ne ncnt ',int1=dlen,int2=ncnt)
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' dlen ne ncnt')
+            call prism_sys_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(ivarname),NF90_INT,dimid1,varid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          endif
       endif
 
       if (present(rarray)) then
          if (.not. present(rvarname)) then
-            write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
-            call prism_sys_abort(compid,subname,' ERROR: rvarname unset')
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' rarray must have rvarname set')
+            call prism_sys_abort()
          endif
 
          ncnt = size(rarray)
@@ -685,38 +749,40 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          if (dlen /= ncnt) then
-            write(nulprt,*) subname,' ERROR: rarray dlen ne ncnt ',dlen,ncnt
-            call prism_sys_abort(compid,subname,' ERROR: dlen ne ncnt')
+            CALL oasis_pprinti(subname,2,' ERROR: rarray dlen ne ncnt ',int1=dlen,int2=ncnt)
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' dlen ne ncnt')
+            call prism_sys_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(rvarname),NF90_DOUBLE,dimid1,varid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          endif
       endif
 
       status = nf90_enddef(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
       if (present(iarray)) then
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_put_var(ncid,varid,iarray)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       endif
 
       if (present(rarray)) then
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_put_var(ncid,varid,rarray)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       endif
 
       status = nf90_close(ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
    endif
 
@@ -797,7 +863,9 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
          whead = .false.
          wdata = .true.
       else
-         call prism_sys_abort(compid,subname,'ERROR: fk illegal')
+          CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+          CALL oasis_pprintc(subname,2,' error :',char1=' fk illegal')
+          CALL prism_sys_abort()
       end if
 
       call prism_ioshr_write(lfn,&
@@ -817,8 +885,11 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-         call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+         CALL oasis_pprinti(subname,2,' ERROR: av gsize nx ny mismatch ',int1=size(av_g%rAttr,dim=2),&
+                                      int2=nx,int3=ny)
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1=' av_g gsize nx ny mismatch')
+         call prism_sys_abort()
       endif
 
       allocate(array3(nx,ny,1))
@@ -849,41 +920,41 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
          inquire(file=trim(lfn),exist=exists)
          if (exists) then
             status = nf90_open(lfn,NF90_WRITE,ncid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_inq_dimid(ncid,'time',dimid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_inquire_dimension(ncid,dimid,len=dlen)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             start1(1) = dlen + 1
             start3(3) = start1(1)
          else
             status = nf90_create(lfn,NF90_CLOBBER,ncid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_def_dim(ncid,'nx',nx,dimid3(1))
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_def_dim(ncid,'ny',ny,dimid3(2))
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_def_dim(ncid,'time',NF90_UNLIMITED,dimid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             dimid3(3) = dimid
             status = nf90_def_var(ncid,'time',NF90_INT,dimid,varid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_def_var(ncid,trim(itemc),NF90_DOUBLE,dimid3,varid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
             status = nf90_enddef(ncid)
-            if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+            if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          endif
 
          status = nf90_inq_varid(ncid,'time',varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_put_var(ncid,varid,lmsec,start1,count1)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_put_var(ncid,varid,array3,start3,count3)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_close(ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       enddo
       deallocate(array3)
       call mct_aVect_clean(av_g)
@@ -970,44 +1041,52 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
 
          inquire(file=trim(lfn),exist=exists)
          if (.not.exists) then
-            write(nulprt,*) subname,' ERROR: file not found ',trim(lfn)
-            call prism_sys_abort(compid,subname,'ERROR: file not found')
+            CALL oasis_pprintc(subname,2,' ERROR: file not found ',char1=trim(lfn))
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' file not found')
+            call prism_sys_abort()
          endif
 
          status = nf90_open(lfn,NF90_NOWRITE,ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          status = nf90_inq_dimid(ncid,'time',dimid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_inquire_dimension(ncid,dimid,len=dlen)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          allocate(time(dlen))
          status = nf90_inq_varid(ncid,'time',varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_get_var(ncid,varid,time)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          n1 = 0
          do j = 1,dlen
             if (time(j) == lmsec(1)) n1 = j
          enddo
          deallocate(time)
          if (n1 < 1) then
-            write(nulprt,*) subname,' ERROR: time not found on file ',trim(lfn),lmsec
-            call prism_sys_abort(compid,subname,'ERROR: time not found on file')
+            CALL oasis_pprinti(subname,2,' ERROR: time not found ',int1=lmsec(1))
+            CALL oasis_pprintc(subname,2,' on file ',char1=trim(lfn))
+            CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+            CALL oasis_pprintc(subname,2,' error :',char1=' time not found on file')
+            call prism_sys_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_inquire_variable(ncid,varid,dimids=dimid3)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_inquire_dimension(ncid,dimid3(1),len=nx)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_inquire_dimension(ncid,dimid3(2),len=ny)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
-             write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-             call prism_sys_abort(compid,subname,'ERROR: av_g gsize nx ny mismatch')
+             CALL oasis_pprinti(subname,2,' ERROR: av gsize nx ny mismatch ',int1=size(av_g%rAttr,dim=2),&
+                                            int2=nx,int3=ny)
+             CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+             CALL oasis_pprintc(subname,2,' error :',char1=' av_g gsize nx ny mismatch')
+             call prism_sys_abort()
          endif
 
          start3 = 1
@@ -1018,9 +1097,9 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
          allocate(array3(nx,ny,1))
 
          status = nf90_get_var(ncid,varid,array3,start3,count3)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
          status = nf90_close(ncid)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
          n1 = 0
          do j = 1,ny
@@ -1087,49 +1166,55 @@ subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    inquire(file=trim(filename),exist=exists)
    if (exists) then
       status = nf90_open(filename,NF90_NOWRITE,ncid)
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       status = nf90_redef(ncid)
    else
-      write(nulprt,*) subname,' ERROR: in filename ',trim(filename)
-      call prism_sys_abort(compid,subname,' ERROR filename does not exist')
+      CALL oasis_pprintc(subname,2,' ERROR: in filename ',char1=trim(filename))
+      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+      CALL oasis_pprintc(subname,2,' error :',char1=' filename does not exist')
+      call prism_sys_abort()
    endif
 
    status = nf90_inq_varid(ncid,trim(fldname),varid)
    if (status /= nf90_noerr) then
-      write(nulprt,*) subname,' ERROR: in variable name ',trim(fldname)
-      call prism_sys_abort(compid,subname,' ERROR variable name does not exist')
+      CALL oasis_pprintc(subname,2,' ERROR: in variable name ',char1=trim(fldname))
+      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+      CALL oasis_pprintc(subname,2,' error :',char1=' filename does not exist')
+      call prism_sys_abort()
    endif
 
    status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
-   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+   if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
    allocate(dimid(ndims),nd(ndims))
 
    status = nf90_inquire_variable(ncid,varid,dimids=dimid)
-   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+   if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
    do n = 1,ndims
       status = nf90_inquire_dimension(ncid,dimid(n),len=nd(n))
-      if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+      if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
    enddo
 
    if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
       if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
          status = nf90_get_var(ncid,varid,ifld2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
          status = nf90_get_var(ncid,varid,fld2)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
          status = nf90_get_var(ncid,varid,fld3)
-         if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+         if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
       else
-         write(nulprt,*) subname,' ERROR: mismatch in field and data'
-         call prism_sys_abort(compid,subname,' ERROR mismatch in field and data')
+         CALL oasis_pprintc(subname,2,' : ',char1=' ERROR: mismatch in field and data')
+         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+         CALL oasis_pprintc(subname,2,' error :',char1='  mismatch in field and data')
+         call prism_sys_abort()
       endif
    endif
     
    status = nf90_close(ncid)
-   if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+   if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
    if (present(nx)) then
       nx = nd(1)
@@ -1188,51 +1273,53 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       call prism_sys_abort(compid,subname,' ERROR in fldname')
+       CALL oasis_pprintc(subname,2,' ERROR: in fldname ',char1=trim(fldname))
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1=' in fldname')
+       call prism_sys_abort()
     endif
     gridname = fldname(1:ind-1)
 
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid2(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid2(1))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid2(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid2(2))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_DOUBLE,dimid2,varid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_put_var(ncid,varid,fld)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     else
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     status = nf90_close(ncid)
-    if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+    if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
 !   endif
 
@@ -1277,51 +1364,53 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       call prism_sys_abort(compid,subname,' ERROR in fldname')
+       CALL oasis_pprintc(subname,2,' ERROR: in fldname ',char1=trim(fldname))
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1=' in fldname')
+       call prism_sys_abort()
     endif
     gridname = fldname(1:ind-1)
 
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid2(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid2(1))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid2(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid2(2))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_INT,dimid2,varid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_put_var(ncid,varid,fld)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     else
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     status = nf90_close(ncid)
-    if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+    if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
 !   endif
 
@@ -1367,58 +1456,60 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
 
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       call prism_sys_abort(compid,subname,' ERROR in fldname')
+       CALL oasis_pprintc(subname,2,' ERROR: in fldname ',char1=TRIM(fldname))
+       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+       CALL oasis_pprintc(subname,2,' error :',char1=' in fldname')
+       CALL prism_sys_abort()
     endif
     gridname = fldname(1:ind-1)
 
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid3(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid3(1))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid3(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid3(2))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define crn dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'crn_'//trim(gridname),dimid3(3))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'crn_'//trim(gridname),nc,dimid3(3))
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_DOUBLE,dimid3,varid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
        status = nf90_put_var(ncid,varid,fld)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     else
        status = nf90_enddef(ncid)
-       if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
     endif
 
     status = nf90_close(ncid)
-    if (status /= nf90_noerr) write(nulprt,*) subname,':',trim(nf90_strerror(status))
+    if (status /= nf90_noerr) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf90_strerror(status)))
 
 !   endif
 

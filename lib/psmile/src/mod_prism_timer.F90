@@ -37,6 +37,7 @@ module mod_prism_timer
 
    use mod_prism_kinds
    use mod_prism_data
+   USE mod_oasis_print
    use mod_prism_sys
    use mod_prism_mpi
 
@@ -85,6 +86,8 @@ module mod_prism_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
+   LOGICAL :: ll_timer = .TRUE.
+
    contains
 
 ! --------------------------------------------------------------------------------
@@ -99,6 +102,8 @@ module mod_prism_timer
 
          integer :: ierror,n
          character(len=*),parameter :: subname = 'prism_timer_init'
+
+         IF (ll_timer .EQV. .TRUE.) THEN
 
          call prism_sys_unitget(output_unit)
 
@@ -132,6 +137,7 @@ module mod_prism_timer
          write(output_unit,*) ''
          close(output_unit)
          single_timer_header = .false.
+         ENDIF
 
       end subroutine prism_timer_init
 
@@ -149,10 +155,11 @@ module mod_prism_timer
          real :: cpu_time_arg
          character(len=*),parameter :: subname = 'prism_timer_start'
 
+         IF (ll_timer .EQV. .TRUE.) THEN
          call prism_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
             if (ntimer+1 > mtimer) then
-               write(nulprt,*) subname,' WARNING timer number exceeded'
+                CALL oasis_pprintc(subname,2,':',char1=' WARNING timer number exceeded')
                return
             endif
             ntimer = ntimer + 1
@@ -171,6 +178,7 @@ module mod_prism_timer
          timer(timer_id)%start_ctime = cpu_time_arg
          count(timer_id) = count(timer_id) + 1
          timer(timer_id)%runflag = t_running
+         ENDIF
 
       end subroutine prism_timer_start
 
@@ -183,14 +191,15 @@ module mod_prism_timer
          integer :: timer_id
          character(len=*),parameter :: subname = 'prism_timer_stop'
 
+         IF (ll_timer .EQV. .TRUE.) THEN
          call prism_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
-            write(nulprt,*) subname,' WARNING: timer_label does not exist ',trim(timer_label)
+             CALL oasis_pprintc(subname,2,' WARNING: timer_label does not exist ',char1=TRIM(timer_label))
             return
          endif
 
          if (timer(timer_id)%runflag == t_stopped) then
-            write(nulprt,*) subname,' WARNING timer_id ',timer_id,' not started'
+             CALL oasis_pprinti(subname,2,' WARNING timer_id not started ',int1=timer_id)
             return
          endif
 
@@ -203,6 +212,7 @@ module mod_prism_timer
          sum_ctime(timer_id) = sum_ctime(timer_id) + &
                                timer(timer_id)%end_ctime - timer(timer_id)%start_ctime
          timer(timer_id)%runflag = t_stopped
+         ENDIF
 
       end subroutine prism_timer_stop
 
@@ -241,12 +251,14 @@ module mod_prism_timer
          double precision   :: mintime,maxtime,meantime
          character(len=*),parameter :: subname = 'prism_timer_print'
 
+
+         IF (ll_timer .EQV. .TRUE.) THEN
          onetimer = .false.
          if (present(timer_label)) then
             onetimer = .true.
             call prism_timer_c2i(timer_label,timer_id)
             if (timer_id < 1) then
-               write(nulprt,*) subname,' WARNING: invalid timer_label',trim(timer_label)
+                CALL oasis_pprintc(subname,2,' WARNING: invalid timer_label',char1=TRIM(timer_label))
                return
             endif
          endif
@@ -307,11 +319,11 @@ module mod_prism_timer
 
             allocate (sum_ctime_global_tmp(ntimermax, comm_size), &
                       sum_wtime_global_tmp(ntimermax, comm_size), stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error sum_global_tmp'
+            IF ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error sum_global_tmp')
             allocate (count_global_tmp(ntimermax, comm_size), stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error count_global_tmp'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error count_global_tmp')
             allocate (label_global_tmp(ntimermax, comm_size), stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error label_global_tmp'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error label_global_tmp')
 
             sum_ctime_global_tmp = 0.0
             sum_wtime_global_tmp = 0.0
@@ -347,7 +359,7 @@ module mod_prism_timer
 
 ! tcraig this works but requires lots of gather calls, could be better
             allocate(rarr(comm_size),iarr(comm_size),carr(comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error rarr'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error rarr')
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
@@ -377,12 +389,12 @@ module mod_prism_timer
                endif
             enddo
             deallocate(rarr,iarr,carr,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error rarr'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error rarr')
 
             ! now sort all the timers out by names
 
             allocate(carr(ntimermax*comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error carr'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error carr')
             nlabels = 0
             do n = 1,ntimermax
             do m = 1,comm_size
@@ -399,18 +411,18 @@ module mod_prism_timer
             enddo
 
             allocate(label_list(nlabels),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error label_list'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error label_list')
             do k = 1,nlabels
                label_list(k) = trim(carr(k))
             enddo
             deallocate(carr,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error carr'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error carr')
             allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error sum_ctime_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error sum_ctime_global')
             allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error sum_wtime_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error sum_wtime_global')
             allocate(count_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error count_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error count_global')
 
             sum_ctime_global = 0
             sum_wtime_global = 0
@@ -429,24 +441,24 @@ module mod_prism_timer
             enddo
 
             deallocate(label_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error label_global_tmp'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error label_global_tmp')
             deallocate(sum_ctime_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error sum_ctime_global_tmp'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error sum_ctime_global_tmp')
             deallocate(sum_wtime_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error sum_wtime_global_tmp'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error sum_wtime_global_tmp')
             deallocate(count_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error count_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error count_global')
 
          else
             nlabels = ntimer
             allocate(label_list(nlabels),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error label_list'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error label_list')
             allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error sum_ctime_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error sum_ctime_global')
             allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error sum_wtime_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error sum_wtime_global')
             allocate(count_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error count_global'
+            if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: allocate error count_global')
             do k = 1,nlabels
                label_list(k) = timer(k)%label
             enddo
@@ -473,7 +485,7 @@ module mod_prism_timer
                if (trim(timer_label) == trim(label_list(k))) n = k
             enddo
             if (n < 1) then
-               write(nulprt,*) subname,' WARNING: invalid timer_label',trim(timer_label)
+                CALL oasis_pprintc(subname,2,' WARNING: invalid timer_label',char1=TRIM(timer_label))
                return
             endif
             mintime = sum_ctime_global(n,1)
@@ -584,14 +596,14 @@ module mod_prism_timer
          endif ! (comm_rank == root)
 
          deallocate (sum_ctime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error sum_ctime_global'
+         if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error sum_ctime_global')
          deallocate (sum_wtime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error sum_wtime_global'
+         if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error sum_wtime_global')
          deallocate (count_global,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error count_global'
+         if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error count_global')
          deallocate (label_list,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error label_list'
-
+         if ( ierror /= 0 ) CALL oasis_pprintc(subname,2,':',char1=' WARNING: deallocate error label_list')
+         ENDIF
 
       end subroutine prism_timer_print
 
@@ -603,10 +615,12 @@ module mod_prism_timer
 
          integer :: n
 
+         IF (ll_timer .EQV. .TRUE.) THEN
          tid = -1
          do n = 1,ntimer
             if (trim(tname) == trim(timer(n)%label)) tid = n
          enddo
+         ENDIF
 
       end subroutine prism_timer_c2i
 

@@ -324,26 +324,34 @@ CONTAINS
   character(len=*),parameter :: subname='prism_namcouple_init'
   !-----------------------------------------------------------
 
-  call prism_sys_debug_enter(subname)
+!  CALL prism_sys_debug_enter(subname)
 
-  call prism_sys_unitget(nulin)
+  CALL prism_sys_unitget(nulin)
   OPEN (UNIT = nulin,FILE =cl_namcouple,STATUS='OLD', &
         FORM ='FORMATTED', IOSTAT = il_iost)
-  IF (il_iost .ne. 0) THEN
-     write(nulprt,*) subname,' ERROR opening namcouple file ',trim(cl_namcouple)
-     call prism_sys_abort(compid,subname,'ERROR opening namcouple file')
-  ELSE
-     write(nulprt,*) subname,' open namcouple file ',trim(cl_namcouple)
+
+  IF (mpi_rank_global == 0) THEN
+      IF (il_iost .NE. 0) THEN
+          WRITE(nulprt1,*) subname,' ERROR opening namcouple file ',TRIM(cl_namcouple)
+          WRITE (nulprt,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt,'(a)') ' error = ERROR opening namcouple file'
+          CALL prism_sys_flush(nulprt1)
+          CALL prism_sys_abort()
+      ELSE
+          WRITE(nulprt1,*) subname,' open namcouple file ',TRIM(cl_namcouple)
+      ENDIF
   ENDIF
 
   call inipar_alloc()
   call alloc()
   call inipar()
 
-  call prism_sys_unitfree(nulin)
+  CALL prism_sys_unitfree(nulin)
 
-  write(nulprt,*) subname,' allocating ig_nmodel+1',ig_nmodel+1
-  write(nulprt,*) subname,' allocating ig_total_nfield',ig_total_nfield
+  IF (mpi_rank_global == 0) THEN
+      WRITE(nulprt1,*) subname,' allocating ig_nmodel+1',ig_nmodel+1
+      WRITE(nulprt1,*) subname,' allocating ig_total_nfield',ig_total_nfield
+  ENDIF
 
   allocate(prism_modnam(ig_nmodel+1), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "prism_modnam" allocation of experiment module',il_err,1)
@@ -487,7 +495,10 @@ CONTAINS
   namscrbin(:) = -1
 
   maxunit = maxval(iga_unitmod)
-  write(nulprt,*) subname,' maximum unit number = ',maxunit
+  IF (mpi_rank_global == 0) THEN
+      WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
+  ENDIF
+
   call prism_sys_unitsetmin(maxunit)
 
 ! without oasis coupler
@@ -501,10 +512,12 @@ CONTAINS
      prism_modnam(n) = trim(cmodnam(n))
   enddo
 
-  write(nulprt,*) subname,' total number of models = ',prism_nmodels
-  do n = 1,prism_nmodels
-     write(nulprt,*) subname,n,trim(prism_modnam(n))
-  enddo
+  IF (mpi_rank_global == 0) THEN
+      WRITE(nulprt1,*) subname,' total number of models = ',prism_nmodels
+      DO n = 1,prism_nmodels
+        WRITE(nulprt1,*) subname,n,TRIM(prism_modnam(n))
+      ENDDO
+  ENDIF
 
   nnamcpl = ig_total_nfield
   namruntim = ntime
@@ -515,15 +528,21 @@ CONTAINS
      namfldseq(jf) = ig_total_nseqn(jf)
      namfldops(jf) = ig_total_state(jf)
      if (namfldops(jf) == ip_auxilary) then
-        write(nulprt,*) subname,jf,'WARNING: AUXILARY NOT SUPPORTED'
+         IF (mpi_rank_global == 0) THEN
+             WRITE(nulprt1,*) subname,jf,'WARNING: AUXILARY NOT SUPPORTED'
+         ENDIF
      endif
      if (namfldops(jf) == ip_ignored) then
         namfldops(jf) = ip_exported
-        write(nulprt,*) subname,jf,'WARNING: IGNORED converted to EXPORTED'
+        IF (mpi_rank_global == 0) THEN
+            WRITE(nulprt1,*) subname,jf,'WARNING: IGNORED converted to EXPORTED'
+        ENDIF
      endif
      if (namfldops(jf) == ip_ignout) then
         namfldops(jf) = ip_expout
-        write(nulprt,*) subname,jf,'WARNING: IGNOUT converted to EXPOUT'
+        IF (mpi_rank_global == 0) THEN
+            WRITE(nulprt1,*) subname,jf,'WARNING: IGNOUT converted to EXPOUT'
+        ENDIF
      endif
      namflddti(jf) = ig_freq(jf)
      namfldlag(jf) = ig_lag(jf)
@@ -548,10 +567,15 @@ CONTAINS
               namscrvam(jf) =      varmul     (ig_number_field(jf))
               namscrnbr(jf) =      nscripvoi  (ig_number_field(jf))
               namscrbin(jf) =      nbins      (ig_number_field(jf))
-              if (trim(namscrtyp(jf)) /= 'SCALAR') then
-                 write(nulprt,*) subname,jf,'WARNING: SCRIPR weights generation temporarily supported only for SCALAR mapping, not '//trim(namscrtyp(jf))
-                 call prism_sys_abort(compid,subname,'ERROR in SCRIPR CFTYP option')
-              endif
+              IF (TRIM(namscrtyp(jf)) /= 'SCALAR') THEN
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE(nulprt1,*) subname,jf,'WARNING: SCRIPR weights generation temporarily supported only for SCALAR mapping, not '//TRIM(namscrtyp(jf))
+                      WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                      WRITE (nulprt1,'(a)') ' error = ERROR in SCRIPR CFTYP option'
+                      CALL prism_sys_flush(nulprt1)
+                  ENDIF
+                  CALL prism_sys_abort()
+              ENDIF
 
            elseif (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
               nammapfil(jf) = trim(cmap_file(ig_number_field(jf)))
@@ -565,8 +589,13 @@ CONTAINS
               if (cconmet(ig_number_field(jf)) .EQ. 'BASBAL') namfldcon(jf) = ip_cbasbal
               if (cconmet(ig_number_field(jf)) .EQ. 'BASPOS') namfldcon(jf) = ip_cbaspos
               if (namfldcon(jf) .EQ. ip_cnone) then
-                 write(nulprt,*) subname,jf,'WARNING: CONSERV option not supported: '//trim(cconmet(ig_number_field(jf)))
-                 call prism_sys_abort(compid,subname,'ERROR in CONSERV option')
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE(nulprt1,*) subname,jf,'WARNING: CONSERV option not supported: '//TRIM(cconmet(ig_number_field(jf)))
+                      WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                      WRITE (nulprt1,'(a)') ' error = ERROR in CONSERV option'
+                      CALL prism_sys_flush(nulprt1)
+                  ENDIF
+                  CALL prism_sys_abort()
               endif
 
            elseif (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) then
@@ -581,8 +610,13 @@ CONTAINS
                  if (trim(cbofld(jc,ig_number_field(jf))) == 'CONSTANT') then
                     namfldsad(jf) = abocoef(jc,ig_number_field(jf))
                  else
-                    write(nulprt,*) subname,jf,'ERROR: BLASOLD only supports CONSTANTS: '//trim(cbofld(jc,ig_number_field(jf)))
-                    call prism_sys_abort(compid,subname,'ERROR in BLASOLD option')
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE(nulprt1,*) subname,jf,'ERROR: BLASOLD only supports CONSTANTS: '//TRIM(cbofld(jc,ig_number_field(jf)))
+                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASOLD option'
+                         CALL prism_sys_flush(nulprt1)
+                     ENDIF
+                    call prism_sys_abort()
                  endif
               enddo
 
@@ -592,8 +626,13 @@ CONTAINS
                  if (trim(cbnfld(jc,ig_number_field(jf))) == 'CONSTANT') then
                     namflddad(jf) = abncoef(jc,ig_number_field(jf))
                  else
-                    write(nulprt,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//trim(cbofld(jc,ig_number_field(jf)))
-                    call prism_sys_abort(compid,subname,'ERROR in BLASNEW option')
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE(nulprt1,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//TRIM(cbofld(jc,ig_number_field(jf)))
+                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASNEW option'
+                         CALL prism_sys_flush(nulprt1)
+                     ENDIF
+                    call prism_sys_abort()
                  endif
               enddo
 
@@ -602,43 +641,45 @@ CONTAINS
      endif   ! ig_number_field
   enddo   ! ig_total_nfield
 
-  write(nulprt,*) ' '
-  do n = 1,nnamcpl
-     write(nulprt,*) subname,n,'namsrcfld ',trim(namsrcfld(n))
-     write(nulprt,*) subname,n,'namdstfld ',trim(namdstfld(n))
-     write(nulprt,*) subname,n,'namsrcgrd ',trim(namsrcgrd(n))
-     write(nulprt,*) subname,n,'namsrc_nx ',namsrc_nx(n)
-     write(nulprt,*) subname,n,'namsrc_ny ',namsrc_ny(n)
-     write(nulprt,*) subname,n,'namdstgrd ',trim(namdstgrd(n))
-     write(nulprt,*) subname,n,'namdst_nx ',namdst_nx(n)
-     write(nulprt,*) subname,n,'namdst_ny ',namdst_ny(n)
-     write(nulprt,*) subname,n,'namfldseq ',namfldseq(n)
-     write(nulprt,*) subname,n,'namfldops ',namfldops(n)
-     write(nulprt,*) subname,n,'namfldtrn ',namfldtrn(n)
-     write(nulprt,*) subname,n,'namfldcon ',namfldcon(n)
-     write(nulprt,*) subname,n,'namflddti ',namflddti(n)
-     write(nulprt,*) subname,n,'namfldlag ',namfldlag(n)
-     write(nulprt,*) subname,n,'nammapfil ',trim(nammapfil(n))
-     write(nulprt,*) subname,n,'nammaploc ',trim(nammaploc(n))
-     write(nulprt,*) subname,n,'nammapopt ',trim(nammapopt(n))
-     write(nulprt,*) subname,n,'namrstfil ',trim(namrstfil(n))
-     write(nulprt,*) subname,n,'naminpfil ',trim(naminpfil(n))
-     write(nulprt,*) subname,n,'namchecki ',namchecki(n)
-     write(nulprt,*) subname,n,'namchecko ',namchecko(n)
-     write(nulprt,*) subname,n,'namfldsmu ',namfldsmu(n)
-     write(nulprt,*) subname,n,'namfldsad ',namfldsad(n)
-     write(nulprt,*) subname,n,'namflddmu ',namflddmu(n)
-     write(nulprt,*) subname,n,'namflddad ',namflddad(n)
-     write(nulprt,*) subname,n,'namscrmet ',trim(namscrmet(n))
-     write(nulprt,*) subname,n,'namscrnor ',trim(namscrnor(n))
-     write(nulprt,*) subname,n,'namscrtyp ',trim(namscrtyp(n))
-     write(nulprt,*) subname,n,'namscrord ',trim(namscrord(n))
-     write(nulprt,*) subname,n,'namscrres ',trim(namscrres(n))
-     write(nulprt,*) subname,n,'namscrvam ',namscrvam(n)
-     write(nulprt,*) subname,n,'namscrnbr ',namscrnbr(n)
-     write(nulprt,*) subname,n,'namscrbin ',namscrbin(n)
-     write(nulprt,*) ' '
-  enddo
+  IF (mpi_rank_global == 0) THEN
+      WRITE(nulprt1,*) ' '
+      DO n = 1,nnamcpl
+        WRITE(nulprt1,*) subname,n,'namsrcfld ',TRIM(namsrcfld(n))
+        WRITE(nulprt1,*) subname,n,'namdstfld ',TRIM(namdstfld(n))
+        WRITE(nulprt1,*) subname,n,'namsrcgrd ',TRIM(namsrcgrd(n))
+        WRITE(nulprt1,*) subname,n,'namsrc_nx ',namsrc_nx(n)
+        WRITE(nulprt1,*) subname,n,'namsrc_ny ',namsrc_ny(n)
+        WRITE(nulprt1,*) subname,n,'namdstgrd ',TRIM(namdstgrd(n))
+        WRITE(nulprt1,*) subname,n,'namdst_nx ',namdst_nx(n)
+        WRITE(nulprt1,*) subname,n,'namdst_ny ',namdst_ny(n)
+        WRITE(nulprt1,*) subname,n,'namfldseq ',namfldseq(n)
+        WRITE(nulprt1,*) subname,n,'namfldops ',namfldops(n)
+        WRITE(nulprt1,*) subname,n,'namfldtrn ',namfldtrn(n)
+        WRITE(nulprt1,*) subname,n,'namfldcon ',namfldcon(n)
+        WRITE(nulprt1,*) subname,n,'namflddti ',namflddti(n)
+        WRITE(nulprt1,*) subname,n,'namfldlag ',namfldlag(n)
+        WRITE(nulprt1,*) subname,n,'nammapfil ',TRIM(nammapfil(n))
+        WRITE(nulprt1,*) subname,n,'nammaploc ',TRIM(nammaploc(n))
+        WRITE(nulprt1,*) subname,n,'nammapopt ',TRIM(nammapopt(n))
+        WRITE(nulprt1,*) subname,n,'namrstfil ',TRIM(namrstfil(n))
+        WRITE(nulprt1,*) subname,n,'naminpfil ',TRIM(naminpfil(n))
+        WRITE(nulprt1,*) subname,n,'namchecki ',namchecki(n)
+        WRITE(nulprt1,*) subname,n,'namchecko ',namchecko(n)
+        WRITE(nulprt1,*) subname,n,'namfldsmu ',namfldsmu(n)
+        WRITE(nulprt1,*) subname,n,'namfldsad ',namfldsad(n)
+        WRITE(nulprt1,*) subname,n,'namflddmu ',namflddmu(n)
+        WRITE(nulprt1,*) subname,n,'namflddad ',namflddad(n)
+        WRITE(nulprt1,*) subname,n,'namscrmet ',TRIM(namscrmet(n))
+        WRITE(nulprt1,*) subname,n,'namscrnor ',TRIM(namscrnor(n))
+        WRITE(nulprt1,*) subname,n,'namscrtyp ',TRIM(namscrtyp(n))
+        WRITE(nulprt1,*) subname,n,'namscrord ',TRIM(namscrord(n))
+        WRITE(nulprt1,*) subname,n,'namscrres ',TRIM(namscrres(n))
+        WRITE(nulprt1,*) subname,n,'namscrvam ',namscrvam(n)
+        WRITE(nulprt1,*) subname,n,'namscrnbr ',namscrnbr(n)
+        WRITE(nulprt1,*) subname,n,'namscrbin ',namscrbin(n)
+        WRITE(nulprt1,*) ' '
+      ENDDO
+  ENDIF
 
   !--- compute seq sort ---
   namfldsort(:) = -1
@@ -656,28 +697,36 @@ CONTAINS
      namfldsort(loc) = nv
   enddo
 
-  do nv = 1,nnamcpl
-     n1 = namfldsort(nv)
-     write(nulprt,*) subname,' sort ',nv,n1,namfldseq(n1)
-  enddo
+  IF (mpi_rank_global == 0) THEN
+      DO nv = 1,nnamcpl
+        n1 = namfldsort(nv)
+        WRITE(nulprt1,*) subname,' sort ',nv,n1,namfldseq(n1)
+      ENDDO
+  ENDIF
+
 
   !--- check they are sorted ---
   do n = 2,nnamcpl
      if (namfldseq(namfldsort(n)) < namfldseq(namfldsort(n-1))) then
-        write(nulprt,*) subname,' ERROR in seq sort'
-        call prism_sys_abort(compid,subname,'ERROR in seq sort')
+         IF (mpi_rank_global == 0) THEN
+             WRITE(nulprt1,*) subname,' ERROR in seq sort'
+             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+             WRITE (nulprt1,'(a)') ' error = ERROR in seq sort'
+             CALL prism_sys_flush(nulprt1)
+         ENDIF
+        call prism_sys_abort()
      endif
   enddo
 
   call dealloc()
 
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prism_namcouple_init
 
 !===============================================================================
 
-      SUBROUTINE inipar_alloc
+      SUBROUTINE inipar_alloc()
 !****
 !               *****************************
 !               * OASIS ROUTINE  -  LEVEL 0 *
@@ -748,23 +797,25 @@ CONTAINS
 
 !* ---------------------------- Poema verses --------------------------
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 !*    1. Get basic info for the simulation 
 !        ---------------------------------
 
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)'  ROUTINE inipar_alloc - Level 0'
-      WRITE (UNIT = nulprt,FMT = *)'  ********************   *******'
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)'  Initialization of run parameters'
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)'  Reading input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)' '
-      CALL FLUSH(nulprt)
+  IF (mpi_rank_global == 0) THEN
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)'  ROUTINE inipar_alloc - Level 0'
+      WRITE (UNIT = nulprt1,FMT = *)'  ********************   *******'
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)'  Initialization of run parameters'
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)'  Reading input file namcouple'
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      CALL FLUSH(nulprt1)
+  ENDIF
 
 !* Initialization
       cchan = '    '
@@ -788,20 +839,24 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $NBMODEL '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $NBMODEL '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE IF (ilen .GT. 1) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Input variable length is incorrect'
-          WRITE (UNIT = nulprt,FMT = *) ' There are too many models '
-          WRITE (UNIT = nulprt,FMT = *) ' ilen = ', ilen  
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Check $NBMODEL variable spelling '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Input variable length is incorrect'
+              WRITE (UNIT = nulprt1,FMT = *) ' There are too many models '
+              WRITE (UNIT = nulprt1,FMT = *) ' ilen = ', ILEN  
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Check $NBMODEL variable spelling '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+          ENDIF
       ELSE
           READ (clvari,FMT = 1003) ig_nmodel
       ENDIF
@@ -844,22 +899,32 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $CHANNEL '
-          CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $CHANNEL '
+              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+              WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+              CALL prism_sys_flush(nulprt1)
+          ENDIF
+          CALL PRISM_SYS_ABORT()
       ELSE IF (ilen .GT. 0 .AND. ilen .NE. 4) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Input variable length is incorrect'
-          WRITE (UNIT = nulprt,FMT = *) ' ilen = ', ilen  
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Check $CHANNEL variable spelling '
-          CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Input variable length is incorrect'
+              WRITE (UNIT = nulprt1,FMT = *) ' ilen = ', ILEN  
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Check $CHANNEL variable spelling '
+              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+              WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+              CALL prism_sys_flush(nulprt1)
+          ENDIF
+          CALL PRISM_SYS_ABORT()
       ELSE
           cchan = clvari(1:4)
 
-          IF (cchan .EQ.'MPI1' .or. cchan .EQ. 'MPI2' &
+          IF (cchan .EQ.'MPI1' .OR. cchan .EQ. 'MPI2' &
               .or. cchan .EQ. 'GSIP') THEN
               CALL parse (clline, clvari, 2, jpeighty, ilen)
 #if defined use_comm_MPI1 || defined use_comm_MPI2 || defined use_comm_GSIP || (!defined use_comm_MPI1 && !defined use_comm_MPI2 && !defined use_comm_GSIP && !defined use_comm_SIPC && !defined use_comm_GMEM && !defined use_comm_PIPE && !defined use_comm_NONE)
@@ -880,46 +945,57 @@ CONTAINS
 !*              Get the total number of processors for the model
                 CALL parse (clline, clvari, 1, jpeighty, ilen)
                 READ (clvari,FMT = 1004) nbtotproc(jm)
-                WRITE (UNIT = nulprt,FMT = *) ' '
-                WRITE (UNIT=nulprt,FMT='(''The total number of proc'', &
-                '' for model'', I4, '' is'', I4)') &
-                jm, nbtotproc(jm)
-                WRITE (UNIT = nulprt,FMT = *) ' '
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                    WRITE (UNIT=nulprt1,FMT='(''The total number of proc'', &
+                       '' for model'', I4, '' is'', I4)') &
+                       jm, nbtotproc(jm)
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                ENDIF
 
 !*              Get the nbr of processors involved in the coupling for the model
                 CALL parse (clline, clvari, 2, jpeighty, ilen)
                 IF (ilen .LE. 0) THEN
-                    WRITE (UNIT = nulprt,FMT = *) '      ***WARNING***'
-                    WRITE (UNIT = nulprt,FMT = *)  &
-           'No input for number of processors involved in the coupling'
-                    WRITE (UNIT = nulprt,FMT = *) 'for model', jm
-                    WRITE (UNIT = nulprt,FMT = *) &
-                        'Total number of processors will be used'
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *) '      ***WARNING***'
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           'No input for number of processors involved in the coupling'
+                        WRITE (UNIT = nulprt1,FMT = *) 'for model', jm
+                        WRITE (UNIT = nulprt1,FMT = *) &
+                           'Total number of processors will be used'
+                    ENDIF
                     nbcplproc(jm)=nbtotproc(jm)
                 ELSE
                     READ (clvari,FMT = 1004) nbcplproc(jm)
                 ENDIF
-                WRITE (UNIT = nulprt,FMT = *) ' '
-                WRITE (UNIT = nulprt,FMT ='(''The number of processors'', &
-                '' involved in the coupling for model'', I4, '' is'',  &
-                I4)') jm, nbcplproc(jm)
-                WRITE (UNIT = nulprt,FMT = *) ' '
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                    WRITE (UNIT = nulprt1,FMT ='(''The number of processors'', &
+                       '' involved in the coupling for model'', I4, '' is'',  &
+                       I4)') jm, nbcplproc(jm)
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                ENDIF
 
  186          CONTINUE
      
           ELSE IF(cchan .EQ. 'PVM3') THEN
-              WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-              WRITE (UNIT = nulprt,FMT = *)  &
-                  ' PVM3 no longer supported'
-              WRITE (UNIT = nulprt,FMT = *)  &
-                  ' Please keep on using Oasis 2.4'
-              CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                  WRITE (UNIT = nulprt1,FMT = *)  &
+                     ' PVM3 no longer supported'
+                  WRITE (UNIT = nulprt1,FMT = *)  &
+                     ' Please keep on using Oasis 2.4'
+                  WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                  WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                  CALL prism_sys_flush(nulprt1)
+              ENDIF
+              CALL PRISM_SYS_ABORT()
           ENDIF
 
 !* Print out the message passing technique
 
           CALL prcout &
-          (' The message passing used in OASIS is cchan =', cchan, 1)
+             (' The message passing used in OASIS is cchan =', cchan, 1)
       ENDIF
 
 !* Formats
@@ -942,11 +1018,13 @@ CONTAINS
       READ (UNIT = nulin,FMT = 2002) clline
       CALL parse(clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $NFIELDS '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $NFIELDS '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE
           READ (clvari,FMT = 2003) ig_total_nfield
       ENDIF
@@ -964,10 +1042,12 @@ CONTAINS
 
       CALL parse(clline, clvari, 2, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' No ig_clim_maxport in namcouple'
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' No ig_clim_maxport in namcouple'
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
           ig_clim_maxport = 0
       ELSE
           READ (clvari,FMT = 2003) ig_clim_maxport
@@ -1074,7 +1154,7 @@ CONTAINS
         ELSE
 !* Get field status (direct or through oasis) and the number  
 !* of direct and indirect fields if not PIPE nor NONE
-            IF (cchan .ne. 'PIPE' .and. cchan .ne. 'NONE') THEN
+            IF (cchan .NE. 'PIPE' .AND. cchan .NE. 'NONE') THEN
                 CALL parse(clline, clvari, 7, jpeighty, ilen)
                 IF (clvari(1:8).eq.'EXPORTED') THEN
                     ig_nfield = ig_nfield + 1
@@ -1093,11 +1173,16 @@ CONTAINS
                     cg_restart_file(jf) = clvari
                 ELSEIF (clvari(1:7) .eq. 'IGNORED' ) THEN
                     IF (cchan .eq. 'GSIP') THEN
-                        WRITE (UNIT = nulprt,FMT = *) &
-                            'Direct exchange of fields between models'
-                        WRITE (UNIT = nulprt,FMT = *) &
-                            'not supported with GSIP'
-                        CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar_alloc (GSIP)')
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) &
+                               'Direct exchange of fields between models'
+                            WRITE (UNIT = nulprt1,FMT = *) &
+                               'not supported with GSIP'
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc (GSIP)'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                        CALL PRISM_SYS_ABORT()
                     ENDIF
                     ig_direct_nfield = ig_direct_nfield + 1
                     lg_state(jf) = .false.
@@ -1139,20 +1224,28 @@ CONTAINS
             ELSE
 !*          Get field status if PIPE or NONE
               CALL parse(clline, clvari, 8, jpeighty, ilen)
-              IF (clvari .ne. 'EXPORTED' .and. clvari .ne. 'AUXILARY')  &
-                   THEN
+              IF (clvari .NE. 'EXPORTED' .AND. clvari .NE. 'AUXILARY') THEN
                  CALL prtout  &
                       ('Error in namcouple for status of field',jf,1)
-                 WRITE (UNIT = nulprt,FMT = *)  &
-                      '==> Must be EXPORTED or AUXILARY'
-                 IF (clvari(1:7) .eq. 'IGNORED')  &
-                      WRITE (UNIT = nulprt,FMT = *) &
-                 'Direct communication is only for CLIM/MPI1 or MPI2'
-                 WRITE (UNIT = nulprt,FMT = *)  &
-                     'Maybe you forgot the output FILE name which'
-                 WRITE (UNIT = nulprt,FMT = *)  &
-                     'is mandatory for PIPE or NONE techniques'
-                 CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar') 
+                 IF (mpi_rank_global == 0) THEN
+                     WRITE (UNIT = nulprt1,FMT = *)  &
+                        '==> Must be EXPORTED or AUXILARY'
+                 ENDIF
+                 IF (clvari(1:7) .EQ. 'IGNORED')  &
+                    THEN
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE (UNIT = nulprt1,FMT = *) &
+                            'Direct communication is only for CLIM/MPI1 or MPI2'
+                         WRITE (UNIT = nulprt1,FMT = *)  &
+                            'Maybe you forgot the output FILE name which'
+                         WRITE (UNIT = nulprt1,FMT = *)  &
+                            'is mandatory for PIPE or NONE techniques'
+                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                         CALL prism_sys_flush(nulprt1)
+                     ENDIF
+                 CALL PRISM_SYS_ABORT() 
+                 ENDIF
               ELSE IF (clvari .eq. 'EXPORTED') THEN
                  ig_nfield = ig_nfield + 1
                  lg_state(jf) = .true.
@@ -1169,16 +1262,21 @@ CONTAINS
 !* Get restart file name
                  CALL parse(clline, clvari, 6, jpeighty, ilen)
                  cg_restart_file(jf) = clvari
-              ENDIF
-          ENDIF
-      ENDIF
+             ENDIF
+         ENDIF
+     ENDIF
       IF (lg_state(jf)) THEN
            IF (ig_total_ntrans(jf) .eq. 0) THEN
-              WRITE (UNIT = nulprt,FMT = *) &
-                   'If there is no analysis for the field',jf, &
-                   'then the status must not be "EXPORTED"' 
-              WRITE (UNIT = nulprt,FMT = *)' "AUXILARY" or "EXPOUT" '
-              CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar_alloc') 
+               IF (mpi_rank_global == 0) THEN
+                   WRITE (UNIT = nulprt1,FMT = *) &
+                      'If there is no analysis for the field',jf, &
+                      'then the status must not be "EXPORTED"' 
+                   WRITE (UNIT = nulprt1,FMT = *)' "AUXILARY" or "EXPOUT" '
+                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                   WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+                   CALL prism_sys_flush(nulprt1)
+               ENDIF
+              CALL PRISM_SYS_ABORT() 
            ENDIF
            READ (UNIT = nulin,FMT = 2002) clline
            CALL skip(clline, jpeighty)
@@ -1213,25 +1311,32 @@ CONTAINS
               READ (UNIT = nulin,FMT = 2002) clline
               CALL parse(clline, clvari, 1, jpeighty, ilen)
               IF (clvari(1:8) .ne. 'LOCTRANS') THEN
-                 WRITE (UNIT = nulprt,FMT = *) &
-                    'You want a transformation which is not available !'
-                 WRITE (UNIT = nulprt,FMT = *) &
-                    'Only local transformations are available for '
-                 WRITE (UNIT = nulprt,FMT = *) &
-                    'fields exchanged directly or output fields '
-                 CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar_alloc') 
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE (UNIT = nulprt1,FMT = *) &
+                         'You want a transformation which is not available !'
+                      WRITE (UNIT = nulprt1,FMT = *) &
+                         'Only local transformations are available for '
+                      WRITE (UNIT = nulprt1,FMT = *) &
+                         'fields exchanged directly or output fields '
+                      WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                      WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+                      CALL prism_sys_flush(nulprt1)
+                  ENDIF
+                 CALL PRISM_SYS_ABORT() 
               ENDIF
               DO ja=1,ig_total_ntrans(jf)
                  READ (UNIT = nulin,FMT = 2002) clline
                  CALL skip(clline, jpeighty)
               ENDDO
            ENDIF 
-        ENDIF          
+       ENDIF
         
  240    CONTINUE
         IF (ig_nfield.eq.0) THEN
             lg_oasis_field = .false.
-            WRITE (nulprt,*)'==> All the fields are exchanged directly'
+            IF (mpi_rank_global == 0) THEN
+                WRITE (nulprt1,*)'==> All the fields are exchanged directly'
+            ENDIF
         ENDIF
         
 
@@ -1422,7 +1527,9 @@ CONTAINS
 !            ENDIF
 !            istatus=NF_CLOSE(il_id)
 #endif
-            WRITE(nulprt, *) 'lncdfrst =', lncdfrst
+                IF (mpi_rank_global == 0) THEN
+                    WRITE(nulprt1, *) 'lncdfrst =', lncdfrst
+                ENDIF
 !     
 !*          Alloc array needed to get analysis names
  
@@ -1577,10 +1684,15 @@ CONTAINS
                       READ(clvari,FMT = 2005) &
                           nninnfl(ig_number_field(jf))
                       IF (nninnfl(ig_number_field(jf)) .EQ. 0) THEN
-                          WRITE(UNIT = nulprt,FMT = *)'  ***WARNING***'
-                          WRITE(UNIT = nulprt,FMT = *)  &
-         ' **WARNING** The EXTRAP/NINENN dataset id cannot be 0' 
-                          CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                          IF (mpi_rank_global == 0) THEN
+                              WRITE(UNIT = nulprt1,FMT = *)'  ***WARNING***'
+                              WRITE(UNIT = nulprt1,FMT = *)  &
+                                 ' **WARNING** The EXTRAP/NINENN dataset id cannot be 0' 
+                              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                              WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                              CALL prism_sys_flush(nulprt1)
+                          ENDIF
+                          CALL PRISM_SYS_ABORT()
                       ENDIF
 !*                    If choice is WEIGHT, read more data
                   ELSE IF (cextmet(ig_number_field(jf)) .EQ. 'WEIGHT')  &
@@ -1641,13 +1753,18 @@ CONTAINS
                       CALL prcout &
                           ('ERROR in namcouple for analysis',  &
                           canal(ja,ig_number_field(jf)), 1) 
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                   'Since version 2.3, the information on the reduced'
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                   'grid in namcouple has to be NOxx WHERE xx is half'
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                   'the number of latitude lines.'
-                      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+                      IF (mpi_rank_global == 0) THEN
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'Since version 2.3, the information on the reduced'
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'grid in namcouple has to be NOxx WHERE xx is half'
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'the number of latitude lines.'
+                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                          CALL prism_sys_flush(nulprt1)
+                      ENDIF
+                      CALL prism_sys_abort()
                   ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'GLORED')THEN
                   CALL parse(clline, clvari, 1, jpeighty, ilen)
@@ -1658,23 +1775,33 @@ CONTAINS
                       CALL prcout &
                           ('ERROR in namcouple for analysis',  &
                           canal(ja,ig_number_field(jf)), 1) 
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                    'Since version 2.3, the information on the reduced'
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                    'grid in namcouple has to be NOxx WHERE xx is half'
-                      WRITE (UNIT = nulprt,FMT = *)  &
-                    'the number of latitude lines.'
-                      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+                      IF (mpi_rank_global == 0) THEN
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'Since version 2.3, the information on the reduced'
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'grid in namcouple has to be NOxx WHERE xx is half'
+                          WRITE (UNIT = nulprt1,FMT = *)  &
+                             'the number of latitude lines.'
+                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                          CALL prism_sys_flush(nulprt1)
+                      ENDIF
+                      CALL prism_sys_abort()
                   ENDIF
                   CALL parse(clline, clvari, 4, jpeighty, ilen)
 !*                Get NINENN dataset identificator
                   READ(clvari,FMT = 2005) nninnflg(ig_number_field(jf))
                   IF (nninnflg(ig_number_field(jf)) .EQ. 0) THEN
-                     WRITE(UNIT = nulprt,FMT = *)  &
-       '**WARNING** The EXTRAP/NINENN dataset identificator in GLORED' 
-                     WRITE(UNIT = nulprt,FMT = *)  &
-                          'cannot be 0'
-                     CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                      IF (mpi_rank_global == 0) THEN
+                          WRITE(UNIT = nulprt1,FMT = *)  &
+                             '**WARNING** The EXTRAP/NINENN dataset identificator in GLORED' 
+                          WRITE(UNIT = nulprt1,FMT = *)  &
+                             'cannot be 0'
+                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                          CALL prism_sys_flush(nulprt1)
+                      ENDIF
+                     CALL PRISM_SYS_ABORT()
                   ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD') THEN
                   CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -1725,84 +1852,104 @@ CONTAINS
 !*          Search maximum number of underlying neighbors for SURFMESH interpolation
 !     
           ig_maxwoa = maxval(naismvoi)
-          WRITE(nulprt,*) &
-              'Max number of underlying neighbors for SURFMESH : ',  &
-              ig_maxwoa
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Max number of underlying neighbors for SURFMESH : ',  &
+                 ig_maxwoa
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of neighbors for GAUSSIAN interpolation
 !     
           ig_maxnoa = maxval(naisgvoi)
-          WRITE(nulprt,*) &
-              'Max number of neighbors for GAUSSIAN interp : ', &
-              ig_maxnoa
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Max number of neighbors for GAUSSIAN interp : ', &
+                 ig_maxnoa
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of underlying neighbors for MOZAIC interpolation
 !     
           ig_maxmoa = maxval(nmapvoi)
-          WRITE(nulprt,*) &
-          'Maximum number of underlying neighbors for MOZAIC interp: ', &
-              ig_maxmoa
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of underlying neighbors for MOZAIC interp: ', &
+                 ig_maxmoa
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of overlaying neighbors for SUBGRID interpolation
 !     
           ig_maxsoa = maxval(nsubvoi)
-          WRITE(nulprt,*) &
-          'Maximum number of overlaying neighbors for SUBGRID interp :', &
-              ig_maxsoa
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of overlaying neighbors for SUBGRID interp :', &
+                 ig_maxsoa
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different SURFMESH interpolations
 !     
           ig_maxnfm = maxval(naismfl)
-          WRITE(nulprt,*) &
-              'Maximum number of different SURFMESH interpolations : ', &
-              ig_maxnfm
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of different SURFMESH interpolations : ', &
+                 ig_maxnfm
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different GAUSSIAN interpolations
 !     
           ig_maxnfg = maxval(naisgfl)
-          WRITE(nulprt,*) &
-              'Maximum number of different GAUSSIAN interpolations : ', &
-              ig_maxnfg
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of different GAUSSIAN interpolations : ', &
+                 ig_maxnfg
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different MOZAIC interpolations
 !     
           ig_maxnfp = maxval(nmapfl)
-          WRITE(nulprt,*) &
-              'Maximum number of different MOZAIC interpolations : ', &
-              ig_maxnfp
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of different MOZAIC interpolations : ', &
+                 ig_maxnfp
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different SUBGRID interpolations
 !     
           ig_maxnfs = maxval(nsubfl)
-          WRITE(nulprt,*) &
-              'Maximum number of different SUBGRID interpolations : ', &
-              ig_maxnfs
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of different SUBGRID interpolations : ', &
+                 ig_maxnfs
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different NINENN extrapolations
 !     
           ig_maxnfn = maxval(nninnfl)
           IF (maxval(nninnflg).gt.ig_maxnfn) &
               ig_maxnfn = maxval(nninnflg)
-          WRITE(nulprt,*) &
-              'Maximum number of different NINENN extrapolations : ', &
-              ig_maxnfn
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of different NINENN extrapolations : ', &
+                 ig_maxnfn
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of neighbors for extrapolation  
 !     
           ig_maxext = maxval(neighbor)
-          WRITE(nulprt,*) &
-              'Maximum number of neighbors for extrapolation : ', &
-              ig_maxext
-          WRITE(nulprt,*)' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) &
+                 'Maximum number of neighbors for extrapolation : ', &
+                 ig_maxext
+              WRITE(nulprt1,*)' '
+          ENDIF
 !     
 !*          Search maximum number of different extrapolation
 !     
@@ -1823,57 +1970,79 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 
-      WRITE(UNIT = nulprt,FMT = *)' '
-      WRITE(UNIT = nulprt,FMT = *)'-- End of ROUTINE inipar_alloc --'
-      CALL FLUSH (nulprt)
+      IF (mpi_rank_global == 0) THEN
+          WRITE(UNIT = nulprt1,FMT = *)' '
+          WRITE(UNIT = nulprt1,FMT = *)'-- End of ROUTINE inipar_alloc --'
+          CALL FLUSH (nulprt1)
+      ENDIF
 
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
       RETURN
 
 !*    Error branch output
 
  110  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $NBMODEL data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar_alloc')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $NBMODEL data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  130  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $MACHINE data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $MACHINE data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  210  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $FIELDS data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar_alloc')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $FIELDS data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  230  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $STRING data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar_alloc')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $STRING data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
 
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
 
       END SUBROUTINE inipar_alloc
 
@@ -1988,21 +2157,23 @@ CONTAINS
 
 !* ---------------------------- Poema verses --------------------------
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 !*    1. Get basic info for the simulation 
 !        ---------------------------------
 
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)'   ROUTINE inipar  -  Level 0'
-      WRITE (UNIT = nulprt,FMT = *)'   **************     *******'
-      WRITE (UNIT = nulprt,FMT = *)' '
-      WRITE (UNIT = nulprt,FMT = *)'   Initialization of run parameters'
-      WRITE (UNIT = nulprt,FMT = *)'   Reading input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *)' '
-      CALL FLUSH(nulprt)
+  IF (mpi_rank_global == 0) THEN
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)'   ROUTINE inipar  -  Level 0'
+      WRITE (UNIT = nulprt1,FMT = *)'   **************     *******'
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      WRITE (UNIT = nulprt1,FMT = *)'   Initialization of run parameters'
+      WRITE (UNIT = nulprt1,FMT = *)'   Reading input file namcouple'
+      WRITE (UNIT = nulprt1,FMT = *)' '
+      CALL FLUSH(nulprt1)
+  ENDIF
 
 !* Initialize character keywords to locate appropriate input
 
@@ -2029,7 +2200,9 @@ CONTAINS
       INQUIRE (file='cf_name_table.txt', exist=ll_exist)
 
       IF (ll_exist) THEN
-          WRITE (nulprt,*) 'inipar: Reading CF name table!'
+          IF (mpi_rank_global == 0) THEN
+              WRITE (nulprt1,*) 'inipar: Reading CF name table!'
+          ENDIF
           il_file_unit = 99
           OPEN (file='cf_name_table.txt', unit=il_file_unit,  &
               form='formatted', status='old')
@@ -2039,21 +2212,36 @@ CONTAINS
               il_max_entry_id, il_no_of_entries
 
           IF (id_error.ne.0) THEN 
-              WRITE (nulprt,*) 'inipar :cf_name_table.txt:'  &
-                  ,' Reading of first record failed!'
-              CALL prism_sys_abort(compid,subname,'STOP in inipar')
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (nulprt1,*) 'inipar :cf_name_table.txt:'  &
+                     ,' Reading of first record failed!'
+                  WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                  WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                  CALL prism_sys_flush(nulprt1)
+              ENDIF
+              CALL prism_sys_abort()
           ENDIF
 
           IF (il_max_entry_id.gt.0) THEN 
               allocate (cfldlab(1:il_max_entry_id),STAT=id_error)
               IF (id_error.ne.0) THEN 
-                  write(nulprt,*) 'inipar: Allocation of cfldlab failed!'
-                  CALL prism_sys_abort(compid,subname,'STOP in inipar')
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE(nulprt1,*) 'inipar: Allocation of cfldlab failed!'
+                      WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                      WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                      CALL prism_sys_flush(nulprt1)
+                  ENDIF
+                  CALL prism_sys_abort()
               ENDIF
           ELSE
-              WRITE (nulprt,*) 'inipar: cf_name_table.txt:',  &
-                  'The number of entries is less than 0 !'
-              CALL prism_sys_abort(compid,subname,'STOP in inipar')                
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (nulprt1,*) 'inipar: cf_name_table.txt:',  &
+                     'The number of entries is less than 0 !'
+                  WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                  WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                  CALL prism_sys_flush(nulprt1)
+              ENDIF
+              CALL prism_sys_abort()                
           ENDIF
 
           READ (unit=il_file_unit,fmt=*,iostat=id_error)
@@ -2065,19 +2253,34 @@ CONTAINS
                 IF (il_pos .le. il_max_entry_id) THEN 
                     cfldlab(il_pos)=trim(cl_cfname)
                 ELSE
-                    WRITE (nulprt,*) 'inipar: cf_name_table.txt:', &
-                     'Record ',il_i,': numlab =',il_pos,' out of range!'
-                    CALL prism_sys_abort(compid,subname,'STOP in inipar')  
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (nulprt1,*) 'inipar: cf_name_table.txt:', &
+                           'Record ',il_i,': numlab =',il_pos,' out of range!'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL prism_sys_abort()  
                 ENDIF
             ELSE
-                WRITE (nulprt,*) 'inipar: cf_name_table.txt:', &
-                    'Reading record ',il_i,' failed!'
-                CALL prism_sys_abort(compid,subname,'STOP in inipar') 
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (nulprt1,*) 'inipar: cf_name_table.txt:', &
+                       'Reading record ',il_i,' failed!'
+                    WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                    WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                    CALL prism_sys_flush(nulprt1)
+                ENDIF
+                CALL prism_sys_abort() 
             ENDIF
           END DO
       ELSE
-          WRITE (nulprt,*) 'inipar: cf_name_table.txt missing'
-          CALL prism_sys_abort(compid,subname,'STOP in inipar') 
+          IF (mpi_rank_global == 0) THEN
+              WRITE (nulprt1,*) 'inipar: cf_name_table.txt missing'
+              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+              WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+              CALL prism_sys_flush(nulprt1)
+          ENDIF
+          CALL prism_sys_abort() 
       ENDIF
       CLOSE(il_file_unit)
       endif
@@ -2091,20 +2294,24 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $JOBNAME '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $JOBNAME '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE IF (ilen .GT. 0 .AND. ilen .NE. 3 .AND. ilen .NE. 4 ) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Input variable length is incorrect'
-          WRITE (UNIT = nulprt,FMT = *) ' ilen = ', ilen  
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Check $JOBNAME variable spelling '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Input variable length is incorrect'
+              WRITE (UNIT = nulprt1,FMT = *) ' ilen = ', ILEN  
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Check $JOBNAME variable spelling '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE
           IF (ilen .EQ. 3) THEN
               WRITE (cjobnam,FMT='(A1,A3)') ' ',clvari
@@ -2135,9 +2342,12 @@ CONTAINS
 
 !* Print out model names
 
-        WRITE (UNIT = nulprt,FMT =' &
-            (''   Name for model '',I1,'' is '',A6,/)')  &
-            jm, cmodnam(jm)
+        IF (mpi_rank_global == 0) THEN
+            WRITE (UNIT = nulprt1,FMT =' &
+               (''   Name for model '',I1,'' is '',A6,/)')  &
+               jm, cmodnam(jm)
+        ENDIF
+
  140  CONTINUE
 
 !* Get model maximum unit number used if they appear on the line
@@ -2149,21 +2359,24 @@ CONTAINS
             READ (clvari,FMT = 1004) iga_unitmod(jm)
 
 !* Print out model minimum logfile unit number
-
-            WRITE (UNIT = nulprt,FMT = *) ' '
-            WRITE (UNIT=nulprt,FMT='(''The maximum Fortran unit number'', &
-                '' used in model'', I2, '' is '', I2)') &
-                jm, iga_unitmod(jm)
-            WRITE (UNIT = nulprt,FMT = *) ' '
+            IF (mpi_rank_global == 0) THEN
+                WRITE (UNIT = nulprt1,FMT = *) ' '
+                WRITE (UNIT=nulprt1,FMT='(''The maximum Fortran unit number'', &
+                   '' used in model'', I2, '' is '', I2)') &
+                   jm, iga_unitmod(jm)
+                WRITE (UNIT = nulprt1,FMT = *) ' '
+            ENDIF
 
 !* Verify that maximum unit number is larger than 1024; 
 !* if not, use 1024.
             IF (iga_unitmod(jm) .lt. 1024) iga_unitmod(jm)=1024
         ELSE
-            WRITE (UNIT = nulprt, FMT = *) &
-            ' WARNING: You did not give in the namcouple the maximum', &
-            ' Fortran unit numbers used in your models.', &
-            ' Oasis will suppose that units above 1024 are free !'
+            IF (mpi_rank_global == 0) THEN
+                WRITE (UNIT = nulprt1, FMT = *) &
+                   ' WARNING: You did not give in the namcouple the maximum', &
+                   ' Fortran unit numbers used in your models.', &
+                   ' Oasis will suppose that units above 1024 are free !'
+            ENDIF
             iga_unitmod(jm)=1024
         ENDIF
  142      CONTINUE
@@ -2186,19 +2399,23 @@ CONTAINS
 
             CALL parseblk (clline, clvari, 3, jpeighty, ilen)
             IF (ilen .LE. 0) THEN
-                WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-                WRITE (UNIT = nulprt,FMT = *)  &
-           'No launching argument for model', jm
-                WRITE (UNIT = nulprt,FMT = *) ' '
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                    WRITE (UNIT = nulprt1,FMT = *)  &
+                       'No launching argument for model', jm
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                ENDIF
                 cmpiarg(jm)=' '
             ELSE
                 cmpiarg(jm)=clvari
-                WRITE (UNIT = nulprt,FMT = *) ' '
-                WRITE (UNIT =nulprt,FMT=' &
-       (''The launching argument for model '', I2, '' is'')') jm
-                WRITE (UNIT = nulprt,FMT = *) cmpiarg(jm)
-                WRITE (UNIT = nulprt,FMT = *) ' '
-            WRITE (UNIT = nulprt,FMT = *) 'ilen ',ilen
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                    WRITE (UNIT =nulprt1,FMT=' &
+                       (''The launching argument for model '', I2, '' is'')') jm
+                    WRITE (UNIT = nulprt1,FMT = *) cmpiarg(jm)
+                    WRITE (UNIT = nulprt1,FMT = *) ' '
+                    WRITE (UNIT = nulprt1,FMT = *) 'ilen ',ILEN
+                ENDIF
             ENDIF
             
 
@@ -2215,12 +2432,14 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $RUNTIME '
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Default value of 5 days will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $RUNTIME '
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Default value of 5 days will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
         ELSE
           READ (clvari,FMT = 1004) ntime
       ENDIF
@@ -2239,11 +2458,13 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $INIDATE '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $INIDATE '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
         ELSE
           READ (clvari,FMT = 1004) ndate
       ENDIF
@@ -2262,11 +2483,13 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $SEQMODE '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $SEQMODE '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE
           READ (clvari,FMT = 1003) nmseq
       ENDIF
@@ -2285,21 +2508,25 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $MODINFO '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $MODINFO '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
         ELSE IF (ilen .GT. 0 .AND. ilen .NE. 3) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Input variable length is incorrect'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Info mode uncorrectly specified'
-          WRITE (UNIT = nulprt,FMT = *) ' ilen = ', ilen  
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Check $MODINFO variable spelling '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
+            IF (mpi_rank_global == 0) THEN
+                WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                WRITE (UNIT = nulprt1,FMT = *)  &
+                   ' Input variable length is incorrect'
+                WRITE (UNIT = nulprt1,FMT = *)  &
+                   ' Info mode uncorrectly specified'
+                WRITE (UNIT = nulprt1,FMT = *) ' ilen = ', ILEN  
+                WRITE (UNIT = nulprt1,FMT = *)  &
+                   ' Check $MODINFO variable spelling '
+                WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+            ENDIF
         ELSE
           clinfo = clvari
           IF (clinfo .EQ. 'YES') THEN 
@@ -2320,25 +2547,29 @@ CONTAINS
  198  CONTINUE
       READ (UNIT = nulin,FMT = 1001,END = 199) clword
       IF (clword .NE. clprint) GO TO 198
-      nlogprt = 2
+      nlogprt = 0
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $NLOGPRT '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value 2 will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $NLOGPRT '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value 2 will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
       ELSE IF (ilen .gt. 8) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Input variable length is incorrect'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Printing level uncorrectly specified'
-          WRITE (UNIT = nulprt,FMT = *) ' ilen = ', ilen  
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Check $NLOGPRT variable spelling '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value will be used '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Input variable length is incorrect'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Printing level uncorrectly specified'
+              WRITE (UNIT = nulprt1,FMT = *) ' ilen = ', ILEN  
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Check $NLOGPRT variable spelling '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+          ENDIF
       ELSE
           READ (clvari,FMT = 1004) nlogprt
       ENDIF
@@ -2357,11 +2588,13 @@ CONTAINS
       READ (UNIT = nulin,FMT = 1002) clline
       CALL parse (clline, clvari, 1, jpeighty, ilen)
       IF (ilen .LE. 0) THEN
-          WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-          WRITE (UNIT = nulprt,FMT = *)  &
-              ' Nothing on input for $CALTYPE '
-          WRITE (UNIT = nulprt,FMT = *) ' Default value 1 will be used '
-          WRITE (UNIT = nulprt,FMT = *) ' '
+          IF (mpi_rank_global == 0) THEN
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *)  &
+                 ' Nothing on input for $CALTYPE '
+              WRITE (UNIT = nulprt1,FMT = *) ' Default value 1 will be used '
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+          ENDIF
           ncaltype = 1
       ELSE
           READ (clvari,FMT = 1003) ncaltype
@@ -2449,7 +2682,7 @@ CONTAINS
          IF (lg_state(jf)) numlab(ig_number_field(jf)) = ig_numlab(jf)
          CALL parse(clline, clvari, 4, jpeighty, ilen)
 !* Get field exchange frequency
-         IF (clvari(1:4) .eq. 'ONCE') THEN
+         IF (clvari(1:4) .EQ. 'ONCE') THEN
 
 !* The case 'ONCE' means that the coupling period will be equal to the 
 !* time of the simulation
@@ -2457,18 +2690,20 @@ CONTAINS
             ig_freq(jf) = ntime
          ELSE
          READ (clvari,FMT = 2004) ig_freq(jf)
-         IF (ig_freq(jf) .eq. 0) THEN
+         IF (ig_freq(jf) .EQ. 0) THEN
             GOTO 236
          ELSEIF (ig_freq(jf) .gt. ntime) THEN
-           WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-           WRITE (UNIT = nulprt,FMT = *)  &
-                'The coupling period of the field ',jf
-           WRITE (UNIT = nulprt,FMT = *)  &
-                'is greater than the time of the simulation '
-           WRITE (UNIT = nulprt,FMT = *)  &
-                'This field will not be exchanged !'
+             IF (mpi_rank_global == 0) THEN
+                 WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                 WRITE (UNIT = nulprt1,FMT = *)  &
+                    'The coupling period of the field ',jf
+                 WRITE (UNIT = nulprt1,FMT = *)  &
+                    'is greater than the time of the simulation '
+                 WRITE (UNIT = nulprt1,FMT = *)  &
+                    'This field will not be exchanged !'
+             ENDIF
          ENDIF
-         ENDIF
+     ENDIF
          IF (lg_state(jf)) nfexch(ig_number_field(jf)) = ig_freq(jf)
 !* Fill up restart file number and restart file name arrays
          IF (cg_restart_file(jf).ne.' ') THEN
@@ -2514,13 +2749,18 @@ CONTAINS
                 .and. cstate(ig_number_field(jf)) .ne. 'AUXILARY') THEN
                 CALL prtout  &
                     ('Error in namcouple for status of field',jf,1)
-                WRITE (UNIT = nulprt,FMT = *)  &
-                    '==> Must be EXPORTED or AUXILARY'
-                WRITE (UNIT = nulprt,FMT = *)  &
-                    'Maybe you forgot the output FILE name which'
-                WRITE (UNIT = nulprt,FMT = *)  &
-                    'is mandatory for PIPE or NONE techniques'
-                CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar') 
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *)  &
+                       '==> Must be EXPORTED or AUXILARY'
+                    WRITE (UNIT = nulprt1,FMT = *)  &
+                       'Maybe you forgot the output FILE name which'
+                    WRITE (UNIT = nulprt1,FMT = *)  &
+                       'is mandatory for PIPE or NONE techniques'
+                    WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                    WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                    CALL prism_sys_flush(nulprt1)
+                ENDIF
+                CALL PRISM_SYS_ABORT() 
             ENDIF
             ENDIF
         ENDIF
@@ -2542,7 +2782,9 @@ CONTAINS
               ENDIF
               llseq=.FALSE.
               lllag=.FALSE.
-              WRITE (UNIT=nulprt,FMT=3043) jf
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (UNIT=nulprt1,FMT=3043) jf
+              ENDIF
 !tcraig, nmseq irrelevant
 !              IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
            ELSE 
@@ -2573,32 +2815,34 @@ CONTAINS
               DO 245 ilind=ilind1, ilind2
                  CALL parse(clline, clvari, ilind, jpeighty, ilen)
                  IF(ilen .eq. -1) THEN
-                    IF (nlogprt .GE. 2) THEN 
-                       IF(.not. lllag) WRITE (UNIT=nulprt,FMT=3043) jf
-                    ENDIF
-!tcraig, nmseq irrelevant
-!                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
+                     IF (mpi_rank_global == 0) THEN
+                         IF (nlogprt .GE. 0) THEN 
+                             IF(.NOT. lllag) WRITE (UNIT=nulprt1,FMT=3043) jf
+                         ENDIF
+                     ENDIF
+                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
                     GO TO 247
                  ELSE
                     READ(clvari,FMT = 2011) clind, clequa, iind
                     IF (clind .EQ. 'SEQ') THEN
-!tcraig, nmseq irrelevant
-!                       IF (iind .gt. nmseq) THEN
-!                          GO TO 232
-!                       ELSE IF (iind .eq. 0) THEN
-!                          GO TO 234
-!                       ELSE
+                       IF (iind .gt. nmseq) THEN
+                          GO TO 232
+                       ELSE IF (iind .eq. 0) THEN
+                          GO TO 234
+                       ELSE
                           ig_total_nseqn(jf)=iind
                           IF (lg_state(jf)) &
                               nseqn(ig_number_field(jf)) = iind
                           llseq=.TRUE.
-!                       ENDIF
+                       ENDIF
                     ELSE IF (clind .eq. 'LAG') THEN
                        ig_lag(jf)=iind
                        IF (lg_state(jf)) &
                            nlagn(ig_number_field(jf)) = iind
                        lllag=.TRUE.
-                       WRITE (UNIT = nulprt,FMT = 3044)jf,ig_lag(jf)
+                       IF (mpi_rank_global == 0) THEN
+                           WRITE (UNIT = nulprt1,FMT = 3044)jf,ig_lag(jf)
+                       ENDIF
                     ENDIF              
                  ENDIF
  245          CONTINUE
@@ -2619,8 +2863,13 @@ CONTAINS
                 csper(ig_number_field(jf)) .NE. 'R') THEN
               CALL prtout &
             ('ERROR in namcouple for source grid type of field', jf, 1)
-              WRITE (UNIT = nulprt,FMT = *) '==> must be P or R'
-              CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (UNIT = nulprt1,FMT = *) '==> must be P or R'
+                  WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                  WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                  CALL prism_sys_flush(nulprt1)
+              ENDIF
+              CALL PRISM_SYS_ABORT()
            ENDIF
 !     
            CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -2633,8 +2882,13 @@ CONTAINS
                 ctper(ig_number_field(jf)) .NE. 'R') THEN
               CALL prtout &
             ('ERROR in namcouple for target grid type of field', jf, 1)
-              WRITE (UNIT = nulprt,FMT = *) '==> must be P or R'
-              CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+              IF (mpi_rank_global == 0) THEN
+                  WRITE (UNIT = nulprt1,FMT = *) '==> must be P or R'
+                  WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                  WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                  CALL prism_sys_flush(nulprt1)
+              ENDIF
+              CALL PRISM_SYS_ABORT()
            ENDIF
 !     
            CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -2673,9 +2927,14 @@ CONTAINS
                  ELSE
                     CALL prtout &
        ('ERROR in namcouple for local transformations of field', jf, 1)
-                    WRITE (UNIT = nulprt,FMT = *)  &
-          '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')  
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT()  
                  ENDIF
               ENDDO
            ENDIF
@@ -2708,9 +2967,14 @@ CONTAINS
                  ELSE
                     CALL prtout &
        ('ERROR in namcouple for local transformations of field', jf, 1)
-                    WRITE (UNIT = nulprt,FMT = *)  &
-          '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')  
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT()  
                  ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MASK') THEN
                  CALL parse(clline, clvari, 1, jpeighty, ilen)
@@ -2787,11 +3051,13 @@ CONTAINS
                  IF (cextmet(ig_number_field(jf)) .EQ. 'NINENN' .AND.  &
                       neighbor(ig_number_field(jf)) .GT. 4) THEN
                     neighbor(ig_number_field(jf))=4
-                    WRITE(UNIT = nulprt,FMT = *) '        ***WARNING***'
-                    WRITE(UNIT = nulprt,FMT = *)  &
-                         'For EXTRAP/NINENN extrapolation' 
-                    WRITE(UNIT = nulprt,FMT = *)  &
-                         'the number of neighbors has been set to 4'
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE(UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                        WRITE(UNIT = nulprt1,FMT = *)  &
+                           'For EXTRAP/NINENN extrapolation' 
+                        WRITE(UNIT = nulprt1,FMT = *)  &
+                           'the number of neighbors has been set to 4'
+                    ENDIF
                  ENDIF
 !     * If choice is NINENN, read one more data
                  IF (cextmet(ig_number_field(jf)) .EQ. 'NINENN') THEN
@@ -2849,8 +3115,13 @@ CONTAINS
                           cmapopt(ig_number_field(jf)) = trim(clvari)
                        else
                           call prtout ('ERROR in namcouple mapping argument',jf,1)
-                          write(nulprt,*) 'ERROR in namcouple mapping argument ',trim(clvari)
-                          call prism_sys_abort(compid,subname,'STOP in inipar cmaptyp or loc')
+                          IF (mpi_rank_global == 0) THEN
+                              WRITE(nulprt1,*) 'ERROR in namcouple mapping argument ',TRIM(clvari)
+                              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                              WRITE (nulprt1,'(a)') ' error = STOP in inipar cmaptyp or loc'
+                              CALL prism_sys_flush(nulprt1)
+                          ENDIF
+                          call prism_sys_abort()
                        endif
                     endif
                  enddo
@@ -2864,22 +3135,36 @@ CONTAINS
                  IF (cmap_method(ig_number_field(jf)) .eq. 'BICUBIC'  &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'LR' &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'D') THEN
-                    WRITE (UNIT = nulprt,FMT = *) '    '
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE (UNIT = nulprt1,FMT = *) '    '
+                     ENDIF
                     CALL prtout &
                       ('ERROR in namcouple for type of field', jf, 1)
-                    WRITE (UNIT = nulprt,FMT = *)  &
-                      'BICUBIC interpolation cannot be used if grid is not LR or D'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar') 
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           'BICUBIC interpolation cannot be used if grid is not LR or D'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT() 
                  ENDIF
                  IF (cmap_method(ig_number_field(jf)) .eq. 'BILINEAR'  &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'LR' &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'D') THEN
-                    WRITE (UNIT = nulprt,FMT = *) '    '
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE (UNIT = nulprt1,FMT = *) '    '
+                     ENDIF
                     CALL prtout &
                       ('ERROR in namcouple for type of field', jf, 1)
-                    WRITE (UNIT = nulprt,FMT = *)  &
-                      'BILINEAR interpolation cannot be used if grid is not LR or D'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar') 
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           'BILINEAR interpolation cannot be used if grid is not LR or D'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT() 
                  ENDIF
 !* Get field type (scalar/vector)
                  CALL parse(clline, clvari, 3, jpeighty, ilen)
@@ -2888,12 +3173,19 @@ CONTAINS
                     cfldtype(ig_number_field(jf)) .NE. 'VECTOR' .AND. &
                     cfldtype(ig_number_field(jf)) .NE. 'VECTOR_I' .AND. &
                     cfldtype(ig_number_field(jf)) .NE. 'VECTOR_J') THEN
-                    WRITE (UNIT = nulprt,FMT = *) '    '
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE (UNIT = nulprt1,FMT = *) '    '
+                     ENDIF
                     CALL prtout &
                       ('ERROR in namcouple for type of field', jf, 1)
-                    WRITE (UNIT = nulprt,FMT = *)  &
-                      '==> must be SCALAR, VECTOR_I or VECTOR_J'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *)  &
+                           '==> must be SCALAR, VECTOR_I or VECTOR_J'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT()
                  ENDIF
 !* Get restriction type for SCRIP search
                  CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -2902,11 +3194,18 @@ CONTAINS
                     IF (cmap_method(ig_number_field(jf)) .EQ. 'BILINEAR' .or. &
                         cmap_method(ig_number_field(jf)) .EQ. 'BICUBIC') THEN
                         IF (crsttype(ig_number_field(jf)) .NE. 'LATITUDE') THEN
-                            WRITE (UNIT = nulprt,FMT = *) '    '
+                            IF (mpi_rank_global == 0) THEN
+                                WRITE (UNIT = nulprt1,FMT = *) '    '
+                            ENDIF
                             CALL prtout('ERROR in namcouple for restriction of field',jf,1)
-                            WRITE (UNIT = nulprt,FMT = *)  &
-                              '==> LATITUDE must be chosen for reduced grids (D)'
-                            CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                            IF (mpi_rank_global == 0) THEN
+                                WRITE (UNIT = nulprt1,FMT = *)  &
+                                   '==> LATITUDE must be chosen for reduced grids (D)'
+                                WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                                WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                                CALL prism_sys_flush(nulprt1)
+                            ENDIF
+                            CALL PRISM_SYS_ABORT()
                         ELSE  
                             crsttype(ig_number_field(jf)) = 'REDUCED'
                         ENDIF
@@ -2916,10 +3215,17 @@ CONTAINS
                  IF(crsttype(ig_number_field(jf)) .NE. 'LATITUDE' .AND.  &
                     crsttype(ig_number_field(jf)) .NE. 'LATLON' .AND. &
                     crsttype(ig_number_field(jf)) .NE. 'REDUCED') THEN
-                    WRITE (UNIT = nulprt,FMT = *) '    '
+                     IF (mpi_rank_global == 0) THEN
+                         WRITE (UNIT = nulprt1,FMT = *) '    '
+                     ENDIF
                     CALL prtout('ERROR in namcouple for restriction of field',jf,1)
-                    WRITE (UNIT = nulprt,FMT = *) '==> must be LATITUDE or LATLON'
-                    CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE (UNIT = nulprt1,FMT = *) '==> must be LATITUDE or LATLON'
+                        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                        WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                        CALL prism_sys_flush(nulprt1)
+                    ENDIF
+                    CALL PRISM_SYS_ABORT()
                  ENDIF
 !*
 !* Get number of search bins for SCRIP search
@@ -2932,21 +3238,35 @@ CONTAINS
                     IF (cnorm_opt(ig_number_field(jf)) .NE. 'FRACAREA' .AND. &
       		        cnorm_opt(ig_number_field(jf)) .NE. 'DESTAREA' .AND.  &
                         cnorm_opt(ig_number_field(jf)) .NE. 'FRACNNEI') THEN
-                        WRITE (UNIT = nulprt,FMT = *) '    '
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) '    '
+                        ENDIF
                         CALL prtout &
                           ('ERROR in namcouple for normalize option of field',jf,1)
-                        WRITE (UNIT = nulprt, FMT = *)  &
-                          '==> must be FRACAREA, DESTAREA, or FRACNNEI'
-                        CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1, FMT = *)  &
+                               '==> must be FRACAREA, DESTAREA, or FRACNNEI'
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                        CALL PRISM_SYS_ABORT()
                     ENDIF
 !* Get order of remapping for CONSERV
                     CALL parse(clline, clvari, 7, jpeighty, ilen)
                     IF (ilen .LE. 0) THEN
-                        WRITE (UNIT = nulprt,FMT = *) '    '
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) '    '
+                        ENDIF
                         CALL prtout ('ERROR in namcouple for CONSERV for field',jf,1)
-                        WRITE (UNIT = nulprt,FMT = *)  &
-                           '==> SECOND or FIRST must be indicated at end of line'
-                        CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *)  &
+                               '==> SECOND or FIRST must be indicated at end of line'
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                        CALL PRISM_SYS_ABORT()
                     ENDIF
                     READ(clvari,FMT = 2009) corder(ig_number_field(jf))
                  ELSE
@@ -2957,11 +3277,18 @@ CONTAINS
                      cmap_method(ig_number_field(jf)) .EQ. 'GAUSWGT') THEN
                     CALL parse(clline, clvari, 6, jpeighty, ilen)
                     IF (ilen .LE. 0) THEN
-                       WRITE (UNIT = nulprt,FMT = *) '    '
-                       CALL prtout('ERROR in namcouple for field',jf,1)
-                       WRITE (UNIT = nulprt,FMT = *)  &
-                         '==> Number of neighbours must be indicated on the line'
-                       CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) '    '
+                        ENDIF
+                        CALL prtout('ERROR in namcouple for field',jf,1)
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *)  &
+                               '==> Number of neighbours must be indicated on the line'
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                       CALL PRISM_SYS_ABORT()
                     ELSE
                        READ(clvari,FMT=2003)nscripvoi(ig_number_field(jf))
                     ENDIF 
@@ -2970,11 +3297,18 @@ CONTAINS
                  IF (cmap_method(ig_number_field(jf)) .EQ. 'GAUSWGT') THEN
                     CALL parse(clline, clvari, 7, jpeighty, ilen)
                     IF (ilen .LE. 0) THEN
-                       WRITE (UNIT = nulprt,FMT = *) '    '
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) '    '
+                        ENDIF
                        CALL prtout('ERROR in namcouple for GAUSWGT for field',jf,1)
-                       WRITE (UNIT = nulprt,FMT = *)  &
-                         '==> Variance must be indicated at end of line'
-                       CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                       IF (mpi_rank_global == 0) THEN
+                           WRITE (UNIT = nulprt1,FMT = *)  &
+                              '==> Variance must be indicated at end of line'
+                           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                           CALL prism_sys_flush(nulprt1)
+                       ENDIF
+                       CALL PRISM_SYS_ABORT()
                     ELSE
                        READ(clvari,FMT=2006) varmul(ig_number_field(jf))
                     ENDIF
@@ -2989,10 +3323,15 @@ CONTAINS
                     IF(cmap_method(ig_number_field(jf)) .EQ. 'CONSERV') lastplace=8
                     CALL parse(clline, clvari, lastplace, jpeighty, ilen)
                     IF (ilen .le. 0) THEN
-                       WRITE (UNIT = nulprt,FMT = *) ' '
-                       WRITE (UNIT = nulprt,FMT = *)  &
-                          '==> A field associated must be indicated'
-                       CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) ' '
+                            WRITE (UNIT = nulprt1,FMT = *)  &
+                               '==> A field associated must be indicated'
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                       CALL PRISM_SYS_ABORT()
                     ENDIF
                     cg_assoc_input_field(ig_number_field(jf))=clvari
 !*Rotation?
@@ -3001,15 +3340,24 @@ CONTAINS
                        lrotate(ig_number_field(jf)) = .false.
                     ELSEIF(clvari .le. 'PROJCART') THEN
                        lrotate(ig_number_field(jf)) = .true.
-                       WRITE (UNIT = nulprt,FMT = *) &
-                         'rotation to cartesian for field : ', jf
+                       IF (mpi_rank_global == 0) THEN
+                           WRITE (UNIT = nulprt1,FMT = *) &
+                              'rotation to cartesian for field : ', jf
+                       ENDIF
                     ELSE
-                       WRITE (UNIT = nulprt,FMT = *) ' '
-                       CALL prtout &
-                         ('ERROR in namcouple for vector in SCRIPR for field',jf,1)     
-                       WRITE (UNIT = nulprt,FMT = *) &
-                         'must be PROJCART or nothing' 
-                       CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar') 
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) ' '
+                        ENDIF
+                        CALL prtout &
+                         ('ERROR in namcouple for vector in SCRIPR for field',jf,1) 
+                        IF (mpi_rank_global == 0) THEN
+                            WRITE (UNIT = nulprt1,FMT = *) &
+                               'must be PROJCART or nothing' 
+                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                            CALL prism_sys_flush(nulprt1)
+                        ENDIF
+                       CALL PRISM_SYS_ABORT() 
                     ENDIF
                  END IF
 
@@ -3057,11 +3405,13 @@ CONTAINS
                  CALL parse(clline, clvari, 3, jpeighty, ilen)
                  IF (neighborg(ig_number_field(jf)) .GT. 4) THEN
                     neighborg(ig_number_field(jf))=4
-                    WRITE(UNIT = nulprt,FMT = *) '        ***WARNING***'
-                    WRITE(UNIT = nulprt,FMT = *)  &
-                         'For EXTRAP/NINENN extrapolation in GLORED' 
-                    WRITE(UNIT = nulprt,FMT = *)  &
-                         'the number of neighbors has been set to 4'
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE(UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                        WRITE(UNIT = nulprt1,FMT = *)  &
+                           'For EXTRAP/NINENN extrapolation in GLORED' 
+                        WRITE(UNIT = nulprt1,FMT = *)  &
+                           'the number of neighbors has been set to 4'
+                    ENDIF
                  ENDIF
 !     * Get EXTRAP/NINENN weights read/write flag
                  READ(clvari,FMT = 2005) niwtng(ig_number_field(jf))
@@ -3146,17 +3496,22 @@ CONTAINS
                     cdqdt(ig_number_field(jf)) = clvari
                  ENDIF 
               ELSE 
-                 WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-                 WRITE (UNIT = nulprt,FMT = *) &
-                      ' Type of analysis not implemented yet '
-                 WRITE (UNIT = nulprt,FMT = *)  &
-                      ' The analysis required in OASIS is :'
-                 WRITE (UNIT = nulprt,FMT = *) ' canal = ',  &
-                      canal(ja,ig_number_field(jf))
-                 WRITE (UNIT = nulprt,FMT = *)  &
-                      ' with ja = ', ja, ' jf = ', jf
-                 WRITE (UNIT = nulprt,FMT = *) ' '
-                 CALL prism_sys_abort(compid,subname,'STOP in inipar')
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+                      WRITE (UNIT = nulprt1,FMT = *) &
+                         ' Type of analysis not implemented yet '
+                      WRITE (UNIT = nulprt1,FMT = *)  &
+                         ' The analysis required in OASIS is :'
+                      WRITE (UNIT = nulprt1,FMT = *) ' canal = ',  &
+                         canal(ja,ig_number_field(jf))
+                      WRITE (UNIT = nulprt1,FMT = *)  &
+                         ' with ja = ', ja, ' jf = ', jf
+                      WRITE (UNIT = nulprt1,FMT = *) ' '
+                      WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                      WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                      CALL prism_sys_flush(nulprt1)
+                  ENDIF
+                 CALL prism_sys_abort()
               ENDIF
  270       CONTINUE
        ENDIF
@@ -3187,11 +3542,16 @@ CONTAINS
             IF(cmap_method(ig_number_field(jf)) .ne.  &
                  cmap_method(ig_assoc_input_field( &
                  ig_number_field(jf)))) THEN
-               WRITE (UNIT = nulprt,FMT = *)  &
-                    'Interpolations must be the same for the 2'
-               WRITE (UNIT = nulprt,FMT = *) &
-                    'components in vector case'
-               CALL PRISM_SYS_ABORT(COMPID,SUBNAME,'STOP in inipar')
+                IF (mpi_rank_global == 0) THEN
+                    WRITE (UNIT = nulprt1,FMT = *)  &
+                       'Interpolations must be the same for the 2'
+                    WRITE (UNIT = nulprt1,FMT = *) &
+                       'components in vector case'
+                    WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                    WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+                    CALL prism_sys_flush(nulprt1)
+                ENDIF
+               CALL PRISM_SYS_ABORT()
             END IF
          ENDIF
        ENDIF
@@ -3216,8 +3576,9 @@ CONTAINS
 
 !*    3. Printing
 !        --------
+      IF (mpi_rank_global == 0) THEN
 !* Warning: no indentation for the next if (nightmare ...)
-      IF (nlogprt .GE. 1) THEN 
+      IF (nlogprt .GE. 0) THEN 
       DO 310 jf = 1, ig_total_nfield
          IF (ig_total_state(jf) .eq. ip_exported ) THEN
             cl_print_state = 'EXPORTED'
@@ -3246,75 +3607,87 @@ CONTAINS
             cl_print_trans = 'T_MAX'   
          ENDIF
 !* Local indexes
-      IF (.not. lg_state(jf)) THEN
+      IF (.NOT. lg_state(jf)) THEN
          ilab = ig_numlab(jf)
-         WRITE (UNIT = nulprt,FMT = 3001) jf
-         WRITE (UNIT = nulprt,FMT = 3002)
-         WRITE (UNIT = nulprt,FMT = 3003)
-         WRITE (UNIT = nulprt,FMT = 3004)
+         IF (mpi_rank_global == 0) THEN
+             WRITE (UNIT = nulprt1,FMT = 3001) jf
+             WRITE (UNIT = nulprt1,FMT = 3002)
+             WRITE (UNIT = nulprt1,FMT = 3003)
+             WRITE (UNIT = nulprt1,FMT = 3004)
+         ENDIF
          IF (ig_total_state(jf) .eq. ip_input .or.  &
               ig_total_state(jf) .eq. ip_output) THEN
-            WRITE (UNIT = nulprt,FMT = 3121) &
-                 cg_input_field(jf), cg_output_field(jf), cfldlab(ilab),  &
-                 ig_freq(jf), cl_print_trans, &
-                 cl_print_state, ig_total_ntrans(jf)
+             IF (mpi_rank_global == 0) THEN
+                 WRITE (UNIT = nulprt1,FMT = 3121) &
+                    cg_input_field(jf), cg_output_field(jf), cfldlab(ilab),  &
+                    ig_freq(jf), cl_print_trans, &
+                    cl_print_state, ig_total_ntrans(jf)
+             ENDIF
          ELSE  
-            WRITE (UNIT = nulprt,FMT = 3116) &
-                 cg_input_field(jf), cg_output_field(jf), cfldlab(ilab),  &
-                 ig_freq(jf), cl_print_trans, ig_total_nseqn(jf),  &
-                 ig_lag(jf), cl_print_state, ig_total_ntrans(jf)
+             IF (mpi_rank_global == 0) THEN
+                 WRITE (UNIT = nulprt1,FMT = 3116) &
+                    cg_input_field(jf), cg_output_field(jf), cfldlab(ilab),  &
+                    ig_freq(jf), cl_print_trans, ig_total_nseqn(jf),  &
+                    ig_lag(jf), cl_print_state, ig_total_ntrans(jf)
+             ENDIF
          ENDIF
       ELSE
          ilab = numlab(ig_number_field(jf))
          ifcb = len_trim(cficbf(ig_number_field(jf)))
          ifca = len_trim(cficaf(ig_number_field(jf)))
-         WRITE (UNIT = nulprt,FMT = 3001) jf
-         WRITE (UNIT = nulprt,FMT = 3002)
-         WRITE (UNIT = nulprt,FMT = 3003)
-         WRITE (UNIT = nulprt,FMT = 3004) 
+         IF (mpi_rank_global == 0) THEN
+             WRITE (UNIT = nulprt1,FMT = 3001) jf
+             WRITE (UNIT = nulprt1,FMT = 3002)
+             WRITE (UNIT = nulprt1,FMT = 3003)
+             WRITE (UNIT = nulprt1,FMT = 3004) 
+         ENDIF
          IF (cchan.EQ.'MPI2' .OR. cchan.EQ.'MPI1'  &
              .OR. cchan.EQ.'GSIP') THEN
-            WRITE (UNIT = nulprt,FMT = 3005) &
-                 trim(cnaminp(ig_number_field(jf))),  &
-                 trim(cnamout(ig_number_field(jf))), &
-                 cfldlab(ilab),  &
-                 nfexch(ig_number_field(jf)), &
-                 nseqn(ig_number_field(jf)), &
-                 ig_lag(jf), &
-                 cl_print_state, &
-                 ig_ntrans(ig_number_field(jf)),  &
-                 cparal(ig_number_field(jf))
+             IF (mpi_rank_global == 0) THEN
+                 WRITE (UNIT = nulprt1,FMT = 3005) &
+                    TRIM(cnaminp(ig_number_field(jf))),  &
+                    TRIM(cnamout(ig_number_field(jf))), &
+                    cfldlab(ilab),  &
+                    nfexch(ig_number_field(jf)), &
+                    nseqn(ig_number_field(jf)), &
+                    ig_lag(jf), &
+                    cl_print_state, &
+                    ig_ntrans(ig_number_field(jf)),  &
+                    cparal(ig_number_field(jf))
+             ENDIF
          ELSE
-               WRITE (UNIT = nulprt,FMT = 3115) &
-                 trim(cnaminp(ig_number_field(jf))),  &
-                 trim(cnamout(ig_number_field(jf))), &
-                 cfldlab(ilab),  &
-                 nfexch(ig_number_field(jf)), &
-                 nseqn(ig_number_field(jf)),  &
-                 cstate(ig_number_field(jf)),  &
-                 ig_ntrans(ig_number_field(jf))
+             IF (mpi_rank_global == 0) THEN
+                 WRITE (UNIT = nulprt1,FMT = 3115) &
+                    TRIM(cnaminp(ig_number_field(jf))),  &
+                    TRIM(cnamout(ig_number_field(jf))), &
+                    cfldlab(ilab),  &
+                    nfexch(ig_number_field(jf)), &
+                    nseqn(ig_number_field(jf)),  &
+                    cstate(ig_number_field(jf)),  &
+                    ig_ntrans(ig_number_field(jf))
+             ENDIF
          ENDIF
-      ENDIF
+     ENDIF
 !* Warning: no indentation for the next if (nightmare ...)
-        IF (nlogprt .GE. 2) THEN
+        IF (nlogprt .GE. 0) THEN
 !* Warning: no indentation for the next if (nightmare ...)            
         IF (.not. lg_state(jf)) THEN
            IF (ig_total_state(jf) .eq. ip_ignored .or.  &
                ig_total_state(jf) .eq. ip_ignout ) THEN
-              WRITE (UNIT = nulprt,FMT = 3117) cg_restart_file(jf)
+              WRITE (UNIT = nulprt1,FMT = 3117) cg_restart_file(jf)
            ELSEIF (ig_total_state(jf) .eq. ip_input) THEN
-              WRITE (UNIT = nulprt,FMT = 3118) cg_input_file(jf)
+              WRITE (UNIT = nulprt1,FMT = 3118) cg_input_file(jf)
            ENDIF
         ELSE
            IF (ig_total_state(jf) .eq. ip_exported .or.  &
                 ig_total_state(jf) .eq. ip_expout .or.  &
                 ig_total_state(jf) .eq. ip_auxilary ) &
-                WRITE (UNIT = nulprt,FMT = 3117) cg_restart_file(jf)
+                WRITE (UNIT = nulprt1,FMT = 3117) cg_restart_file(jf)
 !* Warning: no indentation for the next if (nightmare ...)           
-        WRITE (UNIT = nulprt,FMT = 3007) &
+        WRITE (UNIT = nulprt1,FMT = 3007) &
             csper(ig_number_field(jf)), nosper(ig_number_field(jf)),  &
             ctper(ig_number_field(jf)), notper(ig_number_field(jf))
-        WRITE (UNIT = nulprt,FMT = 3008) &
+        WRITE (UNIT = nulprt1,FMT = 3008) &
             cficbf(ig_number_field(jf))(1:ifcb)//cglonsuf,  &
             cficbf(ig_number_field(jf))(1:ifcb)//cglatsuf, &
             cficbf(ig_number_field(jf))(1:ifcb)//cmsksuf,  &
@@ -3323,179 +3696,183 @@ CONTAINS
             cficaf(ig_number_field(jf))(1:ifca)//cglatsuf, &
             cficaf(ig_number_field(jf))(1:ifca)//cmsksuf,  &
             cficaf(ig_number_field(jf))(1:ifca)//csursuf
-        WRITE (UNIT = nulprt,FMT = 3009) 
-        WRITE (UNIT = nulprt,FMT = 3010)
+        WRITE (UNIT = nulprt1,FMT = 3009) 
+        WRITE (UNIT = nulprt1,FMT = 3010)
         DO 320 ja = 1, ig_ntrans(ig_number_field(jf))
-          WRITE (UNIT = nulprt,FMT = 3011) ja,  &
+          WRITE (UNIT = nulprt1,FMT = 3011) ja,  &
                 canal(ja,ig_number_field(jf))
           IF (canal(ja,ig_number_field(jf)) .EQ. 'MASK') THEN
-              WRITE(UNIT = nulprt,FMT = 3012)  &
+              WRITE(UNIT = nulprt1,FMT = 3012)  &
                   amskval(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MASKP') THEN
-              WRITE(UNIT = nulprt,FMT = 3042)  &
+              WRITE(UNIT = nulprt1,FMT = 3042)  &
                     amskvalnew(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MOZAIC') THEN
-              WRITE(UNIT = nulprt,FMT = 3013)  &
+              WRITE(UNIT = nulprt1,FMT = 3013)  &
                     cgrdmap(ig_number_field(jf)),  &
                     nlumap(ig_number_field(jf)), &
                     nmapfl(ig_number_field(jf)),  &
                     nmapvoi(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'INVERT') THEN
-              WRITE(UNIT = nulprt,FMT = 3014)  &
+              WRITE(UNIT = nulprt1,FMT = 3014)  &
                     cxordbf(ig_number_field(jf))
-              WRITE(UNIT = nulprt,FMT = 3015)  &
+              WRITE(UNIT = nulprt1,FMT = 3015)  &
                    cyordbf(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'REVERSE') THEN
-              WRITE(UNIT = nulprt,FMT = 3016)  &
+              WRITE(UNIT = nulprt1,FMT = 3016)  &
                     cxordaf(ig_number_field(jf))
-              WRITE(UNIT = nulprt,FMT = 3017)  &
+              WRITE(UNIT = nulprt1,FMT = 3017)  &
                    cyordaf(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'EXTRAP') THEN
-              WRITE(UNIT = nulprt,FMT = 3018)  &
+              WRITE(UNIT = nulprt1,FMT = 3018)  &
                     cextmet(ig_number_field(jf)),  &
                     neighbor(ig_number_field(jf))
               IF (cextmet(ig_number_field(jf)) .EQ. 'WEIGHT') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3019)  &
+                  WRITE(UNIT = nulprt1,FMT = 3019)  &
                       cgrdext(ig_number_field(jf)),  &
                       nluext(ig_number_field(jf)),  &
                       nextfl(ig_number_field(jf))
               ELSE IF (cextmet(ig_number_field(jf)) .EQ. 'NINENN') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3038)  &
+                  WRITE(UNIT = nulprt1,FMT = 3038)  &
                       niwtn(ig_number_field(jf)),  &
                       nninnfl(ig_number_field(jf))
               ENDIF
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'INTERP') THEN
-              WRITE(UNIT = nulprt,FMT = 3020)  &
+              WRITE(UNIT = nulprt1,FMT = 3020)  &
                     cintmet(ig_number_field(jf)),  &
                     cgrdtyp(ig_number_field(jf)), &
                     cfldtyp(ig_number_field(jf))
               IF (cintmet(ig_number_field(jf)) .EQ. 'SURFMESH') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3021)  &
+                  WRITE(UNIT = nulprt1,FMT = 3021)  &
                       naismfl(ig_number_field(jf)),  &
                       naismvoi(ig_number_field(jf)),  &
                       niwtm(ig_number_field(jf))
               ENDIF 
               IF (cintmet(ig_number_field(jf)) .EQ. 'GAUSSIAN') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3021)  &
+                  WRITE(UNIT = nulprt1,FMT = 3021)  &
                       naisgfl(ig_number_field(jf)),  &
                       naisgvoi(ig_number_field(jf)),  &
                       niwtg(ig_number_field(jf))
-                  WRITE(UNIT = nulprt,FMT = 3022)  &
+                  WRITE(UNIT = nulprt1,FMT = 3022)  &
                        varmul(ig_number_field(jf))
               ENDIF
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') THEN
-              write(UNIT = nulprt,FMT = 3048) &
+              write(UNIT = nulprt1,FMT = 3048) &
                     trim(cmap_file(ig_number_field(jf))), &
                     trim(cmaptyp(ig_number_field(jf))), &
                     trim(cmapopt(ig_number_field(jf)))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'SCRIPR') THEN
-              WRITE(UNIT = nulprt,FMT = 3045)  &
+              WRITE(UNIT = nulprt1,FMT = 3045)  &
                     cmap_method(ig_number_field(jf)),  &
                     cfldtype(ig_number_field(jf)),  &
                     cnorm_opt(ig_number_field(jf)), &
                     crsttype(ig_number_field(jf)),  &
                     nbins(ig_number_field(jf))
               IF (cmap_method(ig_number_field(jf)) .EQ. 'CONSERV') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3046)  &
+                  WRITE(UNIT = nulprt1,FMT = 3046)  &
                       corder(ig_number_field(jf))
               ENDIF  
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'FILLING') THEN
-              WRITE(UNIT = nulprt,FMT = 3023)  &
+              WRITE(UNIT = nulprt1,FMT = 3023)  &
                     cfilfic(ig_number_field(jf)),  &
                     nlufil(ig_number_field(jf)), &
                     cfilmet(ig_number_field(jf))
               IF(cfilmet(ig_number_field(jf))(1:6) .EQ. 'SMOSST') &
-                  WRITE(UNIT = nulprt,FMT = 3024)  &
+                  WRITE(UNIT = nulprt1,FMT = 3024)  &
                   nfcoast, cfldcor, nlucor
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') THEN            
-              WRITE(UNIT = nulprt,FMT = 3025)  &
+              WRITE(UNIT = nulprt1,FMT = 3025)  &
                     cconmet(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'REDGLO') THEN
-              WRITE(UNIT = nulprt,FMT = 3026)  &
+              WRITE(UNIT = nulprt1,FMT = 3026)  &
                     ntronca(ig_number_field(jf)),  &
                     cmskrd(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CORRECT') THEN
-              WRITE(UNIT = nulprt,FMT = 3027)  &
+              WRITE(UNIT = nulprt1,FMT = 3027)  &
                     trim(cnamout(ig_number_field(jf))),  &
                     afldcoef(ig_number_field(jf))
-              WRITE(UNIT = nulprt,FMT=3028) ncofld(ig_number_field(jf))
+              WRITE(UNIT = nulprt1,FMT=3028) ncofld(ig_number_field(jf))
               icofld = ncofld(ig_number_field(jf))
               DO 330 jc = 1, icofld
-                WRITE(UNIT = nulprt,FMT = 3029)  &
+                WRITE(UNIT = nulprt1,FMT = 3029)  &
                     ccofic(jc,ig_number_field(jf)), &
                       nludat(jc,ig_number_field(jf))
-                WRITE (UNIT = nulprt,FMT = 3030)  &
+                WRITE (UNIT = nulprt1,FMT = 3030)  &
                     ccofld(jc,ig_number_field(jf)),  &
                      acocoef(jc,ig_number_field(jf))
  330          CONTINUE
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD') THEN
-              WRITE(UNIT = nulprt,FMT = 3027)  &
+              WRITE(UNIT = nulprt1,FMT = 3027)  &
                     trim(cnaminp(ig_number_field(jf))),  &
                     afldcobo(ig_number_field(jf))
-              WRITE(UNIT = nulprt,FMT=3028) nbofld(ig_number_field(jf))
+              WRITE(UNIT = nulprt1,FMT=3028) nbofld(ig_number_field(jf))
               DO 340 jc = 1, nbofld(ig_number_field(jf))
-                WRITE (UNIT = nulprt,FMT = 3030)  &
+                WRITE (UNIT = nulprt1,FMT = 3030)  &
                     cbofld(jc,ig_number_field(jf)),  &
                       abocoef (jc,ig_number_field(jf))
  340          CONTINUE
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW') THEN
-              WRITE(UNIT = nulprt,FMT = 3027)  &
+              WRITE(UNIT = nulprt1,FMT = 3027)  &
                     trim(cnamout(ig_number_field(jf))),  &
                     afldcobn(ig_number_field(jf))
-              WRITE(UNIT = nulprt,FMT=3028) nbnfld(ig_number_field(jf))
+              WRITE(UNIT = nulprt1,FMT=3028) nbnfld(ig_number_field(jf))
               DO 350 jc = 1, nbnfld(ig_number_field(jf))
-                WRITE (UNIT = nulprt,FMT = 3030)  &
+                WRITE (UNIT = nulprt1,FMT = 3030)  &
                     cbnfld(jc,ig_number_field(jf)),  &
                       abncoef (jc,ig_number_field(jf))
  350          CONTINUE
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'SUBGRID') THEN
-              WRITE(UNIT = nulprt,FMT = 3031)  &
+              WRITE(UNIT = nulprt1,FMT = 3031)  &
                     cgrdsub(ig_number_field(jf)),  &
                     nlusub(ig_number_field(jf)), &
                     nsubfl(ig_number_field(jf)),  &
                     nsubvoi(ig_number_field(jf)),  &
                     ctypsub(ig_number_field(jf))
               IF (ctypsub(ig_number_field(jf)) .EQ. 'NONSOLAR') THEN 
-                  WRITE(UNIT = nulprt,FMT = 3032)  &
+                  WRITE(UNIT = nulprt1,FMT = 3032)  &
                       cdqdt(ig_number_field(jf)), &
                       cfldcoa(ig_number_field(jf)),  &
                       cfldfin(ig_number_field(jf))
                 ELSE IF (ctypsub(ig_number_field(jf)) .EQ. 'SOLAR') THEN
-                  WRITE(UNIT = nulprt,FMT = 3033) &
+                  WRITE(UNIT = nulprt1,FMT = 3033) &
                       cfldfin(ig_number_field(jf)),  &
                         cfldcoa(ig_number_field(jf))
               ENDIF
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN') THEN
-                WRITE(UNIT = nulprt,FMT = 3034)  &
+                WRITE(UNIT = nulprt1,FMT = 3034)  &
                     ntinpflx(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CHECKOUT') THEN
-                WRITE(UNIT = nulprt,FMT = 3035)  &
+                WRITE(UNIT = nulprt1,FMT = 3035)  &
                     ntoutflx(ig_number_field(jf)) 
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'GLORED') THEN
-              WRITE(UNIT = nulprt,FMT = 3036)  &
+              WRITE(UNIT = nulprt1,FMT = 3036)  &
                     ntronca(ig_number_field(jf)) 
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'NOINTERP') THEN
-                WRITE(UNIT = nulprt,FMT = 3037)
+                WRITE(UNIT = nulprt1,FMT = 3037)
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'LOCTRANS') THEN
-               WRITE(UNIT = nulprt,FMT = 3047) cl_print_trans
+               WRITE(UNIT = nulprt1,FMT = 3047) cl_print_trans
             ELSE 
-              WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-              WRITE (UNIT = nulprt,FMT = *) &
+              WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+              WRITE (UNIT = nulprt1,FMT = *) &
                   ' Type of analysis not implemented yet '
-              WRITE (UNIT = nulprt,FMT = *)  &
+              WRITE (UNIT = nulprt1,FMT = *)  &
                   ' The analysis required in OASIS is :'
-              WRITE (UNIT = nulprt,FMT = *) ' canal = ',  &
+              WRITE (UNIT = nulprt1,FMT = *) ' canal = ',  &
                    canal(ja,ig_number_field(jf))
-              WRITE (UNIT = nulprt,FMT = *)  &
+              WRITE (UNIT = nulprt1,FMT = *)  &
                   ' with ja = ', ja, ' jf = ', jf
-              WRITE (UNIT = nulprt,FMT = *) ' '
-              CALL prism_sys_abort(compid,subname,'STOP in inipar')
+              WRITE (UNIT = nulprt1,FMT = *) ' '
+              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+              WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+              CALL prism_sys_flush(nulprt1)
+              CALL prism_sys_abort()
           ENDIF
  320    CONTINUE
       ENDIF
       ENDIF
  310  CONTINUE
-      ENDIF
+     ENDIF
+ ENDIF
 
 !* Formats
 
@@ -3629,185 +4006,289 @@ CONTAINS
 !*    4. End of routine
 !        --------------
 
-      IF (nlogprt .GE. 2) THEN
-          WRITE(UNIT = nulprt,FMT = *)' '
-          WRITE(UNIT = nulprt,FMT = *)'------ End of ROUTINE inipar ----'
-          CALL FLUSH (nulprt)
-      ENDIF
-      call prism_sys_debug_exit(subname)
+   IF (mpi_rank_global == 0) THEN
+       IF (nlogprt .GE. 0) THEN
+           WRITE(UNIT = nulprt1,FMT = *)' '
+           WRITE(UNIT = nulprt1,FMT = *)'------ End of ROUTINE inipar ----'
+           CALL FLUSH (nulprt1)
+       ENDIF
+   ENDIF
+!      call prism_sys_debug_exit(subname)
       RETURN
 
 !* Error branch output
 
  110  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $JOBNAME data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $JOBNAME data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  130  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $NBMODEL data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $NBMODEL data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  170  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $MACHINE data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $MACHINE data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
       
  181  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $CHATYPE data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $CHATYPE data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  191  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $RUNTIME data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $RUNTIME data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  193  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $INIDATE data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $INIDATE data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  195  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $SEQMODE data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $SEQMODE data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  197  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $MODINFO data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $MODINFO data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  199  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $NLOGPRT found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $NLOGPRT found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  201  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *) &
-          ' No active $CALTYPE found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *) &
+             ' No active $CALTYPE found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  210  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $FIELDS data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $FIELDS data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  230  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) '        ***WARNING***'
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' No active $STRING data found in input file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      WRITE (UNIT = nulprt,FMT = *)  &
-          ' We STOP!!! Check the file namcouple'
-      WRITE (UNIT = nulprt,FMT = *) ' '
-      CALL prism_sys_abort(compid,subname,'STOP in inipar')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' No active $STRING data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  231  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-                   'NO index of sequential position and $SEQMODE > 1'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'NO index of sequential position and $SEQMODE > 1'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  232  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-                   'Index of sequential position greater than $SEQMODE'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f') 
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'Index of sequential position greater than $SEQMODE'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort() 
  233  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-        'Check the 2nd line for either the index of sequential position, the delay flag, or the extra timestep flag.'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f')
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'Check the 2nd line for either the index of sequential position, the delay flag, or the extra timestep flag.'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
  234  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-                   'Index of sequential position equals 0'
-      WRITE (UNIT = nulprt,FMT = *)  &
-                   '(Should be 1 -default value- IF $SEQMODE=1)'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f') 
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'Index of sequential position equals 0'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             '(Should be 1 -default value- IF $SEQMODE=1)'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort() 
  235  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-            'An input line with integral calculation flag' 
-      WRITE (UNIT = nulprt,FMT = *)  &
-            '("INT=0" or "INT=1")'
-      WRITE (UNIT = nulprt,FMT = *)  &
-            'is now required for analysis CHECKIN or CHECKOUT'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f') 
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'An input line with integral calculation flag' 
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             '("INT=0" or "INT=1")'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'is now required for analysis CHECKIN or CHECKOUT'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort() 
  236  CONTINUE
-      WRITE (UNIT = nulprt,FMT = *) ' '
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+      ENDIF
       CALL prtout ('ERROR in namcouple for field', jf, 1)
-      WRITE (UNIT = nulprt,FMT = *)  &
-           'The coupling period must not be 0 !'
-      WRITE (UNIT = nulprt,FMT = *)  &
-           'If you do not want to exchange this field at all'
-      WRITE (UNIT = nulprt,FMT = *)  &
-           'give a coupling period longer than the total run time.'
-      CALL prism_sys_abort(compid,subname,'STOP in inipar.f') 
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'The coupling period must not be 0 !'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'If you do not want to exchange this field at all'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             'give a coupling period longer than the total run time.'
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort() 
 
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
 
       END SUBROUTINE inipar
 !===============================================================================
@@ -3818,7 +4299,7 @@ CONTAINS
 
   character(len=*),parameter :: subname='mod_prism_namcouple:alloc'
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
   !--- alloc_anais1
   ALLOCATE (varmul(ig_nfield), stat=il_err)
@@ -4100,7 +4581,7 @@ CONTAINS
   cstate(:)=' '
   ENDIF
 
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE alloc
 !===============================================================================
@@ -4110,7 +4591,7 @@ CONTAINS
 
   character(len=*),parameter :: subname='mod_prism_namcouple:dealloc'
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
   deallocate(nbtotproc,stat=il_err)
   if (il_err.ne.0) call prtout('error in "nbtotproc"deallocation of experiment module',il_err,1)
@@ -4311,7 +4792,7 @@ CONTAINS
   IF (il_err.NE.0) CALL prtout ('Error in "cstate"deallocation of string module',il_err,1)
   ENDIF
 
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE dealloc
 !===============================================================================
@@ -4385,34 +4866,37 @@ CONTAINS
 
 !* ---------------------------- Poema verses ----------------------------
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 !*    1. Print character string + integer value
 !        --------------------------------------
 
+  IF (mpi_rank_global == 0) THEN
       IF ( kstyle .EQ. 1 .OR. kstyle .EQ. 2) THEN
           cline = ' '
           ilen = len(cdtext)
-          DO 110 jl = 1, ilen
+          DO 110 jl = 1, ILEN
             cline(jl:jl) = cbase
  110      CONTINUE
+          
           IF ( kstyle .EQ. 2 ) THEN
-              WRITE(UNIT = nulprt,FMT='(/,A,1X,A)') cdots, cline
+              WRITE(UNIT = nulprt1,FMT='(/,A,1X,A)') cdots, cline
           ENDIF
-          WRITE(UNIT = nulprt,FMT='(A,1X,A,1X,I18)') cprpt, cdtext, kvalue
-          WRITE(UNIT = nulprt,FMT='(A,1X,A,/)') cdots, cline
+          WRITE(UNIT = nulprt1,FMT='(A,1X,A,1X,I18)') cprpt, cdtext, kvalue
+          WRITE(UNIT = nulprt1,FMT='(A,1X,A,/)') cdots, cline
         ELSE
-          WRITE(UNIT = nulprt,FMT='(/,A,1X,A,1X,I18,/)') cprpt, cdtext, kvalue
+          WRITE(UNIT = nulprt1,FMT='(/,A,1X,A,1X,I18,/)') cprpt, cdtext, kvalue
       ENDIF
 
 !*    2. End of routine
 !        --------------
 
-      CALL prism_sys_flush(nulprt)
+      CALL prism_sys_flush(nulprt1)
+  ENDIF
 
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
 
   END SUBROUTINE prtout
 
@@ -4492,8 +4976,9 @@ CONTAINS
 !*    1. Print character string + character value
 !        ----------------------------------------
 !
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
+   IF (mpi_rank_global == 0) THEN
       IF ( kstyle .EQ. 1 .OR. kstyle .EQ. 2) THEN
           cline = ' '
           ilen = len(cdtext)
@@ -4501,21 +4986,22 @@ CONTAINS
             cline(jl:jl) = cpbase
  110      CONTINUE
           IF ( kstyle .EQ. 2 ) THEN
-              WRITE(UNIT = nulprt,FMT='(/,A,1X,A)') cpdots, cline
+              WRITE(UNIT = nulprt1,FMT='(/,A,1X,A)') cpdots, cline
           ENDIF
-          WRITE(UNIT = nulprt,FMT='(A,1X,A,1X,A)') cprpt, cdtext, cdstring
-          WRITE(UNIT = nulprt,FMT='(A,1X,A,/)') cpdots, cline
+          WRITE(UNIT = nulprt1,FMT='(A,1X,A,1X,A)') cprpt, cdtext, cdstring
+          WRITE(UNIT = nulprt1,FMT='(A,1X,A,/)') cpdots, cline
         ELSE
-          WRITE(UNIT = nulprt,FMT='(/,A,1X,A,1X,A,/)') cprpt, cdtext, cdstring
+          WRITE(UNIT = nulprt1,FMT='(/,A,1X,A,1X,A,/)') cprpt, cdtext, cdstring
       ENDIF
 !
 !
 !*    3. End of routine
 !        --------------
 !
-      CALL prism_sys_flush(nulprt)
+      CALL prism_sys_flush(nulprt1)
+  ENDIF
 
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
 
       END SUBROUTINE prcout
 !===============================================================================
@@ -4592,7 +5078,7 @@ CONTAINS
 !
 !* ---------------------------- Poema verses ----------------------------
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4623,7 +5109,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
       RETURN
   END IF
 !
@@ -4640,7 +5126,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
-            call prism_sys_debug_exit(subname)
+!            call prism_sys_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -4657,7 +5143,7 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 !
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE parse
 
@@ -4731,7 +5217,7 @@ CONTAINS
 !
 !* ---------------------------- Poema verses ----------------------------
 
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -4772,7 +5258,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
-      call prism_sys_debug_exit(subname)
+!      call prism_sys_debug_exit(subname)
       RETURN
   END IF
 !
@@ -4797,7 +5283,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
-            call prism_sys_debug_exit(subname)
+!            call prism_sys_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -4815,7 +5301,7 @@ CONTAINS
 !        --------------
 !
 
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE parseblk
 !===============================================================================
@@ -4871,7 +5357,7 @@ CONTAINS
 !
 !*-----------------------------------------------------------------------
 !
-  call prism_sys_debug_enter(subname)
+!  call prism_sys_debug_enter(subname)
 
   cl_two='#'
 100 IF (cd_one(1:1) .NE. cl_two) GO TO 120
@@ -4883,7 +5369,7 @@ CONTAINS
 !
 !*-----------------------------------------------------------------------
 !
-  call prism_sys_debug_exit(subname)
+!  call prism_sys_debug_exit(subname)
 
   END SUBROUTINE skip
 !

@@ -2,6 +2,7 @@ MODULE mod_prism_sys
 
    USE mod_prism_kinds
    USE mod_prism_data
+   USE mod_oasis_print
 
    IMPLICIT NONE
 
@@ -26,27 +27,14 @@ MODULE mod_prism_sys
 CONTAINS
 !--------------------------------------------------------------------
 
-   SUBROUTINE prism_sys_abort(id_compid, cd_routine, cd_message)
+   SUBROUTINE prism_sys_abort()
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(in) :: id_compid
-   CHARACTER(len=*), INTENT(in) :: cd_routine
-   CHARACTER(len=*), INTENT(in) :: cd_message
-!--------------------------------------------------------------------
    INTEGER                      :: ierror
    character(len=*),parameter :: subname = 'prism_sys_abort'
 !--------------------------------------------------------------------
-
-   IF (id_compid .ne. 0) THEN
-      WRITE (nulprt,'(a,i4)') subname//' from '// &
-         trim(cd_routine)//' by model ',id_compid
-   ELSE
-      WRITE (nulprt,'(a)') subname//' from '//trim(cd_routine)
-   ENDIF
-   WRITE (nulprt,'(a)') subname//' error = '//trim(cd_message)
-   call prism_sys_flush(nulprt)
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
    CALL MPI_ABORT (mpi_comm_global, 0, ierror)
@@ -92,13 +80,14 @@ CONTAINS
          found = .true.
          uio = n1 + maxion
          unitno(n1) = uio
-         if (PRISM_DEBUG >= 2) write(nulprt,*) subname,n1,uio
+         CALL oasis_pprinti(subname,2,' n1,uio : ',int1=n1,int2=uio)
       endif
    enddo
 
    if (.not.found) then
-      write(nulprt,*) subname,' ERROR no unitno available '
-      call prism_sys_abort(compid,subname,'ERROR no unitno available')
+      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
+      CALL oasis_pprintc(subname,2,' error :',char1=' ERROR no unitno available')
+      call prism_sys_abort()
    endif
      
    END SUBROUTINE prism_sys_unitget
@@ -115,7 +104,7 @@ CONTAINS
 !--------------------------------------------------------------------
 
    maxion = uio
-   if (PRISM_DEBUG >= 20) write(nulprt,*) subname,maxion
+   CALL oasis_pprinti(subname,20,' maxion = ',int1=maxion)
      
    END SUBROUTINE prism_sys_unitsetmin
 
@@ -134,7 +123,7 @@ CONTAINS
    do n1 = 1,muni
       if (unitno(n1) == uio) then
          unitno(n1) = -1
-         if (PRISM_DEBUG >= 20) write(nulprt,*) subname,n1,uio
+         CALL oasis_pprinti(subname,20,' n1,uio = ',int1=n1,int2=uio)
       endif
    enddo
 
@@ -152,7 +141,7 @@ subroutine prism_sys_debug_enter(string)
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_enter
 
-   if (PRISM_DEBUG >= 10) then
+   IF (PRISM_DEBUG >= 10) THEN
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
        tree_enter='**TREE ENTER '//TRIM(string)
@@ -160,7 +149,7 @@ subroutine prism_sys_debug_enter(string)
        tree_indent = tree_indent + tree_delta
        DEALLOCATE (ch_blank)
        CALL prism_sys_flush(nulprt)
-   endif
+   ENDIF
 
 end subroutine prism_sys_debug_enter
 
