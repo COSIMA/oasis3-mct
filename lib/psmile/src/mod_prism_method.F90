@@ -3,7 +3,6 @@ MODULE mod_prism_method
    USE mod_prism_kinds
    USE mod_prism_sys
    USE mod_prism_data
-   USE mod_oasis_print
    USE mod_prism_parameters
    USE mod_prism_namcouple
    USE mod_prism_coupler
@@ -50,7 +49,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: mpi_err
    integer(kind=ip_intwp_p) :: n,iu
    integer(kind=ip_intwp_p) :: icolor,ikey
-   character(len=ic_med)    :: filename
+   CHARACTER(len=ic_med)    :: filename,filename2
    character(len=ic_med)    :: pio_type
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
@@ -89,6 +88,7 @@ CONTAINS
    !------------------------
    !--- nout file, need mpi_rank_global
    !------------------------
+
    iu=-1
 
    call prism_sys_unitsetmin(200)
@@ -123,9 +123,7 @@ CONTAINS
        CALL prism_sys_abort()
    endif
 
-   IF (mpi_rank_global == 0) THEN
-       CLOSE(nulprt1)
-   ENDIF
+   IF (mpi_rank_global == 0) CLOSE(nulprt1)
 
    !------------------------
    !--- Re-Set MPI info (need compid for MPI1 COMM_SPLIT)
@@ -167,28 +165,36 @@ CONTAINS
    !------------------------
 
    iu=-1
-   IF (PRISM_Debug == 0) THEN
-       IF (mpi_rank_local == 0) THEN
-!   call prism_sys_unitfree(iu)
-           CALL prism_sys_unitget(iu)
-           nulprt = iu
+   CALL prism_sys_unitget(iu)
+   nulprt=iu
+
+   IF ( (PRISM_debug == 1) .AND. (mpi_rank_local == 0)) PRISM_Debug=10
+
+       IF (PRISM_Debug <= 1) THEN
+           IF (mpi_rank_local == 0) THEN
+               WRITE(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
+               OPEN(nulprt,file=filename)
+               WRITE(nulprt,*) subname,' OPEN pout file for root pe'
+               call prism_sys_flush(nulprt)
+           ELSE
+               WRITE(filename2,'(a,i2.2)') 'debug_file_non_root_pes.',compid
+               OPEN(nulprt,file=filename2)
+               WRITE(nulprt,*) subname,' OPEN debug file'
+               CALL prism_sys_flush(nulprt)
+           ENDIF
+       ELSE
            WRITE(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
            OPEN(nulprt,file=filename)
+           WRITE(nulprt,*) subname,' OPEN pout file'
+           CALL prism_sys_flush(nulprt)
        ENDIF
-   ELSE
-       CALL prism_sys_unitget(iu)
-       nulprt = iu
-       WRITE(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
-       OPEN(nulprt,file=filename)
-   ENDIF
 
-   CALL oasis_pprintc(subname,2,':',char1=' OPEN pout file ')
-   CALL oasis_pprinti(subname,2,' compid : ',int1=compid)
-   CALL oasis_pprintc(subname,2,' model : ',char1=TRIM(cdnam))
+       IF (PRISM_Debug >= 2) THEN
+           WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
+       ENDIF
 
    call prism_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
       string=subname//':mpi_root_global',all=.true.)
-
    deallocate(tmparr)
 
    call prism_sys_debug_enter(subname)
@@ -222,26 +228,28 @@ CONTAINS
    !--- Diagnostics
    !------------------------
 
-   CALL oasis_pprinti(subname,2,' compid         = ',int1=compid)
-   CALL oasis_pprintc(subname,2,' compnm         = ',char1=trim(compnm))
-   CALL oasis_pprinti(subname,2,' mpi_comm_world = ',int1=MPI_COMM_WORLD)
-   CALL oasis_pprinti(subname,2,' mpi_comm_global= ',int1=mpi_comm_global)
-   CALL oasis_pprinti(subname,2,'     size_global= ',int1=mpi_size_global)
-   CALL oasis_pprinti(subname,2,'     rank_global= ',int1=mpi_rank_global)
-   CALL oasis_pprinti(subname,2,' mpi_comm_local = ',int1=mpi_comm_local)
-   CALL oasis_pprinti(subname,2,'     size_local = ',int1=mpi_size_local)
-   CALL oasis_pprinti(subname,2,'     rank_local = ',int1=mpi_rank_local)
-   CALL oasis_pprinti(subname,2,'     root_local = ',int1=mpi_root_local)
-   CALL oasis_pprinti(subname,2,' prism_debug    = ',int1=prism_debug)
-   CALL oasis_pprintc(subname,2,':',char1='prism models ')
-   DO n = 1,prism_nmodels
-     CALL oasis_pprintc(subname,2,' prism_model = ',char1=TRIM(prism_modnam(n)))
-     CALL oasis_pprinti(subname,2,' n, root,    = ',int1=n,int2=mpi_root_global(n))
-   ENDDO
-
-   if (PRISM_Debug >= 4) then
-      call mpi_barrier(mpi_comm_global,mpi_err)
+   if (PRISM_DEBUG >= 2)  then
+      write(nulprt,*) subname,' compid         = ',compid
+      write(nulprt,*) subname,' compnm         = ',trim(compnm)
+      write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
+      write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
+      write(nulprt,*) subname,'     size_global= ',mpi_size_global
+      write(nulprt,*) subname,'     rank_global= ',mpi_rank_global
+      write(nulprt,*) subname,' mpi_comm_local = ',mpi_comm_local
+      write(nulprt,*) subname,'     size_local = ',mpi_size_local
+      write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
+      write(nulprt,*) subname,'     root_local = ',mpi_root_local
+      write(nulprt,*) subname,' prism_debug    = ',prism_debug
+      write(nulprt,*) subname,' prism models: '
+      do n = 1,prism_nmodels
+      write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+      enddo
+      call prism_sys_flush(nulprt)
    endif
+
+!   if (PRISM_Debug >= 4) then
+!      call mpi_barrier(mpi_comm_global,mpi_err)
+!   endif
 
    call prism_sys_debug_exit(subname)
 
@@ -268,13 +276,13 @@ CONTAINS
 
    CALL MPI_BARRIER (mpi_comm_global, mpi_err)
    IF ( .NOT. lg_mpiflag ) THEN
-       CALL oasis_pprintc(subname,2,':',char1=' Calling MPI_Finalize')
-       CALL MPI_Finalize ( mpi_err )
+      WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
+      CALL MPI_Finalize ( mpi_err )
    else
-       CALL oasis_pprintc(subname,2,':',char1=' Not Calling MPI_Finalize')
+      WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
    ENDIF
 
-   CALL oasis_pprintc(subname,2,':',char1=' SUCCESSFUL RUN')
+   WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
 
    call prism_sys_debug_exit(subname)
 
@@ -340,7 +348,9 @@ CONTAINS
    endif
 
    prism_debug = debug
-   CALL oasis_pprinti(subname,2,' set prism_debug to ',int1=prism_debug)
+   if (PRISM_Debug >= 2) then
+      write(nulprt,*) subname,' set prism_debug to ',prism_debug
+   endif
 
    call prism_sys_debug_exit(subname)
 
@@ -369,9 +379,9 @@ CONTAINS
    do n = 1,prism_nmodels
       if (trim(cdnam) == trim(prism_modnam(n))) then
          if (found) then
-             CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-             CALL oasis_pprintc(subname,2,' error :',char1='found same model name twice')
-             CALL prism_sys_abort()
+            write(nulprt,*) subname,' ERROR: found same model name twice'
+            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+            call prism_sys_abort()
          endif
          il = n
          found = .true.
@@ -379,9 +389,9 @@ CONTAINS
    enddo
 
    if (.not. found) then
-       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-       CALL oasis_pprintc(subname,2,' error :',char1='input model name not found')
-       CALL prism_sys_abort()
+      write(nulprt,*) subname,' ERROR: input model name not found'
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      call prism_sys_abort()
    endif
 
    tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))

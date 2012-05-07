@@ -2,7 +2,6 @@ MODULE mod_prism_part
 
    USE mod_prism_kinds
    USE mod_prism_data
-   USE mod_oasis_print
    USE mod_prism_parameters
    USE mod_prism_sys
    USE mct_mod
@@ -57,7 +56,6 @@ CONTAINS
    INTEGER(kind=ip_intwp_p), DIMENSION(:),intent(in)  :: kparal
    INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo
 !  ----------------------------------------------------------------
-   INTEGER(kind=ip_i4_p)  :: ii ! for prints loop
    integer(kind=ip_intwp_p) :: n,k,nsegs
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
    character(len=*),parameter :: subname = 'prism_part_def'
@@ -82,9 +80,9 @@ CONTAINS
    id_part = prism_npart
 
    if (prism_npart > mpart) then
-       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-       CALL oasis_pprinti(subname,2,' ERROR prism_npart too large ',int1=prism_npart,int2=mpart)
-       CALL prism_sys_abort()
+      write(nulprt,*) subname,' ERROR prism_npart too large ',prism_npart,mpart
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      call prism_sys_abort()
    endif
 
    if (kparal(CLIM_Strategy) == CLIM_Serial) then
@@ -132,10 +130,9 @@ CONTAINS
          endif
       enddo
    else
-
-       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-       CALL oasis_pprinti(subname,2,' ERROR part strategy unknown ',int1=kparal(CLIM_Strategy))
-       CALL prism_sys_abort()
+      write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      call prism_sys_abort()
    endif
 
    call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,mpi_comm_local, &
@@ -149,20 +146,16 @@ CONTAINS
   
    call prism_timer_stop('map definition')
    
-       CALL oasis_pprintc(subname,2,' : ',char1=' Begin infos ')
-       CALL oasis_pprinti(subname,2,' compid = ',int1=prism_part(prism_npart)%gsmap%comp_id)
-       CALL oasis_pprinti(subname,2,' ngseg  = ',int1=prism_part(prism_npart)%gsmap%ngseg)
-       CALL oasis_pprinti(subname,2,' gsize  = ',int1=prism_part(prism_npart)%gsmap%gsize)
-       DO ii=1,SIZE(prism_part(prism_npart)%gsmap%start)
-         CALL oasis_pprinti(subname,2,' start  = ',int1=prism_part(prism_npart)%gsmap%start(ii))
-       ENDDO
-       DO ii=1,SIZE(prism_part(prism_npart)%gsmap%length)
-         CALL oasis_pprinti(subname,2,' length = ',int1=prism_part(prism_npart)%gsmap%length(ii))
-       ENDDO
-       DO ii=1,SIZE(prism_part(prism_npart)%gsmap%pe_loc)
-         CALL oasis_pprinti(subname,2,' pe_loc = ',int1=prism_part(prism_npart)%gsmap%pe_loc(ii))
-       ENDDO
-       CALL oasis_pprintc(subname,2,' : ',char1=' End infos ')
+   if (PRISM_Debug >= 2) then
+      write(nulprt,*) ' '
+      write(nulprt,*) subname,' compid = ',prism_part(prism_npart)%gsmap%comp_id
+      write(nulprt,*) subname,' ngseg  = ',prism_part(prism_npart)%gsmap%ngseg
+      write(nulprt,*) subname,' gsize  = ',prism_part(prism_npart)%gsmap%gsize
+      write(nulprt,*) subname,' start  = ',prism_part(prism_npart)%gsmap%start
+      write(nulprt,*) subname,' length = ',prism_part(prism_npart)%gsmap%length
+      write(nulprt,*) subname,' pe_loc = ',prism_part(prism_npart)%gsmap%pe_loc
+      write(nulprt,*) ' '
+   endif
 
    call prism_sys_debug_exit(subname)
 
@@ -214,9 +207,9 @@ CONTAINS
      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,0,mpicomm,compid)
      deallocate(start,length)
   else
-      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-      CALL oasis_pprintc(subname,2,' ERROR type unknown ',char1=TRIM(TYPE))
-      CALL prism_sys_abort()
+     write(nulprt,*) subname,' ERROR type unknown ',trim(type)
+     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+     call prism_sys_abort()
   endif
 
   id_part = prism_npart

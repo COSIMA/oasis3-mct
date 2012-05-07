@@ -3,7 +3,6 @@ MODULE mod_prism_coupler
 !
   USE mod_prism_kinds
   USE mod_prism_data
-  USE mod_oasis_print
   USE mod_prism_parameters
   USE mod_prism_namcouple
   USE mod_prism_sys
@@ -118,7 +117,7 @@ CONTAINS
   !----------------------------------------------------------
 
   IMPLICIT none
-  integer(kind=ip_i4_p) :: ii ! for prints loop
+
   integer(kind=ip_i4_p) :: n,n1,nn,nv,nm,nv1,nns,lnn,nc
   integer(kind=ip_i4_p) :: pe
   integer(kind=ip_i4_p) :: part1, part2
@@ -170,9 +169,8 @@ CONTAINS
      call prism_mpi_max(pe,model_root(n),mpi_comm_global, &
         subname//':cg',.true.)
   enddo
-  DO ii=1,prism_nmodels
-    CALL oasis_pprinti(subname,2,' model root for each model =',int1=ii,int2=model_root(ii))
-  ENDDO
+
+  if ( PRISM_DEBUG >= 2 ) write(nulprt,*) subname,' model_root = ',model_root(1:prism_nmodels)
 
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
@@ -206,7 +204,7 @@ CONTAINS
      allocate(prism_coupler(nc)%varid(1))
      prism_coupler(nc)%varid(:) = ispval
   enddo
-  CALL oasis_pprinti(subname,2,' initialize %varid :',int1=nnamcpl,int2=size(prism_coupler(nnamcpl)%varid))
+  if (PRISM_DEBUG >= 2) write(nulprt,*) subname,' initialize %varid ',nnamcpl,size(prism_coupler(nnamcpl)%varid)
   prism_coupler(:)%ops     = ispval
   prism_coupler(:)%comp    = ispval
   prism_coupler(:)%routerID  = ispval
@@ -236,10 +234,11 @@ CONTAINS
   ! Share model variable information across all models
   !----------------------------------------------------------
 
-  if (PRISM_Debug >= 5) then
-     CALL oasis_pprintc(subname,5,':',char1='  broadcast var info ')
-     call prism_mpi_barrier(mpi_comm_global)
-  endif
+!  if (PRISM_Debug >= 5) then
+!     write(nulprt,*) subname,' broadcast var info '
+!     call prism_sys_flush(nulprt)
+!     call prism_mpi_barrier(mpi_comm_global)
+!  endif
 
   call prism_sys_debug_note(subname//' share var info between models')
 
@@ -262,45 +261,48 @@ CONTAINS
            myops(n1) = prism_var(n1)%ops
         enddo
      endif
-
-     CALL oasis_pprinti(subname,5,' BCAST from ',int1=n,int2=model_root(n))
-
+     if (PRISM_Debug >= 5) then
+        write(nulprt,*) subname,' BCAST from ',n,model_root(n)
+        call prism_sys_flush(nulprt)
+     endif
      call prism_mpi_bcast(mynvar,mpi_comm_global,'mynvar',model_root(n))
-     CALL oasis_pprinti(subname,5,' bcast mynvar ',int1=mynvar)
-
+     if (PRISM_Debug >= 5) then
+        write(nulprt,*) subname,' bcast mynvar ',mynvar
+        call prism_sys_flush(nulprt)
+     endif
      nallvar(n) = mynvar
      call prism_mpi_bcast(myvar,mpi_comm_global,'myvar',model_root(n))
-     CALL oasis_pprintc(subname,5,' bcast myvar ',char1=trim(myvar(1)))
-
+     if (PRISM_Debug >= 5) then
+        write(nulprt,*) subname,' bcast myvar ',trim(myvar(1))
+        call prism_sys_flush(nulprt)
+     endif
      allvar(:,n) = myvar(:)
      call prism_mpi_bcast(myops,mpi_comm_global,'myops',model_root(n))
-     CALL oasis_pprinti(subname,5,' bcast myops ',int1=myops(1))
-
+     if (PRISM_Debug >= 5) then
+        write(nulprt,*) subname,' bcast myops ',myops(1)
+        call prism_sys_flush(nulprt)
+     endif
      allops(:,n) = myops(:)
   enddo
 
   deallocate(model_root)
   deallocate(myvar,myops)
 
-  CALL oasis_pprintc(subname,2,':',char1=' model variable info:')
-  CALL oasis_pprintc(subname,2,':',char1='======================================================')
-  DO nm = 1,prism_nmodels
-    CALL oasis_pprinti(subname,2,' model,nvars = ',int1=nm,int2=nallvar(nm))
-    CALL oasis_pprintc(subname,2,':',char1='======================================================')
-    DO nv = 1,nallvar(nm)
-      cstring = 'unknown'
-      IF (allops(nv,nm) == PRISM_Out) cstring = 'prism_out'
-      IF (allops(nv,nm) == PRISM_In)  cstring = 'prism_in'
-      CALL oasis_pprinti(subname,2,' Model, idx, ops  : ',int1=nm,int2=nv,int3=allops(nv,nm))
-      CALL oasis_pprintc(subname,2,' Type of variable : ',char1=TRIM(cstring),&
-         char2=TRIM(allvar(nv,nm)))
-    ENDDO
-    CALL oasis_pprintc(subname,2,':',char1='======================================================')
-  ENDDO
-  CALL oasis_pprintc(subname,2,':',char1=' end variable info')
-  IF (PRISM_Debug >= 2) THEN
-      CALL prism_mpi_barrier(mpi_comm_global)
-  ENDIF
+  if (PRISM_Debug >= 2) then
+     write(nulprt,*) subname,' model variable info:'
+     do nm = 1,prism_nmodels
+        write(nulprt,'(8x,a,2i6)') ' model,nvars = ',nm,nallvar(nm)
+        do nv = 1,nallvar(nm)
+           cstring = 'unknown'
+           if (allops(nv,nm) == PRISM_Out) cstring = 'prism_out'
+           if (allops(nv,nm) == PRISM_In)  cstring = 'prism_in'
+           write(nulprt,'(16x,a,2i6,2x,a,i6,2x,a)') ' model,idx,var,ops = ',nm,nv,trim(allvar(nv,nm)),allops(nv,nm),trim(cstring)
+        enddo
+     enddo
+     write(nulprt,*) ' '
+     call prism_sys_flush(nulprt)
+!     call prism_mpi_barrier(mpi_comm_global)
+  endif
 
   !----------------------------------------------------------
   ! Setup couplers based on namcouple and model variable info
@@ -326,7 +328,10 @@ CONTAINS
 
      !--- tcx require for run time error on corail ????----
      call prism_mpi_barrier(mpi_comm_global)
-     CALL oasis_pprinti(subname,2,' check nam :',int1=nns)
+     IF (PRISM_DEBUG >= 2) THEN
+         WRITE(nulprt,*) subname,' check nam ',nns
+         CALL prism_sys_flush(nulprt)
+     ENDIF
 
      !--------------------------------
      ! for all my variables
@@ -335,7 +340,10 @@ CONTAINS
      do nv1 = 1,nallvar(compid)
 
         !--- tcx require for run time error on corail ????----
-        CALL oasis_pprinti(subname,2,' check var :',int1=nns,int2=nv1)
+       IF (PRISM_DEBUG >= 2) THEN
+           WRITE(nulprt,*) subname,' check var ',nns,nv1
+           CALL prism_sys_flush(nulprt)
+       ENDIF
 
         !--------------------------------
         ! get my parition and fld
@@ -388,15 +396,15 @@ CONTAINS
            !--------------------------------
 
            if (flag /= PRISM_In .and. flag /= PRISM_Out) then
-              CALL oasis_pprinti(subname,2,' flag problems :',int1=flag)
-              CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-              CALL oasis_pprintc(subname,2,' error :',char1='flag problems')
+              write(nulprt,*) subname,' ERROR flag problems',flag
+              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
               call prism_sys_abort()
            endif
 
-           CALL oasis_pprinti(subname,5,' ca: nn, compid =',int1=nn,int2=compid)
-           CALL oasis_pprinti(subname,5,' ca: nv, myfldi =',int1=nv,int2=myfldi)
-           CALL oasis_pprintc(subname,5,' ca: myfld =',char1=trim(myfld))
+           if (PRISM_Debug >= 5) then
+              write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: myfld',nn,compid,nv1,myfldi,' ',trim(myfld)
+              call prism_sys_flush(nulprt)
+           endif
 
            !--------------------------------
            ! look for namcouple coupling variable in all other model variables
@@ -407,8 +415,10 @@ CONTAINS
            do nv = 1,nallvar(nm)
 
               !--- tcx require for run time error on corail ????----
-              CALL oasis_pprinti(subname,2,' check mod nns, nv1 :',int1=nns,int2=nv1)
-              CALL oasis_pprinti(subname,2,' check mod nm, nv :',int1=nm,int2=nv)
+              IF (PRISM_DEBUG >= 2) THEN
+                  WRITE(nulprt,*) subname,' check mod ',nns,nv1,nm,nv
+                  CALL prism_sys_flush(nulprt)
+              ENDIF
 
               otfld  = trim(allvar(nv,nm))
               otfldi = -1
@@ -428,12 +438,12 @@ CONTAINS
 
               if (otfldi == myfldi) then
 
-                  CALL oasis_pprinti(subname,2,' check fld nns, nv1, nm: ',int1=nns,int2=nv1,int3=nm)
-                  CALL oasis_pprinti(subname,2,' check fld nv,otfldi : ',int1=nv,int2=otfldi)
+                 if (PRISM_DEBUG >= 2) write(nulprt,*) subname,' check fld ',nns,nv1,nm,nv,otfldi
 
-                  CALL oasis_pprinti(subname,5,' ca: otfld nn,nm : ',int1=nn,int2=nm)
-                  CALL oasis_pprinti(subname,5,' ca: otfld nv,otfldi : ',int1=nv,int2=otfldi)
-                  CALL oasis_pprintc(subname,5,' ca: otfld : ',char1=TRIM(otfld))
+                 if (PRISM_Debug >= 5) then
+                    write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,nv,otfldi,' ',trim(otfld)
+                    call prism_sys_flush(nulprt)
+                 endif
 
                  !--------------------------------
                  ! Do not allow src and dst to be on same model for communication
@@ -443,39 +453,31 @@ CONTAINS
 
                  if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
                     if (nm == compid) then
-                       CALL oasis_pprinti(subname,2,' ERROR send recv pair on same model',int1=nm)
-                       CALL oasis_pprintc(subname,2,' ERROR send recv pair on same model',char1=TRIM(myfld),&
-                                          char2=' and ',char3=trim(otfld))
-                       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                       CALL oasis_pprintc(subname,2,' error :',char1=' send recv pair on same model')
-                       CALL prism_sys_abort()
+                       write(nulprt,*) subname,' ERROR send recv pair on same model',nm,' ', &
+                          trim(myfld),' ',trim(otfld)
+                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       call prism_sys_abort()
                     endif
                     if (flag == PRISM_Out .and. allops(nv,nm) /= PRISM_In) then
-                       CALL oasis_pprintc(subname,2,':',char1=' ERROR send recv pair both Out')
-                       CALL oasis_pprintc(subname,2,' ERROR send recv pair both Out',char1=TRIM(myfld), &
-                                            char2=' and ',char3=trim(otfld))
-                       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                       CALL oasis_pprintc(subname,2,' error :',char1=' ERROR send recv pair both Out')
+                       write(nulprt,*) subname,' ERROR send recv pair both Out ', &
+                          trim(myfld),' ',trim(otfld)
+                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                        call prism_sys_abort()
                     endif
                     if (flag == PRISM_In .and. allops(nv,nm) /= PRISM_Out) then
-                       CALL oasis_pprintc(subname,2,':',char1=' ERROR send recv pair both In')
-                       CALL oasis_pprintc(subname,2,' ERROR send recv pair both In',char1=TRIM(myfld), &
-                                           char2=' and ',char3=trim(otfld))
-                       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                       CALL oasis_pprintc(subname,2,' error :',char1=' ERROR send recv pair both In')
+                       write(nulprt,*) subname,' ERROR send recv pair both In ', &
+                          trim(myfld),' ',trim(otfld)
+                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                        call prism_sys_abort()
                     endif
                  endif
 
                  if (namfldops(nn) == ip_input .or. namfldops(nn) == ip_output) then
                     if (trim(myfld) /= trim(otfld)) then
-                       CALL oasis_pprintc(subname,2,':',char1=' ERROR namcouple field names to not match for in/out')
-                       CALL oasis_pprintc(subname,2,' ERROR namcouple field names to not match for in/out',&
-                                          char1=TRIM(myfld),char2=' and ',char3=trim(otfld))
-                       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                       CALL oasis_pprintc(subname,2,' error :',char1=' namcouple field names do not match for in/out')
-                       CALL prism_sys_abort()
+                       write(nulprt,*) subname,' ERROR namcouple field names to not match for in/out', &
+                          trim(myfld),' ',trim(otfld)
+                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       call prism_sys_abort()
                     endif
                  endif
 
@@ -485,9 +487,8 @@ CONTAINS
                  !--------------------------------
 
                  if (flag == PRISM_In .and. found) then
-                    CALL oasis_pprintc(subname,2,' ERROR found two sources for ',char1=trim(otfld))
-                    CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                    CALL oasis_pprintc(subname,2,' error :',char1='found two wources')
+                    write(nulprt,*) subname,' ERROR found two sources for ',trim(otfld)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call prism_sys_abort()
                  endif
                  found = .true.
@@ -500,10 +501,8 @@ CONTAINS
                  if (nn /= lnn) prism_ncoupler = prism_ncoupler + 1
                  lnn = nn
                  if (prism_ncoupler > prism_mcoupler) then
-                    CALL oasis_pprinti(subname,2,' ERROR prism_ncoupler to large : ',int1=prism_ncoupler,&
-                                          int2=prism_mcoupler)
-                    CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                    CALL oasis_pprintc(subname,2,' error :',char1=' prism_ncoupler too large')
+                    write(nulprt,*) subname,' ERROR prism_ncoupler too large',prism_ncoupler,prism_mcoupler
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call prism_sys_abort()
                  endif
                  nc = prism_ncoupler
@@ -590,10 +589,8 @@ CONTAINS
                     !--------------------------------
                     prism_nrouter = prism_nrouter + 1
                     if (prism_nrouter > prism_mrouter) then
-                       CALL oasis_pprinti(subname,2,' ERROR prism_nrouter to large :  ',int1=prism_nrouter,&
-                                             int2=prism_mrouter)
-                       CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                       CALL oasis_pprintc(subname,2,' error :',char1=' prism_nrouter too large')
+                       write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,prism_mrouter
+                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                        call prism_sys_abort()
                     endif
                     prism_coupler(nc)%routerID = prism_nrouter
@@ -634,10 +631,8 @@ CONTAINS
                     if (mapid < 1) then
                        prism_nmapper = prism_nmapper + 1
                        if (prism_nmapper > prism_mmapper) then
-                          CALL oasis_pprinti(subname,2,' ERROR prism_nmapper too large : ',int1=prism_nmapper, &
-                                                int2=prism_mmapper)
-                          CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                          CALL oasis_pprintc(subname,2,' error :',char1=' prism_nmapper too large')
+                          write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,prism_mmapper
+                          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                           call prism_sys_abort()
                        endif
                        mapid = prism_nmapper
@@ -646,7 +641,10 @@ CONTAINS
                        prism_mapper(mapid)%opt  = trim(nammapopt(nn))
                        if (flag == PRISM_In ) prism_mapper(mapID)%dpart = part1
                        if (flag == PRISM_Out) prism_mapper(mapID)%spart = part1
-                       CALL oasis_pprintc(subname,15,' DEBUG new mapper for file :',char1=trim(prism_mapper(mapid)%file))
+                       if (PRISM_DEBUG > 15) then
+                          write(nulprt,*) subname,' DEBUG new mapper for file ',trim(prism_mapper(mapid)%file)
+                          call prism_sys_flush(nulprt)
+                       endif
                     endif
                     prism_coupler(nc)%mapperID = mapid
                  endif  ! flag and nammaploc match
@@ -672,9 +670,20 @@ CONTAINS
 
   deallocate(allvar,nallvar,allops)
 
-  if (PRISM_Debug >= 2) then 
-     call prism_mpi_barrier(mpi_comm_global,subname//' barrier1')
+  if (PRISM_Debug >= 20) then
+     write(nulprt,*) ' '
+     write(nulprt,*) subname,' couplers setup'
+     do nc = 1,prism_ncoupler
+!tcx can't write here, something uninitialized???
+!        call prism_coupler_print(nc)
+     enddo
+     write(nulprt,*) ' '
   endif
+
+!  if (PRISM_Debug >= 2) then 
+!     call prism_sys_flush(nulprt)
+!     call prism_mpi_barrier(mpi_comm_global,subname//' barrier1')
+!  endif
 
   !----------------------------------------------------------
   ! Initialize coupling infrastructure based on couplers above
@@ -683,16 +692,18 @@ CONTAINS
   call prism_sys_debug_note(subname//' initialize coupling datatypes')
 
   do nc = 1,prism_ncoupler
-     CALL oasis_pprinti(subname,5,' DEBUG ci:initialize coupler ',int1=nc)
+     if (PRISM_Debug >= 5) then
+        write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc
+        call prism_sys_flush(nulprt)
+     endif
 
      namID = prism_coupler(nc)%namID
      part1 = prism_coupler(nc)%partID
      mapID = prism_coupler(nc)%mapperID
 
      if (part1 <= 0) then
-        CALL oasis_pprinti(subname,2,' ERROR part1 invalid : ',int1=part1)
-        CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-        CALL oasis_pprintc(subname,2,' error :',char1=' part1 invalid')
+        write(nulprt,*) subname,' ERROR part1 invalid ',part1
+        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
         call prism_sys_abort()
      endif
 
@@ -702,20 +713,20 @@ CONTAINS
 
      gsize = mct_gsmap_gsize(prism_part(part1)%gsmap)
      lsize = mct_gsmap_lsize(prism_part(part1)%gsmap,mpi_comm_local)
-
-     CALL oasis_pprinti(subname,15,' DEBUG ci:part1 info part1,mapid ',int1=part1,int2=mapid)
-     CALL oasis_pprinti(subname,15,' DEBUG ci:part1 info gsize,lsize ',int1=gsize,int2=lsize)
-     CALL oasis_pprinti(subname,15,' DEBUG ci:part1a ',int1=prism_part(part1)%gsmap%ngseg,int2=prism_part(part1)%gsmap%gsize)
-     DO n1 = 1,prism_part(part1)%gsmap%ngseg
-       CALL oasis_pprinti(subname,15,' DEBUG ci:part1b :',int1=n1)
-       CALL oasis_pprinti(subname,15,' DEBUG ci:part1b :',int1=prism_part(part1)%gsmap%start(n1),&
-                             int2=prism_part(part1)%gsmap%length(n1),&
-                             int3=prism_part(part1)%gsmap%pe_loc(n1))
-     ENDDO
-
+     if (PRISM_Debug >= 15) then
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapid,gsize,lsize
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,prism_part(part1)%gsmap%gsize
+        do n1 = 1,prism_part(part1)%gsmap%ngseg
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,prism_part(part1)%gsmap%start(n1),prism_part(part1)%gsmap%length(n1),prism_part(part1)%gsmap%pe_loc(n1)
+        enddo
+        call prism_sys_flush(nulprt)
+     endif
      call mct_avect_init(prism_coupler(nc)%avect1,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
      call mct_avect_zero(prism_coupler(nc)%avect1)
-     CALL oasis_pprintc(subname,15,':',char1=' DEBUG ci:avect1 initialized ')
+     if (PRISM_Debug >= 15) then
+        write(nulprt,*) subname,' DEBUG ci:avect1 initialized '
+        call prism_sys_flush(nulprt)
+     endif
 
      !--------------------------------
      ! compute nflds for this coupling and initialize avcnt and status
@@ -752,12 +763,16 @@ CONTAINS
            ! get gsmap for non local grid
            ! read mapping weights and initialize sMatP
            !--------------------------------
-           CALL oasis_pprintc(subname,15,' DEBUG ci:read mapfile : ',char1=trim(prism_mapper(mapid)%file))
+           if (PRISM_Debug >= 15) then
+              write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapid)%file)
+              call prism_sys_flush(nulprt)
+           endif
            if (mpi_rank_local == 0) then
               inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
-              CALL oasis_pprintc(subname,15,' DEBUG ci: inquire mapfile : ',char1=TRIM(prism_mapper(mapID)%file))
-              CALL oasis_pprintl(subname,15,' DEBUG ci: inquire mapfile : ',log1=exists)
-
+              if (PRISM_Debug >= 15) then
+                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile',trim(prism_mapper(mapID)%file),exists
+                 call prism_sys_flush(nulprt)
+              endif
               if (.not.exists) then
                  if (trim(namscrmet(namID)) /= trim(cspval)) then
                     !--------------------------------
@@ -766,10 +781,8 @@ CONTAINS
                     !--------------------------------
                     call prism_coupler_genmap(mapid,namID)
                  else
-                    CALL oasis_pprintc(subname,2,' ERROR map file does not exist and SCRIPR not set ', &
-                                          char1=trim(prism_mapper(mapID)%file))
-                    CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-                    CALL oasis_pprintc(subname,2,' error :',char1=' map file does not exist')
+                    write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',trim(prism_mapper(mapID)%file)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call prism_sys_abort()
                  endif
               endif
@@ -828,19 +841,15 @@ CONTAINS
            elseif (prism_mapper(mapID)%opt == 'sum') then
               cstring = 'dst'
            else
-              CALL oasis_pprintc(subname,2,' ERROR mapper opt invalid ', &
-                                    char1=trim(prism_mapper(mapID)%opt))
-              CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-              CALL oasis_pprintc(subname,2,' error :',char1=' mapper opt invalid')
-              CALL prism_sys_abort()
+              write(nulprt,*) subname,' ERROR mapper opt invalid ',trim(prism_mapper(mapID)%opt)
+              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              call prism_sys_abort()
            endif
            if (prism_mapper(mapID)%optval /= '' .and. &
                prism_mapper(mapID)%optval /= trim(cstring)) then
-              CALL oasis_pprintc(subname,2,' ERROR mapper opt changed : ',char1=trim(prism_mapper(mapID)%optval))
-              CALL oasis_pprintc(subname,2,' ERROR mapper opt changed : ',char1=trim(cstring))
-              CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-              CALL oasis_pprintc(subname,2,' error :',char1=' mapper opt changed')
-              CALL prism_sys_abort()
+              write(nulprt,*) subname,' ERROR mapper opt changed',trim(prism_mapper(mapID)%optval),' ',trim(cstring)
+              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              call prism_sys_abort()
            endif
            prism_mapper(mapID)%optval = trim(cstring)
 
@@ -871,23 +880,20 @@ CONTAINS
               call prism_io_read_avfld('areas.nc',prism_mapper(mapid)%av_md, &
                  prism_part(dpart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
 
-              CALL oasis_pprinti(subname,30,' DEBUG msi : ',int1=MINVAL(prism_mapper(mapid)%av_ms%iAttr(:,:)),&
-                                    int2=MAXVAL(prism_mapper(mapid)%av_ms%iAttr(:,:)),&
-                                    int3=sum(prism_mapper(mapid)%av_ms%iAttr(:,:)))
-              CALL oasis_pprintr(subname,30,' DEBUG msr : ',r1=MINVAL(prism_mapper(mapid)%av_ms%rAttr(:,:)),&
-                                    r2=MAXVAL(prism_mapper(mapid)%av_ms%rAttr(:,:)),&
-                                    r3=sum(prism_mapper(mapid)%av_ms%rAttr(:,:)))
-              CALL oasis_pprinti(subname,30,' DEBUG mdi : ',int1=MINVAL(prism_mapper(mapid)%av_md%iAttr(:,:)), &
-                                    int2=MAXVAL(prism_mapper(mapid)%av_md%iAttr(:,:)),&
-                                    int3=sum(prism_mapper(mapid)%av_md%iAttr(:,:)))
-              CALL oasis_pprintr(subname,30,' DEBUG mdr : ',r1=MINVAL(prism_mapper(mapid)%av_md%rAttr(:,:)),&
-                                    r2=MAXVAL(prism_mapper(mapid)%av_md%rAttr(:,:)),&
-                                    r3=sum(prism_mapper(mapid)%av_md%rAttr(:,:)))
+              if (PRISM_DEBUG >= 30) then
+                 write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapid)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%iAttr(:,:)),sum(prism_mapper(mapid)%av_ms%iAttr(:,:))
+                 write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapid)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%rAttr(:,:)),sum(prism_mapper(mapid)%av_ms%rAttr(:,:))
+                 write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapid)%av_md%iAttr(:,:)),maxval(prism_mapper(mapid)%av_md%iAttr(:,:)),sum(prism_mapper(mapid)%av_md%iAttr(:,:))
+                 write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapid)%av_md%rAttr(:,:)),maxval(prism_mapper(mapid)%av_md%rAttr(:,:)),sum(prism_mapper(mapid)%av_md%rAttr(:,:))
+              endif
            endif
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
-           CALL oasis_pprinti(subname,15,' DEBUG ci:done initializing prism_mapper :',int1=mapId,int2=lsize)
+           if (PRISM_Debug >= 15) then
+              write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID," nElements = ",lsize
+              call prism_sys_flush(nulprt)
+           endif
            call mct_sMat_Clean(sMati)
         endif  ! map init
 
@@ -896,20 +902,20 @@ CONTAINS
         !--------------------------------
 
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
-
-        CALL oasis_pprinti(subname,15,' DEBUG ci:part2 info part2 mapid : ',int1=part2,int2=mapid)
-        CALL oasis_pprinti(subname,15,' DEBUG ci:part2 info gsize,lsize : ',int1=gsize,int2=lsize)
-        CALL oasis_pprinti(subname,15,' DEBUG ci:part2a : ',int1=prism_part(part2)%gsmap%ngseg,&
-                             int2=prism_part(part2)%gsmap%gsize)
-        DO n1=1,prism_part(part2)%gsmap%ngseg
-          CALL oasis_pprinti(subname,15,' DEBUG ci:part2b : ',int1=n1)
-          CALL oasis_pprinti(subname,15,' DEBUG ci:part2b : ',int1=prism_part(part2)%gsmap%start(n1),&
-                              int2=prism_part(part2)%gsmap%length(n1),&
-                                int3=prism_part(part2)%gsmap%pe_loc(n1))
-        ENDDO
+        if (PRISM_Debug >= 15) then
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapid,gsize,lsize
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,prism_part(part2)%gsmap%gsize
+           do n1 = 1,prism_part(part2)%gsmap%ngseg
+              write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
+           enddo
+           call prism_sys_flush(nulprt)
+        endif
         call mct_avect_init(prism_coupler(nc)%avect2,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
         call mct_avect_zero(prism_coupler(nc)%avect2)
-        CALL oasis_pprintc(subname,15,':',char1=' DEBUG ci:avect2 initialized ')
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname,' DEBUG ci:avect2 initialized '
+           call prism_sys_flush(nulprt)
+        endif
 
         !--------------------------------
         ! router partition is always other part
@@ -933,13 +939,18 @@ CONTAINS
 
      if (prism_coupler(nc)%sndrcv) then
 
-        CALL oasis_pprinti(subname,15,' DEBUG ci:initialize router : ',int1=prism_coupler(nc)%routerID, &
-                              int2=prism_coupler(nc)%comp,int3=rpart)
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname,' DEBUG ci:initialize router ',prism_coupler(nc)%routerID,prism_coupler(nc)%comp,rpart
+           call prism_sys_flush(nulprt)
+        endif
 
         call mct_router_init(prism_coupler(nc)%comp,prism_part(rpart)%gsmap, &
            mpi_comm_local,prism_router(prism_coupler(nc)%routerID)%router)
 
-        CALL oasis_pprinti(subname,15,' DEBUG ci:done initializing prism_router : ',int1=prism_coupler(nc)%routerID)
+        if (PRISM_Debug >= 15) then
+           write(nulprt,*) subname," DEBUG ci:done initializing prism_router",prism_coupler(nc)%routerID
+           call prism_sys_flush(nulprt)
+        endif
      endif
 
   enddo
@@ -948,18 +959,21 @@ CONTAINS
   ! Diagnostics
   !----------------------------------------------------------
 
-     CALL oasis_pprintc(subname,2,':',char1=' couplers initialized')
-     CALL oasis_pprintc(subname,2,' Print infos : ',char1='=========================================')
+  if (PRISM_DEBUG >= 2) then
+     write(nulprt,*) ' '
+     write(nulprt,*) subname,' couplers initialized'
      do nc = 1,prism_ncoupler
         call prism_coupler_print(nc)
      enddo
-     CALL oasis_pprintc(subname,2,' End Print infos : ',char1='=========================================')
+     write(nulprt,*) ' '
+  endif
 
   call prism_timer_stop('cpl_setup')
 
-  if (PRISM_Debug >= 2) then
-     call prism_mpi_barrier(mpi_comm_global,subname//' barrier2')
-  endif
+!  if (PRISM_Debug >= 2) then
+!     call prism_sys_flush(nulprt)
+!     call prism_mpi_barrier(mpi_comm_global,subname//' barrier2')
+!  endif
 
   call prism_sys_debug_exit(subname)
 
@@ -972,7 +986,6 @@ CONTAINS
 
   integer(ip_i4_p), intent(in) :: cplid
   !----------------------------------------------------------
-  INTEGER(ip_i4_p) :: ii ! for prints loop
   integer(ip_i4_p) :: mapid, rouid, parid, namid, nflds
   integer(ip_i4_p) :: spart,dpart
   character(len=*),parameter :: subname = 'prism_coupler_print'
@@ -985,68 +998,59 @@ CONTAINS
   namid = prism_coupler(cplid)%namid
   nflds = prism_coupler(cplid)%nflds
 
-
-     CALL oasis_pprinti(subname,2,' model and cplid : ',int1=compid,int2=cplid)
+     write(nulprt,*) ' '
+     write(nulprt,*) subname,' model and cplid',compid,cplid
   if (prism_coupler(cplid)%getput == PRISM_PUT) then
-     CALL oasis_pprintc(subname,2,'  send fields  : ',char1=trim(prism_coupler(cplid)%fldlist))
-     CALL oasis_pprinti(subname,2,'  from model   : ',int1=compid)
-     CALL oasis_pprinti(subname,2,'  to model     : ',int1=prism_coupler(cplid)%comp)
-     CALL oasis_pprinti(subname,2,'  using router : ',int1=rouid)
-     CALL oasis_pprinti(subname,2,'  transform    : ',int1=prism_coupler(cplid)%trans)
-     CALL oasis_pprintl(subname,2,'  snd diagnose : ',log1=prism_coupler(cplid)%snddiag)
-     CALL oasis_pprintr(subname,2,'  snd fld mult : ',r1=prism_coupler(cplid)%sndmult)
-     CALL oasis_pprintr(subname,2,'  snd fld add  : ',r1=prism_coupler(cplid)%sndadd)
+     write(nulprt,*) subname,'   send fields  ',trim(prism_coupler(cplid)%fldlist)
+     write(nulprt,*) subname,'   from model   ',compid
+     write(nulprt,*) subname,'   to model     ',prism_coupler(cplid)%comp
+     write(nulprt,*) subname,'   using router ',rouid
+     write(nulprt,*) subname,'   transform    ',prism_coupler(cplid)%trans
+     write(nulprt,*) subname,'   snd diagnose ',prism_coupler(cplid)%snddiag
+     write(nulprt,*) subname,'   snd fld mult ',prism_coupler(cplid)%sndmult
+     write(nulprt,*) subname,'   snd fld add  ',prism_coupler(cplid)%sndadd
   endif
   if (prism_coupler(cplid)%getput == PRISM_GET) then
-     CALL oasis_pprintc(subname,2,'  recv fields  : ',char1=trim(prism_coupler(cplid)%fldlist))
-     CALL oasis_pprinti(subname,2,'  from model   : ',int1=prism_coupler(cplid)%comp)
-     CALL oasis_pprinti(subname,2,'  to model     : ',int1=compid)
-     CALL oasis_pprinti(subname,2,'  using router : ',int1=rouid)
-     CALL oasis_pprintl(subname,2,'  rcv diagnose : ',log1=prism_coupler(cplid)%rcvdiag)
-     CALL oasis_pprintr(subname,2,'  rcv fld mult : ',r1=prism_coupler(cplid)%rcvmult)
-     CALL oasis_pprintr(subname,2,'  rcv fld add  : ',r1=prism_coupler(cplid)%rcvadd)
+     write(nulprt,*) subname,'   recv fields  ',trim(prism_coupler(cplid)%fldlist)
+     write(nulprt,*) subname,'   from model   ',prism_coupler(cplid)%comp
+     write(nulprt,*) subname,'   to model     ',compid
+     write(nulprt,*) subname,'   using router ',rouid
+     write(nulprt,*) subname,'   rcv diagnose ',prism_coupler(cplid)%rcvdiag
+     write(nulprt,*) subname,'   rcv fld mult ',prism_coupler(cplid)%rcvmult
+     write(nulprt,*) subname,'   rcv fld add  ',prism_coupler(cplid)%rcvadd
   endif
-  CALL oasis_pprinti(subname,2,'   namcouple op ',int1=prism_coupler(cplid)%ops)
-  CALL oasis_pprinti(subname,2,'   namcouple id ',int1=namid)
-  DO ii=1,SIZE(prism_coupler(cplid)%varid)
-    CALL oasis_pprinti(subname,2,'   variable ids ',int1=prism_coupler(cplid)%varid(ii))
-  ENDDO
-  CALL oasis_pprintl(subname,2,'   sndrcv flag  ',log1=prism_coupler(cplid)%sndrcv)   
-  CALL oasis_pprintl(subname,2,'   output flag  ',log1=prism_coupler(cplid)%output)
-  CALL oasis_pprintl(subname,2,'   input flag   ',log1=prism_coupler(cplid)%input)
-  CALL oasis_pprintc(subname,2,'   input file   ',char1=trim(prism_coupler(cplid)%inpfile))
-  CALL oasis_pprintc(subname,2,'   restart file ',char1=TRIM(prism_coupler(cplid)%rstfile))
-  CALL oasis_pprinti(subname,2,'   tag          ',int1=prism_coupler(cplid)%tag)
-  CALL oasis_pprinti(subname,2,'   seq          ',int1=prism_coupler(cplid)%seq)
-  CALL oasis_pprinti(subname,2,'   maxtime      ',int1=prism_coupler(cplid)%maxtime)
-  CALL oasis_pprinti(subname,2,'   dt, lag      ',int1=prism_coupler(cplid)%dt,int2=prism_coupler(cplid)%lag)
-  CALL oasis_pprintc(subname,2,'   grid name    ',char1=TRIM(prism_part(parid)%gridname))
-  CALL oasis_pprinti(subname,2,'   partid, size ',int1=parid,int2=prism_part(parid)%gsize)
-  CALL oasis_pprinti(subname,2,'   partid, nx,ny',int1=prism_part(parid)%nx,int2=prism_part(parid)%ny)
+     write(nulprt,*) subname,'   namcouple op ',prism_coupler(cplid)%ops
+     write(nulprt,*) subname,'   namcouple id ',namid
+     write(nulprt,*) subname,'   variable ids ',prism_coupler(cplid)%varid(1:nflds)
+     write(nulprt,*) subname,'   sndrcv flag  ',prism_coupler(cplid)%sndrcv
+     write(nulprt,*) subname,'   output flag  ',prism_coupler(cplid)%output
+     write(nulprt,*) subname,'   input flag   ',prism_coupler(cplid)%input
+     write(nulprt,*) subname,'   input file   ',trim(prism_coupler(cplid)%inpfile)
+     write(nulprt,*) subname,'   restart file ',trim(prism_coupler(cplid)%rstfile)
+     write(nulprt,*) subname,'   tag          ',prism_coupler(cplid)%tag
+     write(nulprt,*) subname,'   seq          ',prism_coupler(cplid)%seq
+     write(nulprt,*) subname,'   maxtime      ',prism_coupler(cplid)%maxtime
+     write(nulprt,*) subname,'   dt, lag      ',prism_coupler(cplid)%dt,prism_coupler(cplid)%lag
+     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),prism_part(parid)%gsize
+     write(nulprt,*) subname,'   partid, nx,ny',prism_part(parid)%nx,prism_part(parid)%ny
 
-  IF (mapid > 0) THEN
-      CALL oasis_pprinti(subname,2,'   use map  mpid  ',int1=mapid)
-      CALL oasis_pprintc(subname,2,'   use map  file  ',char1=TRIM(prism_mapper(mapid)%file))
-      spart = prism_mapper(mapid)%spart
-      dpart = prism_mapper(mapid)%dpart
-      CALL oasis_pprinti(subname,2,'   conserve     ',int1=prism_coupler(cplid)%conserv)
-      CALL oasis_pprintc(subname,2,'   location     ',char1=TRIM(prism_mapper(mapid)%loc))
-      CALL oasis_pprintc(subname,2,'   opt,optval   ',char1=TRIM(prism_mapper(mapid)%opt), &
-                         char2=' : ',char3=TRIM(prism_mapper(mapid)%optval))
-      CALL oasis_pprinti(subname,2,'   s/d partids  ',int1=spart,int2=dpart)
-      IF (spart > 0) THEN
-          CALL oasis_pprintc(subname,2,'   from/to      ',char1=TRIM(prism_part(spart)%gridname),&
-                             char2=' : ',char3=TRIM(prism_part(dpart)%gridname))
-          CALL oasis_pprintc(subname,2,'   from/to      ',char1=TRIM(prism_part(spart)%gridname),&
-                             char2=' : ',char3=TRIM(prism_part(dpart)%gridname))
-          CALL oasis_pprinti(subname,2,'   from nx,ny   ',int1=prism_part(spart)%gsize, &
-                              int2=prism_part(spart)%nx,int3=prism_part(spart)%ny)
-      ENDIF
-      IF (dpart > 0) THEN
-          CALL oasis_pprinti(subname,2,'   to nx,ny     ',int1=prism_part(dpart)%gsize,&
-                           int2=prism_part(dpart)%nx,int3=prism_part(dpart)%ny)
-      ENDIF
-  ENDIF
+  if (mapid > 0) then
+     write(nulprt,*) subname,'   use map      ',mapid,trim(prism_mapper(mapid)%file)
+     spart = prism_mapper(mapid)%spart
+     dpart = prism_mapper(mapid)%dpart
+     write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
+     write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
+     write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',trim(prism_mapper(mapid)%optval)
+     write(nulprt,*) subname,'   s/d partids  ',spart,dpart
+     if (spart > 0) &
+     write(nulprt,*) subname,'   from/to      ',trim(prism_part(spart)%gridname),' ',&
+                                                trim(prism_part(dpart)%gridname)
+     write(nulprt,*) subname,'   from nx,ny   ',prism_part(spart)%gsize,prism_part(spart)%nx,prism_part(spart)%ny
+     if (dpart > 0) &
+     write(nulprt,*) subname,'   to nx,ny     ',prism_part(dpart)%gsize, prism_part(dpart)%nx,prism_part(dpart)%ny
+  endif
+
+  call prism_sys_flush(nulprt)
 
   call prism_sys_debug_exit(subname)
 
@@ -1088,20 +1092,20 @@ CONTAINS
   !--- checks first ---
 
   if (trim(namscrtyp(namID)) /= 'SCALAR') then
-     CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-     CALL oasis_pprintc(subname,2,' error :',char1='only scrip type SCALAR mapping supported')
-     CALL prism_sys_abort()
+     write(nulprt,*) subname,' ERROR: only scrip type SCALAR mapping supported'
+     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+     call prism_sys_abort()
   endif
 
   if (trim(namscrmet(namID)) == 'CONSERV' .and. trim(namscrord(namID)) /= 'FIRST') then
-     CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-     CALL oasis_pprintc(subname,2,' error :',char1='only FIRST ORDER mapping supported for CONSERV')
+     write(nulprt,*) subname,' ERROR: only FIRST ORDER mapping supported'
+     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
      call prism_sys_abort()
   endif
 
   if (trim(namscrmet(namID)) == 'BICUBIC') then
-     CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-     CALL oasis_pprintc(subname,2,' error :',char1=' BICUBIC mapping not yet supported')
+     write(nulprt,*) subname,' ERROR: BICUBIC mapping not yet supported'
+     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
      call prism_sys_abort()
   endif
   
@@ -1120,10 +1124,7 @@ CONTAINS
      fldname = trim(namsrcgrd(namID))//'.lon'
      call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
   endif
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=trim(fldname))
-  CALL oasis_pprinti(subname,15,' nx,ny : ',int1=nx,int2=ny)
-  CALL oasis_pprinti(subname,15,' nc : ',int1=nc)
-  CALL oasis_pprintl(subname,15,' do_corners : ',log1=do_corners)
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc,do_corners
   src_rank = 2
   src_size = nx*ny
   allocate(src_dims(src_rank))
@@ -1143,8 +1144,8 @@ CONTAINS
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      src_mask(icnt) = ifld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprinti(subname,15,' min and max src_mask : ',int1=minval(src_mask),int2=maxval(src_mask))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_mask),maxval(src_mask)
   deallocate(ifld2)
 
   allocate(fld2(nx,ny))
@@ -1154,15 +1155,15 @@ CONTAINS
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      src_lon(icnt) = fld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprintr(subname,15,' min and max src_lon : ',r1=minval(src_lon),r2=maxval(src_lon))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_lon),maxval(src_lon)
   fldname = trim(namsrcgrd(namID))//'.lat'
   call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      src_lat(icnt) = fld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprintr(subname,15,' min and max src_lat : ',r1=minval(src_lat),r2=maxval(src_lat))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(src_lat),maxval(src_lat)
   deallocate(fld2)
 
   if (do_corners) then
@@ -1175,9 +1176,8 @@ CONTAINS
            src_corner_lon(k,icnt) = fld3(i,j,k)
         enddo
      enddo; enddo
-     CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-     CALL oasis_pprintr(subname,15,' min and max src_clo : ',r1=MINVAL(src_corner_lon),&
-                        r2=MAXVAL(src_corner_lon))
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(src_corner_lon),maxval(src_corner_lon)
      fldname = trim(namsrcgrd(namID))//'.cla'
      call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
      icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
@@ -1185,9 +1185,8 @@ CONTAINS
            src_corner_lat(k,icnt) = fld3(i,j,k)
         enddo
      enddo; enddo
-     CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-     CALL oasis_pprintr(subname,15,' min and max src_cla : ',r1=MINVAL(src_corner_lat),&
-                        r2=MAXVAL(src_corner_lat))
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(src_corner_lat),maxval(src_corner_lat)
      deallocate(fld3)
   else
      src_corner_lon = -9999.
@@ -1204,8 +1203,7 @@ CONTAINS
      fldname = trim(namdstgrd(namID))//'.lon'
      call prism_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
   endif
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=trim(fldname))
-  CALL oasis_pprinti(subname,15,' nx,ny,nc : ',int1=nx,int2=ny,int3=nc)
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc
   dst_rank = 2
   dst_size = nx*ny
   allocate(dst_dims(dst_rank))
@@ -1225,8 +1223,8 @@ CONTAINS
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      dst_mask(icnt) = ifld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprinti(subname,15,' min and max dst_mask : ',int1=minval(dst_mask),int2=maxval(dst_mask))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_mask),maxval(dst_mask)
   deallocate(ifld2)
 
   allocate(fld2(nx,ny))
@@ -1236,15 +1234,15 @@ CONTAINS
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      dst_lon(icnt) = fld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprintr(subname,15,' min and max dst_lon : ',r1=minval(dst_lon),r2=maxval(dst_lon))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_lon),maxval(dst_lon)
   fldname = trim(namdstgrd(namID))//'.lat'
   call prism_io_read_field_fromroot(filename,fldname,fld2=fld2)
   icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
      dst_lat(icnt) = fld2(i,j)
   enddo; enddo
-  CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-  CALL oasis_pprintr(subname,15,' min and max dst_lat : ',r1=minval(dst_lat),r2=maxval(dst_lat))
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+     minval(dst_lat),maxval(dst_lat)
   deallocate(fld2)
 
   if (do_corners) then
@@ -1257,9 +1255,8 @@ CONTAINS
            dst_corner_lon(k,icnt) = fld3(i,j,k)
         enddo
      enddo; enddo
-     CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-     CALL oasis_pprintr(subname,15,' min and max dst_clo : ',r1=MINVAL(dst_corner_lon),&
-                                     r2=MAXVAL(dst_corner_lon))
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(dst_corner_lon),maxval(dst_corner_lon)
      fldname = trim(namdstgrd(namID))//'.cla'
      call prism_io_read_field_fromroot(filename,fldname,fld3=fld3)
      icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
@@ -1267,16 +1264,16 @@ CONTAINS
            dst_corner_lat(k,icnt) = fld3(i,j,k)
         enddo
      enddo; enddo
-     CALL oasis_pprintc(subname,15,' read : ',char1=TRIM(filename),char2=' : ',char3=TRIM(fldname))
-     CALL oasis_pprintr(subname,15,' min and max dst_cla : ',r1=MINVAL(dst_corner_lat),&
-                                      r2=MAXVAL(dst_corner_lat))
+     if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
+        minval(dst_corner_lat),maxval(dst_corner_lat)
      deallocate(fld3)
   else
      dst_corner_lon = -9999.
      dst_corner_lat = -9999.
   endif
 
-  CALL oasis_pprintc(subname,15,' : ',char1=' call grid_init ')
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' call grid_init '
+  call prism_sys_flush(nulprt)
 
   !--- 0/1 mask convention opposite in scrip vs oasis
   src_mask = 1 - src_mask
@@ -1289,12 +1286,18 @@ CONTAINS
        src_corner_lat, src_corner_lon, &
        dst_corner_lat, dst_corner_lon, &
        logunit=nulprt)
-  CALL oasis_pprintc(subname,15,' : ',char1=' done grid_init ')
+  if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' done scrip '
 
-  CALL oasis_pprintc(subname,15,' : ',char1=' call scrip ')
+  IF (PRISM_DEBUG >= 15) THEN
+      WRITE(nulprt,*) subname,' call scrip '
+      CALL prism_sys_flush(nulprt)
+  ENDIF
   call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
              namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
-  CALL oasis_pprintc(subname,15,' : ',char1=' done scrip ')
+  IF (PRISM_DEBUG >= 15) THEN
+      WRITE(nulprt,*) subname,' done scrip '
+      CALL prism_sys_flush(nulprt)
+  ENDIF
 
   deallocate(src_dims, dst_dims)
   deallocate(src_mask)
@@ -1307,6 +1310,7 @@ CONTAINS
   deallocate(dst_lat)
   deallocate(dst_corner_lon)
   deallocate(dst_corner_lat)
+
 
   call prism_sys_debug_exit(subname)
 
@@ -1445,17 +1449,17 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
  call prism_sys_debug_enter(subname)
  call prism_mpi_commsize(mpicom,commsize)
  if (mytask == 0) then
-     CALL oasis_pprintc(subname,2,' : ',char1=' reading mapping matrix data decomposed...')
+   if (PRISM_DEBUG >= 2) write(nulprt,F00) "reading mapping matrix data decomposed..."
 
    !----------------------------------------------------------------------------
    ! open & read the file
    !----------------------------------------------------------------------------
-   CALL oasis_pprintc(subname,2,'* file name                  : ',char1=trim(fileName))
+   if (PRISM_DEBUG >=2 ) write(nulprt,F00) "* file name                  : ",trim(fileName)
    status = nf_open(filename,NF_NOWRITE,fid)
    if (status /= NF_NOERR) then
-      CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
-      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-      CALL oasis_pprintc(subname,2,' error :',char1=filename)
+      write(nulprt,F00) trim(nf_strerror(status))
+      WRITE(nulprt,*) subname,'ERROR filename'
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
       call prism_sys_abort()
    endif
 
@@ -1490,8 +1494,9 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       ni_o = dims(1)
       nj_o = dims(2)
    end if
-   CALL oasis_pprinti(subname,2,'* matrix dims src x dst      : ',int1=na,int2=nb)
-   CALL oasis_pprinti(subname,2,'* number of non-zero elements : ',int1=ns)
+
+   if (PRISM_DEBUG >= 2) write(nulprt,F01) "* matrix dims src x dst      : ",na,' x',nb
+   if (PRISM_DEBUG >= 2) write(nulprt,F01) "* number of non-zero elements: ",ns
 
  endif
  
@@ -1501,9 +1506,15 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call mct_aVect_init(areasrc0,' ',areaAV_field,na)
 !     status = nf_inq_varid     (fid,'area_a',vid)
       status = nf_inq_varid     (fid,'src_grid_area',vid)
-      if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+      IF (status /= NF_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+      ENDIF
       status = nf_get_var_double(fid, vid, areasrc0%rAttr)
-      if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+      IF (status /= NF_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+      ENDIF
    endif
    call mct_aVect_scatter(areasrc0, areasrc, SgsMap, 0, mpicom, status)
    if (status /= 0) call mct_die(subname,"Error on scatter of areasrc0")
@@ -1524,9 +1535,15 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call mct_aVect_init(areadst0,' ',areaAV_field,nb)
 !     status = nf_inq_varid     (fid,'area_b',vid)
       status = nf_inq_varid     (fid,'dst_grid_area',vid)
-      if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+      IF (status /= NF_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+      ENDIF
       status = nf_get_var_double(fid, vid, areadst0%rAttr)
-      if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+      IF (status /= NF_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+      ENDIF
    endif
    call mct_aVect_scatter(areadst0, areadst, DgsMap, 0, mpicom, status)
    if (status /= 0) call mct_die(subname,"Error on scatter of areadst0")
@@ -1558,9 +1575,8 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    elseif (newdom == 'dst') then
       mygsmap => SgsMap
    else
-      CALL oasis_pprintc(subname,2,'ERROR: invalid newdom value = ',char1=newdom)
-      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-      CALL oasis_pprintc(subname,2,' error :',char1=' invalid newdom value')
+      write(nulprt,F00) 'ERROR: invalid newdom value = ',newdom
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
       call prism_sys_abort()
    endif
    lsize = 0
@@ -1595,9 +1611,9 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    enddo
    do n = 1,lsize-1
       if (lsstart(n) > lsstart(n+1)) then
-         CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-         CALL oasis_pprintc(subname,2,' error :',char1=' lsstart not properly sorted')
-         CALL prism_sys_abort()
+         write(nulprt,F00) ' ERROR: lsstart not properly sorted'
+         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+         call prism_sys_abort()
       endif
    enddo
 
@@ -1634,17 +1650,26 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 !        status = nf_get_vara_double(fid,vid,start,count,Sbuf)
          status = nf_get_vara_double(fid,vid,start2,count2,remaps)
          Sbuf(:) = remaps(1,:)
-         if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+         IF (status /= NF_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+         ENDIF
 
 !        status = nf_inq_varid      (fid,'row',vid)
          status = nf_inq_varid      (fid,'dst_address',vid)
          status = nf_get_vara_int   (fid,vid,start,count,Rbuf)
-         if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+         IF (status /= NF_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+         ENDIF
 
 !        status = nf_inq_varid      (fid,'col',vid)
          status = nf_inq_varid      (fid,'src_address',vid)
          status = nf_get_vara_int   (fid,vid,start,count,Cbuf)
-         if (status /= NF_NOERR) CALL oasis_pprintc(subname,2,' : ',char1=TRIM(nf_strerror(status)))
+         IF (status /= NF_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+         ENDIF
       endif
 
       !--- send S, row, col to all pes
@@ -1678,7 +1703,7 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
                deallocate(Snew,Rnew,Cnew,stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate new',status)
                bsize = 1.5 * bsize
-               CALL oasis_pprinti(subname,15,' reallocate bsize to : ',int1=bsize)
+               if (PRISM_DEBUG > 15) write(nulprt,F01) ' reallocate bsize to ',bsize
                allocate(Snew(bsize),Rnew(bsize),Cnew(bsize),stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
 
@@ -1727,7 +1752,7 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    if (mytask == 0) then
       status = nf_close(fid)
-      CALL oasis_pprintc(subname,2,' : ',char1='... done reading file')
+      if (PRISM_DEBUG >= 2) write(nulprt,F00) "... done reading file"
    endif
 
   call prism_sys_debug_exit(subname)

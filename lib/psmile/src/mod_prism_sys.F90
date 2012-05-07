@@ -2,7 +2,6 @@ MODULE mod_prism_sys
 
    USE mod_prism_kinds
    USE mod_prism_data
-   USE mod_oasis_print
 
    IMPLICIT NONE
 
@@ -80,13 +79,13 @@ CONTAINS
          found = .true.
          uio = n1 + maxion
          unitno(n1) = uio
-         CALL oasis_pprinti(subname,2,' n1,uio : ',int1=n1,int2=uio)
+         if (PRISM_DEBUG >= 2) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
    if (.not.found) then
-      CALL oasis_pprinti(subname,2,' abort by model compid ',int1=compid)
-      CALL oasis_pprintc(subname,2,' error :',char1=' ERROR no unitno available')
+      write(nulprt,*) subname,' ERROR no unitno available '
+      WRITE(nulprt,*) subname,' abort by model ',compid,' proc :',mpi_rank_local
       call prism_sys_abort()
    endif
      
@@ -104,7 +103,7 @@ CONTAINS
 !--------------------------------------------------------------------
 
    maxion = uio
-   CALL oasis_pprinti(subname,20,' maxion = ',int1=maxion)
+   if (PRISM_DEBUG >= 20) write(nulprt,*) subname,maxion
      
    END SUBROUTINE prism_sys_unitsetmin
 
@@ -123,7 +122,7 @@ CONTAINS
    do n1 = 1,muni
       if (unitno(n1) == uio) then
          unitno(n1) = -1
-         CALL oasis_pprinti(subname,20,' n1,uio = ',int1=n1,int2=uio)
+         if (PRISM_DEBUG >= 20) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
@@ -141,7 +140,7 @@ subroutine prism_sys_debug_enter(string)
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_enter
 
-   IF (PRISM_DEBUG >= 10) THEN
+   if (PRISM_DEBUG >= 10) then
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
        tree_enter='**TREE ENTER '//TRIM(string)
@@ -149,7 +148,7 @@ subroutine prism_sys_debug_enter(string)
        tree_indent = tree_indent + tree_delta
        DEALLOCATE (ch_blank)
        CALL prism_sys_flush(nulprt)
-   ENDIF
+   endif
 
 end subroutine prism_sys_debug_enter
 

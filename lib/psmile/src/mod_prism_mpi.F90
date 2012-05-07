@@ -6,7 +6,7 @@ MODULE mod_prism_mpi
 !-------------------------------------------------------------------------------
 
    use mod_prism_kinds
-   USE mod_oasis_print, ONLY: oasis_pprinti,oasis_pprintc
+   USE mod_prism_data, ONLY: compid, mpi_rank_local
    use mod_prism_sys, only: prism_sys_debug_enter, prism_sys_debug_exit
 
    implicit none
@@ -121,7 +121,7 @@ SUBROUTINE prism_mpi_chkerr(rcode,string)
    lstring = ' '
    if (rcode /= MPI_SUCCESS) then
      call MPI_ERROR_STRING(rcode,lstring,len,ierr)
-     CALL oasis_pprintc(subName,2,' : ',char1=lstring(1:len))
+     write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",lstring(1:len)
      call prism_mpi_abort(string,rcode)
    endif
 
@@ -2254,8 +2254,7 @@ SUBROUTINE prism_mpi_abort(string,rcode)
    call prism_sys_debug_enter(subname)
 
    if ( present(string) .and. present(rcode) ) then
-      CALL oasis_pprintc(subName,2,' : ',char1=trim(string))
-      CALL oasis_pprinti(subName,2,' rcode : ',int1=rcode)
+      write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",trim(string),rcode
    endif
    if ( present(rcode) )then
       rc = rcode

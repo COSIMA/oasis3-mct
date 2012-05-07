@@ -3,7 +3,6 @@ module mod_prism_getput_interface
 
     use mod_prism_kinds
     use mod_prism_data
-    USE mod_oasis_print
     use mod_prism_parameters
     use mod_prism_advance
     use mod_prism_var
@@ -59,7 +58,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=trim(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -106,7 +105,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -153,7 +152,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -204,7 +203,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -256,7 +255,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -303,7 +302,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -350,7 +349,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
@@ -401,7 +400,7 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       CALL oasis_pprintc(subname,15,' variable not coupled ',char1=TRIM(prism_var(nfld)%name))
+       if (PRISM_DEBUG >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
        call prism_sys_debug_exit(subname)
        return
     endif
