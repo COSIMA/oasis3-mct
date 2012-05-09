@@ -247,10 +247,6 @@ CONTAINS
       call prism_sys_flush(nulprt)
    endif
 
-!   if (PRISM_Debug >= 4) then
-!      call mpi_barrier(mpi_comm_global,mpi_err)
-!   endif
-
    call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_init

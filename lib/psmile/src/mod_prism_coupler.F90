@@ -234,12 +234,6 @@ CONTAINS
   ! Share model variable information across all models
   !----------------------------------------------------------
 
-!  if (PRISM_Debug >= 5) then
-!     write(nulprt,*) subname,' broadcast var info '
-!     call prism_sys_flush(nulprt)
-!     call prism_mpi_barrier(mpi_comm_global)
-!  endif
-
   call prism_sys_debug_note(subname//' share var info between models')
 
   allocate(allvar(100,prism_nmodels))
@@ -301,7 +295,6 @@ CONTAINS
      enddo
      write(nulprt,*) ' '
      call prism_sys_flush(nulprt)
-!     call prism_mpi_barrier(mpi_comm_global)
   endif
 
   !----------------------------------------------------------
@@ -680,11 +673,6 @@ CONTAINS
      write(nulprt,*) ' '
   endif
 
-!  if (PRISM_Debug >= 2) then 
-!     call prism_sys_flush(nulprt)
-!     call prism_mpi_barrier(mpi_comm_global,subname//' barrier1')
-!  endif
-
   !----------------------------------------------------------
   ! Initialize coupling infrastructure based on couplers above
   !----------------------------------------------------------
@@ -969,11 +957,6 @@ CONTAINS
   endif
 
   call prism_timer_stop('cpl_setup')
-
-!  if (PRISM_Debug >= 2) then
-!     call prism_sys_flush(nulprt)
-!     call prism_mpi_barrier(mpi_comm_global,subname//' barrier2')
-!  endif
 
   call prism_sys_debug_exit(subname)
 

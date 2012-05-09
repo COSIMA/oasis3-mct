@@ -971,8 +971,8 @@ CONTAINS
                 IF (mpi_rank_global == 0) THEN
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                     WRITE (UNIT = nulprt1,FMT ='(''The number of processors'', &
-                       '' involved in the coupling for model'', I4, '' is'',  &
-                       I4)') jm, nbcplproc(jm)
+                       '' involved in the coupling for model'', I8, '' is'',i8)')  &
+                          jm, nbcplproc(jm)
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                 ENDIF
 
