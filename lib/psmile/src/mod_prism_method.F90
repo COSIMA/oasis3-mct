@@ -168,26 +168,26 @@ CONTAINS
    CALL prism_sys_unitget(iu)
    nulprt=iu
 
-   IF ( (PRISM_debug == 1) .AND. (mpi_rank_local == 0)) PRISM_Debug=10
-
        IF (PRISM_Debug <= 1) THEN
            IF (mpi_rank_local == 0) THEN
-               WRITE(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
+               WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
                OPEN(nulprt,file=filename)
                WRITE(nulprt,*) subname,' OPEN pout file for root pe'
                call prism_sys_flush(nulprt)
            ELSE
-               WRITE(filename2,'(a,i2.2)') 'debug_file_non_root_pes.',compid
+               WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
                OPEN(nulprt,file=filename2)
                WRITE(nulprt,*) subname,' OPEN debug file'
                CALL prism_sys_flush(nulprt)
            ENDIF
        ELSE
-           WRITE(filename,'(a,i2.2,a,i6.6)') 'pout.',compid,'.',mpi_rank_local
+           WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
            OPEN(nulprt,file=filename)
            WRITE(nulprt,*) subname,' OPEN pout file'
            CALL prism_sys_flush(nulprt)
        ENDIF
+
+       IF ( (PRISM_debug == 1) .AND. (mpi_rank_local == 0)) PRISM_Debug=10
 
        IF (PRISM_Debug >= 2) THEN
            WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
