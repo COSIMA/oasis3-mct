@@ -85,6 +85,8 @@ module mod_prism_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
+   INTEGER  :: TIMER_debug=1
+
    contains
 
 ! --------------------------------------------------------------------------------
@@ -99,8 +101,6 @@ module mod_prism_timer
 
          integer :: ierror,n
          character(len=*),parameter :: subname = 'prism_timer_init'
-
-         call prism_sys_unitget(output_unit)
 
          app_name  = trim (app)
          file_name = trim (file)
@@ -125,12 +125,20 @@ module mod_prism_timer
          call MPI_Comm_size(comm, comm_size, ierror)
          call MPI_Comm_rank(comm, comm_rank, ierror)
 
-         write(file_name,'(a,i4.4)') trim(file)//'_',comm_rank
+         IF ((TIMER_debug == 1) .AND. (mpi_rank_local == 0)) TIMER_Debug=2
 
-         open(output_unit, file=trim(file_name), form="FORMATTED", &
-             status="UNKNOWN")
-         write(output_unit,*) ''
-         close(output_unit)
+         IF (TIMER_Debug > 0) THEN
+
+                 CALL prism_sys_unitget(output_unit)
+                 WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',comm_rank
+
+                 OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+                    status="UNKNOWN")
+                 WRITE(output_unit,*) ''
+                 CLOSE(output_unit)
+
+         ENDIF
+
          single_timer_header = .false.
 
       end subroutine prism_timer_init
@@ -258,52 +266,63 @@ module mod_prism_timer
 !-----------------------------------------------------
          if (onetimer) then
 
-            open(output_unit, file=trim(file_name), form="FORMATTED", &
-              status="UNKNOWN", position="APPEND")
-
-            if (.not.single_timer_header) then
-               write(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+         IF (TIMER_Debug >= 2) THEN
+             OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+                status="UNKNOWN", position="APPEND")
+         ENDIF
+         IF (TIMER_Debug >= 2) THEN
+             IF (.NOT.single_timer_header) THEN
+                 WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
                     ' wtime ','on pe','count',' ctime ','on pe','count'
-               single_timer_header = .true.
-            endif
+                 single_timer_header = .TRUE.
+             ENDIF
+         ENDIF
             n = timer_id
-            WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                  n, timer(n)%label, timer(n)%runflag, &
-                  sum_wtime(n), comm_rank, count(n), &
-                  sum_ctime(n), comm_rank, count(n)
+            IF (TIMER_Debug >= 2) THEN
+                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                   n, timer(n)%label, timer(n)%runflag, &
+                   sum_wtime(n), comm_rank, COUNT(n), &
+                   sum_ctime(n), comm_rank, COUNT(n)
 
-            close(output_unit)
+                CLOSE(output_unit)
+            ENDIF
 !----------
             return
 !----------
 
          endif
 !-----------------------------------------------------
-
-         open(output_unit, file=trim(file_name), form="FORMATTED", &
-           status="UNKNOWN", position="APPEND")
-         write(output_unit,*)''
-         write(output_unit,*)' =================================='
-         write(output_unit,*)' ', trim(app_name)
-         write(output_unit,*)' Local processor times '
-         write(output_unit,*)' =================================='
-         write(output_unit,*)''
+         IF (TIMER_Debug >= 2) THEN
+             OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+                status="UNKNOWN", position="APPEND")
+             WRITE(output_unit,*)''
+             WRITE(output_unit,*)' =================================='
+             WRITE(output_unit,*)' ', TRIM(app_name)
+             WRITE(output_unit,*)' Local processor times '
+             WRITE(output_unit,*)' =================================='
+             WRITE(output_unit,*)''
+         ENDIF
 
          do n = 1,ntimer
-
-            if (.not.single_timer_header) then
-               write(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
-                    ' wtime ','on pe','count',' ctime ','on pe','count'
-               single_timer_header = .true.
-            endif
-            WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                  n, timer(n)%label, timer(n)%runflag, &
-                  sum_wtime(n), comm_rank, count(n), &
-                  sum_ctime(n), comm_rank, count(n)
+           IF (TIMER_Debug >= 2) THEN
+               IF (.NOT.single_timer_header) THEN
+                   WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+                      ' wtime ','on pe','count',' ctime ','on pe','count'
+                   single_timer_header = .TRUE.
+               ENDIF
+           ENDIF
+           IF (TIMER_Debug >= 2) THEN
+                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                   n, timer(n)%label, timer(n)%runflag, &
+                   sum_wtime(n), comm_rank, COUNT(n), &
+                   sum_ctime(n), comm_rank, COUNT(n)
+            ENDIF
 
          enddo
 
-         close(output_unit)
+         IF (TIMER_Debug >= 2) THEN
+             CLOSE(output_unit)
+         ENDIF
 
          if (comm_size > 1) then
 
@@ -461,17 +480,19 @@ module mod_prism_timer
 
          ! if this is the root process
          if (comm_rank == root) then
-
-         open(output_unit, file=trim(file_name), form="FORMATTED", &
-              status="UNKNOWN", position="APPEND")
+             IF (TIMER_Debug >= 2) THEN
+                 OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+                    status="UNKNOWN", position="APPEND")
+             ENDIF
 
          if (onetimer) then
-
-            if (.not.single_timer_header) then
-               write(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
-                    'mintime','on pe','count','maxtime','on pe','count'
-               single_timer_header = .true.
-            endif
+             IF (TIMER_Debug >= 2) THEN
+                 IF (.NOT.single_timer_header) THEN
+                    WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+                       'mintime','on pe','count','maxtime','on pe','count'
+                    single_timer_header = .TRUE.
+                ENDIF
+            ENDIF
             n = 0
             do k = 1,nlabels
                if (trim(timer_label) == trim(label_list(k))) n = k
@@ -494,23 +515,26 @@ module mod_prism_timer
                   maxpe = k
                endif
             enddo
-            WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                  n, label_list(n), timer(n)%runflag, &
-                  sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
-                  sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
+            IF (TIMER_Debug >= 2) THEN
+                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                   n, label_list(n), timer(n)%runflag, &
+                   sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
+                   sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
+            ENDIF
 
          else
+             IF (TIMER_Debug >= 2) THEN
+                 single_timer_header = .FALSE.
 
-            single_timer_header = .false.
-
-            write(output_unit,*)''
-            write(output_unit,*)' =================================='
-            write(output_unit,*)' ', trim(app_name)
-            write(output_unit,*)' Overall Elapsed Min/Max statistics'
-            write(output_unit,*)' =================================='
-            write(output_unit,*)''
-            write(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x),a,3x)') &
-                 'mintime','on pe','count','maxtime','on pe','count','meantime'
+                WRITE(output_unit,*)''
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)' ', TRIM(app_name)
+                WRITE(output_unit,*)' Overall Elapsed Min/Max statistics'
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)''
+                WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x),a,3x)') &
+                   'mintime','on pe','count','maxtime','on pe','count','meantime'
+            ENDIF
             do n = 1,nlabels
                mintime = 1.0e36
                minpe = -1
@@ -533,57 +557,63 @@ module mod_prism_timer
                   endif
                enddo
                if (mcnt > 0) meantime = meantime / float(mcnt)
-               WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
-                     n, label_list(n), timer(n)%runflag, &
-                     sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
-                     sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
-                     meantime
+               IF (TIMER_Debug >= 2) THEN
+                   WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
+                      n, label_list(n), timer(n)%runflag, &
+                      sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
+                      sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
+                      meantime
+               ENDIF
             enddo
-            write(output_unit,*)''
-            write(output_unit,*)' =================================='
-            write(output_unit,*)' ', trim(app_name)
-            write(output_unit,*)' Overall Count statistics'
-            write(output_unit,*)' =================================='
-            write(output_unit,*)''
-            write(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-            write(output_unit,'(8(3x,i2,5x))')(k-1,k=1,comm_size)
-            do n = 1, nlabels
+            IF (TIMER_Debug >= 2) THEN
+                WRITE(output_unit,*)''
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)' ', TRIM(app_name)
+                WRITE(output_unit,*)' Overall Count statistics'
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)''
+                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
+                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
+                DO n = 1, nlabels
 
-               WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,(8i10))') n, label_list(n), timer(n)%runflag, &
+                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8i10))') n, label_list(n), timer(n)%runflag, &
                                                                (count_global(n,k),k=1,comm_size)
-            enddo
-            write(output_unit,*)''
-            write(output_unit,*)' =================================='
-            write(output_unit,*)' ', trim(app_name)
-            write(output_unit,*)' Overall CPU time statistics'
-            write(output_unit,*)' =================================='
-            write(output_unit,*)''
-            write(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-            write(output_unit,'(8(3x,i2,5x))')(k-1,k=1,comm_size)
-            do n = 1, nlabels
+                ENDDO
+                WRITE(output_unit,*)''
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)' ', TRIM(app_name)
+                WRITE(output_unit,*)' Overall CPU time statistics'
+                WRITE(output_unit,*)' =================================='
+                WRITE(output_unit,*)''
+                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
+                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
+                DO n = 1, nlabels
 
-               WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
+                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
                                                                (sum_ctime_global(n,k),k=1,comm_size)
-            enddo
-            write(output_unit,*)''
-            write(output_unit,*)' ======================================'
-            write(output_unit,*)' ', trim(app_name)
-            write(output_unit,*)' Overall Elapsed time statistics'
-            write(output_unit,*)' ======================================'
-            write(output_unit,*)''
-            write(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-            write(output_unit,'(8(3x,i2,5x))')(k-1,k=1,comm_size)
-            do n = 1, nlabels
+                ENDDO
+                WRITE(output_unit,*)''
+                WRITE(output_unit,*)' ======================================'
+                WRITE(output_unit,*)' ', TRIM(app_name)
+                WRITE(output_unit,*)' Overall Elapsed time statistics'
+                WRITE(output_unit,*)' ======================================'
+                WRITE(output_unit,*)''
+                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
+                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
+                DO n = 1, nlabels
 
-               WRITE(output_unit,'(1x,i3,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
+                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
                                                                (sum_wtime_global(n,k),k=1,comm_size)
-            enddo
-            write(output_unit,*)''
-            write(output_unit,*)' ======================================'
+                ENDDO
+                WRITE(output_unit,*)''
+                WRITE(output_unit,*)' ======================================'
+            ENDIF
 
          endif ! (onetimer)
 
-         close(output_unit)
+         IF (TIMER_Debug >= 2) THEN
+             CLOSE(output_unit)
+         ENDIF
 
          endif ! (comm_rank == root)
 
