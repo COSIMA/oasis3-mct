@@ -85,7 +85,7 @@ module mod_prism_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
-   INTEGER  :: TIMER_debug=1
+   INTEGER  :: TIMER_debug=0
 
    contains
 
@@ -127,7 +127,7 @@ module mod_prism_timer
 
          IF ((TIMER_debug == 1) .AND. (mpi_rank_local == 0)) TIMER_Debug=2
 
-         IF (TIMER_Debug > 0) THEN
+         IF (TIMER_Debug >= 2) THEN
 
                  CALL prism_sys_unitget(output_unit)
                  WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',comm_rank
