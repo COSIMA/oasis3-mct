@@ -170,11 +170,13 @@ CONTAINS
 
        IF (PRISM_Debug <= 1) THEN
            IF (mpi_rank_local == 0) THEN
+               nulprt=iu
                WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
                OPEN(nulprt,file=filename)
                WRITE(nulprt,*) subname,' OPEN pout file for root pe'
                call prism_sys_flush(nulprt)
            ELSE
+               nulprt=15
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
                OPEN(nulprt,file=filename2)
                WRITE(nulprt,*) subname,' OPEN debug file'
