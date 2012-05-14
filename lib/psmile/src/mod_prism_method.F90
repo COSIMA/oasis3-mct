@@ -176,7 +176,8 @@ CONTAINS
                WRITE(nulprt,*) subname,' OPEN pout file for root pe'
                call prism_sys_flush(nulprt)
            ELSE
-               nulprt=15
+               nulprt=18
+! We must select an unused unit
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
                OPEN(nulprt,file=filename2)
                WRITE(nulprt,*) subname,' OPEN debug file'
