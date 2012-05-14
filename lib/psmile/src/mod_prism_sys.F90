@@ -143,7 +143,7 @@ subroutine prism_sys_debug_enter(string)
    if (PRISM_DEBUG >= 10) then
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
-       tree_enter='**TREE ENTER '//TRIM(string)
+       tree_enter='**** ENTER '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_enter)
        tree_indent = tree_indent + tree_delta
        DEALLOCATE (ch_blank)
@@ -167,7 +167,7 @@ subroutine prism_sys_debug_exit(string)
        tree_indent = MAX(0,tree_indent - tree_delta)
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
-       tree_exit='**TREE EXIT '//trim(string)
+       tree_exit='**** EXIT '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_exit)
        DEALLOCATE (ch_blank)
        CALL prism_sys_flush(nulprt)
@@ -189,7 +189,7 @@ subroutine prism_sys_debug_note(string)
    if (PRISM_DEBUG >= 12) then
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
-       tree_note='**TREE NOTE '//TRIM(string)
+       tree_note='**** NOTE '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_note)
       DEALLOCATE(ch_blank)
       call prism_sys_flush(nulprt)
