@@ -157,6 +157,7 @@ module mod_prism_timer
          real :: cpu_time_arg
          character(len=*),parameter :: subname = 'prism_timer_start'
 
+         IF (TIMER_Debug >=1) THEN
          call prism_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
             if (ntimer+1 > mtimer) then
@@ -180,6 +181,7 @@ module mod_prism_timer
          timer(timer_id)%start_ctime = cpu_time_arg
          count(timer_id) = count(timer_id) + 1
          timer(timer_id)%runflag = t_running
+         ENDIF
 
       end subroutine prism_timer_start
 
@@ -192,6 +194,7 @@ module mod_prism_timer
          integer :: timer_id
          character(len=*),parameter :: subname = 'prism_timer_stop'
 
+         IF (TIMER_Debug >=1) THEN
          call prism_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
@@ -214,6 +217,7 @@ module mod_prism_timer
          sum_ctime(timer_id) = sum_ctime(timer_id) + &
                                timer(timer_id)%end_ctime - timer(timer_id)%start_ctime
          timer(timer_id)%runflag = t_stopped
+         ENDIF
 
       end subroutine prism_timer_stop
 
@@ -252,6 +256,7 @@ module mod_prism_timer
          double precision   :: mintime,maxtime,meantime
          character(len=*),parameter :: subname = 'prism_timer_print'
 
+         IF (TIMER_Debug >= 1) THEN
          onetimer = .false.
          if (present(timer_label)) then
             onetimer = .true.
@@ -626,6 +631,7 @@ module mod_prism_timer
          deallocate (label_list,stat=ierror)
          if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error label_list'
 
+         ENDIF  !(TIMER_Debug >=1)
 
       end subroutine prism_timer_print
 

@@ -46,6 +46,7 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
+   INTEGER(ip_i4_p)         :: master_task,iam     ! mpi info
    integer(kind=ip_intwp_p) :: mpi_err
    integer(kind=ip_intwp_p) :: n,iu
    integer(kind=ip_intwp_p) :: icolor,ikey
@@ -166,27 +167,28 @@ CONTAINS
 
    iu=-1
    CALL prism_sys_unitget(iu)
-   nulprt=iu
+
 
        IF (PRISM_Debug <= 1) THEN
+           CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',master_task)
            IF (mpi_rank_local == 0) THEN
                nulprt=iu
                WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
                OPEN(nulprt,file=filename)
-               WRITE(nulprt,*) subname,' OPEN pout file for root pe'
+               WRITE(nulprt,*) subname,' OPEN pout file for root pe, unit :',nulprt
                call prism_sys_flush(nulprt)
            ELSE
-               nulprt=18
-! We must select an unused unit
+               nulprt=iu+mpi_size_global
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
-               OPEN(nulprt,file=filename2)
-               WRITE(nulprt,*) subname,' OPEN debug file'
+               OPEN(nulprt,file=filename2,access='append')
+               WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
                CALL prism_sys_flush(nulprt)
            ENDIF
        ELSE
+           nulprt=iu
            WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
            OPEN(nulprt,file=filename)
-           WRITE(nulprt,*) subname,' OPEN pout file'
+           WRITE(nulprt,*) subname,' OPEN pout file, unit :',nulprt
            CALL prism_sys_flush(nulprt)
        ENDIF
 
