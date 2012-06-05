@@ -40,7 +40,7 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: wr_field(:)
+    real(kind=ip_single_p), intent(in) :: wr_field(:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
@@ -87,7 +87,7 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: wr_field(:)
+    real(kind=ip_double_p), intent(in) :: wr_field(:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
@@ -134,7 +134,7 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: wr_field(:,:)
+    real(kind=ip_single_p), intent(in) :: wr_field(:,:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
@@ -185,7 +185,7 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: wr_field(:,:)
+    real(kind=ip_double_p), intent(in) :: wr_field(:,:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
