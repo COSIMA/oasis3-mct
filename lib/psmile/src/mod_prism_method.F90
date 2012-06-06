@@ -46,7 +46,6 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   INTEGER(ip_i4_p)         :: master_task,iam     ! mpi info
    integer(kind=ip_intwp_p) :: mpi_err
    integer(kind=ip_intwp_p) :: n,iu
    integer(kind=ip_intwp_p) :: icolor,ikey
@@ -170,7 +169,7 @@ CONTAINS
 
 
        IF (PRISM_Debug <= 1) THEN
-           CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',master_task)
+           CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
            IF (mpi_rank_local == 0) THEN
                nulprt=iu
                WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
