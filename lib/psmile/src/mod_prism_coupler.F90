@@ -1362,57 +1362,57 @@ subroutine prism_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 ! !EOP
 
    !--- local ---
-   integer(IN)           :: n,m     ! generic loop indicies
-   integer(IN)           :: na      ! size of source domain
-   integer(IN)           :: nb      ! size of destination domain
-   integer(IN)           :: ns      ! number of non-zero elements in matrix
-   integer(IN)           :: nwgts   ! number of weights per element
-   integer(IN)           :: ni,nj   ! number of row and col in the matrix
-   integer(IN)           :: igrow   ! aVect index for matrix row
-   integer(IN)           :: igcol   ! aVect index for matrix column
-   integer(IN)           :: iwgt    ! aVect index for matrix element
-   integer(IN)           :: iarea   ! aVect index for area
-   integer(IN)           :: rsize   ! size of read buffer
-   integer(IN)           :: cnt     ! local num of wgts
-   integer(IN)           :: cntold  ! local num of wgts, previous read
-   integer(IN)           :: start(1)! netcdf read
-   integer(IN)           :: count(1)! netcdf read
-   integer(IN)           :: start2(2)! netcdf read
-   integer(IN)           :: count2(2)! netcdf read
-   integer(IN)           :: bsize   ! buffer size
-   integer(IN)           :: nread   ! number of reads 
+   integer           :: n,m     ! generic loop indicies
+   integer           :: na      ! size of source domain
+   integer           :: nb      ! size of destination domain
+   integer           :: ns      ! number of non-zero elements in matrix
+   INTEGER           :: nwgts = -1   ! number of weights per element
+   integer           :: ni,nj   ! number of row and col in the matrix
+   integer           :: igrow   ! aVect index for matrix row
+   integer           :: igcol   ! aVect index for matrix column
+   integer           :: iwgt    ! aVect index for matrix element
+   integer           :: iarea   ! aVect index for area
+   integer           :: rsize   ! size of read buffer
+   integer           :: cnt     ! local num of wgts
+   integer           :: cntold  ! local num of wgts, previous read
+   integer           :: start(1)! netcdf read
+   integer           :: count(1)! netcdf read
+   integer           :: start2(2)! netcdf read
+   integer           :: count2(2)! netcdf read
+   integer           :: bsize   ! buffer size
+   integer           :: nread   ! number of reads 
    logical               :: mywt    ! does this weight belong on my pe
-   integer(IN)           :: dims(2) 
+   integer           :: dims(2) 
 
    !--- buffers for i/o ---
    real(R8)   ,allocatable :: rtemp(:) ! real temporary
    real(R8)   ,allocatable :: Sbuf(:)  ! real weights
    real(R8)   ,allocatable :: remaps(:,:)  ! real weights with num_wgts dim
-   integer(IN),allocatable :: Rbuf(:)  ! ints rows
-   integer(IN),allocatable :: Cbuf(:)  ! ints cols
+   integer,allocatable :: Rbuf(:)  ! ints rows
+   integer,allocatable :: Cbuf(:)  ! ints cols
 
    !--- variables associated with local computation of global indices
-   integer(IN)             :: lsize     ! size of local seg map
-   integer(IN)             :: commsize  ! size of local communicator
-   integer(IN),allocatable :: lsstart(:) ! local seg map info
-   integer(IN),allocatable :: lscount(:) ! local seg map info
+   integer             :: lsize     ! size of local seg map
+   integer             :: commsize  ! size of local communicator
+   integer,allocatable :: lsstart(:) ! local seg map info
+   integer,allocatable :: lscount(:) ! local seg map info
    type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
-   integer(IN)             :: l1,l2     ! generice indices for sort
-   logical                 :: found     ! for sort
+   integer             :: l1,l2     ! generice indices for sort
+   logical             :: found     ! for sort
 
    !--- variable assocaited with local data buffers and reallocation
    real(R8)   ,allocatable :: Snew(:),Sold(:)  ! reals
-   integer(IN),allocatable :: Rnew(:),Rold(:)  ! ints
-   integer(IN),allocatable :: Cnew(:),Cold(:)  ! ints
+   integer,allocatable :: Rnew(:),Rold(:)  ! ints
+   integer,allocatable :: Cnew(:),Cold(:)  ! ints
 
    character,allocatable :: str(:)  ! variable length char string
    character(len=ic_long):: attstr  ! netCDF attribute name string
-   integer(IN)           :: status   ! netCDF routine return code
-   integer(IN)           :: fid     ! netCDF file      ID
-   integer(IN)           :: vid     ! netCDF variable  ID
-   integer(IN)           :: did     ! netCDF dimension ID
+   integer           :: status   ! netCDF routine return code
+   integer           :: fid     ! netCDF file      ID
+   integer           :: vid     ! netCDF variable  ID
+   integer           :: did     ! netCDF dimension ID
    !--- arbitrary size of read buffer, this is the chunk size weights reading
-   integer(IN),parameter :: rbuf_size = 100000
+   integer,parameter :: rbuf_size = 100000
 
    !--- global source and destination areas ---
    type(mct_Avect) :: areasrc0   ! area of src grid from mapping file
