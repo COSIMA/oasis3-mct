@@ -792,7 +792,7 @@ CONTAINS
            il_auxaf, istatus, il_id
       integer (kind=ip_intwp_p) :: ja,jz,jm,jf,ilen
       integer (kind=ip_intwp_p) :: ig_clim_maxport
-      logical :: lg_bsend
+      logical :: lg_bsend,endflag
       character(len=*),parameter :: subname='mod_prism_namcouple:inipar_alloc'
 
 !* ---------------------------- Poema verses --------------------------
@@ -1138,7 +1138,7 @@ CONTAINS
 
 !* First line
 
-        READ (UNIT = nulin,FMT = 2002) clline
+        READ (UNIT = nulin,FMT = 2002, END=241) clline
 !* Get output field symbolic name
         CALL parse(clline, clvari, 2, jpeighty, ilen)
         cg_output_field(jf) = clvari
@@ -1332,6 +1332,14 @@ CONTAINS
        ENDIF
         
  240    CONTINUE
+!* Verify we're at the end of the namcouple, if not STOP (tcraig, june 2012)
+ 243    READ (UNIT = nulin,FMT = 2002, END=242) clline
+        CALL skip(clline, jpeighty,endflag)
+        if (endflag == .true.) goto 242
+        CALL parse(clline, clvari, 1, jpeighty, ilen)
+        IF (trim(clvari) .eq. "$END") goto 243
+        goto 241       
+ 242    CONTINUE
         IF (ig_nfield.eq.0) THEN
             lg_oasis_field = .false.
             IF (mpi_rank_global == 0) THEN
@@ -2031,6 +2039,21 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
           WRITE (UNIT = nulprt1,FMT = *)  &
              ' No active $STRING data found in input file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
+ 241  CONTINUE
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' NFIELDS larger or smaller than the number of inputs in namcouple'
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (UNIT = nulprt1,FMT = *)  &
@@ -2785,7 +2808,7 @@ CONTAINS
               IF (mpi_rank_global == 0) THEN
                   WRITE (UNIT=nulprt1,FMT=3043) jf
               ENDIF
-!tcraig, nmseq irrelevant
+! tcraig, remove nmseq checking, not needed in oasis3-mct
 !              IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
            ELSE 
               READ(clvari,FMT = 2011) clind, clequa, iind
@@ -2820,21 +2843,21 @@ CONTAINS
                              IF(.NOT. lllag) WRITE (UNIT=nulprt1,FMT=3043) jf
                          ENDIF
                      ENDIF
-                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
+!                    IF(nmseq .gt. 1 .and. .not. llseq) GO TO 231
                     GO TO 247
                  ELSE
                     READ(clvari,FMT = 2011) clind, clequa, iind
                     IF (clind .EQ. 'SEQ') THEN
-                       IF (iind .gt. nmseq) THEN
-                          GO TO 232
-                       ELSE IF (iind .eq. 0) THEN
-                          GO TO 234
-                       ELSE
+!                       IF (iind .gt. nmseq) THEN
+!                          GO TO 232
+!                       ELSE IF (iind .eq. 0) THEN
+!                          GO TO 234
+!                       ELSE
                           ig_total_nseqn(jf)=iind
                           IF (lg_state(jf)) &
                               nseqn(ig_number_field(jf)) = iind
                           llseq=.TRUE.
-                       ENDIF
+!                       ENDIF
                     ELSE IF (clind .eq. 'LAG') THEN
                        ig_lag(jf)=iind
                        IF (lg_state(jf)) &
@@ -5306,7 +5329,7 @@ CONTAINS
   END SUBROUTINE parseblk
 !===============================================================================
 
-  SUBROUTINE skip (cd_one, id_len)
+  SUBROUTINE skip (cd_one, id_len, endflag)
 !
 !**** SKIP
 !
@@ -5347,6 +5370,7 @@ CONTAINS
 !
   INTEGER (kind=ip_intwp_p),intent(in) :: id_len
   CHARACTER(len=*),intent(inout)       :: cd_one
+  LOGICAL, optional, intent(inout)     :: endflag
 !
 !** ++ Local declarations
 !
@@ -5361,10 +5385,19 @@ CONTAINS
 
   cl_two='#'
 100 IF (cd_one(1:1) .NE. cl_two) GO TO 120
-  READ (UNIT = nulin, FMT = 1001) cl_line
+  if (present(endflag)) then
+     endflag = .false.
+     READ (UNIT = nulin, FMT = 1001, END=140) cl_line
+  else
+     READ (UNIT = nulin, FMT = 1001) cl_line
+  endif
   cd_one = trim(cl_line)
   GO TO 100
 120 CONTINUE 
+  RETURN
+140 CONTINUE
+  ENDFLAG = .true.
+  RETURN
 1001 FORMAT(A80)
 !
 !*-----------------------------------------------------------------------

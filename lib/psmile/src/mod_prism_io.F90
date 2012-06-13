@@ -270,16 +270,16 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= nx) then
             write(nulprt,*) subname,' ERROR: dlen ne nx ',dlen,nx
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+!            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+!            call prism_sys_abort()
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ny) then
             write(nulprt,*) subname,' ERROR: dlen ne ny ',dlen,ny
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+!            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+!            call prism_sys_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)

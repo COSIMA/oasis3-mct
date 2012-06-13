@@ -798,7 +798,7 @@ CONTAINS
            endif
 
            !tcx improve match here with nx,ny,gridname 
-           call prism_part_create(part2,'1d',gsize)
+           call prism_part_create(part2,'1d',gsize,nx,ny,gridname)
 
            if (prism_part(part2)%nx < 1) then
               prism_part(part2)%nx = nx

@@ -162,13 +162,16 @@ CONTAINS
  END SUBROUTINE prism_part_def
 
 !------------------------------------------------------------
-  SUBROUTINE prism_part_create(id_part,type,gsize)
+  SUBROUTINE prism_part_create(id_part,type,gsize,nx,ny,gridname)
 
   IMPLICIT NONE
 
   integer(ip_i4_p),intent(out) :: id_part
   character(len=*),intent(in)  :: type
   integer(ip_i4_p),intent(in)  :: gsize
+  integer(ip_i4_p),intent(in)  :: nx
+  integer(ip_i4_p),intent(in)  :: ny
+  character(len=*),intent(in)  :: gridname
   !--------------------------------------------------------
   integer(ip_i4_p) :: mpicomm
   integer(ip_i4_p) :: mpirank
@@ -187,7 +190,10 @@ CONTAINS
 
   !--- before initializing another gsmap, check if one exists that will work
   do n = 1,prism_npart
-     if (prism_part(n)%gsize == gsize) then
+     if (prism_part(n)%gsize == gsize .and. &
+         trim(prism_part(n)%gridname) == trim(gridname) .and. &
+         prism_part(n)%nx == nx .and. &
+         prism_part(n)%ny == ny) then
         id_part = n
         call prism_sys_debug_exit(subname)
         return
