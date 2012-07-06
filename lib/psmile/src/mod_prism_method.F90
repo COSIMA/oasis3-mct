@@ -179,7 +179,7 @@ CONTAINS
            ELSE
                nulprt=iu+mpi_size_global
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
-               OPEN(nulprt,file=filename2,access='append')
+               OPEN(nulprt,file=filename2,position='append')
                WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
                CALL prism_sys_flush(nulprt)
            ENDIF
