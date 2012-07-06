@@ -948,7 +948,7 @@ CONTAINS
                 IF (mpi_rank_global == 0) THEN
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                     WRITE (UNIT=nulprt1,FMT='(''The total number of proc'', &
-                       '' for model'', I4, '' is'', I4)') &
+           &           '' for model'', I4, '' is'', I4)') &
                        jm, nbtotproc(jm)
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                 ENDIF
@@ -971,7 +971,7 @@ CONTAINS
                 IF (mpi_rank_global == 0) THEN
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                     WRITE (UNIT = nulprt1,FMT ='(''The number of processors'', &
-                       '' involved in the coupling for model'', I8, '' is'',i8)')  &
+           &           '' involved in the coupling for model'', I8, '' is'',i8)')  &
                           jm, nbcplproc(jm)
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                 ENDIF
@@ -1335,7 +1335,7 @@ CONTAINS
 !* Verify we're at the end of the namcouple, if not STOP (tcraig, june 2012)
  243    READ (UNIT = nulin,FMT = 2002, END=242) clline
         CALL skip(clline, jpeighty,endflag)
-        if (endflag == .true.) goto 242
+        if (endflag .EQV. .true.) goto 242
         CALL parse(clline, clvari, 1, jpeighty, ilen)
         IF (trim(clvari) .eq. "$END") goto 243
         goto 241       
@@ -2367,7 +2367,7 @@ CONTAINS
 
         IF (mpi_rank_global == 0) THEN
             WRITE (UNIT = nulprt1,FMT =' &
-               (''   Name for model '',I1,'' is '',A6,/)')  &
+     &        (''   Name for model '',I1,'' is '',A6,/)')  &
                jm, cmodnam(jm)
         ENDIF
 
@@ -2385,7 +2385,7 @@ CONTAINS
             IF (mpi_rank_global == 0) THEN
                 WRITE (UNIT = nulprt1,FMT = *) ' '
                 WRITE (UNIT=nulprt1,FMT='(''The maximum Fortran unit number'', &
-                   '' used in model'', I2, '' is '', I2)') &
+       &            '' used in model'', I2, '' is '', I2)') &
                    jm, iga_unitmod(jm)
                 WRITE (UNIT = nulprt1,FMT = *) ' '
             ENDIF
@@ -2434,7 +2434,7 @@ CONTAINS
                 IF (mpi_rank_global == 0) THEN
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                     WRITE (UNIT =nulprt1,FMT=' &
-                       (''The launching argument for model '', I2, '' is'')') jm
+     &                (''The launching argument for model '', I2, '' is'')') jm
                     WRITE (UNIT = nulprt1,FMT = *) cmpiarg(jm)
                     WRITE (UNIT = nulprt1,FMT = *) ' '
                     WRITE (UNIT = nulprt1,FMT = *) 'ilen ',ILEN
