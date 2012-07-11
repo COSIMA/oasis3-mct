@@ -1108,10 +1108,13 @@ contains
     enddo
     enddo
 
-    call MPI_COMM_RANK(mpicom,mype,ierr)
-    call prism_mpi_sum(lsum,gsum,mpicom,string=trim(subname)//':sum',all=.false.)
-    call prism_mpi_min(lmin,gmin,mpicom,string=trim(subname)//':min',all=.false.)
-    call prism_mpi_max(lmax,gmax,mpicom,string=trim(subname)//':max',all=.false.)
+    mype = -1
+    if (mpicom /= MPI_COMM_NULL) then
+       call MPI_COMM_RANK(mpicom,mype,ierr)
+       call prism_mpi_sum(lsum,gsum,mpicom,string=trim(subname)//':sum',all=.false.)
+       call prism_mpi_min(lmin,gmin,mpicom,string=trim(subname)//':min',all=.false.)
+       call prism_mpi_max(lmax,gmax,mpicom,string=trim(subname)//':max',all=.false.)
+    endif
     if (mype == 0) then
        do m = 1,fsize
          call mct_aVect_getRList(mstring,m,av)

@@ -167,7 +167,7 @@ subroutine prism_sys_debug_exit(string)
        tree_indent = MAX(0,tree_indent - tree_delta)
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
-       tree_exit='**** EXIT '//TRIM(string)
+       tree_exit='**** EXIT  '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_exit)
        DEALLOCATE (ch_blank)
        CALL prism_sys_flush(nulprt)

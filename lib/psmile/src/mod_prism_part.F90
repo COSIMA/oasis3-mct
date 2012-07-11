@@ -135,12 +135,16 @@ CONTAINS
       call prism_sys_abort()
    endif
 
-   call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,mpi_comm_local, &
-      compid,numel=nsegs)
+   if (mpi_comm_local /= MPI_COMM_NULL) then
+      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,mpi_comm_local, &
+         compid,numel=nsegs)
+      prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
+   else
+      prism_part(prism_npart)%gsize = -1
+   endif
 
    deallocate(start,length)
 
-   prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
    prism_part(prism_npart)%nx = -1
    prism_part(prism_npart)%ny = -1
   

@@ -643,6 +643,8 @@ CONTAINS
 
   IF (mpi_rank_global == 0) THEN
       WRITE(nulprt1,*) ' '
+      WRITE(nulprt1,*) subname,'namlogprt ',namlogprt
+      WRITE(nulprt1,*) ' '
       DO n = 1,nnamcpl
         WRITE(nulprt1,*) subname,n,'namsrcfld ',TRIM(namsrcfld(n))
         WRITE(nulprt1,*) subname,n,'namdstfld ',TRIM(namdstfld(n))

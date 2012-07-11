@@ -333,10 +333,10 @@ CONTAINS
      do nv1 = 1,nallvar(compid)
 
         !--- tcx require for run time error on corail ????----
-       IF (PRISM_DEBUG >= 2) THEN
+        IF (PRISM_DEBUG >= 2) THEN
            WRITE(nulprt,*) subname,' check var ',nns,nv1
            CALL prism_sys_flush(nulprt)
-       ENDIF
+        ENDIF
 
         !--------------------------------
         ! get my parition and fld
@@ -344,6 +344,11 @@ CONTAINS
 
         part1  = prism_var(nv1)%part
         myfld  = trim(allvar(nv1,compid))
+
+        IF (PRISM_DEBUG >= 20) THEN
+            WRITE(nulprt,*) subname,' get part and fld ',part1,trim(myfld)
+            CALL prism_sys_flush(nulprt)
+        ENDIF
 
         !--------------------------------
         ! check if i'm an In or Out variable
@@ -359,6 +364,11 @@ CONTAINS
            if (myfldi > 0) flag = PRISM_In
         endif
 
+        IF (PRISM_DEBUG >= 20) THEN
+            WRITE(nulprt,*) subname,' check fld ',myfldi,flag
+            CALL prism_sys_flush(nulprt)
+        ENDIF
+
         !--------------------------------
         ! my variable is in this namcouple input
         !--------------------------------
@@ -368,6 +378,11 @@ CONTAINS
            !--------------------------------
            ! migrate namcouple info into part
            !--------------------------------
+
+           IF (PRISM_DEBUG >= 20) THEN
+               WRITE(nulprt,*) subname,' migrate namcouple '
+               CALL prism_sys_flush(nulprt)
+           ENDIF
 
            if (flag == PRISM_In) then
               if (prism_part(part1)%nx < 1) then
@@ -424,6 +439,11 @@ CONTAINS
                  otfldi = prism_string_listGetIndexF(namdstfld(nn),otfld)
               if (flag == PRISM_In) &
                  otfldi = prism_string_listGetIndexF(namsrcfld(nn),otfld)
+
+              IF (PRISM_DEBUG >= 20) THEN
+                  WRITE(nulprt,*) subname,' check other fld ',trim(otfld),otfldi
+                  CALL prism_sys_flush(nulprt)
+              ENDIF
 
               !--------------------------------
               ! matches if they are in the same position in namcouple fld list
@@ -504,6 +524,11 @@ CONTAINS
                  ! prism_coupler fields, multiple field support
                  !--------------------------------
 
+                 IF (PRISM_DEBUG >= 20) THEN
+                     WRITE(nulprt,*) subname,' set prism_coupler '
+                     CALL prism_sys_flush(nulprt)
+                 ENDIF
+
                  prism_coupler(nc)%nflds = prism_coupler(nc)%nflds + 1
                  if (prism_coupler(nc)%nflds == 1) then
                     prism_coupler(nc)%fldlist = trim(myfld)
@@ -557,6 +582,10 @@ CONTAINS
                  ! tags assume up to 1000 namcouple inputs and 100 models
                  !--------------------------------
 
+                 IF (PRISM_DEBUG >= 20) THEN
+                     WRITE(nulprt,*) subname,' inout flags '
+                     CALL prism_sys_flush(nulprt)
+                 ENDIF
 
                  if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
                     prism_coupler(nc)%output = .true.
@@ -592,6 +621,11 @@ CONTAINS
                  !--------------------------------
                  ! prism_coupler mapper
                  !--------------------------------
+
+                 IF (PRISM_DEBUG >= 20) THEN
+                     WRITE(nulprt,*) subname,' mapper '
+                     CALL prism_sys_flush(nulprt)
+                 ENDIF
 
                  tmp_mapfile = nammapfil(nn)
 
@@ -671,7 +705,10 @@ CONTAINS
 !        call prism_coupler_print(nc)
      enddo
      write(nulprt,*) ' '
+     call prism_sys_flush(nulprt)
   endif
+
+  if (mpi_comm_local == MPI_COMM_NULL) return
 
   !----------------------------------------------------------
   ! Initialize coupling infrastructure based on couplers above

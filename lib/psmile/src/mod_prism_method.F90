@@ -20,6 +20,7 @@ MODULE mod_prism_method
    public prism_method_init
    public prism_method_terminate
    public prism_method_getlocalcomm
+   public prism_method_setlocalcomm
    public prism_method_getdebug
    public prism_method_setdebug
    public prism_method_get_intercomm
@@ -54,7 +55,6 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
    integer(kind=ip_intwp_p) :: pio_numtasks
-   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'prism_method_init'
 !  ---------------------------------------------------------
 
@@ -143,6 +143,8 @@ CONTAINS
 
 #endif
 
+!------------------------------------
+
    CALL MPI_Comm_Size(mpi_comm_global,mpi_size_global,mpi_err)
    CALL MPI_Comm_Rank(mpi_comm_global,mpi_rank_global,mpi_err)
 
@@ -150,23 +152,12 @@ CONTAINS
    CALL MPI_Comm_Rank(mpi_comm_local,mpi_rank_local,mpi_err)
    mpi_root_local = 0
 
-   allocate(mpi_root_global(prism_nmodels))
-   allocate(tmparr(prism_nmodels))
-   tmparr = -1
-   do n = 1,prism_nmodels
-      if (trim(cdnam) == trim(prism_modnam(n)) .and. &
-          mpi_rank_local == mpi_root_local) then
-         tmparr(n) = mpi_rank_global
-      endif
-   enddo
-
    !------------------------
-   !--- pout file
+   !--- debug file
    !------------------------
 
    iu=-1
    CALL prism_sys_unitget(iu)
-
 
        IF (PRISM_Debug <= 1) THEN
            CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
@@ -174,7 +165,7 @@ CONTAINS
                nulprt=iu
                WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
                OPEN(nulprt,file=filename)
-               WRITE(nulprt,*) subname,' OPEN pout file for root pe, unit :',nulprt
+               WRITE(nulprt,*) subname,' OPEN debug file for root pe, unit :',nulprt
                call prism_sys_flush(nulprt)
            ELSE
                nulprt=iu+mpi_size_global
@@ -187,7 +178,7 @@ CONTAINS
            nulprt=iu
            WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
            OPEN(nulprt,file=filename)
-           WRITE(nulprt,*) subname,' OPEN pout file, unit :',nulprt
+           WRITE(nulprt,*) subname,' OPEN debug file, unit :',nulprt
            CALL prism_sys_flush(nulprt)
        ENDIF
 
@@ -197,17 +188,7 @@ CONTAINS
            WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
        ENDIF
 
-   call prism_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
-      string=subname//':mpi_root_global',all=.true.)
-   deallocate(tmparr)
-
    call prism_sys_debug_enter(subname)
-
-   !------------------------
-   !--- MCT
-   !------------------------
-
-   call mct_world_init(prism_nmodels,mpi_comm_global,mpi_comm_local,compid)
 
    !------------------------
    !--- PIO
@@ -245,9 +226,6 @@ CONTAINS
       write(nulprt,*) subname,'     root_local = ',mpi_root_local
       write(nulprt,*) subname,' prism_debug    = ',prism_debug
       write(nulprt,*) subname,' prism models: '
-      do n = 1,prism_nmodels
-      write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
-      enddo
       call prism_sys_flush(nulprt)
    endif
 
@@ -274,7 +252,7 @@ CONTAINS
    call prism_timer_stop('total after init')
    call prism_timer_print()
 
-   CALL MPI_BARRIER (mpi_comm_global, mpi_err)
+   call prism_mpi_barrier(mpi_comm_global)
    IF ( .NOT. lg_mpiflag ) THEN
       WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
       CALL MPI_Finalize ( mpi_err )
@@ -310,6 +288,43 @@ CONTAINS
    call prism_sys_debug_exit(subname)
 
    END SUBROUTINE prism_method_getlocalcomm
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_setlocalcomm(localcomm,kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+!  ---------------------------------------------------------
+   character(len=*),parameter :: subname = 'prism_method_setlocalcomm'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   !------------------------
+   !--- update mpi_comm_local from component
+   !------------------------
+
+   mpi_comm_local = localcomm
+
+   !------------------------
+   !--- and now update necessary info
+   !------------------------
+
+   mpi_size_local = -1
+   mpi_rank_local = -1
+   if (mpi_comm_local /= MPI_COMM_NULL) then
+      CALL MPI_Comm_Size(mpi_comm_local,mpi_size_local,mpi_err)
+      CALL MPI_Comm_Rank(mpi_comm_local,mpi_rank_local,mpi_err)
+      mpi_root_local = 0
+   endif
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_setlocalcomm
 !----------------------------------------------------------------------
    SUBROUTINE prism_method_getdebug(debug,kinfo)
 
@@ -435,6 +450,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
+   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'prism_method_enddef'
 !  ---------------------------------------------------------
 
@@ -443,18 +459,56 @@ CONTAINS
       kinfo = PRISM_OK
    endif
 
-   CALL MPI_BARRIER (mpi_comm_global, mpi_err)
+   !------------------------
+   !--- write grid info to files one model at a time
+   !------------------------
 
-   ! write grid info to files one model at a time
    do n = 1,prism_nmodels
       if (compid == n .and. mpi_rank_local == mpi_root_local) then
          call prism_grid_write2files()
       endif
-      CALL MPI_BARRIER (mpi_comm_global, mpi_err)
+      call prism_mpi_barrier(mpi_comm_global)
    enddo
 
+   !------------------------
+   !--- derive mpi_root_global
+   !------------------------
+
+   allocate(mpi_root_global(prism_nmodels))
+   allocate(tmparr(prism_nmodels))
+   tmparr = -1
+   do n = 1,prism_nmodels
+      if (compid == n .and. &
+          mpi_rank_local == mpi_root_local) then
+         tmparr(n) = mpi_rank_global
+      endif
+   enddo
+   call prism_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
+      string=subname//':mpi_root_global',all=.true.)
+   deallocate(tmparr)
+
+   if (PRISM_DEBUG >= 2)  then
+      do n = 1,prism_nmodels
+      write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+      enddo
+      call prism_sys_flush(nulprt)
+   endif
+
+   !------------------------
+   !--- MCT Initialization
+   !------------------------
+
+   call mct_world_init(prism_nmodels,mpi_comm_global,mpi_comm_local,compid)
+   write(nulprt,*) subname, ' done mct_world_init '
+   call prism_sys_flush(nulprt)
+
    call prism_coupler_setup()
+   write(nulprt,*) subname, ' done prism_coupler_setup '
+   call prism_sys_flush(nulprt)
+
    call prism_advance_init()
+   write(nulprt,*) subname, ' done prism_advance_init '
+   call prism_sys_flush(nulprt)
 
    call prism_sys_debug_exit(subname)
 
