@@ -27,15 +27,15 @@ transformation MAPPING.  Several other changes are highlighted below.
 
 \begin{itemize}
 \item MPI2 job launching is NOT supported.  Only MPI1 is allowed.
-\item All coupling is now direct.  gets are blocking, puts are 
-  non-blocking.  get and put calls between models must match
+\item All coupling is now direct.  Gets are blocking, puts are 
+  non-blocking.  Get and put calls between models must match
   adequately to avoid deadlocks.
-\item like oasis3, the first coupling occurs at time=0 and the
+\item Like oasis3, the first coupling occurs at time=0 and the
   final coupling occurs at (ncouplings-1)*dt.
-\item all input and output files must be netcdf, binary not supported
-\item ability to send and receive more than 1 field with a coupling
-  operation.  use colon delimited field names in {\it namcouple} input.
-\item a model output field (put) can be associated with more than one
+\item All input and output files must be netcdf, binary not supported
+\item Ability to send and receive more than 1 field with a coupling
+  operation.  Use colon delimited field names in {\it namcouple} input.
+\item A model output field (put) can be associated with more than one
   destination model (get).  In that case, the source model only
   needs to put the data once and that data will arrive at multiple
   destinations as specified by {\it namcouple} input file.  Different
@@ -45,9 +45,9 @@ transformation MAPPING.  Several other changes are highlighted below.
   multiple transforms as long as the destination field name is
   unique.  For example
 \begin{itemize}
-\item    TSURF from model 1 -> TSURF in model 2
-\item    TSURF from model 1 -> TSURFAVG in model2
-\item    TSURF from model 1 -> TSURF in model 3 
+\item    TSURF from model 1 to TSURF in model 2
+\item    TSURF from model 1 to TSURFAVG in model2
+\item    TSURF from model 1 to TSURF in model 3 
 \end{itemize}
   TSURF only needs to be put from model 1 ``once'' per timestep and
   the data will arrive at the destination at the coupling
@@ -107,32 +107,29 @@ transformation MAPPING.  Several other changes are highlighted below.
   use of IGNORED and INGOUT converts to EXPORTED and EXPOUT respectively
 \item NLOGPRT sets debugging output levels for the coupling software
   and will lead to output to all log files.
-\item non-instant LOCTRANS options will use a restart file now
-\item fields of type OUTPUT now support a restart file argument to be
+\item Non-INSTANT LOCTRANS options will use a restart file
+\item Fields of type OUTPUT now support a restart file argument to be
   compatable with LOCTRANS restart files
-\item SEQ setting has a slightly different meaning.  it is no longer
-  needed to ensure correct coupling sequencing.  that is dependent
+\item SEQ setting has a slightly different meaning.  SEQ is no longer
+  needed to ensure correct coupling sequencing.  Sequencing is dependent
   only on the order of get and put calls in models.  SEQ is never
-  required.  use of SEQ allows the coupling layer to detect
+  required.  Use of SEQ allows the coupling layer to detect
   potential deadlocks before they happen and to exit gracefully.
-  use of SEQ is recommended when it makes sense to do so.
-\item there is a new MAPPING transform that allows use of previously generated
+  Use of SEQ is recommended when it makes sense to do so.
+\item There is a new MAPPING transform that allows use of previously generated
   mapping file for interpolation to be read in.
-\item support to couple multiple fields at a time.  this is supported through
+\item Support to couple multiple fields via a single communication.  This is supported through
   colon delmited field lists in the {\it namcouple} input, for example
   ATMTAUX:ATMTAUY:ATMHFLUX:ATMPREC TAUX:TAUY:HEATFLUX:FWFLUX in a single
-  {\it namcouple} definition.  all fields will use the {\it namcouple} settings for
-  that definition.  the prism\_get and prism\_put interfaces still only
-  support sending (put) or receiving (get) one field at a time.  inside
-  oasis, the fields are stored and and a single send or recieve is 
-  executed for all fields.  this is useful in cases where multiple fields
+  {\it namcouple} definition.  All fields will use the {\it namcouple} settings for
+  that definition.  The prism\_get and prism\_put interfaces still only
+  support sending (put) or receiving (get) one field at a time.  Inside
+  oasis, the fields are stored and and a single mapping and send or recieve is 
+  executed for all fields.  This is useful in cases where multiple fields
   have the same coupling transforms or to reduce communication costs
-  by aggregating multiple fields into a single communication.  this only
-  works if there are no temporal dependencies between any of the fields
-  in the field list.  in other words, all fields in the field list must
-  be couple-able with the same sequence value.
-\item only support for a subset of scrip map generation including bilinear,
-  first order conserv, distwgt, and gausswgt.  No second order mapping is
+  by aggregating multiple fields into a single communication.  
+\item SCRIPR map generation supports a subset of options including BILINEAR,
+  first order CONSERV, DISTWGT, and GAUSSWGT.  No second order mapping is
   supported.
 \end{itemize}
 

@@ -22,11 +22,12 @@ chapter \ref{sec_compilationrunning}.
   can be found in {\tt oasis3/lib/psmile} directory. PSMILe supports:
 
 \begin{itemize}
-\item parallel communication between parallel component models
+\item parallel communication between parallel component models,
+\item an ability to couple a component on a subset of it's processeses only,
 \item automatic sending and receiving actions at appropriate times
  following user's choice indicated in the {\it namcouple},
 \item time integration or accumulation of the coupling fields,
-\item limited transformations such as mapping (interpolation) between grids
+\item limited transformations such as mapping (interpolation) between grids,
 \item I/O actions from/to files.
 \end{itemize}
 
@@ -42,6 +43,7 @@ chapter \ref{sec_compilationrunning}.
 \item I/O-coupling field sending and receiving (section
 \ref{subsubsec_sendingreceiving})
 \item Termination (section \ref{subsubsec_Termination})
+\item Optional auxiliary routines (section \ref{subsubsec_auxroutines})
 \end{enumerate}
 
 Finally, in section \ref{subsubsec_Algoritms}, different coupling
@@ -557,8 +559,46 @@ namcouple. A field will not be received at all if its
 coupling or I/O period indicated in the {\it namcouple} is greater
 than the total run time.
 
-\subsection{Auxiliary routines}
-\label{subsec:auxiliary}
+\section{Termination}
+\label{subsubsec_Termination}
+
+\begin{itemize}
+
+\item {\tt CALL prism\_terminate\_proto(ierror)}
+\item {\tt CALL oasis\_terminate       (ierror)}
+  \begin{itemize}
+  \item {\tt ierror [INTEGER; OUT]}: returned error code.
+  \end{itemize}
+  All processes of the component model must terminate the coupling by calling {\tt
+  prism\_terminate\_proto}\footnote{If the process called {\tt
+  MPI\_Init} (before calling {\tt prism\_init\_comp\_proto}), it must
+  also call {\tt MPI\_Finalize} explicitly, but only after calling
+  {\tt prism\_terminate\_proto}.} (normal termination). OASIS3 will
+  terminate after all processes called
+  prism\_terminate\_proto.
+
+\item {\tt CALL prism\_abort\_proto(compid, routine\_name, abort\_message)}
+\item {\tt CALL oasis\_abort       (compid, routine\_name, abort\_message)}
+\begin{itemize}
+  \item {\tt compid [INTEGER; IN]}: component model ID (from
+prism\_init\_comp\_proto) 
+  \item {\tt routine\_name[CHARACTER*; IN]}: name of calling routine
+  \item {\tt abort\_message[CHARACTER*; IN]}: message to be written out.
+\end{itemize}
+
+ If a process needs to abort voluntarily, it should do so by
+ calling {\tt prism\_abort\_proto}. This will ensure a proper
+ termination of all processes in the coupled model communicator. This
+ routine writes the name of the calling model, the name of the
+ calling routine, and the message to the job standard output (stdout). 
+ This routine cannot be called before {\tt prism\_init\_comp\_proto}.
+
+\end{itemize}
+
+%{Termination}
+
+\section{Auxiliary routines}
+\label{subsubsec_auxroutines}
 
 Not all auxiliary routines available in oasis3\_3 are available.
 
@@ -589,6 +629,70 @@ The debug level is initially set for all processors and all models
 by the NLOGPRT namcouple input.  This method allows users to vary 
 the debug level by model, task, or at different points in the model
 integration.
+
+\begin{itemize} 
+\item {\tt CALL prism\_set\_localcomm\_proto(new\_comm, kinfo)}
+\item {\tt CALL oasis\_set\_localcomm(new\_comm, kinfo)}
+\begin{itemize}
+\item {\tt new\_comm [INTEGER; IN]}: mpi intercomm communicator
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+\end{itemize}
+
+This routine allows a user to reset the local coupling communicator.
+This allows a user to modify the local oasis coupling communicator for
+a particular component to support coupling on a subset of processes.
+For instance, if a component is setup to run on 80 processes but
+16 of those processes are associated with a distinct task, like I/O,
+then the application is able to initialize a new coupling communicator
+made up of the other 64 processes and pass that to oasis.  Oasis will
+then expect the application to couple only using those 64 processes
+and then the other 16 processes can be tasked with other work.
+
+This should be called early in the initialization, after the oasis\_init\_comp
+call but before oasis grid, partition, or variable initialization.  A coding
+sample of how to use this is below 
+ 
+\begin{verbatim}
+  CALL oasis_init_comp (comp_id, comp_name, ierror )
+  CALL oasis_get_localcomm ( localComm, ierror )
+
+  !--- setup the couplingComm from localComm
+  CALL MPI_Comm_Rank ( localComm, mype, ierror )
+  couplingpe = .false.
+  if (mod(mype,2) == 0) couplingpe = .true.  ! set every other pe as coupling pe
+  icolor = MPI_UNDEFINED
+  if (couplingpe) icolor = 1
+  CALL MPI_COMM_Split(localComm,icolor,1,couplingComm,ierror)
+
+  CALL oasis_set_localcomm(couplingComm, ierror)
+
+  CALL oasis_def_partition ( ... )
+  CALL oasis_def_var ( ... )
+  CALL oasis_enddef ( ... )
+
+  !--- do loop
+     ! ...
+     if (couplingpe) CALL oasis_put( ... )
+     ! ...
+     if (couplingpe) CALL oasis_get( ... )
+     ! ...
+  !--- enddo
+
+  CALL oasis_terminate ( ... )
+\end{verbatim}
+
+In particular, all the oasis initialization calls are collective
+on ALL processes except the oasis\_put and oasis\_get calls which 
+are called just on the coupling processes.  There are also a few
+other rules that must be followed.  First, oasis\_set\_localcomm
+must be called from all processes and the communicator passed
+in must be MPI\_COMM\_NULL for processes NOT involved in the coupling.
+Second, the grid writing initialization calls must be called from
+the root of the coupling communicator.  And third, the partition
+must be defined only across the coupling processes even though
+the def\_partition must be called on all processes.
+
 
 \begin{itemize} 
 \item {\tt CALL prism\_get\_intercomm(new\_comm, cdnam, kinfo)}
@@ -694,43 +798,6 @@ components are not involved.
 %corresponding {\tt var\_id}, as defined in the {\it namcouple} (see
 %also section \ref{subsubsec_secondEXPORTED}).
 
-\section{Termination}
-\label{subsubsec_Termination}
-
-\begin{itemize}
-
-\item {\tt CALL prism\_terminate\_proto(ierror)}
-\item {\tt CALL oasis\_terminate       (ierror)}
-  \begin{itemize}
-  \item {\tt ierror [INTEGER; OUT]}: returned error code.
-  \end{itemize}
-  All processes of the component model must terminate the coupling by calling {\tt
-  prism\_terminate\_proto}\footnote{If the process called {\tt
-  MPI\_Init} (before calling {\tt prism\_init\_comp\_proto}), it must
-  also call {\tt MPI\_Finalize} explicitly, but only after calling
-  {\tt prism\_terminate\_proto}.} (normal termination). OASIS3 will
-  terminate after all processes called
-  prism\_terminate\_proto.
-
-\item {\tt CALL prism\_abort\_proto(compid, routine\_name, abort\_message)}
-\item {\tt CALL oasis\_abort       (compid, routine\_name, abort\_message)}
-\begin{itemize}
-  \item {\tt compid [INTEGER; IN]}: component model ID (from
-prism\_init\_comp\_proto) 
-  \item {\tt routine\_name[CHARACTER*; IN]}: name of calling routine
-  \item {\tt abort\_message[CHARACTER*; IN]}: message to be written out.
-\end{itemize}
-
- If a process needs to abort voluntarily, it should do so by
- calling {\tt prism\_abort\_proto}. This will ensure a proper
- termination of all processes in the coupled model communicator. This
- routine writes the name of the calling model, the name of the
- calling routine, and the message to the job standard output (stdout). 
- This routine cannot be called before {\tt prism\_init\_comp\_proto}.
-
-\end{itemize}
-
-%{Termination}
 
 \section{Coupling algorithms - SEQ and LAG concepts}
 \label{subsubsec_Algoritms}
