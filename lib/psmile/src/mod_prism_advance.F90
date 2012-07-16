@@ -166,7 +166,7 @@ contains
     logical               :: comm_now  ! time to communicate
     logical               :: time_now  ! coupling time
     logical               :: lreadrest ! local readrest
-    type(mct_avect)       :: avtest    ! temporary
+    TYPE(mct_avect)       :: avtest    ! temporary
 !    type(mct_avect),pointer  :: avect1, avect2
 !    type(mct_sMatP),pointer  :: sMatP
 !    type(mct_router),pointer :: router
@@ -708,14 +708,19 @@ contains
           !   at the end of the run only
           !------------------------------------------------
 
-          if (mseclag + dt >= maxtime .and. &
+          IF (mseclag + dt >= maxtime .AND. &
              getput == PRISM_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
              call prism_sys_debug_note(subname//' loctrans restart write')
              write(tstring,F01) 'wtrn_',cplid
              call prism_timer_start(tstring)
              write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
-             call prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
-                prism_part(partid)%gsmap,nx,ny,nampre=trim(vstring))
+             IF (lag > 0) THEN
+                 CALL prism_io_write_avfile(rstfile,prism_coupler(cplid)%aVect_loc, &
+                    prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             ELSE
+                 CALL prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
+                    prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             ENDIF
              write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
              call prism_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring))
              call prism_timer_stop(tstring)
@@ -728,7 +733,7 @@ contains
                 write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,prism_coupler(cplid)%avcnt
                 write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
              endif
-          endif
+         ENDIF
 
        endif   ! comm_now
 

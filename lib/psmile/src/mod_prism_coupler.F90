@@ -54,6 +54,7 @@ MODULE mod_prism_coupler
      !--- fixed at initialization ---
      type(mct_aVect)       :: aVect1   ! primary aVect
      type(mct_aVect)       :: aVect2   ! extra aVect needed for mapping
+     type(mct_aVect)       :: aVect_loc! aVect for loctrans restart
      character(len=ic_xl)  :: rstfile  ! restart file
      character(len=ic_xl)  :: inpfile  ! restart file
      character(len=ic_xl)  :: fldlist  ! field list
@@ -753,6 +754,11 @@ CONTAINS
         call prism_sys_flush(nulprt)
      endif
 
+     !--------------------------------
+     ! initialize avect_loc
+     !--------------------------------
+     call mct_avect_init(prism_coupler(nc)%avect_loc,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
+     call mct_avect_zero(prism_coupler(nc)%avect_loc)
      !--------------------------------
      ! compute nflds for this coupling and initialize avcnt and status
      !--------------------------------
