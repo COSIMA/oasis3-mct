@@ -703,6 +703,8 @@ contains
              call prism_sys_flush(nulprt)
           endif
 
+       endif   ! comm_now
+
           !------------------------------------------------
           ! sav non-instant loctrans operations for future restart
           !   at the end of the run only
@@ -714,15 +716,10 @@ contains
              write(tstring,F01) 'wtrn_',cplid
              call prism_timer_start(tstring)
              write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
-             IF (lag > 0) THEN
-                 CALL prism_io_write_avfile(rstfile,prism_coupler(cplid)%aVect_loc, &
-                    prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
-             ELSE
-                 CALL prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
-                    prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
-             ENDIF
-             write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
-             call prism_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring))
+             CALL prism_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
+                prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             WRITE(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
+             CALL prism_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=TRIM(vstring))
              call prism_timer_stop(tstring)
              if (PRISM_Debug >= 2) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
@@ -734,8 +731,6 @@ contains
                 write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
              endif
          ENDIF
-
-       endif   ! comm_now
 
        !------------------------------------------------
        ! GET only, unpack avect1 if its coupling time
