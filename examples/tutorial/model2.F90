@@ -21,13 +21,13 @@ PROGRAM model2
   ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#else
+#elif USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
   CHARACTER(len=30), PARAMETER :: data_filename='grid_model2.nc'
   ! Component name (6 characters) same as in the namcouple
-  CHARACTER(len=6)   :: comp_name = 'toyatm'
+  CHARACTER(len=6)   :: comp_name = 'model2'
   CHARACTER(len=128) :: comp_out ! name of the output log file
   CHARACTER(len=3)   :: chout
   !

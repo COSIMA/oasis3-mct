@@ -14,7 +14,6 @@ PROGRAM model1
   IMPLICIT NONE
 
   INCLUDE 'mpif.h'
-
   !
   ! By default OASIS3 exchanges data in double precision.
   ! To exchange data in single precision with OASIS3, 
@@ -22,13 +21,13 @@ PROGRAM model1
   ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#else
+#elif USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
   CHARACTER(len=30), PARAMETER   :: data_filename='grid_model1.nc'
   ! Component name (6 characters) same as in the namcouple
-  CHARACTER(len=6)   :: comp_name = 'toyocn'
+  CHARACTER(len=6)   :: comp_name = 'model1'
   CHARACTER(len=128) :: comp_out ! name of the output log file 
   CHARACTER(len=3)   :: chout
   !
@@ -304,17 +303,10 @@ PROGRAM model1
   DO ib=1, il_nb_time_steps
     itap_sec = delta_t * (ib-1) ! Time
     !
-!    CALL function_sent(var_actual_shape(2), &
-!                       var_actual_shape(4), &
-!                       localgrid_lon,localgrid_lat, &
-!                       field1_send,ib)
-
-  DO j=1,var_actual_shape(4)
-    DO i=1,var_actual_shape(2)
-      field1_send(i,j) =  ib + (cos(float(i)/10.)*sin(float(j)/10.))
-    ENDDO
-  ENDDO
-
+    CALL function_sent(var_actual_shape(2), &
+                       var_actual_shape(4), &
+                       localgrid_lon,localgrid_lat, &
+                       field1_send,ib)
     !
     ! Send FSENDOCN
     write(w_unit,*) 'tcx sendf1 ',itap_sec,minval(field1_send),maxval(field1_send)

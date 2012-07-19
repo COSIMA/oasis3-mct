@@ -5,10 +5,10 @@ SUBROUTINE function_sent(ni,nj, &
   !
   IMPLICIT NONE
   !
-#ifdef USE_DOUBLE_PRECISION
-  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
-#else
+#ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
+#elif USE_DOUBLE_PRECISION
+  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
   ! Constants

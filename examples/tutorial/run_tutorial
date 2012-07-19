@@ -32,8 +32,8 @@ fi
 #               and name of executables
 #
 #name of the executables
-    exe1=toyocn
-    exe2=toyatm
+    exe1=model1
+    exe2=model2
 # number of processes for each executable
     nproc_exe1=1
     nproc_exe2=1

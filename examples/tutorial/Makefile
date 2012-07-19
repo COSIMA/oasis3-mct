@@ -11,12 +11,14 @@ LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR
 CPPKEYDECOMP_M1=DECOMP_APPLE
 CPPKEYDECOMP_M2=DECOMP_APPLE
 #
+# Precision for REAL: USE_DOUBLE_PRECISION or NO_USE_DOUBLE_PRECISION
+CPPKEYDP=USE_DOUBLE_PRECISION
+#
 ### End User configurable options ###
 #
-CPPKEYDP=USE_DOUBLE_PRECISION
-CPPKEYOA=OASIS3
-CPPLOCAL_M1 =  -D${CPPKEYDP} -D${CPPKEYOA} -D${CPPKEYDECOMP_M1}
-CPPLOCAL_M2 = -D${CPPKEYDP} -D${CPPKEYOA} -D${CPPKEYDECOMP_M2}
+# For single precision, add -DNO_USE_DOUBLE_PRECISION in CPPLOCAL_M1/M2
+CPPLOCAL_M1 =  -D${CPPKEYDECOMP_M1} -D${CPPKEYDP}
+CPPLOCAL_M2 = -D${CPPKEYDECOMP_M2} -D${CPPKEYDP}
 #
 OBJ_M1 =  routine_hdlerr.o read_dim_irreg.o  \
           read_grid_irreg.o decomp_def.o \
@@ -30,7 +32,7 @@ OBJ_M2 =  routine_hdlerr.o read_dim_reg.o  \
 #
 default: all
 #
-all: oasis3_psmile toyocn toyatm 
+all: oasis3_psmile model1 model2 
 #
 # Compile and link libaries
 oasis3_psmile:
@@ -41,16 +43,16 @@ oasis3_psmile:
 # Rules for executables
 #-------------------------------------------------------------------------------
 #
-toyocn: $(OBJ_M1) model1.o $(LIBPSMILE) Makefile
+model1: $(OBJ_M1) model1.o $(LIBPSMILE) Makefile
 	$(LD) $(LDFLAGS) -o $@ $(OBJ_M1) model1.o $(LIBPSMILE) $(FLIBS)
-toyatm: $(OBJ_M2) model2.o $(LIBPSMILE) Makefile
+model2: $(OBJ_M2) model2.o $(LIBPSMILE) Makefile
 	$(LD) $(LDFLAGS) -o $@ $(OBJ_M2) model2.o $(LIBPSMILE) $(FLIBS)
 #
 #-------------------------------------------------------------------------------
 # Rules for compilation
 #-------------------------------------------------------------------------------
 #
-routine_hdlerr.o :		routine_hdlerr.F90
+routine_hdlerr.o :	routine_hdlerr.F90
 				$(F90) $(F90FLAGS) -c routine_hdlerr.F90
 read_dim_irreg.o :	read_dim_irreg.F90
 				$(F90) $(F90FLAGS) -c read_dim_irreg.F90
@@ -62,15 +64,15 @@ read_grid_reg.o :	read_grid_reg.F90
 				$(F90) $(F90FLAGS) -c read_grid_reg.F90
 decomp_def.o : 		decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
-oasis3_local_grid.o :		oasis3_local_grid.F90
+oasis3_local_grid.o :	oasis3_local_grid.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c oasis3_local_grid.F90
-function_sent.o :		function_sent.F90
+function_sent.o :	function_sent.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c function_sent.F90
-decomp_def_m2.o : 		decomp_def.F90
+decomp_def_m2.o : 	decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o decomp_def_m2.o -c decomp_def.F90
-oasis3_local_grid_m2.o :		oasis3_local_grid.F90
+oasis3_local_grid_m2.o :	oasis3_local_grid.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o oasis3_local_grid_m2.o -c oasis3_local_grid.F90
-function_sent_m2.o :		function_sent.F90
+function_sent_m2.o :	function_sent.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o function_sent_m2.o -c function_sent.F90
 
 model1.o :	model1.F90 Makefile
@@ -88,7 +90,12 @@ help:
 # Clean directory
 #
 clean:
-	-rm -f *.o *.x *.mod *.MOD toyocn toyatm
+	-rm -f *.o *.mod *.MOD model1 model2
 	-rm -f i.*.F90 *.L
 	-rm -f core core.* 
-
+#
+# Make sure to recompile everything
+#
+realclean: clean remove
+remove:
+	(cd ../../util/make_dir ; $(MAKE) realclean -f TopMakefileOasis3)
