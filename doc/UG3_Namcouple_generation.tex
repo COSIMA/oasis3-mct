@@ -265,12 +265,19 @@ be the string NOT.
  
 \item {\tt \$NLOGPRT}: The line below this keyword refers to the
   amount of information that will be written to the OASIS log files
-  for each model and processor.  With 0, there is practically no output
-  written to the cplout; A value of 5 is typical for production, 10
-  provides a trace of the calls, 
-  20 provides additional debug information, and 
-  30 provides the full debug information.  This
-  value can be changed at runtime with the {\tt prism\_set\_debug} method.
+  for each model and processor. The value of {\tt \$NLOGPRT} may be:  
+  \begin{itemize}
+  \item 0 : one file debug.root.xx is open by the master proces of each model and one file debug\_notroot.xx is open for all the other processes of each model to write error information.
+  \item 1 : one file debug.root.xx is open by the master proces of each model to write information equivalent to level 10 (see below); one file debug\_notroot.xx is open for all the other processes of each model to write error information.
+  \item 2 : one file debug.xx.xxxxxx is open by each process of each model to write normal production diagnostics
+  \item 5 : as for 2 with in addition some initial debug info
+  \item 10: as for 5 with in addition the routine calling tree
+  \item 12: as for 10 with in addition some routine calling notes
+  \item 15: as for 12 with even more debug diagnostics
+  \item 20: as for 15 with in addition some extra runtime analysis
+  \item 30: full debug information
+ \end{itemize}
+This value can be changed at runtime with the {\tt prism\_set\_debug} method.
 
 \item {\tt \$CALTYPE}: UNUSED.  The line below this keyword contains
 an integer that plays not role in the implementation.
