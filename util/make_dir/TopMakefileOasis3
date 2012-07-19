@@ -1,11 +1,12 @@
 ##############################################################################
-#This is the top makefile for compiling OASIS3 with associated libraries
+#This is the top makefile for compiling OASIS3-MCT coupling library including
+#  mct/mpeu, scrip and psmile (i.e. interpolation and communication)
 #Platform dependent settings, compiler options, cpp keys, 
 #paths and other stuff has to be set in an include file indicated in make.inc.
 # 
-# default   : OASIS3
-# oasis3_psmile : OASIS3 and the psmile library
-# realclean : Clean OASIS3 and psmile library
+# default : mct/mpeu, scrip and psmile
+# oasis3_psmile (for OASIS3 upward compatibility): mct/mpeu, scrip and psmile
+# realclean : Automatic recompilation of all sources
 #
 #######
 include make.inc
@@ -39,14 +40,13 @@ oasis3_psmile:
 realclean:
 	$(MAKEf) cleanlibs
 #
-# Rules for creating build, library and binary directories
+# Rules for creating build and library directories
 #
 makedirs:
 	@mkdir -p $(ARCHDIR)/build/lib/scrip
 	@mkdir -p $(ARCHDIR)/build/lib/mctdir
 	@mkdir -p $(ARCHDIR)/build/lib/mct
 	@mkdir -p $(ARCHDIR)/build/lib/psmile.$(CHAN)
-	@mkdir -p $(ARCHDIR)/bin
 	@mkdir -p $(ARCHDIR)/lib
 #
 # Rules for compiling mpeu/mct library
@@ -76,7 +76,7 @@ makepsmile:
 # Rules for cleaning
 #
 cleanlibs:
-	@echo cleaning oasis3 libraries
+	@echo cleaning oasis3-mct libraries
 	rm -f $(ARCHDIR)/build/lib/scrip/*
 	rm -f $(ARCHDIR)/build/lib/mct/*
 	rm -f -r $(ARCHDIR)/build/lib/mctdir/*
@@ -84,7 +84,6 @@ cleanlibs:
 	rm -f $(ARCHDIR)/lib/libscrip.a
 	rm -f $(ARCHDIR)/lib/libmct.a
 	rm -f $(ARCHDIR)/lib/libmpeu.a
-	rm -f $(ARCHDIR)/lib/libpio.a
 	rm -f $(ARCHDIR)/lib/libpsmile.$(CHAN).a
 #
 ## Some rules to modify/add variables in makefiles
