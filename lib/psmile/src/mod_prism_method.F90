@@ -163,7 +163,7 @@ CONTAINS
            CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
            IF (mpi_rank_local == 0) THEN
                nulprt=iu
-               WRITE(filename,'(a,i2.2,a,i6.6)') 'debug_root.',compid,'.',mpi_rank_local
+               WRITE(filename,'(a,i2.2)') 'debug.root.',compid
                OPEN(nulprt,file=filename)
                WRITE(nulprt,*) subname,' OPEN debug file for root pe, unit :',nulprt
                call prism_sys_flush(nulprt)
