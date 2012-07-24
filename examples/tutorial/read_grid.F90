@@ -3,6 +3,7 @@
                                        data_filename, w_unit, &
                                        gridlon,gridlat, &
                                        gridclo,gridcla, &
+                                       gridsrf, &
                                        indice_mask)
   !**************************************************************************************
   !
@@ -12,7 +13,7 @@
   INTEGER                  :: i,j,k,w_unit
   !
   INTEGER                  :: il_file_id,il_grid_id,il_lon_id, &
-                              il_lat_id,il_clo_id,il_cla_id,il_indice_id, &
+                              il_lat_id,il_clo_id,il_cla_id,il_srf_id,il_indice_id, &
                               lon_dims,lat_dims,clo_dims,cla_dims,&
                               imask_dims
   !
@@ -28,7 +29,7 @@
   INTEGER,  DIMENSION(3)   :: ila_dim
   INTEGER,  DIMENSION(3)   :: ila_corners,ila_what
   !
-  DOUBLE PRECISION, DIMENSION(nlon,nlat)                :: gridlon,gridlat
+  DOUBLE PRECISION, DIMENSION(nlon,nlat)                :: gridlon,gridlat,gridsrf
   DOUBLE PRECISION, DIMENSION(nlon,nlat,corners_ij_lus) :: gridclo,gridcla
   INTEGER, DIMENSION(nlon,nlat)                      :: indice_mask
   !
@@ -42,6 +43,7 @@
   CALL hdlerr( NF90_INQ_VARID(il_file_id, 'lat' , il_lat_id), __LINE__ )
   CALL hdlerr( NF90_INQ_VARID(il_file_id, 'clo' , il_clo_id), __LINE__ )
   CALL hdlerr( NF90_INQ_VARID(il_file_id, 'cla' , il_cla_id), __LINE__ )
+  CALL hdlerr( NF90_INQ_VARID(il_file_id, 'srf' , il_srf_id), __LINE__ )
   CALL hdlerr( NF90_INQ_VARID(il_file_id, 'imask' , il_indice_id), __LINE__ )
   !
   ila_what(:)=1
@@ -60,35 +62,32 @@
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lon_id, gridlon, &
      ila_what(1:2), ila_dim(1:2)), __LINE__ )
-  !
-  WRITE(w_unit,*) 'We read globalgrid_lon'
+  WRITE(w_unit,*) 'Global grid longitudes reading done'
   CALL flush(w_unit)
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lat_id, gridlat, &
      ila_what(1:2), ila_dim(1:2)), __LINE__ )
-  !
-  WRITE(w_unit,*) 'We read globalgrid_lat'
-  CALL flush(w_unit)
-  WRITE(w_unit,*) 'We read globalgrid_lat 2'
-  WRITE(w_unit,*) 'ila_corners', ila_corners(:)
+  WRITE(w_unit,*) 'Global grid latitudes reading done'
   CALL flush(w_unit)
   !
   CALL hdlerr( NF90_GET_VAR(il_file_id, il_clo_id, gridclo, &
      ila_what, ila_corners), __LINE__ )
-  !
-  WRITE(w_unit,*) 'We read globalgrid_clo'
+  WRITE(w_unit,*) 'Global grid longitude corners reading done'
   CALL flush(w_unit)
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_cla_id, gridcla, &
      ila_what, ila_corners), __LINE__ )
+  WRITE(w_unit,*) 'Global grid latitude corners reading done'
+  CALL flush(w_unit)
   !
-  WRITE(w_unit,*) 'We read globalgrid_cla'
+  CALL hdlerr( NF90_GET_VAR (il_file_id, il_srf_id, gridsrf, &
+     ila_what(1:2), ila_dim(1:2)), __LINE__ )
+  WRITE(w_unit,*) 'Global grid surfaces reading done'
   CALL flush(w_unit)
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_indice_id, indice_mask, &
      ila_what, ila_dim), __LINE__ )
-  !
-  WRITE(w_unit,*) 'We read globalgrid_indice_mask'
+  WRITE(w_unit,*) 'Global grid mask reading done'
   CALL flush(w_unit)
   !
   CALL hdlerr( NF90_CLOSE(il_file_id), __LINE__ )

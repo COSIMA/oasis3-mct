@@ -39,6 +39,7 @@ PROGRAM model2
   !
   DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat
   DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla
+  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_srf
   INTEGER, DIMENSION(:,:), POINTER            :: indice_mask ! mask, 0 == valid point, 1 == masked point 
   !
   INTEGER :: mype, npes ! rank and number of pe
@@ -159,6 +160,8 @@ PROGRAM model2
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_clo'
   ALLOCATE(globalgrid_cla(nlon,nlat,nc), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_cla'
+  ALLOCATE(globalgrid_srf(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_srf'
   ALLOCATE(indice_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
@@ -166,6 +169,7 @@ PROGRAM model2
   CALL read_grid(nlon,nlat,nc,data_filename,w_unit, &
                  globalgrid_lon,globalgrid_lat, &
                  globalgrid_clo,globalgrid_cla, &
+                 globalgrid_srf, &
                  indice_mask)
   !
   ! (Global) grid definition for OASIS3
@@ -183,6 +187,7 @@ PROGRAM model2
       CALL oasis_start_grids_writing(il_flag)
       CALL oasis_write_grid('lmdz', nlon, nlat, globalgrid_lon, globalgrid_lat)
       CALL oasis_write_corner('lmdz', nlon, nlat, 4, globalgrid_clo, globalgrid_cla)
+      call oasis_write_area('lmdz', nlon, nlat, globalgrid_srf)
       CALL oasis_write_mask('lmdz', nlon, nlat, indice_mask(:,:))
       CALL oasis_terminate_grids_writing()
   ENDIF
