@@ -113,7 +113,7 @@ LOCTRANS
 #
 # Field 3: model2 to model1
 #
-FSENDATM  FRECVOCN  3 7200  1  fdatm.nc EXPOUT
+FSENDATM  FRECVOCN  3 10800  1  fdatm.nc EXPOUT
 #
 lmdz torc SEQ=2 
 #
