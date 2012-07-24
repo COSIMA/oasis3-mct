@@ -115,9 +115,10 @@ LOCTRANS
 #
 FSENDATM  FRECVOCN  3 7200  1  fdatm.nc EXPOUT
 #
-96 72 182 149  lmdz torc SEQ=2 
+lmdz torc SEQ=2 
 #
 P  0  P  2
-MAPPING
-rmp_lmdz_to_torc_BILINEA.nc src
+SCRIPR
+BILINEAR LR SCALAR LATLON 1
+#
  $END

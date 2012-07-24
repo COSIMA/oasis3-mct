@@ -73,7 +73,6 @@ cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
 
 cp -f $datadir/namcouple $rundir/.
-cp -f $datadir/*nc  $rundir/.
 
 ed $rundir/namcouple <<EOF
 g/nproc_exe1/s/nproc_exe1/$nproc_exe1/

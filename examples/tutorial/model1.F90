@@ -21,7 +21,7 @@ PROGRAM model1
   ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif defined USE_DOUBLE_PRECISION
+#elif USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
@@ -35,10 +35,11 @@ PROGRAM model1
   INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
   INTEGER :: ntot           ! total dimension
   INTEGER :: il_size
-  INTEGER :: nbr_corners_ij ! number of corners in the (i,j) plan
-  DOUBLE PRECISION, DIMENSION(:,:), POINTER    :: globalgrid_lon,globalgrid_lat ! lon, lat of the points
-  DOUBLE PRECISION, DIMENSION(:,:,:), POINTER  :: globalgrid_clo,globalgrid_cla ! lon, lat of the corners
-  INTEGER, DIMENSION(:,:), POINTER           :: indice_mask ! mask, 0 == valid point, 1 == masked point 
+  INTEGER :: nc             ! number of corners
+  !
+  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat ! lon, lat of the points
+  DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla ! lon, lat of the corners
+  INTEGER, DIMENSION(:,:), POINTER            :: indice_mask ! mask, 0 == valid point, 1 == masked point  
   !
   INTEGER :: mype, npes ! rank and  number of pe
   INTEGER :: localComm  ! local MPI communicator and Initialized
@@ -50,16 +51,16 @@ PROGRAM model1
   INTEGER :: i, j
   !
   ! Names of exchanged Fields
-  CHARACTER(len=8), PARAMETER      :: var_name1 = 'FSENDOCN' ! 8 characters field sent by model1 to model2
-  CHARACTER(len=8), PARAMETER      :: var_name2 = 'FRECVOCN' ! 8 characters field received by model1 from model2
-  CHARACTER(len=8), PARAMETER      :: var_name3 = 'FOCNWRIT' ! 8 characters field written in a file
+  CHARACTER(len=8), PARAMETER :: var_name1 = 'FSENDOCN' ! 8 characters field sent by model1 to model2
+  CHARACTER(len=8), PARAMETER :: var_name2 = 'FRECVOCN' ! 8 characters field received by model1 from model2
+  CHARACTER(len=8), PARAMETER :: var_name3 = 'FOCNWRIT' ! 8 characters field written in a file
   !
   ! Used in oasis_def_var and oasis_def_var
-  INTEGER                       :: var_id(3) 
-  INTEGER                       :: var_nodims(2) 
-  INTEGER                       :: var_type
+  INTEGER                   :: var_id(3) 
+  INTEGER                   :: var_nodims(2) 
+  INTEGER                   :: var_type
   !
-  REAL (kind=wp), PARAMETER     :: field_ini = -1. ! initialisation of received fields
+  REAL (kind=wp), PARAMETER :: field_ini = -1. ! initialisation of received fields
   !
   INTEGER               ::  ib
   INTEGER, PARAMETER    ::  il_nb_time_steps = 6 ! number of time steps
@@ -70,22 +71,21 @@ PROGRAM model1
   REAL (kind=wp), POINTER :: localgrid_lon (:,:)
   REAL (kind=wp), POINTER :: localgrid_lat (:,:)
   !
-  INTEGER                       :: il_flag  ! Flag for grid writing by proc 0
+  INTEGER                 :: il_flag  ! Flag for grid writing by proc 0
   !
-  INTEGER                       :: itap_sec ! Time used in oasis_put/get
+  INTEGER                 :: itap_sec ! Time used in oasis_put/get
   !
   ! Grid parameters definition
-  INTEGER                       :: part_id  ! use to connect the partition to the variables
-                                            ! in oasis_def_var
-  INTEGER                       :: var_actual_shape(4) ! local dimensions of the arrays to the pe
-                                                       ! 2 x field rank (= 4 because fields are of rank = 2)
-  !
+  INTEGER                 :: part_id  ! use to connect the partition to the variables
+                                      ! in oasis_def_var
+  INTEGER                 :: var_actual_shape(4) ! local dimensions of the arrays to the pe
+                                                 ! 2 x field rank (= 4 because fields are of rank = 2)
   !
   ! Exchanged local fields arrays
   ! used in routines oasis_put and oasis_get
-  REAL (kind=wp),   POINTER     :: field1_send(:,:)
-  REAL (kind=wp),   POINTER     :: field2_recv(:,:)
-  REAL (kind=wp),   POINTER     :: field3(:,:)
+  REAL (kind=wp), POINTER :: field1_send(:,:)
+  REAL (kind=wp), POINTER :: field2_recv(:,:)
+  REAL (kind=wp), POINTER :: field3(:,:)
   !
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !   INITIALISATION 
@@ -138,7 +138,7 @@ PROGRAM model1
       CALL oasis_abort()
   ENDIF
   !
-  WRITE(w_unit,*) 'I am the', TRIM(comp_name), ' ', 'comp', comp_id, 'local rank', mype
+  WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ', 'comp', comp_id, 'local rank', mype
   CALL flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -148,34 +148,38 @@ PROGRAM model1
   ! Reading global grid netcdf file
   !
   ! Reading dimensions of the global grid
-  CALL read_dim_irreg(nlon,nlat,nbr_corners_ij,data_filename,w_unit)
+  CALL read_dimgrid(nlon,nlat,data_filename,w_unit)
+  nc=4
   !
   ! Allocation
   ALLOCATE(globalgrid_lon(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_lon'
   ALLOCATE(globalgrid_lat(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_lat'
-  ALLOCATE(globalgrid_clo(nlon,nlat,nbr_corners_ij), STAT=ierror )
+  ALLOCATE(globalgrid_clo(nlon,nlat,nc), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_clo'
-  ALLOCATE(globalgrid_cla(nlon,nlat,nbr_corners_ij), STAT=ierror )
+  ALLOCATE(globalgrid_cla(nlon,nlat,nc), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_cla'
   ALLOCATE(indice_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
   ! Reading of the longitudes, latitudes, longitude and latitudes of the corners, mask of the global grid
-  CALL read_grid_irreg(nlon,nlat,nbr_corners_ij,data_filename, w_unit, &
-                                 globalgrid_lon,globalgrid_lat, &
-                                 globalgrid_clo,globalgrid_cla, &
-                                 indice_mask)
+  CALL read_grid(nlon,nlat,nc, data_filename, w_unit, &
+                 globalgrid_lon,globalgrid_lat, &
+                 globalgrid_clo,globalgrid_cla, &
+                 indice_mask)
   !
   ! (Global) grid definition for OASIS3
   ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in
+  !
   IF (mype == 0) THEN
       !
-      ! Half of the line j=148 is masked 
-      DO i=92,182
-        indice_mask(i,148)=1
-      ENDDO
+      ! Mask inversion to follow (historical) OASIS3 convention (0=not masked;1=masked)
+      WHERE(indice_mask == 1) 
+          indice_mask=0
+      ELSEWHERE
+          indice_mask=1
+      END WHERE
       !
       CALL oasis_start_grids_writing(il_flag)
       CALL oasis_write_grid('torc', nlon, nlat, globalgrid_lon, globalgrid_lat)
@@ -303,10 +307,8 @@ PROGRAM model1
   DO ib=1, il_nb_time_steps
     itap_sec = delta_t * (ib-1) ! Time
     !
-    CALL function_sent(var_actual_shape(2), &
-                       var_actual_shape(4), &
-                       localgrid_lon,localgrid_lat, &
-                       field1_send,ib)
+    CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
+                       localgrid_lon,localgrid_lat,field1_send,ib)
     !
     ! Send FSENDOCN
     write(w_unit,*) 'tcx sendf1 ',itap_sec,minval(field1_send),maxval(field1_send)

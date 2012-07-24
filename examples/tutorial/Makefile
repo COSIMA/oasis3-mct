@@ -20,11 +20,11 @@ CPPKEYDP=USE_DOUBLE_PRECISION
 CPPLOCAL_M1 =  -D${CPPKEYDECOMP_M1} -D${CPPKEYDP}
 CPPLOCAL_M2 = -D${CPPKEYDECOMP_M2} -D${CPPKEYDP}
 #
-OBJ_M1 =  routine_hdlerr.o read_dim_irreg.o  \
-          read_grid_irreg.o decomp_def.o \
+OBJ_M1 =  routine_hdlerr.o read_dimgrid.o  \
+          read_grid.o decomp_def.o \
           oasis3_local_grid.o function_sent.o 
-OBJ_M2 =  routine_hdlerr.o read_dim_reg.o  \
-          read_grid_reg.o decomp_def_m2.o \
+OBJ_M2 =  routine_hdlerr.o read_dimgrid.o  \
+          read_grid.o decomp_def_m2.o \
           oasis3_local_grid_m2.o function_sent_m2.o 
 #-------------------------------------------------------------------------------
 # General rules
@@ -54,14 +54,10 @@ model2: $(OBJ_M2) model2.o $(LIBPSMILE) Makefile
 #
 routine_hdlerr.o :	routine_hdlerr.F90
 				$(F90) $(F90FLAGS) -c routine_hdlerr.F90
-read_dim_irreg.o :	read_dim_irreg.F90
-				$(F90) $(F90FLAGS) -c read_dim_irreg.F90
-read_grid_irreg.o :	read_grid_irreg.F90
-				$(F90) $(F90FLAGS) -c read_grid_irreg.F90
-read_dim_reg.o :	read_dim_reg.F90
-				$(F90) $(F90FLAGS) -c read_dim_reg.F90
-read_grid_reg.o :	read_grid_reg.F90 
-				$(F90) $(F90FLAGS) -c read_grid_reg.F90
+read_dimgrid.o :	read_dimgrid.F90
+				$(F90) $(F90FLAGS) -c read_dimgrid.F90
+read_grid.o :		read_grid.F90
+				$(F90) $(F90FLAGS) -c read_grid.F90
 decomp_def.o : 		decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
 oasis3_local_grid.o :	oasis3_local_grid.F90

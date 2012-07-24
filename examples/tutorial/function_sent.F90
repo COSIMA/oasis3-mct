@@ -7,7 +7,7 @@ SUBROUTINE function_sent(ni,nj, &
   !
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif defined USE_DOUBLE_PRECISION
+#elif USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
