@@ -54,7 +54,7 @@ makedirs:
 makemct:
 	@echo "=> Compiling library mpeu and mct"
 	(cd $(ARCHDIR)/build/lib/mctdir; cp -f -r -p $(LIBSRC)/mct/* .;\
-         ./configure MPIF90="$(F90)" F90="$(F90)" 1>> $(LOG) 2>> $(ERR) ;\
+         ./configure MPIFC="$(F90)" FC="$(F90)" 1>> $(LOG) 2>> $(ERR) ;\
           make 1>> $(LOG) 2>> $(ERR) ; \
          cp -f ./*/lib*.a   $(ARCHDIR)/lib/; \
          cp -f ./*/*.o    $(ARCHDIR)/build/lib/mct/; \
