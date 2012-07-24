@@ -63,8 +63,8 @@ PROGRAM model2
   REAL (kind=wp), PARAMETER :: field_ini = -1. ! initialisation of received fields
   !
   INTEGER               ::  ib
-  INTEGER, PARAMETER    ::  il_nb_time_steps = 6 ! number of time steps
-  INTEGER, PARAMETER    ::  delta_t = 3600       ! time step
+  INTEGER, PARAMETER    ::  il_nb_time_steps = 12 ! number of time steps
+  INTEGER, PARAMETER    ::  delta_t = 1800       ! time step
   !
   ! Centers arrays of the local grid
   ! used to calculate the field sent by the model
