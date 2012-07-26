@@ -8,7 +8,7 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
   !
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif USE_DOUBLE_PRECISION
+#elif defined USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
@@ -48,7 +48,7 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
 #ifdef NO_USE_DOUBLE_PRECISION
       localgrid_lon(ij,1) = REAL(globalgrid_lon(i,j))
       localgrid_lat(ij,1) = REAL(globalgrid_lat(i,j))
-#elif USE_DOUBLE_PRECISION
+#elif defined USE_DOUBLE_PRECISION
       localgrid_lon(ij,1) = globalgrid_lon(i,j)
       localgrid_lat(ij,1) = globalgrid_lat(i,j)
 #endif
@@ -67,7 +67,7 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
       localgrid_lat(var_shape_oasis3(1):var_shape_oasis3(2),var_shape_oasis3(3): &
          var_shape_oasis3(4)) = REAL(globalgrid_lat(indi_beg:indi_end,&
                                 indj_beg:indj_end))
-#elif USE_DOUBLE_PRECISION
+#elif defined USE_DOUBLE_PRECISION
       localgrid_lon(var_shape_oasis3(1):var_shape_oasis3(2),var_shape_oasis3(3): &
          var_shape_oasis3(4)) = globalgrid_lon(indi_beg:indi_end,&
                                 indj_beg:indj_end)
