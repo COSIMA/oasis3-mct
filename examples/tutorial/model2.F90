@@ -297,9 +297,6 @@ PROGRAM model2
   DO ib=1, il_nb_time_steps
     itap_sec = delta_t * (ib-1) ! Time
     !
-    CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
-                       localgrid_lon,localgrid_lat,field2_send,ib)
-    !
     ! Get the field FRECVATM
     field1_recv=field_ini
     CALL oasis_get(var_id(1),itap_sec, field1_recv, ierror)
@@ -310,6 +307,9 @@ PROGRAM model2
     ENDIF
     !
     ! Send the field FSENDATM
+    !
+    CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
+                       localgrid_lon,localgrid_lat,field2_send,ib)
     write(w_unit,*) 'tcx sendf2 ',itap_sec,minval(field2_send),maxval(field2_send)
     CALL oasis_put(var_id(2),itap_sec, field2_send, ierror)
     IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN

@@ -86,7 +86,6 @@ PROGRAM model1
   ! used in routines oasis_put and oasis_get
   REAL (kind=wp), POINTER :: field1_send(:,:)
   REAL (kind=wp), POINTER :: field2_recv(:,:)
-  REAL (kind=wp), POINTER :: field3(:,:)
   !
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !   INITIALISATION 
@@ -287,9 +286,6 @@ PROGRAM model1
   ALLOCATE(field2_recv(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field2_recv'
   !
-  ALLOCATE(field3(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field3'
-  !
   ALLOCATE ( localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
   !
@@ -312,6 +308,15 @@ PROGRAM model1
   DO ib=1, il_nb_time_steps
     itap_sec = delta_t * (ib-1) ! Time
     !
+    ! Get FRECVOCN
+    field2_recv=field_ini
+    CALL oasis_get(var_id(2),itap_sec, field2_recv, ierror)
+    write(w_unit,*) 'tcx recvf2 ',itap_sec,minval(field2_recv),maxval(field2_recv)
+    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
+        WRITE (w_unit,*) 'oasis_get abort by model1 compid ',comp_id
+        CALL oasis_abort()
+    ENDIF
+    !
     CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
                        localgrid_lon,localgrid_lat,field1_send,ib)
     !
@@ -323,20 +328,9 @@ PROGRAM model1
       CALL oasis_abort()
     ENDIF
     !
-    ! Get FRECVOCN
-    field2_recv=field_ini
-    CALL oasis_get(var_id(2),itap_sec, field2_recv, ierror)
-    write(w_unit,*) 'tcx recvf2 ',itap_sec,minval(field2_recv),maxval(field2_recv)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
-        WRITE (w_unit,*) 'oasis_get abort by model1 compid ',comp_id
-        CALL oasis_abort()
-    ENDIF
-    !
-    field3(:,:) = field1_send(:,:) 
-    !
     ! Send FOCNWRIT
-    write(w_unit,*) 'tcx sendf3 ',itap_sec,minval(field3),maxval(field3)
-    CALL oasis_put(var_id(3),itap_sec, field3, ierror)
+    write(w_unit,*) 'tcx sendf3 ',itap_sec,minval(field1_send),maxval(field1_send)
+    CALL oasis_put(var_id(3),itap_sec, field1_send, ierror)
     IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN
       WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
       CALL oasis_abort()
