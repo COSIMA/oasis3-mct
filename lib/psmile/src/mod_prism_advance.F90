@@ -915,15 +915,15 @@ contains
 
        if (lconsbfb) then
           call mct_avect_gather(mapper%av_md,av2g,prism_part(mapper%dpart)%gsmap,0,mpi_comm_local)
-          wts_sums = 0.0_ip_r8_p
+          wts_sumd = 0.0_ip_r8_p
           if (mpi_rank_local == 0) then
              ni = mct_aVect_indexIA(av2g,'mask')
              nf = mct_aVect_indexRA(av2g,'area')
              do n = 1,mct_avect_lsize(av2g)
-                if (av2g%iAttr(ni,n) == 0) wts_sums = wts_sums + av2g%rAttr(nf,n)*zradi
+                if (av2g%iAttr(ni,n) == 0) wts_sumd = wts_sumd + av2g%rAttr(nf,n)*zradi
              enddo
           endif
-          call prism_mpi_bcast(wts_sums,mpi_comm_local,subname//" bcast wts_sums")
+          call prism_mpi_bcast(wts_sumd,mpi_comm_local,subname//" bcast wts_sumd")
           call mct_avect_clean(av2g)
        else
           sumtmp = 0.0_ip_r8_p
