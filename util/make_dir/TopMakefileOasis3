@@ -16,7 +16,6 @@ MAKEf = $(MAKE) -f TopMakefileOasis3
 #
 # Defining path for FORTRAN and C sources
 LIBSRC  = $(COUPLE)/lib
-MODSRC  = $(COUPLE)/src
 #
 # Log and error files for compiling
 LOG = $(COUPLE)/util/make_dir/COMP.log
