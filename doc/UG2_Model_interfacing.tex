@@ -828,11 +828,11 @@ components are not involved.
 
 Using the PSMILe library, the user has full flexibility to reproduce
 different coupling algorithms. In the component codes, the sending and
-receiving routines, respectively {\tt prism\_put\_proto} and {\tt
-  prism\_get\_proto}, can be called at each model timestep, with the
+receiving routines, respectively {\tt oasis\_put/prism\_put\_proto} and {\tt
+   oasis\_get/prism\_get\_proto}, can be called at each model timestep, with the
 appropriate {\tt date} argument giving the actual time (at the
 beginning of the timestep), expressed in ``number of seconds since the
-start of the run''. This {\tt date} argument is automatically analysed
+start of the run'' (see section \ref{prismput}). This {\tt date} argument is automatically analysed
 by the PSMILe
 %\footnote{With the PIPE, SIPC, GMEM and previously with
 %the CLIM communication techniques, no such analysis was performed. For
@@ -844,37 +844,10 @@ user for each coupling field in the configuration file {\it namcouple}, differen
 coupling algorithms can be reproduced without modifying anything in the
 component model codes themselves. 
 
-The lag (LAG) value tells the coupler to modify the time that data
-is sent (put) by the amount of the lag.  The lag can be positive or
-negative but should never be larger (in absolute magnitude) than the
-coupling period of any field due to problems with restart-ability and
-dead-locking.  A positive lag indicates the
-put will occur sooner than zero lag and a negative lag tells the coupler
-to send the data later than zero lag.  When the lag is positive, 
-a restart file must be available to initiate the coupling and in those cases, 
-the restart file is then updated at the end of the run.  A positive
-lag acts like a send occurred before the model started.  To mimic that
-mode, the restart data is sent at time=0, the two models then couple at the coupling
-period with the given lag on the send side, and then the final coupling
-data on the source side is written to the restart file for use in the
-next run.  
-
-The order of coupling operations in the system is determined solely
-by the order of calls to send (put) and receive (get) data in the models
-in conjunction with the setting of the lag in the namcouple.  Data that is
-received (get) is always blocking while data that is sent (put) is non-blocking
-with respect to the model making that call.  It is possible
-to deadlock the system if the relative order of puts and gets in different
-models is not compatable.  The SEQ index is no longer needed in the namcouple
+With OASIS3-MCT, the SEQ index is no longer needed in the namcouple
 input to specify the sequencing order of different coupling fields.
 The sequence (SEQ) index in the namcouple file now provides the coupling 
-layer with an ability to detect a deadlock before it happens and exit 
-gracefully.  It does this by tracking the order of get and put calls in
-models compared to the SEQ specified in the namcouple.  If there are any
-inconsistencies, the model will abort gracefully with a useable error
-message before the system deadlocks.  If there are any coupling dependencies
-in the system, use of the SEQ index is recommended for diagnosis, but again,
-it has no impact on the ultimate solution and is NOT required.
+layer with an ability to detect a deadlock before it happens and exit.
 
 The lag concept and indices are explained in more detail below and some
 examples are provided.
@@ -882,36 +855,23 @@ examples are provided.
 \subsection{The lag concept}
 \label{subsub_lag}
 
-If no lag index or if a lag index equal to 0 is given by the user in
-the {\it namcouple} for a particular coupling field, the sending or
-receiving actions will actually be performed, below the {\tt
-  prism\_put\_proto} called in the source model or below the {\tt
-  prism\_get\_proto} called in the target model respectively, each time the
-{\tt date} argument on both sides matches an integer number of
-coupling periods.
+The lag (LAG) value tells the coupler to modify the time at which that data
+is sent (put) by the amount of the lag.  The lag must be
+expressed in ``number of seconds'' and can be positive or
+negative but should never be larger (in absolute magnitude) than the
+coupling period of any field due to problems with restart-ability and
+dead-locking. When a component model calls a {\tt oasis\_put/prism\_put\_proto}, the value of the lag is automatically added to the value of the {\tt date} argument and the ``put'' is actually performed when the sum {\tt date+lag} is a coupling time; in the target component, this ``put'' will match a {\tt oasis\_get/prism\_get\_proto} for which the {\tt date} argument is the same coupling time.
+%A positive lag indicates the
+%put will occur sooner than zero lag and a negative lag tells the coupler
+%to send the data later than zero lag.
+The lag only shifts the time data is sent.  It cannot be used to shift the time data is received yet.
  
-To match a {\tt prism\_put\_proto} called by the source model at a
-particular {\tt date} with a {\tt prism\_get\_proto} called by the target
-model at a different {\tt date}, the user has to define in the {\it
-namcouple} an appropriate lag index, LAG, for the coupling field(see
-section \ref{sec_namcouple}). The value of the LAG index must be
-expressed in ``number of seconds''; its value is automatically added
-to the {\tt prism\_put\_proto} {\tt date} value and the sending action is
-effectively performed when the sum of the {\tt date} and the lag matches an
-integer number of coupling periods. The lag can be positive or negative,
-but it must never be greater than the coupler period or less than or
-equal to the (-) coupling period.  This sending action is
-automatically matched, on the target side, with the receiving action
-performed when the {\tt prism\_get\_proto date} argument equals the
-same integer number of coupling periods.  The lag only shifts the
-time data is sent.  It cannot be used to shift the time data is
-received yet.
+When the lag is positive, a restart file must be available to initiate the coupling and in those cases, the restart file is then updated at the end of the run.  A positive lag acts like a send occurred before the model started. In fact, for a field with positive lag, the source component model automatically reads the field in the restart file during the coupling initialization phase (below the {\tt oasis\_enddef/prism\_enddef\_proto}) and send the data to match the {\tt oasis\_get/prism\_get\_proto} performed at time=0 in the target component model. The final coupling
+data on the source side will then be automatically written to the restart file for use in the next run.  
 
-Note that when there is a lag, the first instance of the source field
-is missing in the debug file (EXPOUT or IGNOUT fields, see section
-\ref{subsec_namcouplesecond}) because the first source field is not
-sent by the source model with a {\tt prism\_put\_proto} but directly
-read by OASIS3 from a coupling restart file.
+When there is a lag, the first and last instance of the source field
+in the debug netCDF file (EXPOUT fields, see section
+\ref{subsec_namcouplesecond}) always correspond respectively to the field read from and written to the restart file.
  
   \begin{enumerate}
 
@@ -920,17 +880,16 @@ read by OASIS3 from a coupling restart file.
   A first coupling algorithm, exploiting the LAG concept, is
   illustrated on figure \ref{fig:lag_concept_1}. 
 
-
   On the 4 figures in this section, short black arrows correspond to {\tt
-  prism\_put\_proto} or \break {\tt prism\_get\_proto} called in the component model
-  that do not lead to any sending or receiving action;
-  long black arrows correspond to {\tt prism\_put\_proto} or {\tt
-  prism\_get\_proto} called in the component models that do
-  effectively lead to a sending or receiving action;
-  long red arrows correspond to {\tt prism\_put\_proto} or {\tt
-  prism\_get\_proto} called in the component models that lead to a
+  oasis\_put/prism\_put\_proto} or {\tt oasis\_get/prism\_get\_proto} called in the component model
+  that do not lead to any ``put" or receiving action;
+  long black arrows correspond to {\tt oasis\_put/prism\_put\_proto} or \break {\tt
+  oasis\_get/prism\_get\_proto} called in the component models that do
+  actually lead to a ``put" or ``get'' action;
+  long red arrows correspond to {\tt oasis\_put/prism\_put\_proto} or \break {\tt
+  oasis\_get/prism\_get\_proto} called in the component models that lead to a
   reading or writing of the coupling field from or to a coupling
-  restart file (either directly or through OASIS3 main process).
+  restart file.
 
 \begin{figure}
 \includegraphics[scale=.6]{figures/fig_lag_concept_1}
@@ -941,35 +900,35 @@ read by OASIS3 from a coupling restart file.
   During a coupling timestep, model A receives $F_2$ and then sends $F_1$; its
   timestep length is 4. During a coupling timestep, model B receives $F_1$
   and then sends $F_2$; its timestep length is 6.  $F_1$ and $F_2$
-  coupling periods are respectively 12 and 24. If $F_1$/$F_2$ sending
+  coupling periods are respectively 12 and 24. If $F_1$/$F_2$ ``put"
   action by model A/B was used at a coupling timestep to match the
-  model B/A receiving action, a deadlock would occur as both models
-  would be initially waiting on a receiving action. To prevent this,
+  model B/A ``get" action, a deadlock would occur as both models
+  would be initially waiting on a ``get" action. To prevent this,
   $F_1$ and $F_2$ produced at the timestep before have to be used to
-  match respectively the model B and model A receiving actions.
+  match respectively the model B and model A ``get" actions.
 
   This implies that a lag of respectively 4 and 6 seconds must be
-  defined for $F_1$ and $F_2$. For $F_1$, the {\tt prism\_put\_proto}
-  performed at time 8 and 20 by model A will then lead to sending actions
+  defined for $F_1$ and $F_2$. For $F_1$, the {\tt oasis\_put/prism\_put\_proto}
+  performed at time 8 and 20 by model A will then lead to ``put" actions
   (as 8 + 4 = 12 and 20 + 4 = 24 which are coupling periods) that
-  match the receiving actions performed at times 12 and 24 below the {\tt
-  prism\_get\_proto} called by model B.  For $F_2$, the {\tt
-  prism\_put\_proto} performed at time 18 by model B then leads to
-  a sending action (as 18 + 6 = 24 which is a coupling
-  period) that matches the receiving action performed at time 24
-  below the {\tt prism\_get\_proto} called by model A.
+  match the ``get" actions performed at times 12 and 24 below the {\tt
+  oasis\_get/prism\_get\_proto} called by model B.  For $F_2$, the {\tt
+  oasis\_put/prism\_put\_proto} performed at time 18 by model B then leads to
+  a ``put" action (as 18 + 6 = 24 which is a coupling
+  period) that matches the ``get" action performed at time 24
+  below the {\tt oasis\_get/prism\_get\_proto} called by model A.
 
   At the beginning of the run, as their LAG index is greater than 0,
-  the first {\tt prism\_get\_proto} of $F_1$ and $F_2$ will automatically 
-  be fulfilled by OASIS3 with fields read from their respective coupling restart files. The user
+  the first {\tt oasis\_get/prism\_get\_proto} of $F_1$ and $F_2$ will automatically 
+  be fulfilled with fields read from their respective coupling restart files. The user
   therefore has to create those coupling restart files before the first
   run in the experiment. At the end of the run, $F_1$
   having a lag greater than 0, is automatically written to its
-  coupling restart file below the last $F_1$ {\tt prism\_put\_proto} as the
-  {\tt date} + $F_1$ lag equals a coupling time. The analogue is true
+  coupling restart file below the last $F_1$ {\tt oasis\_put/prism\_put\_proto} as the
+  {\tt date+lag} equals the total run time. The analogue is true
   for $F_2$. These
   values will automatically be read in at the beginning of the next
-  run below the respective {\tt prism\_get\_proto}.
+  run below the respective {\tt oasis\_get/prism\_get\_proto}.
 
   \item LAG concept second example
 
@@ -988,34 +947,33 @@ read by OASIS3 from a coupling restart file.
 \end{figure}
 
   For $F_1$ and $F_2$ the situation is similar to the first
-  example. If $F_1$/$F_2$ sending action by model A/B was used at a
-  coupling timestep to match the model B/A receiving action, a
-  deadlock would occur as both models would be waiting on a receiving
+  example. If $F_1$/$F_2$ ``put" action by model A/B was used at a
+  coupling timestep to match the model B/A ``get" action, a
+  deadlock would occur as both models would be waiting on a ``get"
   action. To prevent this, $F_1$ and $F_2$ produced at the timestep
-  before have to be used to match the model A and model B receiving
+  before have to be used to match the model A and model B ``get"
   actions, which means that a lag of 6 must be defined for both $F_1$
-  and $F_2$. For both coupling fields, the {\tt prism\_put\_proto}
-  performed at times 6 and 18 by the source model then lead to sending
+  and $F_2$. For both coupling fields, the {\tt oasis\_put/prism\_put\_proto}
+  performed at times 6 and 18 by the source model then lead to ``put"
   actions (as 6 + 6 = 12 and 18 + 6 = 24 which are coupling periods)
-  that match the receiving action performed at time 12 and 24 below
-  the {\tt prism\_get\_proto} called by the target model.
+  that match the ``get" action performed at time 12 and 24 below
+  the {\tt oasis\_get/prism\_get\_proto} called by the target model.
 
   For $F_3$, sent by model A and received by model B, no lag
   needs to be defined: the coupling field produced by model A at the
   coupling timestep can be ``consumed'' by model B without causing a
   deadlock situation.
 
-  As in the first example, the {\tt prism\_get\_proto} performed at
-  the beginning of the run for $F_1$ and $F_2$, automatically read
-  them from their coupling restart files, and the last {\tt
-  prism\_put\_proto} performed at the end of the run automatically
+  As in the first example, the {\tt oasis\_get/prism\_get\_proto} performed at
+  the beginning of the run for $F_1$ and $F_2$, will automatically receive data read from their coupling restart files, and the last {\tt
+  oasis\_put/prism\_put\_proto} performed at the end of the run automatically
   write them to their coupling restart file. For $F_3$, no coupling
   restart file is needed nor used as at each coupling period the
   coupling field produced by model A can be directly ``consumed'' by
   model B.
 
   We see here how the introduction of appropriate LAG indices results in
-  receiving in the target model,
+  ``get" in the target model,
   coupling fields produced by the
   source model the timestep before; this is, in some coupling
   configurations, essential to avoid deadlock situations.
@@ -1024,14 +982,25 @@ read by OASIS3 from a coupling restart file.
 
 \subsection{The sequence concept}
 
-The sequence input, SEQ, in the namcouple provides information to
-the coupling layer about the expected sequence of events.  It is
-optional and has no impact on the solution.  It is used to detect
-potential deadlocks before they happen so the coupling layer can
-abort gracefully.
+The order of coupling operations in the system is determined solely
+by the order of calls to send (put) and receive (get) data in the models
+in conjunction with the setting of the lag in the namcouple.  Data that is
+received (get) is always blocking while data that is sent (put) is non-blocking
+with respect to the model making that call.  It is possible
+to deadlock the system if the relative orders of puts and gets in different
+models are not compatible. 
+
+With OASIS3-MCT, the sequence (SEQ) index in the namcouple file now provides the coupling 
+layer with an ability to detect a deadlock before it happens and exit. 
+It does this by tracking the order of get and put calls in
+models compared to the SEQ specified in the namcouple.  If there are any
+inconsistencies, the model will abort gracefully with a useable error
+message before the system deadlocks.  If there are any coupling dependencies
+in the system, use of the SEQ index is recommended for diagnosis but
+has no impact on the ultimate solution and is NOT required.
 
 Take the following two examples.  In both examples, there are two
-models, each sending a field to the other at every coupling period
+models, each ``put" a field to the other at every coupling period
 without any lags.  In the first case, there is no dependency and 
 each model sends (puts) the data first and then receives the data
 second at each timestep.
@@ -1068,7 +1037,7 @@ runtime, if the sequencing of both model1 and model2 do not match
 the above diagram, the model will abort gracefully.  For instance,
 if model2 has the dependency shown above but model1 does not have
 consistent ordering of the put and get as required by model2,
-then if SEQ is unused, the model will deadlock and hang.  if SEQ
+then if SEQ is unused, the model will deadlock and hang.  If SEQ
 is set properly, the coupling layer will detect that the required
 sequence has not been followed and will exit gracefully with an
 error message.  
@@ -1209,3 +1178,6 @@ not required.
 %section{PRISM System Model Interface for the CLIM/MPI2-MPI1
 %communication technique (PSMILe V.0)}
 %section{Model\_interfacing} 
+
+
+
