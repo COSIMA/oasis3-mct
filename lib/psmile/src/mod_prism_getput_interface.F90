@@ -266,7 +266,7 @@ contains
 
     call prism_advance_run(PRISM_In,nfld,kstep,array,kinfo)
 
-    if (kinfo == PRISM_recvd) then
+    if (kinfo /= PRISM_OK) then
        n = 0
        do ni = 1,ns
           n = n + 1
@@ -313,7 +313,7 @@ contains
 
     call prism_advance_run(PRISM_In,nfld,kstep,array,kinfo)
 
-    if (kinfo == PRISM_recvd) then
+    if (kinfo /= PRISM_OK) then
        n = 0
        do ni = 1,ns
           n = n + 1
@@ -362,7 +362,7 @@ contains
 
     call prism_advance_run(PRISM_In,nfld,kstep,array,kinfo)
 
-    if (kinfo == PRISM_recvd) then
+    if (kinfo /= PRISM_OK) then
        n = 0
        do nj = 1,njs
        do ni = 1,nis
@@ -413,7 +413,7 @@ contains
 
     call prism_advance_run(PRISM_In,nfld,kstep,array,kinfo)
 
-    if (kinfo == PRISM_recvd) then
+    if (kinfo /= PRISM_OK) then
        n = 0
        do nj = 1,njs
        do ni = 1,nis

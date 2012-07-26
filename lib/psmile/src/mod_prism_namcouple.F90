@@ -38,6 +38,7 @@ MODULE mod_prism_namcouple
   INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldlag(:)  ! coupling lag (secs)
   INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldtrn(:)  ! fields transform, ip_instant,...
   integer(kind=ip_i4_p)   ,public,pointer :: namfldcon(:)  ! conserv fld operation
+  character(len=ic_med)   ,public,pointer :: namfldcoo(:)  ! conserv fld option (bfb, opt)
   character(len=ic_long)  ,public,pointer :: nammapfil(:)  ! mapping file name
   character(len=ic_med)   ,public,pointer :: nammaploc(:)  ! mapping location (src or dst pes)
   character(len=ic_med)   ,public,pointer :: nammapopt(:)  ! mapping option (bfb, sum, or opt)
@@ -254,6 +255,7 @@ MODULE mod_prism_namcouple
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cfilfic
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cfilmet 
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cconmet
+  CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cconopt
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cfldcoa
   CHARACTER(len=8), DIMENSION(:),ALLOCATABLE :: cfldfin
   CHARACTER(len=8), DIMENSION(:,:),ALLOCATABLE :: ccofld
@@ -392,6 +394,9 @@ CONTAINS
   allocate(namfldcon(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namfldcon" allocation of experiment module',il_err,1)
 
+  allocate(namfldcoo(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namfldcoo" allocation of experiment module',il_err,1)
+
   allocate(namflddti(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namflddti" allocation of experiment module',il_err,1)
 
@@ -471,6 +476,7 @@ CONTAINS
   namfldops(:) = -1
   namfldtrn(:) = ip_instant
   namfldcon(:) = ip_cnone
+  namfldcoo(:) = "bfb"
   namflddti(:) = -1
   namfldlag(:) = 0
   nammapfil(:) = "idmap"
@@ -584,6 +590,7 @@ CONTAINS
 
            elseif (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') then
               namfldcon(jf) = ip_cnone
+              namfldcoo(jf) = trim(cconopt(ig_number_field(jf)))
               if (cconmet(ig_number_field(jf)) .EQ. 'GLOBAL') namfldcon(jf) = ip_cglobal
               if (cconmet(ig_number_field(jf)) .EQ. 'GLBPOS') namfldcon(jf) = ip_cglbpos
               if (cconmet(ig_number_field(jf)) .EQ. 'BASBAL') namfldcon(jf) = ip_cbasbal
@@ -658,6 +665,7 @@ CONTAINS
         WRITE(nulprt1,*) subname,n,'namfldops ',namfldops(n)
         WRITE(nulprt1,*) subname,n,'namfldtrn ',namfldtrn(n)
         WRITE(nulprt1,*) subname,n,'namfldcon ',namfldcon(n)
+        WRITE(nulprt1,*) subname,n,'namfldcoo ',TRIM(namfldcoo(n))
         WRITE(nulprt1,*) subname,n,'namflddti ',namflddti(n)
         WRITE(nulprt1,*) subname,n,'namfldlag ',namfldlag(n)
         WRITE(nulprt1,*) subname,n,'nammapfil ',TRIM(nammapfil(n))
@@ -1141,6 +1149,8 @@ CONTAINS
 !* First line
 
         READ (UNIT = nulin,FMT = 2002, END=241) clline
+        CALL parse(clline, clvari, 1, jpeighty, ilen)
+        IF (trim(clvari) .eq. "$END") goto 241
 !* Get output field symbolic name
         CALL parse(clline, clvari, 2, jpeighty, ilen)
         cg_output_field(jf) = clvari
@@ -3418,6 +3428,22 @@ CONTAINS
 !     * Get conservation method
                  cconmet(ig_number_field(jf)) = clvari
                  lsurf(ig_number_field(jf)) = .TRUE.
+                 CALL parse(clline, clvari, 2, jpeighty, ilen)
+                 cconopt(ig_number_field(jf)) = 'bfb'
+                 if (ilen > 0) then
+                    if (trim(clvari) == 'bfb' .or. trim(clvari) == 'opt') then
+                       cconopt(ig_number_field(jf)) = clvari
+                    else
+                       call prtout ('ERROR in namcouple conserv argument',jf,1)
+                       IF (mpi_rank_global == 0) THEN
+                           WRITE(nulprt1,*) 'ERROR in namcouple conserv argument ',TRIM(clvari)
+                           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+                           WRITE (nulprt1,'(a)') ' error = STOP in inipar cconopt'
+                           CALL prism_sys_flush(nulprt1)
+                       ENDIF
+                       call prism_sys_abort()
+                    endif
+                 endif
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'REDGLO') THEN
 !     * Get extrapolation flag to go from reduced to global gaussian grid
                  CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -3807,7 +3833,8 @@ CONTAINS
                   nfcoast, cfldcor, nlucor
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CONSERV') THEN            
               WRITE(UNIT = nulprt1,FMT = 3025)  &
-                    cconmet(ig_number_field(jf))
+                    cconmet(ig_number_field(jf)),  &
+                    cconopt(ig_number_field(jf))
             ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'REDGLO') THEN
               WRITE(UNIT = nulprt1,FMT = 3026)  &
                     ntronca(ig_number_field(jf)),  &
@@ -3991,7 +4018,8 @@ CONTAINS
  3024 FORMAT(5X,' Flag for coasts mismatch is       = ',I2,  &
            /,5X,' Name for flux correction field is = ',A8, &
            /,5X,' It is written on logical unit     = ',I2)
- 3025 FORMAT(5X,' Conservation method for field is  = ',A8)
+ 3025 FORMAT(5X,' Conservation method for field is  = ',A8, &
+           /,5X,' Conservation option is            = ',A8)
  3026 FORMAT(5X,' Half number of latitudes for gaussian grid is = ',I3, &
            /,5X,' Extrapolation flag is             = ',A8)
  3027 FORMAT(5X,' Field ',A,' is multiplied by Cst = ',E15.6)
@@ -4425,6 +4453,9 @@ CONTAINS
   ALLOCATE (cconmet(ig_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cconmet"allocation of analysis module',il_err,1)
   cconmet(:)=' '
+  ALLOCATE (cconopt(ig_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout ('Error in "cconopt"allocation of analysis module',il_err,1)
+  cconopt(:)=' '
   ALLOCATE (cfldcoa(ig_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cfldcoa"allocation of analysis module',il_err,1)
   cfldcoa(:)=' '
@@ -4688,6 +4719,8 @@ CONTAINS
   IF (il_err.NE.0) CALL prtout ('Error in "cfilmet"deallocation of analysis module',il_err,1)
   DEALLOCATE (cconmet, stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cconmet"deallocation of analysis module',il_err,1)
+  DEALLOCATE (cconopt, stat=il_err)
+  IF (il_err.NE.0) CALL prtout ('Error in "cconopt"deallocation of analysis module',il_err,1)
   DEALLOCATE (cfldcoa, stat=il_err)
   IF (il_err.NE.0) CALL prtout ('Error in "cfldcoa"deallocation of analysis module',il_err,1)
   DEALLOCATE (cfldfin, stat=il_err)
@@ -5112,7 +5145,7 @@ CONTAINS
 !        ----------------------------
 !
 100 IF (cdone(1:1) .NE. clcmt) GO TO 120
-  READ (UNIT = nulin, FMT = 1001) clline 
+  READ (UNIT = nulin, FMT = 1001, END=241) clline 
   cdone(1:klen) = clline(1:klen)
   GO TO 100
 120 CONTINUE 
@@ -5169,6 +5202,25 @@ CONTAINS
 !        --------------
 !
 !  call prism_sys_debug_exit(subname)
+
+  return
+
+ 241  CONTINUE
+      IF (mpi_rank_global == 0) THEN
+          WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' NFIELDS larger or smaller than the number of inputs in namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (UNIT = nulprt1,FMT = *)  &
+             ' We STOP!!! Check the file namcouple'
+          WRITE (UNIT = nulprt1,FMT = *) ' '
+          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+          WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+          CALL prism_sys_flush(nulprt1)
+      ENDIF
+      CALL prism_sys_abort()
+
 
   END SUBROUTINE parse
 

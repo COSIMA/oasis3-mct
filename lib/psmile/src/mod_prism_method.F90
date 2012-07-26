@@ -20,7 +20,8 @@ MODULE mod_prism_method
    public prism_method_init
    public prism_method_terminate
    public prism_method_getlocalcomm
-   public prism_method_setlocalcomm
+   public prism_method_setcouplcomm
+   public prism_method_createcouplcomm
    public prism_method_getdebug
    public prism_method_setdebug
    public prism_method_get_intercomm
@@ -101,9 +102,17 @@ CONTAINS
 
    !------------------------
    !--- Initialize namcouple
+   !--- first on rank 0 to write error messages
+   !--- then on all other ranks
    !------------------------
 
-   call prism_namcouple_init()
+   IF (mpi_rank_global == 0) THEN
+      call prism_namcouple_init()
+   endif
+   call prism_mpi_barrier(mpi_comm_global)
+   IF (mpi_rank_global /= 0) THEN
+      call prism_namcouple_init()
+   endif
    prism_debug = namlogprt
 
    !------------------------
@@ -289,14 +298,14 @@ CONTAINS
 
    END SUBROUTINE prism_method_getlocalcomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_setlocalcomm(localcomm,kinfo)
+   SUBROUTINE prism_method_setcouplcomm(localcomm,kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_setlocalcomm'
+   character(len=*),parameter :: subname = 'prism_method_setcouplcomm'
 !  ---------------------------------------------------------
 
    call prism_sys_debug_enter(subname)
@@ -324,7 +333,45 @@ CONTAINS
 
    call prism_sys_debug_exit(subname)
 
-   END SUBROUTINE prism_method_setlocalcomm
+   END SUBROUTINE prism_method_setcouplcomm
+!----------------------------------------------------------------------
+   SUBROUTINE prism_method_createcouplcomm(icpl,allcomm,cplcomm,kinfo)
+
+   IMPLICIT NONE
+
+   INTEGER (kind=ip_intwp_p),intent(in)   :: icpl
+   INTEGER (kind=ip_intwp_p),intent(in)   :: allcomm
+   INTEGER (kind=ip_intwp_p),intent(out)  :: cplcomm
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+!  ---------------------------------------------------------
+   integer(kind=ip_intwp_p) :: mpi_err
+   character(len=*),parameter :: subname = 'prism_method_createcouplcomm'
+!  ---------------------------------------------------------
+
+   call prism_sys_debug_enter(subname)
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
+
+   !------------------------
+   !--- generate cplcomm from allcomm and icpl
+   !------------------------
+
+   CALL MPI_COMM_Split(allcomm,icpl,1,cplcomm,mpi_err)
+   IF (mpi_err /= 0) THEN
+      WRITE (nulprt,*) subname,' ERROR: MPI_Comm_Split abort ',mpi_err
+      call prism_sys_abort()
+   ENDIF
+
+   !------------------------
+   !--- update mpi_comm_local from component
+   !------------------------
+
+   call prism_method_setcouplcomm(cplcomm)
+
+   call prism_sys_debug_exit(subname)
+
+   END SUBROUTINE prism_method_createcouplcomm
 !----------------------------------------------------------------------
    SUBROUTINE prism_method_getdebug(debug,kinfo)
 
@@ -450,14 +497,13 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
+   integer (kind=ip_intwp_p) :: lkinfo
    integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'prism_method_enddef'
 !  ---------------------------------------------------------
 
    call prism_sys_debug_enter(subname)
-   if (present(kinfo)) then
-      kinfo = PRISM_OK
-   endif
+   lkinfo = PRISM_OK
 
    !------------------------
    !--- write grid info to files one model at a time
@@ -506,9 +552,15 @@ CONTAINS
    write(nulprt,*) subname, ' done prism_coupler_setup '
    call prism_sys_flush(nulprt)
 
-   call prism_advance_init()
+   call prism_advance_init(lkinfo)
    write(nulprt,*) subname, ' done prism_advance_init '
    call prism_sys_flush(nulprt)
+
+   !--- Force PRISM_OK here rather than anything else ---
+
+   if (present(kinfo)) then
+      kinfo = PRISM_OK
+   endif
 
    call prism_sys_debug_exit(subname)
 

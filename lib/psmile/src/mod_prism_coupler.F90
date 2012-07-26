@@ -72,6 +72,7 @@ MODULE mod_prism_coupler
      integer(kind=ip_i4_p) :: maxtime  ! max time for the coupler
      integer(kind=ip_i4_p) :: trans    ! transformation (ip_average,...)
      integer(kind=ip_i4_p) :: conserv  ! conserve operation (ip_cnone,ip_cglobal,...)
+     character(len=ic_med) :: consopt  ! conserve option (bfb, opt)
      integer(kind=ip_i4_p) :: getput   ! get/put flag
      logical               :: sndrcv   ! send recv flag
      logical               :: output   ! output flag
@@ -563,6 +564,7 @@ CONTAINS
                  prism_coupler(nc)%namID  = nn
                  prism_coupler(nc)%trans  = namfldtrn(nn)
                  prism_coupler(nc)%conserv= namfldcon(nn)
+                 prism_coupler(nc)%consopt= namfldcoo(nn)
                  prism_coupler(nc)%ops    = namfldops(nn)
                  prism_coupler(nc)%tag    = compid*100*1000 + compid*1000 + nn
                  prism_coupler(nc)%getput = PRISM_NotDef
@@ -609,7 +611,7 @@ CONTAINS
                     ! prism_coupler router
                     ! cannot reuse router because don't really know what's on the other side
                     !--------------------------------
-                    prism_nrouter = prism_nrouter + 1
+                    if (prism_coupler(nc)%nflds == 1) prism_nrouter = prism_nrouter + 1
                     if (prism_nrouter > prism_mrouter) then
                        write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,prism_mrouter
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -1059,6 +1061,7 @@ CONTAINS
      spart = prism_mapper(mapid)%spart
      dpart = prism_mapper(mapid)%dpart
      write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
+     write(nulprt,*) subname,'   conserve opt ',prism_coupler(cplid)%consopt
      write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
      write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',trim(prism_mapper(mapid)%optval)
      write(nulprt,*) subname,'   s/d partids  ',spart,dpart

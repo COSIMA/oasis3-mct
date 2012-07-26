@@ -68,7 +68,7 @@ mod_prism_var.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
 mod_prism_part.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o mod_prism_timer.o
 mod_prism_ioshr.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
-        mod_prism_mpi.o
+        mod_prism_mpi.o mod_prism_string.o
 mod_prism_io.o:  mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \
         mod_prism_parameters.o mod_prism_ioshr.o mod_prism_mpi.o
 mod_prism_grid.o: mod_prism_kinds.o mod_prism_data.o mod_prism_sys.o \

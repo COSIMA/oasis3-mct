@@ -21,7 +21,7 @@ MODULE mod_prism_advance
 contains
 
 !---------------------------------------------------------------------
-  SUBROUTINE prism_advance_init()
+  SUBROUTINE prism_advance_init(kinfo)
 
 !   ----------------------------------------------------------------
 !   This routine handles initial restart and communication
@@ -29,10 +29,13 @@ contains
 !   ----------------------------------------------------------------
 
     IMPLICIT none
+!   ----------------------------------------------------------------
+    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
+!   ----------------------------------------------------------------
     integer(kind=ip_i4_p) :: cplid,partid,varid
     integer(kind=ip_i4_p) :: nf,lsize,nflds
     integer(kind=ip_i4_p) :: dt,ltime,lag,getput
-    integer(kind=ip_i4_p) :: msec,kinfo
+    integer(kind=ip_i4_p) :: msec
     type(mct_avect)       :: avtmp  ! data read from restart
     real   (kind=ip_r8_p), allocatable :: array(:) ! data
     integer(kind=ip_i4_p) :: mseclag   ! model time + lag
@@ -41,6 +44,8 @@ contains
     character(len=*),parameter :: subname = 'prism_advance_init'
 
     call prism_sys_debug_enter(subname)
+
+    kinfo = PRISM_OK
 
     call prism_timer_start ('advance_init')
 
@@ -144,13 +149,14 @@ contains
     INTEGER(kind=ip_i4_p), intent(in)    :: varid    ! prism_var id
     INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
     REAL   (kind=ip_r8_p), intent(inout) :: array(:) ! data
-    INTEGER(kind=ip_i4_p), intent(out)   :: kinfo    ! status
+    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
     logical              , intent(in),optional :: readrest  ! special flag to indicate this is called from the advance_init method for restart
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     integer(kind=ip_i4_p) :: cplid,rouid,mapid,partid
     integer(kind=ip_i4_p) :: nfav,nsav,nsa,n,nc,nf
     integer(kind=ip_i4_p) :: tag,dt,ltime,lag,getput,maxtime,conserv
+    logical               :: consbfb
     logical               :: sndrcv,output,input,unpack
     logical               :: snddiag,rcvdiag
     real(kind=ip_double_p):: sndmult,sndadd,rcvmult,rcvadd
@@ -183,6 +189,7 @@ contains
     if (present(readrest)) then
        lreadrest = readrest
     endif
+    if (lreadrest) kinfo = PRISM_fromrest
 
     !------------------------------------------------
     ! validate mop
@@ -217,6 +224,8 @@ contains
        input   = prism_coupler(cplid)%input
        partid  = prism_coupler(cplid)%partID
        conserv = prism_coupler(cplid)%conserv
+       consbfb = .true.
+       if (trim(prism_coupler(cplid)%consopt) == "opt") consbfb = .false.
        snddiag = prism_coupler(cplid)%snddiag
        rcvdiag = prism_coupler(cplid)%rcvdiag
        sndadd  = prism_coupler(cplid)%sndadd
@@ -390,6 +399,7 @@ contains
 
           elseif (prism_coupler(cplid)%trans == ip_average) then
              cstring = 'average'
+             if (kinfo == PRISM_OK) kinfo = PRISM_LocTrans
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
@@ -398,6 +408,7 @@ contains
 
           elseif (prism_coupler(cplid)%trans == ip_accumul) then
              cstring = 'accumul'
+             if (kinfo == PRISM_OK) kinfo = PRISM_LocTrans
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
@@ -406,6 +417,7 @@ contains
 
           elseif (prism_coupler(cplid)%trans == ip_max) then
              cstring = 'max'
+             if (kinfo == PRISM_OK) kinfo = PRISM_LocTrans
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
@@ -418,6 +430,7 @@ contains
 
           elseif (prism_coupler(cplid)%trans == ip_min) then
              cstring = 'min'
+             if (kinfo == PRISM_OK) kinfo = PRISM_LocTrans
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
@@ -445,7 +458,6 @@ contains
 
           if (time_now) then
              prism_coupler(cplid)%status(nfav) = PRISM_COMM_READY
-             kinfo = PRISM_sent
           endif
        endif
 
@@ -524,6 +536,7 @@ contains
              sndrcv = .false.   ! turn off communication
              unpack = .false.   ! nothing to unpack
              if (getput == PRISM_PUT .and. lag > 0 .and. mseclag == maxtime) then
+                kinfo = PRISM_ToRest
                 call prism_sys_debug_note(subname//' lag restart write')
                 write(tstring,F01) 'wrst_',cplid
                 call prism_timer_start(tstring)
@@ -544,6 +557,7 @@ contains
 
           if (sndrcv) then
           if (getput == PRISM_PUT) then
+             kinfo = PRISM_sent
              call prism_sys_debug_note(subname//' put section')
              if (PRISM_Debug >= 2) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' SEND: ', &
@@ -568,7 +582,7 @@ contains
                 call prism_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect2)
                 call prism_advance_map(prism_coupler(cplid)%avect1, &
-                     prism_coupler(cplid)%avect2,prism_mapper(mapid),conserv)
+                     prism_coupler(cplid)%avect2,prism_mapper(mapid),conserv,consbfb)
                 call prism_timer_stop(tstring)
                 write(tstring,F01) 'psnd_',cplid
                 call prism_sys_debug_note(subname//' put send')
@@ -612,7 +626,7 @@ contains
                 call prism_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect1)
                 call prism_advance_map(prism_coupler(cplid)%avect2, &
-                     prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv)
+                     prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv,consbfb)
                 call prism_timer_stop(tstring)
                 if (PRISM_DEBUG >= 20) then
                    write(nulprt,*) subname,'  DEBUG get af map = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
@@ -640,6 +654,13 @@ contains
           endif  ! sndrcv
 
           if (output) then
+             if (kinfo == PRISM_sent) then
+                kinfo = PRISM_sentout
+             elseif (kinfo == PRISM_torest) then
+                kinfo = PRISM_torestout
+             else
+                kinfo = PRISM_output
+             endif
              call prism_sys_debug_note(subname//' output')
              write(tstring,F01) 'wout_',cplid
              call prism_timer_start(tstring)
@@ -738,7 +759,15 @@ contains
 
        if (getput == PRISM_GET) then
          if (time_now .and. unpack) then
+             if (kinfo == PRISM_output) then
+                kinfo = PRISM_recvout
+             elseif (kinfo == PRISM_fromrest) then
+                kinfo = PRISM_fromrestout
+             else
+                kinfo = PRISM_recvd
+             endif
              if (input) then
+                kinfo = PRISM_input
                 call prism_sys_debug_note(subname//' input')
                 if (PRISM_Debug >= 2) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' READ: ', &
@@ -768,10 +797,8 @@ contains
              if (PRISM_DEBUG >= 20) then
                 write(nulprt,*) subname,'  DEBUG array copy = ',cplid,minval(array),maxval(array)
              endif
-             kinfo = PRISM_recvd
           else
              array(:) = 0.
-             kinfo = PRISM_OK
           endif
           if (time_now) prism_coupler(cplid)%status(nfav) = PRISM_COMM_READY
        endif
@@ -783,6 +810,10 @@ contains
        lcouplerid = cplid
        lcouplertime = msec
 
+       if (PRISM_Debug >= 2) then
+          write(nulprt,*) subname,' at ',msec,mseclag,' KINF: ',trim(vname),kinfo
+       endif
+
     enddo  ! nc = 1,var%ncpl
 
     call prism_sys_debug_exit(subname)
@@ -792,7 +823,7 @@ contains
 
 !-------------------------------------------------------------------
 
-  SUBROUTINE prism_advance_map(avs,avd,mapper,conserv)
+  SUBROUTINE prism_advance_map(avs,avd,mapper,conserv,consbfb)
 
     ! NOTE: mask = 0 is active point according to oasis3 conserv.f
 
@@ -801,16 +832,24 @@ contains
     type(mct_aVect)        ,intent(inout) :: avd    ! dst av
     type(prism_mapper_type),intent(inout) :: mapper ! prism_mapper
     integer(kind=ip_i4_p)  ,intent(in),optional :: conserv  ! conserv flag
+    logical                ,intent(in),optional :: consbfb  ! conserv bfb option
 
-    integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,n,m
+    integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m
     real(kind=ip_r8_p)     :: sumtmp, wts_sums, wts_sumd, zradi, zlagr
     integer(kind=ip_i4_p),allocatable :: imasks(:),imaskd(:)
     real(kind=ip_r8_p),allocatable :: areas(:),aread(:)
     real(kind=ip_r8_p),allocatable  :: av_sums(:),av_sumd(:)  ! local sums
     character(len=ic_med) :: tstring   ! timer label string
+    type(mct_aVect)       :: av2g      ! for bfb sums
+    logical               :: lconsbfb
     character(len=*),parameter :: subname = 'prism_advance_map'
 
     call prism_sys_debug_enter(subname)
+
+    lconsbfb = .true.
+    if (present(consbfb)) then
+       lconsbfb = consbfb
+    endif
 
     if (mct_avect_nRattr(avs) /= mct_avect_nRattr(avd)) then
         WRITE(nulprt,*) subname,' ERROR in av num of flds'
@@ -843,11 +882,26 @@ contains
        imasks(:) = mapper%av_ms%iAttr(nf,:)
        nf = mct_aVect_indexRA(mapper%av_ms,'area')
        areas(:) = mapper%av_ms%rAttr(nf,:)*zradi
-       sumtmp = 0.0_ip_r8_p
-       do n = 1,lsizes
-          if (imasks(n) == 0) sumtmp = sumtmp + areas(n)
-       enddo
-       call prism_mpi_sum(sumtmp,wts_sums,mpi_comm_local,string=subname//':wts_sums',all=.true.)
+
+       if (lconsbfb) then
+          call mct_avect_gather(mapper%av_ms,av2g,prism_part(mapper%spart)%gsmap,0,mpi_comm_local)
+          wts_sums = 0.0_ip_r8_p
+          if (mpi_rank_local == 0) then
+             ni = mct_aVect_indexIA(av2g,'mask')
+             nf = mct_aVect_indexRA(av2g,'area')
+             do n = 1,mct_avect_lsize(av2g)
+                if (av2g%iAttr(ni,n) == 0) wts_sums = wts_sums + av2g%rAttr(nf,n)*zradi
+             enddo
+          endif
+          call prism_mpi_bcast(wts_sums,mpi_comm_local,subname//" bcast wts_sums")
+          call mct_avect_clean(av2g)
+       else
+          sumtmp = 0.0_ip_r8_p
+          do n = 1,lsizes
+             if (imasks(n) == 0) sumtmp = sumtmp + areas(n)
+          enddo
+          call prism_mpi_sum(sumtmp,wts_sums,mpi_comm_local,string=subname//':wts_sums',all=.true.)
+       endif
 
        !-------------------
        ! extract mask and area and compute sum of masked area for destination
@@ -858,11 +912,26 @@ contains
        imaskd(:) = mapper%av_md%iAttr(nf,:)
        nf = mct_aVect_indexRA(mapper%av_md,'area')
        aread(:) = mapper%av_md%rAttr(nf,:)*zradi
-       sumtmp = 0.0_ip_r8_p
-       do n = 1,lsized
-          if (imaskd(n) == 0) sumtmp = sumtmp + aread(n)
-       enddo
-       call prism_mpi_sum(sumtmp,wts_sumd,mpi_comm_local,string=subname//':wts_sumd',all=.true.)
+
+       if (lconsbfb) then
+          call mct_avect_gather(mapper%av_md,av2g,prism_part(mapper%dpart)%gsmap,0,mpi_comm_local)
+          wts_sums = 0.0_ip_r8_p
+          if (mpi_rank_local == 0) then
+             ni = mct_aVect_indexIA(av2g,'mask')
+             nf = mct_aVect_indexRA(av2g,'area')
+             do n = 1,mct_avect_lsize(av2g)
+                if (av2g%iAttr(ni,n) == 0) wts_sums = wts_sums + av2g%rAttr(nf,n)*zradi
+             enddo
+          endif
+          call prism_mpi_bcast(wts_sums,mpi_comm_local,subname//" bcast wts_sums")
+          call mct_avect_clean(av2g)
+       else
+          sumtmp = 0.0_ip_r8_p
+          do n = 1,lsized
+             if (imaskd(n) == 0) sumtmp = sumtmp + aread(n)
+          enddo
+          call prism_mpi_sum(sumtmp,wts_sumd,mpi_comm_local,string=subname//':wts_sumd',all=.true.)
+       endif
 
        if (PRISM_DEBUG >= 30) then
           write(nulprt,*) subname,' DEBUG conserve src mask ',minval(imasks),maxval(imasks),sum(imasks)
@@ -875,8 +944,10 @@ contains
        !-------------------
        ! compute global sums of avs
        !-------------------
-       call prism_advance_avsum(avs,av_sums,mpi_comm_local,mask=imasks,wts=areas)
-       call prism_advance_avsum(avd,av_sumd,mpi_comm_local,mask=imaskd,wts=aread)
+       call prism_advance_avsum(avs,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
+                                mask=imasks,wts=areas,consbfb=lconsbfb)
+       call prism_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%gsmap,mpi_comm_local, &
+                                mask=imaskd,wts=aread,consbfb=lconsbfb)
 
        if (PRISM_DEBUG >= 20) then
           write(nulprt,*) subname,' DEBUG src sum b4 conserve ',av_sums
@@ -940,8 +1011,10 @@ contains
        endif
 
        if (PRISM_DEBUG >= 20) then
-          call prism_advance_avsum(avs,av_sums,mpi_comm_local,mask=imasks,wts=areas)
-          call prism_advance_avsum(avd,av_sumd,mpi_comm_local,mask=imaskd,wts=aread)
+          call prism_advance_avsum(avs,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
+                                   mask=imasks,wts=areas,consbfb=lconsbfb)
+          call prism_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%gsmap,mpi_comm_local, &
+                                   mask=imaskd,wts=aread,consbfb=lconsbfb)
           write(nulprt,*) subname,' DEBUG src sum af conserve ',av_sums
           write(nulprt,*) subname,' DEBUG dst sum af conserve ',av_sumd
        endif
@@ -950,7 +1023,7 @@ contains
        deallocate(av_sums,av_sumd)
        call prism_timer_stop(tstring)
     endif
-    endif
+    endif  ! present conserve
 
     call prism_sys_debug_exit(subname)
 
@@ -958,22 +1031,31 @@ contains
 
 !-------------------------------------------------------------------
 
-  SUBROUTINE prism_advance_avsum(av,sum,mpicom,mask,wts)
+  SUBROUTINE prism_advance_avsum(av,sum,gsmap,mpicom,mask,wts,consbfb)
 
     implicit none
-    type(mct_aVect)      ,intent(in)    :: av    ! av
+    type(mct_aVect)      ,intent(in)    :: av      ! av
     real(kind=ip_r8_p)   ,intent(inout) :: sum(:)  ! sum of av fields
+    type(mct_gsMap)      ,intent(in)    :: gsmap   ! gsmap associate with av
     integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpicom
     integer(kind=ip_i4_p),intent(in),optional :: mask(:) ! mask to apply to av
     real(kind=ip_r8_p)   ,intent(in),optional :: wts(:)  ! wts to apply to av
+    logical              ,intent(in),optional :: consbfb ! bfb conserve
 
-    integer(kind=ip_i4_p) :: n,m
+    integer(kind=ip_i4_p) :: n,m,ierr,mytask
     integer(kind=ip_i4_p) :: lsize,fsize        ! local size of av, number of flds in av
     real(kind=ip_r8_p),allocatable  :: lsum(:)  ! local sums
     real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
+    type(mct_aVect)       :: av1, av1g    ! use av1,av1g for gather and bfb sum
+    logical               :: lconsbfb     ! local conserve bfb
     character(len=*),parameter :: subname = 'prism_advance_avsum'
 
     call prism_sys_debug_enter(subname)
+
+    lconsbfb = .true.
+    if (present(consbfb)) then
+       lconsbfb = consbfb
+    endif
 
     fsize = mct_avect_nRattr(av)
     lsize = mct_avect_lsize(av)
@@ -1011,14 +1093,35 @@ contains
        enddo
     endif
 
-    lsum = 0.0_ip_r8_p
-    do n = 1,lsize
-    do m = 1,fsize
-       lsum(m) = lsum(m) + av%rAttr(m,n)*lwts(n)
-    enddo
-    enddo
-
-    call prism_mpi_sum(lsum,sum,mpicom,string=trim(subname)//':sum',all=.true.)
+    if (lconsbfb) then
+       call mct_avect_init(av1,av,lsize)
+       do n = 1,lsize
+       do m = 1,fsize
+          av1%rAttr(m,n) = av%rAttr(m,n)*lwts(n)
+       enddo
+       enddo
+       call mct_avect_gather(av1,av1g,gsmap,0,mpicom)
+       call MPI_COMM_RANK(mpicom,mytask,ierr)
+       sum = 0.0_ip_r8_p
+       if (mytask == 0) then
+          do n = 1,mct_avect_lsize(av1g)
+          do m = 1,fsize
+             sum(m) = sum(m) + av1g%rAttr(m,n)
+          enddo
+          enddo
+       endif
+       call prism_mpi_bcast(sum,mpicom,subname//" bcast sum")
+       call mct_avect_clean(av1)
+       call mct_avect_clean(av1g)
+    else
+       lsum = 0.0_ip_r8_p
+       do n = 1,lsize
+       do m = 1,fsize
+          lsum(m) = lsum(m) + av%rAttr(m,n)*lwts(n)
+       enddo
+       enddo
+       call prism_mpi_sum(lsum,sum,mpicom,string=trim(subname)//':sum',all=.true.)
+    endif
 
     deallocate(lsum)
     deallocate(lwts)
