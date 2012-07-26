@@ -631,8 +631,8 @@ the debug level by model, task, or at different points in the model
 integration.
 
 \begin{itemize} 
-\item {\tt CALL prism\_set\_localcomm\_proto(new\_comm, kinfo)}
-\item {\tt CALL oasis\_set\_localcomm(new\_comm, kinfo)}
+\item {\tt CALL prism\_set\_couplcomm(new\_comm, kinfo)}
+\item {\tt CALL oasis\_set\_couplcomm(new\_comm, kinfo)}
 \begin{itemize}
 \item {\tt new\_comm [INTEGER; IN]}: mpi intercomm communicator
 \item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
@@ -647,7 +647,9 @@ For instance, if a component is setup to run on 80 processes but
 then the application is able to initialize a new coupling communicator
 made up of the other 64 processes and pass that to oasis.  Oasis will
 then expect the application to couple only using those 64 processes
-and then the other 16 processes can be tasked with other work.
+and then the other 16 processes can be tasked with other work.  
+prism\_create\_couplcomm can be used instead of this interface to
+achieve the same feature.
 
 This should be called early in the initialization, after the oasis\_init\_comp
 call but before oasis grid, partition, or variable initialization.  A coding
@@ -665,7 +667,7 @@ sample of how to use this is below
   if (couplingpe) icolor = 1
   CALL MPI_COMM_Split(localComm,icolor,1,couplingComm,ierror)
 
-  CALL oasis_set_localcomm(couplingComm, ierror)
+  CALL oasis_set_couplcomm(couplingComm, ierror)
 
   CALL oasis_def_partition ( ... )
   CALL oasis_def_var ( ... )
@@ -682,17 +684,39 @@ sample of how to use this is below
   CALL oasis_terminate ( ... )
 \end{verbatim}
 
-In particular, all the oasis initialization calls are collective
+In particular, most of the oasis initialization calls are collective
 on ALL processes except the oasis\_put and oasis\_get calls which 
 are called just on the coupling processes.  There are also a few
-other rules that must be followed.  First, oasis\_set\_localcomm
+other rules that must be followed.  First, oasis\_set\_couplcomm
 must be called from all processes and the communicator passed
 in must be MPI\_COMM\_NULL for processes NOT involved in the coupling.
 Second, the grid writing initialization calls must be called from
-the root of the coupling communicator.  And third, the partition
+the root of the coupling communicator.  Third, the partition
 must be defined only across the coupling processes even though
-the def\_partition must be called on all processes.
+the def\_partition must be called on all processes.  Finally, the
+def\_var must be called by at least the root process of the coupler
+communicator but can be called from all processes.
 
+\begin{itemize} 
+\item {\tt CALL prism\_create\_couplcomm(icpl, all\_comm, new\_comm, kinfo)}
+\item {\tt CALL oasis\_create\_couplcomm(icpl, all\_comm, new\_comm, kinfo)}
+\begin{itemize}
+\item {\tt icpl [INTEGER; IN]}: couple process flag
+\item {\tt all\_comm [INTEGER; IN]}: mpi intercomm communicator
+\item {\tt new\_comm [INTEGER; OUT]}: mpi intercomm communicator
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+\end{itemize}
+
+This routine is similar to prism\_set\_couplcomm.  It allows a user
+to reset the coupling communicator to a subset of processes.  all\_comm
+is the mpi communicator associated with all processes on the component
+and icpl is an integer flag associated with each process.  icpl should be
+1 on coupling processes and MPI\_UNDEFINED on other processes.  The new
+coupler communicator will be returned in the new\_comm argument and
+the internal coupling communicator will also be set to that value.  See
+prism\_set\_couplcomm for more information about why and how this 
+feature might be used.
 
 \begin{itemize} 
 \item {\tt CALL prism\_get\_intercomm(new\_comm, cdnam, kinfo)}

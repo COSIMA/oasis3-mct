@@ -1,4 +1,3 @@
-
 \newpage
 \chapter{The transformations and interpolations in OASIS3}
 \label{sec_transformations}
@@ -507,7 +506,7 @@ filename and two optional string values:
     in chapter 5 of SCRIP 1.4 documentation SCRIPusers.pdf)
    See BILINEAR for configure line
  
-\item {\tt CONSERV} performs 1st or 2nd order conservative remapping,
+  \item {\tt CONSERV} performs 1st or 2nd order conservative remapping,
   which means that the weight of a source cell is proportional to area
   intersected by the target cell.  Note that 2nd order conservative mapping
   files can be generated but not used currently.
@@ -999,35 +998,32 @@ OASIS3.
 
 \item {\bf CONSERV}: 
 
-  {\tt CONSERV} (routine {\tt oasis3/src/conserv.f}) ensures
-  a global modification of the coupling field. 
-  This analysis requires one input line with one argument:
+  {\tt CONSERV} ensures a global modification of the coupling field. 
+  This analysis requires one input line with one argument and one optional
+  argument:
 
  \begin{verbatim}
 # CONSERV operation
-     $CMETH
-  \end{verbatim}  where {\tt \$CMETH} is the method required:
-
+     $CMETH  $CONSOPT
+  \end{verbatim}where: 
+  \begin{itemize}
+  \item {\tt \$CMETH} is the method desired with the following choices
    \begin{itemize}
-
    \item with {\tt \$CMETH = GLOBAL}, the field is integrated on both
      source and target grids, without considering values of masked
      points, and the residual (target - source) is uniformly
      distributed on the target grid; this option ensures global
      conservation of the field
-
    \item with {\tt \$CMETH = GLBPOS}, the same operation is performed
      except that the residual is distributed proportionally to the
      value of the original field; this option ensures the global
      conservation of the field and does not change the sign of the field
-
    \item with {\tt \$CMETH = BASBAL}, the operation is analogous to
      {\tt GLOBAL} except that the non masked surface of the source and
      the target grids are taken into account in
      the calculation of the residual; this option does not ensure
      global conservation of the field but ensures that the energy received is
      proportional to the non masked surface of the target grid
-
    \item with {\tt \$CMETH = BASPOS}, the non masked surface of the
      source and the target grids are taken into
      account and the residual is distributed proportionally to the
@@ -1035,6 +1031,13 @@ OASIS3.
      ensure global conservation of the field but ensures that the energy received
      is proportional to the non masked surface of the target grid and 
      it does not change the sign of the field.
+   \end{itemize}
+  \item {\tt \$CONSOPT} is an optional argument specifying the algorithm.  
+  {\tt \$CONSOPT} can be bfb or opt.
+  The bfb option enforces a bit-for-bit transformation regardless of the
+  grid decomposition or process count.  The opt option carries out the conservation using an
+  optimal algorithm using less memory and a faster approach.  bfb is the
+  default setting.
   \end{itemize}
 
 {\it Note that for this operation to be correct, overlapping grid cells 
