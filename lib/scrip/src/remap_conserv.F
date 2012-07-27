@@ -347,8 +347,8 @@ C***********************************************************************
             WRITE(88,*)'    '
             CALL FLUSH(88)
         ENDIF
- 1111 format ('   grid1 corner, lon, lat = ', I2, 2X, F12.4, 2X, F12.4)
- 1112 format ('     srch cell, lon, lat = ', I2, 2X, F12.4, 2X, F12.4)       
+ 1111 format ('   grid1 corner, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)
+ 1112 format ('     srch cell, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)       
 
         !***
         !*** integrate around this cell
@@ -526,11 +526,11 @@ C***********************************************************************
                 !*** also add contributions to cell areas and centroids.
                 !***
  1120 format ('      STORE add1,add2,blon,blat,ilon,ilat,WEIGHTS=', 
-     &         1X,I2,1X,I2,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
+     &         1X,I8,1X,I8,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
  1121 format ('      overlap STORE grid1_add, grid2_add, WEIGHTS=', 
-     &         1X,I2,1X,I2,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
+     &         1X,I8,1X,I8,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
  1122 format ('      lfracnei STORE grid1_add, grid2_add, WEIGHTS=', 
-     &         1X,I2,1X,I2,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
+     &         1X,I8,1X,I8,1X,F12.8,1X,F12.8,1X,F12.8,1X,F12.8, E12.8)
                 if (grid2_add /= 0) then
                     if (grid1_mask(grid1_add)) then
                         call timer_start(4)
@@ -700,8 +700,8 @@ C***********************************************************************
             WRITE(88,*)'    ***************************************'
             WRITE(88,*)'    '
         ENDIF
- 1131 format ('   grid2 corner, lon, lat = ', I2, 2X, F12.4, 2X, F12.4)
- 1132 format ('     srch cell, lon, lat = ', I2, 2X, F12.4, 2X, F12.4)  
+ 1131 format ('   grid2 corner, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)
+ 1132 format ('     srch cell, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)  
 
         !***
         !*** integrate around this cell
