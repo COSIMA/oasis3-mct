@@ -44,7 +44,6 @@ $(LIBRARY): $(OBJS1)  $(OBJS3) $(OBJS4)
 
 remap_bicubic_reduced.o: constants.o grids.o remap_vars.o
 rotations.o: constants.o grids.o kinds_mod.o vector.o
-scriprmp_vector.o: grids.o remap_vars.o rotations.o vector.o
 vector.o: constants.o grids.o kinds_mod.o 
 corners.o: kinds_mod.o 
 netcdf.o: constants.o kinds_mod.o 
@@ -55,7 +54,6 @@ scrip.o: constants.o grids.o iounits.o kinds_mod.o remap_bicubic.o \
 	remap_bicubic_reduced.o remap_bilinear.o remap_bilinear_reduced.o \
 	remap_conserv.o remap_distwgt.o remap_gauswgt.o remap_vars.o \
 	remap_write.o timers.o
-scriprmp.o: grids.o remap_vars.o
 constants.o: kinds_mod.o
 distance.o: constants.o kinds_mod.o
 fracnnei.o: constants.o grids.o kinds_mod.o remap_vars.o
