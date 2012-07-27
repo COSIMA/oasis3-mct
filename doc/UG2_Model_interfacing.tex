@@ -1,25 +1,16 @@
 \newpage
-\chapter{Interfacing a model with the PSMILe library}
+\chapter{Interfacing a model with the OASIS3-MCT library}
 \label{sec_modelinterfacing}
 
-At run-time, the OASIS3 coupling layer supports coupling data
+At run-time, the OASIS3-MCT coupling layer supports coupling data
 between two components as well as interpolation and transformation
-of coupled fields. To communicate with OASIS3 or directly between the component
-models, different communication techniques have been historically
-developed. The technique used for one particular run is defined by the
-user with the keyword \$CHANNEL in the configuration file {\it namcouple} 
-(see chapter
-\ref{sec_namcouple}). In OASIS3, direct coupling is supported 
-based on MPI1 message passing implementation
-using the associated model interface library PSMILe.  For
-a practical test case using the PSMILe library, see the sources in
-{\tt examples/tutorial} and more details in
-chapter \ref{sec_compilationrunning}.
+of coupling fields. Different communication techniques have been historically
+developed in OASIS. With OASIS3-MCT, communication is performed by the Model Couling Toolkit library (MCT, see http://www.mcs.anl.gov/research/projects/mct/) based on message passing (the keyword \$CHANNEL in the configuration file {\it namcouple}  (see chapter \ref{sec_namcouple} has to be {\tt MPI1}). 
 
- To communicate directly with another component model
-  or to perform I/O actions, a component model needs to be interfaced
-  with the PRISM System Model Interface library, PSMILe, which sources
-  can be found in {\tt oasis3/lib/psmile} directory. PSMILe supports:
+For a practical test case using the OASIS3-MCT library, see the sources in
+{\tt examples/tutorial} and more details in chapter \ref{sec_compilationrunning}.
+
+To communicate with another component model or to perform I/O actions, a component model needs to be interfaced with the OASIS3-MCT library, which sources can be found in {\tt oasis3-mct/lib/psmile} directory. The OASIS3-MCT library supports:
 
 \begin{itemize}
 \item parallel communication between parallel component models,
@@ -27,11 +18,11 @@ chapter \ref{sec_compilationrunning}.
 \item automatic sending and receiving actions at appropriate times
  following user's choice indicated in the {\it namcouple},
 \item time integration or accumulation of the coupling fields,
-\item limited transformations such as mapping (interpolation) between grids,
+\item some transformations such as mapping (interpolation) between grids,
 \item I/O actions from/to files.
 \end{itemize}
 
- To adapt a component model to PSMILe, specific calls of
+To adapt a component model to OASIS3-MCT, specific calls of
  the following classes have to be implemented in the code:
 
 \begin{enumerate}
@@ -47,15 +38,14 @@ chapter \ref{sec_compilationrunning}.
 \end{enumerate}
 
 Finally, in section \ref{subsubsec_Algoritms}, different coupling
-algorithms are illustrated, and explanations are given on how to
-reproduce them with PSMILe by defining the appropriate indices of
-lag and sequence for each coupling field.
+algorithms are illustrated and details on how to
+reproduce them with OASIS3-MCT are provided. More information on the {\tt LAG} and {\tt SEQ} indices are also given in that section.
 
 \section{Use}
 \label{subsubsec_Use}
 %{Use}
 
-To use prism, a user needs to add 
+To use OASIS3-MCT library, a user needs to add in his code: 
 
 \begin{itemize}
 
@@ -67,63 +57,55 @@ To use prism, a user needs to add
  
 \end{itemize}
 
-Both use statements are valid and use of just one or the other
-is recommended in a particular component model.  
-A single use statement now provides all the methods
-that previously required multiple use statements.  The 
-methods, datatypes, and capabilities are identical for both the
-mod\_prism or mod\_oasis interfaces.  The only difference is the name
-of the interface.  mod\_prism is provided
-for backwards compatability with prior versions of OASIS.  mod\_oasis
-provides a set of updated interface names that will continue to evolve
-in the future.  In the following sections, both the mod\_prism
-and mod\_oasis interface names will be defined and a single description
-of the interface arguments will be provided.
+Both use statements are valid and use of just one or the other is recommended in a particular component model. A single use statement now provides all the methods that required multiple use statements in previous OASIS3 versions.  The 
+methods, datatypes, and capabilities are identical for both the {\tt mod\_prism} or {\tt mod\_oasis} interfaces.  The only difference is the name of the interface. The interface in module {\tt mod\_prism} is provided for backwards compatability with prior versions of OASIS3. Use of module {\tt mod\_oasis} is now recommended provides access to a set of updated routine names that will continue to evolve in the future, always ensuring backward compatibility.  In the following sections, both the {\tt mod\_prism} and {\tt mod\_oasis} interface names is defined and a single description of the interface arguments is provided. 
 
 \section{Initialisation}
 \label{subsubsec_Initialisation}
 %{Initialisation}
 
-All processes of the component model initialise the coupling and, if
-required, retrieve a local communicator for the component model
-internal parallelisation.
+\subsection{Coupling initialisation}
 
 \begin{itemize}
 
-\item {\tt CALL prism\_init\_comp\_proto (compid, model\_name, ierror)} 
 \item {\tt CALL oasis\_init\_comp        (compid, model\_name, ierror)} 
+\item {\tt CALL prism\_init\_comp\_proto (compid, model\_name, ierror)} 
 
  \begin{itemize}
    \item {\tt compid [INTEGER; OUT]}: component model ID 
-   \item {\tt model\_name [CHARACTER*6; IN]}: name of calling model (as in
+   \item {\tt model\_name [CHARACTER*6; IN]}: component model name (as in
   {\em namcouple}) 
    \item {\tt ierror [INTEGER; OUT]}: returned error code.
  \end{itemize}
  
-Routine called by all component model processes, which initialises the
+This routine must called by all component processes to initialise the
 coupling.\footnote{The model may call MPI\_Init explicitly, but if so, has to
 call it before calling {\tt prism\_init\_comp\_proto}; in this case, the
 model also has to call MPI\_Finalize explicitly, but only after calling
 {\tt prism\_terminate\_proto}.}
+\end{itemize}
 
-\item {\tt CALL prism\_get\_localcomm\_proto (local\_comm, ierror )}
+\subsection{Communicator for internal parallelisation}
+
+\begin{itemize}
 \item {\tt CALL oasis\_get\_localcomm        (local\_comm, ierror )}
+\item {\tt CALL prism\_get\_localcomm\_proto (local\_comm, ierror )}
 
  \begin{itemize}
    \item {\tt local\_comm [INTEGER; OUT]}: value of local communicator
    \item {\tt ierror [INTEGER; OUT]}: returned error code.
  \end{itemize}
 
-  If needed, routine called by all model processes  
-  to get the value of a local communicator to be used by the
-  model for its internal parallelisation.
+  If needed, this routine may be called by the component processes  
+  to get the value of a local communicator to be used by the component
+  for its internal parallelisation.
 
-  With MPI1, all component models started in a
-  pseudo-MPMD mode share automatically the same MPI\_COMM\_WORLD
+  This may be needed as all component models started in a
+  pseudo-MPMD mode with MPI1 share automatically the same MPI\_COMM\_WORLD
   communicator.  Another communicator has to be used for the internal
-  parallelisation of each model. OASIS3 creates this model local
-  communicator based on the name of the calling model; its value is returned
-  as the first argument of prism\_get\_localcomm\_proto routine.
+  parallelisation of each component. OASIS3-MCT creates this local
+  communicator based on the name given to {\tt oasis\_init\_comp/prism\_init\_comp\_proto} routine; its value is returned
+  as the first argument of the routine, {\tt local\_comm}.
 
 %  With CLIM-MPI2, OASIS3 executable spawns the component model executables at the
 %  beginning of the run; 
@@ -132,8 +114,80 @@ model also has to call MPI\_Finalize explicitly, but only after calling
 %  prism\_get\_localcomm\_proto 
 %  routine is useless but if called, the communicator MPI\_COMM\_WORLD will be returned as
 %  local communicator.
-
 \end{itemize}
+
+\subsection{Coupling through a subset of the component model processes}
+
+If only a subset of the component processes participate in the coupling (e.g. a component is setup to run on 80 processes but
+16 of those processes are associated with a distinct task, like I/O), a communicator gathering only these processes must be defined, with either {\tt oasis/prism\_create\_couplcomm} or \newline {\tt oasis/prism\_set\_couplcomm}.
+
+If such communicator does not exist yet in the code, the component processes should use, to create it: 
+
+\begin{itemize}
+\item {\tt CALL oasis\_create\_couplcomm(icpl, local\_comm, coupl\_comm, kinfo)} 
+\item {\tt CALL prism\_create\_couplcomm(icpl, local\_comm, coupl\_comm, kinfo)}
+\begin{itemize}
+\item {\tt icpl [INTEGER; IN]}: coupling process flag
+\item {\tt local\_comm [INTEGER; IN]}: MPI communicator with all processes of the component
+\item {\tt coupl\_comm [INTEGER; OUT]}: returned MPI communicator gathering only component processes participating in the coupling
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+
+This routine creates a coupling communicator for a subset of processes. It must be called by all component processes with {\tt icpl=1} for processes participating in the coupling and with {\tt icpl=MPI\_UNDEFINED} for the others. Argument {\tt local\_comm} is the MPI communicator associated with all processes of the component. The new coupling communicator is returned in {\tt coupl\_comm} argument and the internal coupling communicator is also set to that value.  
+\end{itemize}
+
+If this communicator already exist in the code, the component should use, to provide it to OASIS3-MCT:  
+
+\begin{itemize} 
+\item {\tt CALL oasis\_set\_couplcomm(coupl\_comm, kinfo)}
+\item {\tt CALL prism\_set\_couplcomm(coupl\_comm, kinfo)}
+\begin{itemize}
+\item {\tt coupl\_comm [INTEGER; IN]}: MPI communicator gathering only component processes participating in the coupling
+\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
+\end{itemize}
+
+This routine allows to provide a local coupling communicator to OASIS3-MCT, given that it already exists in the code. The value of {\tt coupl\_comm} must be the value of this local coupling communicator for the processes participating to the coupling and it must be {\tt MPI\_COMM\_NULL} for processes not involved in the coupling.  
+\end{itemize}
+
+These routines should be called after the {\tt oasis\_init\_comp/prism\_init\_comp\_proto}
+but before the grid, partition, or coupling field declaration.
+All OASIS3-MCT interface routines, besides the grid definition (see section \ref{subsubsec_griddef}) and the ``puts'' and `` gets'' per se (see section \ref{subsubsec_sendingreceiving}), are collective and must be called by all processes\footnote{In fact, the {\tt oasis\_def\_var/prism\_def\_var\_proto} must be called by at least the root process of the coupler
+communicator but can be called by all processes.}. In particular, the coupling field partition must be described across the coupling processes only even though the {\tt  oasis\_def\_partition/prism\_def\_partition\_proto} must be called on all processes (but with {\tt ig\_paral(:)=0} for the processes not involved in the coupling.) 
+
+Here is a coding sample of how to use these routines:
+ 
+\begin{verbatim}
+  CALL oasis_init_comp (comp_id, comp_name, ierror )
+  CALL oasis_get_localcomm ( localComm, ierror )
+
+  !--- create communicator gathering coupling processes (every other)
+  CALL MPI_Comm_Rank ( localComm, mype, ierror )
+  couplingpe = .false.
+  if (mod(mype,2) == 0) couplingpe = .true. 
+  icpl = MPI_UNDEFINED
+  if (couplingpe) icpl = 1
+  CALL MPI_COMM_Split(localComm,icpl,1,couplComm,ierror)
+  !
+  !--- provide this communicator to OASIS3-MCT
+  CALL oasis_set_couplcomm(couplComm, ierror)
+  
+  ! The call to MPI_COMM_Split and oasis_set_couplcomm could be replaced by 
+  ! CALL oasis_create_couplcomm(icpl,localComm,couplComm,ierror)
+
+  CALL oasis_def_partition ( ... )
+  CALL oasis_def_var ( ... )
+  CALL oasis_enddef ( ... )
+
+  !--- do loop
+     ! ...
+     if (couplingpe) CALL oasis_put( ... )
+     ! ...
+     if (couplingpe) CALL oasis_get( ... )
+     ! ...
+  !--- enddo
+
+  CALL oasis_terminate ( ... )
+\end{verbatim}
 
 \section{Grid data file definition}
 \label{subsubsec_griddef}
@@ -630,93 +684,7 @@ by the NLOGPRT namcouple input.  This method allows users to vary
 the debug level by model, task, or at different points in the model
 integration.
 
-\begin{itemize} 
-\item {\tt CALL prism\_set\_couplcomm(new\_comm, kinfo)}
-\item {\tt CALL oasis\_set\_couplcomm(new\_comm, kinfo)}
-\begin{itemize}
-\item {\tt new\_comm [INTEGER; IN]}: mpi intercomm communicator
-\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
-\end{itemize}
-\end{itemize}
 
-This routine allows a user to reset the local coupling communicator.
-This allows a user to modify the local oasis coupling communicator for
-a particular component to support coupling on a subset of processes.
-For instance, if a component is setup to run on 80 processes but
-16 of those processes are associated with a distinct task, like I/O,
-then the application is able to initialize a new coupling communicator
-made up of the other 64 processes and pass that to oasis.  Oasis will
-then expect the application to couple only using those 64 processes
-and then the other 16 processes can be tasked with other work.  
-prism\_create\_couplcomm can be used instead of this interface to
-achieve the same feature.
-
-This should be called early in the initialization, after the oasis\_init\_comp
-call but before oasis grid, partition, or variable initialization.  A coding
-sample of how to use this is below 
- 
-\begin{verbatim}
-  CALL oasis_init_comp (comp_id, comp_name, ierror )
-  CALL oasis_get_localcomm ( localComm, ierror )
-
-  !--- setup the couplingComm from localComm
-  CALL MPI_Comm_Rank ( localComm, mype, ierror )
-  couplingpe = .false.
-  if (mod(mype,2) == 0) couplingpe = .true.  ! set every other pe as coupling pe
-  icolor = MPI_UNDEFINED
-  if (couplingpe) icolor = 1
-  CALL MPI_COMM_Split(localComm,icolor,1,couplingComm,ierror)
-
-  CALL oasis_set_couplcomm(couplingComm, ierror)
-
-  CALL oasis_def_partition ( ... )
-  CALL oasis_def_var ( ... )
-  CALL oasis_enddef ( ... )
-
-  !--- do loop
-     ! ...
-     if (couplingpe) CALL oasis_put( ... )
-     ! ...
-     if (couplingpe) CALL oasis_get( ... )
-     ! ...
-  !--- enddo
-
-  CALL oasis_terminate ( ... )
-\end{verbatim}
-
-In particular, most of the oasis initialization calls are collective
-on ALL processes except the oasis\_put and oasis\_get calls which 
-are called just on the coupling processes.  There are also a few
-other rules that must be followed.  First, oasis\_set\_couplcomm
-must be called from all processes and the communicator passed
-in must be MPI\_COMM\_NULL for processes NOT involved in the coupling.
-Second, the grid writing initialization calls must be called from
-the root of the coupling communicator.  Third, the partition
-must be defined only across the coupling processes even though
-the def\_partition must be called on all processes.  Finally, the
-def\_var must be called by at least the root process of the coupler
-communicator but can be called from all processes.
-
-\begin{itemize} 
-\item {\tt CALL prism\_create\_couplcomm(icpl, all\_comm, new\_comm, kinfo)}
-\item {\tt CALL oasis\_create\_couplcomm(icpl, all\_comm, new\_comm, kinfo)}
-\begin{itemize}
-\item {\tt icpl [INTEGER; IN]}: couple process flag
-\item {\tt all\_comm [INTEGER; IN]}: mpi intercomm communicator
-\item {\tt new\_comm [INTEGER; OUT]}: mpi intercomm communicator
-\item {\tt kinfo [INTEGER; OUT; OPTIONAL]}: returned error code
-\end{itemize}
-\end{itemize}
-
-This routine is similar to prism\_set\_couplcomm.  It allows a user
-to reset the coupling communicator to a subset of processes.  all\_comm
-is the mpi communicator associated with all processes on the component
-and icpl is an integer flag associated with each process.  icpl should be
-1 on coupling processes and MPI\_UNDEFINED on other processes.  The new
-coupler communicator will be returned in the new\_comm argument and
-the internal coupling communicator will also be set to that value.  See
-prism\_set\_couplcomm for more information about why and how this 
-feature might be used.
 
 \begin{itemize} 
 \item {\tt CALL prism\_get\_intercomm(new\_comm, cdnam, kinfo)}

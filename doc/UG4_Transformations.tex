@@ -242,17 +242,14 @@ OASIS3, controlled by {\tt preproc.f}.
 
 \item {\bf CHECKIN}:
 
- {\tt CHECKIN} calculates the mean and extremum
- values of the source field and prints them to the oasis log files
- (this operation does not transform the field).
+ {\tt CHECKIN} calculates the global minimum, the maximum and the sum of the
+ the source field values and prints them to the OASIS debug file (for the master process of the source component model only). This operation does not transform the field.
 
- The generic input line is as follows:
+ The generic input line is as follows, even if {\tt \$NINT} has no impact in OASIS3-MCT:
  \begin{verbatim}
  # CHECKIN operation
      $INT = $NINT  
  \end{verbatim} 
- where {\tt \$NINT} = 1 or 0, depending on whether or not the source
- field integral is also calculated and printed.
 
 \item {\bf CORRECT}: UNUSED
  
@@ -1000,13 +997,14 @@ OASIS3.
 \item {\bf CONSERV}: 
 
   {\tt CONSERV} ensures a global modification of the coupling field. 
-  This analysis requires one input line with one argument and one optional
+  This analysis requires the areas of the source and target grid meshes to be transfered to the coupler with the {\tt oasis\_write\_area/prism\_write\_area} call (see section \ref{subsubsec_griddef}). In the {\it namcouple}, {\tt CONSERV}requires one input line with one argument and one optional
   argument:
 
  \begin{verbatim}
 # CONSERV operation
      $CMETH  $CONSOPT
-  \end{verbatim}where: 
+  \end{verbatim}
+where: 
   \begin{itemize}
   \item {\tt \$CMETH} is the method desired with the following choices
    \begin{itemize}
@@ -1034,10 +1032,10 @@ OASIS3.
      it does not change the sign of the field.
    \end{itemize}
   \item {\tt \$CONSOPT} is an optional argument specifying the algorithm.  
-  {\tt \$CONSOPT} can be bfb or opt.
-  The bfb option enforces a bit-for-bit transformation regardless of the
-  grid decomposition or process count.  The opt option carries out the conservation using an
-  optimal algorithm using less memory and a faster approach.  bfb is the
+  {\tt \$CONSOPT} can be {\tt bfb} or {\tt opt}.
+  The {\tt bfb} option enforces a bit-for-bit transformation regardless of the
+  grid decomposition or process count.  The {\tt opt} option carries out the conservation using an
+  optimal algorithm using less memory and a faster approach. Option {\tt bfb} is the
   default setting.
   \end{itemize}
 
@@ -1159,10 +1157,8 @@ OASIS3.
 
 \item {\bf CHECKOUT}: 
 
-{\tt CHECKOUT} calculates
-the mean and extremum values of an output field and prints them to the
-oasis output files (this operation does not transform the field).
-
+{\tt CHECKOUT} calculates the global minimum, the maximum and the sum of the
+ the target field values and prints them to the OASIS debug file (for the master process of the target component model only). This operation does not transform the field. 
 The generic input line is as for {\tt CHECKIN} (see above).
 
 \item {\bf GLORED}: UNUSED

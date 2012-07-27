@@ -321,7 +321,8 @@ INPUT} in the example above). The field may be :
   debug NetCDF files, one before the sending action in the source model
   below the {\tt prism\_put\_proto} call, and one after the receiving
   action in the target model below the {\tt prism\_get\_proto} call (should
-  be used when debugging the coupled model only)
+  be used when debugging the coupled model only). The name of the debug NetCDF file (one per field) is
+  automatically defined by the PSMILe based on the field and component model names.
 \item {\tt IGNORED}: this setting is equivalent to and converted to EXPORTED
 \item {\tt IGNOUT}: this setting is equivalent to and converted to EXPOUT
 \item {\tt INPUT}: simply read in from the input file by the target
@@ -329,12 +330,10 @@ INPUT} in the example above). The field may be :
   times corresponding to the input period indicated by the user in the
   {\it namcouple}. See section
   \ref{subsec_inputdata} for the format of the input file.
-\item {\tt OUTPUT}: simply written out to an output file by the source
-  model PSMILe below the {\tt prism\_put\_proto} call at appropriate
+\item {\tt OUTPUT}: simply written out to an output debug NetCDF file by the source
+  model PSMILe below the {\tt prism\_put\_proto} call, after local transformations {\tt LOCTRANS} and {\tt BLASOLD}, at appropriate
   times corresponding to the output period indicated by the user in
-  the {\it namcouple}. The name of the output file (one per field) is
-  automatically built based on the field name and initial date of the
-  run ({\tt \$INIDATE}).
+  the {\it namcouple}. 
 
 \end{itemize}
 
@@ -447,12 +446,13 @@ INPUT} in the example above). The field may be :
   The first 2 lines for fields with status {\tt OUTPUT} are as follows:
   \begin{verbatim}
   COSHFTOT  COSHFTOT   7   86400  0  fldhftot.nc OUTPUT 
-  atmo   atmo \end{verbatim}
+  atmo   atmo 
+  \end{verbatim}
 where the different entries are as for {\tt EXPOUT} fields, except
 that the source symbolic name must be repeated twice on the field
-first line, the restart file name is optional, there is no output file
+first line, the restart file name is needed only for {\tt LOCTRANS} transformations, there is no output file
 name on the first line and no LAG or  SEQ index at the end of the second line.
-The name of the output file is automatically determined by the PSMILe.
+The name of the output file is automatically determined by the PSMILe based on the field and component model names.
 
 The third line is {\tt LOCTRANS} if this transformation is chosen for
 the field. Note that {\tt LOCTRANS} is the only transformation
