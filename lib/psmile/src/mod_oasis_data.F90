@@ -1,7 +1,7 @@
-MODULE mod_prism_data
+MODULE mod_oasis_data
 !     - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !
-  USE mod_prism_kinds
+  USE mod_oasis_kinds
 
   IMPLICIT NONE
 
@@ -39,15 +39,15 @@ MODULE mod_prism_data
 CONTAINS
 !------------------------------------------------------------
 
-  SUBROUTINE prism_data_zero()
+  SUBROUTINE oasis_data_zero()
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname = 'prism_data_zero'
+  character(len=*),parameter :: subname = 'oasis_data_zero'
 
   nulprt = 6
   nulprt1 = 6
-  prism_debug = 0
+  OASIS_debug = 0
   compid = -1
   compnm = trim(cspval)
   mpi_comm_global = -1
@@ -57,9 +57,9 @@ CONTAINS
   mpi_rank_local = -1
   mpi_size_local = -1
   
-  END SUBROUTINE prism_data_zero
+END SUBROUTINE oasis_data_zero
 
 !------------------------------------------------------------
-END MODULE mod_prism_data
+END MODULE mod_oasis_data
 
 

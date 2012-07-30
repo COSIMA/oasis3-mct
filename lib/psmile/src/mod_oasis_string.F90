@@ -1,26 +1,26 @@
 !===============================================================================
 !BOP ===========================================================================
 !
-! !MODULE: mod_prism_string -- string and list methods
+! !MODULE: mod_oasis_string -- string and list methods
 !
 ! !DESCRIPTION:
 !    General string and specific list method.  A list is a single string
 !    that is delimited by a character forming multiple fields, ie,
 !    character(len=*) :: mylist = "t:s:u1:v1:u2:v2:taux:tauy"
 !    The delimiter is called listDel in this module, is default ":",
-!    but can be set by a call to prism_string_listSetDel.
+!    but can be set by a call to oasis_string_listSetDel.
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-module mod_prism_string
+module mod_oasis_string
 
 ! !USES:
 
-   use mod_prism_kinds
-   use mod_prism_parameters
-   use mod_prism_data
-   use mod_prism_sys
+   use mod_oasis_kinds
+   use mod_oasis_parameters
+   use mod_oasis_data
+   use mod_oasis_sys
 
    implicit none
    private
@@ -31,33 +31,33 @@ module mod_prism_string
 
 ! !PUBLIC MEMBER FUNCTIONS:
 
-   public :: prism_string_countChar       ! Count number of char in string, fn
-   public :: prism_string_toUpper         ! Convert string to upper-case
-   public :: prism_string_toLower         ! Convert string to lower-case
-   public :: prism_string_getParentDir    ! For a pathname get the parent directory name
-   public :: prism_string_lastIndex       ! Index of last substr in str
-   public :: prism_string_endIndex        ! Index of end of substr in str
-   public :: prism_string_leftAlign       ! remove leading white space
-   public :: prism_string_alphanum        ! remove all non alpha-numeric characters
-   public :: prism_string_betweenTags     ! get the substring between the two tags
-   public :: prism_string_parseCFtunit    ! parse CF time units
-   public :: prism_string_clean           ! Set string to all white space
+   public :: oasis_string_countChar       ! Count number of char in string, fn
+   public :: oasis_string_toUpper         ! Convert string to upper-case
+   public :: oasis_string_toLower         ! Convert string to lower-case
+   public :: oasis_string_getParentDir    ! For a pathname get the parent directory name
+   public :: oasis_string_lastIndex       ! Index of last substr in str
+   public :: oasis_string_endIndex        ! Index of end of substr in str
+   public :: oasis_string_leftAlign       ! remove leading white space
+   public :: oasis_string_alphanum        ! remove all non alpha-numeric characters
+   public :: oasis_string_betweenTags     ! get the substring between the two tags
+   public :: oasis_string_parseCFtunit    ! parse CF time units
+   public :: oasis_string_clean           ! Set string to all white space
 
-   public :: prism_string_listIsValid     ! test for a valid "list"
-   public :: prism_string_listGetNum      ! Get number of fields in list, fn
-   public :: prism_string_listGetIndex    ! Get index of field
-   public :: prism_string_listGetIndexF   ! function version of listGetIndex
-   public :: prism_string_listGetName     ! get k-th field name
-   public :: prism_string_listIntersect   ! get intersection of two field lists
-   public :: prism_string_listUnion       ! get union of two field lists
-   public :: prism_string_listMerge       ! merge two lists to form third
-   public :: prism_string_listAppend      ! append list at end of another
-   public :: prism_string_listPrepend     ! prepend list in front of another
-   public :: prism_string_listSetDel      ! Set field delimeter in lists
-   public :: prism_string_listGetDel      ! Get field delimeter in lists
+   public :: oasis_string_listIsValid     ! test for a valid "list"
+   public :: oasis_string_listGetNum      ! Get number of fields in list, fn
+   public :: oasis_string_listGetIndex    ! Get index of field
+   public :: oasis_string_listGetIndexF   ! function version of listGetIndex
+   public :: oasis_string_listGetName     ! get k-th field name
+   public :: oasis_string_listIntersect   ! get intersection of two field lists
+   public :: oasis_string_listUnion       ! get union of two field lists
+   public :: oasis_string_listMerge       ! merge two lists to form third
+   public :: oasis_string_listAppend      ! append list at end of another
+   public :: oasis_string_listPrepend     ! prepend list in front of another
+   public :: oasis_string_listSetDel      ! Set field delimeter in lists
+   public :: oasis_string_listGetDel      ! Get field delimeter in lists
 
-   public :: prism_string_setAbort        ! set local abort flag
-   public :: prism_string_setDebug        ! set local debug flag
+   public :: oasis_string_setAbort        ! set local abort flag
+   public :: oasis_string_setDebug        ! set local debug flag
 
 ! !PUBLIC DATA MEMBERS:
 
@@ -77,7 +77,7 @@ contains
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_countChar -- Count number of occurances of a character
+! !IROUTINE: oasis_string_countChar -- Count number of occurances of a character
 !
 ! !DESCRIPTION:
 !  count number of occurances of a single character in a string
@@ -87,7 +87,7 @@ contains
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-integer function prism_string_countChar(str,char,rc)
+integer function oasis_string_countChar(str,char,rc)
 
 
    implicit none
@@ -105,30 +105,30 @@ integer function prism_string_countChar(str,char,rc)
    integer(ip_i4_p) :: n        ! generic index
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_countChar) "
-   character(*),parameter :: F00     = "('(prism_string_countChar) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_countChar) "
+   character(*),parameter :: F00     = "('(oasis_string_countChar) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    count = 0
    do n = 1, len_trim(str)
       if (str(n:n) == char) count = count + 1
    end do
-   prism_string_countChar = count
+   oasis_string_countChar = count
 
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_countChar
+end function oasis_string_countChar
 
 !===============================================================================
 !BOP ===========================================================================
-! !IROUTINE: prism_string_toUpper -- Convert string to upper case
+! !IROUTINE: oasis_string_toUpper -- Convert string to upper case
 !
 ! !DESCRIPTION:
 !     Convert the input string to upper-case.
@@ -137,13 +137,13 @@ end function prism_string_countChar
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-function prism_string_toUpper(str)
+function oasis_string_toUpper(str)
 
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
    character(len=*), intent(in) :: str      ! String to convert to upper case
-   character(len=len(str))      :: prism_string_toUpper
+   character(len=len(str))      :: oasis_string_toUpper
 
    !----- local -----
    integer(ip_i4_p) :: i             ! Index
@@ -152,14 +152,14 @@ function prism_string_toUpper(str)
    character(len=1)     :: ctmp          ! Character temporary
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_toUpper) "
-   character(*),parameter :: F00     = "('(prism_string_toUpper) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_toUpper) "
+   character(*),parameter :: F00     = "('(oasis_string_toUpper) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    LowerToUpper = iachar("A") - iachar("a")
 
@@ -168,16 +168,16 @@ function prism_string_toUpper(str)
       aseq = iachar(ctmp)
       if ( aseq >= iachar("a") .and. aseq <= iachar("z") ) &
            ctmp = achar(aseq + LowertoUpper)
-      prism_string_toUpper(i:i) = ctmp
+      oasis_string_toUpper(i:i) = ctmp
    end do
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_toUpper
+end function oasis_string_toUpper
 
 !===============================================================================
 !BOP ===========================================================================
-! !IROUTINE: prism_string_toLower -- Convert string to lower case
+! !IROUTINE: oasis_string_toLower -- Convert string to lower case
 !
 ! !DESCRIPTION:
 !     Convert the input string to lower-case.
@@ -185,13 +185,13 @@ end function prism_string_toUpper
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
-function prism_string_toLower(str)
+function oasis_string_toLower(str)
 
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
    character(len=*), intent(in) :: str      ! String to convert to lower case
-   character(len=len(str))      :: prism_string_toLower
+   character(len=len(str))      :: oasis_string_toLower
 
    !----- local -----
    integer(ip_i4_p) :: i            ! Index
@@ -200,14 +200,14 @@ function prism_string_toLower(str)
    character(len=1)     :: ctmp         ! Character temporary
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_toLower) "
-   character(*),parameter :: F00     = "('(prism_string_toLower) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_toLower) "
+   character(*),parameter :: F00     = "('(oasis_string_toLower) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    UpperToLower = iachar("a") - iachar("A")
 
@@ -216,16 +216,16 @@ function prism_string_toLower(str)
       aseq = iachar(ctmp)
       if ( aseq >= iachar("A") .and. aseq <= iachar("Z") ) &
            ctmp = achar(aseq + UpperToLower)
-      prism_string_toLower(i:i) = ctmp
+      oasis_string_toLower(i:i) = ctmp
    end do
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_toLower
+end function oasis_string_toLower
 
 !===============================================================================
 !BOP ===========================================================================
-! !IROUTINE: prism_string_getParentDir -- For pathname get the parent directory name
+! !IROUTINE: oasis_string_getParentDir -- For pathname get the parent directory name
 !
 ! !DESCRIPTION:
 !     Get the parent directory name for a pathname.
@@ -233,46 +233,46 @@ end function prism_string_toLower
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-function prism_string_getParentDir(str)
+function oasis_string_getParentDir(str)
 
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
    character(len=*), intent(in) :: str      ! String to convert to lower case
-   character(len=len(str))      :: prism_string_getParentDir
+   character(len=len(str))      :: oasis_string_getParentDir
 
    !----- local -----
    integer(ip_i4_p) :: i       ! Index
    integer(ip_i4_p) :: nlen    ! Length of string
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_getParentDir) "
-   character(*),parameter :: F00     = "('(prism_string_getParentDir) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_getParentDir) "
+   character(*),parameter :: F00     = "('(oasis_string_getParentDir) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    nlen = len_trim(str)
    if ( str(nlen:nlen) == "/" ) nlen = nlen - 1
    i = index( str(1:nlen), "/", back=.true. )
    if ( i == 0 )then
-      prism_string_getParentDir = str
+      oasis_string_getParentDir = str
    else
-      prism_string_getParentDir = str(1:i-1)
+      oasis_string_getParentDir = str(1:i-1)
    end if
    
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_getParentDir
+end function oasis_string_getParentDir
 
 !===============================================================================
 !BOP ===========================================================================
 !
 !
-! !IROUTINE: prism_string_lastIndex -- Get index of last substr within string
+! !IROUTINE: oasis_string_lastIndex -- Get index of last substr within string
 !
 ! !DESCRIPTION:
 !  Get index of last substr within string
@@ -282,7 +282,7 @@ end function prism_string_getParentDir
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-integer function prism_string_lastIndex(string,substr,rc)
+integer function oasis_string_lastIndex(string,substr,rc)
 
    implicit none
 
@@ -297,28 +297,28 @@ integer function prism_string_lastIndex(string,substr,rc)
    !--- local ---
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_lastIndex) "
-   character(*),parameter :: F00     = "('(prism_string_lastIndex) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_lastIndex) "
+   character(*),parameter :: F00     = "('(oasis_string_lastIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Note: 
 ! - "new" F90 back option to index function makes this home-grown solution obsolete
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-   prism_string_lastIndex = index(string,substr,.true.)
+   oasis_string_lastIndex = index(string,substr,.true.)
 
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_lastIndex
+end function oasis_string_lastIndex
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_endIndex -- Get the ending index of substr within string
+! !IROUTINE: oasis_string_endIndex -- Get the ending index of substr within string
 !
 ! !DESCRIPTION:
 !  Get the ending index of substr within string
@@ -328,7 +328,7 @@ end function prism_string_lastIndex
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-integer function prism_string_endIndex(string,substr,rc)
+integer function oasis_string_endIndex(string,substr,rc)
 
    implicit none
 
@@ -344,8 +344,8 @@ integer function prism_string_endIndex(string,substr,rc)
    integer(ip_i4_p)   :: i       ! generic index
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_endIndex) "
-   character(*),parameter :: F00     = "('(prism_string_endIndex) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_endIndex) "
+   character(*),parameter :: F00     = "('(oasis_string_endIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -354,31 +354,31 @@ integer function prism_string_endIndex(string,substr,rc)
 ! * do we need this function?
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    i = index(trim(string),trim(substr))
    if ( i == 0 ) then
-      prism_string_endIndex = 0  ! substr is not in string
+      oasis_string_endIndex = 0  ! substr is not in string
    else
-      prism_string_endIndex = i + len_trim(substr) - 1
+      oasis_string_endIndex = i + len_trim(substr) - 1
    end if
 
 !  -------------------------------------------------------------------
 !  i = index(trim(string),trim(substr),back=.true.)
 !  if (i == len(string)+1) i = 0
-!  prism_string_endIndex = i
+!  oasis_string_endIndex = i
 !  -------------------------------------------------------------------
 
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_endIndex
+end function oasis_string_endIndex
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_leftAlign -- remove leading white space
+! !IROUTINE: oasis_string_leftAlign -- remove leading white space
 !
 ! !DESCRIPTION:
 !    Remove leading white space
@@ -388,7 +388,7 @@ end function prism_string_endIndex
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_leftAlign(str,rc)
+subroutine oasis_string_leftAlign(str,rc)
 
    implicit none
 
@@ -403,8 +403,8 @@ subroutine prism_string_leftAlign(str,rc)
    integer(ip_i4_p) :: rCode ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_leftAlign) "
-   character(*),parameter :: F00     = "('(prism_string_leftAlign) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_leftAlign) "
+   character(*),parameter :: F00     = "('(oasis_string_leftAlign) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! note: 
@@ -421,19 +421,19 @@ subroutine prism_string_leftAlign(str,rc)
 !  !! (len_trim(str) == 0 ) rCode = 1  ! ?? appropriate ??
 !  -------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    str = adjustL(str)
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_leftAlign
+end subroutine oasis_string_leftAlign
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_alphanum -- remove non alpha numeric characters
+! !IROUTINE: oasis_string_alphanum -- remove non alpha numeric characters
 !
 ! !DESCRIPTION:
 !    Remove all non alpha numeric characters from string
@@ -443,7 +443,7 @@ end subroutine prism_string_leftAlign
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_alphanum(str,rc)
+subroutine oasis_string_alphanum(str,rc)
 
    implicit none
 
@@ -459,14 +459,14 @@ subroutine prism_string_alphanum(str,rc)
    integer(ip_i4_p) :: n,icnt ! counters
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_alphaNum) "
-   character(*),parameter :: F00     = "('(prism_string_alphaNum) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_alphaNum) "
+   character(*),parameter :: F00     = "('(oasis_string_alphaNum) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    icnt = 0
    do n=1,len_trim(str)
@@ -483,14 +483,14 @@ subroutine prism_string_alphanum(str,rc)
 
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_alphanum
+end subroutine oasis_string_alphanum
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_betweenTags -- Get the substring between the two tags.
+! !IROUTINE: oasis_string_betweenTags -- Get the substring between the two tags.
 !
 ! !DESCRIPTION:
 !    Get the substring found between the start and end tags.
@@ -500,7 +500,7 @@ end subroutine prism_string_alphanum
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
+subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
 
    implicit none
 
@@ -520,17 +520,17 @@ subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
    integer(ip_i4_p)   :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_betweenTags) "
-   character(*),parameter :: F00     = "('(prism_string_betweenTags) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_betweenTags) "
+   character(*),parameter :: F00     = "('(oasis_string_betweenTags) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 ! * assumes the leading/trailing white space is not part of start & end tags
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-   iStart = prism_string_endIndex(string,trim(adjustL(startTag))) ! end of start tag
+   iStart = oasis_string_endIndex(string,trim(adjustL(startTag))) ! end of start tag
    iEnd   =               index(string,trim(adjustL(endTag  ))) ! start of end tag
 
    rCode = 0
@@ -569,14 +569,14 @@ subroutine prism_string_betweenTags(string,startTag,endTag,substr,rc)
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_betweenTags
+end subroutine oasis_string_betweenTags
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_parseCFtunit -- Parse CF time unit
+! !IROUTINE: oasis_string_parseCFtunit -- Parse CF time unit
 !
 ! !DESCRIPTION:
 !  Parse CF time unit into a delta string name and a base time in yyyymmdd
@@ -593,7 +593,7 @@ end subroutine prism_string_betweenTags
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
+subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
    implicit none
 
@@ -615,8 +615,8 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
    real(ip_r8_p)      :: sec              ! time stuff
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_parseCFtunit) "
-   character(*),parameter :: F00     = "('(prism_string_parseCFtunit) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_parseCFtunit) "
+   character(*),parameter :: F00     = "('(oasis_string_parseCFtunit) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -624,35 +624,35 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
 !   This is a reasonable assumption.
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    unit = 'none'
    bdate = 0
    bsec = 0.0_ip_r8_p
 
-   i = prism_string_lastIndex(string,'days ')
+   i = oasis_string_lastIndex(string,'days ')
    if (i > 0) unit = 'days'
-   i = prism_string_lastIndex(string,'hours ')
+   i = oasis_string_lastIndex(string,'hours ')
    if (i > 0) unit = 'hours'
-   i = prism_string_lastIndex(string,'minutes ')
+   i = oasis_string_lastIndex(string,'minutes ')
    if (i > 0) unit = 'minutes'
-   i = prism_string_lastIndex(string,'seconds ')
+   i = oasis_string_lastIndex(string,'seconds ')
    if (i > 0) unit = 'seconds'
 
    if (trim(unit) == 'none') then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) ' ERROR time unit unknown'
-       CALL prism_string_abort(subName//' time unit unknown')
+       CALL oasis_string_abort(subName//' time unit unknown')
    endif
 
-   i = prism_string_lastIndex(string,' since ')
+   i = oasis_string_lastIndex(string,' since ')
    if (i < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) ' ERROR since does not appear in unit attribute for time '
-       CALL prism_string_abort(subName//' no since in attr name')
+       CALL oasis_string_abort(subName//' no since in attr name')
    endif
    tbase = trim(string(i+6:))
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    if (debug > 0 .and. nulprt > 0) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
@@ -667,31 +667,31 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
    lstr = tbase(i1:i2)
    read(lstr,*,ERR=200,END=200) yr
    tbase = tbase(i2+2:)
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    i2 = index(tbase,'-') - 1
    lstr = tbase(i1:i2)
    read(lstr,*,ERR=200,END=200) mo
    tbase = tbase(i2+2:)
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    i2 = index(tbase,' ') - 1
    lstr = tbase(i1:i2)
    read(lstr,*,ERR=200,END=200) da
    tbase = tbase(i2+2:)
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    i2 = index(tbase,':') - 1
    lstr = tbase(i1:i2)
    read(lstr,*,ERR=200,END=100) hr
    tbase = tbase(i2+2:)
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    i2 = index(tbase,':') - 1
    lstr = tbase(i1:i2)
    read(lstr,*,ERR=200,END=100) min
    tbase = tbase(i2+2:)
-   call prism_string_leftAlign(tbase)
+   call oasis_string_leftAlign(tbase)
 
    i2 = index(tbase,' ') - 1
    lstr = tbase(i1:i2)
@@ -710,21 +710,21 @@ subroutine prism_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
    if (present(rc)) rc = 0
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
    return
 
 200  continue
    WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
    write(nulprt,F00) 'ERROR 200 on char num read '
-   call prism_string_abort(subName//' ERROR on char num read')
-   call prism_sys_debug_exit(subname)
+   call oasis_string_abort(subName//' ERROR on char num read')
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_parseCFtunit
+end subroutine oasis_string_parseCFtunit
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_clean -- Clean a string, set it to "blank"
+! !IROUTINE: oasis_string_clean -- Clean a string, set it to "blank"
 !
 ! !DESCRIPTION:
 !     Clean a string, set it to blank
@@ -734,7 +734,7 @@ end subroutine prism_string_parseCFtunit
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_clean(string,rc)
+subroutine oasis_string_clean(string,rc)
 
    implicit none
 
@@ -750,27 +750,27 @@ subroutine prism_string_clean(string,rc)
    integer(ip_i4_p)   :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_clean) "
-   character(*),parameter :: F00     = "('(prism_string_clean) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_clean) "
+   character(*),parameter :: F00     = "('(oasis_string_clean) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
    string = '       '
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_clean
+end subroutine oasis_string_clean
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listIsValid -- determine whether string is a valid list
+! !IROUTINE: oasis_string_listIsValid -- determine whether string is a valid list
 !
 ! !DESCRIPTION:
 !     Determine whether string is a valid list
@@ -780,7 +780,7 @@ end subroutine prism_string_clean
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-logical function prism_string_listIsValid(list,rc)
+logical function oasis_string_listIsValid(list,rc)
 
    implicit none
 
@@ -796,17 +796,17 @@ logical function prism_string_listIsValid(list,rc)
    integer  (ip_i4_p) :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listIsValid) "
-   character(*),parameter :: F00     = "('(prism_string_listIsValid) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listIsValid) "
+   character(*),parameter :: F00     = "('(oasis_string_listIsValid) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! check that the list conforms to the list format
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
-   prism_string_listIsValid = .true.
+   oasis_string_listIsValid = .true.
 
    nChar = len_trim(list)
    if (nChar < 1) then                           ! list is an empty string
@@ -822,21 +822,21 @@ logical function prism_string_listIsValid(list,rc)
    end if
    
    if (rCode /= 0) then
-      prism_string_listIsValid = .false.
+      oasis_string_listIsValid = .false.
       WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
       write(nulprt,F00) "WARNING: invalid list = ",trim(list)
    endif
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_listIsValid
+end function oasis_string_listIsValid
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listGetName -- Get name of k-th field in list
+! !IROUTINE: oasis_string_listGetName -- Get name of k-th field in list
 !
 ! !DESCRIPTION:
 !     Get name of k-th field in list
@@ -846,7 +846,7 @@ end function prism_string_listIsValid
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listGetName(list,k,name,rc)
+subroutine oasis_string_listGetName(list,k,name,rc)
 
    implicit none
 
@@ -866,31 +866,31 @@ subroutine prism_string_listGetName(list,k,name,rc)
    integer(ip_i4_p)   :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listGetName) "
-   character(*),parameter :: F00     = "('(prism_string_listGetName) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listGetName) "
+   character(*),parameter :: F00     = "('(oasis_string_listGetName) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
    !--- check that this is a valid list ---
-   if (.not. prism_string_listIsValid(list,rCode) ) then
+   if (.not. oasis_string_listIsValid(list,rCode) ) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
       write(nulprt,F00) "ERROR: invalid list = ",trim(list)
-      call prism_string_abort(subName//" ERROR: invalid list = "//trim(list))
+      call oasis_string_abort(subName//" ERROR: invalid list = "//trim(list))
    end if
 
    !--- check that this is a valid index ---
-   kFlds = prism_string_listGetNum(list)
+   kFlds = oasis_string_listGetNum(list)
    if (k<1 .or. kFlds<k) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,*) subName,"ERROR: invalid index = ",k
        WRITE(nulprt,*) subName,"ERROR:          list = ",TRIM(list)
-       CALL prism_string_abort(subName//" ERROR: invalid index")
+       CALL oasis_string_abort(subName//" ERROR: invalid index")
    end if
 
    !--- start with whole list, then remove fields before and after desired field ---
@@ -914,14 +914,14 @@ subroutine prism_string_listGetName(list,k,name,rc)
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listGetName
+end subroutine oasis_string_listGetName
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listIntersect -- Get intersection of two field lists
+! !IROUTINE: oasis_string_listIntersect -- Get intersection of two field lists
 !
 ! !DESCRIPTION:
 !     Get intersection of two fields lists, write into third list
@@ -931,7 +931,7 @@ end subroutine prism_string_listGetName
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listIntersect(list1,list2,listout,rc)
+subroutine oasis_string_listIntersect(list1,list2,listout,rc)
 
    implicit none
 
@@ -950,37 +950,37 @@ subroutine prism_string_listIntersect(list1,list2,listout,rc)
    integer(ip_i4_p)   :: rCode    ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listIntersect) "
-   character(*),parameter :: F00     = "('(prism_string_listIntersect) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listIntersect) "
+   character(*),parameter :: F00     = "('(oasis_string_listIntersect) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
-   nf = prism_string_listGetNum(list1)
-   call prism_string_clean(listout)
+   nf = oasis_string_listGetNum(list1)
+   call oasis_string_clean(listout)
    do n1 = 1,nf
-     call prism_string_listGetName(list1,n1,name,rCode)
-     n2 = prism_string_listGetIndexF(list2,name)
+     call oasis_string_listGetName(list1,n1,name,rCode)
+     n2 = oasis_string_listGetIndexF(list2,name)
      if (n2 > 0) then
-       call prism_string_listAppend(listout,name)
+       call oasis_string_listAppend(listout,name)
      endif
    enddo
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listIntersect
+end subroutine oasis_string_listIntersect
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listUnion -- Get union of two field lists
+! !IROUTINE: oasis_string_listUnion -- Get union of two field lists
 !
 ! !DESCRIPTION:
 !     Get union of two fields lists, write into third list
@@ -990,7 +990,7 @@ end subroutine prism_string_listIntersect
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listUnion(list1,list2,listout,rc)
+subroutine oasis_string_listUnion(list1,list2,listout,rc)
 
    implicit none
 
@@ -1009,47 +1009,47 @@ subroutine prism_string_listUnion(list1,list2,listout,rc)
    integer(ip_i4_p)  :: rCode    ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listUnion) "
-   character(*),parameter :: F00     = "('(prism_string_listUnion) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listUnion) "
+   character(*),parameter :: F00     = "('(oasis_string_listUnion) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
-   call prism_string_clean(listout)
+   call oasis_string_clean(listout)
 
-   nf = prism_string_listGetNum(list1)
+   nf = oasis_string_listGetNum(list1)
    do n1 = 1,nf
-     call prism_string_listGetName(list1,n1,name,rCode)
-     n2 = prism_string_listGetIndexF(listout,name)
+     call oasis_string_listGetName(list1,n1,name,rCode)
+     n2 = oasis_string_listGetIndexF(listout,name)
      if (n2 < 1) then
-       call prism_string_listAppend(listout,name)
+       call oasis_string_listAppend(listout,name)
      endif
    enddo
 
-   nf = prism_string_listGetNum(list2)
+   nf = oasis_string_listGetNum(list2)
    do n1 = 1,nf
-     call prism_string_listGetName(list2,n1,name,rCode)
-     n2 = prism_string_listGetIndexF(listout,name)
+     call oasis_string_listGetName(list2,n1,name,rCode)
+     n2 = oasis_string_listGetIndexF(listout,name)
      if (n2 < 1) then
-       call prism_string_listAppend(listout,name)
+       call oasis_string_listAppend(listout,name)
      endif
    enddo
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listUnion
+end subroutine oasis_string_listUnion
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listMerge -- Merge lists two list to third
+! !IROUTINE: oasis_string_listMerge -- Merge lists two list to third
 !
 ! !DESCRIPTION:
 !     Merge two list to third
@@ -1060,7 +1060,7 @@ end subroutine prism_string_listUnion
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listMerge(list1,list2,listout,rc)
+subroutine oasis_string_listMerge(list1,list2,listout,rc)
 
    implicit none
 ! !INPUT/OUTPUT PARAMETERS:
@@ -1077,32 +1077,32 @@ subroutine prism_string_listMerge(list1,list2,listout,rc)
    integer(ip_i4_p) :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listMerge) "
-   character(*),parameter :: F00     = "('(prism_string_listMerge) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listMerge) "
+   character(*),parameter :: F00     = "('(oasis_string_listMerge) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
    !--- make sure temp strings are large enough ---
    if ( (len(l1) < len_trim(list1)) .or. (len(l2) < len_trim(list2))) then
-      call prism_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//'ERROR: temp string not large enough')
    end if
 
-   call prism_string_clean(l1)
-   call prism_string_clean(l2)
-   call prism_string_clean(listout)
+   call oasis_string_clean(l1)
+   call oasis_string_clean(l2)
+   call oasis_string_clean(listout)
    l1 = trim(list1)
    l2 = trim(list2)
-   call prism_string_leftAlign(l1,rCode)
-   call prism_string_leftAlign(l2,rCode)
+   call oasis_string_leftAlign(l1,rCode)
+   call oasis_string_leftAlign(l2,rCode)
    if (len_trim(l1)+len_trim(l2)+1 > len(listout)) &
-      call prism_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//'ERROR: output list string not large enough')
    if (len_trim(l1) == 0) then
      listout = trim(l2)
    else
@@ -1111,14 +1111,14 @@ subroutine prism_string_listMerge(list1,list2,listout,rc)
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listMerge
+end subroutine oasis_string_listMerge
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listAppend -- Append one list to another
+! !IROUTINE: oasis_string_listAppend -- Append one list to another
 !
 ! !DESCRIPTION:
 !     Append one list to another
@@ -1128,7 +1128,7 @@ end subroutine prism_string_listMerge
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listAppend(list,listadd,rc)
+subroutine oasis_string_listAppend(list,listadd,rc)
 
    implicit none
 
@@ -1145,28 +1145,28 @@ subroutine prism_string_listAppend(list,listadd,rc)
    integer(ip_i4_p) :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listAppend) "
-   character(*),parameter :: F00     = "('(prism_string_listAppend) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listAppend) "
+   character(*),parameter :: F00     = "('(oasis_string_listAppend) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
    !--- make sure temp string is large enough ---
    if (len(l1) < len_trim(listAdd)) then
-      call prism_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//'ERROR: temp string not large enough')
    end if
 
-   call prism_string_clean(l1)
+   call oasis_string_clean(l1)
    l1 = trim(listadd)
-   call prism_string_leftAlign(l1,rCode)
+   call oasis_string_leftAlign(l1,rCode)
    if (len_trim(list)+len_trim(l1)+1 > len(list)) &
-      call prism_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//'ERROR: output list string not large enough')
    if (len_trim(list) == 0) then
      list = trim(l1)
    else
@@ -1175,14 +1175,14 @@ subroutine prism_string_listAppend(list,listadd,rc)
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listAppend
+end subroutine oasis_string_listAppend
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listPrepend -- Prepend one list to another
+! !IROUTINE: oasis_string_listPrepend -- Prepend one list to another
 !
 ! !DESCRIPTION:
 !     Prepend one list to another
@@ -1194,7 +1194,7 @@ end subroutine prism_string_listAppend
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listPrepend(listadd,list,rc)
+subroutine oasis_string_listPrepend(listadd,list,rc)
 
    implicit none
 
@@ -1211,29 +1211,29 @@ subroutine prism_string_listPrepend(listadd,list,rc)
    integer(ip_i4_p) :: rCode   ! return code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listPrepend) "
-   character(*),parameter :: F00     = "('(prism_string_listPrepend) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listPrepend) "
+   character(*),parameter :: F00     = "('(oasis_string_listPrepend) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    rCode = 0
 
    !--- make sure temp string is large enough ---
    if (len(l1) < len_trim(listAdd)) then
-      call prism_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//'ERROR: temp string not large enough')
    end if
 
-   call prism_string_clean(l1)
+   call oasis_string_clean(l1)
    l1 = trim(listadd)
-   call prism_string_leftAlign(l1,rCode)
-   call prism_string_leftAlign(list,rCode)
+   call oasis_string_leftAlign(l1,rCode)
+   call oasis_string_leftAlign(list,rCode)
    if (len_trim(list)+len_trim(l1)+1 > len(list)) &
-      call prism_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//'ERROR: output list string not large enough')
    if (len_trim(l1) == 0) then
      list = trim(list)
    else
@@ -1242,14 +1242,14 @@ subroutine prism_string_listPrepend(listadd,list,rc)
 
    if (present(rc)) rc = rCode
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listPrepend
+end subroutine oasis_string_listPrepend
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listGetIndexF -- Get index of field in string
+! !IROUTINE: oasis_string_listGetIndexF -- Get index of field in string
 !
 ! !DESCRIPTION:
 !     Get index of field in string
@@ -1259,7 +1259,7 @@ end subroutine prism_string_listPrepend
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-integer function prism_string_listGetIndexF(string,fldStr)
+integer function oasis_string_listGetIndexF(string,fldStr)
 
    implicit none
 
@@ -1275,24 +1275,24 @@ integer function prism_string_listGetIndexF(string,fldStr)
    integer(ip_i4_p)    :: rc       ! error code
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listGetIndexF) "
-   character(*),parameter :: F00     = "('(prism_string_listGetIndexF) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listGetIndexF) "
+   character(*),parameter :: F00     = "('(oasis_string_listGetIndexF) ',4a)"
 
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-   call prism_string_listGetIndex(string,fldStr,k,print=.false.,rc=rc)
-   prism_string_listGetIndexF = k
+   call oasis_string_listGetIndex(string,fldStr,k,print=.false.,rc=rc)
+   oasis_string_listGetIndexF = k
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_listGetIndexF
+end function oasis_string_listGetIndexF
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listGetIndex -- Get index of field in string
+! !IROUTINE: oasis_string_listGetIndex -- Get index of field in string
 !
 ! !DESCRIPTION:
 !     Get index of field in string
@@ -1302,7 +1302,7 @@ end function prism_string_listGetIndexF
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
+subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
 
    implicit none
 
@@ -1326,13 +1326,13 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
    logical                :: lprint           ! local print flag
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listGetIndex) "
-   character(*),parameter :: F00     = "('(prism_string_listGetIndex) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listGetIndex) "
+   character(*),parameter :: F00     = "('(oasis_string_listGetIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    if (present(rc)) rc = 0
 
@@ -1345,7 +1345,7 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
            WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
            WRITE(nulprt,F00) "ERROR: input field name has 0 length"
        ENDIF
-       CALL prism_string_abort(subName//"invalid field name")
+       CALL oasis_string_abort(subName//"invalid field name")
    end if
 
    !--- search for field name in string's list of fields ---
@@ -1355,7 +1355,7 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
    i1      = -1
    j0      = -1  ! ?? fldStr == string(j0:j1) ??
    j1      =  len_trim(string)
-   nFields = prism_string_listGetNum(string)
+   nFields = oasis_string_listGetNum(string)
    do k = 1,nFields
       !--------------------------------------------------------
       ! search from end of list to end of list
@@ -1369,7 +1369,7 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
       endif
       !--- sanity check ---
    !  if ((k <nFields .and. n<1) .or. (k==nFields .and. n>0)) then
-   !     call prism_string_abort(subName//"ERROR: wrong string%nf ?")
+   !     call oasis_string_abort(subName//"ERROR: wrong string%nf ?")
    !  end if
       !--- is it a match? ---
       if (trim(fldStr) == string(i0:i1)) then
@@ -1386,7 +1386,7 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
       j0 = n + 1 ! n==0 => the first field name in fieldNames
       !--- sanity check ---
    !  if ((k <nFields .and. n<1) .or. (k==nFields .and. n>0)) then
-   !     call prism_string_abort(subName//"ERROR: wrong string%nf ?")
+   !     call oasis_string_abort(subName//"ERROR: wrong string%nf ?")
    !  end if
       !--- is it a match? ---
       if (trim(fldStr) == string(j0:j1)) then
@@ -1411,14 +1411,14 @@ subroutine prism_string_listGetIndex(string,fldStr,kFld,print,rc)
       if (present(rc)) rc = 1
    end if
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listGetIndex
+end subroutine oasis_string_listGetIndex
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listGetNum -- get number of fields in a string list
+! !IROUTINE: oasis_string_listGetNum -- get number of fields in a string list
 !
 ! !DESCRIPTION:
 !  return number of fields in string list
@@ -1426,7 +1426,7 @@ end subroutine prism_string_listGetIndex
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-integer function prism_string_listGetNum(str)
+integer function oasis_string_listGetNum(str)
 
    implicit none
 
@@ -1440,30 +1440,30 @@ integer function prism_string_listGetNum(str)
    integer(ip_i4_p) :: count    ! counts occurances of char
 
    !----- formats -----
-   character(*),parameter :: subName =   "(prism_string_listGetNum) "
-   character(*),parameter :: F00     = "('(prism_string_listGetNum) ',4a)"
+   character(*),parameter :: subName =   "(oasis_string_listGetNum) "
+   character(*),parameter :: F00     = "('(oasis_string_listGetNum) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-   prism_string_listGetNum = 0
+   oasis_string_listGetNum = 0
 
    if (len_trim(str) > 0) then
-      count = prism_string_countChar(str,listDel)
-      prism_string_listGetNum = count + 1
+      count = oasis_string_countChar(str,listDel)
+      oasis_string_listGetNum = count + 1
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end function prism_string_listGetNum
+end function oasis_string_listGetNum
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listSetDel -- Set list delimeter character
+! !IROUTINE: oasis_string_listSetDel -- Set list delimeter character
 !
 ! !DESCRIPTION:
 !     Set field delimeter character in lists
@@ -1473,7 +1473,7 @@ end function prism_string_listGetNum
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listSetDel(cflag)
+subroutine oasis_string_listSetDel(cflag)
 
    implicit none
 
@@ -1484,12 +1484,12 @@ subroutine prism_string_listSetDel(cflag)
 !EOP
 
    !--- formats ---
-   character(*),parameter :: subName =   "(prism_string_listSetDel) "
-   character(*),parameter :: F00     = "('(prism_string_listSetDel) ',a) "
+   character(*),parameter :: subName =   "(oasis_string_listSetDel) "
+   character(*),parameter :: F00     = "('(oasis_string_listSetDel) ',a) "
 
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    IF (debug > 0) THEN
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
@@ -1498,14 +1498,14 @@ subroutine prism_string_listSetDel(cflag)
    listDel = trim(cflag)
    listDel2 = listDel//listDel
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listSetDel
+end subroutine oasis_string_listSetDel
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_listGetDel -- Get list delimeter character
+! !IROUTINE: oasis_string_listGetDel -- Get list delimeter character
 !
 ! !DESCRIPTION:
 !     Get field delimeter character in lists
@@ -1515,7 +1515,7 @@ end subroutine prism_string_listSetDel
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_listGetDel(del)
+subroutine oasis_string_listGetDel(del)
 
   implicit none
 
@@ -1526,33 +1526,33 @@ subroutine prism_string_listGetDel(del)
 !EOP
 
    !--- formats ---
-   character(*),parameter :: subName =   "(prism_string_listGetDel) "
-   character(*),parameter :: F00     = "('(prism_string_listGetDel) ',a) "
+   character(*),parameter :: subName =   "(oasis_string_listGetDel) "
+   character(*),parameter :: F00     = "('(oasis_string_listGetDel) ',a) "
 
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    del = trim(listDel)
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_listGetDel
+end subroutine oasis_string_listGetDel
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_setAbort -- Set local prism_string abort flag
+! !IROUTINE: oasis_string_setAbort -- Set local oasis_string abort flag
 !
 ! !DESCRIPTION:
-!     Set local prism_string abort flag, true = abort, false = print and continue
+!     Set local oasis_string abort flag, true = abort, false = print and continue
 !     \newline
 !     call shr\_string\_setAbort(.false.)
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_setAbort(flag)
+subroutine oasis_string_setAbort(flag)
 
    implicit none
 
@@ -1563,12 +1563,12 @@ subroutine prism_string_setAbort(flag)
 !EOP
 
    !--- formats ---
-   character(*),parameter :: subName =   "(prism_string_setAbort) "
-   character(*),parameter :: F00     = "('(prism_string_setAbort) ',a) "
+   character(*),parameter :: subName =   "(oasis_string_setAbort) "
+   character(*),parameter :: F00     = "('(oasis_string_setAbort) ',a) "
 
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    if (debug > 0) then
       if (flag) then
@@ -1582,24 +1582,24 @@ subroutine prism_string_setAbort(flag)
 
    doabort = flag
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_setAbort
+end subroutine oasis_string_setAbort
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_string_setDebug -- Set local prism_string debug level
+! !IROUTINE: oasis_string_setDebug -- Set local oasis_string debug level
 !
 ! !DESCRIPTION:
-!     Set local prism_string debug level, 0 = production
+!     Set local oasis_string debug level, 0 = production
 !     \newline
 !     call shr\_string\_setDebug(2)
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_string_setDebug(iFlag)
+subroutine oasis_string_setDebug(iFlag)
 
    implicit none
 
@@ -1612,27 +1612,27 @@ subroutine prism_string_setDebug(iFlag)
    !--- local ---
 
    !--- formats ---
-   character(*),parameter :: subName =   "(prism_string_setDebug) "
-   character(*),parameter :: F00     = "('(prism_string_setDebug) ',a) "
-   character(*),parameter :: F01     = "('(prism_string_setDebug) ',a,i3,a,i3) "
+   character(*),parameter :: subName =   "(oasis_string_setDebug) "
+   character(*),parameter :: F00     = "('(oasis_string_setDebug) ',a) "
+   character(*),parameter :: F01     = "('(oasis_string_setDebug) ',a,i3,a,i3) "
 
 !-------------------------------------------------------------------------------
 ! NTOE: write statement can be expensive if called many times.
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-!   if (PRISM_Debug > 0) write(nulprt,F01) 'changing debug level from ',debug,' to ',iflag
+!   if (OASIS_debug > 0) write(nulprt,F01) 'changing debug level from ',debug,' to ',iflag
    debug = iFlag
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_setDebug
+end subroutine oasis_string_setDebug
 
 !===============================================================================
 !===============================================================================
 
-subroutine prism_string_abort(string)
+subroutine oasis_string_abort(string)
 
    implicit none
 
@@ -1644,15 +1644,15 @@ subroutine prism_string_abort(string)
 
    !--- local ---
    character(ic_xl) :: lstring
-   character(*),parameter :: subName =   "(prism_string_abort)"
-   character(*),parameter :: F00     = "('(prism_string_abort) ',a)"
+   character(*),parameter :: subName =   "(oasis_string_abort)"
+   character(*),parameter :: F00     = "('(oasis_string_abort) ',a)"
 
 !-------------------------------------------------------------------------------
 ! NOTE:
 ! - no input or output string should be longer than ic_xl
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lstring = ''
    if (present(string)) lstring = string
@@ -1660,16 +1660,16 @@ subroutine prism_string_abort(string)
    if (doabort) then
        WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    else
       write(nulprt,F00) ' no abort:'//trim(lstring)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_string_abort
+end subroutine oasis_string_abort
 
 !===============================================================================
 !===============================================================================
 
-end module mod_prism_string
+end module mod_oasis_string

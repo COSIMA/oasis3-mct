@@ -1,16 +1,16 @@
-  MODULE mod_prism_var
+  MODULE mod_oasis_var
 
-  USE mod_prism_kinds
-  USE mod_prism_data
-  USE mod_prism_parameters
-  USE mod_prism_sys
+  USE mod_oasis_kinds
+  USE mod_oasis_data
+  USE mod_oasis_parameters
+  USE mod_oasis_sys
 
   IMPLICIT none
 
   private
 
   !--- interfaces ---
-  public prism_var_def
+  public oasis_def_var
 
   !--- datatypes ---
   public :: prism_var_type
@@ -37,7 +37,7 @@
 
 !---------------------------------------------------------------
 
-  SUBROUTINE prism_var_def(id_nports, cdport, id_part, &
+  SUBROUTINE oasis_def_var(id_nports, cdport, id_part, &
          id_var_nodims, kinout, id_var_shape, ktype, kinfo)
 !    ---------------------------------------------------------------
      INTEGER(kind=ip_i4_p) :: kinout, ktype, id_nports,id_part
@@ -46,18 +46,18 @@
      INTEGER(kind=ip_i4_p),optional :: kinfo
 !    ---------------------------------------------------------------
      integer(kind=ip_i4_p) :: n
-     character(len=*),parameter :: subname = 'prism_var_def'
+     character(len=*),parameter :: subname = 'oasis_def_var'
 !    ---------------------------------------------------------------
 
-     call prism_sys_debug_enter(subname)
+     call oasis_debug_enter(subname)
 
-     kinfo = PRISM_Ok
+     kinfo = OASIS_Ok
 
      do n = 1,prism_nvar
         if (trim(cdport) == trim(prism_var(n)%name)) then
            write(nulprt,*) subname,' variable already defined with var_def ',trim(cdport)
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           call prism_sys_abort()
+           call oasis_abort_noarg()
         endif
      enddo
 
@@ -67,7 +67,7 @@
      if (prism_nvar > mvar) then
         write(nulprt,*) subname,' ERROR prism_nvar too large ',prism_nvar,mvar
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        call prism_sys_abort()
+        call oasis_abort_noarg()
      endif
 
      prism_var(prism_nvar)%name = trim(cdport)
@@ -86,7 +86,7 @@
     !----------------------------------
     !--- some diagnostics
     !----------------------------------
-     if (PRISM_DEBUG >= 2) then
+     if (OASIS_debug >= 2) then
         write(nulprt,*) ' '
         write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
         write(nulprt,*) subname,' varname = ',prism_nvar,trim(prism_var(prism_nvar)%name)
@@ -99,9 +99,9 @@
         write(nulprt,*) ' '
      endif
 
-     call prism_sys_debug_exit(subname)
+     call oasis_debug_exit(subname)
 
-  END SUBROUTINE prism_var_def
+   END SUBROUTINE oasis_def_var
 
-END MODULE mod_prism_var
+ END MODULE mod_oasis_var
 

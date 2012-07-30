@@ -1,46 +1,47 @@
-module mod_oasis
+MODULE mod_oasis
 
 ! !USES:
-   use mod_prism_kinds  ,only: ip_single_p
-   use mod_prism_kinds  ,only: ip_double_p
-   use mod_prism_kinds  ,only: ip_realwp_p
-   use mod_prism_kinds  ,only: ll_single
-   use mod_prism_kinds  ,only: ip_i2_p
-   use mod_prism_kinds  ,only: ip_i4_p
-   use mod_prism_kinds  ,only: ip_i8_p
-   use mod_prism_kinds  ,only: ip_intwp_p
+  USE mod_oasis_kinds  ,ONLY: ip_single_p
+  USE mod_oasis_kinds  ,ONLY: ip_double_p
+  USE mod_oasis_kinds  ,ONLY: ip_realwp_p
+  USE mod_oasis_kinds  ,ONLY: ll_single
+  USE mod_oasis_kinds  ,ONLY: ip_i2_p
+  USE mod_oasis_kinds  ,ONLY: ip_i4_p
+  USE mod_oasis_kinds  ,ONLY: ip_i8_p
+  USE mod_oasis_kinds  ,ONLY: ip_intwp_p
 
-   use mod_prism_parameters
+  USE mod_oasis_parameters
 
-   use mod_prism_method ,only: oasis_init_comp     => prism_method_init
-   use mod_prism_method ,only: oasis_terminate     => prism_method_terminate
-   use mod_prism_method ,only: oasis_get_localcomm => prism_method_getlocalcomm
-   use mod_prism_method ,only: oasis_set_couplcomm => prism_method_setcouplcomm
-   use mod_prism_method ,only: oasis_create_couplcomm => prism_method_createcouplcomm
-   use mod_prism_method ,only: oasis_get_intracomm => prism_method_get_intracomm
-   use mod_prism_method ,only: oasis_get_intercomm => prism_method_get_intercomm
-   use mod_prism_method ,only: oasis_set_debug     => prism_method_setdebug
-   use mod_prism_method ,only: oasis_get_debug     => prism_method_getdebug
-   use mod_prism_method ,only: oasis_enddef        => prism_method_enddef
+  USE mod_oasis_method ,ONLY: oasis_init_comp    
+  USE mod_oasis_method ,ONLY: oasis_terminate
+  USE mod_oasis_method ,ONLY: oasis_get_localcomm
+  USE mod_oasis_method ,ONLY: oasis_set_couplcomm
+  USE mod_oasis_method ,ONLY: oasis_create_couplcomm
+  USE mod_oasis_method ,ONLY: oasis_get_intracomm
+  USE mod_oasis_method ,ONLY: oasis_get_intercomm 
+  USE mod_oasis_method ,ONLY: oasis_set_debug     
+  USE mod_oasis_method ,ONLY: oasis_get_debug     
+  USE mod_oasis_method ,ONLY: oasis_enddef        
 
-   use mod_prism_part   ,only: oasis_def_partition => prism_part_def
+  USE mod_oasis_part   ,ONLY: oasis_def_partition 
+  
+  USE mod_oasis_var    ,ONLY: oasis_def_var      
+  
+  USE mod_oasis_getput_interface ,ONLY: oasis_get 
+  USE mod_oasis_getput_interface ,ONLY: oasis_put 
+  
+  USE mod_oasis_grid   ,ONLY: oasis_start_grids_writing 
+  USE mod_oasis_grid   ,ONLY: oasis_write_grid 
+  USE mod_oasis_grid   ,ONLY: oasis_write_angle
+  USE mod_oasis_grid   ,ONLY: oasis_write_corner        
+  USE mod_oasis_grid   ,ONLY: oasis_write_mask          
+  USE mod_oasis_grid   ,ONLY: oasis_write_area          
+  USE mod_oasis_grid   ,ONLY: oasis_terminate_grids_writing 
+  
+  USE mod_oasis_sys    ,ONLY: oasis_abort       
 
-   use mod_prism_var    ,only: oasis_def_var       => prism_var_def
-
-   use mod_prism_getput_interface ,only: oasis_get => prism_get_proto
-   use mod_prism_getput_interface ,only: oasis_put => prism_put_proto
-
-   use mod_prism_grid   ,only: oasis_start_grids_writing => prism_grid_start_grids_writing
-   use mod_prism_grid   ,only: oasis_write_grid          => prism_grid_write_grid
-   use mod_prism_grid   ,only: oasis_write_corner        => prism_grid_write_corner
-   use mod_prism_grid   ,only: oasis_write_mask          => prism_grid_write_mask
-   use mod_prism_grid   ,only: oasis_write_area          => prism_grid_write_area
-   use mod_prism_grid   ,only: oasis_terminate_grids_writing => prism_grid_terminate_grids_writing
-
-   use mod_prism_sys    ,only: oasis_abort       => prism_sys_abort
-
-   implicit none
+  IMPLICIT NONE
 
 !===============================================================================
 
-end module mod_oasis
+END MODULE mod_oasis

@@ -1,7 +1,7 @@
 !===============================================================================
 !BOP ===========================================================================
 !
-! !MODULE: mod_prism_ioshr -- reads and writes driver files
+! !MODULE: mod_oasis_ioshr -- reads and writes driver files
 !
 ! !DESCRIPTION:
 !    Writes attribute vectors to netcdf
@@ -12,18 +12,18 @@
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-module mod_prism_ioshr
+module mod_oasis_ioshr
 
 #if (PIO_DEFINED)
 
   ! !USES:
 
-  use mod_prism_kinds, only: r8 => ip_r8_p, in => ip_intwp_p
-  use mod_prism_kinds, only: cl => ic_long
-  use mod_prism_data
-  use mod_prism_sys
-  use mod_prism_string, only: prism_string_toupper
-  use mod_prism_mpi
+  use mod_oasis_kinds, only: r8 => ip_r8_p, in => ip_intwp_p
+  use mod_oasis_kinds, only: cl => ic_long
+  use mod_oasis_data
+  use mod_oasis_sys
+  use mod_oasis_string, only: oasis_string_toupper
+  use mod_oasis_mpi
   use mct_mod           ! mct wrappers
   use pio
 
@@ -36,19 +36,19 @@ module mod_prism_ioshr
 
 ! !PUBLIC MEMBER FUNCTIONS:
 
-  public prism_ioshr_init
-  public prism_ioshr_finalize
-  public prism_ioshr_wopen
-  public prism_ioshr_close
-  public prism_ioshr_redef
-  public prism_ioshr_enddef
-  public prism_ioshr_date2yyyymmdd
-  public prism_ioshr_sec2hms
-  public prism_ioshr_read
-  public prism_ioshr_write
-!  public prism_ioshr_getiosys
-  public prism_ioshr_getiotype
-  public prism_ioshr_getioroot
+  public oasis_ioshr_init
+  public oasis_ioshr_finalize
+  public oasis_ioshr_wopen
+  public oasis_ioshr_close
+  public oasis_ioshr_redef
+  public oasis_ioshr_enddef
+  public oasis_ioshr_date2yyyymmdd
+  public oasis_ioshr_sec2hms
+  public oasis_ioshr_read
+  public oasis_ioshr_write
+!  public oasis_ioshr_getiosys
+  public oasis_ioshr_getiotype
+  public oasis_ioshr_getioroot
 
 ! !PUBLIC DATA MEMBERS
 
@@ -56,37 +56,37 @@ module mod_prism_ioshr
 
 !EOP
 
-  interface prism_ioshr_read
-     module procedure prism_ioshr_read_av
-     module procedure prism_ioshr_read_int
-     module procedure prism_ioshr_read_int1d
-     module procedure prism_ioshr_read_r8
-     module procedure prism_ioshr_read_r81d
-     module procedure prism_ioshr_read_char
+  interface oasis_ioshr_read
+     module procedure oasis_ioshr_read_av
+     module procedure oasis_ioshr_read_int
+     module procedure oasis_ioshr_read_int1d
+     module procedure oasis_ioshr_read_r8
+     module procedure oasis_ioshr_read_r81d
+     module procedure oasis_ioshr_read_char
   end interface
-  interface prism_ioshr_write
-     module procedure prism_ioshr_write_av
-     module procedure prism_ioshr_write_int
-     module procedure prism_ioshr_write_int1d
-     module procedure prism_ioshr_write_r8
-     module procedure prism_ioshr_write_r81d
-     module procedure prism_ioshr_write_char
-     module procedure prism_ioshr_write_time
+  interface oasis_ioshr_write
+     module procedure oasis_ioshr_write_av
+     module procedure oasis_ioshr_write_int
+     module procedure oasis_ioshr_write_int1d
+     module procedure oasis_ioshr_write_r8
+     module procedure oasis_ioshr_write_r81d
+     module procedure oasis_ioshr_write_char
+     module procedure oasis_ioshr_write_time
   end interface
 
 !-------------------------------------------------------------------------------
 ! Local data
 !-------------------------------------------------------------------------------
 
-   character(*),parameter :: prefix = "prism_ioshr_"
+   character(*),parameter :: prefix = "oasis_ioshr_"
    character(CL)          :: wfilename = ''
    real(r8)    ,parameter :: fillvalue = rspval
    character(CL) :: charvar   ! buffer for string read/write
 
-   character(*),parameter :: modName = "(mod_prism_ioshr) "
+   character(*),parameter :: modName = "(mod_oasis_ioshr) "
    integer(in) ,parameter :: debug = 1 ! internal debug level
 
-   character(*),parameter :: version ='prism_ioshr_v00'
+   character(*),parameter :: version ='oasis_ioshr_v00'
 
    type(file_desc_t), save :: pio_file
    type(iosystem_desc_t), save :: pio_iosystem
@@ -106,7 +106,7 @@ contains
 !=================================================================================
 !BOP =============================================================================
 !
-! !IROUTINE: prism_ioshr_init - initialize io for coupler
+! !IROUTINE: oasis_ioshr_init - initialize io for coupler
 !
 ! !DESCRIPTION:
 !    Read the pio_inparm namelist and initialize the pio subsystem
@@ -117,7 +117,7 @@ contains
 !
 ! !INTERFACE: --------------------------------------------------------------------
 
-  subroutine prism_ioshr_init(mpicomm,typename,stride,root,numtasks)
+  subroutine oasis_ioshr_init(mpicomm,typename,stride,root,numtasks)
     implicit none
     integer(IN),intent(in) :: mpicomm
     character(len=*),intent(in) :: typename
@@ -126,9 +126,9 @@ contains
     integer(IN),intent(in) :: root
 
     integer :: npes
-    character(*),parameter :: subName =   '(prism_ioshr_init) '
-    character(*),parameter :: F00     = "('(prism_ioshr_init) ',4a)"
-    character(*),parameter :: F01     = "('(prism_ioshr_init) ',a,i6)"
+    character(*),parameter :: subName =   '(oasis_ioshr_init) '
+    character(*),parameter :: F00     = "('(oasis_ioshr_init) ',4a)"
+    character(*),parameter :: F01     = "('(oasis_ioshr_init) ',a,i6)"
 
     !--------------------------------------------------------------------------
     ! init pio library
@@ -139,8 +139,8 @@ contains
     pio_numtasks = numtasks
     pio_root     = root
     call getiotypefromname(typename, pio_iotype, pio_iotype_netcdf)
-    call prism_mpi_commsize(pio_mpicomm,npes)
-    call prism_mpi_commrank(pio_mpicomm,pio_iam)
+    call oasis_mpi_commsize(pio_mpicomm,npes)
+    call oasis_mpi_commrank(pio_mpicomm,pio_iam)
 
     call namelist_set(npes, pio_mpicomm, pio_stride, pio_root, pio_numtasks, pio_iotype)
 
@@ -164,7 +164,7 @@ contains
     call pio_init(pio_iam, pio_mpicomm, pio_numtasks, 0, pio_stride, &
                   pio_rearr_box, pio_iosystem, base=pio_root)
 
-  end subroutine prism_ioshr_init
+  end subroutine oasis_ioshr_init
 
 !===============================================================================
 
@@ -175,9 +175,9 @@ contains
      integer, intent(in) :: defaulttype
 
      character(len=len(itypename)) :: typename
-     character(*),parameter :: subName =   '(prism_ioshr_getiotypefromname) '
+     character(*),parameter :: subName =   '(oasis_ioshr_getiotypefromname) '
 
-     typename = prism_string_toUpper(itypename)
+     typename = oasis_string_toUpper(itypename)
      if      ( typename .eq. 'NETCDF' ) then
         iotype = pio_iotype_netcdf
      else if ( typename .eq. 'PNETCDF') then
@@ -189,7 +189,7 @@ contains
      else if ( typename .eq. 'NOTHING') then
         iotype = defaulttype
      else
-        write(nulprt,*) 'mod_prism_ioshr: WARNING Bad io_type argument - using iotype_netcdf'
+        write(nulprt,*) 'mod_oasis_ioshr: WARNING Bad io_type argument - using iotype_netcdf'
         iotype=pio_iotype_netcdf
      end if
   end subroutine getiotypefromname
@@ -201,13 +201,13 @@ contains
     integer, intent(in) :: npes, mycomm
     integer, intent(inout) :: pio_stride, pio_root, pio_numtasks
     integer, intent(inout) :: pio_iotype
-    character(*),parameter :: subName =   '(prism_ioshr_namelist_set) '
+    character(*),parameter :: subName =   '(oasis_ioshr_namelist_set) '
 
 
-    call prism_mpi_bcast(pio_iotype  , mycomm)
-    call prism_mpi_bcast(pio_stride  , mycomm)
-    call prism_mpi_bcast(pio_root    , mycomm)
-    call prism_mpi_bcast(pio_numtasks, mycomm)
+    call oasis_mpi_bcast(pio_iotype  , mycomm)
+    call oasis_mpi_bcast(pio_stride  , mycomm)
+    call oasis_mpi_bcast(pio_root    , mycomm)
+    call oasis_mpi_bcast(pio_numtasks, mycomm)
 
     !--------------------------------------------------------------------------
     ! check/set/correct io pio parameters
@@ -256,54 +256,54 @@ contains
   end subroutine namelist_set
 
 !===============================================================================
-  subroutine prism_ioshr_finalize
+  subroutine oasis_ioshr_finalize
     implicit none
     integer :: ierr
-    character(*),parameter :: subName =   '(prism_ioshr_finalize) '
+    character(*),parameter :: subName =   '(oasis_ioshr_finalize) '
 
     call pio_finalize(pio_iosystem, ierr)
 
-  end subroutine prism_ioshr_finalize
+  end subroutine oasis_ioshr_finalize
 
 !===============================================================================
-!  function prism_ioshr_getiosys() result(iosystem)
+!  function oasis_ioshr_getiosys() result(iosystem)
 !    implicit none
 !    type(iosystem_desc_t), pointer :: iosystem
-!    character(*),parameter :: subName =   '(prism_ioshr_getiosys) '
+!    character(*),parameter :: subName =   '(oasis_ioshr_getiosys) '
 !
 !    iosystem => pio_iosystem
 !
-!  end function prism_ioshr_getiosys
+!  end function oasis_ioshr_getiosys
 !
 !===============================================================================
-  function prism_ioshr_getiotype() result(io_type)
+  function oasis_ioshr_getiotype() result(io_type)
     implicit none
     integer :: io_type
-    character(*),parameter :: subName =   '(prism_ioshr_getiotype) '
+    character(*),parameter :: subName =   '(oasis_ioshr_getiotype) '
 
     io_type = pio_iotype
 
-  end function prism_ioshr_getiotype
+  end function oasis_ioshr_getiotype
 !===============================================================================
-  function prism_ioshr_getioroot() result(io_root)
+  function oasis_ioshr_getioroot() result(io_root)
     implicit none
     integer :: io_root
-    character(*),parameter :: subName =   '(prism_ioshr_getioroot) '
+    character(*),parameter :: subName =   '(oasis_ioshr_getioroot) '
 
     io_root = pio_root
 
-  end function prism_ioshr_getioroot
+  end function oasis_ioshr_getioroot
 
 
 !===============================================================================
 
-subroutine prism_ioshr_flds_lookup(fldname,longname,stdname,units)
+subroutine oasis_ioshr_flds_lookup(fldname,longname,stdname,units)
     implicit none
     character(len=*),intent(in)  :: fldname
     character(len=*),intent(out),optional :: longname
     character(len=*),intent(out),optional :: stdname
     character(len=*),intent(out),optional :: units
-    character(*),parameter :: subName =   '(prism_ioshr_flds_lookup) '
+    character(*),parameter :: subName =   '(oasis_ioshr_flds_lookup) '
 
     if (present(longname)) then
        longname = 'unknown'
@@ -315,12 +315,12 @@ subroutine prism_ioshr_flds_lookup(fldname,longname,stdname,units)
        units    = 'unknown'
     endif
 
-end subroutine prism_ioshr_flds_lookup
+end subroutine oasis_ioshr_flds_lookup
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_ioshr_wopen - open netcdf file
+! !IROUTINE: oasis_ioshr_wopen - open netcdf file
 !
 ! !DESCRIPTION:
 !    open netcdf file
@@ -330,7 +330,7 @@ end subroutine prism_ioshr_flds_lookup
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_ioshr_wopen(filename,clobber,cdf64)
+subroutine oasis_ioshr_wopen(filename,clobber,cdf64)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -346,7 +346,7 @@ subroutine prism_ioshr_wopen(filename,clobber,cdf64)
     integer :: rcode
     integer :: nmode
     character(CL)  :: lversion
-    character(*),parameter :: subName = '(prism_ioshr_wopen) '
+    character(*),parameter :: subName = '(oasis_ioshr_wopen) '
     
 !-------------------------------------------------------------------------------
 !
@@ -361,7 +361,7 @@ subroutine prism_ioshr_wopen(filename,clobber,cdf64)
     if (.not. pio_file_is_open(pio_file)) then
        ! filename not open
        if (pio_iam==0) inquire(file=trim(filename),exist=exists)
-       call prism_mpi_bcast(exists,pio_mpicomm,'prism_ioshr_wopen exists')
+       call oasis_mpi_bcast(exists,pio_mpicomm,'oasis_ioshr_wopen exists')
        if (exists) then
           if (lclobber) then
              nmode = pio_clobber
@@ -392,17 +392,17 @@ subroutine prism_ioshr_wopen(filename,clobber,cdf64)
     elseif (trim(wfilename) /= trim(filename)) then
        ! filename is open, better match open filename
        if(pio_iam==0) write(nulprt,*) subname,' different file currently open ',trim(filename)
-       call prism_sys_abort(compid,subname,' ERROR: incorrect file')
+       call oasis_abort_noarg()
     else
        ! filename is already open, just return
     endif
 
-end subroutine prism_ioshr_wopen
+end subroutine oasis_ioshr_wopen
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_ioshr_close - close netcdf file
+! !IROUTINE: oasis_ioshr_close - close netcdf file
 !
 ! !DESCRIPTION:
 !    close netcdf file
@@ -412,7 +412,7 @@ end subroutine prism_ioshr_wopen
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_ioshr_close(filename)
+subroutine oasis_ioshr_close(filename)
 
     implicit none
 
@@ -422,7 +422,7 @@ subroutine prism_ioshr_close(filename)
     !EOP
 
     integer :: rcode
-    character(*),parameter :: subName = '(prism_ioshr_close) '
+    character(*),parameter :: subName = '(oasis_ioshr_close) '
 
 !-------------------------------------------------------------------------------
 !
@@ -436,38 +436,38 @@ subroutine prism_ioshr_close(filename)
     else
        ! different filename is open, abort
        if(pio_iam==0) write(nulprt,*) subname,' different file currently open ',trim(filename)
-       call prism_sys_abort(compid,subname,' ERROR: incorrect file')
+       call oasis_abortnoarg()
     endif
 
     wfilename = ''
 
-end subroutine prism_ioshr_close
+end subroutine oasis_ioshr_close
 
 !===============================================================================
 
-subroutine prism_ioshr_redef(filename)
+subroutine oasis_ioshr_redef(filename)
     implicit none
     character(len=*), intent(in) :: filename
     integer :: rcode
-    character(*),parameter :: subName =   '(prism_ioshr_redef) '
+    character(*),parameter :: subName =   '(oasis_ioshr_redef) '
 
     rcode = pio_redef(pio_file)
-end subroutine prism_ioshr_redef
+end subroutine oasis_ioshr_redef
 
 !===============================================================================
 
-subroutine prism_ioshr_enddef(filename)
+subroutine oasis_ioshr_enddef(filename)
     implicit none
     character(len=*), intent(in) :: filename
     integer :: rcode
-    character(*),parameter :: subName =   '(prism_ioshr_enddef) '
+    character(*),parameter :: subName =   '(oasis_ioshr_enddef) '
 
     rcode = pio_enddef(pio_file)
-end subroutine prism_ioshr_enddef
+end subroutine oasis_ioshr_enddef
 
 !===============================================================================
 
-character(len=10) function prism_ioshr_date2yyyymmdd (date)
+character(len=10) function oasis_ioshr_date2yyyymmdd (date)
    implicit none
 
 ! Input arguments
@@ -479,26 +479,28 @@ character(len=10) function prism_ioshr_date2yyyymmdd (date)
    integer :: year    ! year of yyyy-mm-dd
    integer :: month   ! month of yyyy-mm-dd
    integer :: day     ! day of yyyy-mm-dd
-   character(*),parameter :: subName =   '(prism_ioshr_date2yyyymmdd) '
+   character(*),parameter :: subName =   '(oasis_ioshr_date2yyyymmdd) '
 
 !-------------------------------------------------------------------------------
 
    if (date < 0) then
-      call prism_sys_abort(compid,subname,' ERROR: prism_ioshr_date2yyyymmdd: negative date not allowed')
+       WRITE (nulprt,*)  subname,' abort by model ',compid
+       WRITE(nulprt,*) subname,' ERROR: oasis_ioshr_date2yyyymmdd: negative date not allowed'
+       CALL oasis_abort_noarg()
    end if
 
    year  = date / 10000
    month = (date - year*10000) / 100
    day   = date - year*10000 - month*100
 
-   write(prism_ioshr_date2yyyymmdd,80) year, month, day
+   write(oasis_ioshr_date2yyyymmdd,80) year, month, day
 80 format(i4.4,'-',i2.2,'-',i2.2)
 
-end function prism_ioshr_date2yyyymmdd
+end function oasis_ioshr_date2yyyymmdd
 
 !===============================================================================
 
-character(len=8) function prism_ioshr_sec2hms (seconds)
+character(len=8) function oasis_ioshr_sec2hms (seconds)
    implicit none
 
 ! Input arguments
@@ -510,13 +512,14 @@ character(len=8) function prism_ioshr_sec2hms (seconds)
    integer :: hours     ! hours of hh:mm:ss
    integer :: minutes   ! minutes of hh:mm:ss
    integer :: secs      ! seconds of hh:mm:ss
-   character(*),parameter :: subName =   '(prism_ioshr_sec2hms) '
+   character(*),parameter :: subName =   '(oasis_ioshr_sec2hms) '
 
 !-------------------------------------------------------------------------------
 
    if (seconds < 0 .or. seconds > 86400) then
-      write(nulprt,*)'prism_ioshr_sec2hms: bad input seconds:', seconds
-      call prism_sys_abort(compid,subname,' ERROR: bad input seconds')
+       WRITE (nulprt,*)  subname,' abort by model ',compid
+       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad input seconds:', seconds
+       CALL oasis_abort_noarg()
    end if
 
    hours   = seconds / 3600
@@ -524,24 +527,26 @@ character(len=8) function prism_ioshr_sec2hms (seconds)
    secs    = (seconds - hours*3600 - minutes*60)
 
    if (minutes < 0 .or. minutes > 60) then
-      write(nulprt,*)'prism_ioshr_sec2hms: bad minutes = ',minutes
-      call prism_sys_abort(compid,subname,' ERROR: bad minutes')
+       WRITE (nulprt,*)  subname,' abort by model ',compid
+       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad minutes = ',minutes
+       CALL oasis_abort_noarg()
    end if
 
    if (secs < 0 .or. secs > 60) then
-      write(nulprt,*)'prism_ioshr_sec2hms: bad secs = ',secs
-      call prism_sys_abort(compid,subname,' ERROR: bad secs')
+       WRITE (nulprt,*)  subname,' abort by model ',compid
+       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad secs = ',secs
+       CALL oasis_abort_noarg()
    end if
 
-   write(prism_ioshr_sec2hms,80) hours, minutes, secs
+   write(oasis_ioshr_sec2hms,80) hours, minutes, secs
 80 format(i2.2,':',i2.2,':',i2.2)
 
-end function prism_ioshr_sec2hms
+end function oasis_ioshr_sec2hms
 
 !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_ioshr_write_av - write AV to netcdf file
+! !IROUTINE: oasis_ioshr_write_av - write AV to netcdf file
 !
 ! !DESCRIPTION:
 !    Write AV to netcdf file
@@ -551,7 +556,7 @@ end function prism_ioshr_sec2hms
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_av(filename,gsmap,AV,dname,whead,wdata,nx,ny,nt,fillval,pre,tavg,use_float)
+  subroutine oasis_ioshr_write_av(filename,gsmap,AV,dname,whead,wdata,nx,ny,nt,fillval,pre,tavg,use_float)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -593,7 +598,7 @@ end function prism_ioshr_sec2hms
     real(r8) :: lfillvalue
     type(mct_aVect) :: AVroot
     real(r8),pointer :: fld1(:,:)  ! needed to convert AVroot ng rAttr to 2d nx,ny
-    character(*),parameter :: subName = '(prism_ioshr_write_av) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_av) '
     integer :: lbnum
     integer, pointer :: Dof(:)
 
@@ -627,8 +632,9 @@ end function prism_ioshr_sec2hms
 	
     nf = mct_aVect_nRattr(AV)
     if (nf < 1) then
+       WRITE (nulprt,*)  subname,' abort by model ',compid
        write(nulprt,*) subname,' ERROR: nf = ',nf,trim(dname)
-       call prism_sys_abort(compid,subname,' ERROR: nf')
+       call oasis_abort_noarg()
     endif
 
     if (present(nx)) then
@@ -638,8 +644,9 @@ end function prism_ioshr_sec2hms
        if (ny /= 0) lny = ny
     endif
     if (lnx*lny /= ng) then
+       if(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
        if(pio_iam==0) write(nulprt,*) subname,' ERROR: grid2d size not consistent ',ng,lnx,lny,trim(dname)
-       call prism_sys_abort(compid,subname,' ERROR: grid2d size')
+       call oasis_abort_noarg()
     endif
 
     if (lwhead) then
@@ -660,7 +667,7 @@ end function prism_ioshr_sec2hms
           call mct_string_clean(mstring)
 ! "v0"    name1 = trim(prefix)//trim(dname)//'_'//trim(itemc)
           name1 = trim(lpre)//'_'//trim(itemc)
-          call prism_ioshr_flds_lookup(itemc,longname=lname,stdname=sname,units=cunit)
+          call oasis_ioshr_flds_lookup(itemc,longname=lname,stdname=sname,units=cunit)
 	  if (present(use_float)) then 
              rcode = pio_def_var(pio_file,trim(name1),PIO_REAL,dimid,varid)
           else
@@ -677,7 +684,7 @@ end function prism_ioshr_sec2hms
              endif
           endif
        enddo
-       if (lwdata) call prism_ioshr_enddef(filename)
+       if (lwdata) call oasis_ioshr_enddef(filename)
     end if
 
     if (lwdata) then
@@ -704,12 +711,12 @@ end function prism_ioshr_sec2hms
        call pio_freedecomp(pio_file, iodesc)
 
     end if
-  end subroutine prism_ioshr_write_av
+  end subroutine oasis_ioshr_write_av
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_write_int - write scalar integer to netcdf file
+  ! !IROUTINE: oasis_ioshr_write_int - write scalar integer to netcdf file
   !
   ! !DESCRIPTION:
   !    Write scalar integer to netcdf file
@@ -719,7 +726,7 @@ end function prism_ioshr_sec2hms
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_int(filename,idata,dname,whead,wdata)
+  subroutine oasis_ioshr_write_int(filename,idata,dname,whead,wdata)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -738,7 +745,7 @@ end function prism_ioshr_sec2hms
     character(CL)    :: sname       ! standard name
     logical :: exists
     logical :: lwhead, lwdata
-    character(*),parameter :: subName = '(prism_ioshr_write_int) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_int) '
 
     !-------------------------------------------------------------------------------
     !
@@ -755,14 +762,14 @@ end function prism_ioshr_sec2hms
     endif
 
     if (lwhead) then
-       call prism_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
+       call oasis_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
 !       rcode = pio_def_dim(pio_file,trim(dname)//'_nx',1,dimid(1))
 !       rcode = pio_def_var(pio_file,trim(dname),PIO_INT,dimid,varid)
        rcode = pio_def_var(pio_file,trim(dname),PIO_INT,varid)
        rcode = pio_put_att(pio_file,varid,"units",trim(cunit))
        rcode = pio_put_att(pio_file,varid,"long_name",trim(lname))
        rcode = pio_put_att(pio_file,varid,"standard_name",trim(sname))
-       if (lwdata) call prism_ioshr_enddef(filename)
+       if (lwdata) call oasis_ioshr_enddef(filename)
     endif
 
     if (lwdata) then
@@ -772,12 +779,12 @@ end function prism_ioshr_sec2hms
        !      write(nulprt,*) subname,' wrote AV ',trim(dname),lwhead,lwdata
     endif
 
-  end subroutine prism_ioshr_write_int
+  end subroutine oasis_ioshr_write_int
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_write_int1d - write 1d integer array to netcdf file
+  ! !IROUTINE: oasis_ioshr_write_int1d - write 1d integer array to netcdf file
   !
   ! !DESCRIPTION:
   !    Write 1d integer array to netcdf file
@@ -787,7 +794,7 @@ end function prism_ioshr_sec2hms
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_int1d(filename,idata,dname,whead,wdata)
+  subroutine oasis_ioshr_write_int1d(filename,idata,dname,whead,wdata)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -808,7 +815,7 @@ end function prism_ioshr_sec2hms
     integer(in) :: lnx
     logical :: exists
     logical :: lwhead, lwdata
-    character(*),parameter :: subName = '(prism_ioshr_write_int1d) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_int1d) '
 
     !-------------------------------------------------------------------------------
     !
@@ -825,14 +832,14 @@ end function prism_ioshr_sec2hms
     endif
 
     if (lwhead) then
-       call prism_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
+       call oasis_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
        lnx = size(idata)
        rcode = pio_def_dim(pio_file,trim(dname)//'_nx',lnx,dimid(1))
        rcode = pio_def_var(pio_file,trim(dname),PIO_INT,dimid,varid)
        rcode = pio_put_att(pio_file,varid,"units",trim(cunit))
        rcode = pio_put_att(pio_file,varid,"long_name",trim(lname))
        rcode = pio_put_att(pio_file,varid,"standard_name",trim(sname))
-       if (lwdata) call prism_ioshr_enddef(filename)
+       if (lwdata) call oasis_ioshr_enddef(filename)
     endif
 
     if (lwdata) then
@@ -842,12 +849,12 @@ end function prism_ioshr_sec2hms
 
        !      write(nulprt,*) subname,' wrote AV ',trim(dname),lwhead,lwdata
 
-  end subroutine prism_ioshr_write_int1d
+  end subroutine oasis_ioshr_write_int1d
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_write_r8 - write scalar double to netcdf file
+  ! !IROUTINE: oasis_ioshr_write_r8 - write scalar double to netcdf file
   !
   ! !DESCRIPTION:
   !    Write scalar double to netcdf file
@@ -857,7 +864,7 @@ end function prism_ioshr_sec2hms
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_r8(filename,rdata,dname,whead,wdata)
+  subroutine oasis_ioshr_write_r8(filename,rdata,dname,whead,wdata)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -876,7 +883,7 @@ end function prism_ioshr_sec2hms
     character(CL)    :: sname       ! standard name
     logical :: exists
     logical :: lwhead, lwdata
-    character(*),parameter :: subName = '(prism_ioshr_write_r8) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_r8) '
 
     !-------------------------------------------------------------------------------
     !
@@ -893,7 +900,7 @@ end function prism_ioshr_sec2hms
     endif
 
     if (lwhead) then
-       call prism_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
+       call oasis_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
 !       rcode = pio_def_dim(pio_file,trim(dname)//'_nx',1,dimid(1))
 !       rcode = pio_def_var(pio_file,trim(dname),PIO_DOUBLE,dimid,varid)
 
@@ -903,7 +910,7 @@ end function prism_ioshr_sec2hms
           rcode = pio_put_att(pio_file,varid,"units",trim(cunit))
           rcode = pio_put_att(pio_file,varid,"long_name",trim(lname))
           rcode = pio_put_att(pio_file,varid,"standard_name",trim(sname))
-          if (lwdata) call prism_ioshr_enddef(filename)
+          if (lwdata) call oasis_ioshr_enddef(filename)
        end if
     endif
 
@@ -913,12 +920,12 @@ end function prism_ioshr_sec2hms
     endif
 
 
-  end subroutine prism_ioshr_write_r8
+  end subroutine oasis_ioshr_write_r8
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_write_r81d - write 1d double array to netcdf file
+  ! !IROUTINE: oasis_ioshr_write_r81d - write 1d double array to netcdf file
   !
   ! !DESCRIPTION:
   !    Write 1d double array to netcdf file
@@ -928,7 +935,7 @@ end function prism_ioshr_sec2hms
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_r81d(filename,rdata,dname,whead,wdata)
+  subroutine oasis_ioshr_write_r81d(filename,rdata,dname,whead,wdata)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -949,7 +956,7 @@ end function prism_ioshr_sec2hms
     integer(in) :: lnx
     logical :: exists
     logical :: lwhead, lwdata
-    character(*),parameter :: subName = '(prism_ioshr_write_r81d) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_r81d) '
 
     !-------------------------------------------------------------------------------
     !
@@ -966,14 +973,14 @@ end function prism_ioshr_sec2hms
     endif
 
     if (lwhead) then
-       call prism_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
+       call oasis_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
        lnx = size(rdata)
        rcode = pio_def_dim(pio_file,trim(dname)//'_nx',lnx,dimid(1))
        rcode = pio_def_var(pio_file,trim(dname),PIO_DOUBLE,dimid,varid)
        rcode = pio_put_att(pio_file,varid,"units",trim(cunit))
        rcode = pio_put_att(pio_file,varid,"long_name",trim(lname))
        rcode = pio_put_att(pio_file,varid,"standard_name",trim(sname))
-       if (lwdata) call prism_ioshr_enddef(filename)
+       if (lwdata) call oasis_ioshr_enddef(filename)
     endif
 
     if (lwdata) then
@@ -983,12 +990,12 @@ end function prism_ioshr_sec2hms
        !      write(nulprt,*) subname,' wrote AV ',trim(dname),lwhead,lwdata
     endif
 
-  end subroutine prism_ioshr_write_r81d
+  end subroutine oasis_ioshr_write_r81d
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_write_char - write char string to netcdf file
+  ! !IROUTINE: oasis_ioshr_write_char - write char string to netcdf file
   !
   ! !DESCRIPTION:
   !    Write char string to netcdf file
@@ -998,7 +1005,7 @@ end function prism_ioshr_sec2hms
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_write_char(filename,rdata,dname,whead,wdata)
+  subroutine oasis_ioshr_write_char(filename,rdata,dname,whead,wdata)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1019,7 +1026,7 @@ end function prism_ioshr_sec2hms
     integer(in) :: lnx
     logical :: exists
     logical :: lwhead, lwdata
-    character(*),parameter :: subName = '(prism_ioshr_write_char) '
+    character(*),parameter :: subName = '(oasis_ioshr_write_char) '
 
     !-------------------------------------------------------------------------------
     !
@@ -1036,14 +1043,14 @@ end function prism_ioshr_sec2hms
     endif
 
     if (lwhead) then
-       call prism_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
+       call oasis_ioshr_flds_lookup(trim(dname),longname=lname,stdname=sname,units=cunit)
        lnx = len(charvar)
        rcode = pio_def_dim(pio_file,trim(dname)//'_len',lnx,dimid(1))
        rcode = pio_def_var(pio_file,trim(dname),PIO_CHAR,dimid,varid)
        rcode = pio_put_att(pio_file,varid,"units",trim(cunit))
        rcode = pio_put_att(pio_file,varid,"long_name",trim(lname))
        rcode = pio_put_att(pio_file,varid,"standard_name",trim(sname))
-       if (lwdata) call prism_ioshr_enddef(filename)
+       if (lwdata) call oasis_ioshr_enddef(filename)
     endif
 
     if (lwdata) then
@@ -1053,12 +1060,12 @@ end function prism_ioshr_sec2hms
        rcode = pio_put_var(pio_file,varid,charvar)
     endif
 
-  end subroutine prism_ioshr_write_char
+  end subroutine oasis_ioshr_write_char
 
   !===============================================================================
 !BOP ===========================================================================
 !
-! !IROUTINE: prism_ioshr_write_time - write time variable to netcdf file
+! !IROUTINE: oasis_ioshr_write_time - write time variable to netcdf file
 !
 ! !DESCRIPTION:
 !    Write time variable to netcdf file
@@ -1068,7 +1075,7 @@ end function prism_ioshr_sec2hms
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead,wdata,tbnds)
+subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead,wdata,tbnds)
 
 ! !INPUT/OUTPUT PARAMETERS:
    implicit none
@@ -1093,7 +1100,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
    integer :: start(4),count(4)
    character(len=CL) :: lcalendar
    real(r8) :: time_val_1d(1)
-   character(*),parameter :: subName = '(prism_ioshr_write_time) '
+   character(*),parameter :: subName = '(oasis_ioshr_write_time) '
 
 !-------------------------------------------------------------------------------
 !
@@ -1121,7 +1128,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
          rcode = pio_def_dim(pio_file,'ntb',2,dimid2(1))
          rcode = pio_def_var(pio_file,'time_bnds',PIO_DOUBLE,dimid2,varid)
       endif
-      if (lwdata) call prism_ioshr_enddef(filename)
+      if (lwdata) call oasis_ioshr_enddef(filename)
    endif
 
    if (lwdata) then
@@ -1147,12 +1154,12 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
       !      write(nulprt,*) subname,' wrote time ',lwhead,lwdata
    endif
 
- end subroutine prism_ioshr_write_time
+ end subroutine oasis_ioshr_write_time
 
 !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_av - read AV from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_av - read AV from netcdf file
   !
   ! !DESCRIPTION:
   !    Read AV from netcdf file
@@ -1162,7 +1169,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_av(filename,gsmap,AV,dname,pre)
+  subroutine oasis_ioshr_read_av(filename,gsmap,AV,dname,pre)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1189,7 +1196,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     character(CL)  :: lversion
     character(CL)  :: name1
     character(CL)  :: lpre
-    character(*),parameter :: subName = '(prism_ioshr_read_av) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_av) '
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
@@ -1205,7 +1212,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     nf = mct_aVect_nRattr(AV)
 
     if (pio_iam==0) inquire(file=trim(filename),exist=exists)
-    call prism_mpi_bcast(exists,pio_mpicomm,'prism_ioshr_read_av exists')
+    call oasis_mpi_bcast(exists,pio_mpicomm,'oasis_ioshr_read_av exists')
     if (exists) then
        rcode = pio_openfile(pio_iosystem, pioid, pio_iotype, trim(filename),pio_nowrite)
        if(pio_iam==0) write(nulprt,*) subname,' open file ',trim(filename)
@@ -1213,8 +1220,9 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
+       if(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
        if(pio_iam==0) write(nulprt,*) subname,' ERROR: file invalid ',trim(filename),' ',trim(dname)
-       call prism_sys_abort(compid,subname,' ERROR: file invalid')
+       call oasis_abort_noarg()
     endif
 
     do k = 1,nf
@@ -1236,16 +1244,17 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
              end if
              ng = lnx * lny
              if (ng /= mct_gsmap_gsize(gsmap)) then
-                if (pio_iam==0) write(nulprt,*) subname,' ERROR: dimensions do not match',&
+                 IF (pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
+                 IF (pio_iam==0) WRITE(nulprt,*) subname,' ERROR: dimensions do not match',&
                      lnx,lny,mct_gsmap_gsize(gsmap)
-                call prism_sys_abort(compid,subname,'ERROR dims do not match')
+                 CALL oasis_abort_noarg()
              end if
              call pio_initdecomp(pio_iosystem, pio_double, (/lnx,lny/), dof, iodesc)
              deallocate(dof)
           end if
           call pio_read_darray(pioid,varid,iodesc, av%rattr(k,:), rcode)
        else
-          write(nulprt,*)'prism_ioshr_readav warning: field ',trim(itemc),' is not on restart file'
+          write(nulprt,*)'oasis_ioshr_readav warning: field ',trim(itemc),' is not on restart file'
           write(nulprt,*)'for backwards compatibility will set it to 0'
           av%rattr(k,:) = 0.0_r8
        end if
@@ -1262,12 +1271,12 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     call pio_freedecomp(pioid, iodesc)
     call pio_closefile(pioid)
 
-  end subroutine prism_ioshr_read_av
+  end subroutine oasis_ioshr_read_av
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_int - read scalar integer from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_int - read scalar integer from netcdf file
   !
   ! !DESCRIPTION:
   !    Read scalar integer from netcdf file
@@ -1277,7 +1286,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_int(filename,idata,dname)
+  subroutine oasis_ioshr_read_int(filename,idata,dname)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1288,21 +1297,21 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     !EOP
 
     integer :: i1d(1)
-    character(*),parameter :: subName = '(prism_ioshr_read_int) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_int) '
 
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
 
-    call prism_ioshr_read_int1d(filename,i1d,dname)
+    call oasis_ioshr_read_int1d(filename,i1d,dname)
     idata = i1d(1)
 
-  end subroutine prism_ioshr_read_int
+  end subroutine oasis_ioshr_read_int
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_int1d - read 1d integer from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_int1d - read 1d integer from netcdf file
   !
   ! !DESCRIPTION:
   !    Read 1d integer array from netcdf file
@@ -1312,7 +1321,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_int1d(filename,idata,dname)
+  subroutine oasis_ioshr_read_int1d(filename,idata,dname)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1328,13 +1337,13 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     logical :: exists
     character(CL)  :: lversion
     character(CL)  :: name1
-    character(*),parameter :: subName = '(prism_ioshr_read_int1d) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_int1d) '
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
 
     if (pio_iam==0) inquire(file=trim(filename),exist=exists)
-    call prism_mpi_bcast(exists,pio_mpicomm,'prism_ioshr_read_int1d exists')
+    call oasis_mpi_bcast(exists,pio_mpicomm,'oasis_ioshr_read_int1d exists')
     if (exists) then
        rcode = pio_openfile(pio_iosystem, pioid, pio_iotype, trim(filename),pio_nowrite)
        !         write(nulprt,*) subname,' open file ',trim(filename)
@@ -1342,8 +1351,9 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-       if(pio_iam==0) write(nulprt,*) subname,' ERROR: file invalid ',trim(filename),' ',trim(dname)
-       call prism_sys_abort(compid,subname,'ERROR: file invalid')
+        IF(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
+        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort_noarg()
     endif
 
     name1 = trim(dname)
@@ -1355,12 +1365,12 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     !      write(nulprt,*) subname,' read int ',trim(dname)
 
 
-  end subroutine prism_ioshr_read_int1d
+  end subroutine oasis_ioshr_read_int1d
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_r8 - read scalar double from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_r8 - read scalar double from netcdf file
   !
   ! !DESCRIPTION:
   !    Read scalar double from netcdf file
@@ -1370,7 +1380,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_r8(filename,rdata,dname)
+  subroutine oasis_ioshr_read_r8(filename,rdata,dname)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1381,21 +1391,21 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     !EOP
 
     real(r8) :: r1d(1)
-    character(*),parameter :: subName = '(prism_ioshr_read_r8) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_r8) '
 
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
 
-    call prism_ioshr_read_r81d(filename,r1d,dname)
+    call oasis_ioshr_read_r81d(filename,r1d,dname)
     rdata = r1d(1)
 
-  end subroutine prism_ioshr_read_r8
+  end subroutine oasis_ioshr_read_r8
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_r81d - read 1d double array from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_r81d - read 1d double array from netcdf file
   !
   ! !DESCRIPTION:
   !    Read 1d double array from netcdf file
@@ -1405,7 +1415,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_r81d(filename,rdata,dname)
+  subroutine oasis_ioshr_read_r81d(filename,rdata,dname)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1421,14 +1431,14 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     logical :: exists
     character(CL)  :: lversion
     character(CL)  :: name1
-    character(*),parameter :: subName = '(prism_ioshr_read_r81d) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_r81d) '
 
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
 
     if (pio_iam==0) inquire(file=trim(filename),exist=exists)
-    call prism_mpi_bcast(exists,pio_mpicomm,'prism_ioshr_read_r81d exists')
+    call oasis_mpi_bcast(exists,pio_mpicomm,'oasis_ioshr_read_r81d exists')
     if (exists) then
        rcode = pio_openfile(pio_iosystem, pioid, pio_iotype, trim(filename),pio_nowrite)
        !         write(nulprt,*) subname,' open file ',trim(filename)
@@ -1436,8 +1446,9 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-       if(pio_iam==0) write(nulprt,*) subname,' ERROR: file invalid ',trim(filename),' ',trim(dname)
-       call prism_sys_abort(compid,subname,' ERROR: file invalid')
+        IF(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
+        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort_noarg()
     endif
 
     name1 = trim(dname)
@@ -1448,12 +1459,12 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
 
     !      write(nulprt,*) subname,' read int ',trim(dname)
 
-  end subroutine prism_ioshr_read_r81d
+  end subroutine oasis_ioshr_read_r81d
 
   !===============================================================================
   !BOP ===========================================================================
   !
-  ! !IROUTINE: prism_ioshr_read_char - read char string from netcdf file
+  ! !IROUTINE: oasis_ioshr_read_char - read char string from netcdf file
   !
   ! !DESCRIPTION:
   !    Read char string from netcdf file
@@ -1463,7 +1474,7 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
   !
   ! !INTERFACE: ------------------------------------------------------------------
 
-  subroutine prism_ioshr_read_char(filename,rdata,dname)
+  subroutine oasis_ioshr_read_char(filename,rdata,dname)
 
     ! !INPUT/OUTPUT PARAMETERS:
     implicit none
@@ -1479,14 +1490,14 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
     logical :: exists
     character(CL)  :: lversion
     character(CL)  :: name1
-    character(*),parameter :: subName = '(prism_ioshr_read_char) '
+    character(*),parameter :: subName = '(oasis_ioshr_read_char) '
 
     !-------------------------------------------------------------------------------
     !
     !-------------------------------------------------------------------------------
 
     if (pio_iam==0) inquire(file=trim(filename),exist=exists)
-    call prism_mpi_bcast(exists,pio_mpicomm,'prism_ioshr_read_char exists')
+    call oasis_mpi_bcast(exists,pio_mpicomm,'oasis_ioshr_read_char exists')
     if (exists) then
        rcode = pio_openfile(pio_iosystem, pioid, pio_iotype, trim(filename),pio_nowrite)
        !         write(nulprt,*) subname,' open file ',trim(filename)
@@ -1494,8 +1505,9 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-       if(pio_iam==0) write(nulprt,*) subname,' ERROR: file invalid ',trim(filename),' ',trim(dname)
-       call prism_sys_abort(compid,subname,' ERROR: file invalid')
+        IF(pio_iam==0)WRITE (nulprt,*)  subname,' abort by model ',compid
+        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort_noarg()
     endif
 
     name1 = trim(dname)
@@ -1505,9 +1517,9 @@ subroutine prism_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
 
     call pio_closefile(pioid)
 
-  end subroutine prism_ioshr_read_char
+  end subroutine oasis_ioshr_read_char
 
 #endif
   !===============================================================================
 !===============================================================================
-end module mod_prism_ioshr
+end module mod_oasis_ioshr

@@ -1,19 +1,19 @@
-MODULE mod_prism_part
+MODULE mod_oasis_part
 
-   USE mod_prism_kinds
-   USE mod_prism_data
-   USE mod_prism_parameters
-   USE mod_prism_sys
+   USE mod_oasis_kinds
+   USE mod_oasis_data
+   USE mod_oasis_parameters
+   USE mod_oasis_sys
+   USE mod_oasis_timer
    USE mct_mod
-   USE mod_prism_timer
 
    implicit none
 
    private
 
    !--- interfaces ---
-   public :: prism_part_def
-   public :: prism_part_create
+   public :: oasis_def_partition
+   public :: oasis_part_create
 
    !--- datatypes ---
    public :: prism_part_type
@@ -33,7 +33,7 @@ MODULE mod_prism_part
 
 CONTAINS
 !
-  SUBROUTINE prism_part_def (id_part, kparal, kinfo)
+  SUBROUTINE oasis_def_partition (id_part, kparal, kinfo)
 !
 !*    *** Def_partition ***   PRISM 1.0
 !
@@ -58,14 +58,14 @@ CONTAINS
 !  ----------------------------------------------------------------
    integer(kind=ip_intwp_p) :: n,k,nsegs
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
-   character(len=*),parameter :: subname = 'prism_part_def'
+   character(len=*),parameter :: subname = 'oasis_def_partition'
 !  ----------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
-   kinfo = PRISM_OK
+   kinfo = OASIS_OK
 
-   call prism_timer_start('map definition')
+   call oasis_timer_start('map definition')
 
    if (prism_npart == 0) then  ! first call
       do n = 1,mpart
@@ -82,7 +82,7 @@ CONTAINS
    if (prism_npart > mpart) then
       write(nulprt,*) subname,' ERROR prism_npart too large ',prism_npart,mpart
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
 
    if (kparal(CLIM_Strategy) == CLIM_Serial) then
@@ -132,7 +132,7 @@ CONTAINS
    else
       write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
 
    if (mpi_comm_local /= MPI_COMM_NULL) then
@@ -148,9 +148,9 @@ CONTAINS
    prism_part(prism_npart)%nx = -1
    prism_part(prism_npart)%ny = -1
   
-   call prism_timer_stop('map definition')
+   call oasis_timer_stop('map definition')
    
-   if (PRISM_Debug >= 2) then
+   if (OASIS_debug >= 2) then
       write(nulprt,*) ' '
       write(nulprt,*) subname,' compid = ',prism_part(prism_npart)%gsmap%comp_id
       write(nulprt,*) subname,' ngseg  = ',prism_part(prism_npart)%gsmap%ngseg
@@ -161,12 +161,12 @@ CONTAINS
       write(nulprt,*) ' '
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
- END SUBROUTINE prism_part_def
+ END SUBROUTINE oasis_def_partition
 
 !------------------------------------------------------------
-  SUBROUTINE prism_part_create(id_part,type,gsize,nx,ny,gridname)
+  SUBROUTINE oasis_part_create(id_part,TYPE,gsize,nx,ny,gridname)
 
   IMPLICIT NONE
 
@@ -183,10 +183,10 @@ CONTAINS
   integer(ip_i4_p),pointer :: start(:),length(:)
   integer(ip_i4_p) :: pts
   integer(ip_i4_p) :: n
-  character(len=*),parameter :: subname = 'prism_part_create'
+  character(len=*),parameter :: subname = 'oasis_part_create'
   !--------------------------------------------------------
 
-  call prism_sys_debug_enter(subname)
+  call oasis_debug_enter(subname)
 
   mpicomm = mpi_comm_local
   mpirank = mpi_rank_local
@@ -199,7 +199,7 @@ CONTAINS
          prism_part(n)%nx == nx .and. &
          prism_part(n)%ny == ny) then
         id_part = n
-        call prism_sys_debug_exit(subname)
+        call oasis_debug_exit(subname)
         return
      endif
   enddo
@@ -219,14 +219,14 @@ CONTAINS
   else
      write(nulprt,*) subname,' ERROR type unknown ',trim(type)
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     call prism_sys_abort()
+     call oasis_abort_noarg()
   endif
 
   id_part = prism_npart
 
-  call prism_sys_debug_exit(subname)
+  call oasis_debug_exit(subname)
 
-  END SUBROUTINE prism_part_create
+END SUBROUTINE oasis_part_create
 !------------------------------------------------------------
 
-END MODULE mod_prism_part
+END MODULE mod_oasis_part

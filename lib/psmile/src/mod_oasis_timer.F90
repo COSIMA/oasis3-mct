@@ -6,15 +6,15 @@
 !
 ! !DESCRIPTION:
 !
-! Module prism_timer contains functionallity, which can be used to
+! Module oasis_timer contains functionallity, which can be used to
 ! measure the time consumed in specific parts of the code.
 !
 ! Available routines:
-!  prism_timer_init         allocates timers
-!  prism_timer_start        starts specific timer
-!  prism_timer_stop         stops specific timer and sums up measured time intervals
-!  prism_timer_print        root process prints all timers of all processes sharing
-!                            the same mpi communicator provided to prism_timer_init
+!  oasis_timer_init         allocates timers
+!  oasis_timer_start        starts specific timer
+!  oasis_timer_stop         stops specific timer and sums up measured time intervals
+!  oasis_timer_print        root process prints all timers of all processes sharing
+!                            the same mpi communicator provided to oasis_timer_init
 !                            in addition it frees all memory allocated by timers
 !
 !
@@ -28,17 +28,17 @@
 !
 !----------------------------------------------------------------------
 !
-!  $Id: prism_timer.F90 2849 2011-01-05 08:14:13Z hanke $
+!  $Id: oasis_timer.F90 2849 2011-01-05 08:14:13Z hanke $
 !  $Author: hanke $
 !
 !----------------------------------------------------------------------
 
-module mod_prism_timer
+module mod_oasis_timer
 
-   use mod_prism_kinds
-   use mod_prism_data
-   use mod_prism_sys
-   use mod_prism_mpi
+   use mod_oasis_kinds
+   use mod_oasis_data
+   use mod_oasis_sys
+   use mod_oasis_mpi
 
    implicit none
 
@@ -91,7 +91,7 @@ module mod_prism_timer
 
 ! --------------------------------------------------------------------------------
 
-      subroutine prism_timer_init (app, file, comm)
+      subroutine oasis_timer_init (app, file, comm)
 
          implicit none
 
@@ -100,7 +100,7 @@ module mod_prism_timer
          integer, intent (in)             :: comm
 
          integer :: ierror,n
-         character(len=*),parameter :: subname = 'prism_timer_init'
+         character(len=*),parameter :: subname = 'oasis_timer_init'
 
          app_name  = trim (app)
          file_name = trim (file)
@@ -129,7 +129,7 @@ module mod_prism_timer
 
          IF (TIMER_Debug >= 2) THEN
 
-                 CALL prism_sys_unitget(output_unit)
+                 CALL oasis_unitget(output_unit)
                  WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',comm_rank
 
                  OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
@@ -141,11 +141,11 @@ module mod_prism_timer
 
          single_timer_header = .false.
 
-      end subroutine prism_timer_init
+      end subroutine oasis_timer_init
 
 ! --------------------------------------------------------------------------------
 
-      subroutine prism_timer_start (timer_label, barrier)
+      subroutine oasis_timer_start (timer_label, barrier)
 
          implicit none
 
@@ -155,10 +155,10 @@ module mod_prism_timer
          integer :: ierr
          integer :: timer_id
          real :: cpu_time_arg
-         character(len=*),parameter :: subname = 'prism_timer_start'
+         character(len=*),parameter :: subname = 'oasis_timer_start'
 
          IF (TIMER_Debug >=1) THEN
-         call prism_timer_c2i(timer_label,timer_id)
+         call oasis_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
             if (ntimer+1 > mtimer) then
                 WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
@@ -183,19 +183,19 @@ module mod_prism_timer
          timer(timer_id)%runflag = t_running
          ENDIF
 
-      end subroutine prism_timer_start
+      end subroutine oasis_timer_start
 
 ! --------------------------------------------------------------------------------
 
-      subroutine prism_timer_stop (timer_label)
+      subroutine oasis_timer_stop (timer_label)
 
          character(len=*), intent (in) :: timer_label
          real :: cpu_time_arg
          integer :: timer_id
-         character(len=*),parameter :: subname = 'prism_timer_stop'
+         character(len=*),parameter :: subname = 'oasis_timer_stop'
 
          IF (TIMER_Debug >=1) THEN
-         call prism_timer_c2i(timer_label,timer_id)
+         call oasis_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
              WRITE(nulprt,*) subname,' WARNING: timer_label does not exist ',TRIM(timer_label)
@@ -219,11 +219,11 @@ module mod_prism_timer
          timer(timer_id)%runflag = t_stopped
          ENDIF
 
-      end subroutine prism_timer_stop
+      end subroutine oasis_timer_stop
 
 ! --------------------------------------------------------------------------------
 
-      subroutine prism_timer_print(timer_label)
+      subroutine oasis_timer_print(timer_label)
 
          implicit none
 
@@ -254,13 +254,13 @@ module mod_prism_timer
          integer            :: pe1,pe2
          integer            :: minpe,maxpe,mcnt
          double precision   :: mintime,maxtime,meantime
-         character(len=*),parameter :: subname = 'prism_timer_print'
+         character(len=*),parameter :: subname = 'oasis_timer_print'
 
          IF (TIMER_Debug >= 1) THEN
          onetimer = .false.
          if (present(timer_label)) then
             onetimer = .true.
-            call prism_timer_c2i(timer_label,timer_id)
+            call oasis_timer_c2i(timer_label,timer_id)
             if (timer_id < 1) then
                 WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
                 WRITE(nulprt,*) subname,' WARNING: invalid timer_label',TRIM(timer_label)
@@ -331,7 +331,7 @@ module mod_prism_timer
 
          if (comm_size > 1) then
 
-            call prism_mpi_max(ntimer,ntimermax,comm_timer,string='ntimer',all=.true.)
+            call oasis_mpi_max(ntimer,ntimermax,comm_timer,string='ntimer',all=.true.)
 
             allocate (sum_ctime_global_tmp(ntimermax, comm_size), &
                       sum_wtime_global_tmp(ntimermax, comm_size), stat=ierror)
@@ -633,10 +633,10 @@ module mod_prism_timer
 
          ENDIF  !(TIMER_Debug >=1)
 
-      end subroutine prism_timer_print
+      end subroutine oasis_timer_print
 
 ! --------------------------------------------------------------------------------
-      subroutine prism_timer_c2i(tname,tid)
+      subroutine oasis_timer_c2i(tname,tid)
 
          character(len=*),intent(in)  :: tname
          integer         ,intent(out) :: tid
@@ -648,7 +648,7 @@ module mod_prism_timer
             if (trim(tname) == trim(timer(n)%label)) tid = n
          enddo
 
-      end subroutine prism_timer_c2i
+      end subroutine oasis_timer_c2i
 
 ! --------------------------------------------------------------------------------
-end module mod_prism_timer
+end module mod_oasis_timer

@@ -1,4 +1,4 @@
-MODULE mod_prism_parameters
+MODULE mod_oasis_parameters
 !
 ! -- clim.h   18-08-95   Version 2.0   Author: Laurent Terray
 !    ******
@@ -13,8 +13,7 @@ MODULE mod_prism_parameters
 !@  --------
 !@
 !
-  USE mod_prism_kinds
-! INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Debug    = 3 ! moved to mod_prism_kinds
+  USE mod_oasis_kinds
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Ok	 = 0 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Ok       = PRISM_Ok
 
@@ -149,5 +148,5 @@ MODULE mod_prism_parameters
 !  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_NotFreq  = -23 
 !
 
-END MODULE mod_prism_parameters
+END MODULE mod_oasis_parameters
 

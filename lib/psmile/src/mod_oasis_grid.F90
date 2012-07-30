@@ -1,4 +1,4 @@
-module mod_prism_grid
+MODULE mod_oasis_grid
 !-----------------------------------------------------------------------
 ! BOP
 !
@@ -15,45 +15,46 @@ module mod_prism_grid
 !
 ! !PUBLIC MEMBER FUNCTIONS:
 ! 
-!      subroutine prism_grid_start_grids_writing(iwrite)
+!      subroutine oasis_start_grids_writing(iwrite)
 !             This subroutine initializes grid writing by receiving a 
 !             starting command from OASIS.
 !
-!      subroutine prism_grid_write_grid(cgrid, nx, ny, lon, lat)
+!      subroutine oasis_write_grid(cgrid, nx, ny, lon, lat)
 !	      This subroutine writes longitudes and latitudes for a model
 !             grid.
 !
-!      subroutine prism_grid_write_corner(cgrid, nx, ny, nc, clon, clat)
+!      subroutine oasis_write_corner(cgrid, nx, ny, nc, clon, clat)
 !	      This subroutine writes the longitudes and latitudes of the
 !             grid cell corners.
 !
-!      subroutine prism_grid_write_mask(cgrid, nx, ny, mask)
+!      subroutine oasis_write_mask(cgrid, nx, ny, mask)
 !	      This subroutine writes the mask for a model grid
 !
-!      subroutine prism_grid_write_area(cgrid, nx, ny, area)
+!      subroutine oasis_write_area(cgrid, nx, ny, area)
 !	      This subroutine writes the grid cell areas for a model grid.
 !
-!      subroutine prism_grid_terminate_grids_writing()
+!      subroutine oasis_terminate_grids_writing()
 !             This subroutine terminates grid writing by sending a flag
 !             to OASIS, stating the all needed grid information was written.
 !       
 
 ! !USES:
-  use mod_prism_data
-  use mod_prism_io
-  use mod_prism_sys
+  use mod_oasis_data
+  use mod_oasis_io
+  use mod_oasis_sys
   
   implicit none
 
   private
 
-  public prism_grid_start_grids_writing
-  public prism_grid_write_grid
-  public prism_grid_write_corner
-  public prism_grid_write_mask
-  public prism_grid_write_area
-  public prism_grid_terminate_grids_writing
-  public prism_grid_write2files
+  public oasis_start_grids_writing
+  public oasis_write_grid
+  public oasis_write_angle
+  public oasis_write_corner
+  public oasis_write_mask
+  public oasis_write_area   
+  public oasis_terminate_grids_writing 
+  public oasis_write2files
 
   !--- datatypes ---
   public :: prism_grid_type
@@ -94,7 +95,7 @@ module mod_prism_grid
 CONTAINS
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_start_grids_writing(iwrite)
+    SUBROUTINE oasis_start_grids_writing(iwrite)
 
     !-------------------------------------------------
     ! Routine to start the grids writing. To syncronize access to the
@@ -107,15 +108,15 @@ CONTAINS
     integer(kind=ip_intwp_p), intent (OUT) :: iwrite ! flag to state whether
                                             ! grids file needs to be written
     !-------------------------------------------------
-    character(len=*),parameter :: subname = 'prism_grid_start_grids_writing'
+    character(len=*),parameter :: subname = 'oasis_start_grids_writing'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
     if (prism_ngrid == 0) then  ! first call
@@ -128,13 +129,13 @@ CONTAINS
     endif
     iwrite = 1   ! just set grids are needed always
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_start_grids_writing
+  END SUBROUTINE oasis_start_grids_writing
 
 !--------------------------------------------------------------------------
 
-    subroutine prism_grid_write_grid(cgrid, nx, ny, lon, lat)
+    SUBROUTINE oasis_write_grid(cgrid, nx, ny, lon, lat)
 
     !-------------------------------------------------
     ! Routine to create a new grids file or to add a grid description to an
@@ -151,18 +152,18 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'prism_grid_write_grid'
+    character(len=*),parameter :: subname = 'oasis_write_grid'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
-    call prism_grid_findgrid(cgrid,nx,ny,gridID)
+    call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%lon(nx,ny),stat=ierror)
     IF (ierror /= 0) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING lon alloc'
@@ -172,12 +173,12 @@ CONTAINS
     prism_grid(gridID)%lat = lat
     prism_grid(gridID)%grid_set = .true.
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write_grid
+  END SUBROUTINE oasis_write_grid
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_write_angle(cgrid, nx, ny, angle)
+    SUBROUTINE oasis_write_angle(cgrid, nx, ny, angle)
 
     !-------------------------------------------------
     ! Routine to add angles to an existing grid file.
@@ -192,30 +193,30 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'prism_grid_write_angle'
+    character(len=*),parameter :: subname = 'oasis_write_angle'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
-    call prism_grid_findgrid(cgrid,nx,ny,gridID)
+    call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%angle(nx,ny),stat=ierror)
     if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING angle alloc'
     prism_grid(gridID)%angle = angle
     prism_grid(gridID)%angle_set = .true.
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write_angle
+  END SUBROUTINE oasis_write_angle
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_write_corner(cgrid, nx, ny, nc, clon, clat)
+    SUBROUTINE oasis_write_corner(cgrid, nx, ny, nc, clon, clat)
 
     !-------------------------------------------------
     ! Routine to add longitudes and latitudes of grid cell corners to an
@@ -233,18 +234,18 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'prism_grid_write_corner'
+    character(len=*),parameter :: subname = 'oasis_write_corner'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
-    call prism_grid_findgrid(cgrid,nx,ny,gridID)
+    call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%clon(nx,ny,nc),stat=ierror)
     if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING clon alloc'
@@ -255,12 +256,12 @@ CONTAINS
     prism_grid(gridID)%clat = clat
     prism_grid(gridID)%corner_set = .true.
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write_corner
+  END SUBROUTINE oasis_write_corner
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_write_mask(cgrid, nx, ny, mask)
+    SUBROUTINE oasis_write_mask(cgrid, nx, ny, mask)
 
     !-------------------------------------------------
     ! Routine to create a new masks file or to add a land see mask to an
@@ -276,30 +277,30 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'prism_grid_write_mask'
+    character(len=*),parameter :: subname = 'oasis_write_mask'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
-    call prism_grid_findgrid(cgrid,nx,ny,gridID)
+    call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%mask(nx,ny),stat=ierror)
     if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING mask alloc'
     prism_grid(gridID)%mask = mask
     prism_grid(gridID)%mask_set = .true.
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write_mask
+  END SUBROUTINE oasis_write_mask
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_write_area(cgrid, nx, ny, area)
+    SUBROUTINE oasis_write_area(cgrid, nx, ny, area)
 
     !-------------------------------------------------
     ! Routine to create a new areas file or to add areas of a grid to an
@@ -315,44 +316,44 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'prism_grid_write_area'
+    character(len=*),parameter :: subname = 'oasis_write_area'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
-    call prism_grid_findgrid(cgrid,nx,ny,gridID)
+    call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%area(nx,ny),stat=ierror)
     if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING area alloc'
     prism_grid(gridID)%area = area
     prism_grid(gridID)%area_set = .true.
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write_area
+  END SUBROUTINE oasis_write_area
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_terminate_grids_writing()
+    SUBROUTINE oasis_terminate_grids_writing()
     !-------------------------------------------------
     ! Routine to terminate the grids writing.
     !-------------------------------------------------
 
     implicit none
     integer(kind=ip_i4_p) :: n
-    character(len=*),parameter :: subname = 'prism_grid_terminate_grids_writing'
+    character(len=*),parameter :: subname = 'oasis_terminate_grids_writing'
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
 
     do n = 1,prism_ngrid
@@ -360,14 +361,14 @@ CONTAINS
     enddo
 
 ! moved to prism_method_enddef for synchronization
-!    call prism_grid_write2files()
+!    call oasis_write2files()
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_terminate_grids_writing
+  END SUBROUTINE oasis_terminate_grids_writing
 
 !--------------------------------------------------------------------------
-    subroutine prism_grid_write2files()
+    SUBROUTINE oasis_write2files()
 
     !-------------------------------------------------
     ! Write fields to grid files.
@@ -384,10 +385,10 @@ CONTAINS
     logical :: exists                  ! check if file exists
     integer(kind=ip_i4_p) :: n         ! counter
     integer(kind=ip_i4_p) :: nx,ny,nc  ! grid size
-    character(len=*),parameter :: subname = 'prism_grid_write2files'
+    character(len=*),parameter :: subname = 'oasis_write2files'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     do n = 1,prism_ngrid
     if (prism_grid(n)%terminated) then
@@ -401,46 +402,46 @@ CONTAINS
        if (prism_grid(n)%grid_set) then
           filename = 'grids.nc'
           fldname  = trim(cgrid)//'.lon'
-          call prism_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%lon,nx,ny)
+          call oasis_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%lon,nx,ny)
           fldname  = trim(cgrid)//'.lat'
-          call prism_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%lat,nx,ny)
+          call oasis_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%lat,nx,ny)
        endif
 
        if (prism_grid(n)%corner_set) then
           filename = 'grids.nc'
           fldname  = trim(cgrid)//'.clo'
-          call prism_io_write_3dgridfld_fromroot(filename,fldname,prism_grid(n)%clon,nx,ny,nc)
+          call oasis_io_write_3dgridfld_fromroot(filename,fldname,prism_grid(n)%clon,nx,ny,nc)
           fldname  = trim(cgrid)//'.cla'
-          call prism_io_write_3dgridfld_fromroot(filename,fldname,prism_grid(n)%clat,nx,ny,nc)
+          call oasis_io_write_3dgridfld_fromroot(filename,fldname,prism_grid(n)%clat,nx,ny,nc)
        endif
 
        if (prism_grid(n)%area_set) then
           filename = 'areas.nc'
           fldname  = trim(cgrid)//'.srf'
-          call prism_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%area,nx,ny)
+          call oasis_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%area,nx,ny)
        endif
 
        if (prism_grid(n)%angle_set) then
           filename = 'grids.nc'
           fldname  = trim(cgrid)//'.ang'
-          call prism_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%angle,nx,ny)
+          call oasis_io_write_2dgridfld_fromroot(filename,fldname,prism_grid(n)%angle,nx,ny)
        endif
 
        if (prism_grid(n)%mask_set) then
           filename = 'masks.nc'
           fldname  = trim(cgrid)//'.msk'
-          call prism_io_write_2dgridint_fromroot(filename,fldname,prism_grid(n)%mask,nx,ny)
+          call oasis_io_write_2dgridint_fromroot(filename,fldname,prism_grid(n)%mask,nx,ny)
        endif
 
     endif  ! terminated
     enddo
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_write2files
+  END SUBROUTINE oasis_write2files
 !--------------------------------------------------------------------------
 
-    subroutine prism_grid_findgrid(cgrid,nx,ny,gridID)
+    SUBROUTINE oasis_findgrid(cgrid,nx,ny,gridID)
     !-------------------------------------------------
     ! Routine that sets gridID, identifies existing
     ! grid with cgrid name or starts a new one
@@ -453,10 +454,10 @@ CONTAINS
     integer(kind=ip_intwp_p), intent(out) :: gridID      ! gridID matching cgrid
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: n
-    character(len=*),parameter :: subname = 'prism_grid_findgrid'
+    character(len=*),parameter :: subname = 'oasis_findgrid'
     !-------------------------------------------------
 
-    call prism_sys_debug_enter(subname)
+    call oasis_debug_enter(subname)
 
     gridID = -1
     do n = 1,prism_ngrid
@@ -467,7 +468,7 @@ CONTAINS
              write(nulprt,*) subname,' ERROR in predefined grid size',nx,ny, &
                 prism_grid(gridID)%nx,prism_grid(gridID)%ny
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             call prism_sys_abort()
+             call oasis_abort_noarg()
           endif
        endif
     enddo
@@ -481,11 +482,11 @@ CONTAINS
     prism_grid(gridID)%nx = nx
     prism_grid(gridID)%ny = ny
 
-    call prism_sys_debug_exit(subname)
+    call oasis_debug_exit(subname)
 
-    end subroutine prism_grid_findgrid
+  END SUBROUTINE oasis_findgrid
 !--------------------------------------------------------------------------
-end module mod_prism_grid
+END MODULE mod_oasis_grid
 !--------------------------------------------------------------------------
 
 

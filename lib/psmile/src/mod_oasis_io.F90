@@ -1,11 +1,11 @@
-MODULE mod_prism_io
+MODULE mod_oasis_io
 
-   USE mod_prism_kinds
-   USE mod_prism_data
-   USE mod_prism_parameters
-   USE mod_prism_mpi
-   USE mod_prism_sys
-   USE mod_prism_ioshr
+   USE mod_oasis_kinds
+   USE mod_oasis_data
+   USE mod_oasis_parameters
+   USE mod_oasis_mpi
+   USE mod_oasis_sys
+   USE mod_oasis_ioshr
    USE mct_mod
    USE netcdf
 
@@ -14,17 +14,17 @@ MODULE mod_prism_io
    private
 
    !--- interfaces ---
-   public :: prism_io_read_avfld
-   public :: prism_io_read_avfile
-   public :: prism_io_write_avfile
-   public :: prism_io_read_array
-   public :: prism_io_write_array
-   public :: prism_io_read_avfbf
-   public :: prism_io_write_avfbf
-   public :: prism_io_write_2dgridint_fromroot
-   public :: prism_io_write_2dgridfld_fromroot
-   public :: prism_io_write_3dgridfld_fromroot
-   public :: prism_io_read_field_fromroot
+   public :: oasis_io_read_avfld
+   public :: oasis_io_read_avfile
+   public :: oasis_io_write_avfile
+   public :: oasis_io_read_array
+   public :: oasis_io_write_array
+   public :: oasis_io_read_avfbf
+   public :: oasis_io_write_avfbf
+   public :: oasis_io_write_2dgridint_fromroot
+   public :: oasis_io_write_2dgridfld_fromroot
+   public :: oasis_io_write_3dgridfld_fromroot
+   public :: oasis_io_read_field_fromroot
 
 !===========================================================================
 CONTAINS
@@ -32,7 +32,7 @@ CONTAINS
 
 !===============================================================================
 
-subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
+subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
 
    ! ---------------------------------------
    ! Reads single field from file to av
@@ -61,7 +61,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
    integer(ip_i4_p) ,allocatable :: array2i(:,:)
    integer(ip_i4_p)    :: ifldtype     ! field type int (1) or real (2)
 
-   character(len=*),parameter :: subname = 'prism_io_read_avfld'
+   character(len=*),parameter :: subname = 'oasis_io_read_avfld'
 
 !-------------------------------------------------------------------------------
 !
@@ -69,9 +69,9 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
 
    ! empty filename, just return
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (len_trim(filename) < 1) then
-      call prism_sys_debug_exit(subname)
+      call oasis_debug_exit(subname)
       return
    endif
 
@@ -87,7 +87,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       if (ifldtype == 0) then
           WRITE(nulprt,*) subname,' ERROR in fldtype argument'
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
    endif
 
@@ -102,7 +102,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       else
          write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
          WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
 
       status = nf90_inq_varid(ncid,trim(filefld),varid)
@@ -110,14 +110,14 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
          write(nulprt,*) subname,':',trim(nf90_strerror(status))
          WRITE(nulprt,*) subname,' ERROR: filefld variable not found '//trim(filefld)
          WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
       if (dlen /= 2) then
          write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(filefld),dlen
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
@@ -127,7 +127,7 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
 
       if (ifldtype == 1) then
@@ -172,13 +172,13 @@ subroutine prism_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       call mct_aVect_clean(av_g)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_read_avfld
+end subroutine oasis_io_read_avfld
 
 !===============================================================================
 
-subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
+subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    ! ---------------------------------------
    ! Writes all fields from av to file
@@ -207,18 +207,18 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
    logical             :: exists      ! file existance
    real(ip_double_p),allocatable :: array2(:,:)
 
-   character(len=*),parameter :: subname = 'prism_io_write_avfile'
+   character(len=*),parameter :: subname = 'oasis_io_write_avfile'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    ! empty filename, just return
 
    if (len_trim(rstfile) < 1) then
-      call prism_sys_debug_exit(subname)
+      call oasis_debug_exit(subname)
       return
    endif
 
@@ -237,7 +237,7 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
 
       inquire(file=trim(rstfile),exist=exists)
@@ -271,7 +271,7 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          if (dlen /= nx) then
             write(nulprt,*) subname,' ERROR: dlen ne nx ',dlen,nx
 !            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-!            call prism_sys_abort()
+!            call oasis_abort_noarg()
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
@@ -279,7 +279,7 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          if (dlen /= ny) then
             write(nulprt,*) subname,' ERROR: dlen ne ny ',dlen,ny
 !            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-!            call prism_sys_abort()
+!            call oasis_abort_noarg()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -321,13 +321,13 @@ subroutine prism_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_avfile
+end subroutine oasis_io_write_avfile
 
 !===============================================================================
 
-subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
+subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
 
    ! ---------------------------------------
    ! Reads all fields for av from file
@@ -358,18 +358,18 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
    logical             :: labort      ! local abort flag
    real(ip_double_p),allocatable :: array2(:,:)
 
-   character(len=*),parameter :: subname = 'prism_io_read_avfile'
+   character(len=*),parameter :: subname = 'oasis_io_read_avfile'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    ! empty filename, just return
 
    if (len_trim(rstfile) < 1) then
-      call prism_sys_debug_exit(subname)
+      call oasis_debug_exit(subname)
       return
    endif
 
@@ -397,7 +397,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
          WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
          IF (labort) THEN
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL prism_sys_abort()
+             CALL oasis_abort_noarg()
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
@@ -417,7 +417,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
                IF (labort) THEN
                    WRITE(nulprt,*) subname,'ERROR: var missing'
                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                   CALL prism_sys_abort()
+                   CALL oasis_abort_noarg()
                ENDIF
 
             else
@@ -426,7 +426,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
                if (dlen /= 2) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
                   WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
@@ -436,7 +436,7 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
                   write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
 
                allocate(array2(nx,ny))
@@ -467,13 +467,13 @@ subroutine prism_io_read_avfile(rstfile,av,gsmap,abort,nampre)
       call mct_aVect_clean(av_g)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_read_avfile
+end subroutine oasis_io_read_avfile
 
 !===============================================================================
 
-subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
+subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
 
    ! ---------------------------------------
    ! Writes all fields from av to file
@@ -497,18 +497,18 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
    logical             :: exists      ! file existance
    logical             :: labort      ! local abort flag
 
-   character(len=*),parameter :: subname = 'prism_io_read_array'
+   character(len=*),parameter :: subname = 'oasis_io_read_array'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    ! empty filename, just return
 
    if (len_trim(rstfile) < 1) then
-      call prism_sys_debug_exit(subname)
+      call oasis_debug_exit(subname)
       return
    endif
 
@@ -529,7 +529,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
          WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
          IF (labort) THEN
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL prism_sys_abort()
+             CALL oasis_abort_noarg()
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
@@ -539,7 +539,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
             if (.not. present(ivarname)) then
                write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               call prism_sys_abort()
+               call oasis_abort_noarg()
             endif
 
             ncnt = size(iarray)
@@ -551,7 +551,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                IF (labort) THEN
                    WRITE(nulprt,*) subname,'ERROR: var missing'
                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                   CALL prism_sys_abort()
+                   CALL oasis_abort_noarg()
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
@@ -559,7 +559,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                if (dlen /= 1) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(ivarname),dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
@@ -567,7 +567,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,' ERROR: iarray ncnt dlen mismatch ',ncnt,dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
 
                status = nf90_get_var(ncid,varid,iarray)
@@ -579,7 +579,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
             if (.not. present(rvarname)) then
                write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               call prism_sys_abort()
+               call oasis_abort_noarg()
             endif
 
             ncnt = size(rarray)
@@ -591,7 +591,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                IF (labort) THEN
                    WRITE(nulprt,*) subname,'ERROR: var missing'
                    WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-                   CALL prism_sys_abort()
+                   CALL oasis_abort_noarg()
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
@@ -599,7 +599,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                if (dlen /= 1) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(rvarname),dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
@@ -607,7 +607,7 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,' ERROR: rarray ncnt dlen mismatch ',ncnt,dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  call prism_sys_abort()
+                  call oasis_abort_noarg()
                endif
 
                status = nf90_get_var(ncid,varid,rarray)
@@ -622,20 +622,20 @@ subroutine prism_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
    endif
 
    if (present(iarray)) then
-      call prism_mpi_bcast(iarray,mpicom,trim(subname)//':iarray',master_task)
+      call oasis_mpi_bcast(iarray,mpicom,trim(subname)//':iarray',master_task)
    endif
 
    if (present(rarray)) then
-      call prism_mpi_bcast(rarray,mpicom,trim(subname)//':rarray',master_task)
+      call oasis_mpi_bcast(rarray,mpicom,trim(subname)//':rarray',master_task)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_read_array
+end subroutine oasis_io_read_array
 
 !===============================================================================
 
-subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
+subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
 
    ! ---------------------------------------
    ! Writes all fields from av to file
@@ -657,18 +657,18 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
 
-   character(len=*),parameter :: subname = 'prism_io_write_array'
+   character(len=*),parameter :: subname = 'oasis_io_write_array'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    ! empty filename, just return
 
    if (len_trim(rstfile) < 1) then
-      call prism_sys_debug_exit(subname)
+      call oasis_debug_exit(subname)
       return
    endif
 
@@ -692,7 +692,7 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          if (.not. present(ivarname)) then
             write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          ncnt = size(iarray)
@@ -707,7 +707,7 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          if (dlen /= ncnt) then
             write(nulprt,*) subname,' ERROR: iarray dlen ne ncnt ',dlen,ncnt
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
@@ -721,7 +721,7 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          if (.not. present(rvarname)) then
             write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          ncnt = size(rarray)
@@ -736,7 +736,7 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          if (dlen /= ncnt) then
             write(nulprt,*) subname,' ERROR: rarray dlen ne ncnt ',dlen,ncnt
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
@@ -768,13 +768,13 @@ subroutine prism_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
 
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_array
+end subroutine oasis_io_write_array
 
 !===============================================================================
 
-subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
+subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
 
    ! ---------------------------------------
    ! Write all fields from av to individual field files
@@ -811,13 +811,13 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
    real(ip_double_p),allocatable :: array3(:,:,:)
    real(ip_double_p)   :: tbnds(2)
 
-   character(len=*),parameter :: subname = 'prism_io_write_avfbf'
+   character(len=*),parameter :: subname = 'oasis_io_write_avfbf'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lmsec = 0
    if (present(msec)) then
@@ -835,7 +835,7 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
 
 #if (PIO_DEFINED)
 ! tcraig, not working as of Oct 2011
-   call prism_ioshr_wopen(lfn,clobber=.true.,cdf64=.true.)
+   call oasis_ioshr_wopen(lfn,clobber=.true.,cdf64=.true.)
 
    do fk = fk1,2
       if (fk == 1) then
@@ -847,21 +847,21 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
       else
           WRITE(nulprt,*) subname,'ERROR: fk illegal'
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       end if
 
-      call prism_ioshr_write(lfn,&
+      call oasis_ioshr_write(lfn,&
                time_units='seconds',time_cal='seconds',time_val=real(lmsec,ip_double_p),&
                nt=1,whead=whead,wdata=wdata)
 
-      call prism_ioshr_write(lfn, gsmap, av, 'pout', &
+      call oasis_ioshr_write(lfn, gsmap, av, 'pout', &
                whead=whead,wdata=wdata,nx=nx,ny=ny,nt=1, &
                use_float=.false.)
    
-      if (fk == 1) call prism_ioshr_enddef(lfn)
+      if (fk == 1) call oasis_ioshr_enddef(lfn)
    enddo
 
-   call prism_ioshr_close(lfn)
+   call oasis_ioshr_close(lfn)
 #else
 
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
@@ -869,7 +869,7 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
 
       allocate(array3(nx,ny,1))
@@ -943,13 +943,13 @@ subroutine prism_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
 
 #endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_avfbf
+end subroutine oasis_io_write_avfbf
 
 !===============================================================================
 
-subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
+subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
 
    ! ---------------------------------------
    ! Read all fields to av from individual field files
@@ -985,13 +985,13 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
    integer(ip_i4_p) ,allocatable :: time(:)
    real(ip_double_p)   :: tbnds(2)
 
-   character(len=*),parameter :: subname = 'prism_io_read_avfbf'
+   character(len=*),parameter :: subname = 'oasis_io_read_avfbf'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lmsec = 0
    if (present(msec)) then
@@ -1023,7 +1023,7 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
          if (.not.exists) then
             write(nulprt,*) subname,' ERROR: file not found ',trim(lfn)
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          status = nf90_open(lfn,NF90_NOWRITE,ncid)
@@ -1046,7 +1046,7 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
          if (n1 < 1) then
             write(nulprt,*) subname,' ERROR: time not found on file ',trim(lfn),lmsec
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -1061,7 +1061,7 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
              write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             call prism_sys_abort()
+             call oasis_abort_noarg()
          endif
 
          start3 = 1
@@ -1094,13 +1094,13 @@ subroutine prism_io_read_avfbf(av,gsmap,msec,string,filename)
       call mct_aVect_clean(av_g)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_read_avfbf
+end subroutine oasis_io_read_avfbf
 
 !===============================================================================
 
-subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,nz)
+subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,nz)
 
    ! ---------------------------------------
    ! Write real fld on rootpe to file
@@ -1127,13 +1127,13 @@ subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'prism_io_read_field_fromroot'
+   character(len=*),parameter :: subname = 'oasis_io_read_field_fromroot'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -1146,14 +1146,14 @@ subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    else
       write(nulprt,*) subname,' ERROR: in filename ',trim(filename)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
 
    status = nf90_inq_varid(ncid,trim(fldname),varid)
    if (status /= nf90_noerr) then
       write(nulprt,*) subname,' ERROR: in variable name ',trim(fldname)
       WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
 
    status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
@@ -1181,7 +1181,7 @@ subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
       else
          write(nulprt,*) subname,' ERROR: mismatch in field and data'
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call prism_sys_abort()
+         call oasis_abort_noarg()
       endif
    endif
     
@@ -1204,13 +1204,13 @@ subroutine prism_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
 
 !   endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_read_field_fromroot
+end subroutine oasis_io_read_field_fromroot
 
 !===============================================================================
 
-subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
+subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
    ! Write real fld on rootpe to file
@@ -1232,13 +1232,13 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'prism_io_write_2dgridfld_fromroot'
+   character(len=*),parameter :: subname = 'oasis_io_write_2dgridfld_fromroot'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -1247,7 +1247,7 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
     if (ind < 2) then
        write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
     gridname = fldname(1:ind-1)
 
@@ -1294,13 +1294,13 @@ subroutine prism_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
 !   endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_2dgridfld_fromroot
+end subroutine oasis_io_write_2dgridfld_fromroot
 
 !===============================================================================
 
-subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
+subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
    ! Write int fld on rootpe to file
@@ -1322,13 +1322,13 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'prism_io_write_2dgridint_fromroot'
+   character(len=*),parameter :: subname = 'oasis_io_write_2dgridint_fromroot'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -1337,7 +1337,7 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
     if (ind < 2) then
        write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
     gridname = fldname(1:ind-1)
 
@@ -1384,13 +1384,13 @@ subroutine prism_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
 !   endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_2dgridint_fromroot
+end subroutine oasis_io_write_2dgridint_fromroot
 
 !===============================================================================
 
-subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
+subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
  
    ! ---------------------------------------
    ! Write real 3d fld on rootpe to file
@@ -1413,13 +1413,13 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'prism_io_write_3dgridfld_fromroot'
+   character(len=*),parameter :: subname = 'oasis_io_write_3dgridfld_fromroot'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
@@ -1428,7 +1428,7 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
     if (ind < 2) then
        write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call prism_sys_abort()
+       call oasis_abort_noarg()
     endif
     gridname = fldname(1:ind-1)
 
@@ -1482,10 +1482,10 @@ subroutine prism_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
 
 !   endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-end subroutine prism_io_write_3dgridfld_fromroot
+end subroutine oasis_io_write_3dgridfld_fromroot
 
 !-------------------------------------------------------------------
 
-END MODULE mod_prism_io
+END MODULE mod_oasis_io

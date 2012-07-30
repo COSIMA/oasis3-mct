@@ -1,20 +1,21 @@
-MODULE mod_prism_sys
+MODULE mod_oasis_sys
 
-   USE mod_prism_kinds
-   USE mod_prism_data
+   USE mod_oasis_kinds
+   USE mod_oasis_data
 
    IMPLICIT NONE
 
    private
 
-   public prism_sys_abort
-   public prism_sys_flush
-   public prism_sys_unitsetmin
-   public prism_sys_unitget
-   public prism_sys_unitfree
-   public prism_sys_debug_enter
-   public prism_sys_debug_exit
-   public prism_sys_debug_note
+   public oasis_abort_noarg
+   public oasis_abort
+   public oasis_flush
+   public oasis_unitsetmin
+   public oasis_unitget
+   public oasis_unitfree
+   public oasis_debug_enter
+   public oasis_debug_exit
+   public oasis_debug_note
 
    integer(ip_intwp_p),parameter :: muni = 20
    integer(ip_intwp_p),save :: unitno(muni) = -1
@@ -26,13 +27,13 @@ MODULE mod_prism_sys
 CONTAINS
 !--------------------------------------------------------------------
 
-   SUBROUTINE prism_sys_abort()
+   SUBROUTINE oasis_abort_noarg()
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    INTEGER                      :: ierror
-   character(len=*),parameter :: subname = 'prism_sys_abort'
+   character(len=*),parameter   :: subname = 'oasis_abort_noarg'
 !--------------------------------------------------------------------
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
@@ -41,25 +42,50 @@ CONTAINS
 
    STOP
 
-   END SUBROUTINE prism_sys_abort
+ END SUBROUTINE oasis_abort_noarg
+
+!--------------------------------------------------------------------
+
+   SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message)
+
+   IMPLICIT NONE
+!--------------------------------------------------------------------
+   INTEGER(kind=ip_intwp_p),INTENT(in) :: id_compid
+   CHARACTER(len=*), INTENT(in) :: cd_routine
+   CHARACTER(len=*), INTENT(in) :: cd_message
+!--------------------------------------------------------------------
+   INTEGER                      :: ierror
+   character(len=*),parameter   :: subname = 'oasis_abort'
+!--------------------------------------------------------------------
+
+   WRITE (nulprt,'(a)') subname//' from '//TRIM(cd_routine)
+   WRITE (nulprt,'(a)') subname//' error = '//TRIM(cd_message)
+
+#if defined use_comm_MPI1 || defined use_comm_MPI2
+   CALL MPI_ABORT (mpi_comm_global, 0, ierror)
+#endif
+
+   STOP
+
+ END SUBROUTINE oasis_abort
 
 !==========================================================================
-   SUBROUTINE prism_sys_flush(nu)
+   SUBROUTINE oasis_flush(nu)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(in) :: nu
 !--------------------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_sys_flush'
+   character(len=*),parameter :: subname = 'oasis_flush'
 !--------------------------------------------------------------------
 
    call flush(nu)
 
-   END SUBROUTINE prism_sys_flush
+ END SUBROUTINE oasis_flush
 
 !==========================================================================
-   SUBROUTINE prism_sys_unitget(uio)
+   SUBROUTINE oasis_unitget(uio)
 
    IMPLICIT NONE
 
@@ -68,7 +94,7 @@ CONTAINS
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p) :: n1
    logical :: found
-   character(len=*),parameter :: subname = 'prism_sys_unitget'
+   character(len=*),parameter :: subname = 'oasis_unitget'
 !--------------------------------------------------------------------
 
    n1 = 0
@@ -79,36 +105,36 @@ CONTAINS
          found = .true.
          uio = n1 + maxion
          unitno(n1) = uio
-         if (PRISM_DEBUG >= 2) write(nulprt,*) subname,n1,uio
+         if (OASIS_debug >= 2) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
    if (.not.found) then
       write(nulprt,*) subname,' ERROR no unitno available '
       WRITE(nulprt,*) subname,' abort by model ',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
      
-   END SUBROUTINE prism_sys_unitget
+ END SUBROUTINE oasis_unitget
 
 !==========================================================================
-   SUBROUTINE prism_sys_unitsetmin(uio)
+   SUBROUTINE oasis_unitsetmin(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(in) :: uio
 !--------------------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_sys_unitsetmin'
+   character(len=*),parameter :: subname = 'oasis_unitsetmin'
 !--------------------------------------------------------------------
 
    maxion = uio
-   if (PRISM_DEBUG >= 20) write(nulprt,*) subname,maxion
+   if (OASIS_debug >= 20) write(nulprt,*) subname,maxion
      
-   END SUBROUTINE prism_sys_unitsetmin
+ END SUBROUTINE oasis_unitsetmin
 
 !==========================================================================
-   SUBROUTINE prism_sys_unitfree(uio)
+   SUBROUTINE oasis_unitfree(uio)
 
    IMPLICIT NONE
 
@@ -116,87 +142,87 @@ CONTAINS
    INTEGER(kind=ip_intwp_p),INTENT(in) :: uio
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p) :: n1
-   character(len=*),parameter :: subname = 'prism_sys_unitfree'
+   character(len=*),parameter :: subname = 'oasis_unitfree'
 !--------------------------------------------------------------------
 
    do n1 = 1,muni
       if (unitno(n1) == uio) then
          unitno(n1) = -1
-         if (PRISM_DEBUG >= 20) write(nulprt,*) subname,n1,uio
+         if (OASIS_debug >= 20) write(nulprt,*) subname,n1,uio
       endif
    enddo
 
-   END SUBROUTINE prism_sys_unitfree
+ END SUBROUTINE oasis_unitfree
 
 !=========================================================================
 !==========================================================================
-subroutine prism_sys_debug_enter(string)
+SUBROUTINE oasis_debug_enter(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
-   character(len=*),parameter :: subname = 'prism_sys_debug_enter'
+   character(len=*),parameter :: subname = 'oasis_debug_enter'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_enter
 
-   if (PRISM_DEBUG >= 10) then
+   if (OASIS_debug >= 10) then
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
        tree_enter='**** ENTER '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_enter)
        tree_indent = tree_indent + tree_delta
        DEALLOCATE (ch_blank)
-       CALL prism_sys_flush(nulprt)
+       CALL oasis_flush(nulprt)
    endif
 
-end subroutine prism_sys_debug_enter
+ END SUBROUTINE oasis_debug_enter
 
 !==========================================================================
-subroutine prism_sys_debug_exit(string)
+SUBROUTINE oasis_debug_exit(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
-   character(len=*),parameter :: subname = 'prism_sys_debug_exit'
+   character(len=*),parameter :: subname = 'oasis_debug_exit'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500)        :: tree_exit
 
-   IF (PRISM_DEBUG >= 10) THEN
+   IF (OASIS_debug >= 10) THEN
        tree_indent = MAX(0,tree_indent - tree_delta)
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
        tree_exit='**** EXIT  '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_exit)
        DEALLOCATE (ch_blank)
-       CALL prism_sys_flush(nulprt)
+       CALL oasis_flush(nulprt)
    ENDIF
 
-end subroutine prism_sys_debug_exit
+ END SUBROUTINE oasis_debug_exit
 
 !==========================================================================
-subroutine prism_sys_debug_note(string)
+SUBROUTINE oasis_debug_note(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    CHARACTER(len=*), INTENT(in) :: string
-   character(len=*),parameter :: subname = 'prism_sys_debug_note'
+   character(len=*),parameter :: subname = 'oasis_debug_note'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_note
 
-   if (PRISM_DEBUG >= 12) then
+   if (OASIS_debug >= 12) then
        ALLOCATE (ch_blank(tree_indent))
        ch_blank='-'
        tree_note='**** NOTE '//TRIM(string)
        WRITE(nulprt,*) ch_blank,TRIM(tree_note)
       DEALLOCATE(ch_blank)
-      call prism_sys_flush(nulprt)
+      call oasis_flush(nulprt)
    endif
 
-end subroutine prism_sys_debug_note
+ END SUBROUTINE oasis_debug_note
 
 !==========================================================================
 
-END MODULE mod_prism_sys
+END MODULE mod_oasis_sys

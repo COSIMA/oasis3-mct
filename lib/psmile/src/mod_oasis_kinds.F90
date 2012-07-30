@@ -1,8 +1,8 @@
 !-------------------------------------------------------------------
 ! BOP
 !
-! !MODULE: mod_prism_kinds
-MODULE mod_prism_kinds
+! !MODULE: mod_oasis_kinds
+MODULE mod_oasis_kinds
 !
 ! !USES:
 !
@@ -41,11 +41,11 @@ SAVE
 ! !PUBLIC DATA MEMBERS:
 !
   INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1
-  INTEGER(kind=ip_i4_p)	    :: prism_debug
+  INTEGER(kind=ip_i4_p)	    :: OASIS_debug
 !
 ! !DESCRIPTION:
 ! This modules contains the parameters defining the precision used for 
 ! real and integer variables
 !   
-  END MODULE mod_prism_kinds
+END MODULE mod_oasis_kinds
 

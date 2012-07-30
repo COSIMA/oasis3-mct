@@ -1,32 +1,32 @@
-MODULE mod_prism_method
+MODULE mod_oasis_method
 
-   USE mod_prism_kinds
-   USE mod_prism_sys
-   USE mod_prism_data
-   USE mod_prism_parameters
-   USE mod_prism_namcouple
-   USE mod_prism_coupler
-   USE mod_prism_advance
-   USE mod_prism_timer
-   USE mod_prism_ioshr
-   USE mod_prism_grid
-   USE mod_prism_mpi
+   USE mod_oasis_kinds
+   USE mod_oasis_sys
+   USE mod_oasis_data
+   USE mod_oasis_parameters
+   USE mod_oasis_namcouple
+   USE mod_oasis_coupler
+   USE mod_oasis_advance
+   USE mod_oasis_timer
+   USE mod_oasis_ioshr
+   USE mod_oasis_grid
+   USE mod_oasis_mpi
    USE mct_mod
 
    IMPLICIT NONE
 
    private
 
-   public prism_method_init
-   public prism_method_terminate
-   public prism_method_getlocalcomm
-   public prism_method_setcouplcomm
-   public prism_method_createcouplcomm
-   public prism_method_getdebug
-   public prism_method_setdebug
-   public prism_method_get_intercomm
-   public prism_method_get_intracomm
-   public prism_method_enddef
+   public oasis_init_comp
+   public oasis_terminate
+   public oasis_get_localcomm
+   public oasis_set_couplcomm
+   public oasis_create_couplcomm
+   public oasis_get_debug
+   public oasis_set_debug
+   public oasis_get_intercomm
+   public oasis_get_intracomm
+   public oasis_enddef
 
 #ifdef __VERBOSE
    integer(kind=ip_intwp_p),parameter :: debug=2
@@ -38,7 +38,7 @@ MODULE mod_prism_method
 CONTAINS
 
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_init(mynummod,cdnam,kinfo)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo)
 
    ! This is COLLECTIVE, all pes must call
 
@@ -56,13 +56,13 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
    integer(kind=ip_intwp_p) :: pio_numtasks
-   character(len=*),parameter :: subname = 'prism_method_init'
+   character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
 
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
-   call prism_data_zero()
+   call oasis_data_zero()
 
    !------------------------
    !--- Initialize MPI
@@ -71,10 +71,10 @@ CONTAINS
    lg_mpiflag = .FALSE.
    CALL MPI_Initialized ( lg_mpiflag, mpi_err )
    IF ( .NOT. lg_mpiflag ) THEN
-      if (PRISM_DEBUG >= 0) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
+      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
       CALL MPI_INIT ( mpi_err )
    else
-      if (PRISM_DEBUG >= 0) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
+      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
    ENDIF
 
 #ifdef use_comm_MPI1
@@ -92,9 +92,9 @@ CONTAINS
 
    iu=-1
 
-   call prism_sys_unitsetmin(200)
+   call oasis_unitsetmin(200)
    IF (mpi_rank_global == 0) THEN
-       CALL prism_sys_unitget(iu)
+       CALL oasis_unitget(iu)
        nulprt1 = iu
        WRITE(filename,'(a,i6.6)') 'nout.',mpi_rank_global
        OPEN(nulprt1,file=filename)
@@ -107,13 +107,13 @@ CONTAINS
    !------------------------
 
    IF (mpi_rank_global == 0) THEN
-      call prism_namcouple_init()
+      call oasis_namcouple_init()
    endif
-   call prism_mpi_barrier(mpi_comm_global)
+   call oasis_mpi_barrier(mpi_comm_global)
    IF (mpi_rank_global /= 0) THEN
-      call prism_namcouple_init()
+      call oasis_namcouple_init()
    endif
-   prism_debug = namlogprt
+   OASIS_debug = namlogprt
 
    !------------------------
    !--- Set compid (need namcouple model names)
@@ -129,7 +129,7 @@ CONTAINS
        IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) subname,' model not found in namcouple ',TRIM(cdnam)
        ENDIF
-       CALL prism_sys_abort()
+       CALL oasis_abort_noarg()
    endif
 
    IF (mpi_rank_global == 0) CLOSE(nulprt1)
@@ -166,38 +166,38 @@ CONTAINS
    !------------------------
 
    iu=-1
-   CALL prism_sys_unitget(iu)
+   CALL oasis_unitget(iu)
 
-       IF (PRISM_Debug <= 1) THEN
-           CALL prism_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
+       IF (OASIS_debug <= 1) THEN
+           CALL oasis_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
            IF (mpi_rank_local == 0) THEN
                nulprt=iu
                WRITE(filename,'(a,i2.2)') 'debug.root.',compid
                OPEN(nulprt,file=filename)
                WRITE(nulprt,*) subname,' OPEN debug file for root pe, unit :',nulprt
-               call prism_sys_flush(nulprt)
+               call oasis_flush(nulprt)
            ELSE
                nulprt=iu+mpi_size_global
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
                OPEN(nulprt,file=filename2,position='append')
                WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
-               CALL prism_sys_flush(nulprt)
+               CALL oasis_flush(nulprt)
            ENDIF
        ELSE
            nulprt=iu
            WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
            OPEN(nulprt,file=filename)
            WRITE(nulprt,*) subname,' OPEN debug file, unit :',nulprt
-           CALL prism_sys_flush(nulprt)
+           CALL oasis_flush(nulprt)
        ENDIF
 
-       IF ( (PRISM_debug == 1) .AND. (mpi_rank_local == 0)) PRISM_Debug=10
+       IF ( (OASIS_debug == 1) .AND. (mpi_rank_local == 0)) OASIS_debug=10
 
-       IF (PRISM_Debug >= 2) THEN
+       IF (OASIS_debug >= 2) THEN
            WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
        ENDIF
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    !------------------------
    !--- PIO
@@ -208,21 +208,21 @@ CONTAINS
    pio_stride = -99
    pio_root = -99
    pio_numtasks = -99
-   call prism_ioshr_init(mpi_comm_local,pio_type,pio_stride,pio_root,pio_numtasks)
+   call oasis_ioshr_init(mpi_comm_local,pio_type,pio_stride,pio_root,pio_numtasks)
 #endif
 
    !------------------------
    !--- Timer Initialization
    !------------------------
 
-   call prism_timer_init (trim(cdnam), trim(cdnam)//'.timers', mpi_comm_local)
-   call prism_timer_start('total after init')
+   call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers', mpi_comm_local)
+   call oasis_timer_start('total after init')
 
    !------------------------
    !--- Diagnostics
    !------------------------
 
-   if (PRISM_DEBUG >= 2)  then
+   if (OASIS_debug >= 2)  then
       write(nulprt,*) subname,' compid         = ',compid
       write(nulprt,*) subname,' compnm         = ',trim(compnm)
       write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
@@ -233,35 +233,35 @@ CONTAINS
       write(nulprt,*) subname,'     size_local = ',mpi_size_local
       write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
       write(nulprt,*) subname,'     root_local = ',mpi_root_local
-      write(nulprt,*) subname,' prism_debug    = ',prism_debug
+      write(nulprt,*) subname,' OASIS_debug    = ',OASIS_debug
       write(nulprt,*) subname,' prism models: '
-      call prism_sys_flush(nulprt)
+      call oasis_flush(nulprt)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_init
+ END SUBROUTINE oasis_init_comp
 
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_terminate(kinfo)
+   SUBROUTINE oasis_terminate(kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
-   character(len=*),parameter :: subname = 'prism_method_terminate'
+   character(len=*),parameter :: subname = 'oasis_terminate'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
-   call prism_timer_stop('total after init')
-   call prism_timer_print()
+   call oasis_timer_stop('total after init')
+   call oasis_timer_print()
 
-   call prism_mpi_barrier(mpi_comm_global)
+   call oasis_mpi_barrier(mpi_comm_global)
    IF ( .NOT. lg_mpiflag ) THEN
       WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
       CALL MPI_Finalize ( mpi_err )
@@ -271,46 +271,46 @@ CONTAINS
 
    WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_terminate
+ END SUBROUTINE oasis_terminate
 
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_getlocalcomm(localcomm,kinfo)
+   SUBROUTINE oasis_get_localcomm(localcomm,kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(out)   :: localcomm
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_getlocalcomm'
+   character(len=*),parameter :: subname = 'oasis_get_localcomm'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
    ! from prism_data
    localcomm = mpi_comm_local
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_getlocalcomm
+ END SUBROUTINE oasis_get_localcomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_setcouplcomm(localcomm,kinfo)
+   SUBROUTINE oasis_set_couplcomm(localcomm,kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_setcouplcomm'
+   character(len=*),parameter :: subname = 'oasis_set_couplcomm'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
    !------------------------
@@ -331,11 +331,11 @@ CONTAINS
       mpi_root_local = 0
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_setcouplcomm
+ END SUBROUTINE oasis_set_couplcomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_createcouplcomm(icpl,allcomm,cplcomm,kinfo)
+   SUBROUTINE oasis_create_couplcomm(icpl,allcomm,cplcomm,kinfo)
 
    IMPLICIT NONE
 
@@ -345,12 +345,12 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
-   character(len=*),parameter :: subname = 'prism_method_createcouplcomm'
+   character(len=*),parameter :: subname = 'oasis_create_couplcomm'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
    !------------------------
@@ -360,65 +360,65 @@ CONTAINS
    CALL MPI_COMM_Split(allcomm,icpl,1,cplcomm,mpi_err)
    IF (mpi_err /= 0) THEN
       WRITE (nulprt,*) subname,' ERROR: MPI_Comm_Split abort ',mpi_err
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    ENDIF
 
    !------------------------
    !--- update mpi_comm_local from component
    !------------------------
 
-   call prism_method_setcouplcomm(cplcomm)
+   call oasis_set_couplcomm(cplcomm)
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_createcouplcomm
+ END SUBROUTINE oasis_create_couplcomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_getdebug(debug,kinfo)
+   SUBROUTINE oasis_get_debug(debug,kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(out)   :: debug
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_getdebug'
+   character(len=*),parameter :: subname = 'oasis_get_debug'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
-   debug = prism_debug
+   debug = OASIS_debug
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_getdebug
+ END SUBROUTINE oasis_get_debug
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_setdebug(debug,kinfo)
+   SUBROUTINE oasis_set_debug(debug,kinfo)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(in)   :: debug
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_setdebug'
+   character(len=*),parameter :: subname = 'oasis_set_debug'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
-   prism_debug = debug
-   if (PRISM_Debug >= 2) then
-      write(nulprt,*) subname,' set prism_debug to ',prism_debug
+   OASIS_debug = debug
+   if (OASIS_debug >= 2) then
+      write(nulprt,*) subname,' set OASIS_debug to ',OASIS_debug
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_setdebug
+ END SUBROUTINE oasis_set_debug
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_get_intercomm(new_comm, cdnam, kinfo)
+   SUBROUTINE oasis_get_intercomm(new_comm, cdnam, kinfo)
 
    IMPLICIT NONE
 
@@ -429,12 +429,12 @@ CONTAINS
    INTEGER (kind=ip_intwp_p)	:: n, il, ierr, tag
    LOGICAL :: found
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_get_intercomm'
+   character(len=*),parameter :: subname = 'oasis_get_intercomm'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
    found = .false.
@@ -443,7 +443,7 @@ CONTAINS
          if (found) then
             write(nulprt,*) subname,' ERROR: found same model name twice'
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            call prism_sys_abort()
+            call oasis_abort_noarg()
          endif
          il = n
          found = .true.
@@ -453,17 +453,17 @@ CONTAINS
    if (.not. found) then
       write(nulprt,*) subname,' ERROR: input model name not found'
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call prism_sys_abort()
+      call oasis_abort_noarg()
    endif
 
    tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))
    CALL mpi_intercomm_create(mpi_comm_local, 0, MPI_COMM_WORLD, mpi_root_global(il), tag, new_comm, ierr)
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_get_intercomm
+ END SUBROUTINE oasis_get_intercomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_get_intracomm(new_comm, cdnam, kinfo)
+   SUBROUTINE oasis_get_intracomm(new_comm, cdnam, kinfo)
 
    IMPLICIT NONE
 
@@ -474,23 +474,23 @@ CONTAINS
    INTEGER (kind=ip_intwp_p)	:: tmp_intercomm
    INTEGER (kind=ip_intwp_p)	:: ierr
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'prism_method_get_intracomm'
+   character(len=*),parameter :: subname = 'oasis_get_intracomm'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
-   call prism_method_get_intercomm(tmp_intercomm, cdnam, kinfo)
+   call oasis_get_intercomm(tmp_intercomm, cdnam, kinfo)
 
    CALL mpi_intercomm_merge(tmp_intercomm,.FALSE., new_comm, ierr)
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_get_intracomm
+ END SUBROUTINE oasis_get_intracomm
 !----------------------------------------------------------------------
-   SUBROUTINE prism_method_enddef(kinfo)
+   SUBROUTINE oasis_enddef(kinfo)
 
    IMPLICIT NONE
 
@@ -499,11 +499,11 @@ CONTAINS
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
    integer(kind=ip_intwp_p),allocatable :: tmparr(:)
-   character(len=*),parameter :: subname = 'prism_method_enddef'
+   character(len=*),parameter :: subname = 'oasis_enddef'
 !  ---------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
-   lkinfo = PRISM_OK
+   call oasis_debug_enter(subname)
+   lkinfo = OASIS_OK
 
    !------------------------
    !--- write grid info to files one model at a time
@@ -511,9 +511,9 @@ CONTAINS
 
    do n = 1,prism_nmodels
       if (compid == n .and. mpi_rank_local == mpi_root_local) then
-         call prism_grid_write2files()
+         call oasis_write2files()
       endif
-      call prism_mpi_barrier(mpi_comm_global)
+      call oasis_mpi_barrier(mpi_comm_global)
    enddo
 
    !------------------------
@@ -529,15 +529,15 @@ CONTAINS
          tmparr(n) = mpi_rank_global
       endif
    enddo
-   call prism_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
+   call oasis_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
       string=subname//':mpi_root_global',all=.true.)
    deallocate(tmparr)
 
-   if (PRISM_DEBUG >= 2)  then
+   if (OASIS_debug >= 2)  then
       do n = 1,prism_nmodels
       write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
       enddo
-      call prism_sys_flush(nulprt)
+      call oasis_flush(nulprt)
    endif
 
    !------------------------
@@ -546,25 +546,25 @@ CONTAINS
 
    call mct_world_init(prism_nmodels,mpi_comm_global,mpi_comm_local,compid)
    write(nulprt,*) subname, ' done mct_world_init '
-   call prism_sys_flush(nulprt)
+   call oasis_flush(nulprt)
 
-   call prism_coupler_setup()
+   call oasis_coupler_setup()
    write(nulprt,*) subname, ' done prism_coupler_setup '
-   call prism_sys_flush(nulprt)
+   call oasis_flush(nulprt)
 
-   call prism_advance_init(lkinfo)
+   call oasis_advance_init(lkinfo)
    write(nulprt,*) subname, ' done prism_advance_init '
-   call prism_sys_flush(nulprt)
+   call oasis_flush(nulprt)
 
-   !--- Force PRISM_OK here rather than anything else ---
+   !--- Force OASIS_OK here rather than anything else ---
 
    if (present(kinfo)) then
-      kinfo = PRISM_OK
+      kinfo = OASIS_OK
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-   END SUBROUTINE prism_method_enddef
+ END SUBROUTINE oasis_enddef
 !----------------------------------------------------------------------
 
-END MODULE mod_prism_method
+END MODULE mod_oasis_method

@@ -1,95 +1,94 @@
-
-MODULE mod_prism_mpi
+MODULE mod_oasis_mpi
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: general layer on MPI functions
 !-------------------------------------------------------------------------------
 
-   use mod_prism_kinds
-   USE mod_prism_data, ONLY: compid, mpi_rank_local
-   use mod_prism_sys, only: prism_sys_debug_enter, prism_sys_debug_exit
+   use mod_oasis_kinds
+   USE mod_oasis_data, ONLY: compid, mpi_rank_local
+   use mod_oasis_sys, only: oasis_debug_enter, oasis_debug_exit
 
    implicit none
    private
 
 ! PUBLIC: Public interfaces
 
-   public :: prism_mpi_chkerr
-   public :: prism_mpi_send
-   public :: prism_mpi_recv
-   public :: prism_mpi_bcast
-   public :: prism_mpi_gathScatVInit
-   public :: prism_mpi_gatherV
-   public :: prism_mpi_scatterV
-   public :: prism_mpi_sum
-   public :: prism_mpi_min
-   public :: prism_mpi_max
-   public :: prism_mpi_commsize
-   public :: prism_mpi_commrank
-   public :: prism_mpi_initialized
-   public :: prism_mpi_wtime
-   public :: prism_mpi_abort
-   public :: prism_mpi_barrier
-   public :: prism_mpi_init
-   public :: prism_mpi_finalize
+   public :: oasis_mpi_chkerr
+   public :: oasis_mpi_send
+   public :: oasis_mpi_recv
+   public :: oasis_mpi_bcast
+   public :: oasis_mpi_gathScatVInit
+   public :: oasis_mpi_gatherV
+   public :: oasis_mpi_scatterV
+   public :: oasis_mpi_sum
+   public :: oasis_mpi_min
+   public :: oasis_mpi_max
+   public :: oasis_mpi_commsize
+   public :: oasis_mpi_commrank
+   public :: oasis_mpi_initialized
+   public :: oasis_mpi_wtime
+   public :: oasis_mpi_abort
+   public :: oasis_mpi_barrier
+   public :: oasis_mpi_init
+   public :: oasis_mpi_finalize
 
-   interface prism_mpi_send ; module procedure &
-     prism_mpi_sendi0, &
-     prism_mpi_sendi1, &
-     prism_mpi_sendr0, &
-     prism_mpi_sendr1, &
-     prism_mpi_sendr3
+   interface oasis_mpi_send ; module procedure &
+     oasis_mpi_sendi0, &
+     oasis_mpi_sendi1, &
+     oasis_mpi_sendr0, &
+     oasis_mpi_sendr1, &
+     oasis_mpi_sendr3
    end interface
-   interface prism_mpi_recv ; module procedure &
-     prism_mpi_recvi0, &
-     prism_mpi_recvi1, &
-     prism_mpi_recvr0, &
-     prism_mpi_recvr1, &
-     prism_mpi_recvr3
+   interface oasis_mpi_recv ; module procedure &
+     oasis_mpi_recvi0, &
+     oasis_mpi_recvi1, &
+     oasis_mpi_recvr0, &
+     oasis_mpi_recvr1, &
+     oasis_mpi_recvr3
    end interface
-   interface prism_mpi_bcast ; module procedure &
-     prism_mpi_bcastc0, &
-     prism_mpi_bcastc1, &
-     prism_mpi_bcastl0, &
-     prism_mpi_bcastl1, &
-     prism_mpi_bcasti0, &
-     prism_mpi_bcasti1, &
-     prism_mpi_bcasti2, &
-     prism_mpi_bcastr0, &
-     prism_mpi_bcastr1, &
-     prism_mpi_bcastr2, &
-     prism_mpi_bcastr3
+   interface oasis_mpi_bcast ; module procedure &
+     oasis_mpi_bcastc0, &
+     oasis_mpi_bcastc1, &
+     oasis_mpi_bcastl0, &
+     oasis_mpi_bcastl1, &
+     oasis_mpi_bcasti0, &
+     oasis_mpi_bcasti1, &
+     oasis_mpi_bcasti2, &
+     oasis_mpi_bcastr0, &
+     oasis_mpi_bcastr1, &
+     oasis_mpi_bcastr2, &
+     oasis_mpi_bcastr3
    end interface
-   interface prism_mpi_gathScatVInit ; module procedure &
-     prism_mpi_gathScatVInitr1
+   interface oasis_mpi_gathScatVInit ; module procedure &
+     oasis_mpi_gathScatVInitr1
    end interface
-   interface prism_mpi_gatherv ; module procedure &
-     prism_mpi_gatherVr1
+   interface oasis_mpi_gatherv ; module procedure &
+     oasis_mpi_gatherVr1
    end interface
-   interface prism_mpi_scatterv ; module procedure &
-     prism_mpi_scatterVr1
+   interface oasis_mpi_scatterv ; module procedure &
+     oasis_mpi_scatterVr1
    end interface
-   interface prism_mpi_sum ; module procedure &
-     prism_mpi_sumi0, &
-     prism_mpi_sumi1, &
-     prism_mpi_sumb0, &
-     prism_mpi_sumb1, &
-     prism_mpi_sumr0, &
-     prism_mpi_sumr1, &
-     prism_mpi_sumr2, &
-     prism_mpi_sumr3
+   interface oasis_mpi_sum ; module procedure &
+     oasis_mpi_sumi0, &
+     oasis_mpi_sumi1, &
+     oasis_mpi_sumb0, &
+     oasis_mpi_sumb1, &
+     oasis_mpi_sumr0, &
+     oasis_mpi_sumr1, &
+     oasis_mpi_sumr2, &
+     oasis_mpi_sumr3
    end interface
-   interface prism_mpi_min ; module procedure &
-     prism_mpi_mini0, &
-     prism_mpi_mini1, &
-     prism_mpi_minr0, &
-     prism_mpi_minr1
+   interface oasis_mpi_min ; module procedure &
+     oasis_mpi_mini0, &
+     oasis_mpi_mini1, &
+     oasis_mpi_minr0, &
+     oasis_mpi_minr1
    end interface
-   interface prism_mpi_max ; module procedure &
-     prism_mpi_maxi0, &
-     prism_mpi_maxi1, &
-     prism_mpi_maxr0, &
-     prism_mpi_maxr1
+   interface oasis_mpi_max ; module procedure &
+     oasis_mpi_maxi0, &
+     oasis_mpi_maxi1, &
+     oasis_mpi_maxr0, &
+     oasis_mpi_maxr1
    end interface
 
 ! mpi library include file
@@ -99,7 +98,7 @@ MODULE mod_prism_mpi
 CONTAINS
 !===============================================================================
 
-SUBROUTINE prism_mpi_chkerr(rcode,string)
+SUBROUTINE oasis_mpi_chkerr(rcode,string)
 
    IMPLICIT none
 
@@ -108,7 +107,7 @@ SUBROUTINE prism_mpi_chkerr(rcode,string)
    character(*),         intent(in) :: string ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_chkerr'
+   character(*),parameter           :: subName = 'oasis_mpi_chkerr'
    character(MPI_MAX_ERROR_STRING)  :: lstring
    integer(ip_i4_p)             :: len
    integer(ip_i4_p)             :: ierr
@@ -117,23 +116,23 @@ SUBROUTINE prism_mpi_chkerr(rcode,string)
 ! PURPOSE: layer on MPI error checking
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lstring = ' '
    if (rcode /= MPI_SUCCESS) then
      call MPI_ERROR_STRING(rcode,lstring,len,ierr)
      write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",lstring(1:len)
-     call prism_mpi_abort(string,rcode)
+     call oasis_mpi_abort(string,rcode)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_chkerr
+END SUBROUTINE oasis_mpi_chkerr
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sendi0(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_sendi0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -145,7 +144,7 @@ SUBROUTINE prism_mpi_sendi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sendi0'
+   character(*),parameter           :: subName = 'oasis_mpi_sendi0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -153,25 +152,25 @@ SUBROUTINE prism_mpi_sendi0(lvec,pid,tag,comm,string)
 ! PURPOSE: Send a single integer
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
 
    call MPI_SEND(lvec,lsize,MPI_INTEGER,pid,tag,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sendi0
+END SUBROUTINE oasis_mpi_sendi0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sendi1(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_sendi1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -183,7 +182,7 @@ SUBROUTINE prism_mpi_sendi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sendi1'
+   character(*),parameter           :: subName = 'oasis_mpi_sendi1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -191,25 +190,25 @@ SUBROUTINE prism_mpi_sendi1(lvec,pid,tag,comm,string)
 ! PURPOSE: Send a vector of integers
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(lvec)
 
    call MPI_SEND(lvec,lsize,MPI_INTEGER,pid,tag,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sendi1
+END SUBROUTINE oasis_mpi_sendi1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sendr0(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_sendr0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -221,7 +220,7 @@ SUBROUTINE prism_mpi_sendr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sendr0'
+   character(*),parameter           :: subName = 'oasis_mpi_sendr0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -229,25 +228,25 @@ SUBROUTINE prism_mpi_sendr0(lvec,pid,tag,comm,string)
 ! PURPOSE: Send a real scalar
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
 
    call MPI_SEND(lvec,lsize,MPI_REAL8,pid,tag,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sendr0
+END SUBROUTINE oasis_mpi_sendr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sendr1(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_sendr1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -259,7 +258,7 @@ SUBROUTINE prism_mpi_sendr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sendr1'
+   character(*),parameter           :: subName = 'oasis_mpi_sendr1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -267,25 +266,25 @@ SUBROUTINE prism_mpi_sendr1(lvec,pid,tag,comm,string)
 ! PURPOSE: Send a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(lvec)
 
    call MPI_SEND(lvec,lsize,MPI_REAL8,pid,tag,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sendr1
+END SUBROUTINE oasis_mpi_sendr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sendr3(array,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_sendr3(array,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -297,7 +296,7 @@ SUBROUTINE prism_mpi_sendr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sendr3'
+   character(*),parameter           :: subName = 'oasis_mpi_sendr3'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -305,25 +304,25 @@ SUBROUTINE prism_mpi_sendr3(array,pid,tag,comm,string)
 ! PURPOSE: Send a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(array)
 
    call MPI_SEND(array,lsize,MPI_REAL8,pid,tag,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sendr3
+END SUBROUTINE oasis_mpi_sendr3
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_recvi0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -335,7 +334,7 @@ SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_recvi0'
+   character(*),parameter           :: subName = 'oasis_mpi_recvi0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -344,25 +343,25 @@ SUBROUTINE prism_mpi_recvi0(lvec,pid,tag,comm,string)
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
 
    call MPI_RECV(lvec,lsize,MPI_INTEGER,pid,tag,comm,status,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_recvi0
+END SUBROUTINE oasis_mpi_recvi0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_recvi1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -374,7 +373,7 @@ SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_recvi1'
+   character(*),parameter           :: subName = 'oasis_mpi_recvi1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -383,25 +382,25 @@ SUBROUTINE prism_mpi_recvi1(lvec,pid,tag,comm,string)
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(lvec)
 
    call MPI_RECV(lvec,lsize,MPI_INTEGER,pid,tag,comm,status,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_recvi1
+END SUBROUTINE oasis_mpi_recvi1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_recvr0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -413,7 +412,7 @@ SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_recvr0'
+   character(*),parameter           :: subName = 'oasis_mpi_recvr0'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -422,25 +421,25 @@ SUBROUTINE prism_mpi_recvr0(lvec,pid,tag,comm,string)
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
 
    call MPI_RECV(lvec,lsize,MPI_REAL8,pid,tag,comm,status,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_recvr0
+END SUBROUTINE oasis_mpi_recvr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_recvr1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -452,7 +451,7 @@ SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_recvr1'
+   character(*),parameter           :: subName = 'oasis_mpi_recvr1'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -461,25 +460,25 @@ SUBROUTINE prism_mpi_recvr1(lvec,pid,tag,comm,string)
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(lvec)
 
    call MPI_RECV(lvec,lsize,MPI_REAL8,pid,tag,comm,status,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_recvr1
+END SUBROUTINE oasis_mpi_recvr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
+SUBROUTINE oasis_mpi_recvr3(array,pid,tag,comm,string)
 
    IMPLICIT none
 
@@ -491,7 +490,7 @@ SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_recvr3'
+   character(*),parameter           :: subName = 'oasis_mpi_recvr3'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -500,25 +499,25 @@ SUBROUTINE prism_mpi_recvr3(array,pid,tag,comm,string)
 ! PURPOSE: Recv a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(array)
 
    call MPI_RECV(array,lsize,MPI_REAL8,pid,tag,comm,status,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_recvr3
+END SUBROUTINE oasis_mpi_recvr3
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcasti0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -529,7 +528,7 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcasti0'
+   character(*),parameter             :: subName = 'oasis_mpi_bcasti0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -538,7 +537,7 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast an integer
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -546,19 +545,19 @@ SUBROUTINE prism_mpi_bcasti0(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_INTEGER,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcasti0
+END SUBROUTINE oasis_mpi_bcasti0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastl0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -569,7 +568,7 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastl0'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastl0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -578,7 +577,7 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a logical
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -586,19 +585,19 @@ SUBROUTINE prism_mpi_bcastl0(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_LOGICAL,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastl0
+END SUBROUTINE oasis_mpi_bcastl0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastc0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -609,7 +608,7 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastc0'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastc0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -618,7 +617,7 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a character string
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = len(vec)
    lpebcast = 0
@@ -626,19 +625,19 @@ SUBROUTINE prism_mpi_bcastc0(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_CHARACTER,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastc0
+END SUBROUTINE oasis_mpi_bcastc0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastc1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -649,7 +648,7 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastc1'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastc1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -658,7 +657,7 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a character string
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(vec)*len(vec)
    lpebcast = 0
@@ -666,19 +665,19 @@ SUBROUTINE prism_mpi_bcastc1(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_CHARACTER,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastc1
+END SUBROUTINE oasis_mpi_bcastc1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastr0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -689,7 +688,7 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastr0'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastr0'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -698,7 +697,7 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a real
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = 1
    lpebcast = 0
@@ -706,19 +705,19 @@ SUBROUTINE prism_mpi_bcastr0(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_REAL8,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastr0
+END SUBROUTINE oasis_mpi_bcastr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcasti1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -729,7 +728,7 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcasti1'
+   character(*),parameter             :: subName = 'oasis_mpi_bcasti1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -738,7 +737,7 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a vector of integers
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -746,19 +745,19 @@ SUBROUTINE prism_mpi_bcasti1(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_INTEGER,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcasti1
+END SUBROUTINE oasis_mpi_bcasti1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastl1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -769,7 +768,7 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastl1'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastl1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -778,7 +777,7 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a logical
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -786,19 +785,19 @@ SUBROUTINE prism_mpi_bcastl1(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_LOGICAL,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastl1
+END SUBROUTINE oasis_mpi_bcastl1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastr1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -809,7 +808,7 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_bcastr1'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastr1'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -818,7 +817,7 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
 ! PURPOSE: Broadcast a vector of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(vec)
    lpebcast = 0
@@ -826,19 +825,19 @@ SUBROUTINE prism_mpi_bcastr1(vec,comm,string,pebcast)
 
    call MPI_BCAST(vec,lsize,MPI_REAL8,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastr1
+END SUBROUTINE oasis_mpi_bcastr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastr2(arr,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastr2(arr,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -854,13 +853,13 @@ SUBROUTINE prism_mpi_bcastr2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_bcastr2'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastr2'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -868,19 +867,19 @@ SUBROUTINE prism_mpi_bcastr2(arr,comm,string,pebcast)
 
    call MPI_BCAST(arr,lsize,MPI_REAL8,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastr2
+END SUBROUTINE oasis_mpi_bcastr2
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcasti2(arr,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcasti2(arr,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -896,13 +895,13 @@ SUBROUTINE prism_mpi_bcasti2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_bcasti2'
+   character(*),parameter             :: subName = 'oasis_mpi_bcasti2'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of integers
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -910,19 +909,19 @@ SUBROUTINE prism_mpi_bcasti2(arr,comm,string,pebcast)
 
    call MPI_BCAST(arr,lsize,MPI_INTEGER,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcasti2
+END SUBROUTINE oasis_mpi_bcasti2
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_bcastr3(arr,comm,string,pebcast)
+SUBROUTINE oasis_mpi_bcastr3(arr,comm,string,pebcast)
 
    IMPLICIT none
 
@@ -938,13 +937,13 @@ SUBROUTINE prism_mpi_bcastr3(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_bcastr3'
+   character(*),parameter             :: subName = 'oasis_mpi_bcastr3'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 3d array of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    lsize = size(arr)
    lpebcast = 0
@@ -952,19 +951,19 @@ SUBROUTINE prism_mpi_bcastr3(arr,comm,string,pebcast)
 
    call MPI_BCAST(arr,lsize,MPI_REAL8,lpebcast,comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_bcastr3
+END SUBROUTINE oasis_mpi_bcastr3
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, &
+SUBROUTINE oasis_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, &
                                    displs, string )
 
    IMPLICIT none
@@ -990,17 +989,17 @@ SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    integer(ip_i4_p)               :: maxSize       ! Maximum size
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_gathScatvInitr1'
+   character(*),parameter             :: subName = 'oasis_mpi_gathScatvInitr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Setup arrays for a gatherv/scatterv operation
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    locSize = size(locarr)
-   call prism_mpi_commsize( comm, npes )
-   call prism_mpi_commrank( comm, rank )
+   call oasis_mpi_commsize( comm, npes )
+   call oasis_mpi_commrank( comm, rank )
    allocate( globSize(npes) )
    !
    ! --- Gather the send global sizes from each MPI task -----------------------
@@ -1011,9 +1010,9 @@ SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    call MPI_GATHER( locSize, 1, MPI_INTEGER, globSize, sendSize, &
                     MPI_INTEGER, rootid, comm, ierr )
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
    deallocate( sendSize )
    !
@@ -1037,21 +1036,21 @@ SUBROUTINE prism_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    !----- Do some error checking for the root task arrays computed ----
    if ( rootid == rank )then
       if ( nsiz1D /= sum(globSize) ) &
-         call prism_mpi_abort( subName//" : Error, size of global array not right" )
+         call oasis_mpi_abort( subName//" : Error, size of global array not right" )
       if ( any(displs < 0) .or. any(displs >= nsiz1D) ) &
-         call prism_mpi_abort( subName//" : Error, displacement array not right" )
+         call oasis_mpi_abort( subName//" : Error, displacement array not right" )
       if ( (displs(npes)+globSize(npes)) /= nsiz1D ) &
-         call prism_mpi_abort( subName//" : Error, displacement array values too big" )
+         call oasis_mpi_abort( subName//" : Error, displacement array values too big" )
    end if
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_gathScatvInitr1
+END SUBROUTINE oasis_mpi_gathScatvInitr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, rootid, &
+SUBROUTINE oasis_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, rootid, &
                              comm, string )
 
    IMPLICIT none
@@ -1070,30 +1069,30 @@ SUBROUTINE prism_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, roo
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_gathervr1'
+   character(*),parameter             :: subName = 'oasis_mpi_gathervr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Gather a 1D array of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_GATHERV( locarr, locSize, MPI_REAL8, glob1Darr, globSize, displs, &
                      MPI_REAL8, rootid, comm, ierr )
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_gathervr1
+END SUBROUTINE oasis_mpi_gathervr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, rootid, &
+SUBROUTINE oasis_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, rootid, &
                               comm, string )
 
    IMPLICIT none
@@ -1112,31 +1111,31 @@ SUBROUTINE prism_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, ro
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = 'prism_mpi_scattervr1'
+   character(*),parameter             :: subName = 'oasis_mpi_scattervr1'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Scatter a 1D array of reals
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_SCATTERV( glob1Darr, globSize, displs, MPI_REAL8, locarr, locSize, &
                       MPI_REAL8, rootid, comm, ierr )
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_scattervr1
+END SUBROUTINE oasis_mpi_scattervr1
 
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumi0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1148,7 +1147,7 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumi0'
+   character(*),parameter           :: subName = 'oasis_mpi_sumi0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1161,7 +1160,7 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1179,25 +1178,25 @@ SUBROUTINE prism_mpi_sumi0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumi0
+END SUBROUTINE oasis_mpi_sumi0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumi1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1209,7 +1208,7 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumi1'
+   character(*),parameter           :: subName = 'oasis_mpi_sumi1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1222,7 +1221,7 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1240,25 +1239,25 @@ SUBROUTINE prism_mpi_sumi1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumi1
+END SUBROUTINE oasis_mpi_sumi1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumb0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1270,7 +1269,7 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumb0'
+   character(*),parameter           :: subName = 'oasis_mpi_sumb0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1283,7 +1282,7 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1301,25 +1300,25 @@ SUBROUTINE prism_mpi_sumb0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumb0
+END SUBROUTINE oasis_mpi_sumb0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumb1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1331,7 +1330,7 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumb1'
+   character(*),parameter           :: subName = 'oasis_mpi_sumb1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1344,7 +1343,7 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1362,25 +1361,25 @@ SUBROUTINE prism_mpi_sumb1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumb1
+END SUBROUTINE oasis_mpi_sumb1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1392,7 +1391,7 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumr0'
+   character(*),parameter           :: subName = 'oasis_mpi_sumr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1405,7 +1404,7 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1423,25 +1422,25 @@ SUBROUTINE prism_mpi_sumr0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumr0
+END SUBROUTINE oasis_mpi_sumr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1453,7 +1452,7 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumr1'
+   character(*),parameter           :: subName = 'oasis_mpi_sumr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1466,7 +1465,7 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1484,25 +1483,25 @@ SUBROUTINE prism_mpi_sumr1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumr1
+END SUBROUTINE oasis_mpi_sumr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumr2(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1514,7 +1513,7 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumr2'
+   character(*),parameter           :: subName = 'oasis_mpi_sumr2'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1527,7 +1526,7 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1545,25 +1544,25 @@ SUBROUTINE prism_mpi_sumr2(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumr2
+END SUBROUTINE oasis_mpi_sumr2
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_sumr3(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1575,7 +1574,7 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_sumr3'
+   character(*),parameter           :: subName = 'oasis_mpi_sumr3'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1588,7 +1587,7 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_SUM
    if (present(all)) then
@@ -1606,25 +1605,25 @@ SUBROUTINE prism_mpi_sumr3(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_sumr3
+END SUBROUTINE oasis_mpi_sumr3
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_mini0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1636,7 +1635,7 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_mini0'
+   character(*),parameter           :: subName = 'oasis_mpi_mini0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1649,7 +1648,7 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1667,25 +1666,25 @@ SUBROUTINE prism_mpi_mini0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_mini0
+END SUBROUTINE oasis_mpi_mini0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_mini1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1697,7 +1696,7 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_mini1'
+   character(*),parameter           :: subName = 'oasis_mpi_mini1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1710,7 +1709,7 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1728,25 +1727,25 @@ SUBROUTINE prism_mpi_mini1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_mini1
+END SUBROUTINE oasis_mpi_mini1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_minr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1758,7 +1757,7 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_minr0'
+   character(*),parameter           :: subName = 'oasis_mpi_minr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1771,7 +1770,7 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1789,25 +1788,25 @@ SUBROUTINE prism_mpi_minr0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_minr0
+END SUBROUTINE oasis_mpi_minr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_minr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1819,7 +1818,7 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_minr1'
+   character(*),parameter           :: subName = 'oasis_mpi_minr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1832,7 +1831,7 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MIN
    if (present(all)) then
@@ -1850,25 +1849,25 @@ SUBROUTINE prism_mpi_minr1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_minr1
+END SUBROUTINE oasis_mpi_minr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_maxi0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1880,7 +1879,7 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_maxi0'
+   character(*),parameter           :: subName = 'oasis_mpi_maxi0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1893,7 +1892,7 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1911,25 +1910,25 @@ SUBROUTINE prism_mpi_maxi0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_maxi0
+END SUBROUTINE oasis_mpi_maxi0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_maxi1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -1941,7 +1940,7 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_maxi1'
+   character(*),parameter           :: subName = 'oasis_mpi_maxi1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1954,7 +1953,7 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -1972,25 +1971,25 @@ SUBROUTINE prism_mpi_maxi1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_INTEGER,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_maxi1
+END SUBROUTINE oasis_mpi_maxi1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_maxr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -2002,7 +2001,7 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_maxr0'
+   character(*),parameter           :: subName = 'oasis_mpi_maxr0'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -2015,7 +2014,7 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -2033,25 +2032,25 @@ SUBROUTINE prism_mpi_maxr0(lvec,gvec,comm,string,all)
    gsize = 1
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_maxr0
+END SUBROUTINE oasis_mpi_maxr0
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
+SUBROUTINE oasis_mpi_maxr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
@@ -2063,7 +2062,7 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'prism_mpi_maxr1'
+   character(*),parameter           :: subName = 'oasis_mpi_maxr1'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -2076,7 +2075,7 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
 !          already computed
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    reduce_type = MPI_MAX
    if (present(all)) then
@@ -2094,25 +2093,25 @@ SUBROUTINE prism_mpi_maxr1(lvec,gvec,comm,string,all)
    gsize = size(gvec)
 
    if (lsize /= gsize) then
-     call prism_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
    endif
 
    if (lall) then
      call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
    else
      call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL8,reduce_type,0,comm,ierr)
-     call prism_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_maxr1
+END SUBROUTINE oasis_mpi_maxr1
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_commsize(comm,size,string)
+SUBROUTINE oasis_mpi_commsize(comm,size,string)
 
    IMPLICIT none
 
@@ -2122,30 +2121,30 @@ SUBROUTINE prism_mpi_commsize(comm,size,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_commsize'
+   character(*),parameter             :: subName = 'oasis_mpi_commsize'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI commsize
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_COMM_SIZE(comm,size,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_commsize
+END SUBROUTINE oasis_mpi_commsize
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_commrank(comm,rank,string)
+SUBROUTINE oasis_mpi_commrank(comm,rank,string)
 
    IMPLICIT none
 
@@ -2155,30 +2154,30 @@ SUBROUTINE prism_mpi_commrank(comm,rank,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_commrank'
+   character(*),parameter             :: subName = 'oasis_mpi_commrank'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI commrank
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_COMM_RANK(comm,rank,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_commrank
+END SUBROUTINE oasis_mpi_commrank
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_initialized(flag,string)
+SUBROUTINE oasis_mpi_initialized(flag,string)
 
    IMPLICIT none
 
@@ -2187,30 +2186,30 @@ SUBROUTINE prism_mpi_initialized(flag,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_initialized'
+   character(*),parameter             :: subName = 'oasis_mpi_initialized'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI initialized
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_INITIALIZED(flag,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_initialized
+END SUBROUTINE oasis_mpi_initialized
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_wtime(wtime)
+SUBROUTINE oasis_mpi_wtime(wtime)
 
    IMPLICIT none
 
@@ -2218,24 +2217,24 @@ SUBROUTINE prism_mpi_wtime(wtime)
    real(ip_r8_p), intent(out) :: wtime  ! time
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_wtime'
+   character(*),parameter             :: subName = 'oasis_mpi_wtime'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI wtime
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    wtime = MPI_WTIME()
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_wtime
+END SUBROUTINE oasis_mpi_wtime
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_abort(string,rcode)
+SUBROUTINE oasis_mpi_abort(string,rcode)
 
    IMPLICIT none
 
@@ -2244,7 +2243,7 @@ SUBROUTINE prism_mpi_abort(string,rcode)
    integer,optional,intent(in)        :: rcode    ! optional code
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_abort'
+   character(*),parameter             :: subName = 'oasis_mpi_abort'
    integer(ip_i4_p)                   :: ierr
    integer                            :: rc       ! return code
 
@@ -2252,7 +2251,7 @@ SUBROUTINE prism_mpi_abort(string,rcode)
 ! PURPOSE: MPI abort
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    if ( present(string) .and. present(rcode) ) then
       write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",trim(string),rcode
@@ -2264,14 +2263,14 @@ SUBROUTINE prism_mpi_abort(string,rcode)
    end if
    call MPI_ABORT(MPI_COMM_WORLD,rcode,ierr)
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_abort
+END SUBROUTINE oasis_mpi_abort
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_barrier(comm,string)
+SUBROUTINE oasis_mpi_barrier(comm,string)
 
    IMPLICIT none
 
@@ -2280,30 +2279,30 @@ SUBROUTINE prism_mpi_barrier(comm,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_barrier'
+   character(*),parameter             :: subName = 'oasis_mpi_barrier'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI barrier
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_BARRIER(comm,ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_barrier
+END SUBROUTINE oasis_mpi_barrier
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_init(string)
+SUBROUTINE oasis_mpi_init(string)
 
    IMPLICIT none
 
@@ -2311,30 +2310,30 @@ SUBROUTINE prism_mpi_init(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_init'
+   character(*),parameter             :: subName = 'oasis_mpi_init'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI init
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_INIT(ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_init
+END SUBROUTINE oasis_mpi_init
 
 !===============================================================================
 !===============================================================================
 
-SUBROUTINE prism_mpi_finalize(string)
+SUBROUTINE oasis_mpi_finalize(string)
 
    IMPLICIT none
 
@@ -2342,28 +2341,28 @@ SUBROUTINE prism_mpi_finalize(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'prism_mpi_finalize'
+   character(*),parameter             :: subName = 'oasis_mpi_finalize'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI finalize
 !-------------------------------------------------------------------------------
 
-   call prism_sys_debug_enter(subname)
+   call oasis_debug_enter(subname)
 
    call MPI_BARRIER(MPI_COMM_WORLD,ierr)
    call MPI_FINALIZE(ierr)
    if (present(string)) then
-     call prism_mpi_chkerr(ierr,subName//trim(string))
+     call oasis_mpi_chkerr(ierr,subName//trim(string))
    else
-     call prism_mpi_chkerr(ierr,subName)
+     call oasis_mpi_chkerr(ierr,subName)
    endif
 
-   call prism_sys_debug_exit(subname)
+   call oasis_debug_exit(subname)
 
-END SUBROUTINE prism_mpi_finalize
+END SUBROUTINE oasis_mpi_finalize
 
 !===============================================================================
 !===============================================================================
 
-END MODULE mod_prism_mpi
+END MODULE mod_oasis_mpi

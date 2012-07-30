@@ -1,19 +1,19 @@
-MODULE mod_prism_namcouple
+MODULE mod_oasis_namcouple
 
 !     - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  USE mod_prism_kinds
-  USE mod_prism_data
-  USE mod_prism_parameters
-  USE mod_prism_sys
-  USE mod_prism_mpi
-  USE mod_prism_string
+  USE mod_oasis_kinds
+  USE mod_oasis_data
+  USE mod_oasis_parameters
+  USE mod_oasis_sys
+  USE mod_oasis_mpi
+  USE mod_oasis_string
 
   IMPLICIT NONE
 
   private
 
-  public prism_namcouple_init
+  public oasis_namcouple_init
 
 ! NAMCOUPLE PUBLIC DATA
 
@@ -314,7 +314,7 @@ MODULE mod_prism_namcouple
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
-  SUBROUTINE prism_namcouple_init()
+  SUBROUTINE oasis_namcouple_init()
 
   IMPLICIT NONE
 
@@ -323,12 +323,12 @@ CONTAINS
   integer(kind=ip_i4_p) :: ja, jf, jc
   integer(kind=ip_i4_p) :: il_iost
   integer(kind=ip_i4_p) :: maxunit
-  character(len=*),parameter :: subname='prism_namcouple_init'
+  character(len=*),parameter :: subname='oasis_namcouple_init'
   !-----------------------------------------------------------
 
-!  CALL prism_sys_debug_enter(subname)
+!  CALL oasis_debug_enter(subname)
 
-  CALL prism_sys_unitget(nulin)
+  CALL oasis_unitget(nulin)
   OPEN (UNIT = nulin,FILE =cl_namcouple,STATUS='OLD', &
         FORM ='FORMATTED', IOSTAT = il_iost)
 
@@ -337,8 +337,8 @@ CONTAINS
           WRITE(nulprt1,*) subname,' ERROR opening namcouple file ',TRIM(cl_namcouple)
           WRITE (nulprt,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt,'(a)') ' error = ERROR opening namcouple file'
-          CALL prism_sys_flush(nulprt1)
-          CALL prism_sys_abort()
+          CALL oasis_flush(nulprt1)
+          CALL oasis_abort_noarg()
       ELSE
           WRITE(nulprt1,*) subname,' open namcouple file ',TRIM(cl_namcouple)
       ENDIF
@@ -348,7 +348,7 @@ CONTAINS
   call alloc()
   call inipar()
 
-  CALL prism_sys_unitfree(nulin)
+  CALL oasis_unitfree(nulin)
 
   IF (mpi_rank_global == 0) THEN
       WRITE(nulprt1,*) subname,' allocating ig_nmodel+1',ig_nmodel+1
@@ -505,7 +505,7 @@ CONTAINS
       WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
   ENDIF
 
-  call prism_sys_unitsetmin(maxunit)
+  call oasis_unitsetmin(maxunit)
 
 ! without oasis coupler
   prism_nmodels = ig_nmodel
@@ -578,9 +578,9 @@ CONTAINS
                       WRITE(nulprt1,*) subname,jf,'WARNING: SCRIPR weights generation temporarily supported only for SCALAR mapping, not '//TRIM(namscrtyp(jf))
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = ERROR in SCRIPR CFTYP option'
-                      CALL prism_sys_flush(nulprt1)
+                      CALL oasis_flush(nulprt1)
                   ENDIF
-                  CALL prism_sys_abort()
+                  CALL oasis_abort_noarg()
               ENDIF
 
            elseif (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
@@ -600,9 +600,9 @@ CONTAINS
                       WRITE(nulprt1,*) subname,jf,'WARNING: CONSERV option not supported: '//TRIM(cconmet(ig_number_field(jf)))
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = ERROR in CONSERV option'
-                      CALL prism_sys_flush(nulprt1)
+                      CALL oasis_flush(nulprt1)
                   ENDIF
-                  CALL prism_sys_abort()
+                  CALL oasis_abort_noarg()
               endif
 
            elseif (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) then
@@ -621,9 +621,9 @@ CONTAINS
                          WRITE(nulprt1,*) subname,jf,'ERROR: BLASOLD only supports CONSTANTS: '//TRIM(cbofld(jc,ig_number_field(jf)))
                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                          WRITE (nulprt1,'(a)') ' error = ERROR in BLASOLD option'
-                         CALL prism_sys_flush(nulprt1)
+                         CALL oasis_flush(nulprt1)
                      ENDIF
-                    call prism_sys_abort()
+                    call oasis_abort_noarg()
                  endif
               enddo
 
@@ -637,9 +637,9 @@ CONTAINS
                          WRITE(nulprt1,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//TRIM(cbofld(jc,ig_number_field(jf)))
                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                          WRITE (nulprt1,'(a)') ' error = ERROR in BLASNEW option'
-                         CALL prism_sys_flush(nulprt1)
+                         CALL oasis_flush(nulprt1)
                      ENDIF
-                    call prism_sys_abort()
+                    call oasis_abort_noarg()
                  endif
               enddo
 
@@ -722,17 +722,17 @@ CONTAINS
              WRITE(nulprt1,*) subname,' ERROR in seq sort'
              WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
              WRITE (nulprt1,'(a)') ' error = ERROR in seq sort'
-             CALL prism_sys_flush(nulprt1)
+             CALL oasis_flush(nulprt1)
          ENDIF
-        call prism_sys_abort()
+        call oasis_abort_noarg()
      endif
   enddo
 
   call dealloc()
 
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
-  END SUBROUTINE prism_namcouple_init
+END SUBROUTINE oasis_namcouple_init
 
 !===============================================================================
 
@@ -803,11 +803,11 @@ CONTAINS
       integer (kind=ip_intwp_p) :: ja,jz,jm,jf,ilen
       integer (kind=ip_intwp_p) :: ig_clim_maxport
       logical :: lg_bsend,endflag
-      character(len=*),parameter :: subname='mod_prism_namcouple:inipar_alloc'
+      character(len=*),parameter :: subname='mod_oasis_namcouple:inipar_alloc'
 
 !* ---------------------------- Poema verses --------------------------
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -824,7 +824,7 @@ CONTAINS
       WRITE (UNIT = nulprt1,FMT = *)'  Reading input file namcouple'
       WRITE (UNIT = nulprt1,FMT = *)' '
       WRITE (UNIT = nulprt1,FMT = *)' '
-      CALL FLUSH(nulprt1)
+      CALL oasis_flush(nulprt1)
   ENDIF
 
 !* Initialization
@@ -915,9 +915,9 @@ CONTAINS
                  ' Nothing on input for $CHANNEL '
               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-              CALL prism_sys_flush(nulprt1)
+              CALL oasis_flush(nulprt1)
           ENDIF
-          CALL PRISM_SYS_ABORT()
+          CALL oasis_abort_noarg()
       ELSE IF (ilen .GT. 0 .AND. ilen .NE. 4) THEN
           IF (mpi_rank_global == 0) THEN
               WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -928,9 +928,9 @@ CONTAINS
                  ' Check $CHANNEL variable spelling '
               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-              CALL prism_sys_flush(nulprt1)
+              CALL oasis_flush(nulprt1)
           ENDIF
-          CALL PRISM_SYS_ABORT()
+          CALL OASIS_ABORT_NOARG()
       ELSE
           cchan = clvari(1:4)
 
@@ -997,9 +997,9 @@ CONTAINS
                      ' Please keep on using Oasis 2.4'
                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                  CALL prism_sys_flush(nulprt1)
+                  CALL oasis_flush(nulprt1)
               ENDIF
-              CALL PRISM_SYS_ABORT()
+              CALL OASIS_ABORT_NOARG()
           ENDIF
 
 !* Print out the message passing technique
@@ -1046,7 +1046,7 @@ CONTAINS
            ig_total_nfield, 1)
 
 !* Read ig_clim_maxport which should be the maximum number of 
-!* prism_def_var_proto called by one component in the coupled model
+!* oasis_def_var called by one component in the coupled model
 !* Note: ig_clim_maxport is optional if it is smaller than twice 
 !*       the number of fields exchanged by this OASIS process
 
@@ -1192,9 +1192,9 @@ CONTAINS
                                'not supported with GSIP'
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc (GSIP)'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL PRISM_SYS_ABORT()
+                        CALL OASIS_ABORT_NOARG()
                     ENDIF
                     ig_direct_nfield = ig_direct_nfield + 1
                     lg_state(jf) = .false.
@@ -1254,9 +1254,9 @@ CONTAINS
                             'is mandatory for PIPE or NONE techniques'
                          WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                          WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                         CALL prism_sys_flush(nulprt1)
+                         CALL oasis_flush(nulprt1)
                      ENDIF
-                 CALL PRISM_SYS_ABORT() 
+                 CALL OASIS_ABORT_NOARG() 
                  ENDIF
               ELSE IF (clvari .eq. 'EXPORTED') THEN
                  ig_nfield = ig_nfield + 1
@@ -1286,9 +1286,9 @@ CONTAINS
                    WRITE (UNIT = nulprt1,FMT = *)' "AUXILARY" or "EXPOUT" '
                    WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                    WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-                   CALL prism_sys_flush(nulprt1)
+                   CALL oasis_flush(nulprt1)
                ENDIF
-              CALL PRISM_SYS_ABORT() 
+              CALL OASIS_ABORT_NOARG() 
            ENDIF
            READ (UNIT = nulin,FMT = 2002) clline
            CALL skip(clline, jpeighty)
@@ -1332,9 +1332,9 @@ CONTAINS
                          'fields exchanged directly or output fields '
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-                      CALL prism_sys_flush(nulprt1)
+                      CALL oasis_flush(nulprt1)
                   ENDIF
-                 CALL PRISM_SYS_ABORT() 
+                 CALL OASIS_ABORT_NOARG() 
               ENDIF
               DO ja=1,ig_total_ntrans(jf)
                  READ (UNIT = nulin,FMT = 2002) clline
@@ -1710,9 +1710,9 @@ CONTAINS
                                  ' **WARNING** The EXTRAP/NINENN dataset id cannot be 0' 
                               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                              CALL prism_sys_flush(nulprt1)
+                              CALL oasis_flush(nulprt1)
                           ENDIF
-                          CALL PRISM_SYS_ABORT()
+                          CALL OASIS_ABORT_NOARG()
                       ENDIF
 !*                    If choice is WEIGHT, read more data
                   ELSE IF (cextmet(ig_number_field(jf)) .EQ. 'WEIGHT')  &
@@ -1782,9 +1782,9 @@ CONTAINS
                              'the number of latitude lines.'
                           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                          CALL prism_sys_flush(nulprt1)
+                          CALL oasis_flush(nulprt1)
                       ENDIF
-                      CALL prism_sys_abort()
+                      CALL oasis_abort_noarg()
                   ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'GLORED')THEN
                   CALL parse(clline, clvari, 1, jpeighty, ilen)
@@ -1804,9 +1804,9 @@ CONTAINS
                              'the number of latitude lines.'
                           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                          CALL prism_sys_flush(nulprt1)
+                          CALL oasis_flush(nulprt1)
                       ENDIF
-                      CALL prism_sys_abort()
+                      CALL oasis_abort_noarg()
                   ENDIF
                   CALL parse(clline, clvari, 4, jpeighty, ilen)
 !*                Get NINENN dataset identificator
@@ -1819,9 +1819,9 @@ CONTAINS
                              'cannot be 0'
                           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                          CALL prism_sys_flush(nulprt1)
+                          CALL oasis_flush(nulprt1)
                       ENDIF
-                     CALL PRISM_SYS_ABORT()
+                     CALL OASIS_ABORT_NOARG()
                   ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD') THEN
                   CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -1993,10 +1993,10 @@ CONTAINS
       IF (mpi_rank_global == 0) THEN
           WRITE(UNIT = nulprt1,FMT = *)' '
           WRITE(UNIT = nulprt1,FMT = *)'-- End of ROUTINE inipar_alloc --'
-          CALL FLUSH (nulprt1)
+          CALL oasis_flush (nulprt1)
       ENDIF
 
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
       RETURN
 
 !*    Error branch output
@@ -2013,9 +2013,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  130  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2028,9 +2028,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  210  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2043,9 +2043,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  230  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2058,9 +2058,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  241  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2073,11 +2073,11 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
 
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
 
       END SUBROUTINE inipar_alloc
 
@@ -2188,11 +2188,11 @@ CONTAINS
       integer (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
       integer (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
       integer (kind=ip_intwp_p) :: icofld,imodel
-      character(len=*),parameter :: subname='mod_prism_namcouple:inipar'
+      character(len=*),parameter :: subname='mod_oasis_namcouple:inipar'
 
 !* ---------------------------- Poema verses --------------------------
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2207,7 +2207,7 @@ CONTAINS
       WRITE (UNIT = nulprt1,FMT = *)'   Initialization of run parameters'
       WRITE (UNIT = nulprt1,FMT = *)'   Reading input file namcouple'
       WRITE (UNIT = nulprt1,FMT = *)' '
-      CALL FLUSH(nulprt1)
+      CALL oasis_flush(nulprt1)
   ENDIF
 
 !* Initialize character keywords to locate appropriate input
@@ -2252,9 +2252,9 @@ CONTAINS
                      ,' Reading of first record failed!'
                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                  CALL prism_sys_flush(nulprt1)
+                  CALL oasis_flush(nulprt1)
               ENDIF
-              CALL prism_sys_abort()
+              CALL oasis_abort_noarg()
           ENDIF
 
           IF (il_max_entry_id.gt.0) THEN 
@@ -2264,9 +2264,9 @@ CONTAINS
                       WRITE(nulprt1,*) 'inipar: Allocation of cfldlab failed!'
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                      CALL prism_sys_flush(nulprt1)
+                      CALL oasis_flush(nulprt1)
                   ENDIF
-                  CALL prism_sys_abort()
+                  CALL oasis_abort_noarg()
               ENDIF
           ELSE
               IF (mpi_rank_global == 0) THEN
@@ -2274,9 +2274,9 @@ CONTAINS
                      'The number of entries is less than 0 !'
                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                  CALL prism_sys_flush(nulprt1)
+                  CALL oasis_flush(nulprt1)
               ENDIF
-              CALL prism_sys_abort()                
+              CALL oasis_abort_noarg()                
           ENDIF
 
           READ (unit=il_file_unit,fmt=*,iostat=id_error)
@@ -2293,9 +2293,9 @@ CONTAINS
                            'Record ',il_i,': numlab =',il_pos,' out of range!'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL prism_sys_abort()  
+                    CALL oasis_abort_noarg()  
                 ENDIF
             ELSE
                 IF (mpi_rank_global == 0) THEN
@@ -2303,9 +2303,9 @@ CONTAINS
                        'Reading record ',il_i,' failed!'
                     WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                     WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                    CALL prism_sys_flush(nulprt1)
+                    CALL oasis_flush(nulprt1)
                 ENDIF
-                CALL prism_sys_abort() 
+                CALL oasis_abort_noarg() 
             ENDIF
           END DO
       ELSE
@@ -2313,9 +2313,9 @@ CONTAINS
               WRITE (nulprt1,*) 'inipar: cf_name_table.txt missing'
               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-              CALL prism_sys_flush(nulprt1)
+              CALL oasis_flush(nulprt1)
           ENDIF
-          CALL prism_sys_abort() 
+          CALL oasis_abort_noarg() 
       ENDIF
       CLOSE(il_file_unit)
       endif
@@ -2793,9 +2793,9 @@ CONTAINS
                        'is mandatory for PIPE or NONE techniques'
                     WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                     WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                    CALL prism_sys_flush(nulprt1)
+                    CALL oasis_flush(nulprt1)
                 ENDIF
-                CALL PRISM_SYS_ABORT() 
+                CALL OASIS_ABORT_NOARG() 
             ENDIF
             ENDIF
         ENDIF
@@ -2902,9 +2902,9 @@ CONTAINS
                   WRITE (UNIT = nulprt1,FMT = *) '==> must be P or R'
                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                  CALL prism_sys_flush(nulprt1)
+                  CALL oasis_flush(nulprt1)
               ENDIF
-              CALL PRISM_SYS_ABORT()
+              CALL OASIS_ABORT_NOARG()
            ENDIF
 !     
            CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -2921,9 +2921,9 @@ CONTAINS
                   WRITE (UNIT = nulprt1,FMT = *) '==> must be P or R'
                   WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                  CALL prism_sys_flush(nulprt1)
+                  CALL oasis_flush(nulprt1)
               ENDIF
-              CALL PRISM_SYS_ABORT()
+              CALL OASIS_ABORT_NOARG()
            ENDIF
 !     
            CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -2967,9 +2967,9 @@ CONTAINS
                            '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT()  
+                    CALL OASIS_ABORT_NOARG()  
                  ENDIF
               ENDDO
            ENDIF
@@ -3007,9 +3007,9 @@ CONTAINS
                            '==> Must be INSTANT, AVERAGE, ACCUMUL, T_MIN or T_MAX'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT()  
+                    CALL OASIS_ABORT_NOARG()  
                  ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MASK') THEN
                  CALL parse(clline, clvari, 1, jpeighty, ilen)
@@ -3154,9 +3154,9 @@ CONTAINS
                               WRITE(nulprt1,*) 'ERROR in namcouple mapping argument ',TRIM(clvari)
                               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                               WRITE (nulprt1,'(a)') ' error = STOP in inipar cmaptyp or loc'
-                              CALL prism_sys_flush(nulprt1)
+                              CALL oasis_flush(nulprt1)
                           ENDIF
-                          call prism_sys_abort()
+                          call oasis_abort_noarg()
                        endif
                     endif
                  enddo
@@ -3180,9 +3180,9 @@ CONTAINS
                            'BICUBIC interpolation cannot be used if grid is not LR or D'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT() 
+                    CALL OASIS_ABORT_NOARG() 
                  ENDIF
                  IF (cmap_method(ig_number_field(jf)) .eq. 'BILINEAR'  &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'LR' &
@@ -3197,9 +3197,9 @@ CONTAINS
                            'BILINEAR interpolation cannot be used if grid is not LR or D'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT() 
+                    CALL OASIS_ABORT_NOARG() 
                  ENDIF
 !* Get field type (scalar/vector)
                  CALL parse(clline, clvari, 3, jpeighty, ilen)
@@ -3218,9 +3218,9 @@ CONTAINS
                            '==> must be SCALAR, VECTOR_I or VECTOR_J'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT()
+                    CALL OASIS_ABORT_NOARG()
                  ENDIF
 !* Get restriction type for SCRIP search
                  CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -3238,9 +3238,9 @@ CONTAINS
                                    '==> LATITUDE must be chosen for reduced grids (D)'
                                 WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                                 WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                                CALL prism_sys_flush(nulprt1)
+                                CALL oasis_flush(nulprt1)
                             ENDIF
-                            CALL PRISM_SYS_ABORT()
+                            CALL OASIS_ABORT_NOARG()
                         ELSE  
                             crsttype(ig_number_field(jf)) = 'REDUCED'
                         ENDIF
@@ -3258,9 +3258,9 @@ CONTAINS
                         WRITE (UNIT = nulprt1,FMT = *) '==> must be LATITUDE or LATLON'
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                        CALL prism_sys_flush(nulprt1)
+                        CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL PRISM_SYS_ABORT()
+                    CALL OASIS_ABORT_NOARG()
                  ENDIF
 !*
 !* Get number of search bins for SCRIP search
@@ -3283,9 +3283,9 @@ CONTAINS
                                '==> must be FRACAREA, DESTAREA, or FRACNNEI'
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL PRISM_SYS_ABORT()
+                        CALL OASIS_ABORT_NOARG()
                     ENDIF
 !* Get order of remapping for CONSERV
                     CALL parse(clline, clvari, 7, jpeighty, ilen)
@@ -3299,9 +3299,9 @@ CONTAINS
                                '==> SECOND or FIRST must be indicated at end of line'
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL PRISM_SYS_ABORT()
+                        CALL OASIS_ABORT_NOARG()
                     ENDIF
                     READ(clvari,FMT = 2009) corder(ig_number_field(jf))
                  ELSE
@@ -3321,9 +3321,9 @@ CONTAINS
                                '==> Number of neighbours must be indicated on the line'
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                       CALL PRISM_SYS_ABORT()
+                       CALL OASIS_ABORT_NOARG()
                     ELSE
                        READ(clvari,FMT=2003)nscripvoi(ig_number_field(jf))
                     ENDIF 
@@ -3341,9 +3341,9 @@ CONTAINS
                               '==> Variance must be indicated at end of line'
                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                           CALL prism_sys_flush(nulprt1)
+                           CALL oasis_flush(nulprt1)
                        ENDIF
-                       CALL PRISM_SYS_ABORT()
+                       CALL OASIS_ABORT_NOARG()
                     ELSE
                        READ(clvari,FMT=2006) varmul(ig_number_field(jf))
                     ENDIF
@@ -3364,9 +3364,9 @@ CONTAINS
                                '==> A field associated must be indicated'
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                       CALL PRISM_SYS_ABORT()
+                       CALL OASIS_ABORT_NOARG()
                     ENDIF
                     cg_assoc_input_field(ig_number_field(jf))=clvari
 !*Rotation?
@@ -3390,9 +3390,9 @@ CONTAINS
                                'must be PROJCART or nothing' 
                             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL prism_sys_flush(nulprt1)
+                            CALL oasis_flush(nulprt1)
                         ENDIF
-                       CALL PRISM_SYS_ABORT() 
+                       CALL OASIS_ABORT_NOARG() 
                     ENDIF
                  END IF
 
@@ -3439,9 +3439,9 @@ CONTAINS
                            WRITE(nulprt1,*) 'ERROR in namcouple conserv argument ',TRIM(clvari)
                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                            WRITE (nulprt1,'(a)') ' error = STOP in inipar cconopt'
-                           CALL prism_sys_flush(nulprt1)
+                           CALL oasis_flush(nulprt1)
                        ENDIF
-                       call prism_sys_abort()
+                       call oasis_abort_noarg()
                     endif
                  endif
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'REDGLO') THEN
@@ -3560,9 +3560,9 @@ CONTAINS
                       WRITE (UNIT = nulprt1,FMT = *) ' '
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                      CALL prism_sys_flush(nulprt1)
+                      CALL oasis_flush(nulprt1)
                   ENDIF
-                 CALL prism_sys_abort()
+                 CALL oasis_abort_noarg()
               ENDIF
  270       CONTINUE
        ENDIF
@@ -3600,9 +3600,9 @@ CONTAINS
                        'components in vector case'
                     WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                     WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                    CALL prism_sys_flush(nulprt1)
+                    CALL oasis_flush(nulprt1)
                 ENDIF
-               CALL PRISM_SYS_ABORT()
+               CALL OASIS_ABORT_NOARG()
             END IF
          ENDIF
        ENDIF
@@ -3916,8 +3916,8 @@ CONTAINS
               WRITE (UNIT = nulprt1,FMT = *) ' '
               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-              CALL prism_sys_flush(nulprt1)
-              CALL prism_sys_abort()
+              CALL oasis_flush(nulprt1)
+              CALL oasis_abort_noarg()
           ENDIF
  320    CONTINUE
       ENDIF
@@ -4063,10 +4063,10 @@ CONTAINS
        IF (nlogprt .GE. 0) THEN
            WRITE(UNIT = nulprt1,FMT = *)' '
            WRITE(UNIT = nulprt1,FMT = *)'------ End of ROUTINE inipar ----'
-           CALL FLUSH (nulprt1)
+           CALL oasis_flush (nulprt1)
        ENDIF
    ENDIF
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
       RETURN
 
 !* Error branch output
@@ -4083,9 +4083,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  130  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4098,9 +4098,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  170  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4113,9 +4113,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
       
  181  CONTINUE
       IF (mpi_rank_global == 0) THEN
@@ -4129,9 +4129,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  191  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4144,9 +4144,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  193  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4159,9 +4159,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  195  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4174,9 +4174,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  197  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4189,9 +4189,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  199  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4204,9 +4204,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  201  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4219,9 +4219,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  210  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4234,9 +4234,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  230  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -4249,9 +4249,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  231  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4262,9 +4262,9 @@ CONTAINS
              'NO index of sequential position and $SEQMODE > 1'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  232  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4275,9 +4275,9 @@ CONTAINS
              'Index of sequential position greater than $SEQMODE'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort() 
+      CALL oasis_abort_noarg() 
  233  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4288,9 +4288,9 @@ CONTAINS
              'Check the 2nd line for either the index of sequential position, the delay flag, or the extra timestep flag.'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
  234  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4303,9 +4303,9 @@ CONTAINS
              '(Should be 1 -default value- IF $SEQMODE=1)'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort() 
+      CALL oasis_abort_noarg() 
  235  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4320,9 +4320,9 @@ CONTAINS
              'is now required for analysis CHECKIN or CHECKOUT'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort() 
+      CALL oasis_abort_noarg() 
  236  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -4337,11 +4337,11 @@ CONTAINS
              'give a coupling period longer than the total run time.'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort() 
+      CALL oasis_abort_noarg() 
 
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
 
       END SUBROUTINE inipar
 !===============================================================================
@@ -4350,9 +4350,9 @@ CONTAINS
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname='mod_prism_namcouple:alloc'
+  character(len=*),parameter :: subname='mod_oasis_namcouple:alloc'
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
   !--- alloc_anais1
   ALLOCATE (varmul(ig_nfield), stat=il_err)
@@ -4637,7 +4637,7 @@ CONTAINS
   cstate(:)=' '
   ENDIF
 
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
   END SUBROUTINE alloc
 !===============================================================================
@@ -4645,9 +4645,9 @@ CONTAINS
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname='mod_prism_namcouple:dealloc'
+  character(len=*),parameter :: subname='mod_oasis_namcouple:dealloc'
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
   deallocate(nbtotproc,stat=il_err)
   if (il_err.ne.0) call prtout('error in "nbtotproc"deallocation of experiment module',il_err,1)
@@ -4850,7 +4850,7 @@ CONTAINS
   IF (il_err.NE.0) CALL prtout ('Error in "cstate"deallocation of string module',il_err,1)
   ENDIF
 
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
   END SUBROUTINE dealloc
 !===============================================================================
@@ -4920,11 +4920,11 @@ CONTAINS
       character(len=*),PARAMETER :: cbase = '-'
       character(len=*),PARAMETER :: cprpt = '* ===>>> :'
       character(len=*),PARAMETER :: cdots = '  ------  '
-      character(len=*),parameter :: subname='mod_prism_namcouple:prtout'
+      character(len=*),parameter :: subname='mod_oasis_namcouple:prtout'
 
 !* ---------------------------- Poema verses ----------------------------
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -4951,10 +4951,10 @@ CONTAINS
 !*    2. End of routine
 !        --------------
 
-      CALL prism_sys_flush(nulprt1)
+      CALL oasis_flush(nulprt1)
   ENDIF
 
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
 
   END SUBROUTINE prtout
 
@@ -5025,7 +5025,7 @@ CONTAINS
       character(len=*), PARAMETER :: cpbase = '-'
       character(len=*), PARAMETER :: cprpt = '* ===>>> :'
       character(len=*), PARAMETER :: cpdots = '  ------  ' 
-      character(len=*),parameter :: subname='mod_prism_namcouple:prcout'
+      character(len=*),parameter :: subname='mod_oasis_namcouple:prcout'
 !
 !* ---------------------------- Poema verses ----------------------------
 !
@@ -5034,7 +5034,7 @@ CONTAINS
 !*    1. Print character string + character value
 !        ----------------------------------------
 !
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
    IF (mpi_rank_global == 0) THEN
       IF ( kstyle .EQ. 1 .OR. kstyle .EQ. 2) THEN
@@ -5056,10 +5056,10 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 !
-      CALL prism_sys_flush(nulprt1)
+      CALL oasis_flush(nulprt1)
   ENDIF
 
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
 
       END SUBROUTINE prcout
 !===============================================================================
@@ -5132,11 +5132,11 @@ CONTAINS
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
-  character(len=*),parameter :: subname='mod_prism_namcouple:parse'
+  character(len=*),parameter :: subname='mod_oasis_namcouple:parse'
 !
 !* ---------------------------- Poema verses ----------------------------
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -5167,7 +5167,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
       RETURN
   END IF
 !
@@ -5184,7 +5184,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
-!            call prism_sys_debug_exit(subname)
+!            call oasis_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -5201,7 +5201,7 @@ CONTAINS
 !*    3. End of routine
 !        --------------
 !
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
   return
 
@@ -5217,9 +5217,9 @@ CONTAINS
           WRITE (UNIT = nulprt1,FMT = *) ' '
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
-          CALL prism_sys_flush(nulprt1)
+          CALL oasis_flush(nulprt1)
       ENDIF
-      CALL prism_sys_abort()
+      CALL oasis_abort_noarg()
 
 
   END SUBROUTINE parse
@@ -5290,11 +5290,11 @@ CONTAINS
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
-  character(len=*),parameter :: subname='mod_prism_namcouple:parseblk'
+  character(len=*),parameter :: subname='mod_oasis_namcouple:parseblk'
 !
 !* ---------------------------- Poema verses ----------------------------
 
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
 !
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -5335,7 +5335,7 @@ CONTAINS
 !
   IF ( LEN_TRIM ( clwork) .LE. 0) THEN
       kleng = -1
-!      call prism_sys_debug_exit(subname)
+!      call oasis_debug_exit(subname)
       RETURN
   END IF
 !
@@ -5360,7 +5360,7 @@ CONTAINS
 !
         IF (LEN_TRIM ( clwork) .LE. 0) THEN
             kleng = -1
-!            call prism_sys_debug_exit(subname)
+!            call oasis_debug_exit(subname)
             RETURN
         END IF
       END DO
@@ -5378,7 +5378,7 @@ CONTAINS
 !        --------------
 !
 
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
   END SUBROUTINE parseblk
 !===============================================================================
@@ -5431,11 +5431,11 @@ CONTAINS
   INTEGER (kind=ip_intwp_p) :: ib
   CHARACTER(len=80) :: cl_line
   CHARACTER(len=1) :: cl_two
-  character(len=*),parameter :: subname='mod_prism_namcouple:skip'
+  character(len=*),parameter :: subname='mod_oasis_namcouple:skip'
 !
 !*-----------------------------------------------------------------------
 !
-!  call prism_sys_debug_enter(subname)
+!  call oasis_debug_enter(subname)
 
   cl_two='#'
 100 IF (cd_one(1:1) .NE. cl_two) GO TO 120
@@ -5456,13 +5456,13 @@ CONTAINS
 !
 !*-----------------------------------------------------------------------
 !
-!  call prism_sys_debug_exit(subname)
+!  call oasis_debug_exit(subname)
 
   END SUBROUTINE skip
 !
 !*========================================================================
 !===============================================================================
 !===============================================================================
-END MODULE mod_prism_namcouple
+END MODULE mod_oasis_namcouple
 
 
