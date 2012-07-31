@@ -54,6 +54,7 @@ CONTAINS
 
     LOGICAL, INTENT(in) :: &
        ld_extrapdone              ! logical, true if EXTRAP done on field
+    LOGICAL :: ll_nnei            ! true (default) if extra search is done 
     
     INTEGER (KIND=int_kind), DIMENSION(4,4) :: &
        ila_src_add                ! address for source points non-masked  
@@ -113,6 +114,7 @@ CONTAINS
          CALL FLUSH(nulou)
       ENDIF
 !   
+      ll_nnei = .true.
     !
     !  Loop over destination grid     
     !
@@ -143,6 +145,7 @@ CONTAINS
       !
 
       IF (SUM(ila_nbr_found)==0) THEN
+          IF (ll_nnei .EQV. .TRUE. ) THEN
           IF (nlogprt .GE. 2) THEN
               WRITE(nulou,*) '  '
               WRITE(nulou,*) &
@@ -206,6 +209,7 @@ CONTAINS
               WRITE(nulou,*) '  '
           ENDIF
           CYCLE 
+      ENDIF
       END IF
 
       rla_weight(:,:) = 0

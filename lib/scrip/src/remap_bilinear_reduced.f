@@ -98,6 +98,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       LOGICAL ::
      &           lextrapdone   ! logical, true if EXTRAP done on field
+      LOGICAL :: ll_nnei        ! true (default) if extra search is done
 
 !-----------------------------------------------------------------------
 !
@@ -149,6 +150,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
          CALL FLUSH(nulou)
       ENDIF
 !
+      ll_nnei = .true.
       nmap = 1
       if (grid1_rank /= 2) then
           stop 'Can not do bilinear interpolation when grid_rank /= 2'
@@ -346,6 +348,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
               grid2_frac(dst_add) = one
               call store_link_bilin(dst_add, src_add, wgts, nmap)
           ELSE
+              IF (ll_nnei .eqv. .true. ) then
               IF (nlogprt .ge. 2) THEN
                   WRITE(nulou,*) '  '
                   WRITE(nulou,*) 
@@ -400,7 +403,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
               grid2_frac(dst_add) = one
               call store_link_bilin(dst_add, src_add, wgts, nmap)
-
+          endif
           ENDIF
       ENDIF
       end do grid_loop1
