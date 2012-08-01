@@ -14,6 +14,7 @@ MODULE mod_oasis_coupler
   USE mod_oasis_timer
   USE mct_mod
   USE grids    ! scrip
+  USE netcdf
 
   IMPLICIT NONE
 
@@ -108,7 +109,7 @@ MODULE mod_oasis_coupler
   integer(kind=ip_i4_p)   ,public :: lcouplertime  ! last coupler time 
 
 
-#include <netcdf.inc>
+!#include <netcdf.inc>
 
 !------------------------------------------------------------
 CONTAINS
@@ -820,12 +821,12 @@ CONTAINS
               !--------------------------------
               ! open mapping file
               !--------------------------------
-              status = nf_open(trim(prism_mapper(mapid)%file),nf_nowrite,ncid)
+              status = nf90_open(trim(prism_mapper(mapid)%file),nf90_nowrite,ncid)
               if (prism_coupler(nc)%getput == OASIS3_PUT) &
-                 status = nf_inq_dimid(ncid,'dst_grid_size',dimid)
+                 status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
               if (prism_coupler(nc)%getput == OASIS3_GET) &
-                 status = nf_inq_dimid(ncid,'src_grid_size',dimid)
-              status = nf_inq_dimlen(ncid,dimid,gsize)
+                 status = nf90_inq_dimid(ncid,'src_grid_size',dimid)
+              status = nf90_inquire_dimension(ncid,dimid,len=gsize)
            endif
            call oasis_mpi_bcast(gsize,mpi_comm_local,subname//' gsize')
 
@@ -1481,42 +1482,42 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    ! open & read the file
    !----------------------------------------------------------------------------
    if (OASIS_debug >=2 ) write(nulprt,F00) "* file name                  : ",trim(fileName)
-   status = nf_open(filename,NF_NOWRITE,fid)
-   if (status /= NF_NOERR) then
-      write(nulprt,F00) trim(nf_strerror(status))
+   status = nf90_open(trim(filename),NF90_NOWRITE,fid)
+   if (status /= NF90_NOERR) then
+      write(nulprt,F00) trim(nf90_strerror(status))
       WRITE(nulprt,*) subname,'ERROR filename'
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
       call oasis_abort_noarg()
    endif
 
    !--- get matrix dimensions ----------
-!  status = nf_inq_dimid (fid, 'n_s', did)  ! size of sparse matrix
-   status = nf_inq_dimid (fid, 'num_links', did)  ! size of sparse matrix
-   status = nf_inq_dimlen(fid, did  , ns)
-!  status = nf_inq_dimid (fid, 'n_a', did)  ! size of  input vector
-   status = nf_inq_dimid (fid, 'src_grid_size', did)  ! size of  input vector
-   status = nf_inq_dimlen(fid, did  , na)
-!  status = nf_inq_dimid (fid, 'n_b', did)  ! size of output vector
-   status = nf_inq_dimid (fid, 'dst_grid_size', did)  ! size of output vector
-   status = nf_inq_dimlen(fid, did  , nb)
-   status = nf_inq_dimid (fid, 'num_wgts', did)  ! size of output vector
-   status = nf_inq_dimlen(fid, did  , nwgts)
+!  status = nf90_inq_dimid (fid, 'n_s', did)  ! size of sparse matrix
+   status = nf90_inq_dimid (fid, 'num_links', did)  ! size of sparse matrix
+   status = nf90_inquire_dimension(fid, did  , len = ns)
+!  status = nf90_inq_dimid (fid, 'n_a', did)  ! size of  input vector
+   status = nf90_inq_dimid (fid, 'src_grid_size', did)  ! size of  input vector
+   status = nf90_inquire_dimension(fid, did  , len = na)
+!  status = nf90_inq_dimid (fid, 'n_b', did)  ! size of output vector
+   status = nf90_inq_dimid (fid, 'dst_grid_size', did)  ! size of output vector
+   status = nf90_inquire_dimension(fid, did  , len = nb)
+   status = nf90_inq_dimid (fid, 'num_wgts', did)  ! size of output vector
+   status = nf90_inquire_dimension(fid, did  , len = nwgts)
    
    if (present(ni_i) .and. present(nj_i) .and. present(ni_o) .and. present(nj_o)) then
-!     status = nf_inq_dimid (fid, 'ni_a', did)  ! number of lons in input grid
-!     status = nf_inq_dimlen(fid, did  , ni_i)
-!     status = nf_inq_dimid (fid, 'nj_a', did)  ! number of lats in input grid
-!     status = nf_inq_dimlen(fid, did  , nj_i)
-!     status = nf_inq_dimid (fid, 'ni_b', did)  ! number of lons in output grid
-!     status = nf_inq_dimlen(fid, did  , ni_o)
-!     status = nf_inq_dimid (fid, 'nj_b', did)  ! number of lats in output grid
-!     status = nf_inq_dimlen(fid, did  , nj_o)
-      status = nf_inq_varid(fid, 'src_grid_dims', vid)
-      status = nf_get_var_int(fid, vid, dims)
+!     status = nf90_inq_dimid (fid, 'ni_a', did)  ! number of lons in input grid
+!     status = nf90_inquire_dimension(fid, did  , len = ni_i)
+!     status = nf90_inq_dimid (fid, 'nj_a', did)  ! number of lats in input grid
+!     status = nf90_inquire_dimension(fid, did  , len = nj_i)
+!     status = nf90_inq_dimid (fid, 'ni_b', did)  ! number of lons in output grid
+!     status = nf90_inquire_dimension(fid, did  , len = ni_o)
+!     status = nf90_inq_dimid (fid, 'nj_b', did)  ! number of lats in output grid
+!     status = nf90_inquire_dimension(fid, did  , len = nj_o)
+      status = nf90_inq_varid(fid, 'src_grid_dims', vid)
+      status = nf90_get_var(fid, vid, dims)
       ni_i = dims(1)
       nj_i = dims(2)
-      status = nf_inq_varid(fid, 'dst_grid_dims', vid)
-      status = nf_get_var_int(fid, vid, dims)
+      status = nf90_inq_varid(fid, 'dst_grid_dims', vid)
+      status = nf90_get_var(fid, vid, dims)
       ni_o = dims(1)
       nj_o = dims(2)
    end if
@@ -1530,15 +1531,15 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (present(areasrc)) then
    if (mytask == 0) then
       call mct_aVect_init(areasrc0,' ',areaAV_field,na)
-!     status = nf_inq_varid     (fid,'area_a',vid)
-      status = nf_inq_varid     (fid,'src_grid_area',vid)
-      IF (status /= NF_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+!     status = nf90_inq_varid     (fid,'area_a',vid)
+      status = nf90_inq_varid     (fid,'src_grid_area',vid)
+      IF (status /= NF90_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
       ENDIF
-      status = nf_get_var_double(fid, vid, areasrc0%rAttr)
-      IF (status /= NF_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+      status = nf90_get_var(fid, vid, areasrc0%rAttr)
+      IF (status /= NF90_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
       ENDIF
    endif
@@ -1559,15 +1560,15 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (present(areadst)) then
    if (mytask == 0) then
       call mct_aVect_init(areadst0,' ',areaAV_field,nb)
-!     status = nf_inq_varid     (fid,'area_b',vid)
-      status = nf_inq_varid     (fid,'dst_grid_area',vid)
-      IF (status /= NF_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+!     status = nf90_inq_varid     (fid,'area_b',vid)
+      status = nf90_inq_varid     (fid,'dst_grid_area',vid)
+      IF (status /= NF90_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
       ENDIF
-      status = nf_get_var_double(fid, vid, areadst0%rAttr)
-      IF (status /= NF_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf_strerror(status))
+      status = nf90_get_var(fid, vid, areadst0%rAttr)
+      IF (status /= NF90_NOERR) THEN
+          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
       ENDIF
    endif
@@ -1671,29 +1672,29 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
       !--- read data on root pe
       if (mytask== 0) then
-!        status = nf_inq_varid      (fid,'S'  ,vid)
-         status = nf_inq_varid      (fid,'remap_matrix'  ,vid)
-!        status = nf_get_vara_double(fid,vid,start,count,Sbuf)
-         status = nf_get_vara_double(fid,vid,start2,count2,remaps)
+!        status = nf90_inq_varid      (fid,'S'  ,vid)
+         status = nf90_inq_varid      (fid,'remap_matrix'  ,vid)
+!        status = nf90_get_var(fid,vid,start,count,Sbuf)
+         status = nf90_get_var(fid,vid,remaps,start2,count2)
          Sbuf(:) = remaps(1,:)
-         IF (status /= NF_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+         IF (status /= NF90_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
          ENDIF
 
-!        status = nf_inq_varid      (fid,'row',vid)
-         status = nf_inq_varid      (fid,'dst_address',vid)
-         status = nf_get_vara_int   (fid,vid,start,count,Rbuf)
-         IF (status /= NF_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+!        status = nf90_inq_varid      (fid,'row',vid)
+         status = nf90_inq_varid      (fid,'dst_address',vid)
+         status = nf90_get_var   (fid,vid,Rbuf,start,count)
+         IF (status /= NF90_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
          ENDIF
 
-!        status = nf_inq_varid      (fid,'col',vid)
-         status = nf_inq_varid      (fid,'src_address',vid)
-         status = nf_get_vara_int   (fid,vid,start,count,Cbuf)
-         IF (status /= NF_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf_strerror(status))
+!        status = nf90_inq_varid      (fid,'col',vid)
+         status = nf90_inq_varid      (fid,'src_address',vid)
+         status = nf90_get_var   (fid,vid,Cbuf,start,count)
+         IF (status /= NF90_NOERR) THEN
+             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
          ENDIF
       endif
@@ -1777,7 +1778,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (status /= 0) call mct_perr_die(subName,':: deallocate new',status)
 
    if (mytask == 0) then
-      status = nf_close(fid)
+      status = nf90_close(fid)
       if (OASIS_debug >= 2) write(nulprt,F00) "... done reading file"
    endif
 
