@@ -125,7 +125,8 @@ C***********************************************************************
      &     sinlon_dst,     ! sin(lon) of destination grid point
      &     dist_tot,       ! sum of neighbor distances (for normalizing)
      &     dist_average    ! average distance between the source points
-      logical (kind=log_kind) :: ll_allmask, ll_nnei
+      logical (kind=log_kind) :: ll_allmask
+      logical (kind=log_kind), PARAMETER :: ll_nnei=.true.
       real (kind=dbl_kind) ::
      &        distance ,plat,plon,src_latsnn, arg   ! angular distance
       real (kind=dbl_kind), dimension (1) :: wgts_new
@@ -228,7 +229,6 @@ C***********************************************************************
             grid2_frac(dst_add) = one
           endif
         end do
-        ll_nnei = .false.
         IF (ll_nnei) THEN
             ll_allmask= .true.
             do n=1,num_neighbors
