@@ -1169,7 +1169,8 @@ contains
 
     allocate(lwts(lsize))
     lwts = 1.0_ip_r8_p
-
+!!$    lmin=HUGE(lwts)
+!!$    lmax=-lmin
     if (present(mask)) then
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size mask ne size av'
@@ -1193,9 +1194,9 @@ contains
     endif
 
     lsum = 0.0_ip_r8_p
+    do m = 1,fsize
     first_call = .true.
     do n = 1,lsize
-    do m = 1,fsize
        lval = av%rAttr(m,n)*lwts(n)
        lsum(m) = lsum(m) + lval
        if (lwts(n) /= 0.0_ip_r8_p) then
