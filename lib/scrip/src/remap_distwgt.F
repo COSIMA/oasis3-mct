@@ -70,7 +70,7 @@ C***********************************************************************
      &     coslat, sinlat, ! cosine, sine of grid lats (for distance)
      &     coslon, sinlon, ! cosine, sine of grid lons (for distance)
      &     wgtstmp         ! an array to hold the link weight
-
+      LOGICAL, parameter :: ll_nnei=.true.
 !***********************************************************************
 
       contains
@@ -93,7 +93,6 @@ C***********************************************************************
 
       LOGICAL ::
      &           lextrapdone   ! logical, true if EXTRAP done on field
-
 
       INTEGER (kind=int_kind) ::
      &       num_neighbors     ! number of neighbours
@@ -241,8 +240,7 @@ C***********************************************************************
             icount = icount + 1
           endif
         end do
-
-#ifndef NOT_NNEIGHBOUR
+        IF (ll_nnei) then
         if (icount == 0) THEN
             IF (nlogprt .ge. 2) then
                 WRITE(nulou,*) '    '
@@ -255,7 +253,7 @@ C***********************************************************************
             grid2_frac(dst_add) = one
             call store_link_nbr(src_addnn, dst_add, wgtstmp, nmap)
         ENDIF
-#endif
+        endif
 
       end do grid_loop1
 
@@ -312,6 +310,7 @@ C***********************************************************************
       LOGICAL ::
      &           lextrapdone,   ! logical, true if EXTRAP done on field
      &           ll_debug
+     
 
 !-----------------------------------------------------------------------
 !
@@ -451,7 +450,8 @@ C***********************************************************************
                 WRITE(nulou,1010) nadd, distance
             ENDIF
         ENDIF
-#ifndef NOT_NNEIGHBOUR
+        !
+        IF (ll_nnei) then
         !***
         !*** store the non-masked closest neighbour
         !***
@@ -466,7 +466,7 @@ C***********************************************************************
                 ENDIF
             ENDIF        
         ENDIF
-#endif
+        endif
       end DO
  1009 FORMAT (1X, 'nadd0 =', 1X, I6, 2X, 'distance0 =', 1X, F18.16)
  1010 FORMAT (1X, 'nadd1 =', 1X, I6, 2X, 'distance0 =', 1X, F18.16)
