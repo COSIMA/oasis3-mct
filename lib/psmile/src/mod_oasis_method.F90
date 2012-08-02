@@ -92,7 +92,7 @@ CONTAINS
 
    iu=-1
 
-   call oasis_unitsetmin(200)
+   call oasis_unitsetmin(1024)
    IF (mpi_rank_global == 0) THEN
        CALL oasis_unitget(iu)
        nulprt1 = iu
