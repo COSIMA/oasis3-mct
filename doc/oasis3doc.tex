@@ -9,24 +9,27 @@
 \usepackage{rotating}
 \usepackage{graphicx}
 \usepackage{amssymb}
+\usepackage{longtable}
 %
 % Specifications for cover pages: 
 %
 \prismdocNum{}
 \prismdocTitel{{\fontsize{13}{16}\selectfont
     OASIS3 User Guide \\ [0.5ex]
-    \it{oasis3-mct-1.0 }}}
+    \it{OASIS3-MCT\_1.0 }}}
 \prismdocAutor{Edited by:  \\ [0.5ex]
-            S. Valcke, CERFACS/CNRS URA No1875 \\[0.5ex]
+            S. Valcke, T. Craig, L. Coquart  \\[0.5ex]
+            CERFACS/CNRS SUC URA No1875 \\[0.5ex]
 }
 \prismdocVersion{CERFACS TR/CMGC/XX/XX}
-\prismdocFName{Sophie Valcke}
-\prismdocFAff{CERFACS}
+\prismdocSName{Sophie Valcke}
+\prismdocFAff{CNRS}
+\prismdocSAff{CERFACS}
 %\prismdocFEM{toto}
 \prismdocFEm{oasishelp(at)cerfacs.fr} 
-%\prismdocSName{Ren\'e Redler}
-\prismdocFPhone{+33-5-61-19-30-76}
-%\prismdocSPhone{+49-2241-92-52-40}
+\prismdocFName{Laure Coquart}
+\prismdocSPhone{+33-5-61-19-30-76}
+\prismdocFPhone{+33-5-61-19-30-29}
 %\prismdocFWp{wpnn}
 %\prismdocSWp{wpnn}
 \prismdocDate{July 2012}
@@ -50,12 +53,13 @@
 
 %\includeonly{documentation}
 \begin{document}
+%\setcounter{secnumdepth}{-1} 
 \prismdocHeader
 
 \include{defines}
 \include{UG_Acknowledgements}
 \include{UG0_Stepbystep_overview}
-\include{UG1_Obtaining}
+%\include{UG1_Obtaining}
 \include{UG2_Model_interfacing}
 \include{UG3_Namcouple_generation}
 \include{UG4_Transformations}

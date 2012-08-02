@@ -514,7 +514,7 @@
           \parbox{15cm}{
             {\PRISMDOCFont{T1}{ptm}{b}{n}{12pt}{14pt}Copyright Notice\\[0.5ex]}
             \PRISMDOCFont{T1}{ptm}{m}{n}{11pt}{13pt}
-            \copyright\ Copyright 2010 by CERFACS \\
+            \copyright\ Copyright 2012 by CERFACS \\
             All rights reserved.\\
             No parts of this document should be either reproduced or 
             commercially used without prior agreement 
@@ -529,7 +529,7 @@
               How to get documentation ?\\[0.5ex]}
             \PRISMDOCFont{T1}{ptm}{m}{n}{11pt}{13pt}
             The documentation can be downloaded from the OASIS web site under the URL : \\
-            https://verc.enes.org/models/software-tools/oasis \\
+            http://oasis.enes.org \\
             }}}
 
       \PRISMDOCDebugBox{\put(0,16.2){\dashbox{0.1}(15,5.2)[t]{}}}

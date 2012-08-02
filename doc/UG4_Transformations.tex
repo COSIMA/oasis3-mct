@@ -1,71 +1,17 @@
 \newpage
-\chapter{The transformations and interpolations in OASIS3}
+\chapter{Transformations and interpolations}
 \label{sec_transformations}
 
 Different transformations and 2D interpolations are available in
-OASIS3 to adapt the coupling fields from a source model grid to a target
-model grid. They are divided into five general classes that have
-precedence one over the other in the following order: time
-transformation, pre-processing, 
-interpolation, ``cooking'', and post-processing. This order of
-precedence is conceptually logical, but is also constrained by the 
-OASIS3 software internal structure.
-
+OASIS3-MCT to adapt the coupling fields from a source model grid to a target
+model grid. 
 In the following paragraphs, a description of each
 transformation with its corresponding configuring lines is given.
 Features that are now deprecated (non functional) compared
 to prior versions will be noted with the string UNUSED
 but not described.
 
-%\section{Using OASIS3 in the interpolator-only mode}
-%\label{subsec_interpolator}
-%
-%OASIS3 can be used in an interpolator-only mode, in which case it 
-% transforms fields without running any model.  It is
-% recommended to use first OASIS3 in this mode
-% to test different transformations and interpolations without
-% having to run the whole coupled system. In the interpolator-only mode,
-% all transformations, except the time transformations, are available.
-%
-%To run OASIS3 in an interpolator-only mode, the user has to prepare
-%the {\it namcouple} as indicated in sections
-%\ref{subsec_namcouplefirst} and \ref{subsec_namcouplesecond}. In
-%particular, {\tt NONE} has to be chosen below the keyword {\tt
-%\$CHANNEL}; ``0'' (without any model name and Fortran unit number)
-%must be given below the keyword {\tt \$NBMODEL}; {\tt \$RUNTIME} has
-%to be the number of time occurrences of the field to interpolate from
-%the NetCDF input file\footnote{For binary input file, only one time
-%occurence may be interpolated}; finally, the ``coupling'' period of
-%the field (4th entry on the field first line) must be always ``1''.
-%Note that if {\tt \$RUNTIME} is smaller than the total number of time
-%ocurrences in the input file, the first {\tt \$RUNTIME} occurrences
-%will be interpolated.
-%
-%The name of the input file which contains the fields to interpolate is
-%given by the 6th entry on the field first line (see
-%\ref{subsec_namcouplesecond}). After their transformation, OASIS3
-%writes them to their output file which name is the 7th entry on the
-%first line. Note that there must be one input file and one output file
-%per field.
-%
-%The time variable in the input file, if any, is recognized by the its
-%attribute "units".  The acceptable units for time are listed in the
-%udunits.dat file \cite{udunits}.  This follows the CF convention.
-%
-%To compile OASIS3 in interpolator-only mode, see section \ref{sec_notSCE}.
-%Practical examples on how to use OASIS3 in a interpolator-only mode are
-%given in {\tt oasis3/examples/testinterp} (see also
-%section \ref{subsec_running_testinterp}) and {\tt
-%  oasis3/examples/testNONE} (see also section
-%\ref{subsec_running_testnone})
-%
-%The configuring parameters that have to be defined in the {\it
-%namcouple} for each transformation in the interpolator-only mode or in
-%the coupling mode are described here after.
- 
-%{Running OASIS3 in the interpolator-only mode}
-
-\section{The time transformations}
+\section{Time transformations}
 \label{subsec_timetrans}
 
 \begin{itemize}
@@ -73,24 +19,15 @@ but not described.
 \item {\bf LOCTRANS}:
 
 {\tt LOCTRANS} requires one configuring line on which a time
-transformation, automatically performed below the call to PSMILe {\tt
+transformation, automatically performed below the call to
+{\tt oasis\_put} or {\tt
   prism\_put\_proto}, should be indicated:
-
-Non INSTANT time transformations are now supported more generally
-with use of a restart file.  The restart file allows the partial
-time transformation to be saved at the end of the run for exact
-restart at the start of the next run.  For that reason, restart
-filenames are now required for all {\it namcouple} transforms that use
-LOCTRANS with non INSTANT values.  In this mode, oasis will exit
-gracefully with an error message if a restart filename is not provided.
-This is the reason an optional restart file is now provided on the
-OUTPUT {\it namcouple} input line.
 
   \begin{verbatim}
  # LOCTRANS operation
-     $TRANSFORM
-  \end{verbatim} 
-
+   $TRANSFORM
+  \end{verbatim}
+%$ 
 where {\tt \$TRANSFORM} can be
 
   \begin{itemize}
@@ -99,11 +36,13 @@ where {\tt \$TRANSFORM} can be
     \item {\tt ACCUMUL}: the field accumulated over the previous coupling
     period is exchanged (the accumulation is simply done over the arrays
     {\tt field\_array}  provided as third argument to the {\tt
+      oasis\_put} or {\tt
     prism\_put\_proto} calls, not weighted by the time interval
     between these calls);
     \item {\tt AVERAGE}: the field averaged over the previous coupling
     period is transferred (the average is simply done over the arrays
     {\tt field\_array} provided as third argument to the {\tt
+      oasis\_put} or {\tt
     prism\_put\_proto} calls, not weighted by the time interval
     between these calls);
     \item {\tt T\_MIN}: the minimum value of the field
@@ -111,139 +50,40 @@ where {\tt \$TRANSFORM} can be
     transferred; 
     \item {\tt T\_MAX}: the maximum value of the field for each source grid
     point over the previous coupling period is transferred;
-    \item ONCE: UNUSED
-%only one {\tt prism\_put\_proto} or {\tt
-%prism\_get\_proto} will be performed; this is equivalent to giving the
-%length of the run as coupling or I/O period.
+    \item {\tt ONCE}: only one {\tt oasis\_put} / {\tt prism\_put\_proto} or
+      {\tt oasis\_get} / {\tt
+prism\_get\_proto} will be performed; this is equivalent to giving the
+length of the run as coupling or I/O period. 
   \end{itemize}
+
+With OASIS3-MCT, time transformations are supported more generally
+with use of the coupling restart file.  The coupling restart file allows the partial
+time transformation to be saved at the end of a run for exact
+restart at the start of the next run.  For that reason, coupling restart
+filenames are now required for all {\it namcouple} transformations that use
+LOCTRANS (with non INSTANT values).  In this mode, OASIS3-MCT will exit
+gracefully with an error message if a restart filename is not provided.
+This is the reason an optional restart file is now provided on the
+OUTPUT {\it namcouple} input line.
 \end{itemize}
 
 \section{The pre-processing transformations}
 \label{subsec_preproc}
 
-The following transformations are available in the pre-processing part of
-OASIS3, controlled by {\tt preproc.f}.
- 
 \begin{itemize}
 
 \item {\bf REDGLO} UNUSED
-   
-%  {\it This transformation is deprecated in the current OASIS3 version as
-%  interpolations for Gaussian Reduced grid now exist; this transformation
-%  should not be used anymore.}
-
-% {\tt REDGLO} (routine {\tt redglo.f}) performs the interpolation from a
-% Reduced grid to a Gaussian one. The interpolation is linear and
-% performed latitude circle per
-% latitude circle. When present, REDGLO must be the first pre-processing
-% transformation performed.
-% The configuring line is as follows:
-% \begin{verbatim}
-% # REDGLO operation
-%     $NNBRLAT  $CDMSK \end{verbatim}where {\tt \$NNBRLAT} is NOxxx 
-% where xxx is half the number of latitude circles of the Gaussian
-% grid. For example, for a T42 with 64 latitude circles, {\tt
-% \$NNBRLAT} is ``NO32''. In the current version, it can be either
-% NO16, NO24, NO32, NO48, NO80, NO160. {\tt \$CDMSK} is a flag
-% indicating if non-masked values have to be extended to masked areas
-% before interpolation ({\tt \$CDMSK = SEALAND}) using the Reduced grid
-% mask (see section \ref{subsec_griddata}) or if the opposite has to be
-% performed ({\tt \$CDMSK = LANDSEA}).  If {\tt \$CDMSK = NOEXTRAP},
-% then no extrapolation is performed.
 
 \item {\bf INVERT}: UNUSED
 
-%  {\it This transformation is deprecated in the current OASIS version
-%    and should be used anymore. The fields and corresponding grids can
-%    be given in any direction as long as they are coherent.}
-%
-% {\tt INVERT} (routine {\tt invert.f}) reorders a field so that it
-% goes from south to north and from west to east (the first point will
-% be the southern and western most one; then it goes parallel by parallel
-% going from south to north). Note that {\tt INVERT} does not transform the
-% associated grid or mask. {\tt INVERT} should be used only for
-% fields associated to A, B, G, L, Z, or Y grids (see annexe
-% \ref{subsec_gridtypes}) but produced by the source model from North to
-% South and/or from East to West. {\tt INVERT} does not work for
-% Reduced ('D') or unstructured ('U') grids (see annexe
-% \ref{subsec_gridtypes}).
-%
-% The generic input line is as follows:
-% \begin{verbatim}
-% # INVERT operation
-%     $CORLAT  $CORLON \end{verbatim} where
-% {\tt \$CORLAT = NORSUD} or {\tt SUDNOR} and {\tt \$CORLON = ESTWST}
-% or {\tt WSTEST} describes the orientation of the source field in
-% longitude and latitude, respectively. 
-
 \item {\bf MASK}: UNUSED
  
-% {\tt MASK} (routine {\tt masq.f}) is used before the analysis {\tt
-% EXTRAP}.  A given {\tt REAL} value {\tt VALMASK} is assigned to all masked
-% points following the source grid mask (see section
-% \ref{subsec_griddata}), so they can be detected by {\tt EXTRAP}.
-%
-% The generic input line is as follows:
-% \begin{verbatim}
-% # MASK operation
-%     $VALMASK \end{verbatim}
-%   Make sure that \$VALMASK conforms to a {\tt REAL} value, e.g. ``99999999." not ``99999999" . Problems may arise if the value chosen
-% approaches the maximum value that your computing platform can
-% represent; choose a value well outside the range of
-% your field values but not too large.
-
 \item {\bf EXTRAP}: UNUSED
-
-% {\tt EXTRAP} (routine {\tt extrap.f}) performs the extrapolation of a
-% field over its masked points.  The analysis {\tt MASK} must be used
-% just before, so that {\tt EXTRAP} can identify masked points. Note
-% that {\tt EXTRAP} does not work for Reduced ('D') or unstructured
-% ('U') grids (see appendix \ref{subsec_gridtypes}).
-%
-% Two methods of extrapolation are available. With {\tt NINENN}, a
-% N-nearest-neighbour method is used. The procedure is iterative and the
-% set of remaining masked points evolves at each iteration.  The
-% configuring line is:
-% \begin{verbatim}
-% # EXTRAP operation for $CMETH = NINENN
-%     $CMETH  $NV  $NIO  $NID\end{verbatim} where
-% {\tt \$CMETH = NINENN}; {\tt \$NV} is the minimum number
-% of neighbours required to perform the extrapolation (with a maximum
-% of 4)\footnote{For some grids, the extrapolation may not converge if
-% {\tt \$NV} is too large.}; {\tt \$NIO} is the flag that
-% indicates if the weight-address-and-iteration-number dataset will be
-% calculated and written by OASIS3 ({\tt \$NIO}= 1), or only read ({\tt
-% \$NIO}= 0) in file {\em nweights} (see section
-% \ref{subsec_transformationdata}); {\tt \$NID} is the identificator for
-% the weight-address-iteration-number dataset in all the different
-% {\tt EXTRAP/NINENN} datasets in the present coupling.\footnote{An
-% {\tt EXTRAP/NINENN} analysis is automatically performed within {\tt GLORED}
-% analysis but the corresponding datasets have to be distinct; this is 
-% automatically checked by OASIS3 at the beginning of the run.}
-%
-% With {\tt \$CMETH = WEIGHT}, an N-weighted-neighbour extrapolation
-% is performed. In that case, the user has to build the grid-mapping
-% file, giving for each target grid point the weights and addresses
-% of the source grid points used in the extrapolation; the structure of this
-% file has to follow the OASIS3 generic structure for transformation
-% auxiliary data files (see section \ref{subsec_transformationdata}).
-%
-% The configuring line is:
-% \begin{verbatim}
-% # EXTRAP operation for $CMETH = WEIGHT
-%     $CMETH  $NV  $CFILE  $NUMLU  $NID\end{verbatim} where
-% {\tt \$CMETH = WEIGHT}; {\tt \$NV} is the maximum number of
-% neighbours required by the extrapolation operation; {\tt \$CFILE} and
-% {\tt \$NUMLU} are the grid-mapping file name and associated logical
-% unit; {\tt \$NID} is the identificator for the relevant grid-mapping
-% dataset in all different {\tt EXTRAP/WEIGHT} transformations in the present
-% coupling.
-
 
 \item {\bf CHECKIN}:
 
  {\tt CHECKIN} calculates the global minimum, the maximum and the sum of the
- the source field values and prints them to the OASIS debug file (for the master process of the source component model only). This operation does not transform the field.
+ the source field values and prints them to the debug file (for the master process of the source component model only). This operation does not transform the field.
 
  The generic input line is as follows, even if {\tt \$NINT} has no impact in OASIS3-MCT:
  \begin{verbatim}
@@ -253,26 +93,6 @@ OASIS3, controlled by {\tt preproc.f}.
 
 \item {\bf CORRECT}: UNUSED
  
-% {\tt CORRECT} allows users to scale and add a scalar to a
-% field.  The ability to  read external fields and to use them
-% to modify the coupling field is no longer available. This transformation
-% can be used, for example, to change units on the field.
-%
-% This transformation requires at least one configuration line with two
-% parameters:
-% \begin{verbatim}
-% # CORRECT operation 
-%     $XMULT  $NBFIELDS \end{verbatim} where
-% {\tt \$XMULT} is the multiplicative coefficient of the current
-% field, and {\tt \$NBFIELDS} is UNUSED and must be set to 1.
-% \begin{verbatim}
-% # nbfields lines
-%     $CLOC  $AMULT  $CFILE  $NUMLU \end{verbatim} where
-% {\tt \$AMULT} specifies the additive value.  
-% {\tt \$CLOC} (string), {\tt \$CFILE} (string) and {\tt \$NUMLU} (integer)
-% are all UNUSED but still required for parsing.  
-% \ref{subsec_restartdata}).
-%
 \end{itemize}
 
 %subsection{The pre-processing transformations}
@@ -280,16 +100,14 @@ OASIS3, controlled by {\tt preproc.f}.
 \section{The interpolation}
 \label{subsec_interp}
 
-The following transformations are available in OASIS3.
-
 \begin{itemize}
 
 \item {\bf BLASOLD}: 
 
-{\tt BLASOLD} allows the source fields to be scaled and allows
+{\tt BLASOLD} allows the source field to be scaled and allows
 a scalar to be added to the field.  The prior ability to perform 
 a linear combination of the current coupling field with other coupling fields 
-has been deprecated.  This transform occurs before the interpolation {\it per se}.
+has been deprecated in OASIS3-MCT.  This transformation occurs before the interpolation {\it per se}.
 
 This transformation requires at least one configuring line with two
 parameters:
@@ -297,15 +115,14 @@ parameters:
 # BLASOLD operation
      $XMULT   $NBFIELDS 
  \end{verbatim} 
-where {\tt \$XMULT} is the multiplicative coefficient of the current
-field, and {\tt \$NBFIELDS} is UNUSED and should be
-set to 0 or 1.  To add a scalar, an additional input line is required:
+where {\tt \$XMULT} is the multiplicative coefficient of the source
+field. {\tt \$NBFIELDS} must be 0 if no scalar needs to be added or 1
+if a scalar needs to be added. In this last case, an additional input
+line is required where {\tt \$AVALUE} is the scalar to be added to the
+field :
 \begin{verbatim}
-# nbfields lines
      CONSTANT  $AVALUE
 \end{verbatim}
-where {\tt CONSTANT} is required and {\tt \$AVALUE} is the
-constant that is added to the field.
 
 \item {\bf MAPPING}: 
 
@@ -313,7 +130,7 @@ constant that is added to the field.
   read and used for mapping (ie. regridding or interpolation); the {\tt MAPPING} file must follow the {\tt SCRIPR} format. 
   This is an alternative method to {\tt SCRIPR} for setting the mapping file.
  
-  In the current implementation, each pair of source and target points in the {\tt MAPPING} file can be linked by only one weight, i.e. remappings such as {\tt SCRIPR/BICUBIC} involving at each ssource grid point the value of the field, of the gradients and of the cross-gradient, or second-order conservative remapping are not supported.   
+  In the current implementation, each pair of source and target points in the {\tt MAPPING} file can be linked by only one weight, i.e. remappings such as {\tt SCRIPR/BICUBIC} involving at each source grid point the value of the field, of the gradients and the cross-gradient, or second-order conservative remapping are not supported.   
 
 This transformation requires at least one configuring line with one
 filename and two optional string values:
@@ -322,12 +139,12 @@ filename and two optional string values:
 \end{verbatim}
 
   \begin{itemize}
-  \item {\tt \$MAPNAME} is the name of the mapping file to read.  This is a netcdf
-  file consistent with the OASIS/SCRIPR map file format.
+  \item {\tt \$MAPNAME} is the name of the mapping file to read.  This
+    is a netcdf file consistent with the SCRIPR map file format (see section
+  \ref{subsec_inputdata}).
 
   \item {\tt \$MAPLOC} is optional and can be either {\tt src} or {\tt dst}.  With {\tt src}, the mapping will be done
-  in parallel on the source processors before communication on the destination
-  grid to the destination model and processors; this is the default.   With {\tt dst}, the mapping is 
+  in parallel on the source processors before communication to the destination model and processors; this is the default.   With {\tt dst}, the mapping is 
   done on the destination processors after the data is sent from the source
   model on the source grid. 
 
@@ -336,8 +153,11 @@ filename and two optional string values:
   of the grid decompositions without leveraging a partial sum computation.  With
   {\tt sum}, the transform is done using the partial sum approach which generally
   introduces roundoff level changes in the results on different processor
-  counts. Option {\tt opt} allows the coupling layer to choose either approach based on
-  an analysis of which strategy is likely to run faster. Usually, partial sums will be used if the source grid has a higher resolution than the target grid as this should reduce the overall communication.
+  counts. Option {\tt opt} allows the coupling layer to choose either
+  approach based on an analysis of which strategy is likely to run
+  faster. Usually, partial sums will be used if the source grid has a higher resolution
+  than the target grid as this should reduce the overall
+  communication. 
 
   \end{itemize}
 
@@ -346,15 +166,18 @@ Note that if {\tt SCRIPR} (see below) is used to calculate the remapping file, {
 \item {\bf SCRIPR}: 
  
   {\tt SCRIPR} gathers the interpolation techniques offered by Los
-  Alamos National Laboratory SCRIP 1.4 library\footnote{See the
-    copyright statement in appendix \ref{sec_SCRIP}.}\cite{SCRIPR}.
-  {\tt SCRIPR} routines are in {\tt oasis3/lib/scrip}. See the SCRIP 1.4
+  Alamos National Laboratory SCRIP 1.4 library \citep{Jones99}\footnote{See also http://climate.lanl.gov/Software/SCRIP/ and the
+    copyright statement in appendix \ref{sec_SCRIP}.}.
+  {\tt SCRIPR} routines are in {\tt oasis3-mct/lib/scrip}. See the SCRIP 1.4
   documentation in {\tt oasis3/doc/SCRIPusers.pdf} for more
-  details on the interpolation algorithms.  In the current implementation,
-  only first order mapping is supported through either scrip weights
-  generation or reading from a file generated off-line.  As a result,
-  second order {\tt CONSERV} or {\tt BICUBIC} are not currently supported.
-  Second order mapping methods will be added in future versions.
+  details on the interpolation algorithms.  
+  In the current implementation, each pair of source and target points
+  in the {\tt MAPPING} file can be linked by only one weight,
+  i.e. remappings such as {\tt SCRIPR/BICUBIC} involving at each
+  source grid point the value of the field, of the gradients and the
+  cross-gradient, or second-order conservative {\tt
+    SCRIPR/CONSERV/SECOND} remapping are not
+  supported.   
 
   The following types of interpolations are available:
 
@@ -374,7 +197,7 @@ Note that if {\tt SCRIPR} (see below) is used to calculate the remapping file, {
 
      \item Non-masked target grid points having all of the N source
        nearest neighbours masked: by default, the nearest non-masked
-       source neighbour is used. 
+       source neighbour is used . 
 % footote about NOT_NNEIGHBOUR and ll_weightot removed
 
      \end{itemize}

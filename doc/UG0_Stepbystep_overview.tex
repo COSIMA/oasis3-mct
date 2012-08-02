@@ -2,153 +2,191 @@
 \chapter{Introduction}
 \label{sec_step}
 
-In 1991, CERFACS decided to tackle coupled climate modelling and to
-develop a software interface to couple existing numerical General
+In 1991, CERFACS started the development of
+a software interface to couple existing numerical General
 Circulation Models of the ocean and of the atmosphere. Today, the
-OASIS3 coupler, which is the result of more than 20 years of evolution
+OASIS3.3 coupler, which is the result of more than 20 years of evolution
 is used by about 30 modelling groups in Europe, Australia, Asia and
-North America, on the different computing platforms used by the
-climate modelling community. The list of
-coupled models realized with OASIS3 and previous versions and the
-platforms onto which they were run on in the few past years can be
-found in Appendix \ref{sec_couplings}.
+North America on the different computing platforms. The list of
+coupled models realized with OASIS3  and OASIS2 can be
+found in tables \ref{Tab:OASIS3_a} and \ref{Tab:OASIS2_a} in Appendix \ref{sec_couplings}.
 
-OASIS3 sustained development is ensured by a collaboration
+OASIS sustained development is ensured by a collaboration
 between CERFACS and the Centre National de la Recherche Scientifique
 (CNRS) and its maintainance and user support is presently reinforced
 with additinal resources coming from IS-ENES project funded by the EU (FP7 -
 GA no 228203).
 
-OASIS3 is a portable set of Fortran 77, Fortran 90 and C routines.
-Portability and flexibility are OASIS3 key design concepts. At
-run-time, OASIS3 acts as a coupling layer, which main function is
-to interpolate the coupling fields exchanged between the component
-models, and as a communication library linking component models, via the OASIS3
-PRISM Model Interface Library (PSMILe). OASIS3 supports 
-coupling of general two dimensional fields.  Unstructured grids are also supported
-using a one dimension degeneration of the two dimensional structures.
-To communicate directly with
-another model, or to perform I/O actions, a component model needs to
-include few specific PSMILe calls. OASIS3 PSMILe supports 
-parallel communication between parallel component models
-as well as parallel interpolation via Message Passing Interface
-(MPI) and file I/O using netcdf.  
+The current OASIS3-MCT version was significantly refactored with respect to OASIS3.3. OASIS3-MCT is now interfaced with the Model
+Coupling Toolkit\footnote{MCT, see www.mcs.anl.gov/research/projects/mct/} \citet{mct_larson} \citet{mct_jacob} developed by the Argonne National Laboratory in the USA. MCT implements fully parallel regridding (as a parallel matrix vector 
+multiplication) and parallel distributed exchanges of the coupling
+fields, based on pre-computed regridding weights and addresses. 
+Its design philosophy, based on flexibility and minimal invasiveness,
+is close to the OASIS approach. 
+MCT has proven parallel performance and is, most notably, the
+underlying coupling software used in National Center for Atmospheric
+Research Community Earth System Model 1 (NCAR CESM1).
 
-This version has been significantly refactored.  There is no
-longer a separate OASIS coupler component.  All coupling is now
-direct and all transforms are executed in parallel on a set
-of component processes.  This version of OASIS3 leverages the
-Argonne National Laboratory's Model Coupling Toolkit (MCT)
-in the coupling layer.  In spite of the significant changes
-in underlying implementation, usage has largely remained unchanged.
-The prism fortran interfaces used in component models are unchanged.  The use 
-statement has been updated and now requires a single ``use\ mod\_prism''
-statement instead of the various use statements required in prior
-OASIS3 versions.  The {\it namcouple} spec is also largely unchanged
+OASIS3-MCT is a portable set of Fortran 77, Fortran 90 and C routines. Low-intrusiveness, portability and flexibility are OASIS3-MCT key design concepts. At run-time, there is no
+longer a separate coupler executable: OASIS3-MCT acts as a coupling library, which main function is to interpolate and exchange the coupling fields between the component models of a coupled system.  OASIS3-MCT supports  coupling of general two dimensional fields.  Unstructured grids are also supported using a one dimension degeneration of the two dimensional structures. Thanks to MCT, all transformations, including regridding, are executed in parallel on the set of source or target component processes and all couplings are now executed in parallel directly between the components via Message Passing Interface
+(MPI). OASIS3-MCT also supports parallel file I/O using netcdf.  
+
+In spite of the significant changes in underlying implementation, usage of OASIS3-MCT in the codes has largely remained unchanged with respect to OASIS3.3.
+To communicate with another model, or to perform I/O actions, a component model needs to include few specific calls to the OASIS3-MCT coupling library, which Application Programmig Interface used in component models is unchanged.  The use 
+statement has been updated and now requires a single ``use\ mod\_prism'' or ``use mod\_oasis'' statement instead of the various use statements required in prior
+OASIS3 versions.  The {\it namcouple} configuration file is also largely unchanged
 relative to OASIS3, although several options are either not used
-or not supported.  There are a few new keywords in {\it namcouple}
-including {\tt MAPPING} which allows a user to specify a mapping
+or not supported.  There is a new transformation in {\it namcouple}
+i.e. {\tt MAPPING} which allows a user to specify a mapping
 file generated externally.  Some features like vector mapping
 and second order mapping have been delayed in implementation
 while other new features like parallel mapping have been added.
 And currently, only MPI1 job launching is supported.
-
-See appendix \ref{sec_changes} for a more detailed list of changes in this version.
-
-%For each coupling exchange, OASIS3 performs the transformations and regridding
-%needed to express the source field on the grid of the target model.
-%The current OASIS3 version and its example coupled model, tutorial, were
-%compiled and run on NEC SX6, IBM Power4, CRAY XD1, and Linux PC (XXX
-%list to be updated).
-
-% To exchange coupling information with other components, a component
-% model needs to call few specific routines of the OASIS coupling
-% library for its initialisation, grid and partition definition, field
-% declaration, field {\bf Get} and {\bf Put} actions (to receive or send
-% a field by respectively) and termination. 
  
-% In OASIS, the communication follows the ``end-point'' principle, i.e.
-% there is no reference in the component model code to the origin of a
-% Get action or to the destination of a Put action; the source and
-% target component models (coupling exchange) or the input or output
-% file (I/O) are set externally by the user.  This ensures an easy
-% transition between different coupling configurations, in particular
-% from the coupled mode (Get/Put actions leading to a coupling exchange
-% performed using MPI) to the forced mode (Get/Put action leading to
-% reading/writing from/to a file using the GFDL mpp\_io library, Balaji
-% 2001), totally transparent for the component model itself.
-% Furthermore, the Get/Put routines can be called at each time step in
-% the component model code but the receiving/sending actions will
-% effectively be performed only at appropriate times from/to the
-% appropriate source/target following the configuration externally
-% defined by the user.
+First tests done with up to
+8000 cores on the Bullx Curie machine at the TGCC are very encouraging
+and it is therefore very likely that OASIS3-MCT will provide an efficient and
+easy-to-use coupling solution. 
 
-% For each coupling exchange, OASIS performs the transformations and
-% regridding needed to express the source field on the grid of the
-% target model. The following 2D regridding algorithms based on the
-% SCRIP library (Jones 1999) are available (for more details, the reader
-% is referred to the SCRIP User Guide available at
-% http://climate.lanl.gov/Software/SCRIP/):
+%See appendix \ref{sec_changes} for a more detailed list of changes in this %version.
 
-% \begin{itemize}
-% \item N nearest-neighbour: the N closest source neighbours are used.
-%   The weight of each neighbour is inversely proportional to $d$, its
-%   Great Circle distance to the target point, or to $exp(-1/2 \cdot
-%   d^2/\sigma^2)$ where $\sigma^2$ is the variance of a Gaussian function.
-% \item bilinear: the 4 enclosing source neighbour points are used and
-%   their respective weight is evaluated using a general bilinear
-%   iteration in a continuous local coordinate system.
-% \item bicubic: the value of the source field, its gradients and cross
-%   gradient with respect to the local directions {\it i} and {\it j} at
-%   the 4 enclosing source neighbour points are used. For Reduced
-%   Gaussian grid, a standard bicubic algorithm with the 16 enclosing
-%   source neighbours is used.
-% \item 1st order conservative remapping: the weight of a source cell is
-%   proportional to area of the source cell intersected by target cell.
-%   Using the divergence theorem, the SCRIP library evaluates this area
-%   with the line integral along the cell borders enclosing the area. 
+\section{Step-by-step use of OASIS3-MCT}
 
-% \end{itemize}
-
-% (XXX to be added: a word on subgrid, Interpolation of vectors)
-
-\section{Step-by-step use of OASIS3}
-
-To use OASIS3 for coupling models (and/or perform I/O
+To use OASIS3-MCT for coupling models (and/or perform I/O
 actions), one has to follow these steps:
 \begin{enumerate}
-\item Obtain OASIS3 source code (see chapter \ref{sec_Obtaining}).
+\item Obtain OASIS3-MCT source code (see chapter \ref{sec_Obtaining}).
 \item Identify the coupling or I/O fields and adapt the component
-  models to allow their exchange with the PSMILe library based on MPI1
+  models to allow their exchange with the OASIS3-MCT coupling library based on MPI1
   message passing.
-  The PSMILe library uses NetCDF and therefore can be used to perform I/O actions
+  The OASIS3-MCT coupling library uses NetCDF and therefore can be used to perform I/O actions
   from/to disk files.  For more detail on how to interface a model
-  with the PSMILe, see chapter \ref{sec_modelinterfacing}.
+  with OASIS3-MCT, see chapter \ref{sec_modelinterfacing}.
 
 The tutorial coupled model gives a practical example of a coupled
 model; the sources are given in directories {\tt
-  examples/tutorial }; more detail on the tutorial and
+  examples/tutorial }; more detail on the {\tt tutorial} and
 how to compile and run it can be found in chapter
 \ref{sec_compilationrunning}.
 
 \item Define all coupling and I/O parameters and the transformations
   required to adapt each coupling field from its source model grid to
-  its target model grid; on this basis, prepare OASIS3 configuring file 
-  {\it namcouple} (See chapter \ref{sec_namcouple}). 
+  its target model grid; on this basis, prepare OASIS3-MCT configuring file 
+  {\it namcouple} (see chapter \ref{sec_namcouple}). 
   
-  OASIS3 supports different interpolation algorithms as is described in
+  OASIS3-MCT supports different interpolation algorithms as is described in
   chapter \ref{sec_transformations}.  Regridding files can be compute
   online using the SCRIP options or offline and read using the MAPPING
   transformation.
 
 \item Generate required auxiliary data files (see chapter
-  \ref{sec_auxiliary}).
-\item Compile OASIS3, the component models and start the coupled
+  \ref{sec_auxiliary}) XXXXX.
+\item Compile OASIS3-MCT, the component models and start the coupled
   experiment. Chapter \ref{sec_compilationrunning} describes how to
-  compile and run OASIS3 and the TOYOASIS3 coupled model.
+  compile and run OASIS3-MCT and the {\tt tutorial} toy coupled model.
 
 \end{enumerate}
 
 If you need extra help, do not hesitate to contact us (see contact
 details on the back of the cover page).
 
+\section{OASIS3-MCT sources}
+\label{sec_Obtaining}
+OASIS3-MCT and {\tt tutorial} toy coupled model sources are available from CERFACS SVN server. To obtain more detail on how to download
+the sources, please fill in the registration form at \newline 
+https://verc.enes.org/oasis/download/oasis-registration-form .
+
+OASIS3-MCT directory structure is the following one:
+
+\begin{verbatim}
+ - oasis3-mct/lib/psmile         OASIS3-MCT coupling library
+                 /scrip          SCRIP interpolation library
+                 /mct            Model Coupling Toolkit Coupling Software
+                  
+ - oasis3-mct/doc                OASIS3-MCT User Guide
+
+ - oasis3-mct/util/make_dir      Utilities to compile OASIS3-MCT
+
+ - oasis3-mct/examples/tutorial  Environment to run the tutorial toymodel
+\end{verbatim}
+
+\section{Licenses and Copyrights}
+ 
+\subsection{OASIS3-MCT license and copyright statement}
+
+Copyright © 2012 Centre Europ\'een de Recherche et Formation
+Avanc\'ee en Calcul Scientifique (CERFACS).  
+
+This software and ancillary information called OASIS3-MCT is free
+software.  CERFACS has rights to use, reproduce, and distribute
+OASIS3-MCT. The public may copy, distribute, use, prepare derivative works and
+publicly display OASIS3-MCT under the terms of the Lesser GNU General
+Public License (LGPL) as published by the Free Software Foundation,
+provided that this notice and any statement of authorship are
+reproduced on all copies. If OASIS3-MCT is modified to produce derivative
+works, such modified software should be clearly marked, so as not to
+confuse it with the OASIS3-MCT version available from CERFACS.
+
+The developers of the OASIS3-MCT software are researchers attempting to
+build a modular and user-friendly coupler accessible to the climate
+modelling community. Although we use the tool ourselves and have made
+every effort to ensure its accuracy, we can not make any
+guarantees. We provide the software to you for free. In return,
+you--the user--assume full responsibility for use of the software. The
+OASIS3-MCT software comes without any warranties (implied or expressed) and
+is not guaranteed to work for you or on your computer. Specifically,
+CERFACS and the various individuals involved in development and
+maintenance of the OASIS3-MCT software are not responsible for any damage
+that may result from correct or incorrect use of this software.
+
+\subsection{MCT copyright statement}
+\label{sec_MCT}
+
+                            Modeling Coupling Toolkit (MCT) Software
+
+Copyright © 2011, UChicago Argonne, LLC as Operator of Argonne National Laboratory. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+\begin{enumerate}
+\item Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+\item Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+\item The end-user documentation included with the redistribution, if any, must include the following acknowledgment: "This product includes software developed by the UChicago Argonne, LLC, as Operator of Argonne National Laboratory." Alternately, this acknowledgment may appear in the software itself, if and wherever such third-party acknowledgments normally appear.
+
+This software was authored by:
+\begin{itemize}
+\item Argonne National Laboratory Climate Modeling Group, Mathematics and Computer Science Division, Argonne National Laboratory, Argonne IL 60439
+\item Robert Jacob, tel: (630) 252-2983, E-mail: jacob@mcs.anl.gov
+\item Jay Larson, E-mail: larson@mcs.anl.gov
+\item Everest Ong
+\item Ray Loy
+\end{itemize}
+
+\item WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS" WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE OR NON-IN- FRINGEMENT, (2) DO NOT ASSUME ANY LEGAL LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF THE SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4) DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED. 
+
+\item LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND OR NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA, FOR ANY REASON WHATSOEVER, WHETHER SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE, EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGES.
+
+\end{enumerate}
+
+\subsection{The SCRIP 1.4 license copyright statement}
+\label{sec_SCRIP}
+
+The SCRIP 1.4 copyright statement reads as follows:
+
+ ``Copyright © 1997, 1998 the Regents of the
+University of California.  This software and ancillary information
+(herein called SOFTWARE) called SCRIP is made available under the
+terms described here. The SOFTWARE has been approved for release with
+associated LA-CC Number 98-45. Unless otherwise indicated, this
+SOFTWARE has been authored by an employee or employees of the
+University of California, operator of Los Alamos National Laboratory
+under Contract No. W-7405-ENG-36 with the United States Department of
+Energy. The United States Government has rights to use, reproduce, and
+distribute this SOFTWARE. The public may copy, distribute, prepare
+derivative works and publicly display this SOFTWARE without charge,
+provided that this Notice and any statement of authorship are
+reproduced on all copies. Neither the Government nor the University
+makes any warranty, express or implied, or assumes any liability or
+responsibility for the use of this SOFTWARE. If SOFTWARE is modified
+to produce derivative works, such modified SOFTWARE should be clearly
+marked, so as not to confuse it with the version available from Los
+Alamos National Laboratory.''
