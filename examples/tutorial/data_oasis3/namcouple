@@ -5,17 +5,6 @@
 #
 # Any line beginning with # is ignored. Blank lines are not allowed.
 #
- $SEQMODE
-# Not used for OASIS3-MCT 
-    1
- $END
-#########################################################################
- $CHANNEL
-# Not used for OASIS3-MCT
-  MPI1
-   nproc_exe1 ncpl_exe1
-   nproc_exe2 ncpl_exe2
- $END
 #########################################################################
  $NFIELDS
 # The number of fields described in the second part of the namcouple.
@@ -23,11 +12,6 @@
              3
  $END
 #########################################################################
- $JOBNAME
-# This is an acronym for this run (3 or 4 characters).
-  TOY
- $END
-##########################################################################
  $NBMODEL
 # The number of models in this experiment + their names (6 characters)
 #
@@ -40,25 +24,9 @@
   21600
  $END
 ###########################################################################
- $INIDATE
-# The initial date of the run. The format is YYYYMMDD.
-  20000101
- $END
-###########################################################################
- $MODINFO
-# Not used for OASIS3-MCT
-  NOT
- $END
-###########################################################################
  $NLOGPRT
 # Amount of information written to OASIS3-MCT log files (see User Guide)
   10
- $END
-###########################################################################
- $CALTYPE
-# Not used for OASIS3-MCT
-#
-  1
  $END
 ###########################################################################
  $STRINGS
@@ -104,7 +72,7 @@ rmp_torc_to_lmdz_BILINEA.nc src
 #
 # Field 2: model1 output
 #
-FOCNWRIT FOCNWRIT 2 7200 1 f2avg.nc OUTPUT
+FOCNWRIT FOCNWRIT 1 7200 1 f2avg.nc OUTPUT
  torc  torc
 LOCTRANS
   AVERAGE
@@ -113,7 +81,7 @@ LOCTRANS
 #
 # Field 3: model2 to model1
 #
-FSENDATM  FRECVOCN  3 10800  1  fdatm.nc EXPOUT
+FSENDATM  FRECVOCN  1 10800  1  fdatm.nc EXPOUT
 #
 lmdz torc LAG=+1800
 #
