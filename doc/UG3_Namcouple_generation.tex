@@ -31,7 +31,7 @@ configuring lines (described in more details in chapter
 
 In OASIS3-MCT, several {\it namcouple} inputs have been deprecated but, for backwards compatibility, they are still 
 allowed.  These inputs will be noted in the following text using the
-notation ``UNUSED'' and not fully described.Information below these keywords is
+notation ``UNUSED'' and not fully described. Information below these keywords is
   obsolete in OASIS3-MCT; it will not be read and will not be used. 
 
 In the next sections, a simple {\it namcouple} example is given and
@@ -56,7 +56,6 @@ atmospheric chemistry, and one field (SOALBEDO) is read from a file by
 the ocean.
 
 \begin{verbatim}
-
 ######################################################################
 # First section
 #
@@ -86,7 +85,6 @@ the ocean.
 #
 ######################################################################
 # Second section 
-#
  $STRINGS
 #
 # Field 1
@@ -120,7 +118,6 @@ the ocean.
 #
 # Field 4
  SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT
-#
 #####################################################################
 \end{verbatim}
 
@@ -141,8 +138,9 @@ are described hereafter:
 \item {\tt \$CHANNEL}: UNUSED
 
 \item {\tt \$NFIELDS}: On the line below this keyword is the total
-number of fields exchanged and described in the second part of
-the {\it namcouple}. 
+number of field entries in the second part of
+the {\it namcouple}. If more than one field are described on the same
+line (new in OASIS3-MCT, see section \ref{sec_changes}) this counts as only one entry. 
 
 \item {\tt \$JOBNAME}: UNUSED
 
@@ -244,6 +242,7 @@ INPUT} in the example above). The field may be :
    182  149    128  64  toce  atmo   LAG=+14400 SEQ=+1
    P 2 P 0 
   \end{verbatim}
+\vspace{-0.2cm}
   where the different entries are:
     \begin{itemize}
       \item Field first line:
@@ -319,11 +318,12 @@ INPUT} in the example above). The field may be :
   COSHFTOT  COSHFTOT   7   86400  0  fldhftot.nc OUTPUT 
   atmo   atmo 
   \end{verbatim}
+\vspace{-0.2cm}
 where the different entries are as for {\tt EXPOUT} fields, except
 that the source symbolic name must be repeated twice on the field
 first line, the restart file name is needed only if {\tt LOCTRANS}
 transformations are present, there is no output file
-name on the first line and no LAG or  SEQ index at the end of the second line.
+name on the first line, and no grid dimensions and no LAG or SEQ index on the second line.
 The name of the output file is automatically defined based on the field and component model names.
 
 The third line is {\tt LOCTRANS} if this transformation is chosen for
@@ -337,7 +337,9 @@ supported for {\tt OUTPUT} fields.
   The first and only line for fields with status {\tt INPUT} is:
 
   \begin{verbatim}
-  SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT\end{verbatim} where the different entries are:
+  SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT\end{verbatim}
+\vspace{-0.2cm}
+ where the different entries are:
   \begin{itemize}
   \item  {\tt SOALBEDO}: symbolic name for the field in the target
   model ({\tt CHARACTER*8} repeated twice)

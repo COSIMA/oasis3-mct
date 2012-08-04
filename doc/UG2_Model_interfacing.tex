@@ -1,5 +1,5 @@
 \newpage
-\chapter{Interfacing a component model with the OASIS3-MCT library}
+\chapter{Interfacing a component model with OASIS3-MCT}
 \label{sec_modelinterfacing}
 
 At run-time, the OASIS3-MCT coupling layer supports coupling data
@@ -86,6 +86,7 @@ model also has to call MPI\_Finalize explicitly, but only after calling
 \end{itemize}
 
 \subsection{Communicator for internal parallelisation}
+\label{subsec_MPI1}
 
 \begin{itemize}
 \item {\tt CALL oasis\_get\_localcomm        (local\_comm, ierror )}
@@ -503,13 +504,13 @@ All component processes close the definition phase.
 
 %{End of definition phase}
 
-\section{Sending and receiving actions}
+\section{Sending ``put'' and receiving ``get'' actions}
 \label{subsubsec_sendingreceiving}
 
 \subsection{Sending a coupling (or I/O) field}
 \label{prismput}
 
-In the model time stepping loop, each process 
+In the model time step loop, each process 
 sends its part of the coupling (or I/O) field. 
 
 \begin{itemize} 
@@ -538,34 +539,46 @@ time of the call (by convention at the beginning of the timestep)
 \end{itemize}
 \end{itemize}
 
-This routine may be called by the model at each timestep. The sending
-is actually performed only if the time obtained by adding the field
-lag ({\tt LAG} in the {\em namcouple}) to the argument {\tt date}
-corresponds to a time at which it should be activated, given the
-coupling or I/O period indicated by the user in the {\it namcouple} (see
-section \ref{sec_namcouple}). A field will not be sent at all if its
-coupling (or I/O) period indicated in the {\it namcouple} is greater
-than the total run time. 
+To ensure a proper use of the {\tt oasis\_put} / {\tt
+  prism\_put\_proto}, one has to take care of the following aspects:
 
-An exchange at the beginning of the run at time = 0 is expected; if a
-coupling field has a positive lag, the coupling field that matches the {\tt
-  oasis\_get} / {\tt prism\_get\_proto} at time=0 will come from a
-coupling restart file written by the last {\tt
+\begin{itemize}
+
+\item This routine may be called by the model at each timestep. The
+  convention, for the {\tt date} argument is to indicate the time at
+  the beginning of the timestep. The sending is actually performed
+  only if the time obtained by adding the field lag ({\tt LAG} in the
+  {\em namcouple}) to the {\tt date} corresponds to a time at which it
+  should be activated, given the coupling or I/O period indicated by
+  the user in the {\it namcouple} (see section \ref{sec_namcouple}). 
+\item If the convention for {\tt date} is followed, the first
+  coupling of a run should occur at time=0 and the final coupling
+  should occur at time = runtime - cpl\_period, where runtime is the
+  total time of the run and cpl\_period is the coupling period. 
+\item The total run time should match an integer number of coupling
+  periods.
+\item If a coupling field has a positive lag, the coupling field that
+  matches the {\tt oasis\_get} / {\tt prism\_get\_proto} at time=0
+  will come from a coupling restart file written by the last active {\tt
   oasis\_put} / {\tt prism\_put\_proto} of the previous run (see
-section \ref{subsubsec_Algoritms}).
-For a coupling field with a positive lag, the coupling restart file (see section
-\ref{subsec_restartdata}) is automatically written by the
-last {\tt prism\_put\_proto} call of the run, if the time = {\tt
-  date+LAG}
-corresponds to a coupling or I/O period.
- 
-If a local time transformation is indicated for the field by
-the user in the {\it namcouple} (INSTANT, AVERAGE, ACCUMUL, T\_MIN or T\_MAX,
-see section \ref{sec_transformations}), it is automatically performed
-and the resulting field is finally sent at the coupling or I/O
-frequency.  For non-instant transformations, partially transformed
-fields will be written to the restart file at the end of the run
-for use on the next model startup; this is a bug fix new in OASIS3-MCT.
+  section \ref{subsubsec_Algoritms}). For a coupling field with a
+  positive lag, the coupling restart file (see section
+  \ref{subsec_restartdata}) is automatically overwritten by the {\tt
+  oasis\_put} / {\tt
+    prism\_put\_proto} when the time (i.e. {\tt date+LAG}) equals
+  to the total runtime.
+%\item A field will not be sent at all if its
+%coupling (or I/O) period indicated in the {\it namcouple} is greater
+%than the total run time. 
+\item If a local time transformation is indicated for the field by the
+  user in the {\it namcouple} (INSTANT, AVERAGE, ACCUMUL, T\_MIN or
+  T\_MAX, see section \ref{sec_transformations}), it is automatically
+  performed and the resulting field is finally sent at the coupling or
+  I/O frequency.  For non-instant transformations, partially
+  transformed fields will be written to the restart file at the end of
+  the run for use on the next model startup; this is a bug fix new in
+  OASIS3-MCT.
+\end{itemize}
 
 \subsection{Receiving a coupling (or I/O) field}
 
@@ -574,13 +587,13 @@ receives its part of the coupling field.
 
 \begin{itemize}
  
-\item {\tt CALL oasis\_get       (var\_id, date, field\_array, ierror)}
-\item {\tt CALL prism\_get\_proto(var\_id, date, field\_array, ierror)}
+\item {\tt CALL oasis\_get       (var\_id, date, field\_array, info)}
+\item {\tt CALL prism\_get\_proto(var\_id, date, field\_array, info)}
 \begin{itemize}
 \item {\tt var\_id [INTEGER; IN]}: field ID (from
   corresponding prism\_def\_var\_proto)
 \item {\tt date [INTEGER; IN]}: number of seconds in the run at the
-time of the call
+time of the call (by convention at the beginning of the timestep)
 \item {\tt field\_array [REAL, OUT]}: I/O or coupling field array 
 \item {\tt info [INTEGER; OUT]}: returned info code:
    \begin{itemize} 
@@ -603,9 +616,10 @@ argument is automatically analysed and the receiving action is actually
 performed only if {\tt date} corresponds to a time for which it should
 be activated, given the period indicated by the user in the
 {\it namcouple}. An exchange at the beginning of the run at time=0 is
-expected. A field will not be received at all if its
-coupling or I/O period indicated in the {\it namcouple} is greater
-than the total run time.
+expected. 
+%A field will not be received at all if its
+%coupling or I/O period indicated in the {\it namcouple} is greater
+%than the total run time.
 
 \section{Termination}
 \label{subsubsec_Termination}
@@ -737,6 +751,7 @@ layer with an ability to detect a deadlock before it happens and exit.
 The lag concept and indices are explained in more detail below and some
 examples are provided.
 
+\vspace{-0.3cm}
 \subsection{The lag concept}
 \label{subsub_lag}
 
@@ -865,7 +880,9 @@ in the debug netCDF file (EXPOUT fields, see section
 
   \end{enumerate}
 
+\vspace{-0.3cm}
 \subsection{The sequence concept}
+\label{subsec_sec}
 
 The order of coupling operations in the system is determined solely
 by the order of calls to send (put) and receive (get) data in the models
@@ -929,140 +946,6 @@ error message.
 
 Again, the SEQ namecouple setting is only diagnostic and is
 not required.
-
-%To exchange the coupling fields going through OASIS3 main process
-%(i.e. with status EXPORTED, AU-\newline XILARY, or EXPOUT, see section
-%\ref{sec_namcouple}), in a given order at each coupling timestep, a
-%sequence index SEQ must be defined for each of them. This is not
-%required for I/O fields or for coupling fields exchanged directly
-%between the component models, i.e. with status IGNOUT, INPUT or
-%OUTPUT. SEQ gives the position of the coupling field in the
-%sequence.
-%
-%
-%\begin{figure}
-%\includegraphics[scale=.6]{figures/fig_seq_concept} 
-%\caption{The SEQ concept}
-%\label{fig:seq_concept}
-%\end{figure}
-%
-%A coupling algorithm, showing the SEQ concept, is illustrated on
-%figure \ref{fig:seq_concept}. All coupling field produced by the
-%source model at the coupling timestep can be ``consumed'' by the
-%target model at the same timestep without causing any
-%deadlock situation; therefore, LAG = 0 for all coupling fields.
-%However, at each coupling timestep, a particular order
-%of exchange must be respected; $F_1$ must be received by
-%model A before it can send $F_2$, which in turn must be received by model B
-%before it can send $F_3$. Therefore, SEQ = 1, 2, 3 must be defined
-%respectively for $F_1$, $F_2$ and $F_3$. 
-%As all fields can be consumed at the time they are produced (LAG=0 for
-%all fields), there no reading/writing from/to coupling restart files.
-%
-%An appropriate use of the SEQ index can optimise a coupled run when 
-%one of the component model is much slower than the other. This is illustrated 
-%on figure \ref{fig:seq_optim}.
-% \begin{figure}
-%\includegraphics[scale=.6]{figures/fig_seq_optim} 
-%\caption{Optimisation of a coupled run using the SEQ index}
-%\label{fig:seq_optim}
-%\end{figure}
-%
-%In part A of figure \ref{fig:seq_optim} , a coupled run with no use of the SEQ
-%index is illustrated.  When the fast model reaches a coupling period,
-%it sends its output coupling fields to OASIS that receives them and
-%then waits until the slow model has also reaches the coupling period.
-%Once OASIS3 has received the fields from both the fast and the slow
-%components, it transforms them and send them respectively to the slow
-%and the fast components. Only then the fast and the slow components
-%are able to go on. The total elapse time for a coupling period is the
-%sum of the slow model running time and the OASIS3 working time.  
-%
-%In part B of figure \ref{fig:seq_optim}, an index SEQ = 1 is assigned to the
-%coupling fields going from the fast to the slow component and an index
-%SEQ = 2 is assigned to the coupling fields going from the slow to the
-%fast component. When the fast model reaches a coupling period, it
-%sends its output coupling fields to OASIS3 that receives them, treats
-%them and sends them to the slow model.  As soon as the slow model also
-%reaches the coupling period, it sends its output coupling fields to
-%OASIS, receives its input coupling fields right after, and is then
-%able to go on without any delay.  Concurrently, OASIS3 treats the slow
-%model output component fields and sends them to the fast model that is
-%then able to go on. Here the total elapse time for a coupling period
-%is very close to the slow model running time only. One can see that
-%using the SEQ index in this way results in ``hiding'' OASIS3 working
-%time behind the slow model running time. Note that in this case, the
-%default buffered send must be used (i.e the {\tt NOBSEND} option
-%cannot be specified in the {\it namcouple}, see section
-%\ref{subsec_namcouplefirst}).
-%
-%\subsection{A mix of lag and sequence: the sequential coupled model}
-%\label{subsubsec_mix}
-%
-%One can run the same component models simultaneously or sequentially
-%by defining the appropriate LAG and SEQ indices. In the example
-%illustrated on figure \ref{fig:mix_seqlag}, the models perform their
-%{\tt prism\_put\_proto} and {\tt prism\_get\_proto} calls exactly as
-%in the first lag example above (see 1. of \ref{subsub_lag}): model A receives $F_2$ and then sends
-%$F_1$; its timestep length is 4. During a coupling timestep, model B
-%receives $F_1$ and then sends $F_2$; its timestep length is 6.  $F_1$
-%and $F_2$ coupling periods are both 12. By defining a LAG index of -8
-%for $F_1$, the models will now run sequentially.
-%
-%\begin{figure}
-%\includegraphics[scale=.6]{figures/fig_mix_seqlag}
-%\caption{Mix of LAG and SEQ concepts}
-%\label{fig:mix_seqlag}
-%\end{figure}
-%
-%As the LAG for $F_2$ is positive (6), a reading of $F_2$ in its
-%coupling restart file is automatically performed by OASIS3 to fulfill the initial
-%{\tt prism\_get\_proto}. As the LAG for $F_1$ is negative (-8), no
-%reading from file is performed initially and model B waits; at time 8,
-%a sending action is effectively performed below model A $F_1$ {\tt
-%prism\_put\_proto} (as 8 + LAG (-8) = 0 which is the first coupling
-%timestep) and matches the initial model B $F_1$ {\tt
-%prism\_get\_proto}. Below the last model A $F_1$ {\tt
-%prism\_put\_proto} of the run at time 116, a sending action is
-%effectively performed, as $116 + LAG(-8) = 108$ is a coupling period
-%(as the LAG is negative, the field is not written to its coupling
-%restart file). Below the last model B $F_2$ {\tt prism\_put\_proto} of
-%the run at time 114, a writing of $F_2$ to its restart file is
-%performed, as $114 + LAG(6) = 120$ is a coupling period and as the LAG
-%is positive.
-%
-%If the coupling fields are transformed through OASIS3 executable, it
-%is important to indicate a sequence index. In fact, at each OASIS3
-%coupling timestep, $F_1$ must be necessarily treated after
-%$F_2$. Therefore, $SEQ(F_1) = 2$ and $SEQ(F_2) = 1$.
-%
-%\subsection{Mixing sequential and parallel
-%    runs using {\tt prism\_put\_restart\_proto}}
-%
-%In the example illustrated on figure \ref{restart_ex}, the models
-%run sequentially for the first run only and then run
-%simultaneously. For the first run, the LAG and SEQ indices must be
-%defined as in section \ref{subsubsec_mix}.  After the first run, the
-%situation is similar to the one of section \ref{subsub_lag}, and
-%positive LAG must be defined for $F_1$ and $F_2$. As their lag is
-%positive, their corresponding first {\tt prism\_get\_proto} will
-%automatically lead to reading $F_1$ and $F_2$ from coupling restart
-%files.  In this case, model A has to write $F_1$ to its restart file
-%explicitly by calling {\tt prism\_put\_restart\_proto} (illustrated
-%on the figure by an orange arrow) at the end of the first run; in
-%fact, $F_1$ lag being then negative, such writing is not automatically
-%done below the last {\tt prism\_put\_proto} of the first run.
-%
-%
-%\begin{figure}
-%\includegraphics[scale=.6]{figures/restart_example} 
-%\caption{An example using prism\_put\_restart\_proto}
-%\label{restart_ex}
-%\end{figure} 
-
-%section{PRISM System Model Interface for the CLIM/MPI2-MPI1
-%communication technique (PSMILe V.0)}
-%section{Model\_interfacing} 
 
 
 
