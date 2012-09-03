@@ -180,8 +180,8 @@ CONTAINS
                nulprt=iu+mpi_size_global
                WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
                OPEN(nulprt,file=filename2,position='append')
-               WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
-               CALL oasis_flush(nulprt)
+!               WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
+!               CALL oasis_flush(nulprt)
            ENDIF
        ELSE
            nulprt=iu
@@ -263,13 +263,19 @@ CONTAINS
 
    call oasis_mpi_barrier(mpi_comm_global)
    IF ( .NOT. lg_mpiflag ) THEN
-      WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
-      CALL MPI_Finalize ( mpi_err )
+       IF (OASIS_debug >= 2)  THEN
+           WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
+       ENDIF
+       CALL MPI_Finalize ( mpi_err )
    else
-      WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
+       IF (OASIS_debug >= 2)  THEN
+           WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
+       ENDIF
    ENDIF
 
-   WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
+   IF (OASIS_debug >= 2)  THEN
+       WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
+   ENDIF
 
    call oasis_debug_exit(subname)
 
