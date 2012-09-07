@@ -2161,24 +2161,8 @@ SUBROUTINE inipar_alloc()
                  ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN')THEN
                   CALL parse(clline, clvari, 1, jpeighty, ILEN)
-                 IF (mpi_rank_global == 0) THEN
-                     WRITE (UNIT = nulprt1,FMT = *) '        '
-                     WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
-                     WRITE (UNIT = nulprt1,FMT = *) 'Information below CHECKIN'
-                     WRITE (UNIT = nulprt1,FMT = *) 'is obsolete in OASIS3-MCT'
-                     WRITE (UNIT = nulprt1,FMT = *) 'It will not be read and will not be used'
-                     CALL oasis_flush(nulprt1)
-                 ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CHECKOUT')  THEN
                   CALL parse(clline, clvari, 1, jpeighty, ILEN)
-                  IF (mpi_rank_global == 0) THEN
-                     WRITE (UNIT = nulprt1,FMT = *) '        '
-                     WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
-                     WRITE (UNIT = nulprt1,FMT = *) 'Information below CHECKOUT'
-                     WRITE (UNIT = nulprt1,FMT = *) 'is obsolete in OASIS3-MCT'
-                     WRITE (UNIT = nulprt1,FMT = *) 'It will not be read and will not be used'
-                     CALL oasis_flush(nulprt1)
-                 ENDIF 
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') THEN
 !* Get mapping filename
                  CALL parse(clline, clvari, 1, jpeighty, ilen)
