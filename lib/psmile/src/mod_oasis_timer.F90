@@ -85,7 +85,7 @@ module mod_oasis_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
-   INTEGER  :: TIMER_debug=0
+   INTEGER  :: TIMER_debug=3
 
    contains
 
@@ -284,7 +284,7 @@ module mod_oasis_timer
          ENDIF
             n = timer_id
             IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
                    n, timer(n)%label, timer(n)%runflag, &
                    sum_wtime(n), comm_rank, COUNT(n), &
                    sum_ctime(n), comm_rank, COUNT(n)
@@ -317,7 +317,7 @@ module mod_oasis_timer
                ENDIF
            ENDIF
            IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
                    n, timer(n)%label, timer(n)%runflag, &
                    sum_wtime(n), comm_rank, COUNT(n), &
                    sum_ctime(n), comm_rank, COUNT(n)
@@ -521,7 +521,7 @@ module mod_oasis_timer
                endif
             enddo
             IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
                    n, label_list(n), timer(n)%runflag, &
                    sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
                    sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
@@ -563,26 +563,28 @@ module mod_oasis_timer
                enddo
                if (mcnt > 0) meantime = meantime / float(mcnt)
                IF (TIMER_Debug >= 2) THEN
-                   WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
+                   WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
                       n, label_list(n), timer(n)%runflag, &
                       sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
                       sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
                       meantime
                ENDIF
             enddo
-            IF (TIMER_Debug >= 2) THEN
+            IF (TIMER_Debug >= 3) THEN
                 WRITE(output_unit,*)''
                 WRITE(output_unit,*)' =================================='
                 WRITE(output_unit,*)' ', TRIM(app_name)
                 WRITE(output_unit,*)' Overall Count statistics'
                 WRITE(output_unit,*)' =================================='
                 WRITE(output_unit,*)''
-                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
-                DO n = 1, nlabels
-
-                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8i10))') n, label_list(n), timer(n)%runflag, &
-                                                               (count_global(n,k),k=1,comm_size)
+                DO k=1,comm_size
+                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                  DO n = 1, nlabels
+                    
+                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(i10))') n, label_list(n), timer(n)%runflag, &
+                                                                     (count_global(n,k))
+                  ENDDO
                 ENDDO
                 WRITE(output_unit,*)''
                 WRITE(output_unit,*)' =================================='
@@ -590,12 +592,14 @@ module mod_oasis_timer
                 WRITE(output_unit,*)' Overall CPU time statistics'
                 WRITE(output_unit,*)' =================================='
                 WRITE(output_unit,*)''
-                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
-                DO n = 1, nlabels
-
-                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
-                                                               (sum_ctime_global(n,k),k=1,comm_size)
+                DO k=1,comm_size
+                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                  DO n = 1, nlabels
+                    
+                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                                                                       (sum_ctime_global(n,k))
+                  ENDDO
                 ENDDO
                 WRITE(output_unit,*)''
                 WRITE(output_unit,*)' ======================================'
@@ -603,12 +607,14 @@ module mod_oasis_timer
                 WRITE(output_unit,*)' Overall Elapsed time statistics'
                 WRITE(output_unit,*)' ======================================'
                 WRITE(output_unit,*)''
-                WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r s   ----------> "
-                WRITE(output_unit,'(8(3x,i8,5x))')(k-1,k=1,comm_size)
-                DO n = 1, nlabels
+                DO k=1,comm_size
+                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                  DO n = 1, nlabels
 
-                  WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(8f10.4))') n, label_list(n), timer(n)%runflag, &
-                                                               (sum_wtime_global(n,k),k=1,comm_size)
+                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                                                                      (sum_wtime_global(n,k))
+                  ENDDO
                 ENDDO
                 WRITE(output_unit,*)''
                 WRITE(output_unit,*)' ======================================'
