@@ -115,6 +115,19 @@ CONTAINS
    endif
    OASIS_debug = namlogprt
 
+   ! If NFIELDS=0 there is no coupling
+   ! No information must be written in the debug files as
+   ! the different structures are not allocated
+   !
+   IF ( nnamcpl == 0 ) THEN
+       WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+       WRITE (UNIT = nulprt1,FMT = *)  &
+          ' The models are not exchanging any field ($NFIELDS = 0) '
+       WRITE (UNIT = nulprt1,FMT = *)  &
+          ' so we force OASIS_debug = 0 for all processors '
+       OASIS_debug = 0
+   ENDIF
+
    !------------------------
    !--- Set compid (need namcouple model names)
    !------------------------
