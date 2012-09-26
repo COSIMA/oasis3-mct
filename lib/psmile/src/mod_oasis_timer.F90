@@ -85,7 +85,7 @@ module mod_oasis_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
-   INTEGER  :: TIMER_debug=3
+   INTEGER  :: TIMER_debug=0
 
    contains
 
@@ -540,7 +540,7 @@ module mod_oasis_timer
                 WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x),a,3x)') &
                    'mintime','on pe','count','maxtime','on pe','count','meantime'
             ENDIF
-            do n = 1,nlabels
+            DO n = 1,nlabels
                mintime = 1.0e36
                minpe = -1
                maxtime = -1.0e36
@@ -569,7 +569,7 @@ module mod_oasis_timer
                       sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
                       meantime
                ENDIF
-            enddo
+             ENDDO
             IF (TIMER_Debug >= 3) THEN
                 WRITE(output_unit,*)''
                 WRITE(output_unit,*)' =================================='
