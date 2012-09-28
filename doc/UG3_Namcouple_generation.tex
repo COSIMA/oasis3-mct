@@ -238,7 +238,7 @@ INPUT} in the example above). The field may be :
   The first 3 lines for fields with status {\tt EXPORTED} and 
   {\tt EXPOUT} are as follows:
   \begin{verbatim}
-   SOSSTSST SISUTESU 1 86400  5  sstoc.nc  sstat.nc EXPORTED
+   SOSSTSST SISUTESU 1 86400  5  sstoc.nc  EXPORTED
    182  149    128  64  toce  atmo   LAG=+14400 SEQ=+1
    P 2 P 0 
   \end{verbatim}
@@ -269,7 +269,6 @@ INPUT} in the example above). The field may be :
           field ({\tt CHARACTER*8}); 
           mandatory even if no coupling restart file is effectively
           used. (for more detail, see section \ref{subsec_restartdata});
-        \item sstat.nc : UNUSED but still required for parsing
         \item {\tt EXPORTED} : field status.
         \end{itemize}
       \item Field second line:
