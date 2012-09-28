@@ -155,9 +155,11 @@ CONTAINS
       write(nulprt,*) subname,' compid = ',prism_part(prism_npart)%gsmap%comp_id
       write(nulprt,*) subname,' ngseg  = ',prism_part(prism_npart)%gsmap%ngseg
       write(nulprt,*) subname,' gsize  = ',prism_part(prism_npart)%gsmap%gsize
-      write(nulprt,*) subname,' start  = ',prism_part(prism_npart)%gsmap%start
-      write(nulprt,*) subname,' length = ',prism_part(prism_npart)%gsmap%length
-      write(nulprt,*) subname,' pe_loc = ',prism_part(prism_npart)%gsmap%pe_loc
+      IF (mpi_comm_local /= MPI_COMM_NULL) THEN
+          WRITE(nulprt,*) subname,' start  = ',prism_part(prism_npart)%gsmap%start
+          WRITE(nulprt,*) subname,' length = ',prism_part(prism_npart)%gsmap%length
+          WRITE(nulprt,*) subname,' pe_loc = ',prism_part(prism_npart)%gsmap%pe_loc
+      ENDIF
       write(nulprt,*) ' '
    endif
 
