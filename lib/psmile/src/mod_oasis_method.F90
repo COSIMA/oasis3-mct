@@ -388,6 +388,10 @@ CONTAINS
 
    call oasis_set_couplcomm(cplcomm)
 
+   IF (OASIS_debug >= 2)  THEN
+       WRITE (nulprt,*) 'New local coupling comm =',cplcomm
+   ENDIF
+
    call oasis_debug_exit(subname)
 
  END SUBROUTINE oasis_create_couplcomm
