@@ -505,6 +505,7 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
 !
 !-------------------------------------------------------------------------------
 
+   IF (mpi_comm_local /= MPI_COMM_NULL) THEN
    call oasis_debug_enter(subname)
 
    ! empty filename, just return
@@ -632,6 +633,7 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
    endif
 
    call oasis_debug_exit(subname)
+   ENDIF
 
 end subroutine oasis_io_read_array
 
