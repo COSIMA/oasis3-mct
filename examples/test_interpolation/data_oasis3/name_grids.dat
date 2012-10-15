@@ -1,0 +1,6 @@
+$grid_source_characteristics
+cl_grd_src='torc'
+$end
+$grid_target_characteristics
+cl_grd_tgt='lmdz'
+$end

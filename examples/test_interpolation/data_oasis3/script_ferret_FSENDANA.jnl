@@ -1,0 +1,7 @@
+use FSENDANA_model1_01.nc
+
+
+shade FSENDANA[L=1,d=1]
+
+
+

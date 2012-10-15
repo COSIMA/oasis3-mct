@@ -1,0 +1,10 @@
+ ! NOAA/PMEL TMAP
+ ! FERRET v6.3  
+ ! Linux(g77) 2.6.9-22. - 09/29/09
+ ! 10-Apr-12 14:32     
+
+use atm.nc
+sh dat
+shade FSENDATM
+ SET MEMORY/SIZE=5000
+shade FSENDATM
