@@ -114,14 +114,14 @@ PROGRAM model2
   CALL oasis_init_comp (comp_id, comp_name, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'oasis_init_comp abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 105')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 117')
   ENDIF
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 112')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 124')
   ENDIF
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -129,20 +129,20 @@ PROGRAM model2
   CALL oasis_get_localcomm ( localComm, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_get_localcomm abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 120')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
   ENDIF
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
       WRITE(w_unit,*) 'MPI_comm_size abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 127')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 139')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 133')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 145')
   ENDIF
   !
   IF ((FILE_Debug == 1) .AND. (mype == 0)) FILE_Debug=2
@@ -285,7 +285,7 @@ PROGRAM model2
      var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 293')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 288')
   ENDIF
   !
   DEALLOCATE(il_paral)
@@ -301,7 +301,7 @@ PROGRAM model2
   CALL oasis_enddef ( ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_enddef abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 314')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 304')
   ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -352,7 +352,7 @@ PROGRAM model2
   ENDIF
   IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
       WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 398')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 355')
   ENDIF
   !
   !
@@ -442,7 +442,7 @@ PROGRAM model2
   CALL oasis_terminate (ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_terminate abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 421')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 445')
   ENDIF
   !
   CALL mpi_finalize(ierror)
