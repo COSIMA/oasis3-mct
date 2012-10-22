@@ -54,7 +54,7 @@ PROGRAM model1
   REAL (kind=wp), DIMENSION(:,:), POINTER    :: globalgrid_lon,globalgrid_lat ! lon, lat of the points
   REAL (kind=wp), DIMENSION(:,:,:), POINTER  :: globalgrid_clo,globalgrid_cla ! lon, lat of the corners
   REAL (kind=wp), DIMENSION(:,:), POINTER    :: globalgrid_srf ! surface of the grid meshes
-  INTEGER, DIMENSION(:,:), POINTER           :: indice_mask ! mask, 0 == valid point, 1 == masked point 
+  INTEGER, DIMENSION(:,:), POINTER           :: globalgrid_mask ! mask, 0 == valid point, 1 == masked point 
   !
   INTEGER :: mype, npes ! rank and  number of pe
   INTEGER :: localComm  ! local MPI communicator and Initialized
@@ -80,11 +80,6 @@ PROGRAM model1
   INTEGER, PARAMETER    ::  il_nb_time_steps = 1 ! number of time steps
   INTEGER, PARAMETER    ::  delta_t = 3600     ! time step
   !
-  ! Centers arrays of the local grid
-  ! used to calculate the field field1_send sent by the model
-  REAL (kind=wp), POINTER :: localgrid_lon (:,:)
-  REAL (kind=wp), POINTER :: localgrid_lat (:,:)
-  INTEGER, POINTER        :: local_mask (:,:)
   !
   INTEGER                       :: il_flag  ! Flag for grid writing by proc 0
   !
@@ -202,7 +197,7 @@ PROGRAM model1
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_cla'
   ALLOCATE(globalgrid_srf(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_srf'
-  ALLOCATE(indice_mask(nlon,nlat), STAT=ierror )
+  ALLOCATE(globalgrid_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
   ! Reading of the longitudes, latitudes, longitude and latitudes of the corners, mask 
@@ -211,7 +206,7 @@ PROGRAM model1
                  globalgrid_lon,globalgrid_lat, &
                  globalgrid_clo,globalgrid_cla)
   CALL read_mask(nlon,nlat, data_maskname, cl_grd_src, w_unit, FILE_Debug, &
-                 indice_mask)
+                 globalgrid_mask)
   CALL read_area(nlon,nlat, data_areaname, cl_grd_src, w_unit, FILE_Debug, &
                  globalgrid_srf)
   !
@@ -307,19 +302,6 @@ PROGRAM model1
   !
   ALLOCATE(field_send(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field1_send'
-  ALLOCATE ( localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
-  ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
-  ALLOCATE ( local_mask(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating local_mask'
-  !
-  ! Calculate the local grid to the process for OASIS3
-  !
-  CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
-                         localgrid_lon, localgrid_lat, local_mask,  &
-                         globalgrid_lon, globalgrid_lat, indice_mask, &
-                         w_unit, FILE_Debug)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
   !
@@ -330,7 +312,7 @@ PROGRAM model1
   !
   CALL function_ana(var_actual_shape(2), &
                     var_actual_shape(4), &
-                    localgrid_lon,localgrid_lat, &
+                    globalgrid_lon,globalgrid_lat, &
                     field_send,ib)
   !
   ! Send FSENDANA
@@ -351,7 +333,7 @@ PROGRAM model1
   call write_field(var_actual_shape(2),var_actual_shape(4), &
                    data_filename, field_name, &
                    w_unit, FILE_Debug, &
-                   localgrid_lon, localgrid_lat, field_send)
+                   globalgrid_lon, globalgrid_lat, field_send)
   !
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
