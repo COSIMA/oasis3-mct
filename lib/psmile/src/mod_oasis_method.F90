@@ -558,10 +558,18 @@ CONTAINS
 
    if (OASIS_debug >= 2)  then
       do n = 1,prism_nmodels
-      write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+         write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
       enddo
       call oasis_flush(nulprt)
    endif
+
+   do n = 1,prism_nmodels
+      if (mpi_root_global(n) < 0) then
+         write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+         write(nulprt,*) subname,' ERROR: global root invalid, check couplcomm for active tasks'
+         call oasis_abort_noarg()
+      endif
+   enddo
 
    !------------------------
    !--- MCT Initialization

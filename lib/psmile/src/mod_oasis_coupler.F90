@@ -50,6 +50,7 @@ MODULE mod_oasis_coupler
      logical               :: init
      integer(kind=ip_i4_p) :: spart ! src partition
      integer(kind=ip_i4_p) :: dpart ! dst partition
+     logical               :: AVred ! AV_ms, AV_md data already read in
      type(mct_aVect)       :: AV_ms ! av for CONSERV src: mask, area, etc
      type(mct_aVect)       :: AV_md ! av for CONSERV dst: mask, area, etc
   end type prism_mapper_type
@@ -197,6 +198,7 @@ CONTAINS
   prism_mapper(:)%init  = .false.
   prism_mapper(:)%spart = ispval
   prism_mapper(:)%dpart = ispval
+  prism_mapper(:)%AVred = .false.
 
   prism_mcoupler = nnamcpl
   allocate(prism_coupler(prism_mcoupler))
@@ -650,36 +652,36 @@ CONTAINS
                     ! try to reuse mapper already defined
                     ! must match mapping file and partition
                     !--------------------------------
-                    mapid = -1
+                    mapID = -1
                     do n = 1,prism_nmapper
                        if (trim(prism_mapper(n)%file) == trim(tmp_mapfile) .and. &
                            trim(prism_mapper(n)%opt ) == trim(nammapopt(nn))) then
-                          if (flag == OASIS_In  .and. prism_mapper(n)%dpart == part1) mapid = n
-                          if (flag == OASIS_Out .and. prism_mapper(n)%spart == part1) mapid = n
+                          if (flag == OASIS_In  .and. prism_mapper(n)%dpart == part1) mapID = n
+                          if (flag == OASIS_Out .and. prism_mapper(n)%spart == part1) mapID = n
                        endif
                     enddo
                     !--------------------------------
                     ! or will need a new mapper
                     !--------------------------------
-                    if (mapid < 1) then
+                    if (mapID < 1) then
                        prism_nmapper = prism_nmapper + 1
                        if (prism_nmapper > prism_mmapper) then
                           write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,prism_mmapper
                           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                           call oasis_abort_noarg()
                        endif
-                       mapid = prism_nmapper
-                       prism_mapper(mapid)%file = trim(tmp_mapfile)
-                       prism_mapper(mapid)%loc  = trim(nammaploc(nn))
-                       prism_mapper(mapid)%opt  = trim(nammapopt(nn))
+                       mapID = prism_nmapper
+                       prism_mapper(mapID)%file = trim(tmp_mapfile)
+                       prism_mapper(mapID)%loc  = trim(nammaploc(nn))
+                       prism_mapper(mapID)%opt  = trim(nammapopt(nn))
                        if (flag == OASIS_In ) prism_mapper(mapID)%dpart = part1
                        if (flag == OASIS_Out) prism_mapper(mapID)%spart = part1
                        if (OASIS_debug > 15) then
-                          write(nulprt,*) subname,' DEBUG new mapper for file ',trim(prism_mapper(mapid)%file)
+                          write(nulprt,*) subname,' DEBUG new mapper for file ',trim(prism_mapper(mapID)%file)
                           call oasis_flush(nulprt)
                        endif
                     endif
-                    prism_coupler(nc)%mapperID = mapid
+                    prism_coupler(nc)%mapperID = mapID
                  endif  ! flag and nammaploc match
                  endif  ! nammapfil
 
@@ -745,7 +747,7 @@ CONTAINS
      gsize = mct_gsmap_gsize(prism_part(part1)%gsmap)
      lsize = mct_gsmap_lsize(prism_part(part1)%gsmap,mpi_comm_local)
      if (OASIS_debug >= 15) then
-        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapid,gsize,lsize
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapID,gsize,lsize
         write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,prism_part(part1)%gsmap%gsize
         do n1 = 1,prism_part(part1)%gsmap%ngseg
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,prism_part(part1)%gsmap%start(n1),prism_part(part1)%gsmap%length(n1),prism_part(part1)%gsmap%pe_loc(n1)
@@ -795,7 +797,7 @@ CONTAINS
            ! read mapping weights and initialize sMatP
            !--------------------------------
            if (OASIS_debug >= 15) then
-              write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapid)%file)
+              write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapID)%file)
               call oasis_flush(nulprt)
            endif
            if (mpi_rank_local == 0) then
@@ -810,7 +812,7 @@ CONTAINS
                     ! generate mapping file on root pe
                     ! taken from oasis3 scriprmp
                     !--------------------------------
-                    call oasis_coupler_genmap(mapid,namID)
+                    call oasis_coupler_genmap(mapID,namID)
                  else
                     write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',trim(prism_mapper(mapID)%file)
                     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -821,7 +823,7 @@ CONTAINS
               !--------------------------------
               ! open mapping file
               !--------------------------------
-              status = nf90_open(trim(prism_mapper(mapid)%file),nf90_nowrite,ncid)
+              status = nf90_open(trim(prism_mapper(mapID)%file),nf90_nowrite,ncid)
               if (prism_coupler(nc)%getput == OASIS3_PUT) &
                  status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
               if (prism_coupler(nc)%getput == OASIS3_GET) &
@@ -886,38 +888,11 @@ CONTAINS
 
            call oasis_timer_start('cpl_smatrd')
            call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-              trim(cstring),trim(prism_mapper(mapid)%file),mpi_rank_local,mpi_comm_local)
+              trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local)
            call mct_sMatP_Init(prism_mapper(mapID)%sMatP, sMati, &
               prism_part(spart)%gsmap, prism_part(dpart)%gsmap, 0, mpi_comm_local, compid)
+           call mct_sMat_Clean(sMati)
            call oasis_timer_stop('cpl_smatrd')
-
-           if (prism_coupler(nc)%conserv /= ip_cnone) then
-              ! initialize and load AV_ms and AV_md
-              lsize = mct_gsmap_lsize(prism_part(spart)%gsmap,mpi_comm_local)
-              call mct_avect_init(prism_mapper(mapid)%av_ms,iList='mask',rList='area',lsize=lsize)
-              call mct_avect_zero(prism_mapper(mapid)%av_ms)
-              gridname = prism_part(spart)%gridname
-              call oasis_io_read_avfld('masks.nc',prism_mapper(mapid)%av_ms, &
-                 prism_part(spart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
-              call oasis_io_read_avfld('areas.nc',prism_mapper(mapid)%av_ms, &
-                 prism_part(spart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
-
-              lsize = mct_gsmap_lsize(prism_part(dpart)%gsmap,mpi_comm_local)
-              call mct_avect_init(prism_mapper(mapid)%av_md,iList='mask',rList='area',lsize=lsize)
-              call mct_avect_zero(prism_mapper(mapid)%av_md)
-              gridname = prism_part(dpart)%gridname
-              call oasis_io_read_avfld('masks.nc',prism_mapper(mapid)%av_md, &
-                 prism_part(dpart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
-              call oasis_io_read_avfld('areas.nc',prism_mapper(mapid)%av_md, &
-                 prism_part(dpart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
-
-              if (OASIS_debug >= 30) then
-                 write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapid)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%iAttr(:,:)),sum(prism_mapper(mapid)%av_ms%iAttr(:,:))
-                 write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapid)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapid)%av_ms%rAttr(:,:)),sum(prism_mapper(mapid)%av_ms%rAttr(:,:))
-                 write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapid)%av_md%iAttr(:,:)),maxval(prism_mapper(mapid)%av_md%iAttr(:,:)),sum(prism_mapper(mapid)%av_md%iAttr(:,:))
-                 write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapid)%av_md%rAttr(:,:)),maxval(prism_mapper(mapid)%av_md%rAttr(:,:)),sum(prism_mapper(mapid)%av_md%rAttr(:,:))
-              endif
-           endif
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
@@ -925,8 +900,44 @@ CONTAINS
               write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID," nElements = ",lsize
               call oasis_flush(nulprt)
            endif
-           call mct_sMat_Clean(sMati)
         endif  ! map init
+
+        !--------------------------------
+        ! read mapper mask and area if not already done
+        !--------------------------------
+        if (.not.prism_mapper(mapID)%AVred .and. prism_coupler(nc)%conserv /= ip_cnone) then
+           ! initialize and load AV_ms and AV_md
+
+           spart = prism_mapper(mapID)%spart
+           dpart = prism_mapper(mapID)%dpart
+
+           lsize = mct_gsmap_lsize(prism_part(spart)%gsmap,mpi_comm_local)
+           call mct_avect_init(prism_mapper(mapID)%av_ms,iList='mask',rList='area',lsize=lsize)
+           call mct_avect_zero(prism_mapper(mapID)%av_ms)
+           gridname = prism_part(spart)%gridname
+           call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_ms, &
+              prism_part(spart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
+           call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_ms, &
+              prism_part(spart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
+
+           lsize = mct_gsmap_lsize(prism_part(dpart)%gsmap,mpi_comm_local)
+           call mct_avect_init(prism_mapper(mapID)%av_md,iList='mask',rList='area',lsize=lsize)
+           call mct_avect_zero(prism_mapper(mapID)%av_md)
+           gridname = prism_part(dpart)%gridname
+           call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_md, &
+              prism_part(dpart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
+           call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_md, &
+              prism_part(dpart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
+
+           prism_mapper(mapID)%AVred = .true.
+
+           if (OASIS_debug >= 30) then
+              write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapID)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapID)%av_ms%iAttr(:,:)),sum(prism_mapper(mapID)%av_ms%iAttr(:,:))
+              write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapID)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapID)%av_ms%rAttr(:,:)),sum(prism_mapper(mapID)%av_ms%rAttr(:,:))
+              write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapID)%av_md%iAttr(:,:)),maxval(prism_mapper(mapID)%av_md%iAttr(:,:)),sum(prism_mapper(mapID)%av_md%iAttr(:,:))
+              write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapID)%av_md%rAttr(:,:)),maxval(prism_mapper(mapID)%av_md%rAttr(:,:)),sum(prism_mapper(mapID)%av_md%rAttr(:,:))
+           endif
+        endif
 
         !--------------------------------
         ! initialize avect2
@@ -934,7 +945,7 @@ CONTAINS
 
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
         if (OASIS_debug >= 15) then
-           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapid,gsize,lsize
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapID,gsize,lsize
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,prism_part(part2)%gsmap%gsize
            do n1 = 1,prism_part(part2)%gsmap%ngseg
               write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
