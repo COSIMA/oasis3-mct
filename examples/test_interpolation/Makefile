@@ -5,23 +5,18 @@ LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR
 ##### User configurable options #####
 #
 # CPP keys for model 1 (_M1) and for model 2 (_M2)
-# type of decomposition :
-# DECOMP_APPLE for 1D decomposition
-# DECOMP_BOX for 2D decomposition
-CPPKEYDECOMP_M1=DECOMP_APPLE
-CPPKEYDECOMP_M2=DECOMP_APPLE
 #
 # Precision for REAL: USE_DOUBLE_PRECISION or NO_USE_DOUBLE_PRECISION
 include header_precision
-CPPLOCAL_M1 = -D${CPPKEYDP} -D${CPPKEYDECOMP_M1} 
-CPPLOCAL_M2 = -D${CPPKEYDP} -D${CPPKEYDECOMP_M2} 
+CPPLOCAL_M1 = -D${CPPKEYDP} 
+CPPLOCAL_M2 = -D${CPPKEYDP} 
 #
 ### End User configurable options ###
 #
-OBJ_M1 =  routine_hdlerr.o read_all_data.o decomp_def.o \
-          oasis3_local_grid.o function_ana.o write_all_fields.o
-OBJ_M2 =  routine_hdlerr.o read_all_data.o decomp_def_m2.o \
-          oasis3_local_grid_m2.o function_ana.o  write_all_fields.o
+OBJ_M1 =  routine_hdlerr.o read_all_data.o \
+          function_ana.o write_all_fields.o
+OBJ_M2 =  routine_hdlerr.o read_all_data.o \
+          function_ana.o  write_all_fields.o
 #-------------------------------------------------------------------------------
 # General rules
 #-------------------------------------------------------------------------------
@@ -54,16 +49,8 @@ read_all_data.o :		read_all_data.F90
 				$(F90) $(F90FLAGS) -D${CPPKEYDP} -c read_all_data.F90
 write_all_fields.o :		write_all_fields.F90
 				$(F90) $(F90FLAGS) -D${CPPKEYDP} -c write_all_fields.F90
-decomp_def.o : 			decomp_def.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
-oasis3_local_grid.o :		oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c oasis3_local_grid.F90
 function_ana.o :		function_ana.F90
 				$(F90) $(F90FLAGS) -D${CPPKEYDP} -c function_ana.F90
-decomp_def_m2.o : 		decomp_def.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o decomp_def_m2.o -c decomp_def.F90
-oasis3_local_grid_m2.o :		oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o oasis3_local_grid_m2.o -c oasis3_local_grid.F90
 
 model1.o :	model1.F90 Makefile
 		$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c model1.F90

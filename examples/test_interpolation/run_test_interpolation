@@ -43,10 +43,10 @@ echo 'Target grid :' $TGT_GRID
 #
 if [ ${arch} == tioman_pgi_mpich ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
-    rundir=/space/${user}/oasis3-mct/examples/tutorial/work_${casename}
+    rundir=/space/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
-    rundir=/space/${user}/oasis3-mct/examples/tutorial/work_${casename}
+    rundir=/space/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == corail ]; then
     rundir=/lustre/globc/${user}/oasis3-mct-examples_buildbot/${casename}/work_${casename}
 elif [ ${arch} == curie ]; then

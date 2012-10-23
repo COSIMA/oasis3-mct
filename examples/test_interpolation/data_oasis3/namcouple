@@ -31,8 +31,9 @@
  $END
 ###########################################################################
  $NLOGPRT
-# Index of printing level in output file cplout: 0 = no printing
-#  1 = main routines and field names when treated, 2 = complete output
+# Index of printing level in the debug files : 
+# 0 : no printing ; 1 = main routines by master procs; 
+# >= 2 : complete output by all procs
   1
  $END
 ###########################################################################

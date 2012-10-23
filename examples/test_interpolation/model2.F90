@@ -17,14 +17,11 @@ PROGRAM model2
   USE write_all_fields
   !
   IMPLICIT NONE
-
-  INCLUDE 'mpif.h'
-
   !
-  ! By default OASIS3 exchanges data in double precision.
-  ! To exchange data in single precision with OASIS3, 
-  ! the coupler has to be compiled with CPP key "use_realtype_single" 
-  ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
+  INCLUDE 'mpif.h'
+  !
+  ! By default OASIS3-MCT exchanges data in double precision,
+  ! but conversion to or from single precision data is supported in the interface
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
 #elif defined USE_DOUBLE_PRECISION
@@ -47,7 +44,6 @@ PROGRAM model2
   !
   ! Global grid parameters : 
   INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
-  INTEGER :: ntot           ! total dimension
   INTEGER :: il_size
   INTEGER :: nc             ! number of corners in the (i,j) plan
   !
@@ -109,14 +105,14 @@ PROGRAM model2
   CALL oasis_init_comp (comp_id, comp_name, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'oasis_init_comp abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 117')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 108')
   ENDIF
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 124')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 115')
   ENDIF
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -124,20 +120,20 @@ PROGRAM model2
   CALL oasis_get_localcomm ( localComm, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_get_localcomm abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 123')
   ENDIF
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
       WRITE(w_unit,*) 'MPI_comm_size abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 139')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 130')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 145')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 136')
   ENDIF
   !
   IF ((FILE_Debug == 1) .AND. (mype == 0)) FILE_Debug=2
@@ -226,30 +222,18 @@ PROGRAM model2
   !  PARTITION DEFINITION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
-  ! Definition of the partition of the grid (calling oasis_def_partition)
-  ntot=nlon*nlat
-#ifdef DECOMP_APPLE
-  il_size = 3
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'APPLE partitioning'
-      CALL FLUSH(w_unit)
-  ENDIF
-#elif defined DECOMP_BOX
+  ! Definition of the partition of the grid
   il_size = 5
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'BOX partitioning'
-      CALL FLUSH(w_unit)
-  ENDIF
-#endif
   ALLOCATE(il_paral(il_size))
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
-      CALL FLUSH(w_unit)
-  ENDIF
   !
-  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  il_paral (1) = 2
+  il_paral (2) = 0
+  il_paral (3) = nlon
+  il_paral (4) = nlat
+  il_paral (5) = nlon
+  !
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
+      WRITE(w_unit,*) 'No decomposition il_paral = ', il_paral(:)
       CALL FLUSH(w_unit)
   ENDIF
   CALL oasis_def_partition (part_id, il_paral, ierror)
@@ -270,17 +254,14 @@ PROGRAM model2
   var_actual_shape(1) = 1
   var_actual_shape(2) = il_paral(3)
   var_actual_shape(3) = 1 
-#ifdef DECOMP_APPLE
-  var_actual_shape(4) = 1
-#elif defined DECOMP_BOX
   var_actual_shape(4) = il_paral(4)
-#endif
+  !
   ! Declaration of the field associated with the partition of the grid
   CALL oasis_def_var (var_id,var_name, part_id, &
      var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 288')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 264')
   ENDIF
   !
   DEALLOCATE(il_paral)
@@ -296,7 +277,7 @@ PROGRAM model2
   CALL oasis_enddef ( ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_enddef abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 304')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 280')
   ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -333,7 +314,7 @@ PROGRAM model2
   ENDIF
   IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
       WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 355')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 317')
   ENDIF
   !
   !
@@ -354,7 +335,7 @@ PROGRAM model2
   call write_field(var_actual_shape(2),var_actual_shape(4), &
                    data_filename, field_name,  &
                    w_unit, FILE_Debug, &
-                   localgrid_lon, localgrid_lat, error)
+                   globalgrid_lon, globalgrid_lat, error)
   !
   WHERE (globalgrid_mask == 1)
       field_recv = field_ini
@@ -364,7 +345,7 @@ PROGRAM model2
   call write_field(var_actual_shape(2),var_actual_shape(4), &
                    data_filename, field_name, &
                    w_unit, FILE_Debug, &
-                   localgrid_lon, localgrid_lat, field_recv)
+                   globalgrid_lon, globalgrid_lat, field_recv)
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points !!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
@@ -423,7 +404,7 @@ PROGRAM model2
   CALL oasis_terminate (ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_terminate abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 445')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 407')
   ENDIF
   !
   CALL mpi_finalize(ierror)
