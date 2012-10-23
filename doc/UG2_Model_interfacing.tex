@@ -204,6 +204,19 @@ Here is a coding sample of how to use these routines:
   CALL oasis_terminate ( ... )
 \end{verbatim}
 
+\subsection{Separate executable not coupling at all}
+\label{subsec_nocpl}
+
+For a model that is launched by oasis as a separate executable but that is NOT coupling at all, 
+the only calls that should be made are :
+
+\begin{verbatim}
+  CALL oasis_init_comp (comp_id, comp_name, ierror )
+  CALL oasis_get_localcomm ( localComm, ierror )   ! optional
+  CALL oasis_enddef ( ... )
+  CALL oasis_terminate ( ... )
+\end{verbatim}
+
 \section{Grid data file definition}
 \label{subsubsec_griddef}
 
