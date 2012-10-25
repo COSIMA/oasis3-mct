@@ -36,7 +36,10 @@ COMP.log and COMP.err in make\_dir.
 During compilation, a new compiling directory, defined by variable {\tt ARCHDIR}
 is created.  After successful
 compilation, resulting executables are found in the compiling directory in {\tt /bin}, libraries in {\tt /lib} and object
-and module files in {\tt /build}.
+and module files in {\tt /build}. If mod\_ oasis is used in the models, it is enough to include the path of the psmile
+objects and modules for the compilation and to use the psmile library when linking. If mod\_prism is used in the models, it is 
+necessary to include the path of the psmile and of the mct objects and modules for the compilation and to use both the psmile and 
+mct libraries when linking.
 
 The following CPP keys are coded in OASIS3-MCT and
 can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
