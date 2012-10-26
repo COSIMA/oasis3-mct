@@ -11,6 +11,7 @@ MODULE mod_oasis_method
    USE mod_oasis_ioshr
    USE mod_oasis_grid
    USE mod_oasis_mpi
+   USE mod_oasis_string
    USE mct_mod
 
    IMPLICIT NONE
@@ -49,7 +50,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
-   integer(kind=ip_intwp_p) :: n,iu
+   INTEGER(kind=ip_intwp_p) :: n,nns,iu
    integer(kind=ip_intwp_p) :: icolor,ikey
    CHARACTER(len=ic_med)    :: filename,filename2
    character(len=ic_med)    :: pio_type
@@ -127,6 +128,24 @@ CONTAINS
           ' so we force OASIS_debug = 0 for all processors '
        OASIS_debug = 0
    ENDIF
+
+   ! Determines the total number of fields to avoid a parameter in oasis_def_var
+   ! and mod_oasis_coupler
+   mvar=0
+   DO nns = 1,nnamcpl
+     n = namfldsort(nns)
+     mvar = mvar + oasis_string_listGetNum(namsrcfld(n))
+   ENDDO
+   WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
+   !
+   ALLOCATE(prism_var(mvar))
+   !
+   ! Define mtimer as a function of mvars instead of a parameter
+   mtimer = 7*mvar+30
+   ALLOCATE(timer(mtimer))
+   ALLOCATE(sum_ctime(mtimer))
+   ALLOCATE(sum_wtime(mtimer))
+   ALLOCATE(timer_count(mtimer))
 
    !------------------------
    !--- Set compid (need namcouple model names)

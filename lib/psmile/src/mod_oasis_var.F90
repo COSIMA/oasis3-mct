@@ -13,25 +13,8 @@
   public oasis_def_var
 
   !--- datatypes ---
-  public :: prism_var_type
-
-  integer(kind=ip_i4_p),parameter :: mvar = 100
-  integer(kind=ip_i4_p),parameter :: mvarcpl = 10
-
-  type prism_var_type
-     character(len=ic_lvar):: name
-     integer(kind=ip_i4_p) :: part
-     integer(kind=ip_i4_p) :: ndim
-     integer(kind=ip_i4_p) :: num
-     integer(kind=ip_i4_p) :: ops
-     integer(kind=ip_i4_p) :: type
-     integer(kind=ip_i4_p) :: size
-     integer(kind=ip_i4_p) :: ncpl
-     integer(kind=ip_i4_p) :: cpl(mvarcpl)
-  end type prism_var_type
 
   integer(kind=ip_intwp_p),public :: prism_nvar = 0
-  type(prism_var_type),public :: prism_var(mvar)
 
   CONTAINS
 

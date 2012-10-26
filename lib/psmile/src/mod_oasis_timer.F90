@@ -57,28 +57,7 @@ module mod_oasis_timer
    ! name of the time statistics file
    character (len=ic_med) :: file_name
 
-   type timer_details
-
-      ! label of timer
-      character (len=ic_med) :: label
-
-      ! wall time values
-      double precision :: start_wtime, end_wtime
-
-      ! cpu time values
-      double precision :: start_ctime, end_ctime
-
-      ! is the timer running now
-      character(len=1) :: runflag
-
-   end type timer_details
-
-   integer,parameter :: mtimer = 500
    integer :: ntimer
-   type (timer_details) :: timer(mtimer)
-   double precision     :: sum_ctime(mtimer) ! these values are not part of timer details
-   double precision     :: sum_wtime(mtimer) ! because they are later used in an mpi call
-   integer              :: count(mtimer)     ! number of calls
 
    integer :: output_unit = 901
    logical,save :: single_timer_header
@@ -116,7 +95,7 @@ module mod_oasis_timer
 
             sum_wtime(n)         = 0
             sum_ctime(n)         = 0
-            count(n)             = 0
+            timer_count(n)       = 0
          enddo
 
          ! initialise MPI specific data
@@ -160,14 +139,16 @@ module mod_oasis_timer
          IF (TIMER_Debug >=1) THEN
          call oasis_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
-            if (ntimer+1 > mtimer) then
-                WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-                WRITE(nulprt,*) subname,' WARNING timer number exceeded'
-                RETURN
-            endif
             ntimer = ntimer + 1
             timer_id = ntimer
             timer(timer_id)%label = trim(timer_label)
+            IF (ntimer+1 > mtimer) THEN
+                WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
+                WRITE(nulprt,*) subname,' WARNING timer number exceeded' 
+                WRITE(nulprt,*) subname,' Increase mtimer in mod_oasis_method'
+                CALL flush(nulprt)
+                CALL oasis_abort_noarg()
+            ENDIF
          endif
 
          if (present(barrier)) then
@@ -179,7 +160,7 @@ module mod_oasis_timer
          timer(timer_id)%start_wtime = MPI_WTIME()
          call cpu_time(cpu_time_arg)
          timer(timer_id)%start_ctime = cpu_time_arg
-         count(timer_id) = count(timer_id) + 1
+         timer_count(timer_id) = timer_count(timer_id) + 1
          timer(timer_id)%runflag = t_running
          ENDIF
 
@@ -286,8 +267,8 @@ module mod_oasis_timer
             IF (TIMER_Debug >= 2) THEN
                 WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
                    n, timer(n)%label, timer(n)%runflag, &
-                   sum_wtime(n), comm_rank, COUNT(n), &
-                   sum_ctime(n), comm_rank, COUNT(n)
+                   sum_wtime(n), comm_rank, TIMER_COUNT(n), &
+                   sum_ctime(n), comm_rank, TIMER_COUNT(n)
 
                 CLOSE(output_unit)
             ENDIF
@@ -319,8 +300,8 @@ module mod_oasis_timer
            IF (TIMER_Debug >= 2) THEN
                 WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
                    n, timer(n)%label, timer(n)%runflag, &
-                   sum_wtime(n), comm_rank, COUNT(n), &
-                   sum_ctime(n), comm_rank, COUNT(n)
+                   sum_wtime(n), comm_rank, TIMER_COUNT(n), &
+                   sum_ctime(n), comm_rank, TIMER_COUNT(n)
             ENDIF
 
          enddo
@@ -398,7 +379,7 @@ module mod_oasis_timer
                   sum_wtime_global_tmp(n,1:comm_size) = rarr(1:comm_size)
                endif
 
-               ival = count(n)
+               ival = timer_count(n)
                call MPI_Gather(ival,1,MPI_INTEGER,iarr(1),1,MPI_INTEGER,root,comm_timer,ierror)
                if (comm_rank == root) then
                   count_global_tmp(n,1:comm_size) = iarr(1:comm_size)
@@ -480,7 +461,7 @@ module mod_oasis_timer
             enddo
             sum_ctime_global(:,1) = sum_ctime(:)
             sum_wtime_global(:,1) = sum_wtime(:)
-            count_global(:,1) = count(:)
+            count_global(:,1) = timer_count(:)
          endif ! (comm_size > 1)
 
          ! if this is the root process

@@ -15,6 +15,43 @@ MODULE mod_oasis_data
 
   integer(kind=ip_i4_p) :: compid
   character(len=ic_lvar):: compnm
+  !
+  ! Variables 
+
+  integer(ip_intwp_p)   :: mvar
+  integer(kind=ip_i4_p),parameter :: mvarcpl = 10
+  type prism_var_type
+     character(len=ic_lvar):: name
+     integer(kind=ip_i4_p) :: part
+     integer(kind=ip_i4_p) :: ndim
+     integer(kind=ip_i4_p) :: num
+     integer(kind=ip_i4_p) :: ops
+     integer(kind=ip_i4_p) :: type
+     integer(kind=ip_i4_p) :: size
+     integer(kind=ip_i4_p) :: ncpl
+     integer(kind=ip_i4_p) :: cpl(mvarcpl)
+  end type prism_var_type
+
+  TYPE(prism_var_type),POINTER :: prism_var(:)
+!
+  ! Time statistics
+
+   type timer_details
+      ! label of timer
+      character (len=ic_med) :: label
+      ! wall time values
+      double precision :: start_wtime, end_wtime
+      ! cpu time values
+      double precision :: start_ctime, end_ctime
+      ! is the timer running now
+      character(len=1) :: runflag
+   end type timer_details
+
+   INTEGER :: mtimer 
+   TYPE (timer_details), POINTER :: timer(:)
+   DOUBLE PRECISION, POINTER     :: sum_ctime(:)       ! these values are not part of timer details
+   DOUBLE PRECISION, POINTER     :: sum_wtime(:)       ! because they are later used in an mpi call
+   INTEGER, POINTER              :: TIMER_COUNT(:)     ! number of calls
 
 ! MPI
 

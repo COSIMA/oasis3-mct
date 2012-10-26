@@ -17,6 +17,9 @@ MODULE mod_oasis_namcouple
 
 ! NAMCOUPLE PUBLIC DATA
 
+  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 1000 ! max number of characters to be read 
+                                                         ! in each line of the file namcouple 
+  !
   INTEGER(kind=ip_i4_p) ,public :: prism_nmodels   ! number of models
   character(len=ic_lvar),public,pointer :: prism_modnam(:)  ! model names
 
@@ -24,8 +27,8 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     ! namcouple runtime
   INTEGER(kind=ip_i4_p)   ,public :: namlogprt     ! namcouple nlogprt value
  
-  character(len=ic_lvar)  ,public,pointer :: namsrcfld(:)  ! list of src fields
-  character(len=ic_lvar)  ,public,pointer :: namdstfld(:)  ! list of dst fields
+  character(len=jpeighty)  ,public,pointer :: namsrcfld(:)  ! list of src fields
+  character(len=jpeighty)  ,public,pointer :: namdstfld(:)  ! list of dst fields
   character(len=ic_lvar)  ,public,pointer :: namsrcgrd(:)  ! src grid name
   integer(kind=ip_i4_p)   ,public,pointer :: namsrc_nx(:)  ! src nx grid size
   integer(kind=ip_i4_p)   ,public,pointer :: namsrc_ny(:)  ! src ny grid size
@@ -99,7 +102,6 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p) :: nitfn
   INTEGER (kind=ip_intwp_p) :: nstep
 ! --- mod_parameter
-  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeight = 8, jpfour = 4, jpeighty = 80
   INTEGER (kind=ip_intwp_p) :: ig_nmodel   ! number of models (not including oasis)
   INTEGER (kind=ip_intwp_p) :: ig_nfield   ! number of oasis coupled fields
   INTEGER (kind=ip_intwp_p) :: ig_direct_nfield   ! number of direct coupled fields
@@ -139,8 +141,8 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p)                          :: ig_nbr_rstfile
   INTEGER (kind=ip_intwp_p)                          :: ig_total_frqmin
   LOGICAL                  ,DIMENSION(:),ALLOCATABLE :: lg_state
-  CHARACTER(len=ic_long)   ,DIMENSION(:),ALLOCATABLE :: cnaminp
-  CHARACTER(len=ic_long)   ,DIMENSION(:),ALLOCATABLE :: cnamout
+  CHARACTER(len=jpeighty)   ,DIMENSION(:),ALLOCATABLE :: cnaminp
+  CHARACTER(len=jpeighty)   ,DIMENSION(:),ALLOCATABLE :: cnamout
   CHARACTER(len=8)         ,DIMENSION(:,:),ALLOCATABLE :: canal
   CHARACTER(len=8)                                   :: cg_c
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cg_name_rstfile
@@ -148,8 +150,8 @@ MODULE mod_oasis_namcouple
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cficinp
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cficout
   CHARACTER(len=32)        ,DIMENSION(:),ALLOCATABLE :: cg_input_file
-  CHARACTER(len=ic_long)   ,DIMENSION(:),ALLOCATABLE :: cg_input_field
-  CHARACTER(len=ic_long)   ,DIMENSION(:),ALLOCATABLE :: cg_output_field
+  CHARACTER(len=jpeighty)   ,DIMENSION(:),ALLOCATABLE :: cg_input_field
+  CHARACTER(len=jpeighty)   ,DIMENSION(:),ALLOCATABLE :: cg_output_field
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cficbf
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cficaf
   CHARACTER(len=8)         ,DIMENSION(:),ALLOCATABLE :: cstate
@@ -692,7 +694,7 @@ SUBROUTINE inipar_alloc()
 
   !* ---------------------------- Local declarations --------------------
   
-  CHARACTER*80 clline, clline_aux, clvari
+  CHARACTER*1000 clline, clline_aux, clvari
   CHARACTER*9 clword, clfield, clstring, clmod, clchan
   CHARACTER*3 clind
   CHARACTER*2 cldeb
@@ -795,7 +797,7 @@ SUBROUTINE inipar_alloc()
   !* Formats
 
 1001 FORMAT(A9)
-1002 FORMAT(A80)
+1002 FORMAT(A1000)
 1003 FORMAT(I1)
 
 
@@ -902,6 +904,7 @@ SUBROUTINE inipar_alloc()
 
     READ (UNIT = nulin,FMT = 2002, END=241) clline
     CALL parse(clline, clvari, 1, jpeighty, ilen)
+    IF (TRIM(clvari) .EQ. " ") GOTO 232
     IF (trim(clvari) .eq. "$END") goto 241
     !* Get output field symbolic name
     CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -1461,7 +1464,7 @@ SUBROUTINE inipar_alloc()
     !*    Formats
 
 2001    FORMAT(A9)
-2002    FORMAT(A80)
+2002    FORMAT(A1000)
 2003    FORMAT(I4)
 2004    FORMAT(I8)
 2009    FORMAT(A8)
@@ -1526,6 +1529,23 @@ SUBROUTINE inipar_alloc()
         CALL oasis_flush(nulprt1)
     ENDIF
     CALL oasis_abort_noarg()
+232 CONTINUE
+    IF (mpi_rank_global == 0) THEN
+        WRITE (UNIT = nulprt1,FMT = *) subname,':   ***WARNING***'
+        WRITE (UNIT = nulprt1,FMT = *)  &
+           ' size clline smaller than the size of the names of the fields on the line'
+        WRITE (UNIT = nulprt1,FMT = *)  &
+           ' increase jpeighty and change the associated format A(jpeighty) and cline'
+        WRITE (UNIT = nulprt1,FMT = *) ' '
+        WRITE (UNIT = nulprt1,FMT = *) ' '
+        WRITE (UNIT = nulprt1,FMT = *)  &
+           ' We STOP!!! Check the file namcouple'
+        WRITE (UNIT = nulprt1,FMT = *) ' '
+        WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
+        WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
+        CALL oasis_flush(nulprt1)
+    ENDIF
+    CALL oasis_abort_noarg()
 241 CONTINUE
     IF (mpi_rank_global == 0) THEN
         WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -1577,7 +1597,7 @@ SUBROUTINE inipar_alloc()
 
 !* ---------------------------- Local declarations --------------------
   
-  CHARACTER*80 clline, clvari
+  CHARACTER*1000 clline, clvari
   CHARACTER*9 clword, clstring, clprint, clcal, clchan
   CHARACTER*9 cljob, clmod, cltime, clseq, cldate, clhead
   CHARACTER*8 cl_print_trans, cl_print_state
@@ -1850,7 +1870,7 @@ SUBROUTINE inipar_alloc()
    !* Formats
 
 1001 FORMAT(A9)
-1002 FORMAT(A80)
+1002 FORMAT(A1000)
 1003 FORMAT(I3)
 1004 FORMAT(I8)
 
@@ -2498,7 +2518,7 @@ SUBROUTINE inipar_alloc()
 !* Formats
 
  2001 FORMAT(A9)
- 2002 FORMAT(A80)
+ 2002 FORMAT(A1000)
  2003 FORMAT(I4)
  2004 FORMAT(I8)
  2005 FORMAT(I2)
@@ -3651,7 +3671,7 @@ SUBROUTINE inipar_alloc()
   cdone(1:klen) = clline(1:klen)
   GO TO 100
 120 CONTINUE 
-1001 FORMAT(A80)
+1001 FORMAT(A1000)
 !
 !
 !*    2. Do the extraction job
@@ -3809,7 +3829,7 @@ SUBROUTINE inipar_alloc()
   cdone(1:klen) = clline(1:klen)
   GO TO 100
 120 CONTINUE 
-1001 FORMAT(A80)
+1001 FORMAT(A1000)
 !
 !
 !*    2. Do the extraction job
@@ -3931,7 +3951,7 @@ SUBROUTINE inipar_alloc()
 !** ++ Local declarations
 !
   INTEGER (kind=ip_intwp_p) :: ib
-  CHARACTER(len=80) :: cl_line
+  CHARACTER(len=1000) :: cl_line
   CHARACTER(len=1) :: cl_two
   character(len=*),parameter :: subname='mod_oasis_namcouple:skip'
 !
@@ -3954,7 +3974,7 @@ SUBROUTINE inipar_alloc()
 140 CONTINUE
   ENDFLAG = .true.
   RETURN
-1001 FORMAT(A80)
+1001 FORMAT(A1000)
 !
 !*-----------------------------------------------------------------------
 !

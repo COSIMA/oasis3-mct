@@ -6,7 +6,7 @@ MODULE mod_oasis_coupler
   USE mod_oasis_parameters
   USE mod_oasis_namcouple
   USE mod_oasis_sys
-  USE mod_oasis_var
+  USE mod_oasis_var, only : prism_nvar
   USE mod_oasis_part
   USE mod_oasis_mpi
   USE mod_oasis_string
@@ -27,8 +27,6 @@ MODULE mod_oasis_coupler
   public prism_router_type
   public prism_mapper_type
   public prism_coupler_type
-
-!  INTEGER(kind=ip_i4_p),parameter :: max = 200
 
   !--- derived ---
   INTEGER(kind=ip_i4_p),pointer :: model_root(:)
@@ -243,11 +241,11 @@ CONTAINS
 
   call oasis_debug_note(subname//' share var info between models')
 
-  allocate(allvar(100,prism_nmodels))
+  allocate(allvar(mvar,prism_nmodels))
   allocate(nallvar(prism_nmodels))
-  allocate(allops(100,prism_nmodels))
-  allocate(myvar(100))
-  allocate(myops(100))
+  allocate(allops(mvar,prism_nmodels))
+  allocate(myvar(mvar))
+  allocate(myops(mvar))
 
   allvar = " "
   nallvar = 0
