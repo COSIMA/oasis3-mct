@@ -98,7 +98,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       inquire(file=trim(filename),exist=exists)
       if (exists) then
          status = nf90_open(trim(filename),NF90_NOWRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
          write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
          WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
@@ -113,16 +114,19 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
          call oasis_abort_noarg()
       endif
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
       if (dlen /= 2) then
          write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(filefld),dlen
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
          call oasis_abort_noarg()
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
       status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
@@ -133,7 +137,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       if (ifldtype == 1) then
          allocate(array2i(nx,ny))
          status = nf90_get_var(ncid,varid,array2i)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          n = mct_avect_indexIA(av_g,trim(avfld))
          n1 = 0
@@ -147,7 +152,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       else
          allocate(array2(nx,ny))
          status = nf90_get_var(ncid,varid,array2)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          n = mct_avect_indexRA(av_g,trim(avfld))
          n1 = 0
@@ -162,7 +168,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
 
       status = nf90_close(ncid)
       IF (status /= nf90_noerr) THEN
-          WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+          WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',&
+                          TRIM(nf90_strerror(status))
       ENDIF
 
    endif
@@ -235,7 +242,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
+         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',&
+                         size(av_g%rAttr,dim=2),nx,ny
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
          call oasis_abort_noarg()
       endif
@@ -243,11 +251,13 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
       inquire(file=trim(rstfile),exist=exists)
       if (exists) then
          status = nf90_open(trim(rstfile),NF90_WRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_redef(ncid)
       else
          status = nf90_create(trim(rstfile),NF90_CLOBBER,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       endif
 
       do n = 1,mct_aVect_nRAttr(av_g)
@@ -267,7 +277,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(1),len=dlen)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= nx) then
             write(nulprt,*) subname,' ERROR: dlen ne nx ',dlen,nx
 !            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -275,7 +286,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ny) then
             write(nulprt,*) subname,' ERROR: dlen ne ny ',dlen,ny
 !            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -285,13 +297,15 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          status = nf90_inq_varid(ncid,trim(itemc),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(itemc),NF90_DOUBLE,dimid2,varid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
          endif
 
       enddo
 
       status = nf90_enddef(ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
 
 
       allocate(array2(nx,ny))
@@ -309,15 +323,18 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          enddo
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,array2)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       enddo
       deallocate(array2)
       call mct_aVect_clean(av_g)
 
       status = nf90_close(ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
 
    endif
 
@@ -402,7 +419,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          do n = 1,mct_aVect_nRAttr(av_g)
             call mct_aVect_getRList(mstring,n,av_g)
@@ -423,16 +441,19 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
 
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 2) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
                   WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
                   call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
                status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
                   write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
@@ -443,7 +464,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
                allocate(array2(nx,ny))
 
                status = nf90_get_var(ncid,varid,array2)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                n1 = 0
                do j = 1,ny
@@ -458,7 +480,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
          enddo
 
          status = nf90_close(ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       endif  ! file exists
    endif
@@ -536,7 +559,8 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          if (present(iarray)) then
             if (.not. present(ivarname)) then
@@ -558,14 +582,16 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(ivarname),dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                   call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,' ERROR: iarray ncnt dlen mismatch ',ncnt,dlen
@@ -574,7 +600,8 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                endif
 
                status = nf90_get_var(ncid,varid,iarray)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
             endif
          endif
 
@@ -598,14 +625,16 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
                   write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(rvarname),dlen
                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                   call oasis_abort_noarg()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,' ERROR: rarray ncnt dlen mismatch ',ncnt,dlen
@@ -614,12 +643,14 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
                endif
 
                status = nf90_get_var(ncid,varid,rarray)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
             endif
          endif
 
          status = nf90_close(ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       endif
    endif
@@ -685,11 +716,13 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
       inquire(file=trim(rstfile),exist=exists)
       if (exists) then
          status = nf90_open(trim(rstfile),NF90_WRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_redef(ncid)
       else
          status = nf90_create(trim(rstfile),NF90_CLOBBER,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       endif
 
       if (present(iarray)) then
@@ -707,7 +740,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
             write(nulprt,*) subname,' ERROR: iarray dlen ne ncnt ',dlen,ncnt
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -717,7 +751,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(ivarname),NF90_INT,dimid1,varid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
          endif
       endif
 
@@ -736,7 +771,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
             write(nulprt,*) subname,' ERROR: rarray dlen ne ncnt ',dlen,ncnt
             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -746,29 +782,36 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
          if (status /= nf90_noerr) then
             status = nf90_def_var(ncid,trim(rvarname),NF90_DOUBLE,dimid1,varid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
          endif
       endif
 
       status = nf90_enddef(ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       if (present(iarray)) then
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,iarray)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       endif
 
       if (present(rarray)) then
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,rarray)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       endif
 
       status = nf90_close(ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
 
    endif
 
@@ -778,7 +821,7 @@ end subroutine oasis_io_write_array
 
 !===============================================================================
 
-subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
+subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
 
    ! ---------------------------------------
    ! Write all fields from av to individual field files
@@ -793,14 +836,14 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
    integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
    integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
    integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: string  ! optional string to append to filename
+   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
    character(len=*), intent(in),optional :: filename   ! optional output filename
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
    type(mct_aVect)     :: av_g        ! avect global data
    type(mct_string)    :: mstring     ! mct char type
-   character(ic_med)   :: itemc       ! string converted to char
+   character(ic_med)   :: itemc       ! f_string converted to char
    character(ic_med)   :: lfn         ! local filename
    character(ic_med)   :: lstring     ! local filename
    integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
@@ -829,8 +872,8 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
    endif
 
    lstring = " "
-   if (present(string)) then
-      lstring = trim(string)
+   if (present(f_string)) then
+      lstring = trim(f_string)
    endif
 
    mpicom = mpi_comm_local
@@ -904,41 +947,56 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,string,filename)
          inquire(file=trim(lfn),exist=exists)
          if (exists) then
             status = nf90_open(lfn,NF90_WRITE,ncid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_inq_dimid(ncid,'time',dimid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_inquire_dimension(ncid,dimid,len=dlen)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             start1(1) = dlen + 1
             start3(3) = start1(1)
          else
             status = nf90_create(lfn,NF90_CLOBBER,ncid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_def_dim(ncid,'nx',nx,dimid3(1))
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_def_dim(ncid,'ny',ny,dimid3(2))
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_def_dim(ncid,'time',NF90_UNLIMITED,dimid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             dimid3(3) = dimid
             status = nf90_def_var(ncid,'time',NF90_INT,dimid,varid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_def_var(ncid,trim(itemc),NF90_DOUBLE,dimid3,varid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
             status = nf90_enddef(ncid)
-            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
          endif
 
          status = nf90_inq_varid(ncid,'time',varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,lmsec,start1,count1)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,array3,start3,count3)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_close(ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       enddo
       deallocate(array3)
       call mct_aVect_clean(av_g)
@@ -953,7 +1011,7 @@ end subroutine oasis_io_write_avfbf
 
 !===============================================================================
 
-subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
+subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
 
    ! ---------------------------------------
    ! Read all fields to av from individual field files
@@ -966,7 +1024,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
    type(mct_aVect) , intent(inout) :: av     ! avect
    type(mct_gsmap) , intent(in) :: gsmap     ! gsmap
    integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: string  ! optional string to append to filename
+   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
    character(len=*), intent(in),optional :: filename   ! optional input filename
 
    !--- local ---
@@ -974,7 +1032,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
    integer(ip_i4_p)    :: nx,ny       ! grid size from file
    type(mct_aVect)     :: av_g        ! avect global data
    type(mct_string)    :: mstring     ! mct char type
-   character(ic_med)   :: itemc       ! string converted to char
+   character(ic_med)   :: itemc       ! f_string converted to char
    character(ic_med)   :: lfn         ! local filename
    character(ic_med)   :: lstring     ! local filename
    integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
@@ -1003,8 +1061,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
    endif
 
    lstring = " "
-   if (present(string)) then
-      lstring = trim(string)
+   if (present(f_string)) then
+      lstring = trim(f_string)
    endif
 
    mpicom = mpi_comm_local
@@ -1031,17 +1089,22 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
          endif
 
          status = nf90_open(lfn,NF90_NOWRITE,ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          status = nf90_inq_dimid(ncid,'time',dimid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_inquire_dimension(ncid,dimid,len=dlen)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          allocate(time(dlen))
          status = nf90_inq_varid(ncid,'time',varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_get_var(ncid,varid,time)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          n1 = 0
          do j = 1,dlen
             if (time(j) == lmsec(1)) n1 = j
@@ -1054,13 +1117,17 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_inquire_variable(ncid,varid,dimids=dimid3)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_inquire_dimension(ncid,dimid3(1),len=nx)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_inquire_dimension(ncid,dimid3(2),len=ny)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
              write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
@@ -1076,9 +1143,11 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,string,filename)
          allocate(array3(nx,ny,1))
 
          status = nf90_get_var(ncid,varid,array3,start3,count3)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_close(ncid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          n1 = 0
          do j = 1,ny
@@ -1145,7 +1214,8 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    inquire(file=trim(filename),exist=exists)
    if (exists) then
       status = nf90_open(filename,NF90_NOWRITE,ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
       status = nf90_redef(ncid)
    else
       write(nulprt,*) subname,' ERROR: in filename ',trim(filename)
@@ -1161,27 +1231,33 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    endif
 
    status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
 
    allocate(dimid(ndims),nd(ndims))
 
    status = nf90_inquire_variable(ncid,varid,dimids=dimid)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
    do n = 1,ndims
       status = nf90_inquire_dimension(ncid,dimid(n),len=nd(n))
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
    enddo
 
    if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
       if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
          status = nf90_get_var(ncid,varid,ifld2)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
          status = nf90_get_var(ncid,varid,fld2)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
          status = nf90_get_var(ncid,varid,fld3)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
          write(nulprt,*) subname,' ERROR: mismatch in field and data'
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -1190,7 +1266,8 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    endif
     
    status = nf90_close(ncid)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
 
    if (present(nx)) then
       nx = nd(1)
@@ -1258,43 +1335,52 @@ subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid2(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid2(1))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid2(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid2(2))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_DOUBLE,dimid2,varid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_put_var(ncid,varid,fld)
-       if (status /= nf90_noerr) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',trim(nf90_strerror(status))
+       if (status /= nf90_noerr) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',trim(nf90_strerror(status))
     else
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     status = nf90_close(ncid)
-    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                              mpi_rank_local,':',TRIM(nf90_strerror(status))
 
 !   endif
 
@@ -1348,43 +1434,52 @@ subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid2(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid2(1))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid2(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid2(2))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_INT,dimid2,varid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_put_var(ncid,varid,fld)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     else
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     status = nf90_close(ncid)
-    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                              mpi_rank_local,':',TRIM(nf90_strerror(status))
 
 !   endif
 
@@ -1439,50 +1534,60 @@ subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
     inquire(file=trim(filename),exist=exists)
     if (exists) then
        status = nf90_open(filename,NF90_WRITE,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_redef(ncid)
     else
        status = nf90_create(filename,NF90_CLOBBER,ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define x dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'x_'//trim(gridname),dimid3(1))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'x_'//trim(gridname),nx,dimid3(1))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define y dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'y_'//trim(gridname),dimid3(2))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'y_'//trim(gridname),ny,dimid3(2))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define crn dimension if it doesn't exist
     status = nf90_inq_dimid(ncid,'crn_'//trim(gridname),dimid3(3))
     if (status /= nf90_noerr) then
        status = nf90_def_dim(ncid,'crn_'//trim(gridname),nc,dimid3(3))
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     ! define var if it doesn't exist
     status = nf90_inq_varid(ncid,trim(fldname),varid)
     if (status /= nf90_noerr) then
        status = nf90_def_var(ncid,trim(fldname),NF90_DOUBLE,dimid3,varid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
        status = nf90_put_var(ncid,varid,fld)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     else
        status = nf90_enddef(ncid)
-       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
     endif
 
     status = nf90_close(ncid)
-    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',TRIM(nf90_strerror(status))
+    IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                              mpi_rank_local,':',TRIM(nf90_strerror(status))
 
 !   endif
 

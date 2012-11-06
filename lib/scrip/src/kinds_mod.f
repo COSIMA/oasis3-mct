@@ -48,8 +48,8 @@
 !-----------------------------------------------------------------------
 ! hardwire for now, tcraig
 
-      integer,save :: nlogprt = 1
-      integer,save :: nulou = 6
+      INTEGER           :: nlogprt = 1
+      INTEGER           :: nulou = 6
       logical,parameter :: ll_single = .false.   ! single reals
       logical,parameter :: lncdfgrd = .true.     ! grid files netcdf
       integer,parameter :: jpeight = 8

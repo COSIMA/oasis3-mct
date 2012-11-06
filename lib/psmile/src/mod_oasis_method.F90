@@ -80,7 +80,7 @@ CONTAINS
 
 #ifdef use_comm_MPI1
    mpi_comm_global = MPI_COMM_WORLD
-#elif define use_comm_MPI2
+#elif defined use_comm_MPI2
    mpi_comm_global = ??
 #endif
 
@@ -159,7 +159,8 @@ CONTAINS
    mynummod = compid
    if (compid < 0) then
        IF (mpi_rank_global == 0) THEN
-           WRITE(nulprt1,*) subname,' model not found in namcouple ',TRIM(cdnam)
+           WRITE(nulprt1,*) subname,' model not found in namcouple ',&
+                            TRIM(cdnam)
        ENDIF
        CALL oasis_abort_noarg()
    endif
@@ -177,7 +178,7 @@ CONTAINS
    icolor = compid
    call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_local,mpi_err)
 
-#elif define use_comm_MPI2
+#elif defined use_comm_MPI2
 
    mpi_comm_global = ??
    mpi_comm_local = MPI_COMM_WORLD
@@ -484,7 +485,8 @@ CONTAINS
       if (trim(cdnam) == trim(prism_modnam(n))) then
          if (found) then
             write(nulprt,*) subname,' ERROR: found same model name twice'
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+            WRITE(nulprt,*) subname,' abort by model :',compid,&
+            ' proc :',mpi_rank_local
             call oasis_abort_noarg()
          endif
          il = n
@@ -494,12 +496,14 @@ CONTAINS
 
    if (.not. found) then
       write(nulprt,*) subname,' ERROR: input model name not found'
-      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      WRITE(nulprt,*) subname,' abort by model :',compid,&
+      ' proc :',mpi_rank_local
       call oasis_abort_noarg()
    endif
 
    tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))
-   CALL mpi_intercomm_create(mpi_comm_local, 0, MPI_COMM_WORLD, mpi_root_global(il), tag, new_comm, ierr)
+   CALL mpi_intercomm_create(mpi_comm_local, 0, MPI_COMM_WORLD, &
+                             mpi_root_global(il), tag, new_comm, ierr)
 
    call oasis_debug_exit(subname)
 
@@ -577,15 +581,18 @@ CONTAINS
 
    if (OASIS_debug >= 2)  then
       do n = 1,prism_nmodels
-         write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
+         write(nulprt,*) subname,'   n,prism_model,root = ',&
+         n,trim(prism_modnam(n)),mpi_root_global(n)
       enddo
       call oasis_flush(nulprt)
    endif
 
    do n = 1,prism_nmodels
       if (mpi_root_global(n) < 0) then
-         write(nulprt,*) subname,'   n,prism_model,root = ',n,trim(prism_modnam(n)),mpi_root_global(n)
-         write(nulprt,*) subname,' ERROR: global root invalid, check couplcomm for active tasks'
+         write(nulprt,*) subname,'   n,prism_model,root = ',&
+         n,trim(prism_modnam(n)),mpi_root_global(n)
+         write(nulprt,*) subname,' ERROR: global root invalid, &
+         & check couplcomm for active tasks'
          call oasis_abort_noarg()
       endif
    enddo

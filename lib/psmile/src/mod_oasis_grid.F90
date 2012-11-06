@@ -166,9 +166,11 @@ CONTAINS
     call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%lon(nx,ny),stat=ierror)
-    IF (ierror /= 0) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING lon alloc'
+    IF (ierror /= 0) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING lon alloc'
     allocate(prism_grid(gridID)%lat(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING lat alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING lat alloc'
     prism_grid(gridID)%lon = lon
     prism_grid(gridID)%lat = lat
     prism_grid(gridID)%grid_set = .true.
@@ -207,7 +209,8 @@ CONTAINS
     call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%angle(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING angle alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING angle alloc'
     prism_grid(gridID)%angle = angle
     prism_grid(gridID)%angle_set = .true.
 
@@ -248,9 +251,11 @@ CONTAINS
     call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%clon(nx,ny,nc),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING clon alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING clon alloc'
     allocate(prism_grid(gridID)%clat(nx,ny,nc),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING clat alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING clat alloc'
     prism_grid(gridID)%nc = nc
     prism_grid(gridID)%clon = clon
     prism_grid(gridID)%clat = clat
@@ -291,7 +296,8 @@ CONTAINS
     call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%mask(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING mask alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING mask alloc'
     prism_grid(gridID)%mask = mask
     prism_grid(gridID)%mask_set = .true.
 
@@ -330,7 +336,8 @@ CONTAINS
     call oasis_findgrid(cgrid,nx,ny,gridID)
 
     allocate(prism_grid(gridID)%area(nx,ny),stat=ierror)
-    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,' WARNING area alloc'
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING area alloc'
     prism_grid(gridID)%area = area
     prism_grid(gridID)%area_set = .true.
 

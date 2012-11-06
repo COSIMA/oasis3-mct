@@ -136,8 +136,8 @@ CONTAINS
    endif
 
    if (mpi_comm_local /= MPI_COMM_NULL) then
-      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,mpi_comm_local, &
-         compid,numel=nsegs)
+      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
+                          mpi_comm_local,compid,numel=nsegs)
       prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
    else
       prism_part(prism_npart)%gsize = -1

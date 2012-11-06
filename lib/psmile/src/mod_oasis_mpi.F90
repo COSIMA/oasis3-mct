@@ -121,7 +121,8 @@ SUBROUTINE oasis_mpi_chkerr(rcode,string)
    lstring = ' '
    if (rcode /= MPI_SUCCESS) then
      call MPI_ERROR_STRING(rcode,lstring,len,ierr)
-     write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",lstring(1:len)
+     write(nulprt,*) trim(subName),' model :',compid,' proc :',&
+                     mpi_rank_local,":",lstring(1:len)
      call oasis_mpi_abort(string,rcode)
    endif
 
@@ -2254,7 +2255,8 @@ SUBROUTINE oasis_mpi_abort(string,rcode)
    call oasis_debug_enter(subname)
 
    if ( present(string) .and. present(rcode) ) then
-      write(nulprt,*) trim(subName),' model :',compid,' proc :',mpi_rank_local,":",trim(string),rcode
+      write(nulprt,*) trim(subName),' model :',compid,' proc :',&
+                      mpi_rank_local,":",trim(string),rcode
    endif
    if ( present(rcode) )then
       rc = rcode

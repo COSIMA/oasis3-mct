@@ -261,13 +261,15 @@ CONTAINS
 
   IF (mpi_rank_global == 0) THEN
       IF (il_iost .NE. 0) THEN
-          WRITE(nulprt1,*) subname,' ERROR opening namcouple file ',TRIM(cl_namcouple),' with unit number ', nulin
+          WRITE(nulprt1,*) subname,' ERROR opening namcouple file ',TRIM(cl_namcouple),&
+                           ' with unit number ', nulin
           WRITE (nulprt,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt,'(a)') ' error = ERROR opening namcouple file'
           CALL oasis_flush(nulprt1)
           CALL oasis_abort_noarg()
       ELSE
-          WRITE(nulprt1,*) subname,' open namcouple file ',TRIM(cl_namcouple),' with unit number ', nulin
+          WRITE(nulprt1,*) subname,' open namcouple file ',TRIM(cl_namcouple),' with unit number ', &
+                           nulin
       ENDIF
   ENDIF
 
@@ -502,7 +504,8 @@ CONTAINS
               namscrbin(jf) =      nbins      (ig_number_field(jf))
               IF (TRIM(namscrtyp(jf)) /= 'SCALAR') THEN
                   IF (mpi_rank_global == 0) THEN
-                      WRITE(nulprt1,*) subname,jf,'WARNING: SCRIPR weights generation supported only for SCALAR mapping, not '//TRIM(namscrtyp(jf))
+                      WRITE(nulprt1,*) subname,jf,'WARNING: SCRIPR weights generation &
+                      & supported only for SCALAR mapping, not '//TRIM(namscrtyp(jf))
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = ERROR in SCRIPR CFTYP option'
                       CALL oasis_flush(nulprt1)
@@ -524,7 +527,8 @@ CONTAINS
               if (cconmet(ig_number_field(jf)) .EQ. 'BASPOS') namfldcon(jf) = ip_cbaspos
               if (namfldcon(jf) .EQ. ip_cnone) then
                   IF (mpi_rank_global == 0) THEN
-                      WRITE(nulprt1,*) subname,jf,'WARNING: CONSERV option not supported: '//TRIM(cconmet(ig_number_field(jf)))
+                      WRITE(nulprt1,*) subname,jf,'WARNING: CONSERV option not supported: '//&
+                                       &TRIM(cconmet(ig_number_field(jf)))
                       WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                       WRITE (nulprt1,'(a)') ' error = ERROR in CONSERV option'
                       CALL oasis_flush(nulprt1)
@@ -545,7 +549,8 @@ CONTAINS
                     namfldsad(jf) = abocoef(jc,ig_number_field(jf))
                 else
                     IF (mpi_rank_global == 0) THEN
-                        WRITE(nulprt1,*) subname,jf,'ERROR: BLASOLD only supports CONSTANT: '//TRIM(cbofld(jc,ig_number_field(jf)))
+                        WRITE(nulprt1,*) subname,jf,'ERROR: BLASOLD only supports CONSTANT: '//&
+                                         &TRIM(cbofld(jc,ig_number_field(jf)))
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASOLD option'
                         CALL oasis_flush(nulprt1)
@@ -561,7 +566,8 @@ CONTAINS
                     namflddad(jf) = abncoef(jc,ig_number_field(jf))
                 else
                     IF (mpi_rank_global == 0) THEN
-                        WRITE(nulprt1,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//TRIM(cbofld(jc,ig_number_field(jf)))
+                        WRITE(nulprt1,*) subname,jf,'ERROR: BLASNEW only supports CONSTANTS: '//&
+                                         &TRIM(cbofld(jc,ig_number_field(jf)))
                         WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASNEW option'
                         CALL oasis_flush(nulprt1)
@@ -2201,7 +2207,8 @@ SUBROUTINE inipar_alloc()
                        else
                           call prtout ('ERROR in namcouple mapping argument',jf,1)
                           IF (mpi_rank_global == 0) THEN
-                              WRITE(nulprt1,*) 'ERROR in namcouple mapping argument ',TRIM(clvari)
+                              WRITE(nulprt1,*) 'ERROR in namcouple mapping argument ',&
+                                                TRIM(clvari)
                               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                               WRITE (nulprt1,'(a)') ' error = STOP in inipar cmaptyp or loc'
                               CALL oasis_flush(nulprt1)
@@ -2448,7 +2455,8 @@ SUBROUTINE inipar_alloc()
                     else
                        call prtout ('ERROR in namcouple conserv argument',jf,1)
                        IF (mpi_rank_global == 0) THEN
-                           WRITE(nulprt1,*) 'ERROR in namcouple conserv argument ',TRIM(clvari)
+                           WRITE(nulprt1,*) 'ERROR in namcouple conserv argument ',&
+                                             TRIM(clvari)
                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
                            WRITE (nulprt1,'(a)') ' error = STOP in inipar cconopt'
                            CALL oasis_flush(nulprt1)
@@ -2872,7 +2880,8 @@ SUBROUTINE inipar_alloc()
       CALL prtout ('ERROR in namcouple for field', jf, 1)
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *)  &
-             'Check the 2nd line for either the index of sequential position, the delay flag, or the extra timestep flag.'
+             'Check the 2nd line for either the index of sequential position, &
+              & the delay flag, or the extra timestep flag.'
           WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
           CALL oasis_flush(nulprt1)

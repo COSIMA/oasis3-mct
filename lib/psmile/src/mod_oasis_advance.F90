@@ -124,13 +124,18 @@ contains
                 trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
           endif
           write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
-          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring))
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring))
           write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
-          call oasis_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=trim(vstring),abort=.false.)
+          call oasis_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,&
+                                   ivarname=trim(vstring),abort=.false.)
 
           if (OASIS_debug >= 20) then
-             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,prism_coupler(cplid)%avcnt
-             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+             write(nulprt,*) subname,'  DEBUG read loctrans restart',&
+                             cplid,prism_coupler(cplid)%avcnt
+             write(nulprt,*) subname,'  DEBUG read loctrans restart',cplid,&
+                             minval(prism_coupler(cplid)%avect1%rAttr),&
+                             maxval(prism_coupler(cplid)%avect1%rAttr)
           endif
        endif
 
@@ -150,7 +155,9 @@ contains
     INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
     REAL   (kind=ip_r8_p), intent(inout) :: array(:) ! data
     INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
-    logical              , intent(in),optional :: readrest  ! special flag to indicate this is called from the advance_init method for restart
+    logical              , intent(in),optional :: readrest  ! special flag to indicate this 
+                                                            ! is called from the advance_init 
+                                                            ! method for restart
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     integer(kind=ip_i4_p) :: cplid,rouid,mapid,partid
@@ -300,7 +307,8 @@ contains
 
        if (msec >= maxtime) then
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
-          write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',msec,maxtime
+          write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',&
+                          msec,maxtime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           call oasis_abort_noarg()
        endif
@@ -311,7 +319,8 @@ contains
 
        if (lcouplertime /= ispval .and. msec < lcouplertime) then
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
-          write(nulprt,*) subname,' ERROR model seems to be running backwards',msec,lcouplertime
+          write(nulprt,*) subname,' ERROR model seems to be running backwards',&
+                          msec,lcouplertime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           call oasis_abort_noarg()
        endif
@@ -327,11 +336,15 @@ contains
           if ((prism_coupler(n)%ltime /= ispval) .and. &
               (sndrcv .and. prism_coupler(n)%sndrcv) .and. &
               (msec >  prism_coupler(n)%ltime + prism_coupler(n)%dt)) then
-             write(nulprt,*) subname,' ERROR coupling skipped at earlier time, potential deadlock '
-             write(nulprt,*) subname,' my coupler = ',cplid,' variable = ',trim(prism_coupler(cplid)%fldlist)
+             write(nulprt,*) subname,' ERROR coupling skipped at earlier time, &
+                             & potential deadlock '
+             write(nulprt,*) subname,' my coupler = ',cplid,' variable = ',&
+                             trim(prism_coupler(cplid)%fldlist)
              write(nulprt,*) subname,' current time = ',msec,' mseclag = ',mseclag
-             write(nulprt,*) subname,' skipped coupler = ',n,' variable = ',trim(prism_coupler(n)%fldlist)
-             write(nulprt,*) subname,' skipped coupler last time and dt = ',prism_coupler(n)%ltime,prism_coupler(n)%dt
+             write(nulprt,*) subname,' skipped coupler = ',n,' variable = ',&
+                             trim(prism_coupler(n)%fldlist)
+             write(nulprt,*) subname,' skipped coupler last time and dt = ',&
+                             prism_coupler(n)%ltime,prism_coupler(n)%dt
              WRITE(nulprt,*) subname,' ERROR model timestep does not match coupling timestep'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
              call oasis_flush(nulprt)
@@ -341,12 +354,16 @@ contains
               (sndrcv .and. prism_coupler(n)%sndrcv .and. getput == OASIS3_GET) .and. &
               (prism_coupler(cplid)%seq > prism_coupler(n)%seq) .and. &
               (msec >= prism_coupler(n)%ltime + prism_coupler(n)%dt)) then
-             write(nulprt,*) subname,' ERROR coupling sequence out of order, potential deadlock '
-             write(nulprt,*) subname,' my coupler = ',cplid,' variable = ',trim(prism_coupler(cplid)%fldlist)
+             write(nulprt,*) subname,' ERROR coupling sequence out of order, &
+                             & potential deadlock '
+             write(nulprt,*) subname,' my coupler = ',cplid,' variable = ',&
+                             trim(prism_coupler(cplid)%fldlist)
              write(nulprt,*) subname,' sequence number = ',prism_coupler(cplid)%seq
              write(nulprt,*) subname,' current time = ',msec,' mseclag = ',mseclag
-             write(nulprt,*) subname,' skipped coupler = ',n,' variable = ',trim(prism_coupler(n)%fldlist)
-             write(nulprt,*) subname,' skipped coupler last time and dt = ',prism_coupler(n)%ltime,prism_coupler(n)%dt
+             write(nulprt,*) subname,' skipped coupler = ',n,' variable = ',&
+                             trim(prism_coupler(n)%fldlist)
+             write(nulprt,*) subname,' skipped coupler last time and dt = ',&
+                             prism_coupler(n)%ltime,prism_coupler(n)%dt
              write(nulprt,*) subname,' skipped sequence number = ',prism_coupler(n)%seq
              WRITE(nulprt,*) subname,' ERROR model sequence does not match coupling sequence'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -449,11 +466,13 @@ contains
           call oasis_timer_stop(tstring)
 
           if (OASIS_debug >= 2 .and. trim(cstring) /= 'none') then
-             write(nulprt,*) subname,' at ',msec,mseclag,' PACK: ',trim(vname),' ',trim(cstring)
+             write(nulprt,*) subname,' at ',msec,mseclag,' PACK: ',&
+                             trim(vname),' ',trim(cstring)
           endif
 
           if (OASIS_debug >= 20) then
-             write(nulprt,*) subname,'  DEBUG loctrans update ',cplid,' ',trim(cstring),prism_coupler(cplid)%avcnt(nfav)
+             write(nulprt,*) subname,'  DEBUG loctrans update ',cplid,' ',&
+             trim(cstring),prism_coupler(cplid)%avcnt(nfav)
           endif
 
           if (time_now) then
@@ -498,7 +517,8 @@ contains
           !------------------------------------------------
 
           if (prism_coupler(cplid)%ltime /= ispval .and. msec <= prism_coupler(cplid)%ltime) then
-             write(nulprt,*) subname,' ERROR: model did not advance in time correctly',msec,prism_coupler(cplid)%ltime
+             write(nulprt,*) subname,' ERROR: model did not advance in time correctly',&
+                             msec,prism_coupler(cplid)%ltime
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
              call oasis_abort_noarg()
           endif
@@ -515,12 +535,16 @@ contains
                 if (prism_coupler(cplid)%avcnt(nf) > 1) then
                    rcnt = 1.0/prism_coupler(cplid)%avcnt(nf)
                    do n = 1,nsav
-                      prism_coupler(cplid)%avect1%rAttr(nf,n) = prism_coupler(cplid)%avect1%rAttr(nf,n) * rcnt
+                      prism_coupler(cplid)%avect1%rAttr(nf,n) = &
+                         prism_coupler(cplid)%avect1%rAttr(nf,n) * rcnt
                    enddo             
                 endif
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,prism_coupler(cplid)%avcnt(nf)
-                   write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,minval(prism_coupler(cplid)%avect1%rAttr(nf,:)),maxval(prism_coupler(cplid)%avect1%rAttr(nf,:))
+                   write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,&
+                                   prism_coupler(cplid)%avcnt(nf)
+                   write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr(nf,:)),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr(nf,:))
                 endif
              enddo             
              call oasis_timer_stop(tstring)
@@ -545,7 +569,8 @@ contains
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 2) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' WRST: ', &
-                      trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1)),' ',trim(rstfile)
+                      trim(mct_avect_exportRList2c(prism_coupler(cplid)%avect1)),' ',&
+                      trim(rstfile)
                    call oasis_flush(nulprt)
                 endif
              endif
@@ -568,16 +593,21 @@ contains
                 call oasis_debug_note(subname//' apply sndmult sndadd')
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG sndmult,add = ',sndmult,sndadd
-                   write(nulprt,*) subname,'  DEBUG put b4 sndmult,add = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG put b4 sndmult,add = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
-                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*sndmult + sndadd
+                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*sndmult &
+                                                         + sndadd
              endif
              if (snddiag) call oasis_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
              if (mapid > 0) then
                 write(tstring,F01) 'pmap_',cplid
                 call oasis_debug_note(subname//' put map')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 map = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG put b4 map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
                 call oasis_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect2)
@@ -587,7 +617,9 @@ contains
                 write(tstring,F01) 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,minval(prism_coupler(cplid)%avect2%rAttr),maxval(prism_coupler(cplid)%avect2%rAttr)
+                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect2%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect2%rAttr)
                 endif
                 call oasis_timer_start(tstring)
                 call mct_waitsend(prism_router(rouid)%router)
@@ -597,7 +629,9 @@ contains
                 write(tstring,F01) 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
                 call oasis_timer_start(tstring)
                 call mct_waitsend(prism_router(rouid)%router)
@@ -619,7 +653,9 @@ contains
                 call mct_recv(prism_coupler(cplid)%avect2,prism_router(rouid)%router,tag)
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,minval(prism_coupler(cplid)%avect2%rAttr),maxval(prism_coupler(cplid)%avect2%rAttr)
+                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect2%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect2%rAttr)
                 endif
                 call oasis_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
@@ -629,7 +665,9 @@ contains
                      prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv,consbfb)
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG get af map = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG get af map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
              else
                 write(tstring,F01) 'grcv_',cplid
@@ -638,15 +676,20 @@ contains
                 call mct_recv(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
              endif
              call oasis_debug_note(subname//' apply rcvmult rcvadd')
              if (rcvadd /= 0.0_ip_double_p .or. rcvmult /= 1.0_ip_double_p) then
-                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*rcvmult + rcvadd
+                prism_coupler(cplid)%avect1%rAttr(:,:) = prism_coupler(cplid)%avect1%rAttr(:,:)*rcvmult &
+                                                         + rcvadd
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG rcvmult,add = ',rcvmult,rcvadd
-                   write(nulprt,*) subname,'  DEBUG get af rcvmult,add = ',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                   write(nulprt,*) subname,'  DEBUG get af rcvmult,add = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
              endif
              if (rcvdiag) call oasis_advance_avdiag(prism_coupler(cplid)%avect1,mpi_comm_local)
@@ -675,11 +718,13 @@ contains
              call oasis_timer_stop(tstring)
 
              if (OASIS_debug >= 30) then
-                call mct_avect_init(avtest,prism_coupler(cplid)%avect1,mct_aVect_lsize(prism_coupler(cplid)%avect1))
+                call mct_avect_init(avtest,prism_coupler(cplid)%avect1,&
+                                    mct_aVect_lsize(prism_coupler(cplid)%avect1))
                 write(tstring,F01) 'rinp_',cplid
                 call oasis_timer_start(tstring)
                 call oasis_io_read_avfbf(avtest,prism_part(partid)%gsmap,msec,fstring)
-                write(nulprt,*) subname,' DEBUG write/read test avfbf should be zero ',sum(prism_coupler(cplid)%avect1%rAttr-avtest%rAttr)
+                write(nulprt,*) subname,' DEBUG write/read test avfbf should be zero ',&
+                                sum(prism_coupler(cplid)%avect1%rAttr-avtest%rAttr)
                 call mct_avect_clean(avtest)
                 call oasis_timer_stop(tstring)
              endif
@@ -740,7 +785,8 @@ contains
              CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
                 prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
              WRITE(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
-             CALL oasis_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,ivarname=TRIM(vstring))
+             CALL oasis_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,&
+                                       ivarname=TRIM(vstring))
              call oasis_timer_stop(tstring)
              if (OASIS_debug >= 2) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
@@ -748,8 +794,11 @@ contains
                 call oasis_flush(nulprt)
              endif
              if (OASIS_debug >= 20) then
-                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,prism_coupler(cplid)%avcnt
-                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,minval(prism_coupler(cplid)%avect1%rAttr),maxval(prism_coupler(cplid)%avect1%rAttr)
+                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
+                                prism_coupler(cplid)%avcnt
+                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
+                                minval(prism_coupler(cplid)%avect1%rAttr),&
+                                maxval(prism_coupler(cplid)%avect1%rAttr)
              endif
          ENDIF
 
@@ -777,10 +826,12 @@ contains
                 write(tstring,F01) 'grin_',cplid
                 call oasis_timer_start(tstring)
                 if (trim(inpfile) /= trim(cspval)) then
-                   call oasis_io_read_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,msec,filename=trim(inpfile))
+                   call oasis_io_read_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,&
+                                            msec,filename=trim(inpfile))
                 else
                    fstring = '_'//trim(compnm)
-                   call oasis_io_read_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,msec,string=fstring)
+                   call oasis_io_read_avfbf(prism_coupler(cplid)%avect1,prism_part(partid)%gsmap,&
+                                            msec,f_string=fstring)
                 endif
                 call oasis_timer_stop(tstring)
              endif
@@ -795,7 +846,8 @@ contains
              enddo
              call oasis_timer_stop(tstring)
              if (OASIS_debug >= 20) then
-                write(nulprt,*) subname,'  DEBUG array copy = ',cplid,minval(array),maxval(array)
+                write(nulprt,*) subname,'  DEBUG array copy = ',cplid,&
+                                minval(array),maxval(array)
              endif
           else
              array(:) = 0.
@@ -884,7 +936,8 @@ contains
        areas(:) = mapper%av_ms%rAttr(nf,:)*zradi
 
        if (lconsbfb) then
-          call mct_avect_gather(mapper%av_ms,av2g,prism_part(mapper%spart)%gsmap,0,mpi_comm_local)
+          call mct_avect_gather(mapper%av_ms,av2g,prism_part(mapper%spart)%gsmap,&
+                                0,mpi_comm_local)
           wts_sums = 0.0_ip_r8_p
           if (mpi_rank_local == 0) then
              ni = mct_aVect_indexIA(av2g,'mask')
@@ -900,7 +953,8 @@ contains
           do n = 1,lsizes
              if (imasks(n) == 0) sumtmp = sumtmp + areas(n)
           enddo
-          call oasis_mpi_sum(sumtmp,wts_sums,mpi_comm_local,string=subname//':wts_sums',all=.true.)
+          call oasis_mpi_sum(sumtmp,wts_sums,mpi_comm_local,string=subname//':wts_sums',&
+                             all=.true.)
        endif
 
        !-------------------
@@ -934,10 +988,14 @@ contains
        endif
 
        if (OASIS_debug >= 30) then
-          write(nulprt,*) subname,' DEBUG conserve src mask ',minval(imasks),maxval(imasks),sum(imasks)
-          write(nulprt,*) subname,' DEBUG conserve dst mask ',minval(imaskd),maxval(imaskd),sum(imaskd)
-          write(nulprt,*) subname,' DEBUG conserve src area ',minval(areas),maxval(areas),sum(areas)
-          write(nulprt,*) subname,' DEBUG conserve dst area ',minval(aread),maxval(aread),sum(aread)
+          write(nulprt,*) subname,' DEBUG conserve src mask ',minval(imasks),&
+                          maxval(imasks),sum(imasks)
+          write(nulprt,*) subname,' DEBUG conserve dst mask ',minval(imaskd),&
+                          maxval(imaskd),sum(imaskd)
+          write(nulprt,*) subname,' DEBUG conserve src area ',minval(areas),&
+                          maxval(areas),sum(areas)
+          write(nulprt,*) subname,' DEBUG conserve dst area ',minval(aread),&
+                          maxval(aread),sum(aread)
           write(nulprt,*) subname,' DEBUG conserve wts_sum  ',wts_sums,wts_sumd
        endif
 
@@ -957,7 +1015,8 @@ contains
        if (conserv == ip_cglobal) then
           if (wts_sumd == 0.0_ip_r8_p) then
               WRITE(nulprt,*) subname,' ERROR: conserve global wts_sumd/sums zero'
-              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              WRITE(nulprt,*) subname,' abort by model :',compid,&
+                              ' proc :',mpi_rank_local
               CALL oasis_abort_noarg()
           endif
           do m = 1,fsize
@@ -970,7 +1029,8 @@ contains
           do m = 1,fsize
              if (av_sumd(m) == 0.0_ip_r8_p .and. av_sums(m) /= 0.0_ip_r8_p) then
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
-                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                 WRITE(nulprt,*) subname,' abort by model :',compid,&
+                                 ' proc :',mpi_rank_local
                  CALL oasis_abort_noarg()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = av_sums(m) / av_sumd(m)
@@ -982,7 +1042,8 @@ contains
        elseif (conserv == ip_cbasbal) then
           if (wts_sumd == 0.0_ip_r8_p .or. wts_sums == 0.0_ip_r8_p) then
               WRITE(nulprt,*) subname,' ERROR: conserve wts_sumd/sums zero'
-              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              WRITE(nulprt,*) subname,' abort by model :',compid,&
+                              ' proc :',mpi_rank_local
               CALL oasis_abort_noarg()
           endif
           do m = 1,fsize
@@ -995,7 +1056,8 @@ contains
           do m = 1,fsize
              if (av_sumd(m) == 0.0_ip_r8_p .and. av_sums(m) /= 0.0_ip_r8_p) then
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
-                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                 WRITE(nulprt,*) subname,' abort by model :',compid,&
+                                 ' proc :',mpi_rank_local
                  CALL oasis_abort_noarg()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = (av_sums(m)/av_sumd(m)) * (wts_sumd/wts_sums)

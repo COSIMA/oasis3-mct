@@ -61,7 +61,8 @@
      prism_var(prism_nvar)%type = ktype
      prism_var(prism_nvar)%size = 1
      do n = 1,prism_var(prism_nvar)%ndim
-        prism_var(prism_nvar)%size = prism_var(prism_nvar)%size*(id_var_shape(2*n)-id_var_shape(2*n-1)+1)
+        prism_var(prism_nvar)%size = prism_var(prism_nvar)%size*(id_var_shape(2*n)-&
+                                     id_var_shape(2*n-1)+1)
      enddo
      prism_var(prism_nvar)%ncpl = 0
      prism_var(prism_nvar)%cpl  = 0

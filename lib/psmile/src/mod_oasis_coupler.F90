@@ -174,7 +174,8 @@ CONTAINS
         subname//':cg',.true.)
   enddo
 
-  if ( OASIS_debug >= 2 ) write(nulprt,*) subname,' model_root = ',model_root(1:prism_nmodels)
+  if ( OASIS_debug >= 2 ) write(nulprt,*) subname,' model_root = ',&
+                                          model_root(1:prism_nmodels)
 
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
@@ -209,7 +210,8 @@ CONTAINS
      allocate(prism_coupler(nc)%varid(1))
      prism_coupler(nc)%varid(:) = ispval
   enddo
-  if (OASIS_debug >= 2) write(nulprt,*) subname,' initialize %varid ',nnamcpl,size(prism_coupler(nnamcpl)%varid)
+  if (OASIS_debug >= 2) write(nulprt,*) subname,' initialize %varid ',&
+                                        nnamcpl,size(prism_coupler(nnamcpl)%varid)
   prism_coupler(:)%ops     = ispval
   prism_coupler(:)%comp    = ispval
   prism_coupler(:)%routerID  = ispval
@@ -295,7 +297,9 @@ CONTAINS
            cstring = 'unknown'
            if (allops(nv,nm) == OASIS_Out) cstring = 'prism_out'
            if (allops(nv,nm) == OASIS_In)  cstring = 'prism_in'
-           write(nulprt,'(16x,a,2i6,2x,a,i6,2x,a)') ' model,idx,var,ops = ',nm,nv,trim(allvar(nv,nm)),allops(nv,nm),trim(cstring)
+           write(nulprt,'(16x,a,2i6,2x,a,i6,2x,a)') ' model,idx,var,ops = ',nm,nv,&
+                                                      trim(allvar(nv,nm)),allops(nv,nm),&
+                                                      trim(cstring)
         enddo
      enddo
      write(nulprt,*) ' '
@@ -415,7 +419,8 @@ CONTAINS
            endif
 
            if (OASIS_debug >= 5) then
-              write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: myfld',nn,compid,nv1,myfldi,' ',trim(myfld)
+              write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: myfld',nn,compid,&
+                                             nv1,myfldi,' ',trim(myfld)
               call oasis_flush(nulprt)
            endif
 
@@ -456,10 +461,12 @@ CONTAINS
 
               if (otfldi == myfldi) then
 
-                 if (OASIS_debug >= 2) write(nulprt,*) subname,' check fld ',nns,nv1,nm,nv,otfldi
+                 if (OASIS_debug >= 2) write(nulprt,*) subname,' check fld ',&
+                                                       nns,nv1,nm,nv,otfldi
 
                  if (OASIS_debug >= 5) then
-                    write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,nv,otfldi,' ',trim(otfld)
+                    write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,&
+                                                   nv,otfldi,' ',trim(otfld)
                     call oasis_flush(nulprt)
                  endif
 
@@ -617,7 +624,8 @@ CONTAINS
                     !--------------------------------
                     if (prism_coupler(nc)%nflds == 1) prism_nrouter = prism_nrouter + 1
                     if (prism_nrouter > prism_mrouter) then
-                       write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,prism_mrouter
+                       write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,&
+                                       prism_mrouter
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                        call oasis_abort_noarg()
                     endif
@@ -637,9 +645,11 @@ CONTAINS
 
                  if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
                     if (trim(namscrmet(nn)) == 'CONSERV') then
-                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                     &'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
                     else
-                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//'_'//trim(namscrmet(nn))//'.nc'
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                     &'_'//trim(namscrmet(nn))//'.nc'
                     endif
                  endif
 
@@ -664,7 +674,8 @@ CONTAINS
                     if (mapID < 1) then
                        prism_nmapper = prism_nmapper + 1
                        if (prism_nmapper > prism_mmapper) then
-                          write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,prism_mmapper
+                          write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,&
+                                          prism_mmapper
                           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                           call oasis_abort_noarg()
                        endif
@@ -675,7 +686,8 @@ CONTAINS
                        if (flag == OASIS_In ) prism_mapper(mapID)%dpart = part1
                        if (flag == OASIS_Out) prism_mapper(mapID)%spart = part1
                        if (OASIS_debug > 15) then
-                          write(nulprt,*) subname,' DEBUG new mapper for file ',trim(prism_mapper(mapID)%file)
+                          write(nulprt,*) subname,' DEBUG new mapper for file ',&
+                                          trim(prism_mapper(mapID)%file)
                           call oasis_flush(nulprt)
                        endif
                     endif
@@ -746,9 +758,13 @@ CONTAINS
      lsize = mct_gsmap_lsize(prism_part(part1)%gsmap,mpi_comm_local)
      if (OASIS_debug >= 15) then
         write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapID,gsize,lsize
-        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,prism_part(part1)%gsmap%gsize
+        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,&
+                                     prism_part(part1)%gsmap%gsize
         do n1 = 1,prism_part(part1)%gsmap%ngseg
-           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,prism_part(part1)%gsmap%start(n1),prism_part(part1)%gsmap%length(n1),prism_part(part1)%gsmap%pe_loc(n1)
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,&
+                                        prism_part(part1)%gsmap%start(n1),&
+                                        prism_part(part1)%gsmap%length(n1),&
+                                        prism_part(part1)%gsmap%pe_loc(n1)
         enddo
         call oasis_flush(nulprt)
      endif
@@ -801,7 +817,8 @@ CONTAINS
            if (mpi_rank_local == 0) then
               inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
               if (OASIS_debug >= 15) then
-                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile',trim(prism_mapper(mapID)%file),exists
+                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile',&
+                                 trim(prism_mapper(mapID)%file),exists
                  call oasis_flush(nulprt)
               endif
               if (.not.exists) then
@@ -812,7 +829,8 @@ CONTAINS
                     !--------------------------------
                     call oasis_coupler_genmap(mapID,namID)
                  else
-                    write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',trim(prism_mapper(mapID)%file)
+                    write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',&
+                                    trim(prism_mapper(mapID)%file)
                     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call oasis_abort_noarg()
                  endif
@@ -878,7 +896,8 @@ CONTAINS
            endif
            if (prism_mapper(mapID)%optval /= '' .and. &
                prism_mapper(mapID)%optval /= trim(cstring)) then
-              write(nulprt,*) subname,' ERROR mapper opt changed',trim(prism_mapper(mapID)%optval),' ',trim(cstring)
+              write(nulprt,*) subname,' ERROR mapper opt changed',&
+                              trim(prism_mapper(mapID)%optval),' ',trim(cstring)
               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
               call oasis_abort_noarg()
            endif
@@ -895,7 +914,8 @@ CONTAINS
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
            if (OASIS_debug >= 15) then
-              write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID," nElements = ",lsize
+              write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID,&
+                              " nElements = ",lsize
               call oasis_flush(nulprt)
            endif
         endif  ! map init
@@ -930,10 +950,18 @@ CONTAINS
            prism_mapper(mapID)%AVred = .true.
 
            if (OASIS_debug >= 30) then
-              write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapID)%av_ms%iAttr(:,:)),maxval(prism_mapper(mapID)%av_ms%iAttr(:,:)),sum(prism_mapper(mapID)%av_ms%iAttr(:,:))
-              write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapID)%av_ms%rAttr(:,:)),maxval(prism_mapper(mapID)%av_ms%rAttr(:,:)),sum(prism_mapper(mapID)%av_ms%rAttr(:,:))
-              write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapID)%av_md%iAttr(:,:)),maxval(prism_mapper(mapID)%av_md%iAttr(:,:)),sum(prism_mapper(mapID)%av_md%iAttr(:,:))
-              write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapID)%av_md%rAttr(:,:)),maxval(prism_mapper(mapID)%av_md%rAttr(:,:)),sum(prism_mapper(mapID)%av_md%rAttr(:,:))
+              write(nulprt,*) subname,' DEBUG msi ',minval(prism_mapper(mapID)%av_ms%iAttr(:,:)),&
+                              maxval(prism_mapper(mapID)%av_ms%iAttr(:,:)),&
+                              sum(prism_mapper(mapID)%av_ms%iAttr(:,:))
+              write(nulprt,*) subname,' DEBIG msr ',minval(prism_mapper(mapID)%av_ms%rAttr(:,:)),&
+                              maxval(prism_mapper(mapID)%av_ms%rAttr(:,:)),&
+                              sum(prism_mapper(mapID)%av_ms%rAttr(:,:))
+              write(nulprt,*) subname,' DEBUG mdi ',minval(prism_mapper(mapID)%av_md%iAttr(:,:)),&
+                              maxval(prism_mapper(mapID)%av_md%iAttr(:,:)),&
+                              sum(prism_mapper(mapID)%av_md%iAttr(:,:))
+              write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapID)%av_md%rAttr(:,:)),&
+                              maxval(prism_mapper(mapID)%av_md%rAttr(:,:)),&
+                              sum(prism_mapper(mapID)%av_md%rAttr(:,:))
            endif
         endif
 
@@ -944,9 +972,11 @@ CONTAINS
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
         if (OASIS_debug >= 15) then
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapID,gsize,lsize
-           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,prism_part(part2)%gsmap%gsize
+           write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,&
+                                        prism_part(part2)%gsmap%gsize
            do n1 = 1,prism_part(part2)%gsmap%ngseg
-              write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
+              write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),&
+                                           prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
            enddo
            call oasis_flush(nulprt)
         endif
@@ -980,7 +1010,8 @@ CONTAINS
      if (prism_coupler(nc)%sndrcv) then
 
         if (OASIS_debug >= 15) then
-           write(nulprt,*) subname,' DEBUG ci:initialize router ',prism_coupler(nc)%routerID,prism_coupler(nc)%comp,rpart
+           write(nulprt,*) subname,' DEBUG ci:initialize router ',prism_coupler(nc)%routerID,&
+                           prism_coupler(nc)%comp,rpart
            call oasis_flush(nulprt)
         endif
 
@@ -988,7 +1019,8 @@ CONTAINS
            mpi_comm_local,prism_router(prism_coupler(nc)%routerID)%router)
 
         if (OASIS_debug >= 15) then
-           write(nulprt,*) subname," DEBUG ci:done initializing prism_router",prism_coupler(nc)%routerID
+           write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
+                           prism_coupler(nc)%routerID
            call oasis_flush(nulprt)
         endif
      endif
@@ -1066,7 +1098,8 @@ CONTAINS
      write(nulprt,*) subname,'   seq          ',prism_coupler(cplid)%seq
      write(nulprt,*) subname,'   maxtime      ',prism_coupler(cplid)%maxtime
      write(nulprt,*) subname,'   dt, lag      ',prism_coupler(cplid)%dt,prism_coupler(cplid)%lag
-     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),prism_part(parid)%gsize
+     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
+                                                prism_part(parid)%gsize
      write(nulprt,*) subname,'   partid, nx,ny',prism_part(parid)%nx,prism_part(parid)%ny
 
   if (mapid > 0) then
@@ -1076,14 +1109,17 @@ CONTAINS
      write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
      write(nulprt,*) subname,'   conserve opt ',prism_coupler(cplid)%consopt
      write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
-     write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',trim(prism_mapper(mapid)%optval)
+     write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',&
+                                                trim(prism_mapper(mapid)%optval)
      write(nulprt,*) subname,'   s/d partids  ',spart,dpart
      if (spart > 0) &
      write(nulprt,*) subname,'   from/to      ',trim(prism_part(spart)%gridname),' ',&
                                                 trim(prism_part(dpart)%gridname)
-     write(nulprt,*) subname,'   from nx,ny   ',prism_part(spart)%gsize,prism_part(spart)%nx,prism_part(spart)%ny
+     write(nulprt,*) subname,'   from nx,ny   ',prism_part(spart)%gsize,prism_part(spart)%nx,&
+                                                prism_part(spart)%ny
      if (dpart > 0) &
-     write(nulprt,*) subname,'   to nx,ny     ',prism_part(dpart)%gsize, prism_part(dpart)%nx,prism_part(dpart)%ny
+     write(nulprt,*) subname,'   to nx,ny     ',prism_part(dpart)%gsize, prism_part(dpart)%nx,&
+                                                prism_part(dpart)%ny
   endif
 
   call oasis_flush(nulprt)
@@ -1160,7 +1196,8 @@ CONTAINS
      fldname = trim(namsrcgrd(namID))//'.lon'
      call oasis_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
   endif
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc,do_corners
+  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',&
+                                         trim(fldname),nx,ny,nc,do_corners
   src_rank = 2
   src_size = nx*ny
   allocate(src_dims(src_rank))

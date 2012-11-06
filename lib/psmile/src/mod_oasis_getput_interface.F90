@@ -58,7 +58,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -105,7 +106,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -152,7 +154,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -203,7 +206,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -255,7 +259,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -302,7 +307,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -349,7 +355,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif
@@ -400,7 +407,8 @@ contains
     ncpl  = prism_var(nfld)%ncpl
 
     if (ncpl <= 0) then
-       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',trim(prism_var(nfld)%name)
+       if (OASIS_debug >= 15) write(nulprt,*) subname,' variable not coupled ',&
+                                              trim(prism_var(nfld)%name)
        call oasis_debug_exit(subname)
        return
     endif

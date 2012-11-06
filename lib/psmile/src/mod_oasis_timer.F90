@@ -179,7 +179,8 @@ module mod_oasis_timer
          call oasis_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-             WRITE(nulprt,*) subname,' WARNING: timer_label does not exist ',TRIM(timer_label)
+             WRITE(nulprt,*) subname,' WARNING: timer_label does not exist ',&
+                             TRIM(timer_label)
              RETURN
          endif
 
@@ -194,9 +195,11 @@ module mod_oasis_timer
          timer(timer_id)%end_ctime = cpu_time_arg
 
          sum_wtime(timer_id) = sum_wtime(timer_id) + &
-                               timer(timer_id)%end_wtime - timer(timer_id)%start_wtime
+                               timer(timer_id)%end_wtime - &
+                               timer(timer_id)%start_wtime
          sum_ctime(timer_id) = sum_ctime(timer_id) + &
-                               timer(timer_id)%end_ctime - timer(timer_id)%start_ctime
+                               timer(timer_id)%end_ctime - &
+                               timer(timer_id)%start_ctime
          timer(timer_id)%runflag = t_stopped
          ENDIF
 
@@ -243,8 +246,10 @@ module mod_oasis_timer
             onetimer = .true.
             call oasis_timer_c2i(timer_label,timer_id)
             if (timer_id < 1) then
-                WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-                WRITE(nulprt,*) subname,' WARNING: invalid timer_label',TRIM(timer_label)
+                WRITE(nulprt,*) subname,' model :',compid,&
+                                ' proc :',mpi_rank_local
+                WRITE(nulprt,*) subname,' WARNING: invalid timer_label',&
+                                TRIM(timer_label)
                 RETURN
             endif
          endif
@@ -316,11 +321,14 @@ module mod_oasis_timer
 
             allocate (sum_ctime_global_tmp(ntimermax, comm_size), &
                       sum_wtime_global_tmp(ntimermax, comm_size), stat=ierror)
-            IF ( ierror /= 0 ) WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error sum_global_tmp'
+            IF ( ierror /= 0 ) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error sum_global_tmp'
             allocate (count_global_tmp(ntimermax, comm_size), stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error count_global_tmp'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error count_global_tmp'
             allocate (label_global_tmp(ntimermax, comm_size), stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error label_global_tmp'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error label_global_tmp'
 
             sum_ctime_global_tmp = 0.0
             sum_wtime_global_tmp = 0.0
@@ -356,11 +364,13 @@ module mod_oasis_timer
 
 ! tcraig this works but requires lots of gather calls, could be better
             allocate(rarr(comm_size),iarr(comm_size),carr(comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error rarr'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error rarr'
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
-               call MPI_Gather(cval,len(cval),MPI_CHARACTER,carr(1),len(cval),MPI_CHARACTER,root,comm_timer,ierror)
+               call MPI_Gather(cval,len(cval),MPI_CHARACTER,carr(1),len(cval),&
+                               MPI_CHARACTER,root,comm_timer,ierror)
                if (comm_rank == root) then
                   do m = 1,comm_size
                      label_global_tmp(n,m) = trim(carr(m))
@@ -368,30 +378,35 @@ module mod_oasis_timer
                endif
 
                rval = sum_ctime(n)
-               call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,root,comm_timer,ierror)
+               call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
+                               root,comm_timer,ierror)
                if (comm_rank == root) then
                   sum_ctime_global_tmp(n,1:comm_size) = rarr(1:comm_size)
                endif
 
                rval = sum_wtime(n)
-               call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,root,comm_timer,ierror)
+               call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
+                               root,comm_timer,ierror)
                if (comm_rank == root) then
                   sum_wtime_global_tmp(n,1:comm_size) = rarr(1:comm_size)
                endif
 
                ival = timer_count(n)
-               call MPI_Gather(ival,1,MPI_INTEGER,iarr(1),1,MPI_INTEGER,root,comm_timer,ierror)
+               call MPI_Gather(ival,1,MPI_INTEGER,iarr(1),1,MPI_INTEGER,root,&
+                               comm_timer,ierror)
                if (comm_rank == root) then
                   count_global_tmp(n,1:comm_size) = iarr(1:comm_size)
                endif
             enddo
             deallocate(rarr,iarr,carr,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error rarr'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error rarr'
 
             ! now sort all the timers out by names
 
             allocate(carr(ntimermax*comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error carr'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error carr'
             nlabels = 0
             do n = 1,ntimermax
             do m = 1,comm_size
@@ -408,18 +423,23 @@ module mod_oasis_timer
             enddo
 
             allocate(label_list(nlabels),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error label_list'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error label_list'
             do k = 1,nlabels
                label_list(k) = trim(carr(k))
             enddo
             deallocate(carr,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error carr'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error carr'
             allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
             allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
             allocate(count_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error count_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error count_global'
 
             sum_ctime_global = 0
             sum_wtime_global = 0
@@ -438,24 +458,32 @@ module mod_oasis_timer
             enddo
 
             deallocate(label_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error label_global_tmp'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error label_global_tmp'
             deallocate(sum_ctime_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global_tmp'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global_tmp'
             deallocate(sum_wtime_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global_tmp'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global_tmp'
             deallocate(count_global_tmp,stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error count_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error count_global'
 
          else
             nlabels = ntimer
             allocate(label_list(nlabels),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error label_list'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error label_list'
             allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
             allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
             allocate(count_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: allocate error count_global'
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: allocate error count_global'
             do k = 1,nlabels
                label_list(k) = timer(k)%label
             enddo
@@ -484,7 +512,8 @@ module mod_oasis_timer
                if (trim(timer_label) == trim(label_list(k))) n = k
             enddo
             if (n < 1) then
-               write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
+               write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
                return
             endif
             mintime = sum_ctime_global(n,1)
@@ -563,8 +592,8 @@ module mod_oasis_timer
                   WRITE(output_unit,'(3x,i8,5x)')(k-1)
                   DO n = 1, nlabels
                     
-                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(i10))') n, label_list(n), timer(n)%runflag, &
-                                                                     (count_global(n,k))
+                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(i10))') n, label_list(n), &
+                                                                    timer(n)%runflag, (count_global(n,k))
                   ENDDO
                 ENDDO
                 WRITE(output_unit,*)''
@@ -610,13 +639,17 @@ module mod_oasis_timer
          endif ! (comm_rank == root)
 
          deallocate (sum_ctime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global'
+         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+            mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global'
          deallocate (sum_wtime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global'
+         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+            mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global'
          deallocate (count_global,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error count_global'
+         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+            mpi_rank_local,':',' WARNING: deallocate error count_global'
          deallocate (label_list,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local,':',' WARNING: deallocate error label_list'
+         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+            mpi_rank_local,':',' WARNING: deallocate error label_list'
 
          ENDIF  !(TIMER_Debug >=1)
 
