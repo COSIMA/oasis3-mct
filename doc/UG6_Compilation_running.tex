@@ -56,14 +56,85 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   these rules are to be respected.
 \end{itemize}
 
-\section{Debugging}
-
-If you experience problems while running your coupled model with
-OASIS3, you can obtain more information on what is happening by increasing {\tt \$NLOGPRT} in your {\it namcouple} (see section \ref{subsec_namcouplefirst}).
-
-\subsection{Running OASIS3-MCT}
+\section{Running OASIS3-MCT}
+\label{subsec_running}
 
 A practical example on how to run OASIS3-MCT and running it in a
 coupled system is provided in {\tt oasis3-mct/examples/tutorial}. For
 more details, see the README there in.
+
+\section{Debugging}
+\label{subsec_debug}
+
+\subsection{Debug files}
+If you experience problems while running your coupled model with
+OASIS3-MCT, you can obtain more information on what is happening by increasing {\tt \$NLOGPRT} 
+in your {\it namcouple} (see also section \ref{subsec_namcouplefirst}).
+
+Different output are written depending on NLOGPRT value:
+\begin{itemize}
+\item {0}  : one file debug.root.xx is open by the master proces of each model and one file debug\_notroot.xx is open for all the other processes of each model to write error information.
+\item {1}  : one file debug.root.xx is open by the master proces of each model to write information equivalent to level 10 (see below); one file debug\_notroot.xx is open for all the other processes of each model to write error information.
+\item {2}  : one file debug.xx.xxxxxx is open by each process of each model to write normal production diagnostics.
+\item {5}  : as for 2 with in addition some initial debug info.
+\item {10} : as for 5 with in addition the routine calling tree.
+\item {12} : as for 10 with in addition some routine calling notes.
+\item {15} : as for 12 with even more debug diagnostics.
+\item {20} : as for 15 with in addition some extra runtime analysis.
+\item {30} : full debug information.
+\end{itemize}
+
+\subsection{Time statistics files}
+
+The variable TIMER\_ Debug, defined in mod\_ oasis\_ timer, is used to obtain time statistics over all the processors for each routine.
+
+Different output are written (in files named *.timers\_ xxxx) depending on TIMER\_ Debug value :
+
+\begin{itemize}
+\item {TIMER\_ Debug=0} : nothing is calculated, nothing is written.
+\item {TIMER\_ Debug=1} : the times are calculated and written in a single file by the processor 0 as well as 
+the min and the max times over all the processors.
+\item {TIMER\_ Debug=2} : the times are calculated and each processor writes its own file ; processor 0 also 
+writes the min and the max times over all the processors in its file.
+\item {TIMER\_ Debug=3} : the times are calculated and each processor writes its own file ; processor 0 also 
+writes in its file the min and the max times over all processors and also writes in its file all the results for each processor.
+\end{itemize}
+
+The time given for each routine is the accumulated time over the entire run.
+
+oasis\_ timer\_start() and oasis\_ timer\_ stop() are the routines used to calculate the time of each routine.
+
+Below is an overview of the meaning of the routines for an example where a model receives field1 and sends field2 :
+
+\begin{itemize}
+\item {'total after init'} : represents the total time of the simulation, implemented in mod\_ prism\_ method : 
+oasis\_ timer\_ start() is called after initialisation (ie after oasis\_ namcouple\_ init and mct\_ world\_ init) 
+and oasis\_ timer\_ stop() before mpi\_ barrier et mpi\_ finalize (routine oasis\_ terminate).
+\item {'map definition'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after mct\_ gsmap\_ init 
+in mod\_ oasis\_ part (routine oasis\_ def\_ partition). It defines which source processor has to communicate with which target processor.
+\item {'cpl\_ setup'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after oasis\_ coupler\_ setup. It 
+"reconciles the coupling stuff" called by oasis\_ method\_ enddef.
+\item {'cpl\_ smatrd'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after oasis\_ coupler\_ smatreaddnc 
+in mod\_ oasis\_ coupler (routine oasis\_ coupler\_ setup). It does a distributed read of a NetCDF SCRIP file and return weights 
+in a distributed SparseMatrix, and calls mct\_ sMatP\_ Init which initialises the sparse matrix vector multiplication.
+\item {'oasis\_ advance\_ init()'} : oasis\_ timer\_ start() is called at the beginning of the routine and oasis\_ timer\_ stop() 
+at the end of the routine (in mod\_ oasis\_ advance). It handles initial restart and communication of data for fields with positive lags.
+\item {'grcv\_ 001'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
+oasis\_ timer\_ stop() after mct\_ recv for field 1.
+\item {'wout\_ 001'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
+oasis\_ timer\_ stop() after I/O of debug for field 1.
+\item {'gcpy\_ 001'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) after the get, oasis\_ timer\_ start() is called 
+before and oasis\_ timer\_ stop() after copying received array field 1 in array(n).
+\item {'pcpy\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put, oasis\_ timer\_ start() is called 
+before and oasis\_ timer\_ stop()  after copying array(n) in array to send (i.e. with local transformation besides division 
+for averaging) for field 2.
+\item {'pavg\_ 002'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put,  oasis\_ timer\_ start() is called 
+before and oasis\_ timer\_ stop() after average as needed for field 2.
+\item {'pmap\_ 002'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put, oasis\_ timer\_ start() is called 
+before and oasis\_ timer\_ stop() after matrix vector multiplication for field 2.
+\item {'psnd\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
+oasis\_ timer\_ stop() after the mct\_ waitsend and mct\_ isend for field 2.
+\item {'wout\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
+oasis\_ timer\_ stop() after  I/O of debug for field 2. 
+\end{itemize}
 
