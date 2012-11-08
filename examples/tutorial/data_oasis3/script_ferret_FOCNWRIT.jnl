@@ -1,4 +1,4 @@
-use FOCNWRIT_toyocn_02.nc
+use FOCNWRIT_model1_02.nc
 
 
 shade FOCNWRIT[L=1,d=1]
