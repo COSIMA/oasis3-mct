@@ -91,19 +91,17 @@ PROGRAM model1
   !   INITIALISATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
+  CALL MPI_Init(ierror)
   !!!!!!!!!!!!!!!!! OASIS_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL oasis_init_comp (comp_id, comp_name, ierror )
-  IF (ierror /= 0) THEN
-      WRITE(0,*) 'oasis_init_comp abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id, comp_name,'Problem at line 99')
-  ENDIF
+  ! TOCOMPLETE - Put here OASIS initialisation call !
+  !
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'MPI_Comm_Rank abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 106')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 103')
   ENDIF
   !
   w_unit = 100 + rank
@@ -119,23 +117,20 @@ PROGRAM model1
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL oasis_get_localcomm ( localComm, ierror )
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_get_localcomm abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 125')
-  ENDIF
+  localComm = MPI_COMM_WORLD
+  ! TOCOMPLETE - Put here OASIS call to get local MPI communicator !
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
       WRITE(w_unit,*) 'MPI_comm_size abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 126')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'MPI_Comm_Rank abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 138')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
   ENDIF
   !
   WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ', 'comp', comp_id, 'local rank', mype
@@ -172,24 +167,20 @@ PROGRAM model1
                  globalgrid_srf, &
                  indice_mask)
   !
-  ! (Global) grid definition for OASIS3
+  ! (Global) grid definition for OASIS
   ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in
   !
   IF (mype == 0) THEN
       !
-      ! Mask inversion to follow (historical) OASIS3 convention (0=not masked;1=masked)
+      ! Mask inversion to follow (historical) OASIS convention (0=not masked;1=masked)
       WHERE(indice_mask == 1) 
           indice_mask=0
       ELSEWHERE
           indice_mask=1
       END WHERE
       !
-      CALL oasis_start_grids_writing(il_flag)
-      CALL oasis_write_grid('torc', nlon, nlat, globalgrid_lon, globalgrid_lat)
-      CALL oasis_write_corner('torc', nlon, nlat, 4, globalgrid_clo, globalgrid_cla)
-      call oasis_write_area('torc', nlon, nlat, globalgrid_srf)
-      CALL oasis_write_mask('torc', nlon, nlat, indice_mask(:,:))
-      CALL oasis_terminate_grids_writing()
+      ! TOCOMPLETE - Put here OASIS grid, corner, areas and mask writing calls !
+      !
   ENDIF
   WRITE(w_unit,*) 'After grids writing'
   call flush(w_unit)
@@ -212,9 +203,8 @@ PROGRAM model1
   CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
-  CALL oasis_def_partition (part_id, il_paral, ierror)
-  WRITE(w_unit,*) 'After oasis_def_partition = ', il_paral(:)
-  call flush(w_unit)
+  !
+  ! TOCOMPLETE - Put here OASIS call to define local partition !
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! DEFINITION OF THE LOCAL FIELDS  
@@ -238,26 +228,12 @@ PROGRAM model1
 #endif
   !
   ! Declaration of the field associated with the partition
-  CALL oasis_def_var (var_id(1),var_name1, part_id, &
-     var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_def_var abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 245')
-  ENDIF
   !
-  CALL oasis_def_var (var_id(2),var_name2, part_id, &
-     var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_def_var abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 252')
-  ENDIF
-  !
-  CALL oasis_def_var (var_id(3),var_name3, part_id, &
-     var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_def_var abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 259')
-  ENDIF
+  ! TOCOMPLETE - Put here OASIS call to declare the 3 coupling fields
+  !              FRECVOCN, FSENDOCN, FOCNWRIT !
+  ! var_name1 = 'FSENDOCN'
+  ! var_name2 = 'FRECVOCN'
+  ! var_name3 = 'FOCNWRIT'
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
@@ -267,11 +243,7 @@ PROGRAM model1
   !
   !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  CALL oasis_enddef ( ierror )
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_enddef abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 273')
-  ENDIF
+  ! TOCOMPLETE - Put here the OASIS call to end the definition phase
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! SEND AND RECEIVE ARRAYS 
@@ -309,32 +281,19 @@ PROGRAM model1
     itap_sec = delta_t * (ib-1) ! Time
     !
     ! Get FRECVOCN
-    field2_recv=field_ini
-    CALL oasis_get(var_id(2),itap_sec, field2_recv, ierror)
-    write(w_unit,*) 'tcx recvf2 ',itap_sec,minval(field2_recv),maxval(field2_recv)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
-        WRITE (w_unit,*) 'oasis_get abort by model1 compid ',comp_id
-        CALL oasis_abort(comp_id,comp_name,'Problem at line 317')
-    ENDIF
+    ! TOCOMPLETE - Put here the OASIS call to receive FRECVOCN (field2_recv)
+    ! Let's suppose here that FRECVOCN contains BC needed for the timestep
+    !
+    ! Here the model computes its timestep
     !
     CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
                        localgrid_lon,localgrid_lat,field1_send,ib)
     !
     ! Send FSENDOCN
-    write(w_unit,*) 'tcx sendf1 ',itap_sec,minval(field1_send),maxval(field1_send)
-    CALL oasis_put(var_id(1),itap_sec, field1_send, ierror)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN
-      WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 328')
-    ENDIF
+    ! TOCOMPLETE - Put here the OASIS call to send FSENDOCN (field1_send)
     !
     ! Send FOCNWRIT
-    write(w_unit,*) 'tcx sendf3 ',itap_sec,minval(field1_send),maxval(field1_send)
-    CALL oasis_put(var_id(3),itap_sec, field1_send, ierror)
-    IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN
-      WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 336')
-    ENDIF
+    ! TOCOMPLETE - Put here the OASIS call to send FOCNWRIT (field1_send)
     !
   ENDDO
   !
@@ -350,11 +309,8 @@ PROGRAM model1
   !
   ! Collective call to terminate the coupling exchanges
   !
-  CALL oasis_terminate (ierror)
-  IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'oasis_terminate abort by model1 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 356')
-  ENDIF
+  ! TOCOMPLETE - Put here the OASIS call to terminate the coupling
   !
+  CALL mpi_finalize(ierror)
 END PROGRAM MODEL1
 !

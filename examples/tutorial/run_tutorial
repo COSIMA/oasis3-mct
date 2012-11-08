@@ -23,7 +23,7 @@ if [ ${arch} == Linux ]; then
     elif [ ${compiler} == intel ] && [ ${MPILIB} == openmpi ]; then
 	MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     fi
-rundir=/space/${user}/oasis3-mct/examples/tutorial/work_${casename}
+rundir=${HOME}/${user}/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == corail ]; then
 rundir=/lustre/globc/${user}/oasis3-mct/examples/tutorial/work_${casename}
 fi
@@ -65,7 +65,6 @@ echo ''
 \rm -fr $rundir
 mkdir -p $rundir
 
-cp -f $datadir/*txt $rundir/.
 cp -f $datadir/*nc  $rundir/.
 cp -f $datadir/*.jnl $rundir/.
 
