@@ -44,7 +44,7 @@ PROGRAM model1
   NAMELIST /grid_target_characteristics/cl_grd_tgt
   !
   ! Global grid parameters : 
-  INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
+  INTEGER :: nlon, nlat, ntot    ! dimensions in the 2 directions of space + total size
   INTEGER :: il_size
   INTEGER :: nc             ! number of corners
   REAL (kind=wp), DIMENSION(:,:), POINTER    :: globalgrid_lon,globalgrid_lat ! lon, lat of the points
@@ -76,6 +76,10 @@ PROGRAM model1
   INTEGER, PARAMETER    ::  il_nb_time_steps = 1 ! number of time steps
   INTEGER, PARAMETER    ::  delta_t = 3600     ! time step
   !
+  ! Centers arrays of the local grid
+  ! used to calculate the field field1_send sent by the model
+  REAL (kind=wp), POINTER :: localgrid_lon (:,:)
+  REAL (kind=wp), POINTER :: localgrid_lat (:,:)
   !
   INTEGER                       :: il_flag  ! Flag for grid writing by proc 0
   !
@@ -217,19 +221,20 @@ PROGRAM model1
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
   ! Definition of the partition of the grid 
+  ntot=nlon*nlat
+#ifdef DECOMP_APPLE
+  il_size = 3
+#elif defined DECOMP_BOX
   il_size = 5
+#endif
   ALLOCATE(il_paral(il_size))
+  WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
+  call flush(w_unit)
   !
-  il_paral (1) = 2
-  il_paral (2) = 0
-  il_paral (3) = nlon
-  il_paral (4) = nlat
-  il_paral (5) = nlon
+  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
+  call flush(w_unit)
   !
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'No decomposition il_paral = ', il_paral(:)
-      CALL FLUSH(w_unit)
-  ENDIF
   CALL oasis_def_partition (part_id, il_paral, ierror)
   !
   !
@@ -248,7 +253,11 @@ PROGRAM model1
   var_actual_shape(1) = 1
   var_actual_shape(2) = il_paral(3)
   var_actual_shape(3) = 1 
+#ifdef DECOMP_APPLE
+  var_actual_shape(4) = 1
+#elif defined DECOMP_BOX
   var_actual_shape(4) = il_paral(4)
+#endif
   !
   ! Declaration of the field associated with the partition
   CALL oasis_def_var (var_id,var_name, part_id, &
@@ -283,6 +292,18 @@ PROGRAM model1
   ALLOCATE(field_send(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field1_send'
   !
+  ALLOCATE ( localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
+  !
+  ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
+  !
+  ! Calculate the local grid to the process for OASIS3
+  !
+  CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
+                         localgrid_lon, localgrid_lat,             &
+                         globalgrid_lon, globalgrid_lat, w_unit)
+  !
   !!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
   !
   ! Data exchange 
@@ -292,7 +313,7 @@ PROGRAM model1
   !
   CALL function_ana(var_actual_shape(2), &
                     var_actual_shape(4), &
-                    globalgrid_lon,globalgrid_lat, &
+                    localgrid_lon,localgrid_lat, &
                     field_send,ib)
   !
   ! Send FSENDANA
@@ -304,16 +325,6 @@ PROGRAM model1
       WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
       CALL oasis_abort(comp_id,comp_name,'Problem at line 330')
   ENDIF
-  !
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! Write the initial field in a NetCDF file 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  data_filename='fldin_'//cl_grd_src//'.nc'
-  field_name='fldin'
-  call write_field(var_actual_shape(2),var_actual_shape(4), &
-                   data_filename, field_name, &
-                   w_unit, FILE_Debug, &
-                   globalgrid_lon, globalgrid_lat, field_send)
   !
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

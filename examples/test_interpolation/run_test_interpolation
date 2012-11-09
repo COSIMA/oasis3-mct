@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler 
-arch=corail   #tioman_pgi_mpich/corail/curie(CEA)
+arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)
 host=`uname -n`
 user=`whoami`
 #
@@ -32,7 +32,7 @@ echo 'Target grid :' $TGT_GRID
     exe2=model2
 # number of processes for each executable
     nproc_exe1=1
-    nproc_exe2=1
+    nproc_exe2=2
 # number of processes involved in the coupling for the namcouple
     ncpl_exe1=$nproc_exe1
     ncpl_exe2=$nproc_exe2
@@ -43,7 +43,7 @@ echo 'Target grid :' $TGT_GRID
 #
 if [ ${arch} == tioman_pgi_mpich ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
-    rundir=/space/${user}/oasis3-mct/examples/${casename}/work_${casename}
+    rundir=/space/${user}/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=/space/${user}/oasis3-mct/examples/${casename}/work_${casename}
