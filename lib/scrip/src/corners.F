@@ -51,6 +51,7 @@ C
 C* ---------------------------- Modules --------------------------------
 C
       USE kinds_mod
+      USE mod_oasis_flush
 C
 C* ---------------------------- Implicit --------------------------------
 C
@@ -151,7 +152,7 @@ C
           WRITE (UNIT = nulou,FMT = *) 
      $         ' Get grid cell corners for grid: ', grd_name
           WRITE (UNIT = nulou,FMT = *) ' '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
 C
@@ -516,7 +517,7 @@ C
           WRITE (UNIT = nulou,FMT = *) ' '
           WRITE (UNIT = nulou,FMT = *) 
      $    '          --------- End of routine corners ---------'
-          CALL FLUSH (nulou)
+          CALL OASIS_FLUSH_SCRIP (nulou)
       ENDIF
       RETURN
       END SUBROUTINE corners

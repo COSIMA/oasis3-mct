@@ -65,6 +65,7 @@ C***********************************************************************
       use timers       ! module for timing
       use grids        ! module containing grid information
       use remap_vars   ! module containing remap information
+      USE mod_oasis_flush
 
       implicit none
 
@@ -158,7 +159,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_conserv'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -191,7 +192,7 @@ C***********************************************************************
 !
       IF (nlogprt .GE. 2) THEN      
           WRITE(nulou,*) 'Check overlapping point of the source grid'
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
       CALL get_unit(overunit)
@@ -234,7 +235,7 @@ C***********************************************************************
 !
       IF (nlogprt .GE. 2) THEN      
           WRITE(nulou,*) 'Check overlapping point of the target grid'
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF      
 
       WRITE(overunit, *) 'list of overlapping point of the target grid'
@@ -265,14 +266,14 @@ C***********************************************************************
 ! Sweeps
       IF (nlogprt .GE. 2) THEN
          WRITE (nulou,*) 'grid1 sweep '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       ll_debug = .false.
       do grid1_add = 1,grid1_size
         IF (ll_debug) THEN 
             WRITE(88,*) 'grid1_add=', grid1_add
-            CALL FLUSH(88)
+            CALL OASIS_FLUSH_SCRIP(88)
         ENDIF
 
         !***
@@ -345,7 +346,7 @@ C***********************************************************************
             END DO
             WRITE(88,*)'    ***************************************'
             WRITE(88,*)'    '
-            CALL FLUSH(88)
+            CALL OASIS_FLUSH_SCRIP(88)
         ENDIF
  1111 format ('   grid1 corner, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)
  1112 format ('     srch cell, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)       
@@ -426,7 +427,7 @@ C***********************************************************************
      &                  'if calculated by OASIS routine corners' 
                     write(nulou,*) 
      &                 'integration stalled: num_subseg exceeded limit'
-                    CALL FLUSH(nulou)
+                    CALL OASIS_FLUSH_SCRIP(nulou)
                     stop
                 endif
 
@@ -442,7 +443,7 @@ C***********************************************************************
                     WRITE(88,1115) beglon, beglat 
                     WRITE(88,1116) endlon, endlat
                     WRITE(88,*) '             '
-                    CALL FLUSH(88)
+                    CALL OASIS_FLUSH_SCRIP(88)
                 ENDIF
  1115 format ('   avant intersection;  beglon, beglat = ', 
      &        2X, F12.4, 2X, F12.4)
@@ -460,7 +461,7 @@ C***********************************************************************
                     WRITE(88,1118) endlon, endlat
                     WRITE(88,1119) intrsct_lon, intrsct_lat
                     WRITE(88,*) '   '
-                    CALL FLUSH(88)
+                    CALL OASIS_FLUSH_SCRIP(88)
                 ENDIF
  1117 format('   après intersection;  beglon, beglat =           ', 
      &        2X, F12.4, 2X, F12.4)
@@ -487,7 +488,7 @@ C***********************************************************************
                       WRITE(88,*) '  A1) WEIGHTS for this subsegment =',
      &                      weights(1)
                       WRITE(88,*) '     '
-                      CALL FLUSH(88)
+                      CALL OASIS_FLUSH_SCRIP(88)
                     ENDIF
 
                 else
@@ -500,7 +501,7 @@ C***********************************************************************
                      WRITE(88,*) '  B1) WEIGHTS for this subsegment =',
      &                     weights(1)
                      WRITE(88,*) '     '
-                     CALL FLUSH(88)
+                     CALL OASIS_FLUSH_SCRIP(88)
                     ENDIF
 
                 endif
@@ -614,7 +615,7 @@ C***********************************************************************
       deallocate(srch_mask)
       IF (nlogprt .GE. 2) THEN 
           WRITE(nulou,*) 'grid1 end sweep '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -626,12 +627,12 @@ C***********************************************************************
       allocate(srch_mask(grid1_size))
       IF (nlogprt .GE. 2) THEN 
           WRITE(nulou,*) 'grid2 sweep '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
       do grid2_add = 1,grid2_size
         IF (ll_debug) THEN 
             WRITE(88,*) 'grid2_add=', grid2_add
-            CALL FLUSH(88)
+            CALL OASIS_FLUSH_SCRIP(88)
         ENDIF
         !***
         !*** restrict searches first using search bins
@@ -777,7 +778,7 @@ C***********************************************************************
                 write(nulou,*) 'if calculated by OASIS routine corners'
                 write(nulou,*) 
      &              'integration stalled: num_subseg exceeded limit'
-                CALL FLUSH(nulou)
+                CALL OASIS_FLUSH_SCRIP(nulou)
                 stop
             endif
 
@@ -921,7 +922,7 @@ C***********************************************************************
 #endif
       IF (nlogprt .GE. 2) THEN
           WRITE(nulou,*) 'grid2 end sweep '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
       IF (ll_debug) THEN
@@ -1153,7 +1154,7 @@ C***********************************************************************
 
       IF (nlogprt .GE. 2) THEN
           WRITE(nulou,*) 'Total number of links = ',num_links_map1
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
       where (grid1_area /= zero) grid1_frac = grid1_frac/grid1_area
@@ -1180,7 +1181,7 @@ C***********************************************************************
      &n, centroid_lat, mask='
      &          ,n,grid1_centroid_lat(n), grid1_mask(n)
             endif
-            CALL FLUSH(nulou)
+            CALL OASIS_FLUSH_SCRIP(nulou)
         ENDIF
         grid1_centroid_lat(n) = zero
         grid1_centroid_lon(n) = zero
@@ -1198,7 +1199,7 @@ C***********************************************************************
      &n, centroid_lat, mask='
      &          ,n,grid2_centroid_lat(n), grid2_mask(n)
             endif
-            CALL FLUSH(nulou)
+            CALL OASIS_FLUSH_SCRIP(nulou)
         ENDIF
         grid2_centroid_lat(n) = zero
         grid2_centroid_lon(n) = zero
@@ -1302,7 +1303,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine remap_conserv'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF      
 
 !-----------------------------------------------------------------------
@@ -1623,7 +1624,7 @@ C***********************************************************************
      $                    srch_corner_lat(:,cell)
                       write(nulou,*) 'srch_corner_lon=',
      $                    srch_corner_lon(:,cell)
-                      CALL FLUSH(nulou)
+                      CALL OASIS_FLUSH_SCRIP(nulou)
                   ENDIF
                endif
             endif

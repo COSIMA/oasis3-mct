@@ -38,6 +38,7 @@
 !-----------------------------------------------------------------------
 
       use kinds_mod   ! defines data types
+      USE mod_oasis_flush
 
       implicit none
 
@@ -94,7 +95,7 @@
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine get_unit'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       if (first_call) then
@@ -123,7 +124,7 @@
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine get_unit'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -158,7 +159,7 @@
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine release_unit'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       unit_free(iunit) = .true.
@@ -170,7 +171,7 @@
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine release_unit'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       end subroutine release_unit

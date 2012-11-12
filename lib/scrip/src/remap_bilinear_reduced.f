@@ -71,6 +71,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       use constants     ! defines common constants
       use grids         ! module containing grid info
       use remap_vars    ! module containing remap info
+      USE mod_oasis_flush
 
       implicit none
 
@@ -147,7 +148,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)
      &       'Entering routine remap_bilin_reduced'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       ll_nnei = .true.
@@ -275,7 +276,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &            ,dst_add
               WRITE(nulou,*) 
      &    'Using non-masked points among 4 nearest neighbors.'
-              CALL FLUSH(nulou)
+              CALL OASIS_FLUSH_SCRIP(nulou)
           ENDIF
 
           !***
@@ -358,7 +359,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &                plon, plat
                   WRITE(nulou,*) 
      &                'Using the nearest non-masked neighbour.'
-                  CALL FLUSH(nulou)
+                  CALL OASIS_FLUSH_SCRIP(nulou)
               ENDIF
               src_latsnn = bignum
 !cdir novector
@@ -390,7 +391,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &                grid1_center_lon(src_addnn), 
      &                grid1_center_lat(src_addnn) 
                   WRITE(nulou,*) '  '
-                  CALL FLUSH(nulou)
+                  CALL OASIS_FLUSH_SCRIP(nulou)
               ENDIF
               wgts(1) = 1.
               wgts(2) = 0.

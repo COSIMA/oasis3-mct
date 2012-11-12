@@ -70,6 +70,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       use constants     ! defines common constants
       use grids         ! module containing grid info
       use remap_vars    ! module containing remap info
+      USE mod_oasis_flush
 
       implicit NONE
 
@@ -146,7 +147,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_bicub'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       ll_nnei = .true.
@@ -431,7 +432,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine remap_bicub'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       end subroutine remap_bicub

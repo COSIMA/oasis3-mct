@@ -62,6 +62,7 @@ C***********************************************************************
       use kinds_mod    ! defines data types
       use constants    ! common constants
       use iounits      ! I/O unit manager
+      USE mod_oasis_flush
 
       implicit none
 
@@ -244,7 +245,7 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine grid_init'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -746,7 +747,7 @@ C
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine grid_init'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 ! 
 !-----------------------------------------------------------------------
@@ -767,7 +768,7 @@ C
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine free_grid'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 ! 
       deallocate(grid1_mask, grid2_mask, 
@@ -797,7 +798,7 @@ C
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine free_grid'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !-----------------------------------------------------------------------
 

@@ -49,6 +49,7 @@ C
 C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       USE constants
       USE kinds_mod
+      USE mod_oasis_flush
 
       IMPLICIT NONE
 !-----------------------------------------------------------------------
@@ -104,7 +105,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine gradient_bicubic'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !     Transformation from degree to radiant
@@ -266,7 +267,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine gradient_bicubic'
          WRITE (UNIT = nulou,FMT = *)' '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       RETURN

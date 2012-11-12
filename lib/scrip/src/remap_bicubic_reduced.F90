@@ -10,6 +10,7 @@ MODULE remap_bicubic_reduced
   USE constants             ! defines common constants      
   USE grids                 ! module containing grid info
   USE remap_vars            ! module containing remap info
+  USE mod_oasis_flush
 
 ! !PUBLIC TYPES:
   IMPLICIT NONE  
@@ -111,7 +112,7 @@ CONTAINS
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *) 'Entering routine remap_bicub_reduced'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !   
       ll_nnei = .true.
@@ -154,7 +155,7 @@ CONTAINS
               WRITE(nulou,*) 'with longitude and latitude', rl_plon, rl_plat
               WRITE(nulou,*) 'Using the nearest non-masked neighbour.' 
               WRITE(nulou,*) ' '
-              CALL FLUSH(nulou)
+              CALL OASIS_FLUSH_SCRIP(nulou)
           ENDIF
           
           ! Search the nearest point in bin [il_min:il_max]
@@ -443,7 +444,7 @@ CONTAINS
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *) 'Leaving routine remap_bicub_reduced'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !          
   END SUBROUTINE remap_bicub_reduced

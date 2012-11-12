@@ -5,6 +5,7 @@ MODULE rotations
   USE constants             ! defines common constants      
   USE grids
   USE vector
+  USE mod_oasis_flush
 
   IMPLICIT NONE
 
@@ -63,7 +64,7 @@ CONTAINS
        WRITE (UNIT = nulou,FMT = *) ' '
        WRITE (UNIT = nulou,FMT = *) '     Entering ROUTINE angel'
        WRITE (UNIT = nulou,FMT = *) ' '
-       CALL FLUSH(nulou)
+       CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 
     IF (lncdfgrd) THEN
@@ -104,7 +105,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
        WRITE (UNIT = nulou,FMT = *) ' '
        WRITE (UNIT = nulou,FMT = *) '  Leaving routine angel '
-       CALL FLUSH (nulou)
+       CALL OASIS_FLUSH_SCRIP (nulou)
     ENDIF
 
   END SUBROUTINE angel
@@ -144,7 +145,7 @@ CONTAINS
        IF (nlogprt .GE. 2) THEN
           WRITE (UNIT = nulou,FMT = *) ' '
           WRITE (UNIT = nulou,FMT = *) '   Entering ROUTINE loc2spher '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
        ENDIF
 !
 !*Find the angle between the two referentials
@@ -195,7 +196,7 @@ CONTAINS
           WRITE (UNIT = nulou,FMT = *) &
                '          --------- Leaving routine loc2spher ---------'
           WRITE (UNIT = nulou,FMT = *) ' '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
        ENDIF
 
      END SUBROUTINE loc2spher
@@ -231,7 +232,7 @@ CONTAINS
        IF (nlogprt .GE. 2) THEN
           WRITE (UNIT = nulou,FMT = *) ' '
           WRITE (UNIT = nulou,FMT = *) '  Entering ROUTINE spher2loc '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
        ENDIF
 !
 !*Find the angle between the two referentials
@@ -282,7 +283,7 @@ CONTAINS
           WRITE (UNIT = nulou,FMT = *) &
                '          --------- Leaving routine spher2loc ---------'
           WRITE (UNIT = nulou,FMT = *) ' '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
        ENDIF
 
      END SUBROUTINE spher2loc    
@@ -322,7 +323,7 @@ CONTAINS
 	WRITE (UNIT = nulou,FMT = *) ' '
 	WRITE (UNIT = nulou,FMT = *) ' Entering ROUTINE - spher2car'
 	WRITE (UNIT = nulou,FMT = *) ' '
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 
     rla_sin_lon(:) = SIN(rda_grd_lon(:) * rp_deg2rad)
@@ -382,7 +383,7 @@ CONTAINS
 	WRITE (UNIT = nulou,FMT = *) ' '
 	WRITE (UNIT = nulou,FMT = *) &
 	   '          --------- Leaving routine spher2car ---------'
-	CALL FLUSH (nulou)
+	CALL OASIS_FLUSH_SCRIP (nulou)
     ENDIF
 
   END SUBROUTINE spher2car
@@ -420,7 +421,7 @@ CONTAINS
 	WRITE (UNIT = nulou,FMT = *) ' '
 	WRITE (UNIT = nulou,FMT = *) '  Entering ROUTINE   - car2spher'
 	WRITE (UNIT = nulou,FMT = *) ' '
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
  
     rla_sin_lon(:) = SIN(rda_grd_lon(:) * rp_deg2rad)
@@ -475,7 +476,7 @@ CONTAINS
 	WRITE (UNIT = nulou,FMT = *) ' '
 	WRITE (UNIT = nulou,FMT = *) &
 	   '          --------- Leaving routine car2spher ---------'
-	CALL FLUSH (nulou)
+	CALL OASIS_FLUSH_SCRIP (nulou)
     ENDIF
 
   END SUBROUTINE car2spher

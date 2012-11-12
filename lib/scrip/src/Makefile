@@ -41,7 +41,7 @@ $(LIBRARY): $(OBJS1)  $(OBJS3) $(OBJS4)
 #
 # ALL dependencies ...
 #
-
+mod_oasis_flush.o : kinds_mod.o
 remap_bicubic_reduced.o: constants.o grids.o remap_vars.o
 rotations.o: constants.o grids.o kinds_mod.o vector.o
 vector.o: constants.o grids.o kinds_mod.o 

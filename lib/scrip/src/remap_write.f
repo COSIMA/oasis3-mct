@@ -56,6 +56,7 @@ C***********************************************************************
       use grids         ! module containing grid information
       use remap_vars    ! module containing remap information
       use netcdf_mod    ! module with netCDF stuff
+      USE mod_oasis_flush
 
       implicit none
 
@@ -160,7 +161,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine write_remap '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
       select case(norm_opt)
       case (norm_opt_none)
@@ -227,7 +228,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine write_remap '
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
       end subroutine write_remap
@@ -277,7 +278,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
        WRITE (UNIT = nulou,FMT = *)' '
        WRITE (UNIT = nulou,FMT = *)'Entering routine write_remap_scrip '
-       CALL FLUSH(nulou)
+       CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !-----------------------------------------------------------------------
 !
@@ -896,7 +897,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
        WRITE (UNIT = nulou,FMT = *)' '
        WRITE (UNIT = nulou,FMT = *)'Leaving routine write_remap_scrip '
-       CALL FLUSH(nulou)
+       CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !-----------------------------------------------------------------------
 

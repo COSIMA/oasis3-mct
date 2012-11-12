@@ -61,6 +61,7 @@ C***********************************************************************
       use constants     ! defines common constants
       use grids         ! module containing grid info
       use remap_vars    ! module containing remap info
+      USE mod_oasis_flush
 
       implicit none
 
@@ -137,7 +138,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_gauswgt'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !-----------------------------------------------------------------------
 !
@@ -239,7 +240,7 @@ C***********************************************************************
             if ( ll_allmask) THEN
                 IF (nlogprt .GE. 2) THEN
                     WRITE(nulou,*)'ll_allmask true',src_addnn
-                    CALL FLUSH(nulou)
+                    CALL OASIS_FLUSH_SCRIP(nulou)
                 ENDIF
                 src_latsnn = bignum
                 do srch_add = min_add_out,max_add_out
@@ -407,7 +408,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine remap_gauswgt'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -710,7 +711,7 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)
      &       'Entering routine remap_dist_average'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -797,7 +798,7 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)
      &       'Leaving routine remap_dist_average'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       END subroutine grid_dist_average

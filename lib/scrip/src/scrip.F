@@ -78,6 +78,7 @@ C***********************************************************************
       use remap_bilinear_reduced     ! routines for bilinear interp
       use remap_bicubic_reduced      ! routines for bicubic interp
       use remap_write                ! routines for remap output
+      USE mod_oasis_flush
 
       implicit none
 
@@ -124,7 +125,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine scrip'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -187,7 +188,7 @@ C***********************************************************************
      &        ,grid1_name
          WRITE (UNIT = nulou,FMT = *)'                          and  '
      &       ,grid2_name
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -278,7 +279,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine scrip'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !-----------------------------------------------------------------------!
       end subroutine scrip
@@ -295,6 +296,7 @@ C***********************************************************************
 
       use kinds_mod     ! defines common data types
       use constants     ! defines common scalar constants
+      USE mod_oasis_flush
 
       implicit none
 
@@ -335,7 +337,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine sort_add'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -523,7 +525,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine sort_add'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------

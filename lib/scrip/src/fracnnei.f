@@ -55,6 +55,7 @@ C
       use constants     ! defines common constants
       use grids         ! module containing grid information
       use remap_vars    ! module containing remap information
+      USE mod_oasis_flush
 C
 C* ---------------------------- Implicit --------------------------------
 C
@@ -146,7 +147,7 @@ C
           WRITE (UNIT = nulou,FMT = *) 
      $        ' Treating the tricky points of the remapping'
           WRITE (UNIT = nulou,FMT = *) ' '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 C
 C *----------------------------------------------------------------------
@@ -264,7 +265,7 @@ C
           WRITE (UNIT = nulou,FMT = *) 
      $        '   Leaving ROUTINE fracnnei  -  Level 4'
           WRITE (UNIT = nulou,FMT = *) ' '
-          CALL FLUSH(nulou)
+          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 
       END SUBROUTINE fracnnei

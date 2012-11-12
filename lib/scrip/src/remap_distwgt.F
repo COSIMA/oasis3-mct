@@ -57,6 +57,7 @@ C***********************************************************************
       use constants     ! defines common constants
       use grids         ! module containing grid info
       use remap_vars    ! module containing remap info
+      USE mod_oasis_flush
 
       implicit none
 
@@ -133,7 +134,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_distwgt'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -195,7 +196,7 @@ C***********************************************************************
             IF (dst_add == il_debug_add) THEN 
                 WRITE(nulou,*) 'nbr_add = ', nbr_add(:)
                 WRITE(nulou,*) 'nbr_dist = ', nbr_dist(:)
-                CALL FLUSH(nulou)
+                CALL OASIS_FLUSH_SCRIP(nulou)
             ENDIF
         ENDIF
 
@@ -247,7 +248,7 @@ C***********************************************************************
                 WRITE(nulou,*) 
      & 'Using the nearest non-masked neighbour because all 4 
      &  surrounding source points are masked for target point ',dst_add
-                CALL FLUSH(nulou)
+                CALL OASIS_FLUSH_SCRIP(nulou)
             ENDIF
             wgtstmp(1) = 1.
             grid2_frac(dst_add) = one
@@ -264,7 +265,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine remap_distwgt'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------

@@ -55,6 +55,7 @@ C***********************************************************************
       use kinds_mod
       use constants
       use grids
+      USE mod_oasis_flush
 
       implicit none
 
@@ -136,7 +137,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine init_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -233,7 +234,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine init_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       end subroutine init_remap_vars
@@ -280,7 +281,7 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)
      &       'Entering routine resize_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -344,7 +345,7 @@ C***********************************************************************
         if (ierr .ne. 0) THEN
             WRITE(nulou,*) '   '
             WRITE(nulou,*)'error allocating temps in resize: ',ierr
-            CALL FLUSH(nulou)
+            CALL OASIS_FLUSH_SCRIP(nulou)
             stop
         endif
 
@@ -365,7 +366,7 @@ C***********************************************************************
         if (ierr .ne. 0) then
             WRITE(nulou,*) '   '
             WRITE(nulou,*)'error allocating new arrays in resize: ',ierr
-            CALL FLUSH(nulou)
+            CALL OASIS_FLUSH_SCRIP(nulou)
             stop
         endif
 
@@ -387,7 +388,7 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)
      &       'Leaving routine resize_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------
@@ -405,7 +406,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Entering routine free_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
       deallocate (grid1_add_map1, grid2_add_map1, wts_map1)
@@ -424,7 +425,7 @@ C***********************************************************************
       IF (nlogprt .GE. 2) THEN
          WRITE (UNIT = nulou,FMT = *)' '
          WRITE (UNIT = nulou,FMT = *)'Leaving routine free_remap_vars'
-         CALL FLUSH(nulou)
+         CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
 !
 !-----------------------------------------------------------------------

@@ -13,6 +13,7 @@ MODULE vector
   USE kinds_mod 
   USE constants 
   USE grids
+  USE mod_oasis_flush
   
   IMPLICIT NONE
 
@@ -83,7 +84,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Entering routine calc_remap_matrix'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !
 !  
@@ -121,7 +122,7 @@ CONTAINS
             ' Calculation of SCRIP remapping matrix: method = ', &
             map_method
        WRITE (UNIT = nulou,FMT = *) ' '
-       call flush(nulou)
+       call oasis_flush_scrip(nulou)
     ENDIF
 !
 !** -- Get grid cell corners for conservative remapping
@@ -179,7 +180,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Leaving routine calc_remap_matrix'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !
   END SUBROUTINE calc_remap_matrix
@@ -250,7 +251,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Entering routine remap_vector_comps'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !  
 !* Read weights and addresses
@@ -481,7 +482,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Leaving routine remap_vector_comps'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 ! 
   END SUBROUTINE remap_vector_comps
@@ -525,7 +526,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Entering routine check_points_at_poles'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !     
     latpolN = pi*half
@@ -569,7 +570,7 @@ CONTAINS
             WRITE (UNIT = nulou,FMT = *) 'Average of field component I at north pole : ', ave_N
             WRITE (UNIT = nulou,FMT = *) 'Average of field component I at south pole : ', ave_S
         ENDIF
-        CALL FLUSH (nulou)
+        CALL OASIS_FLUSH_SCRIP (nulou)
     ENDIF
 !     
 !** The same calculation for the second target grid 
@@ -618,7 +619,7 @@ CONTAINS
 !
         WRITE (UNIT = nulou,FMT = *)' '
         WRITE (UNIT = nulou,FMT = *)'Leaving routine check_points_at_poles'
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !         
   END SUBROUTINE check_points_at_poles
@@ -656,7 +657,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Entering routine write_src_array_spheric'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !  
 !
@@ -673,7 +674,7 @@ CONTAINS
         WRITE (UNIT = nulou,FMT = *) filename,' is created containg fields in spheric and'
         WRITE (UNIT = nulou,FMT = *) ' eventually cartesian referentials'
         WRITE (UNIT = nulou,FMT = *) ' '
-        CALL FLUSH(nulou)
+        CALL OASIS_FLUSH_SCRIP(nulou)
     ENDIF
 !    
     CALL hdlerr(NF_DEF_DIM &
@@ -723,7 +724,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Entering routine write_src_array_spheric'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !    
   END SUBROUTINE write_src_array_spheric
@@ -762,7 +763,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Entering routine write_dst_array_spheric'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !
 !** Open the file vector_debug_XXX_to_YYY.nc and define the dimensions
@@ -834,7 +835,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Leaving routine write_dst_array_spheric'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !    
   END SUBROUTINE write_dst_array_spheric
@@ -878,7 +879,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Entering routine write_cartesian_components'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !
 !** Open the file vector_debug_XXX_to_YYY.nc and define the dimensions
@@ -997,7 +998,7 @@ CONTAINS
     IF (nlogprt .GE. 2) THEN
         WRITE(nulou,*) '   '
         WRITE(nulou,*) ' Leaving routine write_cartesian_components'
-        call flush(nulou)
+        call oasis_flush_scrip(nulou)
     ENDIF
 !
   END SUBROUTINE write_cartesian_components
