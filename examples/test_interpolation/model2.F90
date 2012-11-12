@@ -328,7 +328,7 @@ PROGRAM model2
   !
   CALL function_ana(var_actual_shape(2),&
                     var_actual_shape(4), &
-                    globalgrid_lon,globalgrid_lat, &
+                    localgrid_lon,localgrid_lat, &
                     field_ana,ib)
   !
   ! Get the field FRECVANA
@@ -397,8 +397,6 @@ PROGRAM model2
       ENDIF
   ENDIF
       !
-  PRINT*, 'Laure  var_actual_shape(2)*var_actual_shape(4):',mype,var_actual_shape(2)*var_actual_shape(4)
-  CALL flush()
 #ifdef NO_USE_DOUBLE_PRECISION
       CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL,&
                        global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
@@ -422,10 +420,10 @@ PROGRAM model2
       ENDDO
       data_filename='error_'//cl_grd_tgt//'.nc'
       field_name='error'
-!      CALL write_field(nlon,nlat, &
-!                       data_filename, field_name,  &
-!                       w_unit, FILE_Debug, &
-!                       globalgrid_lon, globalgrid_lat, global_error)
+      CALL write_field(nlon,nlat, &
+                       data_filename, field_name,  &
+                       w_unit, FILE_Debug, &
+                       globalgrid_lon, globalgrid_lat, global_error)
   ENDIF
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points calculated by proc 0 !!!!!!!!!!!!!!!!
