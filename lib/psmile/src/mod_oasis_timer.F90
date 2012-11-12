@@ -146,7 +146,7 @@ module mod_oasis_timer
                 WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
                 WRITE(nulprt,*) subname,' WARNING timer number exceeded' 
                 WRITE(nulprt,*) subname,' Increase mtimer in mod_oasis_method'
-                CALL flush(nulprt)
+                CALL oasis_flush(nulprt)
                 CALL oasis_abort_noarg()
             ENDIF
          endif

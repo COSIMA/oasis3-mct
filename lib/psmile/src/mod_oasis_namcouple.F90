@@ -1332,7 +1332,7 @@ SUBROUTINE inipar_alloc()
                   CALL parse(clline, clvari, 1, jpeighty, ILEN)
                   !*                    Get number of longitudes for initial field
                   WRITE(nulprt1,*)'CLVARI=',clvari
-                  call flush(nulprt1) 
+                  call oasis_flush(nulprt1) 
                   READ(clvari,FMT = 2004) nlonbf_notnc
                   CALL parse(clline, clvari, 2, jpeighty, ilen)
                   !*                    Get number of latitudes for initial field
@@ -1385,7 +1385,7 @@ SUBROUTINE inipar_alloc()
                 IF (lg_state(jf)) THEN
                     cg_c=canal(ja,ig_number_field(jf))
                     WRITE(nulprt1,*)'LG_STATE cg_c=', clline
-                    call flush(nulprt1)
+                    call oasis_flush(nulprt1)
                     IF (cg_c .EQ. 'NOINTERP' .OR. cg_c .EQ. 'REDGLO' .OR. cg_c .EQ. 'INVERT' .OR. &
                        cg_c .EQ. 'MASK' .OR. cg_c .EQ. 'EXTRAP' .OR. cg_c .EQ. 'CORRECT' .OR. &
                        cg_c .EQ. 'REDGLO' .OR. cg_c .EQ. 'INTERP' .OR. cg_c .EQ. 'MOZAIC' .OR. &
@@ -1428,7 +1428,7 @@ SUBROUTINE inipar_alloc()
                     ! For IGNORED, IGNOUT and OUTPUT, only one line for LOCTRANS
                     READ (UNIT = nulin,FMT = 2002) clline
                     WRITE(nulprt1,*)'OUTPUT clline=', clline
-                    call flush(nulprt1)
+                    call oasis_flush(nulprt1)
                     CALL skip(clline, jpeighty)
                 ENDIF
 270           CONTINUE
