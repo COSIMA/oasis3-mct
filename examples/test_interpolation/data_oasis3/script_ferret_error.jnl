@@ -1,0 +1,7 @@
+use error.nc
+
+
+shade error[L=1,d=1]
+shade/lev=(0,1,0.01) error
+
+

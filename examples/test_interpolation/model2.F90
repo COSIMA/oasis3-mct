@@ -418,7 +418,7 @@ PROGRAM model2
           ENDIF
         ENDDO
       ENDDO
-      data_filename='error_'//cl_grd_tgt//'.nc'
+      data_filename='error.nc'
       field_name='error'
       CALL write_field(nlon,nlat, &
                        data_filename, field_name,  &
