@@ -397,17 +397,12 @@ PROGRAM model2
       ENDIF
   ENDIF
       !
-#ifdef NO_USE_DOUBLE_PRECISION
+      IF (FILE_Debug >= 2) THEN
+          WRITE(w_unit,*) 'Local actual_shape :',var_actual_shape(2),var_actual_shape(4),var_actual_shape(2)*var_actual_shape(4)
+      ENDIF
       CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL,&
                        global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
-      !
-#elif defined USE_DOUBLE_PRECISION
-      CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_DOUBLE_PRECISION,&
-                       global_error,rcounts,displs,MPI_DOUBLE_PRECISION,0,localComm,ierror)
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
-      !
-#endif
       !
   IF (mype == 0) THEN
       DO i=1,nlon
@@ -418,6 +413,7 @@ PROGRAM model2
           ENDIF
         ENDDO
       ENDDO
+      !
       data_filename='error.nc'
       field_name='error'
       CALL write_field(nlon,nlat, &
@@ -428,10 +424,6 @@ PROGRAM model2
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points calculated by proc 0 !!!!!!!!!!!!!!!!
   !
-  IF (mype == 0) THEN
-      PRINT*, 'Laure global_error :', global_error
-  ENDIF
-
   IF (mype == 0) THEN
       ic_msk=0
       DO i=1,nlon
