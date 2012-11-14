@@ -78,7 +78,7 @@ CHECKIN MAPPING CHECKOUT
 # SCRIPR: 1) method 2) source grid type 3) field type 4) search restriction
 #         type 5) number of restriction bins 6)number of neighbours used
 INT=1
-rmp_torc_to_lmdz_BILINEA.nc src
+myfile_rmp_torc_to_lmdz_BILINEAR.nc src
 INT=1
 #
  $END
