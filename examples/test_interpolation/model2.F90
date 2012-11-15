@@ -81,6 +81,7 @@ PROGRAM model2
   ! used to calculate the field sent by the model
   REAL (kind=wp), POINTER :: localgrid_lon (:,:)
   REAL (kind=wp), POINTER :: localgrid_lat (:,:)
+  INTEGER, POINTER        :: localgrid_mask(:,:)
   !
   INTEGER                       :: il_flag          ! Flag for grid writing
   !
@@ -312,11 +313,14 @@ PROGRAM model2
   ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
   !
+  ALLOCATE ( localgrid_mask(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_mask'
+  !
   ! Calculate the local grid to the process for OASIS3
   !
   CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
-                         localgrid_lon, localgrid_lat,             &
-                         globalgrid_lon, globalgrid_lat, w_unit)
+                         localgrid_lon, localgrid_lat, localgrid_mask, &
+                         globalgrid_lon, globalgrid_lat, globalgrid_mask, w_unit)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
@@ -348,7 +352,16 @@ PROGRAM model2
       CALL FLUSH(w_unit)
   ENDIF
   !
-  error = ABS(((field_ana - field_recv)/field_recv))*100
+  error=err_msk
+  !
+  DO j=var_actual_shape(3), var_actual_shape(4)
+    DO i=var_actual_shape(1), var_actual_shape(2)
+      IF (localgrid_mask(i,j) == 0) THEN
+          error(i,j) = ABS(((field_ana(i,j) - field_recv(i,j))/field_recv(i,j)))*100
+      ENDIF
+    ENDDO
+  ENDDO
+  !
   !
   !!!!!!!!!!!!!!!!!!!!!!! Write the error and the field in a NetCDF file by proc 0 !!!!!!!!!!!!!!!!!!!!
   ! field_recv is 0 on masked points => put error = err_msk on these points
@@ -384,7 +397,7 @@ PROGRAM model2
   IF (mype == 0) THEN
       displs(1)=0
       DO i=2,npes
-        displs(i) = displs(i-1) + global_shapes(2,i) * global_shapes(4,i)
+        displs(i) = displs(i-1) + global_shapes(2,i-1) * global_shapes(4,i-1)
       ENDDO
       DO i=1,npes
         rcounts(i) = global_shapes(2,i) * global_shapes(4,i)
@@ -397,22 +410,19 @@ PROGRAM model2
       ENDIF
   ENDIF
       !
-      IF (FILE_Debug >= 2) THEN
-          WRITE(w_unit,*) 'Local actual_shape :',var_actual_shape(2),var_actual_shape(4),var_actual_shape(2)*var_actual_shape(4)
-      ENDIF
+#ifdef NO_USE_DOUBLE_PRECISION
       CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL,&
                        global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
       !
+#elif defined USE_DOUBLE_PRECISION
+      CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL8,&
+                       global_error,rcounts,displs,MPI_REAL8,0,localComm,ierror)
+      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
+      !
+#endif
+      !
   IF (mype == 0) THEN
-      DO i=1,nlon
-        DO j=1,nlat
-          ij=i+(j-1)*(nlon)
-          IF ( globalgrid_mask(i,j) == 1 ) THEN
-              global_error(ij) = -err_msk
-          ENDIF
-        ENDDO
-      ENDDO
       !
       data_filename='error.nc'
       field_name='error'

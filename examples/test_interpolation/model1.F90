@@ -80,6 +80,7 @@ PROGRAM model1
   ! used to calculate the field field1_send sent by the model
   REAL (kind=wp), POINTER :: localgrid_lon (:,:)
   REAL (kind=wp), POINTER :: localgrid_lat (:,:)
+  INTEGER, POINTER        :: localgrid_mask(:,:)
   !
   INTEGER                       :: il_flag  ! Flag for grid writing by proc 0
   !
@@ -298,11 +299,14 @@ PROGRAM model1
   ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
   !
+  ALLOCATE ( localgrid_mask(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_mask'
+  !
   ! Calculate the local grid to the process for OASIS3
   !
   CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
-                         localgrid_lon, localgrid_lat,             &
-                         globalgrid_lon, globalgrid_lat, w_unit)
+                         localgrid_lon, localgrid_lat, localgrid_mask, &
+                         globalgrid_lon, globalgrid_lat, globalgrid_mask, w_unit)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
   !

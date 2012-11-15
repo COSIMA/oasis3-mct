@@ -1,7 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
-                             localgrid_lon, localgrid_lat,             &
-                             globalgrid_lon, globalgrid_lat, id_unit)
+                             localgrid_lon, localgrid_lat, localgrid_mask,  &
+                             globalgrid_lon, globalgrid_lat, globalgrid_mask, id_unit)
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   IMPLICIT NONE
@@ -16,10 +16,13 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
   INTEGER, INTENT(in)    :: var_shape_oasis3(4)
   !
   DOUBLE PRECISION, INTENT(in) :: globalgrid_lon(nlon,nlat),globalgrid_lat(nlon,nlat)
+  INTEGER, INTENT(in)          :: globalgrid_mask(nlon,nlat)
   !
   REAL (kind=wp), INTENT(out)  :: localgrid_lon(   &
      var_shape_oasis3(1):var_shape_oasis3(2),var_shape_oasis3(3):var_shape_oasis3(4))
   REAL (kind=wp), INTENT(out)  :: localgrid_lat(   &
+     var_shape_oasis3(1):var_shape_oasis3(2), var_shape_oasis3(3):var_shape_oasis3(4))
+  INTEGER, INTENT(out)         :: localgrid_mask(   &
      var_shape_oasis3(1):var_shape_oasis3(2), var_shape_oasis3(3):var_shape_oasis3(4))
   !
   INTEGER :: indi_beg, indi_end, indj_beg, indj_end, ij,i,j
@@ -53,6 +56,8 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
       localgrid_lat(ij,1) = globalgrid_lat(i,j)
 #endif
       !
+      localgrid_mask(ij,1) = globalgrid_mask(i,j)
+      !
     ENDDO
   ENDDO
   !
@@ -76,6 +81,10 @@ SUBROUTINE oasis3_local_grid(mype, npes, nlon, nlat, var_shape_oasis3, &
          var_shape_oasis3(4)) = globalgrid_lat(indi_beg:indi_end,&
                                 indj_beg:indj_end)
 #endif
+      !
+      localgrid_mask(var_shape_oasis3(1):var_shape_oasis3(2),var_shape_oasis3(3): &
+         var_shape_oasis3(4)) = globalgrid_mask(indi_beg:indi_end,&
+                                indj_beg:indj_end)
       !
 #endif
   !
