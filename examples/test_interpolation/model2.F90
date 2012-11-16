@@ -60,7 +60,7 @@ PROGRAM model2
   !
   INTEGER :: ierror, rank, w_unit
   INTEGER :: i, j, ij, ic_msk
-  INTEGER :: FILE_Debug=2
+  INTEGER :: FILE_Debug=1
   !
   ! Names of exchanged Fields
   CHARACTER(len=8), PARAMETER :: var_name = 'FRECVANA' ! 8 characters field received by the atmosphere from the ocean

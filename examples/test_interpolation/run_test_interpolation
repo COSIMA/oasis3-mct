@@ -5,7 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler 
-arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)
+arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/training_computer
 host=`uname -n`
 user=`whoami`
 #
@@ -32,7 +32,7 @@ echo 'Target grid :' $TGT_GRID
     exe2=model2
 # number of processes for each executable
     nproc_exe1=1
-    nproc_exe2=2
+    nproc_exe2=1
 # number of processes involved in the coupling for the namcouple
     ncpl_exe1=$nproc_exe1
     ncpl_exe2=$nproc_exe2
@@ -41,7 +41,7 @@ echo 'Target grid :' $TGT_GRID
 # makefile used (for names of the directories for buildbot)
     makefile_ini=Makefile_1
 #
-if [ ${arch} == tioman_pgi_mpich ]; then
+if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
     rundir=/space/${user}/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
@@ -105,7 +105,7 @@ cd $rundir
 ### Linux + pgi
 ###---------------------------------------------------------------------
 
-if [ $arch == tioman_pgi_mpich ] ; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1 
@@ -224,7 +224,7 @@ fi
 ###
 ### 4. Execute the model
 
-if [ $arch == tioman_pgi_mpich ] ; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
 elif [ $arch == tioman_intel_openmpi ] ; then
