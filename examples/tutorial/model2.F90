@@ -103,7 +103,6 @@ PROGRAM model2
       CALL oasis_abort(comp_id,comp_name,'Problem at line 102')
   ENDIF
   !
-  !
   w_unit=100+rank
   WRITE(chout,'(I3)') w_unit
   comp_out=comp_name//'.out_'//chout
@@ -113,6 +112,7 @@ PROGRAM model2
   WRITE (w_unit,*) TRIM(comp_name), ' Running with reals compiled as kind =',wp
   WRITE (w_unit,*) 'I am component ', TRIM(comp_name), ' rank :',rank
   WRITE (w_unit,*) '----------------------------------------------------------'
+  WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ',' comp', comp_id, ' local rank ', mype
   CALL flush(w_unit)
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -124,16 +124,16 @@ PROGRAM model2
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
       WRITE(w_unit,*) 'MPI_comm_size abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 127')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 138')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 133')
   ENDIF
   !
-  WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ',' comp', comp_id, ' local rank ', mype
+  WRITE (w_unit,*) 'Number of processors :',npes
   CALL flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
