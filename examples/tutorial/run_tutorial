@@ -5,10 +5,7 @@
 ############### User's section #######################################
 ##
 ## - Define architecture and coupler 
-arch=corail    #Linux/corail
-# Define compiler and MPILIB for Linux
-compiler=pgi  #pgi/intel
-MPILIB=mpich  #mpich/openmpi
+arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer
 host=`uname -n`
 user=`whoami`
 #
@@ -17,17 +14,6 @@ srcdir=`pwd`
 datadir=$srcdir/data_oasis3
 casename=`basename $srcdir`
 #
-if [ ${arch} == Linux ]; then
-    if [ ${compiler} == pgi ] && [ ${MPILIB} == mpich ]; then
-	MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
-    elif [ ${compiler} == intel ] && [ ${MPILIB} == openmpi ]; then
-	MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
-    fi
-rundir=${HOME}/${user}/oasis3-mct/examples/tutorial/work_${casename}
-elif [ ${arch} == corail ]; then
-rundir=/lustre/globc/${user}/oasis3-mct/examples/tutorial/work_${casename}
-fi
-
 # - Toy models: Define number of processes to run each executable
 #               and name of executables
 #
@@ -41,7 +27,20 @@ fi
     ncpl_exe1=$nproc_exe1
     ncpl_exe2=$nproc_exe2
 #
-
+if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
+    MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == tioman_intel_openmpi ]; then
+    MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == corail ]; then
+rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == curie ]; then
+    rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == jade ]; then
+    rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
+fi
+#
 ############### End of user's section ################################
 
 echo ''
@@ -72,15 +71,6 @@ cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
 
 cp -f $datadir/namcouple $rundir/.
-
-ed $rundir/namcouple <<EOF
-g/nproc_exe1/s/nproc_exe1/$nproc_exe1/
-g/ncpl_exe1/s/ncpl_exe1/$ncpl_exe1/
-g/nproc_exe2/s/nproc_exe2/$nproc_exe2/
-g/ncpl_exe2/s/ncpl_exe2/$ncpl_exe2/
-w
-q
-EOF
 #
 cd $rundir
 #
@@ -92,7 +82,7 @@ cd $rundir
 ### Linux
 ###---------------------------------------------------------------------
 
-if [ $arch == Linux ] && [ $compiler == pgi ]; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1
@@ -146,29 +136,87 @@ ulimit -s unlimited
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
+
+###---------------------------------------------------------------------
+### CURIE (normal nodes)
+###---------------------------------------------------------------------
+elif [ $arch == curie ] ; then
+
+   cat <<EOF > $rundir/appl-curie.conf
+$nproc_exe1 $rundir/$exe1
+$nproc_exe2 $rundir/$exe2
+EOF
+
+      (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash
+#MSUB -r test_interp # Request name
+#MSUB -n $nproc # Number of tasks to use
+#MSUB -T 3600 # Elapsed time limit in seconds
+#MSUB -o $casename_%I.o # Standard output. %I is the job id
+#MSUB -e $casename_%I.e # Error output. %I is the job id
+#MSUB -A gen6028 # Project ID
+set -x
+cd $rundir
+ccc_mprun -f appl-curie.conf
+EOF
+
+###-----------------------------------------------------------------
+### JADE - CINES
+###-----------------------------------------------------------------
+elif [ $arch == jade ] ; then
+(( NNODE = (  $nproc_exe1 + $nproc_exe2 ) / 8 ))
+(( RESTE = (  $nproc_exe1 + $nproc_exe2 ) - ( $NNODE * 8 ) ))
+if [[ $RESTE -gt 0 ]]; then
+ (( NNODE = $NNODE + 1 ))
+fi
+
+echo $NNODE
+
+cat << EOF > $rundir/run_$casename.$arch
+#PBS -S /bin/bash
+#PBS -N OASIS
+#PBS -l walltime=00:10:00
+#PBS -l select=$NNODE:ncpus=8:mpiprocs=8
+#PBS -o $rundir/out
+#PBS -e $rundir/err
+#PBS -j oe
+#
+set -evx
+module load netcdf
+cd $rundir
+cat $PBS_NODEFILE
+## Lancement executable
+which mpiexec
+export MPI_GROUP_MAX=100
+time mpiexec -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2 
+
+EOF
+
 fi 
 
 ######################################################################
 ###
 ### 4. Execute the model
 
-if [ $arch == Linux ] ; then
-    if [ ${compiler} == pgi ] && [ $MPILIB == mpich ]; then
-	echo 'Executing the model using '$MPIRUN 
-	$MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
-    elif [ ${compiler} == intel ] && [ $MPILIB == openmpi ]; then
-	echo 'Executing the model using '$MPIRUN 
-	$MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-    fi
-
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
+    echo 'Executing the model using '$MPIRUN 
+    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
+elif [ $arch == tioman_intel_openmpi ] ; then
+    echo 'Executing the model using '$MPIRUN 
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
-#    qsub -q debug $rundir/run_$casename.$arch
     qsub -q submit $rundir/run_$casename.$arch
-    qstat
-    
+    qstat | grep $user
+elif [ $arch == curie ]; then
+    ccc_msub $rundir/run_$casename.$arch
+    ccc_mpp | grep $user
+elif [ $arch == jade ] ; then
+    qsub $rundir/run_$casename.$arch
+    qstat -awu $user
 fi
-
 echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 
 
