@@ -43,16 +43,16 @@ echo 'Target grid :' $TGT_GRID
 #
 if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
-    rundir=/space/${user}/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
-    rundir=/space/${user}/oasis3-mct/examples/${casename}/work_${casename}
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == corail ]; then
-    rundir=/lustre/globc/${user}/oasis3-mct-examples_buildbot/${casename}/work_${casename}
+    rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == curie ]; then
-    rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct-examples_buildbot/${casename}/work_${casename}
+    rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == jade ]; then
-    rundir=/data/11coqu/oasis3-mct-examples_buildbot/${casename}/work_${casename}
+    rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
 fi
 #
 ############### End of user's section ################################
@@ -78,7 +78,6 @@ echo ''
 \rm -fr $rundir
 mkdir -p $rundir
 
-cp -f $datadir/*txt $rundir/.
 cp -f $datadir/*nc  $rundir/.
 cp -f $datadir/*.jnl $rundir/.
 cp -f $datadir/*.dat $rundir/.
@@ -156,8 +155,7 @@ source /usr/local/bin/intelmpi.sh
 ulimit -s unlimited
 #
 #
-#time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
-mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
 
