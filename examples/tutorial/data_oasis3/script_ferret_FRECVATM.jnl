@@ -1,6 +1,6 @@
 use FRECVATM_model2_01.nc
 
 
-shade/level=(0,5,0.1) FRECVATM[L=3,d=1]
+shade FRECVATM[L=3,d=1]
 
 
