@@ -1711,9 +1711,9 @@ SUBROUTINE inipar_alloc()
         !* Print out model minimum logfile unit number
         IF (mpi_rank_global == 0) THEN
             WRITE (UNIT = nulprt1,FMT = *) ' '
-            WRITE (UNIT=nulprt1,FMT='(''The maximum Fortran unit number'', &
-               &            '' used in model'', I2, '' is '', I2)') &
-               jm, iga_unitmod(jm)
+            WRITE (UNIT=nulprt1,FMT=*) &
+                'The maximum Fortran unit number used in model is', &
+                 jm, iga_unitmod(jm)
             WRITE (UNIT = nulprt1,FMT = *) ' '
         ENDIF
 
