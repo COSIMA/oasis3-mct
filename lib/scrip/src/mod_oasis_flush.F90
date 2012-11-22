@@ -22,11 +22,8 @@ CONTAINS
 !--------------------------------------------------------------------
    character(len=*),parameter :: subname = 'oasis_flush_scrip'
 !--------------------------------------------------------------------
-#if defined SYSAIX
-   CALL FLUSH_(nu)
-#else
+
    CALL FLUSH(nu)
-#endif
 
  END SUBROUTINE oasis_flush_scrip
 
