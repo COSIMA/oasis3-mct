@@ -19,10 +19,10 @@ CPPLOCAL_M2 = -D${CPPKEYDP} -D${CPPKEYDECOMP_M2}
 ### End User configurable options ###
 #
 OBJ_M1 =  routine_hdlerr.o read_all_data.o \
-          decomp_def.o oasis3_local_grid.o \
+          decomp_def.o \
           function_ana.o write_all_fields.o
 OBJ_M2 =  routine_hdlerr.o read_all_data.o \
-          decomp_def_m2.o oasis3_local_grid_m2.o \
+          decomp_def_m2.o \
           function_ana.o  write_all_fields.o
 #-------------------------------------------------------------------------------
 # General rules
@@ -60,12 +60,8 @@ function_ana.o :		function_ana.F90
 				$(F90) $(F90FLAGS) -D${CPPKEYDP} -c function_ana.F90
 decomp_def.o : 			decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
-oasis3_local_grid.o :		oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c oasis3_local_grid.F90
 decomp_def_m2.o : 		decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o decomp_def_m2.o -c decomp_def.F90
-oasis3_local_grid_m2.o :	oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o oasis3_local_grid_m2.o -c oasis3_local_grid.F90
 
 model1.o :	model1.F90 Makefile
 		$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c model1.F90

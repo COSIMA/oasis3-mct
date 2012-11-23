@@ -30,7 +30,6 @@ PROGRAM model2
   !
   CHARACTER(len=30), PARAMETER   :: data_gridname='grids.nc' ! file with the grids
   CHARACTER(len=30), PARAMETER   :: data_maskname='masks.nc' ! file with the masks
-  CHARACTER(len=30), PARAMETER   :: data_areaname='areas.nc' ! file with the areas of the cells
   CHARACTER(len=30)              :: data_filename, field_name
   !
   ! Component name (6 characters) same as in the namcouple
@@ -47,10 +46,9 @@ PROGRAM model2
   INTEGER :: il_size
   INTEGER :: nc             ! number of corners in the (i,j) plan
   !
-  REAL (kind=wp), DIMENSION(:,:), POINTER    :: globalgrid_lon,globalgrid_lat
-  REAL (kind=wp), DIMENSION(:,:,:), POINTER  :: globalgrid_clo,globalgrid_cla
-  REAL (kind=wp), DIMENSION(:,:), POINTER    :: globalgrid_srf
-  INTEGER, DIMENSION(:,:), POINTER           :: globalgrid_mask ! mask, 0 == valid point, 1 == masked point 
+  REAL (kind=wp), DIMENSION(:,:), POINTER    :: gg_lon,gg_lat
+  REAL (kind=wp), DIMENSION(:,:,:), POINTER  :: gg_clo,gg_cla
+  INTEGER, DIMENSION(:,:), POINTER           :: gg_mask ! mask, 0 == valid point, 1 == masked point 
   !
   INTEGER :: mype, npes ! rank and number of pe
   INTEGER :: localComm  ! local MPI communicator and Initialized
@@ -77,12 +75,6 @@ PROGRAM model2
   INTEGER, PARAMETER    ::  il_nb_time_steps = 1 ! number of time steps
   INTEGER, PARAMETER    ::  delta_t = 3600      ! time step
   !
-  ! Centers arrays of the local grid
-  ! used to calculate the field sent by the model
-  REAL (kind=wp), POINTER :: localgrid_lon (:,:)
-  REAL (kind=wp), POINTER :: localgrid_lat (:,:)
-  INTEGER, POINTER        :: localgrid_mask(:,:)
-  !
   INTEGER                       :: il_flag          ! Flag for grid writing
   !
   INTEGER                       :: itap_sec ! Time
@@ -90,11 +82,11 @@ PROGRAM model2
   ! Grid parameter definition
   INTEGER                       :: part_id  ! use to connect the partition to the variables
                                             ! in oasis_def_var
-  INTEGER                       :: var_actual_shape(4) ! local dimensions of the arrays to the pe
-                                                       ! 2 x field rank (= 4 because fields are of rank = 2)
+  INTEGER                       :: var_sh(4) ! local dimensions of the arrays to the pe
+                                             ! 2 x field rank (= 4 because fields are of rank = 2)
+  INTEGER :: indi_beg, indi_end, indj_beg, indj_end
   !
-  ! Exchanged local fields arrays
-  ! used in routines oasis_put and oasis_get
+  ! Local fields arrays used in routines oasis_put and oasis_get
   REAL (kind=wp), POINTER       :: field_recv(:,:), field_ana(:,:), error(:,:)
   !
   ! Global array to plot the error by proc 0 and calculate min and max
@@ -183,7 +175,7 @@ PROGRAM model2
   !  GRID DEFINITION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  ! Reading global grids.nc, masks.nc and areas.nc netcdf files
+  ! Reading global grids.nc and masks.nc netcdf files
   ! Get arguments giving source grid acronym and field type
   !
   OPEN(UNIT=70,FILE='name_grids.dat',FORM='FORMATTED')
@@ -201,30 +193,24 @@ PROGRAM model2
   nc=4
   !
   ! Allocation
-  ALLOCATE(globalgrid_lon(nlon,nlat), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_lon'
-  ALLOCATE(globalgrid_lat(nlon,nlat), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_lat'
-  ALLOCATE(globalgrid_clo(nlon,nlat,nc), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_clo'
-  ALLOCATE(globalgrid_cla(nlon,nlat,nc), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_cla'
-  ALLOCATE(globalgrid_srf(nlon,nlat), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating globalgrid_srf'
-  ALLOCATE(globalgrid_mask(nlon,nlat), STAT=ierror )
+  ALLOCATE(gg_lon(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_lon'
+  ALLOCATE(gg_lat(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_lat'
+  ALLOCATE(gg_clo(nlon,nlat,nc), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_clo'
+  ALLOCATE(gg_cla(nlon,nlat,nc), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_cla'
+  ALLOCATE(gg_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
+  ! Read global grid longitudes, latitudes and mask 
   !
-  ! Reading of the longitudes, latitudes, longitude and latitudes of the corners, mask 
-  ! and areas of the global grid
-  ! Attention peut poser pb de lire toute la grille par tous les procs en HR ...
   CALL read_grid(nlon,nlat,nc, data_gridname, cl_grd_tgt, w_unit, FILE_Debug, &
-                 globalgrid_lon,globalgrid_lat, &
-                 globalgrid_clo,globalgrid_cla)
+                 gg_lon,gg_lat, &
+                 gg_clo,gg_cla)
   CALL read_mask(nlon,nlat, data_maskname, cl_grd_tgt, w_unit, FILE_Debug, &
-                 globalgrid_mask)
-  CALL read_area(nlon,nlat, data_areaname, cl_grd_tgt, w_unit, FILE_Debug, &
-                 globalgrid_srf)
+                 gg_mask)
   !
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'After grids writing'
@@ -269,18 +255,18 @@ PROGRAM model2
   var_nodims(2) = 1    ! Bundles always 1 for OASIS3
   var_type = OASIS_Real
   !
-  var_actual_shape(1) = 1
-  var_actual_shape(2) = il_paral(3)
-  var_actual_shape(3) = 1 
+  var_sh(1) = 1
+  var_sh(2) = il_paral(3)
+  var_sh(3) = 1 
 #ifdef DECOMP_APPLE
-  var_actual_shape(4) = 1
+  var_sh(4) = 1
 #elif defined DECOMP_BOX
-  var_actual_shape(4) = il_paral(4)
+  var_sh(4) = il_paral(4)
 #endif
   !
   ! Declaration of the field associated with the partition of the grid
   CALL oasis_def_var (var_id,var_name, part_id, &
-     var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
+     var_nodims, OASIS_In, var_sh, var_type, ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
       CALL oasis_abort(comp_id,comp_name,'Problem at line 286')
@@ -307,39 +293,33 @@ PROGRAM model2
   !
   ! Allocate the fields send and received by the model
   !
-  ALLOCATE(field_recv(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  ALLOCATE(field_recv(var_sh(2), var_sh(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field_recv'
-  ALLOCATE(field_ana(var_actual_shape(2), var_actual_shape(4)),STAT=ierror )
+  ALLOCATE(field_ana(var_sh(2), var_sh(4)),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field_ana'
-  ALLOCATE(error(var_actual_shape(2), var_actual_shape(4)),STAT=ierror )
+  ALLOCATE(error(var_sh(2), var_sh(4)),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating error'
-  !
-  ALLOCATE ( localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
-  !
-  ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
-  !
-  ALLOCATE ( localgrid_mask(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_mask'
-  !
-  ! Calculate the local grid to the process for OASIS3
-  !
-  CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
-                         localgrid_lon, localgrid_lat, localgrid_mask, &
-                         globalgrid_lon, globalgrid_lat, globalgrid_mask, w_unit)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  ! Data exchange
+  indi_beg=1 ; indi_end=nlon
+  indj_beg=((nlat/npes)*mype)+1 
   !
-  ! Time loop
+  IF (mype .LT. npes - 1) THEN
+      indj_end = (nlat/npes)*(mype+1)
+  ELSE
+      indj_end = nlat 
+  ENDIF
+  !
+  ! Data exchange in time loop
+  !
   ib=1
   itap_sec = delta_t * (ib-1) ! Time
   !
-  CALL function_ana(var_actual_shape(2),&
-                    var_actual_shape(4), &
-                    localgrid_lon,localgrid_lat, &
+  CALL function_ana(var_sh(2),&
+                    var_sh(4), &
+                    RESHAPE(gg_lon(indi_beg:indi_end,indj_beg:indj_end),(/ var_sh(2), var_sh(4) /)), &
+                    RESHAPE(gg_lat(indi_beg:indi_end,indj_beg:indj_end),(/ var_sh(2), var_sh(4) /)), &
                     field_ana,ib)
   !
   ! Get the field FRECVANA
@@ -361,13 +341,9 @@ PROGRAM model2
   !
   error=err_msk
   !
-  DO j=var_actual_shape(3), var_actual_shape(4)
-    DO i=var_actual_shape(1), var_actual_shape(2)
-      IF (localgrid_mask(i,j) == 0) THEN
-          error(i,j) = ABS(((field_ana(i,j) - field_recv(i,j))/field_recv(i,j)))*100
-      ENDIF
-    ENDDO
-  ENDDO
+  WHERE (RESHAPE(gg_mask(indi_beg:indi_end,indj_beg:indj_end),(/ var_sh(2), var_sh(4) /)) == 0)
+      error = ABS(((field_ana - field_recv)/field_recv))*100
+  END WHERE
   !
   !
   !!!!!!!!!!!!!!!!!!!!!!! Write the error and the field in a NetCDF file by proc 0 !!!!!!!!!!!!!!!!!!!!
@@ -392,7 +368,7 @@ PROGRAM model2
   ENDIF
   !      
   !
-  CALL MPI_GATHER(var_actual_shape,4,MPI_INTEGER,global_shapes,4,MPI_INTEGER,0,localComm,ierror)
+  CALL MPI_GATHER(var_sh,4,MPI_INTEGER,global_shapes,4,MPI_INTEGER,0,localComm,ierror)
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting shapes'
   IF (mype == 0) THEN
       IF (FILE_Debug >= 2) THEN
@@ -418,12 +394,12 @@ PROGRAM model2
   ENDIF
       !
 #ifdef NO_USE_DOUBLE_PRECISION
-      CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL,&
+      CALL MPI_gatherv(error, var_sh(2)*var_sh(4),MPI_REAL,&
                        global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
       !
 #elif defined USE_DOUBLE_PRECISION
-      CALL MPI_gatherv(error, var_actual_shape(2)*var_actual_shape(4),MPI_REAL8,&
+      CALL MPI_gatherv(error, var_sh(2)*var_sh(4),MPI_REAL8,&
                        global_error,rcounts,displs,MPI_REAL8,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
       !
@@ -436,7 +412,7 @@ PROGRAM model2
       CALL write_field(nlon,nlat, &
                        data_filename, field_name,  &
                        w_unit, FILE_Debug, &
-                       globalgrid_lon, globalgrid_lat, global_error)
+                       gg_lon, gg_lat, global_error)
   ENDIF
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points calculated by proc 0 !!!!!!!!!!!!!!!!
@@ -446,7 +422,7 @@ PROGRAM model2
       DO i=1,nlon
         DO j=1,nlat
           ij=i+(j-1)*(nlon)
-          IF ( globalgrid_mask(i,j) == 1 ) THEN
+          IF ( gg_mask(i,j) == 1 ) THEN
               global_error(ij) = -err_msk
               ic_msk = ic_msk + 1
           ENDIF
@@ -461,7 +437,7 @@ PROGRAM model2
       DO i=1,nlon
         DO j=1,nlat
           ij=i+(j-1)*(nlon)
-          IF ( globalgrid_mask(i,j) == 1 ) THEN
+          IF ( gg_mask(i,j) == 1 ) THEN
               global_error(ij) = err_msk
           ENDIF
         ENDDO
@@ -475,7 +451,7 @@ PROGRAM model2
       DO i=1,nlon
         DO j=1,nlat
           ij=i+(j-1)*(nlon)
-          IF ( globalgrid_mask(i,j) == 1 ) THEN
+          IF ( gg_mask(i,j) == 1 ) THEN
               global_error(ij) = 0.
           ENDIF
         ENDDO
