@@ -2,10 +2,6 @@
 #set -x
 ######################################################################
 #
-############### User's section #######################################
-##
-## - Define architecture and coupler 
-arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/training_computer
 host=`uname -n`
 user=`whoami`
 #
@@ -14,33 +10,20 @@ srcdir=`pwd`
 datadir=$srcdir/data_oasis3
 casename=`basename $srcdir`
 #
-# Define the name of the source grid and the target grid
-config=$datadir/name_grids.dat
-x=$(cut -d ' ' -f 1 < $config) 
-echo 'x:' $x
-SRC_GRID=`echo $x | cut -b 42-45`
-TGT_GRID=`echo $x | cut -b 94-97`
-echo 'Source grid :' $SRC_GRID
-echo 'Target grid :' $TGT_GRID
-#
-#
-# - Toy models: Define number of processes to run each executable
-#               and name of executables
-#
-#name of the executables
+## - name of the executables
     exe1=model1
     exe2=model2
-# number of processes for each executable
+#
+############### User's section #######################################
+#
+## - Define architecture and coupler 
+arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/training_computer
+#
+# - Define number of processes to run each executable
     nproc_exe1=1
     nproc_exe2=1
-# number of processes involved in the coupling for the namcouple
-    ncpl_exe1=$nproc_exe1
-    ncpl_exe2=$nproc_exe2
-# namcouple used
-    namcouple_ini=namcouple_1
-# makefile used (for names of the directories for buildbot)
-    makefile_ini=Makefile_1
 #
+## - Define rundir
 if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
@@ -56,7 +39,16 @@ elif [ ${arch} == jade ]; then
 fi
 #
 ############### End of user's section ################################
-
+#
+##- Define the name of the source grid and the target grid
+config=$datadir/name_grids.dat
+x=$(cut -d ' ' -f 1 < $config) 
+echo 'x:' $x
+SRC_GRID=`echo $x | cut -b 42-45`
+TGT_GRID=`echo $x | cut -b 94-97`
+echo 'Source grid :' $SRC_GRID
+echo 'Target grid :' $TGT_GRID
+#
 echo ''
 echo '*****************************************************************'
 echo '*** '$casename' : '$run
