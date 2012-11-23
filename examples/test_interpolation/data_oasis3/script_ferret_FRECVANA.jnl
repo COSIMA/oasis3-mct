@@ -1,6 +1,6 @@
 use FRECVANA_model2_01.nc
 
 
-shade FRECVANA[L=1,d=1]
+shade FRECVANA[k=1,d=1]
 
 

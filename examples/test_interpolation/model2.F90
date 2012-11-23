@@ -47,7 +47,6 @@ PROGRAM model2
   INTEGER :: nc             ! number of corners in the (i,j) plan
   !
   REAL (kind=wp), DIMENSION(:,:), POINTER    :: gg_lon,gg_lat
-  REAL (kind=wp), DIMENSION(:,:,:), POINTER  :: gg_clo,gg_cla
   INTEGER, DIMENSION(:,:), POINTER           :: gg_mask ! mask, 0 == valid point, 1 == masked point 
   !
   INTEGER :: mype, npes ! rank and number of pe
@@ -107,14 +106,14 @@ PROGRAM model2
   CALL oasis_init_comp (comp_id, comp_name, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'oasis_init_comp abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 118')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 109')
   ENDIF
   !
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 125')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 116')
   ENDIF
   !
   !
@@ -123,20 +122,20 @@ PROGRAM model2
   CALL oasis_get_localcomm ( localComm, ierror )
   IF (ierror /= 0) THEN
       WRITE (0,*) 'oasis_get_localcomm abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 134')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 125')
   ENDIF
   !
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
       WRITE(0,*) 'MPI_comm_size abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 141')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
       WRITE (0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 147')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 138')
   ENDIF
   !
   !
@@ -197,18 +196,13 @@ PROGRAM model2
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_lon'
   ALLOCATE(gg_lat(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_lat'
-  ALLOCATE(gg_clo(nlon,nlat,nc), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_clo'
-  ALLOCATE(gg_cla(nlon,nlat,nc), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_cla'
   ALLOCATE(gg_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
   ! Read global grid longitudes, latitudes and mask 
   !
-  CALL read_grid(nlon,nlat,nc, data_gridname, cl_grd_tgt, w_unit, FILE_Debug, &
-                 gg_lon,gg_lat, &
-                 gg_clo,gg_cla)
+  CALL read_grid(nlon,nlat, data_gridname, cl_grd_tgt, w_unit, FILE_Debug, &
+                 gg_lon,gg_lat)
   CALL read_mask(nlon,nlat, data_maskname, cl_grd_tgt, w_unit, FILE_Debug, &
                  gg_mask)
   !
@@ -269,7 +263,7 @@ PROGRAM model2
      var_nodims, OASIS_In, var_sh, var_type, ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_def_var abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 286')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 266')
   ENDIF
   !
   !
@@ -284,7 +278,7 @@ PROGRAM model2
   CALL oasis_enddef ( ierror )
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_enddef abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 301')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 281')
   ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -330,7 +324,7 @@ PROGRAM model2
   ENDIF
   IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
       WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 353')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 327')
   ENDIF
   !
   !
@@ -480,7 +474,7 @@ PROGRAM model2
   CALL oasis_terminate (ierror)
   IF (ierror /= 0) THEN
       WRITE (w_unit,*) 'oasis_terminate abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 507')
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 477')
   ENDIF
   !
   CALL mpi_finalize(ierror)

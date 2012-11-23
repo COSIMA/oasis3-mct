@@ -86,10 +86,9 @@ SUBROUTINE read_dimgrid (nlon,nlat,data_filename,cl_grd,w_unit,FILE_Debug)
 END SUBROUTINE read_dimgrid
 
   !****************************************************************************************
-  SUBROUTINE read_grid (nlon,nlat,corners_ij, &
+  SUBROUTINE read_grid (nlon,nlat,&
                         data_filename, cl_grd, w_unit, FILE_Debug, &
-                        gridlon,gridlat, &
-                        gridclo,gridcla)
+                        gridlon,gridlat)
   !**************************************************************************************
   !
 #ifdef NO_USE_DOUBLE_PRECISION
@@ -100,25 +99,25 @@ END SUBROUTINE read_dimgrid
   !
   INTEGER                  :: i,j,k,w_unit,FILE_Debug
   !
-  INTEGER                  :: il_file_id,il_lon_id, il_lat_id,il_clo_id,il_cla_id                                         
+  INTEGER                  :: il_file_id,il_lon_id, il_lat_id                                      
   !               
-  INTEGER, INTENT(in)     :: nlon,nlat,corners_ij
+  INTEGER, INTENT(in)     :: nlon,nlat
   !
   CHARACTER(len=30)        :: data_filename
   CHARACTER(len=4)         :: cl_grd ! name of the source grid
   CHARACTER(len=8)         :: cl_nam ! cl_grd+.lon,+.lat ...
   !
-  INTEGER,  DIMENSION(3)   :: ila_dim
-  INTEGER,  DIMENSION(3)   :: ila_corners,ila_what
+  INTEGER,  DIMENSION(2)   :: ila_dim
+  INTEGER,  DIMENSION(2)   :: ila_what
   !
-  REAL (kind=wp), DIMENSION(nlon,nlat)              :: gridlon,gridlat
-  REAL (kind=wp), DIMENSION(nlon,nlat,corners_ij)   :: gridclo,gridcla
+  REAL (kind=wp), DIMENSION(nlon,nlat)  :: gridlon,gridlat
   !
   !
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'Data_filename :',data_filename
       CALL FLUSH(w_unit)
   ENDIF
+  !
   ! Dimensions
   !
   CALL hdlerr(NF90_OPEN(data_filename, NF90_NOWRITE, il_file_id), __LINE__ )
@@ -135,57 +134,26 @@ END SUBROUTINE read_dimgrid
       CALL FLUSH(w_unit)
   ENDIF
   CALL hdlerr( NF90_INQ_VARID(il_file_id, cl_nam,  il_lat_id),    __LINE__ )
-  cl_nam=cl_grd//".clo" 
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Corners Lon :',cl_nam
-      CALL FLUSH(w_unit)
-  ENDIF
-  CALL hdlerr( NF90_INQ_VARID(il_file_id, cl_nam,  il_clo_id),    __LINE__ )
-  cl_nam=cl_grd//".cla" 
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Corners Lat :',cl_nam
-      CALL FLUSH(w_unit)
-  ENDIF
-  CALL hdlerr( NF90_INQ_VARID(il_file_id, cl_nam,  il_cla_id),    __LINE__ )
   !
   ila_what(:)=1
   !
   ila_dim(1)=nlon
   ila_dim(2)=nlat
-  ila_dim(3)=1
-  !
-  ila_corners(1)=nlon
-  ila_corners(2)=nlat
-  ila_corners(3)=corners_ij
   !
   ! Data
   !
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lon_id, gridlon, &
-     ila_what(1:2), ila_dim(1:2)), __LINE__ )
+     ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'Global grid longitudes reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lat_id, gridlat, &
-     ila_what(1:2), ila_dim(1:2)), __LINE__ )
+     ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'Global grid latitudes reading done'
-      CALL FLUSH(w_unit)
-  ENDIF
-  !
-  CALL hdlerr( NF90_GET_VAR(il_file_id, il_clo_id, gridclo, &
-     ila_what, ila_corners), __LINE__ )
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid longitude corners reading done'
-      CALL FLUSH(w_unit)
-  ENDIF
-  !
-  CALL hdlerr( NF90_GET_VAR (il_file_id, il_cla_id, gridcla, &
-     ila_what, ila_corners), __LINE__ )
-  IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid latitude corners reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !
