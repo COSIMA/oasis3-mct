@@ -72,7 +72,7 @@ my_remapping_file_bilinear.nc src
 #
 # Field 2: model1 output
 #
-FOCNWRIT FOCNWRIT 1 7200 1 f2avg.nc OUTPUT
+FSENDOCN FSENDOCN 1 7200 1 f2avg.nc OUTPUT
 torc  torc
 LOCTRANS
   AVERAGE
