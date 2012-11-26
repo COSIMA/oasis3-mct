@@ -86,55 +86,34 @@ Different output are written depending on NLOGPRT value:
 
 \subsection{Time statistics files}
 
-The variable TIMER\_ Debug, defined in mod\_ oasis\_ timer, is used to obtain time statistics over all the processors for each routine.
+The variable TIMER\_Debug, defined in mod\_oasis\_timer, is used to obtain time statistics over all the processors for each routine.
 
-Different output are written (in files named *.timers\_ xxxx) depending on TIMER\_ Debug value :
+Different output are written (in files named *.timers\_xxxx) depending on TIMER\_Debug value :
 
 \begin{itemize}
-\item {TIMER\_ Debug=0} : nothing is calculated, nothing is written.
-\item {TIMER\_ Debug=1} : the times are calculated and written in a single file by the processor 0 as well as 
+\item {TIMER\_Debug=0} : nothing is calculated, nothing is written.
+\item {TIMER\_Debug=1} : the times are calculated and written in a single file by the processor 0 as well as 
 the min and the max times over all the processors.
-\item {TIMER\_ Debug=2} : the times are calculated and each processor writes its own file ; processor 0 also 
+\item {TIMER\_Debug=2} : the times are calculated and each processor writes its own file ; processor 0 also 
 writes the min and the max times over all the processors in its file.
-\item {TIMER\_ Debug=3} : the times are calculated and each processor writes its own file ; processor 0 also 
+\item {TIMER\_Debug=3} : the times are calculated and each processor writes its own file ; processor 0 also 
 writes in its file the min and the max times over all processors and also writes in its file all the results for each processor.
 \end{itemize}
 
-The time given for each routine is the accumulated time over the entire run.
-
-oasis\_ timer\_start() and oasis\_ timer\_ stop() are the routines used to calculate the time of each routine.
-
-Below is an overview of the meaning of the routines for an example where a model receives field1 and sends field2 :
+The time given for each timer is calculated by the difference between calls to {\tt  oasis\_timer\_start()} and {\tt oasis\_timer\_stop()} and is the accumulated time over the entire run. Here is an overview of the meaning of the different timers as implemented by default. 
 
 \begin{itemize}
-\item {'total after init'} : represents the total time of the simulation, implemented in mod\_ prism\_ method : 
-oasis\_ timer\_ start() is called after initialisation (ie after oasis\_ namcouple\_ init and mct\_ world\_ init) 
-and oasis\_ timer\_ stop() before mpi\_ barrier et mpi\_ finalize (routine oasis\_ terminate).
-\item {'map definition'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after mct\_ gsmap\_ init 
-in mod\_ oasis\_ part (routine oasis\_ def\_ partition). It defines which source processor has to communicate with which target processor.
-\item {'cpl\_ setup'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after oasis\_ coupler\_ setup. It 
-"reconciles the coupling stuff" called by oasis\_ method\_ enddef.
-\item {'cpl\_ smatrd'} : oasis\_ timer\_ start() is called before and oasis\_ timer\_ stop() after oasis\_ coupler\_ smatreaddnc 
-in mod\_ oasis\_ coupler (routine oasis\_ coupler\_ setup). It does a distributed read of a NetCDF SCRIP file and return weights 
-in a distributed SparseMatrix, and calls mct\_ sMatP\_ Init which initialises the sparse matrix vector multiplication.
-\item {'oasis\_ advance\_ init()'} : oasis\_ timer\_ start() is called at the beginning of the routine and oasis\_ timer\_ stop() 
-at the end of the routine (in mod\_ oasis\_ advance). It handles initial restart and communication of data for fields with positive lags.
-\item {'grcv\_ 001'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
-oasis\_ timer\_ stop() after mct\_ recv for field 1.
-\item {'wout\_ 001'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
-oasis\_ timer\_ stop() after I/O of debug for field 1.
-\item {'gcpy\_ 001'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) after the get, oasis\_ timer\_ start() is called 
-before and oasis\_ timer\_ stop() after copying received array field 1 in array(n).
-\item {'pcpy\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put, oasis\_ timer\_ start() is called 
-before and oasis\_ timer\_ stop()  after copying array(n) in array to send (i.e. with local transformation besides division 
-for averaging) for field 2.
-\item {'pavg\_ 002'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put,  oasis\_ timer\_ start() is called 
-before and oasis\_ timer\_ stop() after average as needed for field 2.
-\item {'pmap\_ 002'} :  in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) before the put, oasis\_ timer\_ start() is called 
-before and oasis\_ timer\_ stop() after matrix vector multiplication for field 2.
-\item {'psnd\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
-oasis\_ timer\_ stop() after the mct\_ waitsend and mct\_ isend for field 2.
-\item {'wout\_ 002'} : in mod\_ oasis\_ advance (routine oasis\_ advance\_ run) oasis\_ timer\_ start() is called before and 
-oasis\_ timer\_ stop() after  I/O of debug for field 2. 
+\item {'total after init'} : total time of the simulation, implemented in {\tt mod\_oasis\_method}, i.e. between the end of {\tt oasis\_init\_comp} and the call to {\tt mpi\_barrier} and {\tt mpi\_finalize} in routine {\tt oasis\_terminate}.
+\item {'map definition'} : time spent in {\tt mct\_gsmap\_init} in routine {\tt oasis\_def\_partition}; this routine defines the patterns of communication between the source and target processes.
+\item {'cpl\_setup'} :time spent in {\tt oasis\_coupler\_setup}, which sets up additional coupling aspects related to {\tt oasis\_method\_enddef}.
+\item {'cpl\_smatrd'} : time spent in {\tt oasis\_coupler\_smatreaddnc} in {\tt mod\_oasis\_coupler} (routine {\tt oasis\_coupler\_setup}); this routine performs a distributed read of a NetCDF SCRIP file and returns weights in a distributed SparseMatrix, and calls {\tt mct\_sMatP\_Init} which initialises the sparse matrix vector multiplication.
+\item {'oasis\_advance\_init()'} : time spent in {\tt oasis\_advance\_init}, which handles reading of initial coupling  restart and communication of data for fields with positive lags.
+\item {'grcv\_00x'} : time spent in the reception of field x in {\tt mct\_recv} (including communication and possible waiting time linked to unbalance of components).
+\item {'wout\_00x'} : time spent in the I/O for field x in routine {\tt oasis\_advance\_run}.
+\item {'gcpy\_00x'} : time spent in routine {\tt oasis\_advance\_run} in copying the field x just received in a local array.
+\item {'pcpy\_00x'} : time spent in routine {\tt oasis\_advance\_run} in copying the local field x in the array to send (i.e. with local transformation besides division for averaging).
+\item {'pavg\_00x'} : time spent in routine {\tt oasis\_advance\_run} to calculate the average of field x (if done).
+\item {'pmap\_00x'} : time spent in routine {\tt oasis\_advance\_run} for the matrix vector multiplication for field x.
+\item {'psnd\_00x'} : time spent in routine {\tt oasis\_advance\_run} for sending field x (i.e. including call to {\tt mct\_waitsend} and {\tt mct\_isend}).
 \end{itemize}
 
