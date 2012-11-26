@@ -909,17 +909,12 @@ contains
         CALL oasis_abort_noarg()
     endif
 
-    write(tstring,'(A)') 'map_smat'
     call oasis_debug_note(subname//' map')
-    call oasis_timer_start(tstring)
     call mct_sMat_avMult(avs, mapper%sMatP, avd)
-    call oasis_timer_stop(tstring)
 
     if (present(conserv)) then
     call oasis_debug_note(subname//' conserv')
     if (conserv /= ip_cnone) then
-       write(tstring,'(A)') 'map_conserv'
-       call oasis_timer_start(tstring)
        fsize = mct_avect_nRattr(avs)
        allocate(av_sums(fsize),av_sumd(fsize))
 
@@ -1083,7 +1078,6 @@ contains
 
        deallocate(imasks,imaskd,areas,aread)
        deallocate(av_sums,av_sumd)
-       call oasis_timer_stop(tstring)
     endif
     endif  ! present conserve
 
