@@ -1,4 +1,0 @@
-use FOCNWRIT_model1_02.nc
-shade FOCNWRIT[k=1,d=1]
-
-
