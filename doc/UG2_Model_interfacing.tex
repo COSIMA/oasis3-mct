@@ -231,7 +231,7 @@ time by the {\bf master process of each component model} with the following
 routines.  These routines can be used by the component models to add
 grid fields to the grid files but grid fields
 are {\bf never} overwritten in the grid files. These routines have to
-be called just after {\tt prism\_init\_comp}.
+be called just after {\tt oasis\_init\_comp}. 
 
 \begin{itemize}
 
@@ -338,6 +338,8 @@ Terminates grids writing (required if some of the above grid writing
 routines are called).
 
 \end{itemize}
+
+The creation of the different files is effective in the routine oasis\_enddef.
 
 \section{Partition definition}
 \label{subsubsec_Partition}
