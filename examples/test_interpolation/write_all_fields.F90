@@ -37,7 +37,7 @@ MODULE write_all_fields
   !
   ! Dimensions
   !
-  CALL hdlerr(NF90_CREATE(data_filename, NF90_WRITE, il_file_id), __LINE__ )
+  CALL hdlerr(NF90_CREATE(data_filename, NF90_CLOBBER, il_file_id), __LINE__ )
   !
   CALL hdlerr( NF90_DEF_DIM(il_file_id, "lon", nlon, LONID), __LINE__ )
   CALL hdlerr( NF90_DEF_DIM(il_file_id, "lat", nlat, LATID), __LINE__ )

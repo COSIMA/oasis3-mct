@@ -10,14 +10,15 @@ srcdir=`pwd`
 datadir=$srcdir/data_oasis3
 casename=`basename $srcdir`
 #
-## - name of the executables
+## - Name of the executables
     exe1=model1
     exe2=model2
 #
 ############### User's section #######################################
 #
 ## - Define architecture and coupler 
-arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/training_computer
+arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
+                        #crayXE6
 #
 # - Define number of processes to run each executable
     nproc_exe1=1
@@ -31,11 +32,16 @@ elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == corail ]; then
-    rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
+rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == curie ]; then
     rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == jade ]; then
     rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == ubuntu ]; then 
+  MPIRUN=mpirun
+  rundir=${HOME}/Devel/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == crayXE6 ]; then
+rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
 fi
 #
 ############### End of user's section ################################
@@ -93,23 +99,23 @@ cd $rundir
 ### 3. Creation of configuration scripts
 
 ###---------------------------------------------------------------------
-### Linux + pgi
+### Linux
 ###---------------------------------------------------------------------
 
 if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
-$host 0 $rundir/$exe1 
+$host 0 $rundir/$exe1
 EOF
 else
    cat <<EOF >> $rundir/appl-linux.conf
-$host 0 $rundir/$exe1 
+$host 0 $rundir/$exe1
 EOF
 
   count=1
   while [[ $count -lt $nproc_exe1 ]];do
    cat <<EOF >> $rundir/appl-linux.conf
-$host 1 $rundir/$exe1  
+$host 1 $rundir/$exe1
 EOF
    (( count += 1 ))
   done
@@ -118,7 +124,7 @@ fi
   count=0
   while [[ $count -lt $nproc_exe2 ]];do
    cat <<EOF >> $rundir/appl-linux.conf
-$host 1 $rundir/$exe2 
+$host 1 $rundir/$exe2
 EOF
    (( count += 1 ))
   done
@@ -130,9 +136,9 @@ elif [ $arch == corail ] ; then
 
   cat <<EOF > $rundir/run_$casename.$arch
 # Nom du job
-#PBS -N test_simple
+#PBS -N ${casename}
 # Temps limite du job
-#PBS -l walltime=00:20:00
+#PBS -l walltime=00:10:00
 # Nombre de processus
 #PBS -l select=1:mpiprocs=24:ncpus=24
 #PBS -l place=scatter:excl
@@ -208,6 +214,46 @@ time mpiexec -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
 
 EOF
 
+###---------------------------------------------------------------------
+### CRAYXE6
+###---------------------------------------------------------------------
+elif [ $arch == crayXE6 ] ; then
+
+ (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+d_aus=lm_aus.log       # Ausgabe- u. Fehlerdateien
+d_err=lm_fehler.log
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/ksh
+# Nom du job
+#PBS -N ${casename}
+# Temps limite du job
+#PBS -l walltime=00:10:00
+# Nombre de processus
+#PBS -l mppwidth=$nproc
+#PBS -l mppnppn=1
+#PBS -l mppdepth=1
+#PBS -o $d_aus 
+#PBS -e $d_err
+#
+cd $rundir
+#
+ulimit -c unlimited
+export LIBDWD_FORCE_CONTROLWORDS=1
+export LIBDWD_BITMAP_TYPE=ASCII
+#
+#export MPICH_GNI_DYNAMIC_CONN=disabled
+export MPICH_ENV_DISPLAY=1
+export MPICH_GNI_MAX_EAGER_MSG_SIZE=64000
+export MPICH_ABORT_ON_ERROR=1
+export MALLOC_MMAP_MAX_=0
+export MALLOC_TRIM_THRESHOLD_=-1
+#
+aprun -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
+#
+EOF
+
 fi 
 
 ######################################################################
@@ -217,7 +263,7 @@ fi
 if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
-elif [ $arch == tioman_intel_openmpi ] ; then
+elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == corail ]; then
@@ -230,8 +276,12 @@ elif [ $arch == curie ]; then
 elif [ $arch == jade ] ; then
     qsub $rundir/run_$casename.$arch
     qstat -awu $user
+elif [ $arch == crayXE6 ]; then
+    echo 'Submitting the job to queue using qsub'
+    chmod u+x $rundir/run_$casename.$arch
+    qsub $rundir/run_$casename.$arch
+    qstat
 fi
-
 echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 
 

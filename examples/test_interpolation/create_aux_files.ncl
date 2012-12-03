@@ -16,7 +16,7 @@ fi2 = addfile(dir_in+"grid_model2.nc","r")
 
 ; == write grids.nc == dots are not understood by NCL
 
-fo1 = addfile(dir_out+"grids.nc","r")
+fo1 = addfile(dir_out+"grids.nc","c")
 fo1@creation_date=systemfunc("date")
 fo1@title="Training November 2012 CERFACS"
 
@@ -30,7 +30,7 @@ fo1->$"lmdz_lon"$=fi2->lon
 fo1->$"lmdz_cla"$=fi2->cla
 fo1->$"lmdz_clo"$=fi2->clo
 
-fo2 = addfile(dir_out+"masks.nc","r")
+fo2 = addfile(dir_out+"masks.nc","c")
 fo2@creation_date=systemfunc("date")
 fo2@title="Training November 2012 CERFACS"
 
@@ -38,7 +38,7 @@ fo2->$"torc_msk"$=fi1->imask
 
 fo2->$"lmdz_msk"$=fi2->imask
 
-fo3 = addfile(dir_out+"areas.nc","r")
+fo3 = addfile(dir_out+"areas.nc","c")
 fo3@creation_date=systemfunc("date")
 fo3@title="Training November 2012 CERFACS"
 
