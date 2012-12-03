@@ -39,7 +39,7 @@ elif [ ${arch} == jade ]; then
     rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == ubuntu ]; then 
   MPIRUN=mpirun
-  rundir=${HOME}/Devel/oasis3-mct/examples/${casename}/work_${casename}
+  rundir=${srcdir}/work_${casename}
 elif [ ${arch} == crayXE6 ]; then
 rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
 fi
