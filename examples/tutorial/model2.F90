@@ -56,7 +56,7 @@ PROGRAM model2
   CHARACTER(len=8), PARAMETER :: var_name2 = 'FSENDATM' ! 8 characters field sent by the atmosphere to the ocean
   !
   ! Used in oasis_def_var and oasis_def_var
-  INTEGER                   :: var_id(3) 
+  INTEGER                   :: var_id(2) 
   INTEGER                   :: var_nodims(2) 
   INTEGER                   :: var_type
   !
@@ -200,7 +200,7 @@ PROGRAM model2
   WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
   call flush(w_unit)
   !
-  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
   !

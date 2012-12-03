@@ -54,10 +54,9 @@ PROGRAM model1
   ! Names of exchanged Fields
   CHARACTER(len=8), PARAMETER :: var_name1 = 'FSENDOCN' ! 8 characters field sent by model1 to model2
   CHARACTER(len=8), PARAMETER :: var_name2 = 'FRECVOCN' ! 8 characters field received by model1 from model2
-  CHARACTER(len=8), PARAMETER :: var_name3 = 'FOCNWRIT' ! 8 characters field written in a file
   !
   ! Used in oasis_def_var and oasis_def_var
-  INTEGER                   :: var_id(3) 
+  INTEGER                   :: var_id(2) 
   INTEGER                   :: var_nodims(2) 
   INTEGER                   :: var_type
   !
@@ -201,7 +200,7 @@ PROGRAM model1
   WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
   call flush(w_unit)
   !
-  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
   !
@@ -292,9 +291,8 @@ PROGRAM model1
     !
     ! Send FSENDOCN
     ! TOCOMPLETE - Put here the OASIS call to send FSENDOCN (field1_send)
+    ! to the atmosphere and to the file
     !
-    ! Send FOCNWRIT
-    ! TOCOMPLETE - Put here the OASIS call to send FOCNWRIT (field1_send)
     !
   ENDDO
   !
