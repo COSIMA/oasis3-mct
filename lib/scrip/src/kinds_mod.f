@@ -48,7 +48,7 @@
 !-----------------------------------------------------------------------
 ! hardwire for now, tcraig
 
-      INTEGER           :: nlogprt = 1
+      INTEGER           :: nlogprt = 2
       INTEGER           :: nulou = 6
       logical,parameter :: ll_single = .false.   ! single reals
       logical,parameter :: lncdfgrd = .true.     ! grid files netcdf
