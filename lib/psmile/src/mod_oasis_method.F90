@@ -602,16 +602,22 @@ CONTAINS
    !------------------------
 
    call mct_world_init(prism_nmodels,mpi_comm_global,mpi_comm_local,compid)
-   write(nulprt,*) subname, ' done mct_world_init '
-   call oasis_flush(nulprt)
+  IF (OASIS_debug >= 2)  THEN
+      WRITE(nulprt,*) subname, ' done mct_world_init '
+      CALL oasis_flush(nulprt)
+  ENDIF
 
    call oasis_coupler_setup()
-   write(nulprt,*) subname, ' done prism_coupler_setup '
-   call oasis_flush(nulprt)
+   IF (OASIS_debug >= 2)  THEN
+       WRITE(nulprt,*) subname, ' done prism_coupler_setup '
+       CALL oasis_flush(nulprt)
+   ENDIF
 
    call oasis_advance_init(lkinfo)
-   write(nulprt,*) subname, ' done prism_advance_init '
-   call oasis_flush(nulprt)
+   IF (OASIS_debug >= 2)  THEN
+       WRITE(nulprt,*) subname, ' done prism_advance_init '
+       CALL oasis_flush(nulprt)
+   ENDIF
 
    !--- Force OASIS_OK here rather than anything else ---
 
