@@ -4,7 +4,7 @@
 #
 ###############################################################################
 #
-# CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
 CHAN            = MPI1
 #
 # Paths for libraries, object files and binaries
@@ -40,7 +40,7 @@ ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -Dbalance 
+CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # For compiling in double precision, put -r8
 # For compiling in single precision, remove -r8 and add -Duse_realtype_single

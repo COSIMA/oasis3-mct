@@ -4,7 +4,7 @@
 #
 ###############################################################################
 #
-# CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
 CHAN            = MPI1
 #
 # Paths for libraries, object files and binaries

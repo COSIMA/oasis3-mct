@@ -4,7 +4,7 @@
 #
 ###############################################################################
 #
-# CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
 CHAN            = MPI1
 #
 # Paths for libraries, object files and binaries
@@ -13,7 +13,7 @@ CHAN            = MPI1
 COUPLE          = $(HOME)/oasis3-mct
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = $(HOME)/CORAIL
+ARCHDIR         = $(COUPLE)/CORAIL
 #
 # MPI library
 MPIDIR      = /opt/intel/impi/4.0.0.028/intel64
@@ -38,8 +38,7 @@ ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-#CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTREAT_OVERLAY -DTMG_PERF
-CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # For compiling in double precision, put -r8

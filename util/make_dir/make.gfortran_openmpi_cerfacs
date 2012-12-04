@@ -4,16 +4,16 @@
 #
 ###############################################################################
 #
-# CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
-CHAN            = NONE
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
+CHAN            = MPI1
 #
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3 main directory
-COUPLE          = /space/coquart/oasis3-mct_buildbot
+COUPLE          = $(HOME)/oasis3-mct
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = /space/coquart/compile_oa3-mct_gfopenmpi
+ARCHDIR         = $(COUPLE)/compile_oa3-mct_gfopenmpi
 #
 # MPI library
 MPIDIR      = /usr/lib64/openmpi
@@ -38,10 +38,8 @@ AR          = ar
 ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
-# 
-#CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DTREAT_OVERLAY -Duse_oasis_para
-
-CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -DTREAT_OVERLAY -D__VERBOSE 
+#  
+CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # For compiling in double precision, put -fdefault-real-8 
 # For compiling in single precision, remove -fdefault-real-8  and add -Duse_realtype_single
