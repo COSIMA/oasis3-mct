@@ -285,6 +285,7 @@ CONTAINS
   IF (mpi_rank_global == 0) THEN
       WRITE(nulprt1,*) subname,' allocating ig_nmodel+1',ig_nmodel+1
       WRITE(nulprt1,*) subname,' allocating ig_total_nfield',ig_total_nfield
+      CALL oasis_flush(nulprt1)
   ENDIF
 
   allocate(prism_modnam(ig_nmodel+1), stat=il_err)
@@ -435,6 +436,7 @@ CONTAINS
   maxunit = maxval(iga_unitmod)
   IF (mpi_rank_global == 0) THEN
       WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
+      CALL oasis_flush(nulprt1)
   ENDIF
 
   call oasis_unitsetmin(maxunit)
@@ -450,6 +452,7 @@ CONTAINS
       DO n = 1,prism_nmodels
         WRITE(nulprt1,*) subname,n,TRIM(prism_modnam(n))
       ENDDO
+      CALL oasis_flush(nulprt1)
   ENDIF
 
   nnamcpl = ig_total_nfield
@@ -464,6 +467,7 @@ CONTAINS
         IF (mpi_rank_global == 0) THEN
             WRITE(nulprt1,*) subname,jf,'ERROR: AUXILARY NOT SUPPORTED'
             WRITE (nulprt1,'(a)') ' error = STOP in oasis_namcouple_init'
+            CALL oasis_flush(nulprt1)
         ENDIF
         call oasis_abort_noarg()
     endif
@@ -471,12 +475,14 @@ CONTAINS
         namfldops(jf) = ip_exported
         IF (mpi_rank_global == 0) THEN
             WRITE(nulprt1,*) subname,jf,'WARNING: IGNORED converted to EXPORTED'
+            CALL oasis_flush(nulprt1)
         ENDIF
     endif
     if (namfldops(jf) == ip_ignout) then
         namfldops(jf) = ip_expout
         IF (mpi_rank_global == 0) THEN
             WRITE(nulprt1,*) subname,jf,'WARNING: IGNOUT converted to EXPOUT'
+            CALL oasis_flush(nulprt1)
         ENDIF
     endif
     namflddti(jf) = ig_freq(jf)
@@ -621,6 +627,7 @@ CONTAINS
         WRITE(nulprt1,*) subname,n,'namscrnbr ',namscrnbr(n)
         WRITE(nulprt1,*) subname,n,'namscrbin ',namscrbin(n)
         WRITE(nulprt1,*) ' '
+        CALL oasis_flush(nulprt1)
       ENDDO
   ENDIF
 
@@ -644,6 +651,7 @@ CONTAINS
       DO nv = 1,nnamcpl
         n1 = namfldsort(nv)
         WRITE(nulprt1,*) subname,' sort ',nv,n1,namfldseq(n1)
+        CALL oasis_flush(nulprt1)
       ENDDO
   ENDIF
 
@@ -825,6 +833,7 @@ SUBROUTINE inipar_alloc()
              ' Nothing on input for $NFIELDS '
           WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
           WRITE (UNIT = nulprt1,FMT = *) ' '
+          CALL oasis_flush(nulprt1)
       ENDIF
   ELSE
       READ (clvari,FMT = 2003) ig_total_nfield
@@ -1061,6 +1070,7 @@ SUBROUTINE inipar_alloc()
         lg_oasis_field = .false.
         IF (mpi_rank_global == 0) THEN
             WRITE (nulprt1,*)'==> All the fields are exchanged directly'
+            CALL oasis_flush(nulprt1)
         ENDIF
     ENDIF
 
@@ -1254,6 +1264,7 @@ SUBROUTINE inipar_alloc()
 #endif
         IF (mpi_rank_global == 0) THEN
             WRITE(nulprt1, *) 'lncdfrst =', lncdfrst
+            CALL oasis_flush(nulprt1)
         ENDIF
         !     
         !*          Alloc array needed to get analysis names
@@ -1454,6 +1465,7 @@ SUBROUTINE inipar_alloc()
                'Max number of neighbors for GAUSSIAN interp : ', &
                ig_maxnoa
             WRITE(nulprt1,*)' '
+            CALL oasis_flush(nulprt1)
         ENDIF
         !     
         !*          Search maximum number of different GAUSSIAN interpolations
@@ -1464,6 +1476,7 @@ SUBROUTINE inipar_alloc()
                'Maximum number of different GAUSSIAN interpolations : ', &
                ig_maxnfg
             WRITE(nulprt1,*)' '
+            CALL oasis_flush(nulprt1)
         ENDIF
         ! 
     ENDIF
@@ -1696,6 +1709,7 @@ SUBROUTINE inipar_alloc()
         WRITE (UNIT = nulprt1,FMT =' &
            &        (''   Name for model '',I1,'' is '',A6,/)')  &
            jm, cmodnam(jm)
+        CALL oasis_flush(nulprt1)
     ENDIF
 
 140 CONTINUE
@@ -1715,6 +1729,7 @@ SUBROUTINE inipar_alloc()
                 'The maximum Fortran unit number used in model is', &
                  jm, iga_unitmod(jm)
             WRITE (UNIT = nulprt1,FMT = *) ' '
+            CALL oasis_flush(nulprt1)
         ENDIF
 
         !* Verify that maximum unit number is larger than 1024; 
@@ -1726,6 +1741,7 @@ SUBROUTINE inipar_alloc()
                ' WARNING: You did not give in the namcouple the maximum', &
                ' Fortran unit numbers used in your models.', &
                ' Oasis will suppose that units above 1024 are free !'
+            CALL oasis_flush(nulprt1)
         ENDIF
         iga_unitmod(jm)=1024
     ENDIF
@@ -1835,6 +1851,7 @@ SUBROUTINE inipar_alloc()
               ' Nothing on input for $NLOGPRT '
            WRITE (UNIT = nulprt1,FMT = *) ' Default value 2 will be used '
            WRITE (UNIT = nulprt1,FMT = *) ' '
+           CALL oasis_flush(nulprt1)
        ENDIF
    ELSE IF (ilen .gt. 8) THEN
        IF (mpi_rank_global == 0) THEN
@@ -1847,6 +1864,7 @@ SUBROUTINE inipar_alloc()
            WRITE (UNIT = nulprt1,FMT = *)  &
               ' Check $NLOGPRT variable spelling '
            WRITE (UNIT = nulprt1,FMT = *) ' Default value will be used '
+           CALL oasis_flush(nulprt1)
        ENDIF
    ELSE
        READ (clvari,FMT = 1004) nlogprt
@@ -1955,6 +1973,7 @@ SUBROUTINE inipar_alloc()
                     'is greater than the time of the simulation '
                  WRITE (UNIT = nulprt1,FMT = *)  &
                     'This field will not be exchanged !'
+                 CALL oasis_flush(nulprt1)
              ENDIF
          ENDIF
      ENDIF
@@ -1993,6 +2012,7 @@ SUBROUTINE inipar_alloc()
              ENDIF
 !*
 !* Second line
+! XXX Modif Graham ?
 
         IF (ig_total_state(jf) .ne. ip_input) THEN
            READ (UNIT = nulin,FMT = 2002) clline

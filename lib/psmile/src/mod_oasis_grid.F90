@@ -116,6 +116,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -160,6 +161,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -203,6 +205,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -290,6 +293,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -330,6 +334,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -360,6 +365,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -475,6 +481,7 @@ CONTAINS
              write(nulprt,*) subname,' ERROR in predefined grid size',nx,ny, &
                 prism_grid(gridID)%nx,prism_grid(gridID)%ny
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
              call oasis_abort_noarg()
           endif
        endif

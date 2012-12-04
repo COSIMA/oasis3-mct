@@ -541,12 +541,14 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
        WRITE(nulprt,F00) "ERROR: can't find start tag in string"
        WRITE(nulprt,F00) "ERROR: start tag = ",TRIM(startTag)
        WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       CALL oasis_flush(nulprt)
        rCode = 1
    else if (iEnd < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) "ERROR: can't find end tag in string"
        WRITE(nulprt,F00) "ERROR: end   tag = ",TRIM(  endTag)
        WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       CALL oasis_flush(nulprt)
        rCode = 2
    else if ( iEnd <= iStart) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
@@ -554,16 +556,19 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
        WRITE(nulprt,F00) "ERROR: start tag = ",TRIM(startTag)
        WRITE(nulprt,F00) "ERROR: end   tag = ",TRIM(  endTag)
        WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       CALL oasis_flush(nulprt)
        rCode = 3
    else if ( iStart+1 == iEnd ) then
       substr = ""
       WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
       WRITE(nulprt,F00) "WARNING: zero-length substring found in ",TRIM(string)
+      CALL oasis_flush(nulprt)
    else
       substr = string(iStart+1:iEnd-1)
       IF (LEN_TRIM(substr) == 0) THEN
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
           WRITE(nulprt,F00) "WARNING: white-space substring found in ",TRIM(string)
+          CALL oasis_flush(nulprt)
      ENDIF
    end if
 
@@ -642,6 +647,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
    if (trim(unit) == 'none') then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) ' ERROR time unit unknown'
+       CALL oasis_flush(nulprt)
        CALL oasis_string_abort(subName//' time unit unknown')
    endif
 
@@ -649,6 +655,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
    if (i < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) ' ERROR since does not appear in unit attribute for time '
+       CALL oasis_flush(nulprt)
        CALL oasis_string_abort(subName//' no since in attr name')
    endif
    tbase = trim(string(i+6:))
@@ -658,6 +665,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,*) TRIM(subName)//' '//'unit '//TRIM(unit)
        WRITE(nulprt,*) TRIM(subName)//' '//'tbase '//TRIM(tbase)
+       CALL oasis_flush(nulprt)
    endif
 
    yr=0; mo=0; da=0; hr=0; min=0; sec=0
@@ -702,6 +710,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
    IF (debug > 0 ) THEN
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,*) TRIM(subName),'ymdhms:',yr,mo,da,hr,min,sec
+       CALL oasis_flush(nulprt)
    ENDIF
 
    bdate = abs(yr)*10000 + mo*100 + da
@@ -716,6 +725,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 200  continue
    WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
    write(nulprt,F00) 'ERROR 200 on char num read '
+   CALL oasis_flush(nulprt)
    call oasis_string_abort(subName//' ERROR on char num read')
    call oasis_debug_exit(subname)
 
@@ -825,6 +835,7 @@ logical function oasis_string_listIsValid(list,rc)
       oasis_string_listIsValid = .false.
       WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
       write(nulprt,F00) "WARNING: invalid list = ",trim(list)
+      CALL oasis_flush(nulprt)
    endif
 
    if (present(rc)) rc = rCode
@@ -881,6 +892,7 @@ subroutine oasis_string_listGetName(list,k,name,rc)
    if (.not. oasis_string_listIsValid(list,rCode) ) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
       write(nulprt,F00) "ERROR: invalid list = ",trim(list)
+      CALL oasis_flush(nulprt)
       call oasis_string_abort(subName//" ERROR: invalid list = "//trim(list))
    end if
 
@@ -890,6 +902,7 @@ subroutine oasis_string_listGetName(list,k,name,rc)
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,*) subName,"ERROR: invalid index = ",k
        WRITE(nulprt,*) subName,"ERROR:          list = ",TRIM(list)
+       CALL oasis_flush(nulprt)
        CALL oasis_string_abort(subName//" ERROR: invalid index")
    end if
 
@@ -1344,6 +1357,7 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
        IF (lprint) THEN
            WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
            WRITE(nulprt,F00) "ERROR: input field name has 0 length"
+           CALL oasis_flush(nulprt)
        ENDIF
        CALL oasis_string_abort(subName//"invalid field name")
    end if
@@ -1407,6 +1421,7 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
       IF (lprint) THEN
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
           WRITE(nulprt,F00) "FYI: field ",TRIM(fldStr)," not found in list ",TRIM(string)
+          CALL oasis_flush(nulprt)
       ENDIF
       if (present(rc)) rc = 1
    end if
@@ -1494,6 +1509,7 @@ subroutine oasis_string_listSetDel(cflag)
    IF (debug > 0) THEN
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
        WRITE(nulprt,F00) 'changing listDel from '//TRIM(listDel)//' to '//TRIM(cflag)
+       CALL oasis_flush(nulprt)
    ENDIF
    listDel = trim(cflag)
    listDel2 = listDel//listDel
@@ -1574,9 +1590,11 @@ subroutine oasis_string_setAbort(flag)
       if (flag) then
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
           WRITE(nulprt,F00) 'setting abort to true'
+          CALL oasis_flush(nulprt)
       else
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
           WRITE(nulprt,F00) 'setting abort to false'
+          CALL oasis_flush(nulprt)
       endif
    endif
 
@@ -1660,9 +1678,11 @@ subroutine oasis_string_abort(string)
    if (doabort) then
        WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    else
       write(nulprt,F00) ' no abort:'//trim(lstring)
+      CALL oasis_flush(nulprt)
    endif
 
    call oasis_debug_exit(subname)

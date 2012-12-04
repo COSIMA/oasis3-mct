@@ -127,6 +127,7 @@ CONTAINS
        WRITE (UNIT = nulprt1,FMT = *)  &
           ' so we force OASIS_debug = 0 for all processors '
        OASIS_debug = 0
+       CALL oasis_flush(nulprt)
    ENDIF
 
    ! Determines the total number of fields to avoid a parameter in oasis_def_var
@@ -137,6 +138,7 @@ CONTAINS
      mvar = mvar + oasis_string_listGetNum(namsrcfld(n))
    ENDDO
    WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
+   CALL oasis_flush(nulprt)
    !
    ALLOCATE(prism_var(mvar))
    !
@@ -161,6 +163,7 @@ CONTAINS
        IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) subname,' model not found in namcouple ',&
                             TRIM(cdnam)
+           CALL oasis_flush(nulprt)
        ENDIF
        CALL oasis_abort_noarg()
    endif
@@ -228,6 +231,7 @@ CONTAINS
 
        IF (OASIS_debug >= 2) THEN
            WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
+           CALL oasis_flush(nulprt)
        ENDIF
 
    call oasis_debug_enter(subname)
@@ -298,16 +302,19 @@ CONTAINS
    IF ( .NOT. lg_mpiflag ) THEN
        IF (OASIS_debug >= 2)  THEN
            WRITE (nulprt,FMT='(A)') subname//': Calling MPI_Finalize'
+           CALL oasis_flush(nulprt)
        ENDIF
        CALL MPI_Finalize ( mpi_err )
    else
        IF (OASIS_debug >= 2)  THEN
            WRITE (nulprt,FMT='(A)') subname//': Not Calling MPI_Finalize'
+           CALL oasis_flush(nulprt)
        ENDIF
    ENDIF
 
    IF (OASIS_debug >= 2)  THEN
        WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
+       CALL oasis_flush(nulprt)
    ENDIF
 
    call oasis_debug_exit(subname)
@@ -399,6 +406,7 @@ CONTAINS
    CALL MPI_COMM_Split(allcomm,icpl,1,cplcomm,mpi_err)
    IF (mpi_err /= 0) THEN
       WRITE (nulprt,*) subname,' ERROR: MPI_Comm_Split abort ',mpi_err
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    ENDIF
 
@@ -410,6 +418,7 @@ CONTAINS
 
    IF (OASIS_debug >= 2)  THEN
        WRITE (nulprt,*) 'New local coupling comm =',cplcomm
+       CALL oasis_flush(nulprt)
    ENDIF
 
    call oasis_debug_exit(subname)
@@ -455,6 +464,7 @@ CONTAINS
    OASIS_debug = debug
    if (OASIS_debug >= 2) then
       write(nulprt,*) subname,' set OASIS_debug to ',OASIS_debug
+      CALL oasis_flush(nulprt)
    endif
 
    call oasis_debug_exit(subname)
@@ -487,6 +497,7 @@ CONTAINS
             write(nulprt,*) subname,' ERROR: found same model name twice'
             WRITE(nulprt,*) subname,' abort by model :',compid,&
             ' proc :',mpi_rank_local
+            CALL oasis_flush(nulprt)
             call oasis_abort_noarg()
          endif
          il = n
@@ -498,6 +509,7 @@ CONTAINS
       write(nulprt,*) subname,' ERROR: input model name not found'
       WRITE(nulprt,*) subname,' abort by model :',compid,&
       ' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
 
@@ -593,6 +605,7 @@ CONTAINS
          n,trim(prism_modnam(n)),mpi_root_global(n)
          write(nulprt,*) subname,' ERROR: global root invalid, &
          & check couplcomm for active tasks'
+         CALL oasis_flush(nulprt)
          call oasis_abort_noarg()
       endif
    enddo

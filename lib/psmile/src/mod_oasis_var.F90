@@ -40,6 +40,7 @@
         if (trim(cdport) == trim(prism_var(n)%name)) then
            write(nulprt,*) subname,' variable already defined with var_def ',trim(cdport)
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            call oasis_abort_noarg()
         endif
      enddo
@@ -50,6 +51,7 @@
      if (prism_nvar > mvar) then
         write(nulprt,*) subname,' ERROR prism_nvar too large ',prism_nvar,mvar
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+        CALL oasis_flush(nulprt)
         call oasis_abort_noarg()
      endif
 
@@ -81,6 +83,7 @@
         write(nulprt,*) subname,' vartype = ',prism_nvar,prism_var(prism_nvar)%type
         write(nulprt,*) subname,' varsize = ',prism_nvar,prism_var(prism_nvar)%size
         write(nulprt,*) ' '
+        CALL oasis_flush(nulprt)
      endif
 
      call oasis_debug_exit(subname)

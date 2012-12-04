@@ -181,12 +181,14 @@ module mod_oasis_timer
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
              WRITE(nulprt,*) subname,' WARNING: timer_label does not exist ',&
                              TRIM(timer_label)
+             CALL oasis_flush(nulprt)
              RETURN
          endif
 
          if (timer(timer_id)%runflag == t_stopped) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
              WRITE(nulprt,*) subname,' WARNING timer_id ',timer_id,' not started'
+             CALL oasis_flush(nulprt)
              RETURN
          endif
 
@@ -250,6 +252,7 @@ module mod_oasis_timer
                                 ' proc :',mpi_rank_local
                 WRITE(nulprt,*) subname,' WARNING: invalid timer_label',&
                                 TRIM(timer_label)
+                CALL oasis_flush(nulprt)
                 RETURN
             endif
          endif
@@ -514,6 +517,7 @@ module mod_oasis_timer
             if (n < 1) then
                write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
+               CALL oasis_flush(nulprt)
                return
             endif
             mintime = sum_ctime_global(n,1)

@@ -72,6 +72,7 @@ contains
        if (lag > dt .or. lag <= -dt) then
           write(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -86,6 +87,7 @@ contains
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
              call oasis_abort_noarg()
           endif
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
@@ -117,6 +119,7 @@ contains
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
              call oasis_abort_noarg()
           endif
           if (OASIS_debug >= 2) then
@@ -206,6 +209,7 @@ contains
        write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
        write(nulprt,*) subname,' ERROR mop invalid ',mop
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
        call oasis_abort_noarg()
     endif
 
@@ -266,6 +270,7 @@ contains
        if (abs(lag) > dt) then
           write(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -279,6 +284,7 @@ contains
        else
           write(nulprt,*) subname,' ERROR model op does not match coupler op',mop,getput
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -310,6 +316,7 @@ contains
           write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',&
                           msec,maxtime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -322,6 +329,7 @@ contains
           write(nulprt,*) subname,' ERROR model seems to be running backwards',&
                           msec,lcouplertime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -389,6 +397,7 @@ contains
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' ERROR sizes ',nsav,nsa
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
        endif
 
@@ -461,6 +470,7 @@ contains
           else
              write(nulprt,*) subname,' ERROR: trans not known ',prism_coupler(cplid)%trans
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
              call oasis_abort_noarg()
           endif
           call oasis_timer_stop(tstring)
@@ -520,6 +530,7 @@ contains
              write(nulprt,*) subname,' ERROR: model did not advance in time correctly',&
                              msec,prism_coupler(cplid)%ltime
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
              call oasis_abort_noarg()
           endif
 
@@ -906,6 +917,7 @@ contains
     if (mct_avect_nRattr(avs) /= mct_avect_nRattr(avd)) then
         WRITE(nulprt,*) subname,' ERROR in av num of flds'
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+        CALL oasis_flush(nulprt)
         CALL oasis_abort_noarg()
     endif
 
@@ -1012,6 +1024,7 @@ contains
               WRITE(nulprt,*) subname,' ERROR: conserve global wts_sumd/sums zero'
               WRITE(nulprt,*) subname,' abort by model :',compid,&
                               ' proc :',mpi_rank_local
+              CALL oasis_flush(nulprt)
               CALL oasis_abort_noarg()
           endif
           do m = 1,fsize
@@ -1026,6 +1039,7 @@ contains
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
                  WRITE(nulprt,*) subname,' abort by model :',compid,&
                                  ' proc :',mpi_rank_local
+                 CALL oasis_flush(nulprt)
                  CALL oasis_abort_noarg()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = av_sums(m) / av_sumd(m)
@@ -1039,6 +1053,7 @@ contains
               WRITE(nulprt,*) subname,' ERROR: conserve wts_sumd/sums zero'
               WRITE(nulprt,*) subname,' abort by model :',compid,&
                               ' proc :',mpi_rank_local
+              CALL oasis_flush(nulprt)
               CALL oasis_abort_noarg()
           endif
           do m = 1,fsize
@@ -1053,6 +1068,7 @@ contains
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
                  WRITE(nulprt,*) subname,' abort by model :',compid,&
                                  ' proc :',mpi_rank_local
+                 CALL oasis_flush(nulprt)
                  CALL oasis_abort_noarg()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = (av_sums(m)/av_sumd(m)) * (wts_sumd/wts_sums)
@@ -1064,6 +1080,7 @@ contains
        else
            WRITE(nulprt,*) subname,' ERROR: conserv option'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            CALL oasis_abort_noarg()
        endif
 
@@ -1074,6 +1091,7 @@ contains
                                    mask=imaskd,wts=aread,consbfb=lconsbfb)
           write(nulprt,*) subname,' DEBUG src sum af conserve ',av_sums
           write(nulprt,*) subname,' DEBUG dst sum af conserve ',av_sumd
+          CALL oasis_flush(nulprt)
        endif
 
        deallocate(imasks,imaskd,areas,aread)
@@ -1124,6 +1142,7 @@ contains
     if (size(sum) /= fsize) then
         WRITE(nulprt,*) subname,' ERROR: size sum ne size av'
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+        CALL oasis_flush(nulprt)
         CALL oasis_abort_noarg()
     endif
 
@@ -1131,6 +1150,7 @@ contains
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size mask ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            CALL oasis_abort_noarg()
        endif
        do n = 1,lsize
@@ -1142,6 +1162,7 @@ contains
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size wts ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            CALL oasis_abort_noarg()
        endif
        do n = 1,lsize
@@ -1231,6 +1252,7 @@ contains
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size mask ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            CALL oasis_abort_noarg()
        endif
        do n = 1,lsize
@@ -1242,6 +1264,7 @@ contains
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size wts ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+           CALL oasis_flush(nulprt)
            CALL oasis_abort_noarg()
        endif
        do n = 1,lsize

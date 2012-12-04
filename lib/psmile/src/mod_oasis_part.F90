@@ -82,6 +82,7 @@ CONTAINS
    if (prism_npart > mpart) then
       write(nulprt,*) subname,' ERROR prism_npart too large ',prism_npart,mpart
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
 
@@ -132,6 +133,7 @@ CONTAINS
    else
       write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
 
@@ -161,6 +163,7 @@ CONTAINS
           WRITE(nulprt,*) subname,' pe_loc = ',prism_part(prism_npart)%gsmap%pe_loc
       ENDIF
       write(nulprt,*) ' '
+      CALL oasis_flush(nulprt)
    endif
 
    call oasis_debug_exit(subname)
@@ -221,6 +224,7 @@ CONTAINS
   else
      write(nulprt,*) subname,' ERROR type unknown ',trim(type)
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+     CALL oasis_flush(nulprt)
      call oasis_abort_noarg()
   endif
 

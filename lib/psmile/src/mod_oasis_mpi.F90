@@ -6,7 +6,7 @@ MODULE mod_oasis_mpi
 
    use mod_oasis_kinds
    USE mod_oasis_data, ONLY: compid, mpi_rank_local
-   use mod_oasis_sys, only: oasis_debug_enter, oasis_debug_exit
+   USE mod_oasis_sys, ONLY: oasis_debug_enter, oasis_debug_exit, oasis_flush
 
    implicit none
    private
@@ -123,6 +123,7 @@ SUBROUTINE oasis_mpi_chkerr(rcode,string)
      call MPI_ERROR_STRING(rcode,lstring,len,ierr)
      write(nulprt,*) trim(subName),' model :',compid,' proc :',&
                      mpi_rank_local,":",lstring(1:len)
+     CALL oasis_flush(nulprt)
      call oasis_mpi_abort(string,rcode)
    endif
 
@@ -2257,6 +2258,7 @@ SUBROUTINE oasis_mpi_abort(string,rcode)
    if ( present(string) .and. present(rcode) ) then
       write(nulprt,*) trim(subName),' model :',compid,' proc :',&
                       mpi_rank_local,":",trim(string),rcode
+      CALL oasis_flush(nulprt)
    endif
    if ( present(rcode) )then
       rc = rcode

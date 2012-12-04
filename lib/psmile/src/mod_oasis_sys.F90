@@ -112,6 +112,7 @@ CONTAINS
    if (.not.found) then
       write(nulprt,*) subname,' ERROR no unitno available '
       WRITE(nulprt,*) subname,' abort by model ',compid,' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
      

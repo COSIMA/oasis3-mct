@@ -415,6 +415,7 @@ CONTAINS
            if (flag /= OASIS_In .and. flag /= OASIS_Out) then
               write(nulprt,*) subname,' ERROR flag problems',flag
               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              CALL oasis_flush(nulprt)
               call oasis_abort_noarg()
            endif
 
@@ -481,18 +482,21 @@ CONTAINS
                        write(nulprt,*) subname,' ERROR send recv pair on same model',nm,' ', &
                           trim(myfld),' ',trim(otfld)
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       CALL oasis_flush(nulprt)
                        call oasis_abort_noarg()
                     endif
                     if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
                        write(nulprt,*) subname,' ERROR send recv pair both Out ', &
                           trim(myfld),' ',trim(otfld)
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       CALL oasis_flush(nulprt)
                        call oasis_abort_noarg()
                     endif
                     if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
                        write(nulprt,*) subname,' ERROR send recv pair both In ', &
                           trim(myfld),' ',trim(otfld)
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       CALL oasis_flush(nulprt)
                        call oasis_abort_noarg()
                     endif
                  endif
@@ -502,6 +506,7 @@ CONTAINS
                        write(nulprt,*) subname,' ERROR namcouple field names to not match for in/out', &
                           trim(myfld),' ',trim(otfld)
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       CALL oasis_flush(nulprt)
                        call oasis_abort_noarg()
                     endif
                  endif
@@ -514,6 +519,7 @@ CONTAINS
                  if (flag == OASIS_In .and. found) then
                     write(nulprt,*) subname,' ERROR found two sources for ',trim(otfld)
                     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    CALL oasis_flush(nulprt)
                     call oasis_abort_noarg()
                  endif
                  found = .true.
@@ -528,6 +534,7 @@ CONTAINS
                  if (prism_ncoupler > prism_mcoupler) then
                     write(nulprt,*) subname,' ERROR prism_ncoupler too large',prism_ncoupler,prism_mcoupler
                     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    CALL oasis_flush(nulprt)
                     call oasis_abort_noarg()
                  endif
                  nc = prism_ncoupler
@@ -627,6 +634,7 @@ CONTAINS
                        write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,&
                                        prism_mrouter
                        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                       CALL oasis_flush(nulprt)
                        call oasis_abort_noarg()
                     endif
                     prism_coupler(nc)%routerID = prism_nrouter
@@ -677,6 +685,7 @@ CONTAINS
                           write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,&
                                           prism_mmapper
                           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                          CALL oasis_flush(nulprt)
                           call oasis_abort_noarg()
                        endif
                        mapID = prism_nmapper
@@ -747,6 +756,7 @@ CONTAINS
      if (part1 <= 0) then
         write(nulprt,*) subname,' ERROR part1 invalid ',part1
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+        CALL oasis_flush(nulprt)
         call oasis_abort_noarg()
      endif
 
@@ -832,6 +842,7 @@ CONTAINS
                     write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',&
                                     trim(prism_mapper(mapID)%file)
                     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    CALL oasis_flush(nulprt)
                     call oasis_abort_noarg()
                  endif
               endif
@@ -892,6 +903,7 @@ CONTAINS
            else
               write(nulprt,*) subname,' ERROR mapper opt invalid ',trim(prism_mapper(mapID)%opt)
               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              CALL oasis_flush(nulprt)
               call oasis_abort_noarg()
            endif
            if (prism_mapper(mapID)%optval /= '' .and. &
@@ -899,6 +911,7 @@ CONTAINS
               write(nulprt,*) subname,' ERROR mapper opt changed',&
                               trim(prism_mapper(mapID)%optval),' ',trim(cstring)
               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              CALL oasis_flush(nulprt)
               call oasis_abort_noarg()
            endif
            prism_mapper(mapID)%optval = trim(cstring)
@@ -962,6 +975,7 @@ CONTAINS
               write(nulprt,*) subname,' DEBUG mdr ',minval(prism_mapper(mapID)%av_md%rAttr(:,:)),&
                               maxval(prism_mapper(mapID)%av_md%rAttr(:,:)),&
                               sum(prism_mapper(mapID)%av_md%rAttr(:,:))
+              CALL oasis_flush(nulprt)
            endif
         endif
 
@@ -1038,6 +1052,7 @@ CONTAINS
         call oasis_coupler_print(nc)
      enddo
      write(nulprt,*) ' '
+     CALL oasis_flush(nulprt)
   endif
 
   call oasis_timer_stop('cpl_setup')
@@ -1166,19 +1181,22 @@ CONTAINS
   if (trim(namscrtyp(namID)) /= 'SCALAR') then
      write(nulprt,*) subname,' ERROR: only scrip type SCALAR mapping supported'
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     call oasis_abort_noarg()
+     CALL oasis_flush(nulprt)
+     CALL oasis_abort_noarg()
   endif
 
   if (trim(namscrmet(namID)) == 'CONSERV' .and. trim(namscrord(namID)) /= 'FIRST') then
      write(nulprt,*) subname,' ERROR: only FIRST ORDER mapping supported'
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     call oasis_abort_noarg()
+     CALL oasis_flush(nulprt)
+     CALL oasis_abort_noarg()
   endif
 
   if (trim(namscrmet(namID)) == 'BICUBIC') then
      write(nulprt,*) subname,' ERROR: BICUBIC mapping not yet supported'
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     call oasis_abort_noarg()
+     CALL oasis_flush(nulprt)
+     CALL oasis_abort_noarg()
   endif
   
   do_corners = .false.
@@ -1345,8 +1363,10 @@ CONTAINS
      dst_corner_lat = -9999.
   endif
 
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' call grid_init '
-  call oasis_flush(nulprt)
+  IF (OASIS_debug >= 15) THEN
+      WRITE(nulprt,*) subname,' call grid_init '
+      CALL oasis_flush(nulprt)
+  ENDIF
 
   !--- 0/1 mask convention opposite in scrip vs oasis
   src_mask = 1 - src_mask
@@ -1359,7 +1379,10 @@ CONTAINS
        src_corner_lat, src_corner_lon, &
        dst_corner_lat, dst_corner_lon, &
        logunit=nulprt)
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' done scrip '
+  if (OASIS_debug >= 15) then
+      WRITE(nulprt,*) subname,' done grid_init '
+      CALL oasis_flush(nulprt)
+  ENDIF
 
   IF (OASIS_debug >= 15) THEN
       WRITE(nulprt,*) subname,' call scrip '
@@ -1533,6 +1556,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       write(nulprt,F00) trim(nf90_strerror(status))
       WRITE(nulprt,*) subname,'ERROR filename'
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
 
@@ -1582,11 +1606,13 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       IF (status /= NF90_NOERR) THEN
           WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
       ENDIF
       status = nf90_get_var(fid, vid, areasrc0%rAttr)
       IF (status /= NF90_NOERR) THEN
           WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
       ENDIF
    endif
    call mct_aVect_scatter(areasrc0, areasrc, SgsMap, 0, mpicom, status)
@@ -1611,11 +1637,13 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       IF (status /= NF90_NOERR) THEN
           WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
       ENDIF
       status = nf90_get_var(fid, vid, areadst0%rAttr)
       IF (status /= NF90_NOERR) THEN
           WRITE(nulprt,F00) TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
       ENDIF
    endif
    call mct_aVect_scatter(areadst0, areadst, DgsMap, 0, mpicom, status)
@@ -1650,6 +1678,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    else
       write(nulprt,F00) 'ERROR: invalid newdom value = ',newdom
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
    lsize = 0
@@ -1686,6 +1715,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       if (lsstart(n) > lsstart(n+1)) then
          write(nulprt,F00) ' ERROR: lsstart not properly sorted'
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+         CALL oasis_flush(nulprt)
          call oasis_abort_noarg()
       endif
    enddo
@@ -1726,6 +1756,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          IF (status /= NF90_NOERR) THEN
              WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
          ENDIF
 
 !        status = nf90_inq_varid      (fid,'row',vid)
@@ -1734,6 +1765,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          IF (status /= NF90_NOERR) THEN
              WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
          ENDIF
 
 !        status = nf90_inq_varid      (fid,'col',vid)
@@ -1742,6 +1774,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          IF (status /= NF90_NOERR) THEN
              WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
          ENDIF
       endif
 
@@ -1825,7 +1858,10 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    if (mytask == 0) then
       status = nf90_close(fid)
-      if (OASIS_debug >= 2) write(nulprt,F00) "... done reading file"
+      IF (OASIS_debug >= 2) THEN
+          WRITE(nulprt,F00) "... done reading file"
+          CALL oasis_flush(nulprt)
+      ENDIF
    endif
 
   call oasis_debug_exit(subname)
