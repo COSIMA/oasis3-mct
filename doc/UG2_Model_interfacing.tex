@@ -291,20 +291,6 @@ be called just after {\tt oasis\_init\_comp}.
  to be called after {\tt oasis/prism\_write\_grid}.
 
 \vspace{0.2cm}
-\item {\tt CALL oasis\_write\_angle (cgrid, nx, ny, angle)} or
-\item {\tt CALL prism\_write\_angle (cgrid, nx, ny, angle)}
-
- \begin{itemize}
-    \item {\tt cgrid [CHARACTER*4; IN]}: grid name prefix
-    \item {\tt nx [INTEGER; IN]} : first grid dimension (x)
-    \item {\tt ny [INTEGER; IN]} : second grid dimension (y)
-    \item {\tt angle [REAL, DIMENSION (nx,ny);IN]} : array of angles
- \end{itemize}
-
-Obsolete in OASIS3-MCT as vector interpolation is not supported. 
-See SCRIPR/CONSERV in section \ref{subsec_interp}.
-
-\vspace{0.2cm}
 \item {\tt CALL oasis\_write\_mask (cgrid, nx, ny, mask)} or
 \item {\tt CALL prism\_write\_mask (cgrid, nx, ny, mask)}
 
