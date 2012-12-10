@@ -8,13 +8,16 @@ begin
 
 dir_in = "/space/coquart/oasis3-mct_buildbot/examples/test_interpolation/data_oasis3/"
 dir_out = "/space/coquart/oasis3-mct_buildbot/examples/test_interpolation/"
+system("/bin/rm -f grids.nc")   ; remove any pre-existing file
+system("/bin/rm -f masks.nc")   ; remove any pre-existing file
+system("/bin/rm -f areas.nc")   ; remove any pre-existing file
 
 ; == read the data of each model
 
 fi1 = addfile(dir_in+"grid_model1.nc","r")
 fi2 = addfile(dir_in+"grid_model2.nc","r")
 
-; == write grids.nc == dots are not understood by NCL
+; == write grids.nc ==
 
 fo1 = addfile(dir_out+"grids.nc","c")
 fo1@creation_date=systemfunc("date")
