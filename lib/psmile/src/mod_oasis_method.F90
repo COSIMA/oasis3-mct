@@ -159,6 +159,9 @@ CONTAINS
       if (trim(cdnam) == trim(prism_modnam(n))) compid = n
    enddo
    mynummod = compid
+   WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynumod :',mynumod
+   CALL flush(nulprt1)
+
    if (compid < 0) then
        IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) subname,' model not found in namcouple ',&
@@ -339,6 +342,10 @@ CONTAINS
 
    ! from prism_data
    localcomm = mpi_comm_local
+   IF (OASIS_debug >= 2) THEN
+       WRITE(nulprt,*) 'localcomm :',localcomm
+       CALL FLUSH(nulprt)
+   ENDIF
 
    call oasis_debug_exit(subname)
 
@@ -512,6 +519,13 @@ CONTAINS
       CALL oasis_flush(nulprt)
       call oasis_abort_noarg()
    endif
+
+   IF (OASIS_debug >= 2) THEN
+       WRITE(nulprt,*) subname, 'cdnam :',cdnam,' il :',il, &
+                       'mpi_root_global(il) :',mpi_root_global(il),&
+                       'mpi_comm_local :',mpi_comm_local
+       CALL flush(nulprt)
+   ENDIF
 
    tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))
    CALL mpi_intercomm_create(mpi_comm_local, 0, MPI_COMM_WORLD, &
