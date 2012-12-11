@@ -159,7 +159,7 @@ CONTAINS
       if (trim(cdnam) == trim(prism_modnam(n))) compid = n
    enddo
    mynummod = compid
-   WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynumod :',mynumod
+   WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynummod :',mynummod
    CALL flush(nulprt1)
 
    if (compid < 0) then
