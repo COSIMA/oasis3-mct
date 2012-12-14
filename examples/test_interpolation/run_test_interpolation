@@ -37,6 +37,8 @@ elif [ ${arch} == curie ]; then
     rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == jade ]; then
     rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == neptune_gfortran ]; then
+    rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == ubuntu ]; then 
   MPIRUN=mpirun
   rundir=${HOME}/Devel/oasis3-mct/examples/${casename}/work_${casename}
@@ -158,6 +160,31 @@ time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 EOF
 
 ###---------------------------------------------------------------------
+### NEPTUNE
+###---------------------------------------------------------------------
+elif [ $arch == neptune_gfortran ] ; then
+
+  cat <<EOF > $rundir/run_$casename.$arch
+# Nom du job
+#PBS -N tests
+# Temps limite du job
+#PBS -l walltime=00:10:00
+# Nombre de processus
+#PBS -l select=1:mpiprocs=16:ncpus=16
+#PBS -l place=scatter:excl
+
+cd $rundir
+
+export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+ulimit -s unlimited
+#
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+EOF
+
+
+###---------------------------------------------------------------------
 ### CURIE (normal nodes)
 ###---------------------------------------------------------------------
 elif [ $arch == curie ] ; then
@@ -269,6 +296,10 @@ elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
     qsub -q submit $rundir/run_$casename.$arch
+    qstat | grep $user
+elif [ $arch == neptune_gfortran ]; then
+    echo 'Submitting the job to queue using qsub'
+    qsub $rundir/run_$casename.$arch
     qstat | grep $user
 elif [ $arch == curie ]; then
     ccc_msub $rundir/run_$casename.$arch
