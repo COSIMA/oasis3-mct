@@ -111,6 +111,7 @@ PROGRAM model1
   !
   OPEN(w_unit,file=TRIM(comp_out),form='formatted')
   WRITE (w_unit,*) '-----------------------------------------------------------'
+  WRITE (w_unit,*) 'MPI_COMM_WORLD is :',MPI_COMM_WORLD
   WRITE (w_unit,*) TRIM(comp_name), ' Running with reals compiled as kind =',wp
   WRITE (w_unit,*) 'I am component ', TRIM(comp_name), ' rank :',rank
   WRITE (w_unit,*) '----------------------------------------------------------'
@@ -139,6 +140,7 @@ PROGRAM model1
   !
   WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ', 'comp', comp_id, 'local rank', mype
   WRITE (w_unit,*) 'Number of processors :',npes
+  WRITE (w_unit,*) 'Local communicator :', localComm
   CALL flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
