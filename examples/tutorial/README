@@ -33,3 +33,14 @@ interpolation using the SCRIP library.
 All the documentation about the coupler OASIS3-MCT coupler can be found 
 in the directory oasis3-mct/doc and on the IS-ENES web site at 
 http://oasis.enes.org in USER SUPPORT.
+
+This toy is used during the trainings on OASIS to couple step by step the
+toy models model1.F90 and model2.F90 (see tutorial.pdf)
+
+To run directly the toy in the coupled configuration copy without implementing
+the coupling steps :
+cp model1.F90_TP model1.F90
+cp model2.F90_TP model2.F90
+cp data_oasis3/namcouple_TP data_oasis3/namcouple
+adapt run_tutorial to your platform and run it :
+./run_tutorial
