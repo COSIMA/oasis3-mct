@@ -17,7 +17,7 @@ ARCHDIR         = $(WORKDIR)/CURIE_oa3-mct
 #
 # MPI library
 #For machines in training room, put MPIDIR      = /usr/local/pgi/linux86-64/9.0/mpi/mpich/
-MPIDIR      = /opt/mpi/bullxmpi/1.1.14.3
+MPIDIR      = /opt/mpi/bullxmpi/1.1.16.3
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib
