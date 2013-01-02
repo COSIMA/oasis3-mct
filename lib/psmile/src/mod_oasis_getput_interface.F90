@@ -279,6 +279,8 @@ contains
        enddo
     endif
 
+    deallocate(array)
+
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r14
@@ -326,6 +328,8 @@ contains
           rd_field(ni) = array(n)
        enddo
     endif
+
+    deallocate(array)
 
     call oasis_debug_exit(subname)
 
@@ -379,6 +383,8 @@ contains
        enddo
     endif
 
+    deallocate(array)
+
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r24
@@ -430,6 +436,8 @@ contains
        enddo
        enddo
     endif
+
+    deallocate(array)
 
     call oasis_debug_exit(subname)
 
