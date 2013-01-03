@@ -45,11 +45,11 @@ CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY -DTMG_PE
 # For compiling in double precision, put -r8
 # For compiling in single precision, remove -r8 and add -Duse_realtype_single
 # 
-F90FLAGS_1  = -O2 -xHost -I.
+F90FLAGS_1  = -O2 -xAVX -I.
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
-CCFLAGS_1   = -O2 -xHost
+CCFLAGS_1   = -O2 -xAVX
 LDFLAGS     = 
 #
 ###################
