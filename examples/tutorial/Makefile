@@ -22,10 +22,10 @@ CPPLOCAL_M2 = -D${CPPKEYDECOMP_M2} -D${CPPKEYDP}
 #
 OBJ_M1 =  routine_hdlerr.o read_dimgrid.o  \
           read_grid.o decomp_def.o \
-          oasis3_local_grid.o function_sent.o 
+          function_sent.o 
 OBJ_M2 =  routine_hdlerr.o read_dimgrid.o  \
           read_grid.o decomp_def_m2.o \
-          oasis3_local_grid_m2.o function_sent_m2.o 
+          function_sent_m2.o 
 #-------------------------------------------------------------------------------
 # General rules
 #-------------------------------------------------------------------------------
@@ -60,14 +60,10 @@ read_grid.o :		read_grid.F90
 				$(F90) $(F90FLAGS) -c read_grid.F90
 decomp_def.o : 		decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
-oasis3_local_grid.o :	oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c oasis3_local_grid.F90
 function_sent.o :	function_sent.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c function_sent.F90
 decomp_def_m2.o : 	decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o decomp_def_m2.o -c decomp_def.F90
-oasis3_local_grid_m2.o :	oasis3_local_grid.F90
-				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o oasis3_local_grid_m2.o -c oasis3_local_grid.F90
 function_sent_m2.o :	function_sent.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o function_sent_m2.o -c function_sent.F90
 

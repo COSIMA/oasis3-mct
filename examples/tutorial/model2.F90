@@ -36,6 +36,7 @@ PROGRAM model2
   INTEGER :: ntot           ! total dimension
   INTEGER :: il_size
   INTEGER :: nc ! number of corners in the (i,j) plan
+  INTEGER :: indi_beg, indi_end, indj_beg, indj_end
   !
   DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat
   DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla
@@ -65,11 +66,6 @@ PROGRAM model2
   INTEGER               ::  ib
   INTEGER, PARAMETER    ::  il_nb_time_steps = 12 ! number of time steps
   INTEGER, PARAMETER    ::  delta_t = 1800       ! time step
-  !
-  ! Centers arrays of the local grid
-  ! used to calculate the field sent by the model
-  REAL (kind=wp), POINTER :: localgrid_lon (:,:)
-  REAL (kind=wp), POINTER :: localgrid_lat (:,:)
   !
   INTEGER                :: il_flag          ! Flag for grid writing
   !
@@ -256,21 +252,18 @@ PROGRAM model2
   ALLOCATE(field2_send(var_actual_shape(2), var_actual_shape(4)),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field2_send'
   !
-  ALLOCATE ( localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
-  !
-  ALLOCATE ( localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
-  !
-  ! Calculate the local grid to the process for OASIS3
-  !
-  CALL oasis3_local_grid(mype, npes, nlon, nlat, var_actual_shape, &
-                         localgrid_lon, localgrid_lat,             &
-                         globalgrid_lon, globalgrid_lat, w_unit)
-  !
   DEALLOCATE(il_paral)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  indi_beg=1 ; indi_end=nlon
+  indj_beg=((nlat/npes)*mype)+1 
+  !
+  IF (mype .LT. npes - 1) THEN
+      indj_end = (nlat/npes)*(mype+1)
+  ELSE
+      indj_end = nlat 
+  ENDIF
   !
   ! Data exchange
   !
@@ -287,7 +280,11 @@ PROGRAM model2
     ! Here the model computes its timestep
     !
     CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
-                       localgrid_lon,localgrid_lat,field2_send,ib)
+                       RESHAPE(globalgrid_lon(indi_beg:indi_end,indj_beg:indj_end),&
+                               (/ var_actual_shape(2), var_actual_shape(4) /)), &
+                       RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
+                               (/ var_actual_shape(2), var_actual_shape(4) /)), &
+                                field2_send,ib)
     !
     ! Send the field FSENDATM
     ! TOCOMPLETE - Put here the OASIS call to send FSENDATM (field2_send)
