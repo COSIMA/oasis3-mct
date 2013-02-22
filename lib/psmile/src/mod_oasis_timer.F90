@@ -41,6 +41,12 @@ module mod_oasis_timer
    use mod_oasis_mpi
 
    implicit none
+   private
+
+   public oasis_timer_init
+   public oasis_timer_start
+   public oasis_timer_stop
+   public oasis_timer_print
 
    ! name of the application
    character (len=ic_med) :: app_name

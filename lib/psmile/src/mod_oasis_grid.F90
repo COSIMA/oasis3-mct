@@ -56,6 +56,34 @@ MODULE mod_oasis_grid
   public oasis_terminate_grids_writing 
   public oasis_write2files
 
+  interface oasis_write_grid
+#ifndef __NO_4BYTE_REALS
+     module procedure oasis_write_grid_r4
+#endif
+     module procedure oasis_write_grid_r8
+  end interface
+
+  interface oasis_write_angle
+#ifndef __NO_4BYTE_REALS
+     module procedure oasis_write_angle_r4
+#endif
+     module procedure oasis_write_angle_r8
+  end interface
+
+  interface oasis_write_corner
+#ifndef __NO_4BYTE_REALS
+     module procedure oasis_write_corner_r4
+#endif
+     module procedure oasis_write_corner_r8
+  end interface
+
+  interface oasis_write_area
+#ifndef __NO_4BYTE_REALS
+     module procedure oasis_write_area_r4
+#endif
+     module procedure oasis_write_area_r8
+  end interface
+
   !--- datatypes ---
   public :: prism_grid_type
 
@@ -136,7 +164,7 @@ CONTAINS
 
 !--------------------------------------------------------------------------
 
-    SUBROUTINE oasis_write_grid(cgrid, nx, ny, lon, lat)
+    SUBROUTINE oasis_write_grid_r8(cgrid, nx, ny, lon, lat)
 
     !-------------------------------------------------
     ! Routine to create a new grids file or to add a grid description to an
@@ -148,12 +176,12 @@ CONTAINS
     character(len=*),         intent (in) :: cgrid      ! grid acronym
     integer(kind=ip_intwp_p), intent (in) :: nx         ! number of longitudes
     integer(kind=ip_intwp_p), intent (in) :: ny         ! number of latitudes
-    real(kind=ip_realwp_p),   intent (in) :: lon(nx,ny) ! longitudes
-    real(kind=ip_realwp_p),   intent (in) :: lat(nx,ny) ! latitudes
+    real(kind=ip_double_p),   intent (in) :: lon(nx,ny) ! longitudes
+    real(kind=ip_double_p),   intent (in) :: lat(nx,ny) ! latitudes
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_grid'
+    character(len=*),parameter :: subname = 'oasis_write_grid_r8'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -179,10 +207,52 @@ CONTAINS
 
     call oasis_debug_exit(subname)
 
-  END SUBROUTINE oasis_write_grid
+  END SUBROUTINE oasis_write_grid_r8
 
 !--------------------------------------------------------------------------
-    SUBROUTINE oasis_write_angle(cgrid, nx, ny, angle)
+
+    SUBROUTINE oasis_write_grid_r4(cgrid, nx, ny, lon, lat)
+
+    !-------------------------------------------------
+    ! Routine to create a new grids file or to add a grid description to an
+    ! existing grids file.
+    !-------------------------------------------------
+
+    implicit none
+
+    character(len=*),         intent (in) :: cgrid      ! grid acronym
+    integer(kind=ip_intwp_p), intent (in) :: nx         ! number of longitudes
+    integer(kind=ip_intwp_p), intent (in) :: ny         ! number of latitudes
+    real(kind=ip_single_p),   intent (in) :: lon(nx,ny) ! longitudes
+    real(kind=ip_single_p),   intent (in) :: lat(nx,ny) ! latitudes
+    !-------------------------------------------------
+    real(kind=ip_double_p), allocatable :: lon8(:,:)
+    real(kind=ip_double_p), allocatable :: lat8(:,:)
+    integer(kind=ip_intwp_p) :: ierror
+    character(len=*),parameter :: subname = 'oasis_write_grid_r4'
+    !-------------------------------------------------
+
+    call oasis_debug_enter(subname)
+
+    allocate(lon8(nx,ny),stat=ierror)
+    IF (ierror /= 0) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING lon alloc'
+    allocate(lat8(nx,ny),stat=ierror)
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING lat alloc'
+
+    lon8 = lon
+    lat8 = lat
+    call oasis_write_grid_r8(cgrid,nx,ny,lon8,lat8)
+    deallocate(lon8)
+    deallocate(lat8)
+
+    call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_write_grid_r4
+
+!--------------------------------------------------------------------------
+    SUBROUTINE oasis_write_angle_r8(cgrid, nx, ny, angle)
 
     !-------------------------------------------------
     ! Routine to add angles to an existing grid file.
@@ -193,11 +263,11 @@ CONTAINS
     character(len=*),         intent (in) :: cgrid       ! grid acronym
     integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
     integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_realwp_p),   intent (in) :: angle(nx,ny) ! angles
+    real(kind=ip_double_p),   intent (in) :: angle(nx,ny) ! angles
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_angle'
+    character(len=*),parameter :: subname = 'oasis_write_angle_r8'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -219,10 +289,44 @@ CONTAINS
 
     call oasis_debug_exit(subname)
 
-  END SUBROUTINE oasis_write_angle
+  END SUBROUTINE oasis_write_angle_r8
 
 !--------------------------------------------------------------------------
-    SUBROUTINE oasis_write_corner(cgrid, nx, ny, nc, clon, clat)
+    SUBROUTINE oasis_write_angle_r4(cgrid, nx, ny, angle)
+
+    !-------------------------------------------------
+    ! Routine to add angles to an existing grid file.
+    !-------------------------------------------------
+
+    implicit none
+
+    character(len=*),         intent (in) :: cgrid       ! grid acronym
+    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
+    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
+    real(kind=ip_single_p),   intent (in) :: angle(nx,ny) ! angles
+    !-------------------------------------------------
+    real(kind=ip_double_p),allocatable :: angle8(:,:)
+    integer(kind=ip_intwp_p) :: ierror
+    character(len=*),parameter :: subname = 'oasis_write_angle_r4'
+    !-------------------------------------------------
+
+    call oasis_debug_enter(subname)
+
+    allocate(angle8(nx,ny),stat=ierror)
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING angle8 alloc'
+
+    angle8 = angle
+    call oasis_write_angle_r8(cgrid,nx,ny,angle8)
+
+    deallocate(angle8)
+
+    call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_write_angle_r4
+
+!--------------------------------------------------------------------------
+    SUBROUTINE oasis_write_corner_r8(cgrid, nx, ny, nc, clon, clat)
 
     !-------------------------------------------------
     ! Routine to add longitudes and latitudes of grid cell corners to an
@@ -235,12 +339,12 @@ CONTAINS
     integer(kind=ip_intwp_p), intent (in) :: nx     ! number of longitudes
     integer(kind=ip_intwp_p), intent (in) :: ny     ! number of latitudes
     integer(kind=ip_intwp_p), intent (in) :: nc     ! number of corners per cell
-    real(kind=ip_realwp_p),   intent (in) :: clon(nx,ny,nc) ! longitudes
-    real(kind=ip_realwp_p),   intent (in) :: clat(nx,ny,nc) ! latitudes
+    real(kind=ip_double_p),   intent (in) :: clon(nx,ny,nc) ! longitudes
+    real(kind=ip_double_p),   intent (in) :: clat(nx,ny,nc) ! latitudes
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_corner'
+    character(len=*),parameter :: subname = 'oasis_write_corner_r8'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -266,7 +370,49 @@ CONTAINS
 
     call oasis_debug_exit(subname)
 
-  END SUBROUTINE oasis_write_corner
+  END SUBROUTINE oasis_write_corner_r8
+
+!--------------------------------------------------------------------------
+    SUBROUTINE oasis_write_corner_r4(cgrid, nx, ny, nc, clon, clat)
+
+    !-------------------------------------------------
+    ! Routine to add longitudes and latitudes of grid cell corners to an
+    ! existing grids file.
+    !-------------------------------------------------
+
+    implicit none
+
+    character(len=*),         intent (in) :: cgrid  ! grid acronym
+    integer(kind=ip_intwp_p), intent (in) :: nx     ! number of longitudes
+    integer(kind=ip_intwp_p), intent (in) :: ny     ! number of latitudes
+    integer(kind=ip_intwp_p), intent (in) :: nc     ! number of corners per cell
+    real(kind=ip_single_p),   intent (in) :: clon(nx,ny,nc) ! longitudes
+    real(kind=ip_single_p),   intent (in) :: clat(nx,ny,nc) ! latitudes
+    !-------------------------------------------------
+    real(kind=ip_double_p), allocatable :: clon8(:,:,:),clat8(:,:,:)
+    integer(kind=ip_intwp_p) :: ierror
+    character(len=*),parameter :: subname = 'oasis_write_corner_r4'
+    !-------------------------------------------------
+
+    call oasis_debug_enter(subname)
+
+    allocate(clon8(nx,ny,nc),stat=ierror)
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING clon8 alloc'
+    allocate(clat8(nx,ny,nc),stat=ierror)
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING clat8 alloc'
+
+    clon8 = clon
+    clat8 = clat
+    call oasis_write_corner_r8(cgrid,nx,ny,nc,clon8,clat8)
+
+    deallocate(clon8)
+    deallocate(clat8)
+
+    call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_write_corner_r4
 
 !--------------------------------------------------------------------------
     SUBROUTINE oasis_write_mask(cgrid, nx, ny, mask)
@@ -310,7 +456,7 @@ CONTAINS
   END SUBROUTINE oasis_write_mask
 
 !--------------------------------------------------------------------------
-    SUBROUTINE oasis_write_area(cgrid, nx, ny, area)
+    SUBROUTINE oasis_write_area_r8(cgrid, nx, ny, area)
 
     !-------------------------------------------------
     ! Routine to create a new areas file or to add areas of a grid to an
@@ -322,11 +468,11 @@ CONTAINS
     character(len=*),         intent (in) :: cgrid       ! grid acronym
     integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
     integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_realwp_p),   intent (in) :: area(nx,ny) ! areas
+    real(kind=ip_double_p),   intent (in) :: area(nx,ny) ! areas
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_area'
+    character(len=*),parameter :: subname = 'oasis_write_area_r8'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -348,7 +494,42 @@ CONTAINS
 
     call oasis_debug_exit(subname)
 
-  END SUBROUTINE oasis_write_area
+  END SUBROUTINE oasis_write_area_r8
+
+!--------------------------------------------------------------------------
+    SUBROUTINE oasis_write_area_r4(cgrid, nx, ny, area)
+
+    !-------------------------------------------------
+    ! Routine to create a new areas file or to add areas of a grid to an
+    ! existing areas file.
+    !-------------------------------------------------
+
+    implicit none
+
+    character(len=*),         intent (in) :: cgrid       ! grid acronym
+    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
+    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
+    real(kind=ip_single_p),   intent (in) :: area(nx,ny) ! areas
+    !-------------------------------------------------
+    real(kind=ip_double_p), allocatable :: area8(:,:)
+    integer(kind=ip_intwp_p) :: ierror
+    character(len=*),parameter :: subname = 'oasis_write_area_r4'
+    !-------------------------------------------------
+
+    call oasis_debug_enter(subname)
+
+    allocate(area8(nx,ny),stat=ierror)
+    if (ierror /= 0) write(nulprt,*) subname,' model :',compid,' proc :',&
+                                     mpi_rank_local,' WARNING area8 alloc'
+
+    area8 = area
+    call oasis_write_area_r8(cgrid,nx,ny,area8)
+
+    deallocate(area8)
+
+    call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_write_area_r4
 
 !--------------------------------------------------------------------------
     SUBROUTINE oasis_terminate_grids_writing()

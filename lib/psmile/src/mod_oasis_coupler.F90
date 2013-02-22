@@ -40,7 +40,8 @@ MODULE mod_oasis_coupler
 
   type prism_mapper_type
      !--- fixed at initialization ---
-     type(mct_sMatP)       :: sMatP       ! mapper
+     type(mct_sMatP),pointer :: sMatP(:)  ! mappers, size nwgts
+     integer(kind=ip_i4_p) :: nwgts       ! number of weights in weights file
      character(len=ic_long):: file
      character(len=ic_med) :: loc         ! location: src,dst
      character(len=ic_med) :: opt         ! optimization: bfb,sum,opt
@@ -53,10 +54,17 @@ MODULE mod_oasis_coupler
      type(mct_aVect)       :: AV_md ! av for CONSERV dst: mask, area, etc
   end type prism_mapper_type
 
+  integer(kind=ip_i4_p),public,parameter :: prism_coupler_avsmax=5
+
   type prism_coupler_type
      !--- fixed at initialization ---
      type(mct_aVect)       :: aVect1   ! primary aVect
-     type(mct_aVect)       :: aVect2   ! extra aVect needed for mapping
+     type(mct_aVect)       :: aVect1m  ! extra aVect needed for mapping
+     type(mct_aVect)       :: aVect2   ! aVects 2-5 handle higher order mapping
+     type(mct_aVect)       :: aVect3   ! 
+     type(mct_aVect)       :: aVect4   ! 
+     type(mct_aVect)       :: aVect5   ! 
+     logical               :: aVon(prism_coupler_avsmax)  ! flags indicating whether aVects 2-5 are active
      character(len=ic_xl)  :: rstfile  ! restart file
      character(len=ic_xl)  :: inpfile  ! restart file
      character(len=ic_xl)  :: fldlist  ! field list
@@ -66,6 +74,7 @@ MODULE mod_oasis_coupler
      integer(kind=ip_i4_p) :: partID   ! associated partition ID
      integer(kind=ip_i4_p) :: routerID ! router ID
      integer(kind=ip_i4_p) :: mapperID ! mapper ID
+     character(len=ic_med) :: maploc   ! map location: src,dst
      integer(kind=ip_i4_p) :: ops      ! namcouple operation (ip_exported,...)
      integer(kind=ip_i4_p) :: comp     ! other model compid
      integer(kind=ip_i4_p) :: tag      ! comm tag
@@ -132,7 +141,7 @@ CONTAINS
         ! dpart = dst part for mapping; put=part2, get=part1
         ! rpart = part used for router init
   integer(kind=ip_i4_p) :: mapID,namID
-  type(mct_sMat)        :: sMati
+  type(mct_sMat),pointer :: sMati(:)
   integer(kind=ip_i4_p) :: ncid,dimid,status
   integer(kind=ip_i4_p) :: lsize,gsize
   integer(kind=ip_i4_p) :: svarid
@@ -149,6 +158,7 @@ CONTAINS
   integer(kind=ip_i4_p) :: flag
   logical               :: found, exists
   integer(kind=ip_i4_p) :: mynvar
+  integer(kind=ip_i4_p) :: nwgts
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
   integer(kind=ip_i4_p) ,pointer :: nallvar(:)
@@ -190,6 +200,7 @@ CONTAINS
   prism_mmapper = nnamcpl
   allocate(prism_mapper(prism_mmapper))
   prism_nmapper = 0
+  prism_mapper(:)%nwgts = 0
   prism_mapper(:)%file  = ""
   prism_mapper(:)%loc   = ""
   prism_mapper(:)%opt   = ""
@@ -209,6 +220,7 @@ CONTAINS
   do nc = 1,nnamcpl
      allocate(prism_coupler(nc)%varid(1))
      prism_coupler(nc)%varid(:) = ispval
+     prism_coupler(nc)%aVon(:) = .false.
   enddo
   if (OASIS_debug >= 2) write(nulprt,*) subname,' initialize %varid ',&
                                         nnamcpl,size(prism_coupler(nnamcpl)%varid)
@@ -216,6 +228,7 @@ CONTAINS
   prism_coupler(:)%comp    = ispval
   prism_coupler(:)%routerID  = ispval
   prism_coupler(:)%mapperID  = ispval
+  prism_coupler(:)%maploc  = ""
   prism_coupler(:)%tag     = ispval
   prism_coupler(:)%dt      = ispval
   prism_coupler(:)%lag     = 0
@@ -662,6 +675,7 @@ CONTAINS
                  endif
 
                  if (trim(tmp_mapfile) /= 'idmap') then
+                 prism_coupler(nc)%maploc = trim(nammaploc(nn))
                  if ((flag == OASIS_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
                      (flag == OASIS_Out .and. trim(nammaploc(nn)) == 'src')) then
                     !--------------------------------
@@ -780,6 +794,7 @@ CONTAINS
      endif
      call mct_avect_init(prism_coupler(nc)%avect1,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
      call mct_avect_zero(prism_coupler(nc)%avect1)
+     prism_coupler(nc)%aVon(1) = .true.
      if (OASIS_debug >= 15) then
         write(nulprt,*) subname,' DEBUG ci:avect1 initialized '
         call oasis_flush(nulprt)
@@ -917,18 +932,29 @@ CONTAINS
            prism_mapper(mapID)%optval = trim(cstring)
 
            call oasis_timer_start('cpl_smatrd')
+           !-------------------------------
+           ! smatreaddnc allocates sMati to nwgts
+           ! then instantiate an sMatP for each set of wgts
+           ! to support higher order mapping
+           !-------------------------------
            call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-              trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local)
-           call mct_sMatP_Init(prism_mapper(mapID)%sMatP, sMati, &
-              prism_part(spart)%gsmap, prism_part(dpart)%gsmap, 0, mpi_comm_local, compid)
-           call mct_sMat_Clean(sMati)
+              trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local, &
+              nwgts)
+           prism_mapper(mapID)%nwgts = nwgts
+           allocate(prism_mapper(mapID)%sMatP(nwgts))
+           do n = 1,nwgts
+              call mct_sMatP_Init(prism_mapper(mapID)%sMatP(n), sMati(n), &
+                 prism_part(spart)%gsmap, prism_part(dpart)%gsmap, 0, mpi_comm_local, compid)
+              call mct_sMat_Clean(sMati(n))
+           enddo
+           deallocate(sMati)
            call oasis_timer_stop('cpl_smatrd')
 
-           lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP%Matrix,mpi_comm_local)
+           lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
            if (OASIS_debug >= 15) then
               write(nulprt,*) subname," DEBUG ci:done initializing prism_mapper",mapID,&
-                              " nElements = ",lsize
+                              " nElements = ",lsize," nwgts = ",nwgts
               call oasis_flush(nulprt)
            endif
         endif  ! map init
@@ -980,7 +1006,7 @@ CONTAINS
         endif
 
         !--------------------------------
-        ! initialize avect2
+        ! initialize avect1m
         !--------------------------------
 
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
@@ -994,10 +1020,10 @@ CONTAINS
            enddo
            call oasis_flush(nulprt)
         endif
-        call mct_avect_init(prism_coupler(nc)%avect2,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
-        call mct_avect_zero(prism_coupler(nc)%avect2)
+        call mct_avect_init(prism_coupler(nc)%avect1m,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
+        call mct_avect_zero(prism_coupler(nc)%avect1m)
         if (OASIS_debug >= 15) then
-           write(nulprt,*) subname,' DEBUG ci:avect2 initialized '
+           write(nulprt,*) subname,' DEBUG ci:avect1m initialized '
            call oasis_flush(nulprt)
         endif
 
@@ -1116,9 +1142,11 @@ CONTAINS
      write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
                                                 prism_part(parid)%gsize
      write(nulprt,*) subname,'   partid, nx,ny',prism_part(parid)%nx,prism_part(parid)%ny
+     write(nulprt,*) subname,'   maploc       ',trim(prism_coupler(cplid)%maploc)
 
   if (mapid > 0) then
      write(nulprt,*) subname,'   use map      ',mapid,trim(prism_mapper(mapid)%file)
+     write(nulprt,*) subname,'   nwgts        ',mapid,prism_mapper(mapid)%nwgts
      spart = prism_mapper(mapid)%spart
      dpart = prism_mapper(mapid)%dpart
      write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
@@ -1446,7 +1474,7 @@ CONTAINS
 ! !INTERFACE:  -----------------------------------------------------------------
 
 subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
-                            fileName,mytask,mpicom, &
+                            fileName,mytask,mpicom,nwgts, &
                             areasrc,areadst,ni_i,nj_i,ni_o,nj_o )
 
 ! !USES:
@@ -1457,7 +1485,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   type(mct_sMat)  ,intent(out)           :: sMat    ! mapping data
+   type(mct_sMat)  ,intent(out),pointer   :: sMat(:) ! mapping data
    type(mct_gsMap) ,intent(in) ,target    :: SgsMap  ! src gsmap
    type(mct_gSMap) ,intent(in) ,target    :: DgsMap  ! dst gsmap
    character(*)    ,intent(in)            :: newdom  ! type of sMat (src or dst)
@@ -1465,6 +1493,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    character(*)    ,intent(in)            :: filename! netCDF file to read
    integer(IN)     ,intent(in)            :: mytask   ! processor id
    integer(IN)     ,intent(in)            :: mpicom  ! communicator
+   integer(IN)     ,intent(out)           :: nwgts   ! number of weights 
    type(mct_Avect) ,intent(out), optional :: areasrc ! area of src grid from mapping file
    type(mct_Avect) ,intent(out), optional :: areadst ! area of dst grid from mapping file
    integer(IN)     ,intent(out), optional :: ni_i    ! number of lons on input grid   
@@ -1479,7 +1508,6 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    integer           :: na      ! size of source domain
    integer           :: nb      ! size of destination domain
    integer           :: ns      ! number of non-zero elements in matrix
-   INTEGER           :: nwgts = -1   ! number of weights per element
    integer           :: ni,nj   ! number of row and col in the matrix
    integer           :: igrow   ! aVect index for matrix row
    integer           :: igcol   ! aVect index for matrix column
@@ -1494,12 +1522,12 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    integer           :: count2(2)! netcdf read
    integer           :: bsize   ! buffer size
    integer           :: nread   ! number of reads 
-   logical               :: mywt    ! does this weight belong on my pe
+   logical           :: mywt    ! does this weight belong on my pe
    integer           :: dims(2) 
 
    !--- buffers for i/o ---
    real(R8)   ,allocatable :: rtemp(:) ! real temporary
-   real(R8)   ,allocatable :: Sbuf(:)  ! real weights
+   real(R8)   ,allocatable :: Sbuf(:,:)  ! real weights
    real(R8)   ,allocatable :: remaps(:,:)  ! real weights with num_wgts dim
    integer,allocatable :: Rbuf(:)  ! ints rows
    integer,allocatable :: Cbuf(:)  ! ints cols
@@ -1514,7 +1542,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    logical             :: found     ! for sort
 
    !--- variable assocaited with local data buffers and reallocation
-   real(R8)   ,allocatable :: Snew(:),Sold(:)  ! reals
+   real(R8)   ,allocatable :: Snew(:,:),Sold(:,:)  ! reals
    integer,allocatable :: Rnew(:),Rold(:)  ! ints
    integer,allocatable :: Cnew(:),Cold(:)  ! ints
 
@@ -1544,6 +1572,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
  call oasis_debug_enter(subname)
  call oasis_mpi_commsize(mpicom,commsize)
+ nwgts = -1
  if (mytask == 0) then
    if (OASIS_debug >= 2) write(nulprt,F00) "reading mapping matrix data decomposed..."
 
@@ -1669,6 +1698,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    call oasis_mpi_bcast(ns,mpicom,subName//" MPI in ns bcast")
    call oasis_mpi_bcast(na,mpicom,subName//" MPI in na bcast")
    call oasis_mpi_bcast(nb,mpicom,subName//" MPI in nb bcast")
+   call oasis_mpi_bcast(nwgts,mpicom,subName//" MPI in nwgts bcast")
 
    !--- setup local seg map, sorted
    if (newdom == 'src') then
@@ -1732,9 +1762,11 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       allocate(remaps(nwgts,rsize),stat=status)
       if (status /= 0) call mct_perr_die(subName,':: allocate remaps',status)
    endif
-   allocate(Sbuf(rsize),Rbuf(rsize),Cbuf(rsize),stat=status)
+   allocate(Smat(nwgts),stat=status)
+   if (status /= 0) call mct_perr_die(subName,':: allocate Smat',status)
+   allocate(Sbuf(nwgts,rsize),Rbuf(rsize),Cbuf(rsize),stat=status)
    if (status /= 0) call mct_perr_die(subName,':: allocate Sbuf',status)
-   allocate(Snew(bsize),Cnew(bsize),Rnew(bsize),stat=status)
+   allocate(Snew(nwgts,bsize),Cnew(bsize),Rnew(bsize),stat=status)
    if (status /= 0) call mct_perr_die(subName,':: allocate Snew1',status)
 
    cnt = 0
@@ -1752,7 +1784,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          status = nf90_inq_varid      (fid,'remap_matrix'  ,vid)
 !        status = nf90_get_var(fid,vid,start,count,Sbuf)
          status = nf90_get_var(fid,vid,remaps,start2,count2)
-         Sbuf(:) = remaps(1,:)
+         Sbuf(:,:) = remaps(:,:)
          IF (status /= NF90_NOERR) THEN
              WRITE(nulprt,F00) TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
@@ -1799,9 +1831,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
             !--- new arrays need to be bigger
             if (cnt > bsize) then
                !--- allocate old arrays and copy new into old
-               allocate(Sold(cntold),Rold(cntold),Cold(cntold),stat=status)
+               allocate(Sold(1:nwgts,cntold),Rold(cntold),Cold(cntold),stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
-               Sold(1:cntold) = Snew(1:cntold)
+               Sold(1:nwgts,1:cntold) = Snew(1:nwgts,1:cntold)
                Rold(1:cntold) = Rnew(1:cntold)
                Cold(1:cntold) = Cnew(1:cntold)
 
@@ -1810,18 +1842,18 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
                if (status /= 0) call mct_perr_die(subName,':: allocate new',status)
                bsize = 1.5 * bsize
                if (OASIS_debug > 15) write(nulprt,F01) ' reallocate bsize to ',bsize
-               allocate(Snew(bsize),Rnew(bsize),Cnew(bsize),stat=status)
+               allocate(Snew(nwgts,bsize),Rnew(bsize),Cnew(bsize),stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
 
                !--- copy data back into new
-               Snew(1:cntold) = Sold(1:cntold)
+               Snew(1:nwgts,1:cntold) = Sold(1:nwgts,1:cntold)
                Rnew(1:cntold) = Rold(1:cntold)
                Cnew(1:cntold) = Cold(1:cntold)
                deallocate(Sold,Rold,Cold,stat=status)
                if (status /= 0) call mct_perr_die(subName,':: deallocate old',status)
             endif
 
-            Snew(cnt) = Sbuf(m)
+            Snew(1:nwgts,cnt) = Sbuf(1:nwgts,m)
             Rnew(cnt) = Rbuf(m)
             Cnew(cnt) = Cbuf(m)
          endif
@@ -1841,16 +1873,20 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    ! mct_sMat_init must be given the number of rows and columns that
    ! would be in the full matrix.  Nrows= size of output vector=nb.
    ! Ncols = size of input vector = na.
-   call mct_sMat_init(sMat, nb, na, cnt)
+   do n = 1,nwgts
+      call mct_sMat_init(sMat(n), nb, na, cnt)
+   enddo
 
-   igrow = mct_sMat_indexIA(sMat,'grow')
-   igcol = mct_sMat_indexIA(sMat,'gcol')
-   iwgt  = mct_sMat_indexRA(sMat,'weight')
+   igrow = mct_sMat_indexIA(sMat(1),'grow')
+   igcol = mct_sMat_indexIA(sMat(1),'gcol')
+   iwgt  = mct_sMat_indexRA(sMat(1),'weight')
 
    if (cnt /= 0) then
-      sMat%data%rAttr(iwgt ,1:cnt) = Snew(1:cnt)
-      sMat%data%iAttr(igrow,1:cnt) = Rnew(1:cnt)
-      sMat%data%iAttr(igcol,1:cnt) = Cnew(1:cnt)
+   do n = 1,nwgts
+      sMat(n)%data%rAttr(iwgt ,1:cnt) = Snew(n,1:cnt)
+      sMat(n)%data%iAttr(igrow,1:cnt) = Rnew(1:cnt)
+      sMat(n)%data%iAttr(igcol,1:cnt) = Cnew(1:cnt)
+   enddo
    endif
    deallocate(Snew,Rnew,Cnew, stat=status)
    deallocate(lsstart,lscount,stat=status)

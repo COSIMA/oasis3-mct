@@ -352,7 +352,7 @@ end subroutine oasis_io_write_avfile
 
 !===============================================================================
 
-subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
+subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
 
    ! ---------------------------------------
    ! Reads all fields for av from file
@@ -363,8 +363,9 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
    character(len=*), intent(in) :: rstfile    ! restart filename
    type(mct_aVect) , intent(inout) :: av      ! avect
    type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   logical         , intent(in),optional :: abort   ! abort on fail flag
-   character(len=*), intent(in),optional :: nampre  ! name prepend string
+   logical         , intent(in) ,optional :: abort   ! abort on fail flag
+   character(len=*), intent(in) ,optional :: nampre  ! name prepend string
+   logical         , intent(out),optional :: didread ! was something read
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -391,6 +392,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
 
    IF (mpi_comm_local /= MPI_COMM_NULL) THEN
    call oasis_debug_enter(subname)
+
+   if (present(didread)) didread = .false.
 
    ! empty filename, just return
 
@@ -488,6 +491,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre)
                   av_g%rAttr(n,n1) = array2(i,j)
                enddo
                enddo
+               if (present(didread)) didread = .true.
 
                deallocate(array2)
             endif  ! varid valid

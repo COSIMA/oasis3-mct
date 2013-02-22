@@ -33,7 +33,7 @@ MODULE mod_oasis_part
 
 CONTAINS
 !
-  SUBROUTINE oasis_def_partition (id_part, kparal, kinfo)
+  SUBROUTINE oasis_def_partition (id_part, kparal, kinfo, ig_size)
 !
 !*    *** Def_partition ***   PRISM 1.0
 !
@@ -55,6 +55,7 @@ CONTAINS
    INTEGER(kind=ip_intwp_p)              ,intent(out) :: id_part
    INTEGER(kind=ip_intwp_p), DIMENSION(:),intent(in)  :: kparal
    INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo
+   INTEGER(kind=ip_intwp_p), optional    ,intent(in)  :: ig_size
 !  ----------------------------------------------------------------
    integer(kind=ip_intwp_p) :: n,k,nsegs
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
@@ -138,8 +139,13 @@ CONTAINS
    endif
 
    if (mpi_comm_local /= MPI_COMM_NULL) then
-      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
-                          mpi_comm_local,compid,numel=nsegs)
+      if (present(ig_size)) then
+         call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
+                             mpi_comm_local,compid,numel=nsegs,gsize=ig_size)
+      else
+         call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
+                             mpi_comm_local,compid,numel=nsegs)
+      endif
       prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
    else
       prism_part(prism_npart)%gsize = -1

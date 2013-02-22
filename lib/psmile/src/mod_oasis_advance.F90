@@ -9,6 +9,7 @@ MODULE mod_oasis_advance
     USE mod_oasis_var
     USE mod_oasis_sys
     USE mod_oasis_io
+    USE mod_oasis_mpi
     USE mct_mod
 
     IMPLICIT NONE
@@ -36,8 +37,17 @@ contains
     integer(kind=ip_i4_p) :: nf,lsize,nflds
     integer(kind=ip_i4_p) :: dt,ltime,lag,getput
     integer(kind=ip_i4_p) :: msec
-    type(mct_avect)       :: avtmp  ! data read from restart
-    real   (kind=ip_r8_p), allocatable :: array(:) ! data
+    type(mct_avect)       :: avtmp   ! data read from restart
+    type(mct_avect)       :: avtmp2  ! data read from restart
+    type(mct_avect)       :: avtmp3  ! data read from restart
+    type(mct_avect)       :: avtmp4  ! data read from restart
+    type(mct_avect)       :: avtmp5  ! data read from restart
+    real   (kind=ip_r8_p), allocatable :: array(:)  ! data
+    real   (kind=ip_r8_p), allocatable :: array2(:) ! data
+    real   (kind=ip_r8_p), allocatable :: array3(:) ! data
+    real   (kind=ip_r8_p), allocatable :: array4(:) ! data
+    real   (kind=ip_r8_p), allocatable :: array5(:) ! data
+    logical               :: a2on,a3on,a4on,a5on    ! data 2-5 logicals
     integer(kind=ip_i4_p) :: mseclag   ! model time + lag
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=ic_med) :: vstring   ! temporary string
@@ -78,6 +88,8 @@ contains
 
        !------------------------------------------------
        ! read restart and call advance for the current fields
+       ! right now, do not know whether any hot map terms are there
+       ! assume they are if something is read, otherwise not
        !------------------------------------------------
 
        call oasis_debug_note(subname//' check for lag restart')
@@ -92,20 +104,81 @@ contains
           endif
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
           nflds = mct_aVect_nRAttr(prism_coupler(cplid)%aVect1)
-          call mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
           if (OASIS_debug >= 2) then
              write(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
                 trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
           endif
+
+          call mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
           call oasis_io_read_avfile(trim(rstfile),avtmp,prism_part(partid)%gsmap)
           allocate(array(lsize))
+
+          call mct_aVect_init(avtmp2,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+          call oasis_io_read_avfile(trim(rstfile),avtmp2,prism_part(partid)%gsmap, &
+                                    abort=.false.,nampre='av2_',didread=a2on)
+          if (a2on) then
+             allocate(array2(lsize))
+          else
+             call mct_avect_clean(avtmp2)
+          endif
+
+          call mct_aVect_init(avtmp3,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+          call oasis_io_read_avfile(trim(rstfile),avtmp3,prism_part(partid)%gsmap, &
+                                    abort=.false.,nampre='av3_',didread=a3on)
+          if (a3on) then
+             allocate(array3(lsize))
+          else
+             call mct_avect_clean(avtmp3)
+          endif
+
+          call mct_aVect_init(avtmp4,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+          call oasis_io_read_avfile(trim(rstfile),avtmp4,prism_part(partid)%gsmap, &
+                                    abort=.false.,nampre='av4_',didread=a4on)
+          if (a4on) then
+             allocate(array4(lsize))
+          else
+             call mct_avect_clean(avtmp4)
+          endif
+
+          call mct_aVect_init(avtmp5,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+          call oasis_io_read_avfile(trim(rstfile),avtmp5,prism_part(partid)%gsmap, &
+                                    abort=.false.,nampre='av5_',didread=a5on)
+          if (a5on) then
+             allocate(array5(lsize))
+          else
+             call mct_avect_clean(avtmp5)
+          endif
+
           do nf = 1,nflds
              varid = prism_coupler(cplid)%varid(nf)
              array(1:lsize) = avtmp%rAttr(nf,1:lsize)
-             call oasis_advance_run(OASIS_Out,varid,msec,array,kinfo,readrest=.true.)
+             if (a2on) array2(1:lsize) = avtmp2%rAttr(nf,1:lsize)
+             if (a3on) array3(1:lsize) = avtmp3%rAttr(nf,1:lsize)
+             if (a4on) array4(1:lsize) = avtmp4%rAttr(nf,1:lsize)
+             if (a5on) array5(1:lsize) = avtmp5%rAttr(nf,1:lsize)
+             call oasis_advance_run(OASIS_Out,varid,msec,array,kinfo,readrest=.true., &
+               a2on=a2on,array2=array2,a3on=a3on,array3=array3, &
+               a4on=a4on,array4=array4,a5on=a5on,array5=array5)
           enddo
+
           deallocate(array)
           call mct_avect_clean(avtmp)
+          if (a2on) then
+             deallocate(array2)
+             call mct_avect_clean(avtmp2)
+          endif
+          if (a3on) then
+             deallocate(array3)
+             call mct_avect_clean(avtmp3)
+          endif
+          if (a4on) then
+             deallocate(array4)
+             call mct_avect_clean(avtmp4)
+          endif
+          if (a5on) then
+             deallocate(array5)
+             call mct_avect_clean(avtmp5)
+          endif
        endif
 
        !------------------------------------------------
@@ -126,12 +199,55 @@ contains
              write(nulprt,*) subname,' at ',msec,mseclag,' RTRN: ',&
                 trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
           endif
-          write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
-          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,&
-                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring))
+          lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
+
           write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
           call oasis_io_read_array(rstfile,iarray=prism_coupler(cplid)%avcnt,&
                                    ivarname=trim(vstring),abort=.false.)
+
+          write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect1,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring))
+
+          call mct_aVect_init(prism_coupler(cplid)%aVect2,prism_coupler(cplid)%aVect1,lsize)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect2)
+          write(vstring,'(a,i2.2,a)') 'av2loc',prism_coupler(cplid)%trans,'_'
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect2,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring),&
+                                    didread=prism_coupler(cplid)%aVon(2))
+          if (.not. prism_coupler(cplid)%aVon(2)) then
+             call mct_aVect_clean(prism_coupler(cplid)%avect2)
+          endif
+
+          call mct_aVect_init(prism_coupler(cplid)%aVect3,prism_coupler(cplid)%aVect1,lsize)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect3)
+          write(vstring,'(a,i2.2,a)') 'av3loc',prism_coupler(cplid)%trans,'_'
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect3,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring),&
+                                    didread=prism_coupler(cplid)%aVon(3))
+          if (.not. prism_coupler(cplid)%aVon(3)) then
+             call mct_aVect_clean(prism_coupler(cplid)%avect3)
+          endif
+
+          call mct_aVect_init(prism_coupler(cplid)%aVect4,prism_coupler(cplid)%aVect1,lsize)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect4)
+          write(vstring,'(a,i2.2,a)') 'av4loc',prism_coupler(cplid)%trans,'_'
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect4,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring),&
+                                    didread=prism_coupler(cplid)%aVon(4))
+          if (.not. prism_coupler(cplid)%aVon(4)) then
+             call mct_aVect_clean(prism_coupler(cplid)%avect4)
+          endif
+
+          call mct_aVect_init(prism_coupler(cplid)%aVect5,prism_coupler(cplid)%aVect1,lsize)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect5)
+          write(vstring,'(a,i2.2,a)') 'av5loc',prism_coupler(cplid)%trans,'_'
+          call oasis_io_read_avfile(rstfile,prism_coupler(cplid)%avect5,&
+                                    prism_part(partid)%gsmap,abort=.false.,nampre=trim(vstring),&
+                                    didread=prism_coupler(cplid)%aVon(5))
+          if (.not. prism_coupler(cplid)%aVon(5)) then
+             call mct_aVect_clean(prism_coupler(cplid)%avect5)
+          endif
 
           if (OASIS_debug >= 20) then
              write(nulprt,*) subname,'  DEBUG read loctrans restart',&
@@ -149,7 +265,8 @@ contains
 
   end SUBROUTINE oasis_advance_init
 !---------------------------------------------------------------------
-  SUBROUTINE oasis_advance_run(mop,varid,msec,array,kinfo,readrest)
+  SUBROUTINE oasis_advance_run(mop,varid,msec,array,kinfo,readrest, &
+             a2on,array2,a3on,array3,a4on,array4,a5on,array5)
 
     IMPLICIT none
 !   ----------------------------------------------------------------
@@ -161,6 +278,14 @@ contains
     logical              , intent(in),optional :: readrest  ! special flag to indicate this 
                                                             ! is called from the advance_init 
                                                             ! method for restart
+    logical              , intent(in),optional :: a2on      ! logical for array2
+    REAL   (kind=ip_r8_p), intent(in),optional :: array2(:) ! data
+    logical              , intent(in),optional :: a3on      ! logical for array3
+    REAL   (kind=ip_r8_p), intent(in),optional :: array3(:) ! data
+    logical              , intent(in),optional :: a4on      ! logical for array4
+    REAL   (kind=ip_r8_p), intent(in),optional :: array4(:) ! data
+    logical              , intent(in),optional :: a5on      ! logical for array5
+    REAL   (kind=ip_r8_p), intent(in),optional :: array5(:) ! data
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     integer(kind=ip_i4_p) :: cplid,rouid,mapid,partid
@@ -169,6 +294,7 @@ contains
     logical               :: consbfb
     logical               :: sndrcv,output,input,unpack
     logical               :: snddiag,rcvdiag
+    logical               :: arrayon(prism_coupler_avsmax)
     real(kind=ip_double_p):: sndmult,sndadd,rcvmult,rcvadd
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=ic_xl)  :: inpfile   ! input filename
@@ -183,9 +309,6 @@ contains
     logical               :: time_now  ! coupling time
     logical               :: lreadrest ! local readrest
     TYPE(mct_avect)       :: avtest    ! temporary
-!    type(mct_avect),pointer  :: avect1, avect2
-!    type(mct_sMatP),pointer  :: sMatP
-!    type(mct_router),pointer :: router
     character(len=*),parameter :: subname = 'oasis_advance_run '
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
@@ -243,10 +366,6 @@ contains
        sndmult = prism_coupler(cplid)%sndmult
        rcvadd  = prism_coupler(cplid)%rcvadd
        rcvmult = prism_coupler(cplid)%rcvmult
-!      avect1  => prism_coupler(cplid)%avect1
-!      avect2  => prism_coupler(cplid)%avect2
-!      sMatP   => prism_mapper(mapid)%sMatP
-!      router  => prism_router(rouid)%router
 
        unpack = (sndrcv .or. input)
 
@@ -402,7 +521,87 @@ contains
        endif
 
        !------------------------------------------------
-       ! update avect1 on put side, apply appropriate transform
+       ! check for higher order coupling fields
+       ! and get everything ready
+       ! arrayon is what's passed this time
+       ! optional args only on put side
+       !------------------------------------------------
+
+       arrayon = .false.
+       arrayon(1) = .true.
+       if (present(a2on)) arrayon(2) = a2on
+       if (present(a3on)) arrayon(3) = a3on
+       if (present(a4on)) arrayon(4) = a4on
+       if (present(a5on)) arrayon(5) = a5on
+
+       if ((getput == OASIS3_GET) .or. &
+           (getput == OASIS3_PUT .and. trim(prism_coupler(cplid)%maploc) == "dst" )) then
+          if (arrayon(2) .or. arrayon(3) .or. &
+              arrayon(4) .or. arrayon(5)) then
+             write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
+             write(nulprt,*) subname,' higher order mapping not allowed on get side'
+             write(nulprt,*) subname,' consider changing map location from dst to src'
+             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
+             call oasis_abort_noarg()
+          endif
+       endif
+
+       if ((arrayon(2) .and. .not.present(array2)) .or. &
+           (arrayon(3) .and. .not.present(array3)) .or. &
+           (arrayon(4) .and. .not.present(array4)) .or. &
+           (arrayon(5) .and. .not.present(array5))) then
+          write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
+          write(nulprt,*) subname,' arrayon true but array not sent'
+          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
+          call oasis_abort_noarg()
+       endif
+
+       ! initialize aVect2-5 here if not already allocated
+
+       if (arrayon(2) .and. .not. prism_coupler(cplid)%aVon(2)) then
+          call mct_aVect_init(prism_coupler(cplid)%aVect2,prism_coupler(cplid)%aVect1,nsav)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect2)
+          prism_coupler(cplid)%aVon(2) = .true.
+          if (OASIS_debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' ALLO: ',&
+                             trim(vname),' ','aVect2'
+          endif
+       endif
+
+       if (arrayon(3) .and. .not. prism_coupler(cplid)%aVon(3)) then
+          call mct_aVect_init(prism_coupler(cplid)%aVect3,prism_coupler(cplid)%aVect1,nsav)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect3)
+          prism_coupler(cplid)%aVon(3) = .true.
+          if (OASIS_debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' ALLO: ',&
+                             trim(vname),' ','aVect3'
+          endif
+       endif
+
+       if (arrayon(4) .and. .not. prism_coupler(cplid)%aVon(4)) then
+          call mct_aVect_init(prism_coupler(cplid)%aVect4,prism_coupler(cplid)%aVect1,nsav)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect4)
+          prism_coupler(cplid)%aVon(4) = .true.
+          if (OASIS_debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' ALLO: ',&
+                             trim(vname),' ','aVect4'
+          endif
+       endif
+
+       if (arrayon(5) .and. .not. prism_coupler(cplid)%aVon(5)) then
+          call mct_aVect_init(prism_coupler(cplid)%aVect5,prism_coupler(cplid)%aVect1,nsav)
+          call mct_aVect_zero(prism_coupler(cplid)%aVect5)
+          prism_coupler(cplid)%aVon(5) = .true.
+          if (OASIS_debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' ALLO: ',&
+                             trim(vname),' ','aVect5'
+          endif
+       endif
+
+       !------------------------------------------------
+       ! update avect1-5 on put side, apply appropriate transform
        ! if its coupling time, set status of this var to ready
        ! on restart, treat as instant value
        !------------------------------------------------
@@ -419,6 +618,34 @@ contains
                 cstring = 'instant'
                 do n = 1,nsav
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
+                   if (prism_coupler(cplid)%aVon(2)) then
+                      if (present(array2)) then
+                         prism_coupler(cplid)%avect2%rAttr(nfav,n) = array2(n)
+                      else
+                         prism_coupler(cplid)%avect2%rAttr(nfav,n) = 0.0
+                      endif
+                   endif
+                   if (prism_coupler(cplid)%aVon(3)) then
+                      if (present(array3)) then
+                         prism_coupler(cplid)%avect3%rAttr(nfav,n) = array3(n)
+                      else
+                         prism_coupler(cplid)%avect3%rAttr(nfav,n) = 0.0
+                      endif
+                   endif
+                   if (prism_coupler(cplid)%aVon(4)) then
+                      if (present(array4)) then
+                         prism_coupler(cplid)%avect4%rAttr(nfav,n) = array4(n)
+                      else
+                         prism_coupler(cplid)%avect4%rAttr(nfav,n) = 0.0
+                      endif
+                   endif
+                   if (prism_coupler(cplid)%aVon(5)) then
+                      if (present(array5)) then
+                         prism_coupler(cplid)%avect5%rAttr(nfav,n) = array5(n)
+                      else
+                         prism_coupler(cplid)%avect5%rAttr(nfav,n) = 0.0
+                      endif
+                   endif
                 enddo
                 prism_coupler(cplid)%avcnt(nfav) = 1
              endif
@@ -429,6 +656,30 @@ contains
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
+                if (prism_coupler(cplid)%aVon(2)) then
+                   if (present(array2)) then
+                      prism_coupler(cplid)%avect2%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect2%rAttr(nfav,n) + array2(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(3)) then
+                   if (present(array3)) then
+                      prism_coupler(cplid)%avect3%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect3%rAttr(nfav,n) + array3(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(4)) then
+                   if (present(array4)) then
+                      prism_coupler(cplid)%avect4%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect4%rAttr(nfav,n) + array4(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(5)) then
+                   if (present(array5)) then
+                      prism_coupler(cplid)%avect5%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect5%rAttr(nfav,n) + array5(n)
+                   endif
+                endif
              enddo
              prism_coupler(cplid)%avcnt(nfav) = prism_coupler(cplid)%avcnt(nfav) + 1
 
@@ -438,12 +689,44 @@ contains
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
+                if (prism_coupler(cplid)%aVon(2)) then
+                   if (present(array2)) then
+                      prism_coupler(cplid)%avect2%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect2%rAttr(nfav,n) + array2(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(3)) then
+                   if (present(array3)) then
+                      prism_coupler(cplid)%avect3%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect3%rAttr(nfav,n) + array3(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(4)) then
+                   if (present(array4)) then
+                      prism_coupler(cplid)%avect4%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect4%rAttr(nfav,n) + array4(n)
+                   endif
+                endif
+                if (prism_coupler(cplid)%aVon(5)) then
+                   if (present(array5)) then
+                      prism_coupler(cplid)%avect5%rAttr(nfav,n) = &
+                         prism_coupler(cplid)%avect5%rAttr(nfav,n) + array5(n)
+                   endif
+                endif
              enddo
              prism_coupler(cplid)%avcnt(nfav) = 1
 
           elseif (prism_coupler(cplid)%trans == ip_max) then
              cstring = 'max'
              if (kinfo == OASIS_OK) kinfo = OASIS_LocTrans
+             if (prism_coupler(cplid)%aVon(2) .or. prism_coupler(cplid)%aVon(3) .or. &
+                 prism_coupler(cplid)%aVon(4) .or. prism_coupler(cplid)%aVon(5)) then
+                write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
+                write(nulprt,*) subname,' higher order mapping with MAX trans not supported'
+                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                CALL oasis_flush(nulprt)
+                call oasis_abort_noarg()      
+             endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
@@ -457,6 +740,14 @@ contains
           elseif (prism_coupler(cplid)%trans == ip_min) then
              cstring = 'min'
              if (kinfo == OASIS_OK) kinfo = OASIS_LocTrans
+             if (prism_coupler(cplid)%aVon(2) .or. prism_coupler(cplid)%aVon(3) .or. &
+                 prism_coupler(cplid)%aVon(4) .or. prism_coupler(cplid)%aVon(5)) then
+                write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
+                write(nulprt,*) subname,' higher order mapping with MIN trans not supported'
+                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                CALL oasis_flush(nulprt)
+                call oasis_abort_noarg()      
+             endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
@@ -548,14 +839,46 @@ contains
                    do n = 1,nsav
                       prism_coupler(cplid)%avect1%rAttr(nf,n) = &
                          prism_coupler(cplid)%avect1%rAttr(nf,n) * rcnt
+                      if (prism_coupler(cplid)%aVon(2)) then
+                         prism_coupler(cplid)%avect2%rAttr(nf,n) = &
+                            prism_coupler(cplid)%avect2%rAttr(nf,n) * rcnt
+                      endif
+                      if (prism_coupler(cplid)%aVon(3)) then
+                         prism_coupler(cplid)%avect3%rAttr(nf,n) = &
+                            prism_coupler(cplid)%avect3%rAttr(nf,n) * rcnt
+                      endif
+                      if (prism_coupler(cplid)%aVon(4)) then
+                         prism_coupler(cplid)%avect4%rAttr(nf,n) = &
+                            prism_coupler(cplid)%avect4%rAttr(nf,n) * rcnt
+                      endif
+                      if (prism_coupler(cplid)%aVon(5)) then
+                         prism_coupler(cplid)%avect5%rAttr(nf,n) = &
+                            prism_coupler(cplid)%avect5%rAttr(nf,n) * rcnt
+                      endif
                    enddo             
                 endif
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,&
+                   write(nulprt,*) subname,'  DEBUG loctrans calc0 = ',cplid,nf,&
                                    prism_coupler(cplid)%avcnt(nf)
-                   write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,&
+                   write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,&
                                    minval(prism_coupler(cplid)%avect1%rAttr(nf,:)),&
                                    maxval(prism_coupler(cplid)%avect1%rAttr(nf,:))
+                   if (prism_coupler(cplid)%aVon(2)) &
+                   write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,&
+                                   minval(prism_coupler(cplid)%avect2%rAttr(nf,:)),&
+                                   maxval(prism_coupler(cplid)%avect2%rAttr(nf,:))
+                   if (prism_coupler(cplid)%aVon(3)) &
+                   write(nulprt,*) subname,'  DEBUG loctrans calc3 = ',cplid,nf,&
+                                   minval(prism_coupler(cplid)%avect3%rAttr(nf,:)),&
+                                   maxval(prism_coupler(cplid)%avect3%rAttr(nf,:))
+                   if (prism_coupler(cplid)%aVon(4)) &
+                   write(nulprt,*) subname,'  DEBUG loctrans calc4 = ',cplid,nf,&
+                                   minval(prism_coupler(cplid)%avect4%rAttr(nf,:)),&
+                                   maxval(prism_coupler(cplid)%avect4%rAttr(nf,:))
+                   if (prism_coupler(cplid)%aVon(5)) &
+                   write(nulprt,*) subname,'  DEBUG loctrans calc5 = ',cplid,nf,&
+                                   minval(prism_coupler(cplid)%avect5%rAttr(nf,:)),&
+                                   maxval(prism_coupler(cplid)%avect5%rAttr(nf,:))
                 endif
              enddo             
              call oasis_timer_stop(tstring)
@@ -577,6 +900,18 @@ contains
                 call oasis_timer_start(tstring)
                 call oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
                    prism_part(partid)%gsmap,nx,ny)
+                if (prism_coupler(cplid)%aVon(2)) &
+                   call oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect2, &
+                      prism_part(partid)%gsmap,nx,ny,nampre='av2_')
+                if (prism_coupler(cplid)%aVon(3)) &
+                   call oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect3, &
+                      prism_part(partid)%gsmap,nx,ny,nampre='av3_')
+                if (prism_coupler(cplid)%aVon(4)) &
+                   call oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect4, &
+                      prism_part(partid)%gsmap,nx,ny,nampre='av4_')
+                if (prism_coupler(cplid)%aVon(5)) &
+                   call oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect5, &
+                      prism_part(partid)%gsmap,nx,ny,nampre='av5_')
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 2) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' WRST: ', &
@@ -616,31 +951,50 @@ contains
                 write(tstring,F01) 'pmap_',cplid
                 call oasis_debug_note(subname//' put map')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 map = ',cplid,&
+                   write(nulprt,*) subname,'  DEBUG put av11 b4 map = ',cplid,&
                                    minval(prism_coupler(cplid)%avect1%rAttr),&
                                    maxval(prism_coupler(cplid)%avect1%rAttr)
+                   if (prism_coupler(cplid)%aVon(2)) &
+                   write(nulprt,*) subname,'  DEBUG put av2 b4 map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect2%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect2%rAttr)
+                   if (prism_coupler(cplid)%aVon(3)) &
+                   write(nulprt,*) subname,'  DEBUG put av3 b4 map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect3%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect3%rAttr)
+                   if (prism_coupler(cplid)%aVon(4)) &
+                   write(nulprt,*) subname,'  DEBUG put av4 b4 map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect4%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect4%rAttr)
+                   if (prism_coupler(cplid)%aVon(5)) &
+                   write(nulprt,*) subname,'  DEBUG put av5 b4 map = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect5%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect5%rAttr)
                 endif
                 call oasis_timer_start(tstring)
-                call mct_avect_zero(prism_coupler(cplid)%avect2)
+                call mct_avect_zero(prism_coupler(cplid)%avect1m)
                 call oasis_advance_map(prism_coupler(cplid)%avect1, &
-                     prism_coupler(cplid)%avect2,prism_mapper(mapid),conserv,consbfb)
+                     prism_coupler(cplid)%avect1m,prism_mapper(mapid),conserv,consbfb, &
+                     prism_coupler(cplid)%aVon  ,prism_coupler(cplid)%avect2, &
+                     prism_coupler(cplid)%avect3,prism_coupler(cplid)%avect4, &
+                     prism_coupler(cplid)%avect5)
                 call oasis_timer_stop(tstring)
                 write(tstring,F01) 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,&
-                                   minval(prism_coupler(cplid)%avect2%rAttr),&
-                                   maxval(prism_coupler(cplid)%avect2%rAttr)
+                   write(nulprt,*) subname,'  DEBUG put av1m b4 send = ',cplid,&
+                                   minval(prism_coupler(cplid)%avect1m%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1m%rAttr)
                 endif
                 call oasis_timer_start(tstring)
                 call mct_waitsend(prism_router(rouid)%router)
-                call mct_isend(prism_coupler(cplid)%avect2,prism_router(rouid)%router,tag)
+                call mct_isend(prism_coupler(cplid)%avect1m,prism_router(rouid)%router,tag)
                 call oasis_timer_stop(tstring)
              else
                 write(tstring,F01) 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
-                   write(nulprt,*) subname,'  DEBUG put b4 send = ',cplid,&
+                   write(nulprt,*) subname,'  DEBUG put av1 b4 send = ',cplid,&
                                    minval(prism_coupler(cplid)%avect1%rAttr),&
                                    maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
@@ -660,19 +1014,19 @@ contains
                 call oasis_debug_note(subname//' get recv')
                 write(tstring,F01) 'grcv_',cplid
                 call oasis_timer_start(tstring)
-                call mct_avect_zero(prism_coupler(cplid)%avect2)
-                call mct_recv(prism_coupler(cplid)%avect2,prism_router(rouid)%router,tag)
+                call mct_avect_zero(prism_coupler(cplid)%avect1m)
+                call mct_recv(prism_coupler(cplid)%avect1m,prism_router(rouid)%router,tag)
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,&
-                                   minval(prism_coupler(cplid)%avect2%rAttr),&
-                                   maxval(prism_coupler(cplid)%avect2%rAttr)
+                                   minval(prism_coupler(cplid)%avect1m%rAttr),&
+                                   maxval(prism_coupler(cplid)%avect1m%rAttr)
                 endif
                 call oasis_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
                 call oasis_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect1)
-                call oasis_advance_map(prism_coupler(cplid)%avect2, &
+                call oasis_advance_map(prism_coupler(cplid)%avect1m, &
                      prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv,consbfb)
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
@@ -752,6 +1106,14 @@ contains
              prism_coupler(cplid)%status(:) = OASIS_COMM_WAIT
              prism_coupler(cplid)%avcnt(:) = 0
              call mct_avect_zero(prism_coupler(cplid)%avect1)
+             if (prism_coupler(cplid)%aVon(2)) &
+                call mct_avect_zero(prism_coupler(cplid)%avect2)
+             if (prism_coupler(cplid)%aVon(3)) &
+                call mct_avect_zero(prism_coupler(cplid)%avect3)
+             if (prism_coupler(cplid)%aVon(4)) &
+                call mct_avect_zero(prism_coupler(cplid)%avect4)
+             if (prism_coupler(cplid)%aVon(5)) &
+                call mct_avect_zero(prism_coupler(cplid)%avect5)
              if (OASIS_debug >= 20) then
                 write(nulprt,*) subname,'  DEBUG put reset status = '
              endif
@@ -792,12 +1154,32 @@ contains
              call oasis_debug_note(subname//' loctrans restart write')
              write(tstring,F01) 'wtrn_',cplid
              call oasis_timer_start(tstring)
-             write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
-             CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
-                prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
              WRITE(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_cnt'
              CALL oasis_io_write_array(rstfile,iarray=prism_coupler(cplid)%avcnt,&
                                        ivarname=TRIM(vstring))
+             write(vstring,'(a,i2.2,a)') 'loc',prism_coupler(cplid)%trans,'_'
+             CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect1, &
+                prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             if (prism_coupler(cplid)%aVon(2)) then
+                write(vstring,'(a,i2.2,a)') 'av2loc',prism_coupler(cplid)%trans,'_'
+                CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect2, &
+                   prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             endif
+             if (prism_coupler(cplid)%aVon(3)) then
+                write(vstring,'(a,i2.2,a)') 'av3loc',prism_coupler(cplid)%trans,'_'
+                CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect3, &
+                   prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             endif
+             if (prism_coupler(cplid)%aVon(4)) then
+                write(vstring,'(a,i2.2,a)') 'av4loc',prism_coupler(cplid)%trans,'_'
+                CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect4, &
+                   prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             endif
+             if (prism_coupler(cplid)%aVon(5)) then
+                write(vstring,'(a,i2.2,a)') 'av5loc',prism_coupler(cplid)%trans,'_'
+                CALL oasis_io_write_avfile(rstfile,prism_coupler(cplid)%avect5, &
+                   prism_part(partid)%gsmap,nx,ny,nampre=TRIM(vstring))
+             endif
              call oasis_timer_stop(tstring)
              if (OASIS_debug >= 2) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
@@ -886,16 +1268,22 @@ contains
 
 !-------------------------------------------------------------------
 
-  SUBROUTINE oasis_advance_map(avs,avd,mapper,conserv,consbfb)
+  SUBROUTINE oasis_advance_map(av1,avd,mapper,conserv,consbfb,&
+                               avon,av2,av3,av4,av5)
 
     ! NOTE: mask = 0 is active point according to oasis3 conserv.f
 
     implicit none
-    type(mct_aVect)        ,intent(in)    :: avs    ! source av
+    type(mct_aVect)        ,intent(in)    :: av1  ! source av
     type(mct_aVect)        ,intent(inout) :: avd    ! dst av
     type(prism_mapper_type),intent(inout) :: mapper ! prism_mapper
     integer(kind=ip_i4_p)  ,intent(in),optional :: conserv  ! conserv flag
     logical                ,intent(in),optional :: consbfb  ! conserv bfb option
+    logical                ,intent(in),optional :: avon(:) ! which source avs are on
+    type(mct_aVect)        ,intent(in),optional :: av2  ! source av2
+    type(mct_aVect)        ,intent(in),optional :: av3  ! source av2
+    type(mct_aVect)        ,intent(in),optional :: av4  ! source av2
+    type(mct_aVect)        ,intent(in),optional :: av5  ! source av2
 
     integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m
     real(kind=ip_r8_p)     :: sumtmp, wts_sums, wts_sumd, zradi, zlagr
@@ -903,8 +1291,12 @@ contains
     real(kind=ip_r8_p),allocatable :: areas(:),aread(:)
     real(kind=ip_r8_p),allocatable  :: av_sums(:),av_sumd(:)  ! local sums
     character(len=ic_med) :: tstring   ! timer label string
+    type(mct_aVect)       :: avdtmp    ! for summing multiple mapping weights
     type(mct_aVect)       :: av2g      ! for bfb sums
     logical               :: lconsbfb
+    integer(kind=ip_i4_p),parameter :: avsmax = prism_coupler_avsmax
+    logical               :: locavon(avsmax)   ! local avon
+    integer(kind=ip_i4_p) :: avonsize, nterm
     character(len=*),parameter :: subname = 'oasis_advance_map'
 
     call oasis_debug_enter(subname)
@@ -914,20 +1306,104 @@ contains
        lconsbfb = consbfb
     endif
 
-    if (mct_avect_nRattr(avs) /= mct_avect_nRattr(avd)) then
-        WRITE(nulprt,*) subname,' ERROR in av num of flds'
-        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+    !--- assume avon and av2-5 are not passed but av1 always is ---
+    avonsize = 1
+    nterm = 1
+    locavon = .false.
+    locavon(1) = .true.
+
+    !--- but if avon is passed, use avon flags ---
+    if (present(avon)) then
+       avonsize = size(avon)
+       nterm = min(avsmax,avonsize)
+       locavon(1:nterm) = avon(1:nterm)
+    else
+       !--- if avon is not passed, av2-5 should not be ---
+       if (present(av2) .or. present(av3) .or. present(av4) .or. present(av5)) then
+          WRITE(nulprt,*) subname,' ERROR av2-5 passed but avon not passed'
+          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
+          CALL oasis_abort_noarg()
+       endif
+    endif
+
+    ! check consistency between weights and coupling terms
+    do n = 1,nterm
+       if (locavon(n) .and. n > mapper%nwgts) then
+          WRITE(nulprt,*) subname,' ERROR in nwgts and coupling terms',mapper%nwgts,n
+          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
+          CALL oasis_abort_noarg()
+       endif
+    enddo
+
+    if (locavon(1)) then
+       if (mct_avect_nRattr(av1) /= mct_avect_nRattr(avd)) then
+          WRITE(nulprt,*) subname,' ERROR in av1 num of flds'
+          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+          CALL oasis_flush(nulprt)
+          CALL oasis_abort_noarg()
+       endif
+       call mct_sMat_avMult(av1, mapper%sMatP(1), avd)
+    endif
+
+    if (locavon(2).or.locavon(3).or.locavon(4).or.locavon(5)) then
+       lsized = mct_avect_lsize(avd)
+       call mct_aVect_init(avdtmp,avd,lsized)
+
+       if (locavon(2)) then
+          if (mct_avect_nRattr(av2) /= mct_avect_nRattr(avd)) then
+             WRITE(nulprt,*) subname,' ERROR in av2 num of flds'
+             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
+             CALL oasis_abort_noarg()
+          endif
+          call mct_sMat_avMult(av2, mapper%sMatP(2), avdtmp)
+          avd%rAttr = avd%rAttr + avdtmp%rAttr
+       endif
+
+       if (locavon(3)) then
+          if (mct_avect_nRattr(av3) /= mct_avect_nRattr(avd)) then
+             WRITE(nulprt,*) subname,' ERROR in av3 num of flds'
+             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
+             CALL oasis_abort_noarg()
+          endif
+          call mct_sMat_avMult(av3, mapper%sMatP(3), avdtmp)
+          avd%rAttr = avd%rAttr + avdtmp%rAttr
+       endif
+
+       if (locavon(4)) then
+          if (mct_avect_nRattr(av4) /= mct_avect_nRattr(avd)) then
+             WRITE(nulprt,*) subname,' ERROR in av4 num of flds'
+             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
+             CALL oasis_abort_noarg()
+          endif
+          call mct_sMat_avMult(av4, mapper%sMatP(4), avdtmp)
+          avd%rAttr = avd%rAttr + avdtmp%rAttr
+       endif
+
+       if (locavon(5)) then
+          if (mct_avect_nRattr(av5) /= mct_avect_nRattr(avd)) then
+             WRITE(nulprt,*) subname,' ERROR in av5 num of flds'
+             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+             CALL oasis_flush(nulprt)
+             CALL oasis_abort_noarg()
+          endif
+          call mct_sMat_avMult(av5, mapper%sMatP(5), avdtmp)
+          avd%rAttr = avd%rAttr + avdtmp%rAttr
+       endif
+
+       call mct_aVect_clean(avdtmp)
     endif
 
     call oasis_debug_note(subname//' map')
-    call mct_sMat_avMult(avs, mapper%sMatP, avd)
 
     if (present(conserv)) then
     call oasis_debug_note(subname//' conserv')
     if (conserv /= ip_cnone) then
-       fsize = mct_avect_nRattr(avs)
+       fsize = mct_avect_nRattr(av1)
        allocate(av_sums(fsize),av_sumd(fsize))
 
        zradi = 1./(eradius*eradius)
@@ -1007,9 +1483,10 @@ contains
        endif
 
        !-------------------
-       ! compute global sums of avs
+       ! compute global sums of av1
+       ! assume av1 is the thing to be conserved
        !-------------------
-       call oasis_advance_avsum(avs,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
+       call oasis_advance_avsum(av1,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
                                 mask=imasks,wts=areas,consbfb=lconsbfb)
        call oasis_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%gsmap,mpi_comm_local, &
                                 mask=imaskd,wts=aread,consbfb=lconsbfb)
@@ -1085,7 +1562,7 @@ contains
        endif
 
        if (OASIS_debug >= 20) then
-          call oasis_advance_avsum(avs,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
+          call oasis_advance_avsum(av1,av_sums,prism_part(mapper%spart)%gsmap,mpi_comm_local, &
                                    mask=imasks,wts=areas,consbfb=lconsbfb)
           call oasis_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%gsmap,mpi_comm_local, &
                                    mask=imaskd,wts=aread,consbfb=lconsbfb)
