@@ -55,6 +55,13 @@ contains
 
     call oasis_debug_enter(subname)
 
+    if (mpi_comm_local == MPI_COMM_NULL) then
+       write(nulprt,*) subname,' ERROR called on non coupling task'
+       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
+       call oasis_abort_noarg()
+    endif
+
     kinfo = OASIS_OK
 
     call oasis_timer_start ('advance_init')
@@ -314,6 +321,13 @@ contains
 !   ----------------------------------------------------------------
 
     call oasis_debug_enter(subname)
+
+    if (mpi_comm_local == MPI_COMM_NULL) then
+       write(nulprt,*) subname,' ERROR called on non coupling task'
+       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       CALL oasis_flush(nulprt)
+       call oasis_abort_noarg()
+    endif
 
     kinfo = OASIS_OK
     vname = prism_var(varid)%name

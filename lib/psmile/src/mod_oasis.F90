@@ -12,6 +12,8 @@ MODULE mod_oasis
 
   USE mod_oasis_parameters
 
+  USE mod_oasis_namcouple ,ONLY: namflddti
+
   USE mod_oasis_method ,ONLY: oasis_init_comp    
   USE mod_oasis_method ,ONLY: oasis_terminate
   USE mod_oasis_method ,ONLY: oasis_get_localcomm

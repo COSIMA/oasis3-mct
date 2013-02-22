@@ -21,13 +21,8 @@ SAVE
   INTEGER, PARAMETER :: ic_xl   = 1024
   INTEGER, PARAMETER :: ip_single_p = SELECTED_REAL_KIND(6,37)
   INTEGER, PARAMETER :: ip_double_p = SELECTED_REAL_KIND(12,307)
-#ifdef use_realtype_single
-  INTEGER, PARAMETER :: ip_realwp_p = ip_single_p
-  LOGICAL, PARAMETER :: ll_single = .TRUE.
-#else
   INTEGER, PARAMETER :: ip_realwp_p = ip_double_p
   LOGICAL, PARAMETER :: ll_single = .FALSE.  
-#endif
   INTEGER, PARAMETER :: ip_i2_p = SELECTED_INT_KIND(4)
   INTEGER, PARAMETER :: ip_i4_p = SELECTED_INT_KIND(9)
 #ifdef SX

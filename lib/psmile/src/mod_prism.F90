@@ -12,6 +12,8 @@ module mod_prism
 
    use mod_oasis_parameters
 
+  USE mod_oasis_namcouple ,ONLY: namflddti
+
    use mod_oasis_method ,only: prism_init_comp_proto     => oasis_init_comp
    use mod_oasis_method ,only: prism_terminate_proto     => oasis_terminate
    use mod_oasis_method ,only: prism_get_localcomm_proto => oasis_get_localcomm

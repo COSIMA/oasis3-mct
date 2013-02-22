@@ -57,6 +57,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
    integer(kind=ip_intwp_p) :: pio_numtasks
+   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
 
@@ -127,7 +128,7 @@ CONTAINS
        WRITE (UNIT = nulprt1,FMT = *)  &
           ' so we force OASIS_debug = 0 for all processors '
        OASIS_debug = 0
-       CALL oasis_flush(nulprt)
+       CALL oasis_flush(nulprt1)
    ENDIF
 
    ! Determines the total number of fields to avoid a parameter in oasis_def_var
@@ -138,7 +139,7 @@ CONTAINS
      mvar = mvar + oasis_string_listGetNum(namsrcfld(n))
    ENDDO
    WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
-   CALL oasis_flush(nulprt)
+   CALL oasis_flush(nulprt1)
    !
    ALLOCATE(prism_var(mvar))
    !
@@ -160,18 +161,17 @@ CONTAINS
    enddo
    mynummod = compid
    WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynummod :',mynummod
-   CALL flush(nulprt1)
+   CALL oasis_flush(nulprt1)
 
    if (compid < 0) then
        IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) subname,' model not found in namcouple ',&
                             TRIM(cdnam)
-           CALL oasis_flush(nulprt)
+           CALL oasis_flush(nulprt1)
        ENDIF
        CALL oasis_abort_noarg()
    endif
 
-   IF (mpi_rank_global == 0) CLOSE(nulprt1)
 
    !------------------------
    !--- Re-Set MPI info (need compid for MPI1 COMM_SPLIT)
@@ -199,6 +199,42 @@ CONTAINS
    CALL MPI_Comm_Size(mpi_comm_local,mpi_size_local,mpi_err)
    CALL MPI_Comm_Rank(mpi_comm_local,mpi_rank_local,mpi_err)
    mpi_root_local = 0
+
+   !------------------------
+   !--- derive mpi_root_global
+   !------------------------
+
+   allocate(mpi_root_global(prism_nmodels))
+   allocate(tmparr(prism_nmodels))
+   tmparr = -1
+   do n = 1,prism_nmodels
+      if (compid == n .and. &
+          mpi_rank_local == mpi_root_local) then
+         tmparr(n) = mpi_rank_global
+      endif
+   enddo
+   call oasis_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
+      string=subname//':mpi_root_global',all=.true.)
+   deallocate(tmparr)
+
+   DO n = 1,prism_nmodels
+     WRITE(nulprt1,*) subname,'   n,prism_model,root = ',&
+        n,TRIM(prism_modnam(n)),mpi_root_global(n)
+   ENDDO
+   CALL oasis_flush(nulprt1)
+
+   do n = 1,prism_nmodels
+      if (mpi_root_global(n) < 0) then
+         write(nulprt1,*) subname,'   n,prism_model,root = ',&
+         n,trim(prism_modnam(n)),mpi_root_global(n)
+         write(nulprt1,*) subname,' ERROR: global root invalid, &
+         & check couplcomm for active tasks'
+         CALL oasis_flush(nulprt1)
+         call oasis_abort_noarg()
+      endif
+   enddo
+
+   IF (mpi_rank_global == 0) CLOSE(nulprt1)
 
    !------------------------
    !--- debug file
@@ -344,7 +380,7 @@ CONTAINS
    localcomm = mpi_comm_local
    IF (OASIS_debug >= 2) THEN
        WRITE(nulprt,*) 'localcomm :',localcomm
-       CALL FLUSH(nulprt)
+       CALL oasis_FLUSH(nulprt)
    ENDIF
 
    call oasis_debug_exit(subname)
@@ -524,7 +560,7 @@ CONTAINS
        WRITE(nulprt,*) subname, 'cdnam :',cdnam,' il :',il, &
                        'mpi_root_global(il) :',mpi_root_global(il),&
                        'mpi_comm_local :',mpi_comm_local
-       CALL flush(nulprt)
+       CALL oasis_flush(nulprt)
    ENDIF
 
    tag=ICHAR(TRIM(compnm))+ICHAR(TRIM(cdnam))
@@ -570,7 +606,6 @@ CONTAINS
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
-   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
    character(len=*),parameter :: subname = 'oasis_enddef'
 !  ---------------------------------------------------------
 
@@ -589,42 +624,6 @@ CONTAINS
    enddo
 
    !------------------------
-   !--- derive mpi_root_global
-   !------------------------
-
-   allocate(mpi_root_global(prism_nmodels))
-   allocate(tmparr(prism_nmodels))
-   tmparr = -1
-   do n = 1,prism_nmodels
-      if (compid == n .and. &
-          mpi_rank_local == mpi_root_local) then
-         tmparr(n) = mpi_rank_global
-      endif
-   enddo
-   call oasis_mpi_max(tmparr,mpi_root_global,MPI_COMM_WORLD, &
-      string=subname//':mpi_root_global',all=.true.)
-   deallocate(tmparr)
-
-   if (OASIS_debug >= 2)  then
-      do n = 1,prism_nmodels
-         write(nulprt,*) subname,'   n,prism_model,root = ',&
-         n,trim(prism_modnam(n)),mpi_root_global(n)
-      enddo
-      call oasis_flush(nulprt)
-   endif
-
-   do n = 1,prism_nmodels
-      if (mpi_root_global(n) < 0) then
-         write(nulprt,*) subname,'   n,prism_model,root = ',&
-         n,trim(prism_modnam(n)),mpi_root_global(n)
-         write(nulprt,*) subname,' ERROR: global root invalid, &
-         & check couplcomm for active tasks'
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
-      endif
-   enddo
-
-   !------------------------
    !--- MCT Initialization
    !------------------------
 
@@ -640,11 +639,13 @@ CONTAINS
       CALL oasis_flush(nulprt)
    ENDIF
 
-   call oasis_advance_init(lkinfo)
-   IF (OASIS_debug >= 2)  THEN
-      WRITE(nulprt,*) subname, ' done prism_advance_init '
-      CALL oasis_flush(nulprt)
-   ENDIF
+   if (mpi_comm_local /= MPI_COMM_NULL) then
+      call oasis_advance_init(lkinfo)
+      IF (OASIS_debug >= 2)  THEN
+         WRITE(nulprt,*) subname, ' done prism_advance_init '
+         CALL oasis_flush(nulprt)
+      ENDIF
+   endif
 
    !--- Force OASIS_OK here rather than anything else ---
 
