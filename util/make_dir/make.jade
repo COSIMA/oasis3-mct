@@ -42,11 +42,9 @@ ARFLAGS     = -ruv
 # 
 CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
-# For compiling in double precision, put -r8
-# For compiling in single precision, remove -r8 and add -Duse_realtype_single
 # 
-F90FLAGS_1  = -O2 -I. -r8 -assume byterecl
-#F90FLAGS_1  =  -g -check all -CB -assume byterecl -r8 -I. 
+F90FLAGS_1  = -O2 -I. -assume byterecl
+#F90FLAGS_1  =  -g -check all -CB -assume byterecl  -I. 
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)

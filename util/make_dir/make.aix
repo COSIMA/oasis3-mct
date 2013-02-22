@@ -40,9 +40,7 @@ ARFLAGS   = r
 CPPDEF    = -WF,-Duse_netCDF -WF,-Duse_comm_$(CHAN) -WF,-D__VERBOSE -WF,-DTREAT_OVERLAY
 CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
-# For compiling in double precision, put -qrealsize=8
-# For compiling in single precision, remove -qrealsize=8 and add -WF,-Duse_realtype_single in CPPDEF
-COMFLAGS  =  -qrealsize=8 -Q -qarch=auto -qtune=auto -qcache=auto -qfloat=fltint -qzerosize -qlargepage -qmaxmem=-1 -q64 -O3 -qstrict -qextname
+COMFLAGS  =  -Q -qarch=auto -qtune=auto -qcache=auto -qfloat=fltint -qzerosize -qlargepage -qmaxmem=-1 -q64 -O3 -qstrict -qextname
 F90FLAGS_1  = -qsuffix=cpp=F90 $(COMFLAGS) 
 f90FLAGS_1  = -qsuffix=cpp=f90 $(COMFLAGS)
 FFLAGS_1    = -qfixed -qsuffix=cpp=F $(COMFLAGS) 

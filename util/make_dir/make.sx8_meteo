@@ -49,8 +49,7 @@ CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #COMFLAGS  =  -clear -Cdebug -g -pi auto nest=3 line=100000 -EP 
 COMFLAGS  =  -clear -Cvopt 
 
-#F90FLAGS_1  = $(COMFLAGS) -Wf"-A idbl4"
-F90FLAGS_1  = $(COMFLAGS) -EP -Wf,-pvctl noassume loopcnt=30000 -dwW -Wf"-A idbl4" -Wf,-P nh 
+F90FLAGS_1  = $(COMFLAGS) -EP -Wf,-pvctl noassume loopcnt=30000 -dwW -Wf,-P nh 
 f90FLAGS_1  = $(F90FLAGS_1) 
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)

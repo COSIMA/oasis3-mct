@@ -44,9 +44,7 @@ ARFLAGS     = -r
 CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 #
-# For compiling in double precision, put -Wf,-A idbl4
-# For compiling in single precision, remove -Wf,-A idbl4 and add -Duse_realtype_single
-F90FLAGS_1  = -EP -Pstack  -Wf,-pvctl noassume loopcnt=5000000  -Wl,-h lib_cyclic -Wf,-A idbl4 -Wf,-L fmtlist transform $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
+F90FLAGS_1  = -EP -Pstack  -Wf,-pvctl noassume loopcnt=5000000  -Wl,-h lib_cyclic  -Wf,-L fmtlist transform $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
