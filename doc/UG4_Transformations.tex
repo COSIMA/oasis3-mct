@@ -128,13 +128,9 @@ field :
   read and used for mapping (ie. regridding or interpolation); the {\tt MAPPING} file must follow the {\tt SCRIPR} format. 
   This is an alternative method to {\tt SCRIPR} for setting the mapping file.
  
-  In the current implementation, each pair of source and target points
-  in the {\tt MAPPING} file can be linked by only one weight,
-  i.e. remappings such as {\tt SCRIPR/BICUBIC} involving at each
-  source grid point the value of the field, of the gradients and the
-  cross-gradient, or second-order conservative remapping are not
-  supported. Besides this restriction, {\tt MAPPING} can be used with
-  any mapping file produced by any regridding algorithm.   
+  Since OASIS3-MCT\_2.0, {\tt MAPPING} can be used with
+  any mapping file produced by any regridding algorithm ; in particular it can be used 
+  with {\tt SCRIPR/BICUBIC} and second order conservative remapping.   
 
 This transformation requires at least one configuring line with one
 filename and two optional string values:
@@ -147,20 +143,21 @@ filename and two optional string values:
   \ref{subsec_inputdata}).
 
   \item {\tt \$MAPLOC} is optional and can be either {\tt src} or {\tt dst}.  With {\tt src}, the mapping will be done
-  in parallel on the source processors before communication to the destination model and processors; this is the default.   With {\tt dst}, the mapping is 
+  in parallel on the source processors before communication to the destination model and processors; this is the default.   
+  With {\tt dst}, the mapping is 
   done on the destination processors after the data is sent from the source
   model on the source grid. 
 
   \item {\tt \$MAPSTRATEGY} is optional and can be either {\tt bfb}, {\tt sum}, or {\tt opt}.  In {\tt bfb} mode, the mapping is
   done using a strategy that produces bit-for-bit identical results regardless
-  of the grid decompositions without leveraging a partial sum computation.  With
+  of the grid decompositions without leveraging a partial sum computation; this is the default.  With
   {\tt sum}, the transform is done using the partial sum approach which generally
   introduces roundoff level changes in the results on different processor
   counts. Option {\tt opt} allows the coupling layer to choose either
   approach based on an analysis of which strategy is likely to run
   faster. Usually, partial sums will be used if the source grid has a higher resolution
   than the target grid as this should reduce the overall
-  communication. 
+  communication.
 
   \end{itemize}
 
