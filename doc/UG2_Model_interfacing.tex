@@ -163,8 +163,10 @@ must be called by all processes.
 In particular, the
 coupling fields sent or received by the component must be declared by
 all component processes
-with {\tt oasis\_def\_var} / {\tt prism\_def\_var\_proto} (see section \ref{subsubsec_Declaration})
-and the field partition must be described across all coupling
+with {\tt oasis\_def\_var} / {\tt prism\_def\_var\_proto} (see section \ref{subsubsec_Declaration}), even
+if the symbolic names of the variables defined on the processes not involved in the coupling can be
+different from the ones defined in the namcouple.
+The field partition must also be described across all coupling
 processes with {\tt oasis\_def\_partition} / {\tt prism\_def\_partition\_proto} (but with {\tt
   ig\_paral(:)=0} for the processes not involved in the coupling, see
 section \ref{subsubsec_Partition}.) 
