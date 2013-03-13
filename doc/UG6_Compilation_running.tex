@@ -73,8 +73,8 @@ in your {\it namcouple} (see also section \ref{subsec_namcouplefirst}).
 
 Different output are written depending on NLOGPRT value:
 \begin{itemize}
-\item {0}  : one file debug.root.xx is open by the master proces of each model and one file debug\_notroot.xx is open for all the other processes of each model to write error information.
-\item {1}  : one file debug.root.xx is open by the master proces of each model to write information equivalent to level 10 (see below); one file debug\_notroot.xx is open for all the other processes of each model to write error information.
+\item {0}  : one file debug.root.xx is open by the master proces of each model and one file debug\_notroot.xx is open for all the other processes of each model to write only error information if an error occurs.
+\item {1}  : one file debug.root.xx is open by the master proces of each model to write information equivalent to level 10 (see below); one file debug\_notroot.xx is open for all the other processes of each model to write only error information if an error occurs.
 \item {2}  : one file debug.xx.xxxxxx is open by each process of each model to write normal production diagnostics.
 \item {5}  : as for 2 with in addition some initial debug info.
 \item {10} : as for 5 with in addition the routine calling tree.
@@ -113,7 +113,7 @@ The time given for each timer is calculated by the difference between calls to {
 \item {'gcpy\_00x'} : time spent in routine {\tt oasis\_advance\_run} in copying the field x just received in a local array.
 \item {'pcpy\_00x'} : time spent in routine {\tt oasis\_advance\_run} in copying the local field x in the array to send (i.e. with local transformation besides division for averaging).
 \item {'pavg\_00x'} : time spent in routine {\tt oasis\_advance\_run} to calculate the average of field x (if done).
-\item {'pmap\_00x'} : time spent in routine {\tt oasis\_advance\_run} for the matrix vector multiplication for field x.
+\item {'pmap\_00x'/'gmap\_00x'} : time spent in routine {\tt oasis\_advance\_run} for the matrix vector multiplication for field x on the source/target processes.
 \item {'psnd\_00x'} : time spent in routine {\tt oasis\_advance\_run} for sending field x (i.e. including call to {\tt mct\_waitsend} and {\tt mct\_isend}).
 \end{itemize}
 
