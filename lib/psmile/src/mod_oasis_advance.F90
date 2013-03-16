@@ -455,9 +455,10 @@ contains
 
        !------------------------------------------------
        ! check that model isn't going backwards
+       ! msec >= 0 does the check only in run mode, not in initialization
        !------------------------------------------------
 
-       if (lcouplertime /= ispval .and. msec < lcouplertime) then
+       if (lcouplertime /= ispval .and. msec >= 0 .and. msec < lcouplertime) then
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' ERROR model seems to be running backwards',&
                           msec,lcouplertime

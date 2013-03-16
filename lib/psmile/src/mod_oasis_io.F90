@@ -207,6 +207,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
+   integer(ip_i4_p)    :: nxf,nyf     ! field size on file
    type(mct_aVect)     :: av_g        ! avect global data
    type(mct_string)    :: mstring     ! mct char type
    character(ic_med)   :: itemc       ! string converted to char
@@ -315,24 +316,43 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
 
-
-      allocate(array2(nx,ny))
+      nxf = 0
+      nyf = 0
       do n = 1,mct_aVect_nRAttr(av_g)
          call mct_aVect_getRList(mstring,n,av_g)
          itemc = mct_string_toChar(mstring)
          itemc = trim(lnampre)//trim(itemc)
          call mct_string_clean(mstring)
+         status = nf90_inq_varid(ncid,trim(itemc),varid)
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
+         if (n == 1) then
+            status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
+            status = nf90_inquire_dimension(ncid,dimid2(1),len=nxf)
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
+            status = nf90_inquire_dimension(ncid,dimid2(2),len=nyf)
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
+            if (dlen /= 2 .or. nx*ny /= nxf*nyf) then
+               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+               WRITE(nulprt,*) subname,' abort ERROR: ndims and size does not match on file'
+               CALL oasis_flush(nulprt)
+               call oasis_abort_noarg()
+            endif
+            allocate(array2(nxf,nyf))
+         endif
+
          n1 = 0
-         do j = 1,ny
-         do i = 1,nx
+         do j = 1,nyf
+         do i = 1,nxf
             n1 = n1 + 1
             array2(i,j) = av_g%rAttr(n,n1)
          enddo
          enddo
 
-         status = nf90_inq_varid(ncid,trim(itemc),varid)
-         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
          status = nf90_put_var(ncid,varid,array2)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
