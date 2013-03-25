@@ -4,6 +4,7 @@
   USE mod_oasis_data
   USE mod_oasis_parameters
   USE mod_oasis_sys
+  USE mod_oasis_namcouple, only : namsrcfld, namdstfld
 
   IMPLICIT none
 
@@ -30,11 +31,24 @@
 !    ---------------------------------------------------------------
      integer(kind=ip_i4_p) :: n
      character(len=*),parameter :: subname = 'oasis_def_var'
+     LOGICAL    :: l_field_in_namcouple
 !    ---------------------------------------------------------------
 
      call oasis_debug_enter(subname)
 
      kinfo = OASIS_Ok
+
+     l_field_in_namcouple = .FALSE.
+     do n = 1,mvar
+        if (trim(cdport) == trim(namsrcfld(n)) .OR. trim(cdport) == trim(namdstfld(n))) &
+       &       l_field_in_namcouple = .TRUE.
+     enddo
+
+     if (.not. l_field_in_namcouple) then
+        id_nports = OASIS_Var_Uncpl
+        call oasis_debug_exit(subname)
+        return
+     endif
 
      do n = 1,prism_nvar
         if (trim(cdport) == trim(prism_var(n)%name)) then

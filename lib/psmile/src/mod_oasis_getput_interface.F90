@@ -69,6 +69,13 @@ contains
 
     kinfo = OASIS_OK
 
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
+       call oasis_debug_exit(subname)
+       return
+    endif
+
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
@@ -188,6 +195,13 @@ contains
 
     kinfo = OASIS_OK
 
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
+       call oasis_debug_exit(subname)
+       return
+    endif
+
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
@@ -306,6 +320,13 @@ contains
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
+
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
@@ -436,6 +457,13 @@ contains
 
     kinfo = OASIS_OK
 
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
+       call oasis_debug_exit(subname)
+       return
+    endif
+
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
@@ -555,6 +583,14 @@ contains
 
     kinfo = OASIS_OK
 
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_debug_exit(subname)
+       return
+    endif
+
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
@@ -604,6 +640,14 @@ contains
 
     kinfo = OASIS_OK
 
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_debug_exit(subname)
+       return
+    endif
+
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
 
@@ -652,6 +696,14 @@ contains
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
+
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl
@@ -705,6 +757,14 @@ contains
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
+
+    if (id_port_id == OASIS_Var_Uncpl) then
+       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     nfld = id_port_id
     ncpl  = prism_var(nfld)%ncpl

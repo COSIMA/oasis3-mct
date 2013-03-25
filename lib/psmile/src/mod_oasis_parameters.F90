@@ -21,6 +21,7 @@ MODULE mod_oasis_parameters
 
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_NotDef      = -2 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_NotDef      = PRISM_NotDef
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Var_Uncpl   = -1
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Out         = 14 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Out         = PRISM_Out
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_In          = 15
