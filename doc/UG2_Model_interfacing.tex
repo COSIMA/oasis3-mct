@@ -455,7 +455,7 @@ for one process. The other process partitions are not illustrated.
 
 All component processes declares the fields sent
 or received by the component during the simulation. This is
-  true even for processes not implied in the coupling. 
+  true even for processes not implied in the coupling.
 
 \begin{itemize}
 
@@ -467,7 +467,7 @@ or received by the component during the simulation. This is
 
 
 \begin{itemize}
- \item {\tt var\_id [INTEGER; OUT]}: coupling field ID
+ \item {\tt var\_id [INTEGER; OUT]}: coupling field ID; if the field does not appear in the {\it namcouple}, this will be equal to -1 (and the field will effectively not be exchanged by the corresponding {\it oasis\_put} and {\it oasis\_get}).
  \item {\tt name [CHARACTER*8; IN]}: field symbolic name (as in the
    {\it namcouple})
  \item {\tt il\_part\_id [INTEGER; IN]}: partition ID (see section \ref{subsubsec_Partition})
@@ -548,6 +548,7 @@ To ensure a proper use of the {\tt oasis\_put} / {\tt
 
 \begin{itemize}
 
+\item A field declared  with a {\tt oasis\_def\_var} and not defined in the configuration file {\it namcouple} will not be sent. The corresponding {\it oasis\_put} will be ignored and a warning will simply be written to the debug file.
 \item This routine may be called by the model at each timestep. The
   convention, for the {\tt date} argument is to indicate the time at
   the beginning of the timestep. The sending is actually performed
@@ -621,6 +622,8 @@ performed only if {\tt date} corresponds to a time for which it should
 be activated, given the period indicated by the user in the
 {\it namcouple}. An exchange at the beginning of the run at time=0 is
 expected. 
+
+A field declared  with a {\tt oasis\_def\_var} and not defined in the configuration file {\it namcouple} will not be received. The corresponding {\it oasis\_get} will be ignored and a warning will simply be written to the debug file.
 %A field will not be received at all if its
 %coupling or I/O period indicated in the {\it namcouple} is greater
 %than the total run time.
