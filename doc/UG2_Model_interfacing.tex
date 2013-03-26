@@ -343,9 +343,9 @@ coupling have to call this routine to describe a null partition (i.e. with {\tt 
 \begin{itemize}
 
 \vspace{0.2cm}
-\item {\tt CALL oasis\_def\_partition        (il\_part\_id, ig\_paral, ierror)}
+\item {\tt CALL oasis\_def\_partition        (il\_part\_id, ig\_paral, ierror, isize)}
  or 
-\item {\tt CALL prism\_def\_partition\_proto (il\_part\_id, ig\_paral, ierror)}
+\item {\tt CALL prism\_def\_partition\_proto (il\_part\_id, ig\_paral, ierror, isize)}
 
    \begin{itemize}
    \item {\tt il\_part\_id [INTEGER; OUT]}: partition ID 
@@ -354,6 +354,7 @@ coupling have to call this routine to describe a null partition (i.e. with {\tt 
 partition; in OASIS3-MCT, 4 types of partition are supported: Serial (no
 partition), Apple, Box, and Orange (see below).
    \item {\tt ierror [INTEGER; OUT]}: returned error code.
+   \item {\tt isize [INTEGER, OPTIONAL, IN]}: Optional argument needed if the coupling data us exchanged for only a subdomain of the global grid; in this case, isize must give the total dimension of the grid (total number of points).
    \end{itemize}
 \end{itemize} 
 
