@@ -4,7 +4,6 @@
   USE mod_oasis_data
   USE mod_oasis_parameters
   USE mod_oasis_sys
-  USE mod_oasis_namcouple, only : namsrcfld, namdstfld
 
   IMPLICIT none
 
@@ -29,7 +28,7 @@
      CHARACTER(len=*)         :: cdport
      INTEGER(kind=ip_i4_p),optional :: kinfo
 !    ---------------------------------------------------------------
-     integer(kind=ip_i4_p) :: n
+     INTEGER(kind=ip_i4_p) :: n
      character(len=*),parameter :: subname = 'oasis_def_var'
      LOGICAL    :: l_field_in_namcouple
 !    ---------------------------------------------------------------
@@ -40,7 +39,7 @@
 
      l_field_in_namcouple = .FALSE.
      do n = 1,mvar
-        if (trim(cdport) == trim(namsrcfld(n)) .OR. trim(cdport) == trim(namdstfld(n))) &
+        if (trim(cdport) == trim(total_namsrcfld(n)) .OR. trim(cdport) == trim(total_namdstfld(n))) &
        &       l_field_in_namcouple = .TRUE.
      enddo
 
@@ -49,6 +48,7 @@
         call oasis_debug_exit(subname)
         return
      endif
+
 
      do n = 1,prism_nvar
         if (trim(cdport) == trim(prism_var(n)%name)) then
@@ -61,6 +61,7 @@
 
      prism_nvar = prism_nvar + 1
      id_nports = prism_nvar
+
 
      if (prism_nvar > mvar) then
         write(nulprt,*) subname,' ERROR prism_nvar too large ',prism_nvar,mvar

@@ -19,6 +19,9 @@ MODULE mod_oasis_namcouple
 
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 1000 ! max number of characters to be read 
                                                          ! in each line of the file namcouple 
+                                                         ! to be changed in oasis_data for
+                                                         ! total_namsrcfld and total_namdstfld 
+                                                         ! if changed here
   !
   INTEGER(kind=ip_i4_p) ,public :: prism_nmodels   ! number of models
   character(len=ic_lvar),public,pointer :: prism_modnam(:)  ! model names

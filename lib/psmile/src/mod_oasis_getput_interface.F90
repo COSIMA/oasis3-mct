@@ -72,7 +72,7 @@ contains
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -198,7 +198,7 @@ contains
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -324,7 +324,7 @@ contains
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -460,7 +460,7 @@ contains
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -587,7 +587,7 @@ contains
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_get is called for variable not in namcouple; it will not be received'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -644,7 +644,7 @@ contains
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_get is called for variable not in namcouple; it will not be received'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -701,7 +701,7 @@ contains
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_get is called for variable not in namcouple; it will not be received'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 
@@ -762,7 +762,7 @@ contains
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
           ' Routine oasis_get is called for variable not in namcouple; it will not be received'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_debug_exit(subname)
+       call oasis_abort_noarg()
        return
     endif
 

@@ -57,7 +57,8 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_stride
    integer(kind=ip_intwp_p) :: pio_root
    integer(kind=ip_intwp_p) :: pio_numtasks
-   integer(kind=ip_intwp_p),allocatable :: tmparr(:)
+   INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
+   INTEGER(kind=ip_intwp_p) :: k,i,m
    character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
 
@@ -142,14 +143,44 @@ CONTAINS
    CALL oasis_flush(nulprt1)
    !
    ALLOCATE(prism_var(mvar))
-   !
    ! Define mtimer as a function of mvars instead of a parameter
    mtimer = 7*mvar+30
    ALLOCATE(timer(mtimer))
    ALLOCATE(sum_ctime(mtimer))
    ALLOCATE(sum_wtime(mtimer))
    ALLOCATE(timer_count(mtimer))
+   
+   ! Store all the names of the fields exchanged in the namcouple
+   ! which can be different of namsrcfld(:) and namdstfld(:) if multiple 
+   ! fields are exchanged together
+   ALLOCATE(total_namsrcfld(mvar))
+   ALLOCATE(total_namdstfld(mvar))
+   m=0
+   DO nns = 1,nnamcpl
+     n = namfldsort(nns)
+     k=oasis_string_listGetNum(namsrcfld(n))
+     DO i=1,k 
+       m=m+1
+       CALL oasis_string_listGetName((namsrcfld(n)),i,(total_namsrcfld(m)))
+     ENDDO
+   ENDDO
+   !
+   m=0
+   DO nns = 1,nnamcpl
+     n = namfldsort(nns)
+     k=oasis_string_listGetNum(namdstfld(n))
+     DO i=1,k 
+       m=m+1
+       CALL oasis_string_listGetName((namdstfld(n)),i,(total_namdstfld(m)))
+     ENDDO
+   ENDDO
+   DO m=1,mvar
+     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields namdstfld, namdstfld:',&
+                                     TRIM(total_namsrcfld(m)),TRIM(total_namdstfld(m))
+     CALL oasis_flush(nulprt1)
+   ENDDO
 
+   !
    !------------------------
    !--- Set compid (need namcouple model names)
    !------------------------
