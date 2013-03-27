@@ -320,7 +320,7 @@ PROGRAM model2
     !
   ENDDO
   !
-  WRITE (w_unit,*) 'End of the program, before oasis_terminate'
+  WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
   CLOSE(w_unit)
   !

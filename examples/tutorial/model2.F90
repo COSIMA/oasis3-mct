@@ -178,8 +178,6 @@ PROGRAM model2
       ! TOCOMPLETE - Put here OASIS grid, corner, areas and mask writing calls !
       !
   ENDIF
-  WRITE(w_unit,*) 'After grids writing'
-  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  PARTITION DEFINITION 
@@ -292,7 +290,7 @@ PROGRAM model2
     !
   ENDDO
   !
-  WRITE (w_unit,*) 'End of the program, before oasis_terminate'
+  WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
   CLOSE(w_unit)
   !
