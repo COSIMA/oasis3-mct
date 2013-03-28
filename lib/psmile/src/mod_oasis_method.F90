@@ -173,13 +173,15 @@ CONTAINS
      k=oasis_string_listGetNum(namdstfld(n))
      DO i=1,k 
        m=m+1
-       CALL oasis_string_listGetName(namsrcfld(n),i,i_name)
+       CALL oasis_string_listGetName(namdstfld(n),i,i_name)
        total_namdstfld(m)=trim(i_name)
      ENDDO
    ENDDO
    DO m=1,mvar
-     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields namdstfld, namdstfld:',&
-                                     TRIM(total_namsrcfld(m)),TRIM(total_namdstfld(m))
+     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields  namsrcfld:',&
+                                     TRIM(total_namsrcfld(m))
+     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields namdstfld:',&
+                                     TRIM(total_namdstfld(m))
      CALL oasis_flush(nulprt1)
    ENDDO
 
