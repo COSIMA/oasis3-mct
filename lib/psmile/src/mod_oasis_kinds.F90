@@ -19,6 +19,7 @@ SAVE
   INTEGER, PARAMETER :: ic_med  = 64
   INTEGER, PARAMETER :: ic_long = 256
   INTEGER, PARAMETER :: ic_xl   = 1024
+  INTEGER, PARAMETER :: ic_field = 1000
   INTEGER, PARAMETER :: ip_single_p = SELECTED_REAL_KIND(6,37)
   INTEGER, PARAMETER :: ip_double_p = SELECTED_REAL_KIND(12,307)
   INTEGER, PARAMETER :: ip_realwp_p = ip_double_p

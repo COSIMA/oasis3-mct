@@ -21,7 +21,7 @@ MODULE mod_oasis_data
   integer(ip_intwp_p)   :: mvar
   integer(kind=ip_i4_p),parameter :: mvarcpl = 10
   !
-  CHARACTER(1000), POINTER :: total_namsrcfld(:), total_namdstfld(:)
+  CHARACTER(len=ic_field), POINTER :: total_namsrcfld(:), total_namdstfld(:)
   !
   type prism_var_type
      character(len=ic_lvar):: name

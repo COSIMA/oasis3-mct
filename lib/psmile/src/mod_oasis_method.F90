@@ -59,6 +59,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_numtasks
    INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
    INTEGER(kind=ip_intwp_p) :: k,i,m
+   character(len=ic_field)  :: i_name
    character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
 
@@ -161,7 +162,8 @@ CONTAINS
      k=oasis_string_listGetNum(namsrcfld(n))
      DO i=1,k 
        m=m+1
-       CALL oasis_string_listGetName((namsrcfld(n)),i,(total_namsrcfld(m)))
+       CALL oasis_string_listGetName(namsrcfld(n),i,i_name)
+       total_namsrcfld(m)=trim(i_name)
      ENDDO
    ENDDO
    !
@@ -171,7 +173,8 @@ CONTAINS
      k=oasis_string_listGetNum(namdstfld(n))
      DO i=1,k 
        m=m+1
-       CALL oasis_string_listGetName((namdstfld(n)),i,(total_namdstfld(m)))
+       CALL oasis_string_listGetName(namsrcfld(n),i,i_name)
+       total_namdstfld(m)=trim(i_name)
      ENDDO
    ENDDO
    DO m=1,mvar
