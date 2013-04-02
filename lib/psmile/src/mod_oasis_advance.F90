@@ -571,6 +571,8 @@ contains
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
           call oasis_abort_noarg()
+       ! With the current way of using oasis_advance_run, the above test is useless but we keep the test
+       ! as someone might be later adding an interface call that would violate the consistency
        endif
 
        ! initialize aVect2-5 here if not already allocated
