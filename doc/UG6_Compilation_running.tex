@@ -54,6 +54,10 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   i=imax, it is the latter that must be masked; when this is not the
   case with the mask defined in {\it masks.nc}, this CPP key forces
   these rules are to be respected.
+
+\item {\tt balance}: Add a MPI\_Wtime() function before and after mct\_isend (MPI put)
+   and mct\_recv (MPI get) to calculate the time of the send and receive of a coupling field.
+   This option is used to perform a load balancing analysis in the models.
 \end{itemize}
 
 \section{Running OASIS3-MCT}
