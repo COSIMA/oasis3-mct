@@ -163,7 +163,7 @@ contains
              if (a3on) array3(1:lsize) = avtmp3%rAttr(nf,1:lsize)
              if (a4on) array4(1:lsize) = avtmp4%rAttr(nf,1:lsize)
              if (a5on) array5(1:lsize) = avtmp5%rAttr(nf,1:lsize)
-             call oasis_advance_run(OASIS_Out,varid,msec,array,kinfo,readrest=.true., &
+             CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,array1din=array,readrest=.TRUE., &
                a2on=a2on,array2=array2,a3on=a3on,array3=array3, &
                a4on=a4on,array4=array4,a5on=a5on,array5=array5)
           enddo
@@ -272,7 +272,8 @@ contains
 
   end SUBROUTINE oasis_advance_init
 !---------------------------------------------------------------------
-  SUBROUTINE oasis_advance_run(mop,varid,msec,array,kinfo,readrest, &
+  SUBROUTINE oasis_advance_run(mop,varid,msec,kinfo,array1din,&
+             array1dout,array2dout,readrest, &
              a2on,array2,a3on,array3,a4on,array4,a5on,array5)
 
     IMPLICIT none
@@ -280,9 +281,11 @@ contains
     integer(kind=ip_i4_p), intent(in)    :: mop      ! OASIS_Out or OASIS_In
     INTEGER(kind=ip_i4_p), intent(in)    :: varid    ! prism_var id
     INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
-    REAL   (kind=ip_r8_p), intent(inout) :: array(:) ! data
     INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
-    logical              , intent(in),optional :: readrest  ! special flag to indicate this 
+    REAL   (kind=ip_r8_p), INTENT(in),optional    :: array1din(:) ! data
+    REAL   (kind=ip_r8_p), INTENT(  out),OPTIONAL :: array1dout(:)   ! data
+    REAL   (kind=ip_r8_p), INTENT(  out),OPTIONAL :: array2dout(:,:)   ! data
+    logical              , intent(in),optional    :: readrest  ! special flag to indicate this 
                                                             ! is called from the advance_init 
                                                             ! method for restart
     logical              , intent(in),optional :: a2on      ! logical for array2
@@ -521,7 +524,9 @@ contains
        call oasis_debug_note(subname//' compute field index and sizes')
        nfav = mct_avect_indexra(prism_coupler(cplid)%avect1,trim(vname))
        nsav = mct_avect_lsize(prism_coupler(cplid)%avect1)
-       nsa = size(array)
+       if (present(array1din )) nsa = size(array1din )
+       if (present(array1dout)) nsa = size(array1dout)
+       if (present(array2dout)) nsa = size(array2dout)
 
        if (OASIS_debug >= 20) then
           write(nulprt,*) subname,'  DEBUG nfav,nsav,nsa = ',nfav,nsav,nsa
@@ -634,7 +639,7 @@ contains
              if (time_now) then
                 cstring = 'instant'
                 do n = 1,nsav
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array1din(n)
                    if (prism_coupler(cplid)%aVon(2)) then
                       if (present(array2)) then
                          prism_coupler(cplid)%avect2%rAttr(nfav,n) = array2(n)
@@ -672,7 +677,7 @@ contains
              if (kinfo == OASIS_OK) kinfo = OASIS_LocTrans
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) + array1din(n)
                 if (prism_coupler(cplid)%aVon(2)) then
                    if (present(array2)) then
                       prism_coupler(cplid)%avect2%rAttr(nfav,n) = &
@@ -705,7 +710,7 @@ contains
              if (kinfo == OASIS_OK) kinfo = OASIS_LocTrans
              do n = 1,nsav
                 prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) + array(n)
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) + array1din(n)
                 if (prism_coupler(cplid)%aVon(2)) then
                    if (present(array2)) then
                       prism_coupler(cplid)%avect2%rAttr(nfav,n) = &
@@ -746,10 +751,10 @@ contains
              endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array1din(n)
                 else
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
-                      max(prism_coupler(cplid)%avect1%rAttr(nfav,n),array(n))
+                      max(prism_coupler(cplid)%avect1%rAttr(nfav,n),array1din(n))
                 endif
              enddo
              prism_coupler(cplid)%avcnt(nfav) = 1
@@ -767,10 +772,10 @@ contains
              endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
-                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array(n)
+                   prism_coupler(cplid)%avect1%rAttr(nfav,n) = array1din(n)
                 else
                    prism_coupler(cplid)%avect1%rAttr(nfav,n) = &
-                      min(prism_coupler(cplid)%avect1%rAttr(nfav,n),array(n))
+                      min(prism_coupler(cplid)%avect1%rAttr(nfav,n),array1din(n))
                 endif
              enddo
              prism_coupler(cplid)%avcnt(nfav) = 1
@@ -846,7 +851,7 @@ contains
           ! average as needed (not cache friendly yet)
           !------------------------------------------------
 
-          if (getput == OASIS3_PUT) then
+          IF (getput == OASIS3_PUT) THEN
              call oasis_debug_note(subname//' loctrans calc')
              write(tstring,F01) 'pavg_',cplid
              call oasis_timer_start(tstring)
@@ -899,7 +904,7 @@ contains
                 endif
              enddo             
              call oasis_timer_stop(tstring)
-          endif
+         ENDIF
 
           !------------------------------------------------
           ! past namcouple runtime (maxtime) no communication
@@ -1217,7 +1222,7 @@ contains
        !------------------------------------------------
 
        if (getput == OASIS3_GET) then
-         if (time_now .and. unpack) then
+         IF (time_now .AND. unpack) THEN
              if (kinfo == OASIS_output) then
                 kinfo = OASIS_recvout
              elseif (kinfo == OASIS_fromrest) then
@@ -1251,17 +1256,18 @@ contains
              write(tstring,F01) 'gcpy_',cplid
              call oasis_debug_note(subname//' get copy to array')
              call oasis_timer_start(tstring)
-             do n = 1,nsav
-                array(n) = prism_coupler(cplid)%avect1%rAttr(nfav,n)
-             enddo
+             if (present(array1dout)) array1dout(:) = &
+                       prism_coupler(cplid)%avect1%rAttr(nfav,:)
+             if (present(array2dout)) array2dout(:,:) = &
+                      RESHAPE(prism_coupler(cplid)%avect1%rAttr(nfav,:),SHAPE(array2dout))
              call oasis_timer_stop(tstring)
              if (OASIS_debug >= 20) then
-                write(nulprt,*) subname,'  DEBUG array copy = ',cplid,&
-                                minval(array),maxval(array)
+                if (present(array1dout)) write(nulprt,*) subname,'  DEBUG array copy = ',&
+                         cplid,minval(array1dout),maxval(array1dout)
+                if (present(array2dout)) write(nulprt,*) subname,'  DEBUG array copy = ',&
+                         cplid,minval(array2dout),maxval(array2dout)
              endif
-          else
-             array(:) = 0.
-          endif
+         ENDIF
           if (time_now) prism_coupler(cplid)%status(nfav) = OASIS_COMM_READY
        endif
 
