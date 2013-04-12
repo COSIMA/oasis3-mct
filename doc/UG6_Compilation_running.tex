@@ -56,8 +56,11 @@ can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
   these rules are to be respected.
 
 \item {\tt balance}: Add a MPI\_Wtime() function before and after mct\_isend (MPI put)
-   and mct\_recv (MPI get) to calculate the time of the send and receive of a coupling field.
-   This option is used to perform a load balancing analysis in the models.
+   and mct\_recv (MPI get) to calculate the time of the send and receive of a coupling field. This option can be used to produce timestamps in OASIS debug files. During a post-processing phase, this information can be used to perform
+an analysis of the coupled components load (un)balance; specific tools have
+been developed to do this and will be released with a further version of
+OASIS3-MCT."
+
 \end{itemize}
 
 \section{Running OASIS3-MCT}
