@@ -25,6 +25,7 @@
 ! 03.01.11    M. Hanke     created (based on psmile_timer.F90 and
 !                                   prismdrv_timer.F90 from SV and JL)
 ! 20.09.11    T. Craig     extended
+! 16.04.13    T. Craig     use mpi comm from mod_oasis_data
 !
 !----------------------------------------------------------------------
 !
@@ -51,17 +52,25 @@ module mod_oasis_timer
    ! name of the application
    character (len=ic_med) :: app_name
 
-   ! Communicator for which this timer is valid
-   integer :: comm_timer
-
-   ! size of the communicator
-   integer :: comm_size
-
-   ! rank of the local process within the communicator
-   integer :: comm_rank
-
    ! name of the time statistics file
    character (len=ic_med) :: file_name
+
+   type timer_details
+      ! label of timer
+      character (len=ic_med) :: label
+      ! wall time values
+      double precision :: start_wtime, end_wtime
+      ! cpu time values
+      double precision :: start_ctime, end_ctime
+      ! is the timer running now
+      character(len=1) :: runflag
+   end type timer_details
+
+   INTEGER :: mtimer 
+   TYPE (timer_details), POINTER :: timer(:)
+   DOUBLE PRECISION, POINTER     :: sum_ctime(:)       ! these values are not part of timer details
+   DOUBLE PRECISION, POINTER     :: sum_wtime(:)       ! because they are later used in an mpi call
+   INTEGER, POINTER              :: TIMER_COUNT(:)     ! number of calls
 
    integer :: ntimer
 
@@ -76,19 +85,25 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
-      subroutine oasis_timer_init (app, file, comm)
+      subroutine oasis_timer_init (app, file, nt)
 
          implicit none
 
          character (len=*), intent (in)   :: app
          character (len=*), intent (in)   :: file
-         integer, intent (in)             :: comm
+         integer          , intent (in)   :: nt
 
          integer :: ierror,n
          character(len=*),parameter :: subname = 'oasis_timer_init'
 
          app_name  = trim (app)
          file_name = trim (file)
+
+         mtimer = nt
+         ALLOCATE(timer(mtimer))
+         ALLOCATE(sum_ctime(mtimer))
+         ALLOCATE(sum_wtime(mtimer))
+         ALLOCATE(timer_count(mtimer))
 
          ntimer = 0
          do n = 1,mtimer
@@ -104,18 +119,12 @@ module mod_oasis_timer
             timer_count(n)       = 0
          enddo
 
-         ! initialise MPI specific data
-         comm_timer = comm
-
-         call MPI_Comm_size(comm, comm_size, ierror)
-         call MPI_Comm_rank(comm, comm_rank, ierror)
-
          IF ((TIMER_debug == 1) .AND. (mpi_rank_local == 0)) TIMER_Debug=2
 
          IF (TIMER_Debug >= 2) THEN
 
                  CALL oasis_unitget(output_unit)
-                 WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',comm_rank
+                 WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',mpi_rank_local
 
                  OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
                     status="UNKNOWN")
@@ -158,8 +167,8 @@ module mod_oasis_timer
          endif
 
          if (present(barrier)) then
-            if (barrier) then
-               call MPI_BARRIER(comm_timer, ierr)
+            if (barrier .and. mpi_comm_local /= MPI_COMM_NULL) then
+               call MPI_BARRIER(mpi_comm_local, ierr)
             endif
          endif
 
@@ -248,7 +257,10 @@ module mod_oasis_timer
          double precision   :: mintime,maxtime,meantime
          character(len=*),parameter :: subname = 'oasis_timer_print'
 
-         IF (TIMER_Debug >= 1) THEN
+         IF (TIMER_Debug < 1) then
+            return
+         ENDIF
+
          onetimer = .false.
          if (present(timer_label)) then
             onetimer = .true.
@@ -264,78 +276,72 @@ module mod_oasis_timer
          endif
 
 !-----------------------------------------------------
-         if (onetimer) then
+! one timer output
+!-----------------------------------------------------
+         if (TIMER_Debug >= 2 .and. onetimer) then
 
-         IF (TIMER_Debug >= 2) THEN
-             OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
-                status="UNKNOWN", position="APPEND")
-         ENDIF
-         IF (TIMER_Debug >= 2) THEN
-             IF (.NOT.single_timer_header) THEN
-                 WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
-                    ' wtime ','on pe','count',' ctime ','on pe','count'
-                 single_timer_header = .TRUE.
-             ENDIF
-         ENDIF
-            n = timer_id
-            IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                   n, timer(n)%label, timer(n)%runflag, &
-                   sum_wtime(n), comm_rank, TIMER_COUNT(n), &
-                   sum_ctime(n), comm_rank, TIMER_COUNT(n)
-
-                CLOSE(output_unit)
+            OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+               status="UNKNOWN", position="APPEND")
+            IF (.NOT.single_timer_header) THEN
+               WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+                  ' wtime ','on pe','count',' ctime ','on pe','count'
+               single_timer_header = .TRUE.
             ENDIF
+            n = timer_id
+            WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+               n, timer(n)%label, timer(n)%runflag, &
+               sum_wtime(n), mpi_rank_local, TIMER_COUNT(n), &
+               sum_ctime(n), mpi_rank_local, TIMER_COUNT(n)
+            CLOSE(output_unit)
 !----------
             return
 !----------
-
          endif
+
+!-----------------------------------------------------
+! local output
 !-----------------------------------------------------
          IF (TIMER_Debug >= 2) THEN
-             OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
-                status="UNKNOWN", position="APPEND")
-             WRITE(output_unit,*)''
-             WRITE(output_unit,*)' =================================='
-             WRITE(output_unit,*)' ', TRIM(app_name)
-             WRITE(output_unit,*)' Local processor times '
-             WRITE(output_unit,*)' =================================='
-             WRITE(output_unit,*)''
-         ENDIF
+            OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+               status="UNKNOWN", position="APPEND")
 
-         do n = 1,ntimer
-           IF (TIMER_Debug >= 2) THEN
+            WRITE(output_unit,*)''
+            WRITE(output_unit,*)' =================================='
+            WRITE(output_unit,*)' ', TRIM(app_name)
+            WRITE(output_unit,*)' Local processor times '
+            WRITE(output_unit,*)' =================================='
+            WRITE(output_unit,*)''
+
+            do n = 1,ntimer
                IF (.NOT.single_timer_header) THEN
-                   WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
-                      ' wtime ','on pe','count',' ctime ','on pe','count'
-                   single_timer_header = .TRUE.
+                  WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+                     ' wtime ','on pe','count',' ctime ','on pe','count'
+                  single_timer_header = .TRUE.
                ENDIF
-           ENDIF
-           IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                   n, timer(n)%label, timer(n)%runflag, &
-                   sum_wtime(n), comm_rank, TIMER_COUNT(n), &
-                   sum_ctime(n), comm_rank, TIMER_COUNT(n)
-            ENDIF
+               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                  n, timer(n)%label, timer(n)%runflag, &
+                  sum_wtime(n), mpi_rank_local, TIMER_COUNT(n), &
+                  sum_ctime(n), mpi_rank_local, TIMER_COUNT(n)
+            enddo
 
-         enddo
-
-         IF (TIMER_Debug >= 2) THEN
-             CLOSE(output_unit)
+            CLOSE(output_unit)
          ENDIF
 
-         if (comm_size > 1) then
+!-----------------------------------------------------
+! gather global output on mpi_comm_local pes
+!-----------------------------------------------------
+         if (mpi_size_local > 0) then
 
-            call oasis_mpi_max(ntimer,ntimermax,comm_timer,string='ntimer',all=.true.)
+            call oasis_mpi_max(ntimer,ntimermax,mpi_comm_local,string='ntimer',all=.true.)
 
-            allocate (sum_ctime_global_tmp(ntimermax, comm_size), &
-                      sum_wtime_global_tmp(ntimermax, comm_size), stat=ierror)
+            allocate (sum_ctime_global_tmp(ntimermax, mpi_size_local), &
+                      sum_wtime_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             IF ( ierror /= 0 ) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error sum_global_tmp'
-            allocate (count_global_tmp(ntimermax, comm_size), stat=ierror)
+            allocate (count_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error count_global_tmp'
-            allocate (label_global_tmp(ntimermax, comm_size), stat=ierror)
+            allocate (label_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error label_global_tmp'
 
@@ -348,63 +354,63 @@ module mod_oasis_timer
 
 ! tcraig, causes memory failure on corail for some reason
 !            call MPI_Gather(sum_ctime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_ctime_global_tmp(1,1), &
-!                            ntimermax, MPI_DOUBLE_PRECISION, root, comm_timer, ierror)
+!                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
 !            call MPI_Gather(sum_wtime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_wtime_global_tmp(1,1), &
-!                            ntimermax, MPI_DOUBLE_PRECISION, root, comm_timer, ierror)
+!                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
 !            call MPI_Gather(count(1), ntimermax, MPI_INTEGER, count_global_tmp(1,1), &
-!                            ntimermax, MPI_INTEGER, root, comm_timer, ierror)
+!                            ntimermax, MPI_INTEGER, root, mpi_comm_local, ierror)
 
 ! tcraig, this doesn't work either
 !            allocate(rarr(ntimermax),stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error rarr'
 !            rarr(1:ntimermax) = sum_ctime(1:ntimermax)
-!            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_ctime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,comm_timer,ierror)
+!            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_ctime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,mpi_comm_local,ierror)
 !            rarr(1:ntimermax) = sum_wtime(1:ntimermax)
-!            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_wtime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,comm_timer,ierror)
+!            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_wtime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,mpi_comm_local,ierror)
 !            deallocate(rarr,stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error rarr'
 !
 !            allocate(iarr(ntimermax),stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error iarr'
 !            iarr(1:ntimermax) = count(1:ntimermax)
-!            call MPI_Gather(iarr,ntimermax,MPI_INTEGER,count_global_tmp,ntimermax,MPI_INTEGER,root,comm_timer,ierror)
+!            call MPI_Gather(iarr,ntimermax,MPI_INTEGER,count_global_tmp,ntimermax,MPI_INTEGER,root,mpi_comm_local,ierror)
 !            deallocate(iarr,stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error iarr'
 
 ! tcraig this works but requires lots of gather calls, could be better
-            allocate(rarr(comm_size),iarr(comm_size),carr(comm_size),stat=ierror)
+            allocate(rarr(mpi_size_local),iarr(mpi_size_local),carr(mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error rarr'
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
                call MPI_Gather(cval,len(cval),MPI_CHARACTER,carr(1),len(cval),&
-                               MPI_CHARACTER,root,comm_timer,ierror)
-               if (comm_rank == root) then
-                  do m = 1,comm_size
+                               MPI_CHARACTER,root,mpi_comm_local,ierror)
+               if (mpi_rank_local == root) then
+                  do m = 1,mpi_size_local
                      label_global_tmp(n,m) = trim(carr(m))
                   enddo
                endif
 
                rval = sum_ctime(n)
                call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
-                               root,comm_timer,ierror)
-               if (comm_rank == root) then
-                  sum_ctime_global_tmp(n,1:comm_size) = rarr(1:comm_size)
+                               root,mpi_comm_local,ierror)
+               if (mpi_rank_local == root) then
+                  sum_ctime_global_tmp(n,1:mpi_size_local) = rarr(1:mpi_size_local)
                endif
 
                rval = sum_wtime(n)
                call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
-                               root,comm_timer,ierror)
-               if (comm_rank == root) then
-                  sum_wtime_global_tmp(n,1:comm_size) = rarr(1:comm_size)
+                               root,mpi_comm_local,ierror)
+               if (mpi_rank_local == root) then
+                  sum_wtime_global_tmp(n,1:mpi_size_local) = rarr(1:mpi_size_local)
                endif
 
                ival = timer_count(n)
                call MPI_Gather(ival,1,MPI_INTEGER,iarr(1),1,MPI_INTEGER,root,&
-                               comm_timer,ierror)
-               if (comm_rank == root) then
-                  count_global_tmp(n,1:comm_size) = iarr(1:comm_size)
+                               mpi_comm_local,ierror)
+               if (mpi_rank_local == root) then
+                  count_global_tmp(n,1:mpi_size_local) = iarr(1:mpi_size_local)
                endif
             enddo
             deallocate(rarr,iarr,carr,stat=ierror)
@@ -413,12 +419,12 @@ module mod_oasis_timer
 
             ! now sort all the timers out by names
 
-            allocate(carr(ntimermax*comm_size),stat=ierror)
+            allocate(carr(ntimermax*mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error carr'
             nlabels = 0
             do n = 1,ntimermax
-            do m = 1,comm_size
+            do m = 1,mpi_size_local
                found = .false.
                do k = 1,nlabels
                   if (trim(label_global_tmp(n,m)) == trim(carr(k))) found = .true.
@@ -440,13 +446,13 @@ module mod_oasis_timer
             deallocate(carr,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: deallocate error carr'
-            allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
+            allocate(sum_ctime_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
-            allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
+            allocate(sum_wtime_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
-            allocate(count_global(nlabels,comm_size),stat=ierror)
+            allocate(count_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: allocate error count_global'
 
@@ -456,7 +462,7 @@ module mod_oasis_timer
 
             do k = 1,nlabels
             do m = 1,ntimermax
-            do n = 1,comm_size
+            do n = 1,mpi_size_local
                if (trim(label_list(k)) == trim(label_global_tmp(m,n))) then
                   sum_ctime_global(k,n) = sum_ctime_global_tmp(m,n)
                   sum_wtime_global(k,n) = sum_wtime_global_tmp(m,n)
@@ -479,189 +485,157 @@ module mod_oasis_timer
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',' WARNING: deallocate error count_global'
 
-         else
-            nlabels = ntimer
-            allocate(label_list(nlabels),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error label_list'
-            allocate(sum_ctime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
-            allocate(sum_wtime_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
-            allocate(count_global(nlabels,comm_size),stat=ierror)
-            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error count_global'
-            do k = 1,nlabels
-               label_list(k) = timer(k)%label
-            enddo
-            sum_ctime_global(:,1) = sum_ctime(:)
-            sum_wtime_global(:,1) = sum_wtime(:)
-            count_global(:,1) = timer_count(:)
-         endif ! (comm_size > 1)
+         endif ! (mpi_size_local > 1)
 
-         ! if this is the root process
-         if (comm_rank == root) then
-             IF (TIMER_Debug >= 2) THEN
-                 OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
-                    status="UNKNOWN", position="APPEND")
-             ENDIF
+!-----------------------------------------------------
+! write global output on root of mpi_comm_local 
+!-----------------------------------------------------
+         if (TIMER_Debug >= 2 .and. mpi_rank_local == root) then
+            OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+               status="UNKNOWN", position="APPEND")
 
-         if (onetimer) then
-             IF (TIMER_Debug >= 2) THEN
-                 IF (.NOT.single_timer_header) THEN
-                    WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
-                       'mintime','on pe','count','maxtime','on pe','count'
-                    single_timer_header = .TRUE.
-                ENDIF
-            ENDIF
-            n = 0
-            do k = 1,nlabels
-               if (trim(timer_label) == trim(label_list(k))) n = k
-            enddo
-            if (n < 1) then
-               write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
-               CALL oasis_flush(nulprt)
-               return
-            endif
-            mintime = sum_ctime_global(n,1)
-            minpe = 1
-            maxtime = sum_ctime_global(n,1)
-            maxpe = 1
-            do k = 1,comm_size
-               if (sum_ctime_global(n,k) < mintime) then
-                  mintime = sum_ctime_global(n,k)
-                  minpe = k
+            if (onetimer) then
+               IF (.NOT.single_timer_header) THEN
+                  WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x))') &
+                     'mintime','on pe','count','maxtime','on pe','count'
+                  single_timer_header = .TRUE.
+               ENDIF
+               n = 0
+               do k = 1,nlabels
+                  if (trim(timer_label) == trim(label_list(k))) n = k
+               enddo
+               if (n < 1) then
+                  write(nulprt,*) subname,' model :',compid,' proc :',&
+                  mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
+                  CALL oasis_flush(nulprt)
+                  return
                endif
-               if (sum_ctime_global(n,k) > maxtime) then
-                  maxtime = sum_ctime_global(n,k)
-                  maxpe = k
-               endif
-            enddo
-            IF (TIMER_Debug >= 2) THEN
-                WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
-                   n, label_list(n), timer(n)%runflag, &
-                   sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
-                   sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
-            ENDIF
-
-         else
-             IF (TIMER_Debug >= 2) THEN
-                 single_timer_header = .FALSE.
-
-                WRITE(output_unit,*)''
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)' ', TRIM(app_name)
-                WRITE(output_unit,*)' Overall Elapsed Min/Max statistics'
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)''
-                WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x),a,3x)') &
-                   'mintime','on pe','count','maxtime','on pe','count','meantime'
-            ENDIF
-            DO n = 1,nlabels
-               mintime = 1.0e36
-               minpe = -1
-               maxtime = -1.0e36
-               maxpe = -1
-               meantime = 0.0
-               mcnt = 0
-               do k = 1,comm_size
-                  if (count_global(n,k) > 0) then
-                     meantime = meantime + sum_wtime_global(n,k)
-                     mcnt = mcnt + 1
-                     if (sum_wtime_global(n,k) < mintime) then
-                        mintime = sum_wtime_global(n,k)
-                        minpe = k
-                     endif
-                     if (sum_wtime_global(n,k) > maxtime) then
-                        maxtime = sum_wtime_global(n,k)
-                        maxpe = k
-                     endif
+               mintime = sum_ctime_global(n,1)
+               minpe = 1
+               maxtime = sum_ctime_global(n,1)
+               maxpe = 1
+               do k = 1,mpi_size_local
+                  if (sum_ctime_global(n,k) < mintime) then
+                     mintime = sum_ctime_global(n,k)
+                     minpe = k
+                  endif
+                  if (sum_ctime_global(n,k) > maxtime) then
+                     maxtime = sum_ctime_global(n,k)
+                     maxpe = k
                   endif
                enddo
-               if (mcnt > 0) meantime = meantime / float(mcnt)
-               IF (TIMER_Debug >= 2) THEN
-                   WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
-                      n, label_list(n), timer(n)%runflag, &
-                      sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
-                      sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
-                      meantime
+               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+                  n, label_list(n), timer(n)%runflag, &
+                  sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
+                  sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
+
+            else
+               single_timer_header = .FALSE.
+
+               WRITE(output_unit,*)''
+               WRITE(output_unit,*)' =================================='
+               WRITE(output_unit,*)' ', TRIM(app_name)
+               WRITE(output_unit,*)' Overall Elapsed Min/Max statistics'
+               WRITE(output_unit,*)' =================================='
+               WRITE(output_unit,*)''
+               WRITE(output_unit,'(32x,2(2x,a,5x,a,6x,a,4x),a,3x)') &
+                  'mintime','on pe','count','maxtime','on pe','count','meantime'
+
+               DO n = 1,nlabels
+                  mintime = 1.0e36
+                  minpe = -1
+                  maxtime = -1.0e36
+                  maxpe = -1
+                  meantime = 0.0
+                  mcnt = 0
+                  do k = 1,mpi_size_local
+                     if (count_global(n,k) > 0) then
+                        meantime = meantime + sum_wtime_global(n,k)
+                        mcnt = mcnt + 1
+                        if (sum_wtime_global(n,k) < mintime) then
+                           mintime = sum_wtime_global(n,k)
+                           minpe = k
+                        endif
+                        if (sum_wtime_global(n,k) > maxtime) then
+                           maxtime = sum_wtime_global(n,k)
+                           maxpe = k
+                        endif
+                     endif
+                  enddo
+                  if (mcnt > 0) meantime = meantime / float(mcnt)
+                  WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
+                     n, label_list(n), timer(n)%runflag, &
+                     sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
+                     sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
+                     meantime
+               ENDDO
+
+               IF (TIMER_Debug >= 3) THEN
+                  WRITE(output_unit,*)''
+                  WRITE(output_unit,*)' =================================='
+                  WRITE(output_unit,*)' ', TRIM(app_name)
+                  WRITE(output_unit,*)' Overall Count statistics'
+                  WRITE(output_unit,*)' =================================='
+                  WRITE(output_unit,*)''
+                  DO k=1,mpi_size_local
+                     WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                     WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                     DO n = 1, nlabels
+                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(i10))') n, label_list(n), &
+                                          timer(n)%runflag, (count_global(n,k))
+                     ENDDO
+                  ENDDO
+                  WRITE(output_unit,*)''
+                  WRITE(output_unit,*)' =================================='
+                  WRITE(output_unit,*)' ', TRIM(app_name)
+                  WRITE(output_unit,*)' Overall CPU time statistics'
+                  WRITE(output_unit,*)' =================================='
+                  WRITE(output_unit,*)''
+                  DO k=1,mpi_size_local
+                     WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                     WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                     DO n = 1, nlabels
+                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                                         (sum_ctime_global(n,k))
+                     ENDDO
+                  ENDDO
+                  WRITE(output_unit,*)''
+                  WRITE(output_unit,*)' ======================================'
+                  WRITE(output_unit,*)' ', TRIM(app_name)
+                  WRITE(output_unit,*)' Overall Elapsed time statistics'
+                  WRITE(output_unit,*)' ======================================'
+                  WRITE(output_unit,*)''
+                  DO k=1,mpi_size_local
+                     WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
+                     WRITE(output_unit,'(3x,i8,5x)')(k-1)
+                     DO n = 1, nlabels
+                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                                           (sum_wtime_global(n,k))
+                     ENDDO
+                  ENDDO
+                  WRITE(output_unit,*)''
+                  WRITE(output_unit,*)' ======================================'
                ENDIF
-             ENDDO
-            IF (TIMER_Debug >= 3) THEN
-                WRITE(output_unit,*)''
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)' ', TRIM(app_name)
-                WRITE(output_unit,*)' Overall Count statistics'
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)''
-                DO k=1,comm_size
-                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
-                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
-                  DO n = 1, nlabels
-                    
-                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(i10))') n, label_list(n), &
-                                                                    timer(n)%runflag, (count_global(n,k))
-                  ENDDO
-                ENDDO
-                WRITE(output_unit,*)''
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)' ', TRIM(app_name)
-                WRITE(output_unit,*)' Overall CPU time statistics'
-                WRITE(output_unit,*)' =================================='
-                WRITE(output_unit,*)''
-                DO k=1,comm_size
-                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
-                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
-                  DO n = 1, nlabels
-                    
-                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
-                                                                       (sum_ctime_global(n,k))
-                  ENDDO
-                ENDDO
-                WRITE(output_unit,*)''
-                WRITE(output_unit,*)' ======================================'
-                WRITE(output_unit,*)' ', TRIM(app_name)
-                WRITE(output_unit,*)' Overall Elapsed time statistics'
-                WRITE(output_unit,*)' ======================================'
-                WRITE(output_unit,*)''
-                DO k=1,comm_size
-                  WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
-                  WRITE(output_unit,'(3x,i8,5x)')(k-1)
-                  DO n = 1, nlabels
 
-                    WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
-                                                                      (sum_wtime_global(n,k))
-                  ENDDO
-                ENDDO
-                WRITE(output_unit,*)''
-                WRITE(output_unit,*)' ======================================'
-            ENDIF
+            endif ! (onetimer)
 
-         endif ! (onetimer)
+            CLOSE(output_unit)
 
-         IF (TIMER_Debug >= 2) THEN
-             CLOSE(output_unit)
-         ENDIF
+            deallocate (sum_ctime_global, stat=ierror)
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global'
+            deallocate (sum_wtime_global, stat=ierror)
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global'
+            deallocate (count_global,stat=ierror)
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error count_global'
+            deallocate (label_list,stat=ierror)
+            if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
+               mpi_rank_local,':',' WARNING: deallocate error label_list'
 
-         endif ! (comm_rank == root)
+         endif ! (mpi_rank_local == root)
 
-         deallocate (sum_ctime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-            mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global'
-         deallocate (sum_wtime_global, stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-            mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global'
-         deallocate (count_global,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-            mpi_rank_local,':',' WARNING: deallocate error count_global'
-         deallocate (label_list,stat=ierror)
-         if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-            mpi_rank_local,':',' WARNING: deallocate error label_list'
-
-         ENDIF  !(TIMER_Debug >=1)
 
       end subroutine oasis_timer_print
 

@@ -59,6 +59,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pio_numtasks
    INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
    INTEGER(kind=ip_intwp_p) :: k,i,m
+   INTEGER(kind=ip_intwp_p) :: nt
    character(len=ic_field)  :: i_name
    character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
@@ -142,15 +143,9 @@ CONTAINS
    ENDDO
    WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
    CALL oasis_flush(nulprt1)
-   !
+
    ALLOCATE(prism_var(mvar))
-   ! Define mtimer as a function of mvars instead of a parameter
-   mtimer = 7*mvar+30
-   ALLOCATE(timer(mtimer))
-   ALLOCATE(sum_ctime(mtimer))
-   ALLOCATE(sum_wtime(mtimer))
-   ALLOCATE(timer_count(mtimer))
-   
+
    ! Store all the names of the fields exchanged in the namcouple
    ! which can be different of namsrcfld(:) and namdstfld(:) if multiple 
    ! fields are exchanged together
@@ -327,7 +322,9 @@ CONTAINS
    !--- Timer Initialization
    !------------------------
 
-   call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers', mpi_comm_local)
+   ! Allocate timer memory based on mvar
+   nt = 7*mvar+30
+   call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers',nt)
    call oasis_timer_start('total after init')
 
    !------------------------

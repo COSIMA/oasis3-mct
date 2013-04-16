@@ -36,25 +36,6 @@ MODULE mod_oasis_data
   end type prism_var_type
 
   TYPE(prism_var_type),POINTER :: prism_var(:)
-!
-  ! Time statistics
-
-   type timer_details
-      ! label of timer
-      character (len=ic_med) :: label
-      ! wall time values
-      double precision :: start_wtime, end_wtime
-      ! cpu time values
-      double precision :: start_ctime, end_ctime
-      ! is the timer running now
-      character(len=1) :: runflag
-   end type timer_details
-
-   INTEGER :: mtimer 
-   TYPE (timer_details), POINTER :: timer(:)
-   DOUBLE PRECISION, POINTER     :: sum_ctime(:)       ! these values are not part of timer details
-   DOUBLE PRECISION, POINTER     :: sum_wtime(:)       ! because they are later used in an mpi call
-   INTEGER, POINTER              :: TIMER_COUNT(:)     ! number of calls
 
 ! MPI
 
