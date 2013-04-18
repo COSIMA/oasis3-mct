@@ -29,6 +29,7 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       ! number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     ! namcouple runtime
   INTEGER(kind=ip_i4_p)   ,public :: namlogprt     ! namcouple nlogprt value
+  INTEGER(kind=ip_i4_p)   ,public :: namtlogprt    ! namcouple ntlogprt value
  
   character(len=jpeighty)  ,public,pointer :: namsrcfld(:)  ! list of src fields
   character(len=jpeighty)  ,public,pointer :: namdstfld(:)  ! list of dst fields
@@ -115,6 +116,8 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p) :: ig_maxnfg
 ! --- mod_printing
   INTEGER(kind=ip_intwp_p) :: nlogprt
+!---- Time statistics level printing
+  INTEGER(kind=ip_intwp_p) :: ntlogprt
 ! --- mod_experiment
   INTEGER (kind=ip_intwp_p), DIMENSION(:), ALLOCATABLE :: iga_unitmod
   CHARACTER(len=6) , DIMENSION(:), ALLOCATABLE :: cmodnam
@@ -461,6 +464,7 @@ CONTAINS
   nnamcpl = ig_total_nfield
   namruntim = ntime
   namlogprt = nlogprt
+  namtlogprt = ntlogprt
   do jf = 1,ig_total_nfield
     namsrcfld(jf) = cg_input_field(jf)
     namdstfld(jf) = cg_output_field(jf)
@@ -1844,7 +1848,7 @@ SUBROUTINE inipar_alloc()
 198 CONTINUE
    READ (UNIT = nulin,FMT = 1001,END = 199) clword
    IF (clword .NE. clprint) GO TO 198
-   nlogprt = 0
+   nlogprt = 2
    READ (UNIT = nulin,FMT = 1002) clline
    CALL parse (clline, clvari, 1, jpeighty, ilen)
    IF (ilen .LE. 0) THEN
@@ -1872,11 +1876,27 @@ SUBROUTINE inipar_alloc()
    ELSE
        READ (clvari,FMT = 1004) nlogprt
    ENDIF
+   ntlogprt=0
+   CALL parse (clline, clvari, 2, jpeighty, ilen)
+   IF (ILEN > 0) THEN
+       READ (clvari,FMT = 1004) ntlogprt
+   ELSE
+       IF (mpi_rank_global == 0) THEN
+           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+           WRITE (UNIT = nulprt1,FMT = *)  &
+              ' Nothing on input for time statistic '
+           WRITE (UNIT = nulprt1,FMT = *) ' Default value 0 will be used '
+           WRITE (UNIT = nulprt1,FMT = *) ' '
+           CALL oasis_flush(nulprt1)
+       ENDIF
+   ENDIF
 
    !* Print out the printing level
 
    CALL prtout &
       ('The printing level is nlogprt =', nlogprt, 1)
+   CALL prtout &
+      ('The time statistics level is ntlogprt =', ntlogprt, 1)
 
    !* Get the calendar type for this simulation
 

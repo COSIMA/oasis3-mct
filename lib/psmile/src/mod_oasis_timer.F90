@@ -79,8 +79,6 @@ module mod_oasis_timer
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
 
-   INTEGER  :: TIMER_debug=0
-
    contains
 
 ! --------------------------------------------------------------------------------

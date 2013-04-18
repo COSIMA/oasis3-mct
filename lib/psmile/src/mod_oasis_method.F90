@@ -119,6 +119,7 @@ CONTAINS
       call oasis_namcouple_init()
    endif
    OASIS_debug = namlogprt
+   TIMER_debug = namtlogprt
 
    ! If NFIELDS=0 there is no coupling
    ! No information must be written in the debug files as

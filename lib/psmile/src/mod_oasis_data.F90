@@ -71,6 +71,7 @@ CONTAINS
   nulprt = 6
   nulprt1 = 6
   OASIS_debug = 0
+  TIMER_debug = 0
   compid = -1
   compnm = trim(cspval)
   mpi_comm_global = -1
