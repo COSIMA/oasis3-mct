@@ -1220,12 +1220,6 @@ CONTAINS
      CALL oasis_abort_noarg()
   endif
 
-  if (trim(namscrmet(namID)) == 'BICUBIC') then
-     write(nulprt,*) subname,' ERROR: BICUBIC mapping not yet supported'
-     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     CALL oasis_flush(nulprt)
-     CALL oasis_abort_noarg()
-  endif
   
   do_corners = .false.
   if (trim(namscrmet(namID)) == 'CONSERV') then
