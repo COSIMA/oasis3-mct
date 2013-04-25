@@ -1213,13 +1213,6 @@ CONTAINS
      CALL oasis_abort_noarg()
   endif
 
-  if (trim(namscrmet(namID)) == 'CONSERV' .and. trim(namscrord(namID)) /= 'FIRST') then
-     write(nulprt,*) subname,' ERROR: only FIRST ORDER mapping supported'
-     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     CALL oasis_flush(nulprt)
-     CALL oasis_abort_noarg()
-  endif
-
   
   do_corners = .false.
   if (trim(namscrmet(namID)) == 'CONSERV') then

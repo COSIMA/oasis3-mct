@@ -2403,16 +2403,7 @@ SUBROUTINE inipar_alloc()
                         CALL OASIS_ABORT_NOARG()
                     ENDIF
                     READ(clvari,FMT = 2009) corder(ig_number_field(jf))
-                    IF (corder(ig_number_field(jf)) .EQ. 'SECOND') THEN
-                        IF (mpi_rank_global == 0) THEN
-                            WRITE (UNIT = nulprt1,FMT = *)  &
-                               '==> SECOND not supported for SCRIPR/CONSERV'
-                            WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
-                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
-                            CALL oasis_flush(nulprt1 )
-                        ENDIF
-                        CALL OASIS_ABORT_NOARG()
-                    ENDIF                       
+                    IF (corder(ig_number_field(jf)) .EQ. 'SECOND') THEN                   
                  ELSE
                      cnorm_opt(ig_number_field(jf))='NONORM'
                  ENDIF
