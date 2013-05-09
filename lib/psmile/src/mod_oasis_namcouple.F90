@@ -2402,8 +2402,7 @@ SUBROUTINE inipar_alloc()
                         ENDIF
                         CALL OASIS_ABORT_NOARG()
                     ENDIF
-                    READ(clvari,FMT = 2009) corder(ig_number_field(jf))
-                    IF (corder(ig_number_field(jf)) .EQ. 'SECOND') THEN                   
+                    READ(clvari,FMT = 2009) corder(ig_number_field(jf))                  
                  ELSE
                      cnorm_opt(ig_number_field(jf))='NONORM'
                  ENDIF
