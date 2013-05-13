@@ -17,7 +17,7 @@ ARCHDIR         = $(WORKDIR)/CURIE_oa3-mct
 #
 # MPI library
 #For machines in training room, put MPIDIR      = /usr/local/pgi/linux86-64/9.0/mpi/mpich/
-MPIDIR      = /opt/mpi/bullxmpi/1.1.16.3
+MPIDIR      = /opt/mpi/bullxmpi/1.1.16.5
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib
@@ -44,6 +44,7 @@ CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY -DTMG_PE
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
 F90FLAGS_1  = -O2 -xAVX -I.
+#F90FLAGS_1  = -O3 -xAVX -I. -fp-model precise
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
