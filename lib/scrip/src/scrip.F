@@ -170,6 +170,11 @@ C***********************************************************************
         stop 'unknown mapping method'
       end select
 
+      SELECT CASE (normalize_opt)
+      CASE ('FRACNNEI')
+          lfracnnei = .true.
+      END SELECT
+
       select case(normalize_opt(1:4))
       case ('NONE')
         norm_opt = norm_opt_none

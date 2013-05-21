@@ -206,7 +206,7 @@ C***********************************************************************
         !*** compute weights based on inverse distance
         !*** if mask is false, eliminate those points
         !***
-
+        src_addnn = zero
         dist_tot = zero
         do n=1,num_neighbors
           if ((grid1_mask(nbr_add(n))) .or.
@@ -238,10 +238,6 @@ C***********************************************************************
               endif
             end do
             if ( ll_allmask) THEN
-                IF (nlogprt .GE. 2) THEN
-                    WRITE(nulou,*)'ll_allmask true',src_addnn
-                    CALL OASIS_FLUSH_SCRIP(nulou)
-                ENDIF
                 src_latsnn = bignum
                 do srch_add = min_add_out,max_add_out
                   if (grid1_mask(srch_add) .or.
@@ -264,6 +260,11 @@ C***********************************************************************
                       endif
                   endif
                 end do
+                IF (nlogprt .GE. 2) THEN
+                    WRITE(nulou,*)'ll_allmask=true and src_addnn= '
+     &                  ,src_addnn
+                    CALL OASIS_FLUSH_SCRIP(nulou)
+                ENDIF
                 wgts_new(1) = 1.
                 grid2_frac(dst_add) = one
                 call store_link_nbr(src_addnn,dst_add ,wgts_new, nmap)

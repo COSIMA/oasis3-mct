@@ -43,9 +43,6 @@ $(LIBRARY): $(OBJS1)  $(OBJS3) $(OBJS4)
 #
 mod_oasis_flush.o : kinds_mod.o
 remap_bicubic_reduced.o: constants.o grids.o remap_vars.o
-rotations.o: constants.o grids.o kinds_mod.o vector.o
-vector.o: constants.o grids.o kinds_mod.o 
-corners.o: kinds_mod.o 
 netcdf.o: constants.o kinds_mod.o 
 remap_conserv.o: constants.o grids.o kinds_mod.o remap_vars.o timers.o
 remap_distwgt.o: constants.o grids.o kinds_mod.o remap_vars.o
@@ -56,8 +53,7 @@ scrip.o: constants.o grids.o iounits.o kinds_mod.o remap_bicubic.o \
 	remap_write.o timers.o
 constants.o: kinds_mod.o
 distance.o: constants.o kinds_mod.o
-fracnnei.o: constants.o grids.o kinds_mod.o remap_vars.o
-gradient.o: constants.o kinds_mod.o 
+fracnnei.o: constants.o grids.o kinds_mod.o remap_vars.o 
 gradient_bicubic.o: constants.o kinds_mod.o 
 grids.o: constants.o iounits.o kinds_mod.o 
 iounits.o: kinds_mod.o 
