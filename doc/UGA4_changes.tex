@@ -1,9 +1,81 @@
 \newpage
 
-\chapter{Changes between previous OASIS3.3 and new OASIS3-MCT}
+\chapter{Changes between the different versions of OASIS3-MCT}
 \label{sec_changes}
 
-\section{General architecture}
+The evolution between the different versions of OASIS3-MCT can be
+followed in real-time by registering on the Redmine project management
+site at https://inle.cerfacs.fr/ (see "Register" at the right top of
+the page). On this site, registered users can browse the sources and
+consult tickets describing bug fixes and developments. To follow day
+to day evolution of the OASIS3-MCT sources, it is also possible to
+have your e-mail added to the list of addresses to which the log files
+of the SVN checkins are automatically sent; please contact
+oasishelp@cerfacs.fr if you wish to be added to that list.
+
+\section{Changes between OASIS3-MCT\_1.0 and OASIS3-MCT\_2.0}
+\label{sec_oa1_oa2}
+
+The main changes and bug fixes new in OASIS3-MCT\_2.0 are the
+following:
+\begin{itemize}
+
+\item Support of {\tt BICUBIC} interpolation, see paragraph {\tt
+    BICUBIB} in section \ref{subsec_interp}.
+
+\item Support of {\tt CONSERV/SECOND} regridding, see paragraph {\tt
+    CONSERV/SECOND} in section \ref{subsec_interp}.
+
+\item Support of components exchanging data on only a subdomain of the
+  global grid: a new optional argument, ig\_size was added to
+  oasis\_def\_partition, that provides the user with the ability to
+  define the total number of grid cells on the grid (see section
+  \ref{subsubsec_Partition}).
+
+\item The CPP key "balance" in mod\_oasis\_advance was added; this
+  option can be used to produce timestamps in OASIS debug file (see
+  section \ref{subsec_cpp}).
+
+\item The variable {\tt TIMER\_Debug} controlling the amount of time
+  statistics written out is now an optional argument read in the {\it
+    namcouple}; see the {\tt NLOGPRT} line in
+  \ref{subsec_namcouplefirst} and all details about time statistics in
+  section \ref{timestat}.
+
+\item Specific problems in writing out the time statistics when all
+  the processors are not coupling were solved (see Redmine issue
+  \#497)
+
+\item The problem with restart files when one coupling field is sent
+  to 2 target components was solved (see Redmine ticket \#522)
+
+\item A memory leak in mod\_oasis\_getput\_interface.F90 was fixed
+  thanks to R. Hill from the MetOffice (see Redmine ticket \#437)
+
+\item A bug fix was provided to ensure that the nearest neighbour
+  option is activated when the option {\tt FRACNNEI} is defined in the
+  {\it namcouple} for the conservative interpolation .
+
+\item The behaviour of OASIS3-MCT was changed in the case a
+  component model tries to send with {\tt oasis\_put} a field declared
+  with a {\tt oasis\_def\_var} but not defined in the configuration
+  file {\it namcouple}; this will now lead to an abort. In this case,
+  the field ID returned by the {\tt oasis\_def\_var} is equal to -1
+  and the corresponding {\tt oasis\_put} should not be called.
+
+\item OASIS3-MCT developments are now continuously tested and
+  validated on different computers with a test suite under Buildbot,
+  which is a software written in Python to automate compile and test
+  cycles required in software project (see
+  https://inle.cerfacs.fr/projects/oasis3-mct/wiki/Buildbot on the
+  Redmine site).
+
+\end{itemize}
+
+\section{Changes between OASIS3.3 and OASIS3-MCT\_1.0}
+
+\subsection{General architecture}
+\label{sec_changes_gen}
 
 \begin{itemize}
 \item OASIS3-MCT is (only) a coupling library
@@ -31,13 +103,12 @@ remapping with specific {\tt MAPPING} options (see section \ref{subsec_interp}).
 
 \item Mono-process mapping file generation with the SCRIP library
 
-But as before, OASIS3-MCT can
+But as before, OASIS3-MCT\_1.0 can
 also generate the mapping file using the SCRIP library
 \citep{Jones99}. When this is the case, the mapping file generation is
 done on one process of the model components; all previous {\tt SCRIPR} remapping
 schemes available in OASIS3.3 are still supported besides {\tt
-  BICUBIC} and {\tt CONSERV/SECOND} (see {\tt SCRIPR} in section
-\ref{subsec_interp}). 
+  BICUBIC} and {\tt CONSERV/SECOND}. (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
 
 \item MPI2 job launching is NOT supported. 
 
@@ -50,7 +121,8 @@ schemes available in OASIS3.3 are still supported besides {\tt
 
 \end{itemize}
 
-\section{Changes in the coupling interface in the component models}
+\subsection{Changes in the coupling interface in the component models}
+\label{sec_changes_API}
 
 \begin{itemize}
 
@@ -97,7 +169,8 @@ New routines {\tt oasis\_get\_debug} and {\tt oasis\_set\_debug}
 
 \end{itemize}
 
-\section{Functionality not offered anymore}
+\subsection{Functionality not offered anymore}
+\label{sec_changes_old}
 
 \begin{itemize}
 
@@ -106,11 +179,10 @@ New routines {\tt oasis\_get\_debug} and {\tt oasis\_set\_debug}
 As in OASIS3.3, the SCRIP library can be used to generate the
   remapping/interpolation weights and addresses and write them to a
   mapping file. All previous {\tt SCRIPR} remapping
-schemes available in OASIS3.3 are still supported besides {\tt
+schemes available in OASIS3.3 are still supported in OASIS3-MCT\_1.0 besides {\tt
   BICUBIC} and {\tt CONSERV/SECOND} because these remapping involve
 at each source grid point the value of the field but also the value of the
-gradients of the field (which are not known or calculated). See also section
-\ref{subsec_interp}.
+gradients of the field (which are not known or calculated). (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
 
 \item Vector field remapping
 
@@ -154,7 +226,7 @@ normalization option is chosen (see section \ref{subsec_interp}).
 \item{\tt NOINTERP} does not need to be specified anymore if no
   interpolation is required.
  
-\item Field combination with BLASOLD and BLASNEW ; these
+\item Field combination with {\tt BLASOLD} and {\tt BLASNEW}; these
   transformations only support multiplication and addition terms to
 the fields (see section \ref{subsec_preproc}). 
 
@@ -179,7 +251,8 @@ All auxiliary files, besides the {\it namcouple} must be NetCDF;
   binary files are not supported anymore.
 \end{itemize}
 
-\section{New functionality offered}
+\subsection{New functionality offered}
+\label{sec_changes_new}
 
 \begin{itemize}
 
@@ -201,9 +274,11 @@ In OASIS3.3, components for which only a subset of processes
 If needed, LOCTRANS transformations write partially
   transformed fields  in the coupling restart file at the end of a run
   to ensure an exact restart of the next run (see section
-  \ref{subsec_timetrans}). Therefore, fields of type OUTPUT now
-  support a restart file specification in the {\it namcouple} to be
-  used for LOCTRANS transformations. 
+  \ref{subsec_timetrans}). For that
+  reason, coupling restart filenames are now required for all {\it
+    namcouple} entries that use LOCTRANS (with non INSTANT
+  values). This is the reason an optional restart file is now provided
+  on the OUTPUT {\it namcouple} input line.
 
 \item Support to couple multiple fields via a single communication.
 
@@ -222,13 +297,17 @@ transformations and to reduce communication costs by aggregating multiple fields
 
 \item Matching one source filed with multiple targets
 
-A coupling field sent by a source component model can be
-  associated with more than one target field and model (get). In that
-  case, the source model needs to send (``put'') the field only once
-  and the corresponding data will arrive at multiple targets as
-  specified in the {\it namcouple} configuration file. Different
-  coupling frequencies and transformations are allowed for different
-  coupling exchanges of the same field. 
+  A coupling field sent by a source component model can be associated
+  with more than one target field and model (get). In that case, the
+  source model needs to send (``put'') the field only once and the
+  corresponding data will arrive at multiple targets as specified in
+  the {\it namcouple} configuration file. Different coupling
+  frequencies and transformations are allowed for different coupling
+  exchanges of the same field. If coupling restart files are required
+  (either if a {\tt LAG} or if a {\tt LOCTRANS} transformation is
+  specified), it is mandatory to specify different files for the
+  different fields.
+
 %In addition, a single
 %  coupling field can be sent to the same destination model using
 %  multiple transforms as long as the destination field name is
@@ -246,7 +325,8 @@ each model process is defined by the \$NLOGPRT value in the {\it
 
 \end{itemize}
 
-\section{Changes in the configuration file {\it namcouple}}
+\subsection{Changes in the configuration file {\it namcouple}}
+\label{sec_changes_namcouple}
 
 \begin{itemize}
 
@@ -271,7 +351,8 @@ SUBGRID, MASKP, REVERSE, GLORED.
 
 \end{itemize}
 
-\section{Other differences}
+\subsection{Other differences}
+\label{sec_changes_other}
 
 \begin{itemize}
 
@@ -287,7 +368,6 @@ SUBGRID, MASKP, REVERSE, GLORED.
   gracefully (see section \ref{subsec_sec}).
 
 \item The I/O library mpp\_io is no longer used to write the restart and output files.
-
 
 
 \end{itemize}

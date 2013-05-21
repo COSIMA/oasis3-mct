@@ -3,8 +3,8 @@
 \chapter{The grid types for the transformations}
 \label{subsec_gridtypes}
 
-As described in section \ref{sec_transformations}, the different
-SCRIP remappings OASIS3-MCT support different types of grids. The
+As described in section \ref{sec_transformations} for the different
+SCRIP remappings, OASIS3-MCT support different types of grids. The
 characteristics of these grids are detailed here:
 
 \begin{itemize}
@@ -13,7 +13,7 @@ characteristics of these grids are detailed here:
   2D Logically-Rectangular (LR) grid points can be described by two arrays
   {\tt longitude(i,j)} and {\tt latitude(i,j)}, where i and j
   are respectively the first and second index dimensions. Streched
-  or/and rotated grids are LR grids. Note that A, B, G, L, Y, or Z
+  or/and rotated grids are LR grids. Note that previous OASIS3 A, B, G, L, Y, or Z
   grids are all particular cases of LR grids.
 
 \item {\tt `U' grid}: Unstructured (U) grids do have any particular
@@ -24,7 +24,7 @@ characteristics of these grids are detailed here:
 
 \item {\tt `D' grid} The Reduced (D) grid is composed of a certain
 number of latitude circles, each one being divided into a varying
-number of longitudinal segments. In OASIS3, the grid data (longitudes,
+number of longitudinal segments. In OASIS3-MCT, the grid data (longitudes,
 latitudes, etc.) must be described by arrays dimensioned {\tt
 (nbr\_pts,1)}, where {\tt nbr\_pts} is the total number of grid
 points. There is no overlap of the grid, and no grid point at the

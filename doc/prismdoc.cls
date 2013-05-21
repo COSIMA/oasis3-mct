@@ -514,7 +514,7 @@
           \parbox{15cm}{
             {\PRISMDOCFont{T1}{ptm}{b}{n}{12pt}{14pt}Copyright Notice\\[0.5ex]}
             \PRISMDOCFont{T1}{ptm}{m}{n}{11pt}{13pt}
-            \copyright\ Copyright 2012 by CERFACS \\
+            \copyright\ Copyright 2013 by CERFACS \\
             All rights reserved.\\
             No parts of this document should be either reproduced or 
             commercially used without prior agreement 
