@@ -1349,8 +1349,10 @@ SUBROUTINE inipar_alloc()
                   !*              not in NetCDF format 
                   CALL parse(clline, clvari, 1, jpeighty, ILEN)
                   !*                    Get number of longitudes for initial field
-                  WRITE(nulprt1,*)'CLVARI=',clvari
-                  call oasis_flush(nulprt1) 
+                  IF (mpi_rank_global == 0) THEN
+                      WRITE(nulprt1,*)'CLVARI=',clvari
+                      CALL oasis_flush(nulprt1) 
+                  ENDIF
                   READ(clvari,FMT = 2004) nlonbf_notnc
                   CALL parse(clline, clvari, 2, jpeighty, ilen)
                   !*                    Get number of latitudes for initial field
@@ -1402,8 +1404,10 @@ SUBROUTINE inipar_alloc()
                 !
                 IF (lg_state(jf)) THEN
                     cg_c=canal(ja,ig_number_field(jf))
-                    WRITE(nulprt1,*)'LG_STATE cg_c=', clline
-                    call oasis_flush(nulprt1)
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE(nulprt1,*)'LG_STATE cg_c=', clline
+                        CALL oasis_flush(nulprt1)
+                    ENDIF
                     IF (cg_c .EQ. 'NOINTERP' .OR. cg_c .EQ. 'REDGLO' .OR. cg_c .EQ. 'INVERT' .OR. &
                        cg_c .EQ. 'MASK' .OR. cg_c .EQ. 'EXTRAP' .OR. cg_c .EQ. 'CORRECT' .OR. &
                        cg_c .EQ. 'REDGLO' .OR. cg_c .EQ. 'INTERP' .OR. cg_c .EQ. 'MOZAIC' .OR. &
@@ -1445,8 +1449,10 @@ SUBROUTINE inipar_alloc()
                 ELSE
                     ! For IGNORED, IGNOUT and OUTPUT, only one line for LOCTRANS
                     READ (UNIT = nulin,FMT = 2002) clline
-                    WRITE(nulprt1,*)'OUTPUT clline=', clline
-                    call oasis_flush(nulprt1)
+                    IF (mpi_rank_global == 0) THEN
+                        WRITE(nulprt1,*)'OUTPUT clline=', clline
+                        CALL oasis_flush(nulprt1)
+                    ENDIF
                     CALL skip(clline, jpeighty)
                 ENDIF
 270           CONTINUE
@@ -2402,7 +2408,7 @@ SUBROUTINE inipar_alloc()
                         ENDIF
                         CALL OASIS_ABORT_NOARG()
                     ENDIF
-                    READ(clvari,FMT = 2009) corder(ig_number_field(jf))                  
+                    READ(clvari,FMT = 2009) corder(ig_number_field(jf))                   
                  ELSE
                      cnorm_opt(ig_number_field(jf))='NONORM'
                  ENDIF
@@ -2604,40 +2610,31 @@ SUBROUTINE inipar_alloc()
 !* Local indexes
       IF (.NOT. lg_state(jf)) THEN
          ilab = ig_numlab(jf)
-         IF (mpi_rank_global == 0) THEN
-             WRITE (UNIT = nulprt1,FMT = 3001) jf
-             WRITE (UNIT = nulprt1,FMT = 3002)
-             WRITE (UNIT = nulprt1,FMT = 3003)
-             WRITE (UNIT = nulprt1,FMT = 3004)
-         ENDIF
+         WRITE (UNIT = nulprt1,FMT = 3001) jf
+         WRITE (UNIT = nulprt1,FMT = 3002)
+         WRITE (UNIT = nulprt1,FMT = 3003)
+         WRITE (UNIT = nulprt1,FMT = 3004)
          IF (ig_total_state(jf) .eq. ip_input .or.  &
               ig_total_state(jf) .eq. ip_output) THEN
-             IF (mpi_rank_global == 0) THEN
-                 WRITE (UNIT = nulprt1,FMT = 3121) &
+              WRITE (UNIT = nulprt1,FMT = 3121) &
                     cg_input_field(jf), cg_output_field(jf),  &
                     ig_freq(jf), cl_print_trans, &
                     cl_print_state, ig_total_ntrans(jf)
-             ENDIF
          ELSE  
-             IF (mpi_rank_global == 0) THEN
-                 WRITE (UNIT = nulprt1,FMT = 3116) &
-                    cg_input_field(jf), cg_output_field(jf),  &
-                    ig_freq(jf), cl_print_trans, ig_total_nseqn(jf),  &
-                    ig_lag(jf), cl_print_state, ig_total_ntrans(jf)
-             ENDIF
+             WRITE (UNIT = nulprt1,FMT = 3116) &
+             cg_input_field(jf), cg_output_field(jf),  &
+             ig_freq(jf), cl_print_trans, ig_total_nseqn(jf),  &
+             ig_lag(jf), cl_print_state, ig_total_ntrans(jf)
          ENDIF
       ELSE
          ilab = numlab(ig_number_field(jf))
          ifcb = len_trim(cficbf(ig_number_field(jf)))
          ifca = len_trim(cficaf(ig_number_field(jf)))
-         IF (mpi_rank_global == 0) THEN
-             WRITE (UNIT = nulprt1,FMT = 3001) jf
-             WRITE (UNIT = nulprt1,FMT = 3002)
-             WRITE (UNIT = nulprt1,FMT = 3003)
-             WRITE (UNIT = nulprt1,FMT = 3004) 
-         ENDIF
-             IF (mpi_rank_global == 0) THEN
-                 WRITE (UNIT = nulprt1,FMT = 3005) &
+         WRITE (UNIT = nulprt1,FMT = 3001) jf
+         WRITE (UNIT = nulprt1,FMT = 3002)
+         WRITE (UNIT = nulprt1,FMT = 3003)
+         WRITE (UNIT = nulprt1,FMT = 3004) 
+         WRITE (UNIT = nulprt1,FMT = 3005) &
                     TRIM(cnaminp(ig_number_field(jf))),  &
                     TRIM(cnamout(ig_number_field(jf))), &
                     nfexch(ig_number_field(jf)), &
@@ -2645,10 +2642,8 @@ SUBROUTINE inipar_alloc()
                     ig_lag(jf), &
                     cl_print_state, &
                     ig_ntrans(ig_number_field(jf))
-             ENDIF
      ENDIF
 !* Warning: no indentation for the next if (nightmare ...)
-        IF (nlogprt .GE. 0) THEN
 !* Warning: no indentation for the next if (nightmare ...)            
         IF (.not. lg_state(jf)) THEN
            IF (ig_total_state(jf) .eq. ip_ignored .or.  &
@@ -2744,10 +2739,9 @@ SUBROUTINE inipar_alloc()
           ENDIF
  320    CONTINUE
       ENDIF
-      ENDIF
  310  CONTINUE
      ENDIF
- ENDIF
+ENDIF
 
 !* Formats
 

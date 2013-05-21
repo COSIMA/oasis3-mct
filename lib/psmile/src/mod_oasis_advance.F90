@@ -19,6 +19,7 @@ MODULE mod_oasis_advance
     public oasis_advance_init
     public oasis_advance_run
 
+
 contains
 
 !---------------------------------------------------------------------
@@ -34,14 +35,9 @@ contains
     INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
 !   ----------------------------------------------------------------
     integer(kind=ip_i4_p) :: cplid,partid,varid
-    integer(kind=ip_i4_p) :: nf,lsize,nflds
+    INTEGER(kind=ip_i4_p) :: nf,lsize,nflds,icount
     integer(kind=ip_i4_p) :: dt,ltime,lag,getput
     integer(kind=ip_i4_p) :: msec
-    type(mct_avect)       :: avtmp   ! data read from restart
-    type(mct_avect)       :: avtmp2  ! data read from restart
-    type(mct_avect)       :: avtmp3  ! data read from restart
-    type(mct_avect)       :: avtmp4  ! data read from restart
-    type(mct_avect)       :: avtmp5  ! data read from restart
     real   (kind=ip_r8_p), allocatable :: array(:)  ! data
     real   (kind=ip_r8_p), allocatable :: array2(:) ! data
     real   (kind=ip_r8_p), allocatable :: array3(:) ! data
@@ -72,122 +68,82 @@ contains
     endif
 
     call oasis_debug_note(subname//' loop over cplid')
-    do cplid = 1,prism_ncoupler
-       dt    = prism_coupler(cplid)%dt
-       lag   = prism_coupler(cplid)%lag
-       ltime = prism_coupler(cplid)%ltime
-       getput= prism_coupler(cplid)%getput
-       rstfile=trim(prism_coupler(cplid)%rstfile)
-       partid= prism_coupler(cplid)%partID
-       msec = 0   ! reasonable default to start with
-       mseclag = msec
+    cplid=1
+    DO WHILE (cplid <= prism_ncoupler)
+      dt    = prism_coupler(cplid)%dt
+      lag   = prism_coupler(cplid)%lag
+      ltime = prism_coupler(cplid)%ltime
+      getput= prism_coupler(cplid)%getput
+      rstfile=TRIM(prism_coupler(cplid)%rstfile)
+      partid= prism_coupler(cplid)%partID
+      msec = 0   ! reasonable default to start with
+      mseclag = msec
 
-       !------------------------------------------------
-       ! check that lag is reasonable
-       !------------------------------------------------
+      IF (OASIS_Debug >= 2) THEN
+          WRITE(nulprt,*) subname,' Field cplid :',cplid,TRIM(prism_coupler(cplid)%fldlist)
+          WRITE(nulprt,*) subname,' lag prism_ncoupler :',lag,prism_ncoupler
+          CALL oasis_flush(nulprt)
+      ENDIF
 
-       if (lag > dt .or. lag <= -dt) then
-          write(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
+      !------------------------------------------------
+      ! check that lag is reasonable
+      !------------------------------------------------
+
+      IF (lag > dt .OR. lag <= -dt) THEN
+          WRITE(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
-       endif
+          CALL oasis_abort_noarg()
+      ENDIF
 
-       !------------------------------------------------
-       ! read restart and call advance for the current fields
-       ! right now, do not know whether any hot map terms are there
-       ! assume they are if something is read, otherwise not
-       !------------------------------------------------
-
-       call oasis_debug_note(subname//' check for lag restart')
-       if (getput == OASIS3_PUT .and. lag > 0) then
-          msec = 0-lag   ! effective model time of restart
-          mseclag = msec + lag
-          if (len_trim(rstfile) < 1) then
-             write(nulprt,*) subname,' ERROR restart undefined'
-             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
-          endif
+      !------------------------------------------------
+      ! read restart and call advance for the current fields
+      ! right now, do not know whether any hot map terms are there
+      ! assume they are if something is read, otherwise not
+      !------------------------------------------------
+      IF ( (getput == OASIS3_PUT .AND. lag > 0) ) THEN
+          msec=0-lag
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
           nflds = mct_aVect_nRAttr(prism_coupler(cplid)%aVect1)
-          if (OASIS_debug >= 2) then
-             write(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
-                trim(prism_coupler(cplid)%fldlist),' ',trim(rstfile)
-          endif
 
-          call mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          call oasis_io_read_avfile(trim(rstfile),avtmp,prism_part(partid)%gsmap)
-          allocate(array(lsize))
+          ALLOCATE(array(lsize))
+          ALLOCATE(array2(lsize))
+          ALLOCATE(array3(lsize))
+          ALLOCATE(array4(lsize))
+          ALLOCATE(array5(lsize))
 
-          call mct_aVect_init(avtmp2,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          call oasis_io_read_avfile(trim(rstfile),avtmp2,prism_part(partid)%gsmap, &
-                                    abort=.false.,nampre='av2_',didread=a2on)
-          if (a2on) then
-             allocate(array2(lsize))
-          else
-             call mct_avect_clean(avtmp2)
-          endif
+          DO nf = 1,nflds
+            varid = prism_coupler(cplid)%varid(nf)
+            CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,icount=icount,nff=nf,array1din=array,&
+                                 readrest=.TRUE., array2=array2,array3=array3, &
+                                 array4=array4,array5=array5)
+          ENDDO
+          cplid=cplid+icount
 
-          call mct_aVect_init(avtmp3,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          call oasis_io_read_avfile(trim(rstfile),avtmp3,prism_part(partid)%gsmap, &
-                                    abort=.false.,nampre='av3_',didread=a3on)
-          if (a3on) then
-             allocate(array3(lsize))
-          else
-             call mct_avect_clean(avtmp3)
-          endif
-
-          call mct_aVect_init(avtmp4,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          call oasis_io_read_avfile(trim(rstfile),avtmp4,prism_part(partid)%gsmap, &
-                                    abort=.false.,nampre='av4_',didread=a4on)
-          if (a4on) then
-             allocate(array4(lsize))
-          else
-             call mct_avect_clean(avtmp4)
-          endif
-
-          call mct_aVect_init(avtmp5,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
-          call oasis_io_read_avfile(trim(rstfile),avtmp5,prism_part(partid)%gsmap, &
-                                    abort=.false.,nampre='av5_',didread=a5on)
-          if (a5on) then
-             allocate(array5(lsize))
-          else
-             call mct_avect_clean(avtmp5)
-          endif
-
-          do nf = 1,nflds
-             varid = prism_coupler(cplid)%varid(nf)
-             array(1:lsize) = avtmp%rAttr(nf,1:lsize)
-             if (a2on) array2(1:lsize) = avtmp2%rAttr(nf,1:lsize)
-             if (a3on) array3(1:lsize) = avtmp3%rAttr(nf,1:lsize)
-             if (a4on) array4(1:lsize) = avtmp4%rAttr(nf,1:lsize)
-             if (a5on) array5(1:lsize) = avtmp5%rAttr(nf,1:lsize)
-             CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,array1din=array,readrest=.TRUE., &
-               a2on=a2on,array2=array2,a3on=a3on,array3=array3, &
-               a4on=a4on,array4=array4,a5on=a5on,array5=array5)
-          enddo
-
-          deallocate(array)
-          call mct_avect_clean(avtmp)
-          if (a2on) then
-             deallocate(array2)
-             call mct_avect_clean(avtmp2)
-          endif
-          if (a3on) then
-             deallocate(array3)
-             call mct_avect_clean(avtmp3)
-          endif
-          if (a4on) then
-             deallocate(array4)
-             call mct_avect_clean(avtmp4)
-          endif
-          if (a5on) then
-             deallocate(array5)
-             call mct_avect_clean(avtmp5)
-          endif
-       endif
-
+          DEALLOCATE(array)
+          DEALLOCATE(array2)
+          DEALLOCATE(array3)
+          DEALLOCATE(array4)
+          DEALLOCATE(array5)
+      ELSE
+          cplid=cplid+1
+      ENDIF
+    ENDDO ! cplid
+    !
+    DO cplid=1, prism_ncoupler
+      dt    = prism_coupler(cplid)%dt
+      lag   = prism_coupler(cplid)%lag
+      ltime = prism_coupler(cplid)%ltime
+      getput= prism_coupler(cplid)%getput
+      rstfile=TRIM(prism_coupler(cplid)%rstfile)
+      partid= prism_coupler(cplid)%partID
+      msec = 0   ! reasonable default to start with
+      mseclag = msec
+      
+      IF (OASIS_Debug >= 2) THEN
+          WRITE(nulprt,*) subname,' Field cplid :',cplid,TRIM(prism_coupler(cplid)%fldlist)
+          CALL oasis_flush(nulprt)
+      ENDIF
        !------------------------------------------------
        ! read restart for LOCTRANS fields
        ! do after restart and advance above because prism_advance_run
@@ -195,7 +151,7 @@ contains
        !------------------------------------------------
 
        call oasis_debug_note(subname//' check for loctrans restart')
-       if (getput == OASIS3_PUT .and. prism_coupler(cplid)%trans /= ip_instant) then
+       IF (getput == OASIS3_PUT .AND. prism_coupler(cplid)%trans /= ip_instant) THEN
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -264,16 +220,15 @@ contains
                              maxval(prism_coupler(cplid)%avect1%rAttr)
           endif
        endif
-
-    enddo ! cplid
+     ENDDO  ! cplid
     call oasis_timer_stop ('advance_init')
 
     call oasis_debug_exit(subname)
 
   end SUBROUTINE oasis_advance_init
 !---------------------------------------------------------------------
-  SUBROUTINE oasis_advance_run(mop,varid,msec,kinfo,array1din,&
-             array1dout,array2dout,readrest, &
+  SUBROUTINE oasis_advance_run(mop,varid,msec,kinfo,icount,nff,&
+             array1din,array1dout,array2dout,readrest,&
              a2on,array2,a3on,array3,a4on,array4,a5on,array5)
 
     IMPLICIT none
@@ -282,29 +237,33 @@ contains
     INTEGER(kind=ip_i4_p), intent(in)    :: varid    ! prism_var id
     INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
     INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
-    REAL   (kind=ip_r8_p), INTENT(in),optional    :: array1din(:) ! data
-    REAL   (kind=ip_r8_p), INTENT(  out),OPTIONAL :: array1dout(:)   ! data
-    REAL   (kind=ip_r8_p), INTENT(  out),OPTIONAL :: array2dout(:,:)   ! data
-    logical              , intent(in),optional    :: readrest  ! special flag to indicate this 
-                                                            ! is called from the advance_init 
+    REAL   (kind=ip_r8_p), optional    :: array1din(:) ! data
+    REAL   (kind=ip_r8_p), OPTIONAL :: array1dout(:)   ! data
+    REAL   (kind=ip_r8_p), OPTIONAL :: array2dout(:,:)   ! data
+    logical              , optional    :: readrest  ! special flag to indicate this 
+                                                            ! is called from the advance_init
+    INTEGER(kind=ip_i4_p), OPTIONAL    :: nff
+    INTEGER(kind=ip_i4_p), optional   :: icount
                                                             ! method for restart
-    logical              , intent(in),optional :: a2on      ! logical for array2
-    REAL   (kind=ip_r8_p), intent(in),optional :: array2(:) ! data
-    logical              , intent(in),optional :: a3on      ! logical for array3
-    REAL   (kind=ip_r8_p), intent(in),optional :: array3(:) ! data
-    logical              , intent(in),optional :: a4on      ! logical for array4
-    REAL   (kind=ip_r8_p), intent(in),optional :: array4(:) ! data
-    logical              , intent(in),optional :: a5on      ! logical for array5
-    REAL   (kind=ip_r8_p), intent(in),optional :: array5(:) ! data
+    logical              , optional :: a2on      ! logical for array2
+    REAL   (kind=ip_r8_p), optional :: array2(:) ! data
+    logical              , optional :: a3on      ! logical for array3
+    REAL   (kind=ip_r8_p), optional :: array3(:) ! data
+    logical              , optional :: a4on      ! logical for array4
+    REAL   (kind=ip_r8_p), optional :: array4(:) ! data
+    logical              , optional :: a5on      ! logical for array5
+    REAL   (kind=ip_r8_p), optional :: array5(:) ! data
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
-    integer(kind=ip_i4_p) :: cplid,rouid,mapid,partid
-    integer(kind=ip_i4_p) :: nfav,nsav,nsa,n,nc,nf
+    INTEGER(kind=ip_i4_p) :: cplid,rouid,mapid,partid
+    INTEGER(kind=ip_i4_p) :: nfav,nsav,nsa,n,nc,nf
+    INTEGER(kind=ip_i4_p) :: lsize,nflds,iicount
     integer(kind=ip_i4_p) :: tag,dt,ltime,lag,getput,maxtime,conserv
     logical               :: consbfb
     logical               :: sndrcv,output,input,unpack
     logical               :: snddiag,rcvdiag
     logical               :: arrayon(prism_coupler_avsmax)
+    LOGICAL               :: a22on,a33on,a44on,a55on
     real(kind=ip_double_p):: sndmult,sndadd,rcvmult,rcvadd
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=ic_xl)  :: inpfile   ! input filename
@@ -319,6 +278,11 @@ contains
     logical               :: time_now  ! coupling time
     logical               :: lreadrest ! local readrest
     TYPE(mct_avect)       :: avtest    ! temporary
+    type(mct_avect)       :: avtmp   ! data read from restart
+    type(mct_avect)       :: avtmp2  ! data read from restart
+    type(mct_avect)       :: avtmp3  ! data read from restart
+    type(mct_avect)       :: avtmp4  ! data read from restart
+    type(mct_avect)       :: avtmp5  ! data read from restart
     character(len=*),parameter :: subname = 'oasis_advance_run '
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
@@ -358,57 +322,127 @@ contains
     !------------------------------------------------
 
     call oasis_debug_note(subname//' loop over var ncpl')
-    do nc = 1,prism_var(varid)%ncpl
-       cplid   = prism_var(varid)%cpl(nc)
-       rouid   = prism_coupler(cplid)%routerid
-       mapid   = prism_coupler(cplid)%mapperid
-       tag     = prism_coupler(cplid)%tag
-       dt      = prism_coupler(cplid)%dt
-       lag     = prism_coupler(cplid)%lag
-       ltime   = prism_coupler(cplid)%ltime
-       getput  = prism_coupler(cplid)%getput
-       sndrcv  = prism_coupler(cplid)%sndrcv
-       rstfile =trim(prism_coupler(cplid)%rstfile)
-       inpfile =trim(prism_coupler(cplid)%inpfile)
-       maxtime = prism_coupler(cplid)%maxtime
-       output  = prism_coupler(cplid)%output
-       input   = prism_coupler(cplid)%input
-       partid  = prism_coupler(cplid)%partID
-       conserv = prism_coupler(cplid)%conserv
-       consbfb = .true.
-       if (trim(prism_coupler(cplid)%consopt) == "opt") consbfb = .false.
-       snddiag = prism_coupler(cplid)%snddiag
-       rcvdiag = prism_coupler(cplid)%rcvdiag
-       sndadd  = prism_coupler(cplid)%sndadd
-       sndmult = prism_coupler(cplid)%sndmult
-       rcvadd  = prism_coupler(cplid)%rcvadd
-       rcvmult = prism_coupler(cplid)%rcvmult
 
-       unpack = (sndrcv .or. input)
-
-       call oasis_debug_note(subname//' set nx and ny')
-       if (prism_part(partid)%nx >= 1) then
+    IF (PRESENT(icount)) THEN
+        icount  = 0
+    ENDIF
+    DO nc = 1,prism_var(varid)%ncpl
+      IF (PRESENT(icount)) THEN
+          icount  = icount+1
+      ENDIF
+      cplid   = prism_var(varid)%cpl(nc)
+      rouid   = prism_coupler(cplid)%routerid
+      mapid   = prism_coupler(cplid)%mapperid
+      tag     = prism_coupler(cplid)%tag
+      dt      = prism_coupler(cplid)%dt
+      lag     = prism_coupler(cplid)%lag
+      ltime   = prism_coupler(cplid)%ltime
+      getput  = prism_coupler(cplid)%getput
+      sndrcv  = prism_coupler(cplid)%sndrcv
+      rstfile =TRIM(prism_coupler(cplid)%rstfile)
+      inpfile =TRIM(prism_coupler(cplid)%inpfile)
+      maxtime = prism_coupler(cplid)%maxtime
+      output  = prism_coupler(cplid)%output
+      input   = prism_coupler(cplid)%input
+      partid  = prism_coupler(cplid)%partID
+      conserv = prism_coupler(cplid)%conserv
+      consbfb = .TRUE.
+      IF (TRIM(prism_coupler(cplid)%consopt) == "opt") consbfb = .FALSE.
+      snddiag = prism_coupler(cplid)%snddiag
+      rcvdiag = prism_coupler(cplid)%rcvdiag
+      sndadd  = prism_coupler(cplid)%sndadd
+      sndmult = prism_coupler(cplid)%sndmult
+      rcvadd  = prism_coupler(cplid)%rcvadd
+      rcvmult = prism_coupler(cplid)%rcvmult
+      
+      unpack = (sndrcv .OR. input)
+      
+      CALL oasis_debug_note(subname//' set nx and ny')
+      IF (prism_part(partid)%nx >= 1) THEN
           nx = prism_part(partid)%nx
           ny = prism_part(partid)%ny
-       else
+      ELSE
           nx = prism_part(partid)%gsize
           ny = 1
-       endif
+      ENDIF
+      
+      IF (OASIS_debug >= 20) THEN
+          WRITE(nulprt,*) subname,'  DEBUG nx, ny = ',nx,ny
+          CALL oasis_flush(nulprt)
+      ENDIF
 
-       if (OASIS_debug >= 20) then
-          write(nulprt,*) subname,'  DEBUG nx, ny = ',nx,ny
-       endif
+      !------------------------------------------------
+      ! check that lag is reasonable
+      !------------------------------------------------
 
-       !------------------------------------------------
-       ! check that lag is reasonable
-       !------------------------------------------------
-
-       if (abs(lag) > dt) then
-          write(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
+      IF (ABS(lag) > dt) THEN
+          WRITE(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
-       endif
+          CALL oasis_abort_noarg()
+      ENDIF
+
+       !------------------------------------------------
+       ! read restart and call advance for the current fields
+       ! right now, do not know whether any hot map terms are there
+       ! assume they are if something is read, otherwise not
+       !------------------------------------------------
+
+       call oasis_debug_note(subname//' check for lag restart')
+       IF (getput == OASIS3_PUT .AND. lag > 0 .AND. readrest == .TRUE.) THEN
+       ! effective model time of restart : msec
+           mseclag = msec + lag
+           IF (LEN_TRIM(rstfile) < 1) THEN
+               WRITE(nulprt,*) subname,' ERROR restart undefined'
+               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+               CALL oasis_flush(nulprt)
+               CALL oasis_abort_noarg()
+           ENDIF
+           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
+           IF (OASIS_debug >= 2) THEN
+               WRITE(nulprt,*) subname,' at ',msec,mseclag,' RRST: ',&
+                  TRIM(prism_coupler(cplid)%fldlist),' ',TRIM(rstfile)
+           ENDIF
+           CALL mct_aVect_init(avtmp,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+           CALL oasis_io_read_avfile(TRIM(rstfile),avtmp,prism_part(partid)%gsmap)
+
+           CALL mct_aVect_init(avtmp2,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+           CALL oasis_io_read_avfile(TRIM(rstfile),avtmp2,prism_part(partid)%gsmap, &
+                                     abort=.FALSE.,nampre='av2_',didread=a22on)
+           
+           CALL mct_aVect_init(avtmp3,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+           CALL oasis_io_read_avfile(TRIM(rstfile),avtmp3,prism_part(partid)%gsmap, &
+                                    abort=.FALSE.,nampre='av3_',didread=a33on)
+
+           CALL mct_aVect_init(avtmp4,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+           CALL oasis_io_read_avfile(TRIM(rstfile),avtmp4,prism_part(partid)%gsmap, &
+                                     abort=.FALSE.,nampre='av4_',didread=a44on)
+
+           CALL mct_aVect_init(avtmp5,rlist=prism_coupler(cplid)%fldlist,lsize=lsize)
+           CALL oasis_io_read_avfile(TRIM(rstfile),avtmp5,prism_part(partid)%gsmap, &
+                                    abort=.false.,nampre='av5_',didread=a55on)
+
+           array1din(1:lsize) = avtmp%rAttr(nff,1:lsize)
+           IF (a22on) array2(1:lsize) = avtmp2%rAttr(nff,1:lsize)
+           IF (a33on) array3(1:lsize) = avtmp3%rAttr(nff,1:lsize)
+           IF (a44on) array4(1:lsize) = avtmp4%rAttr(nff,1:lsize)
+           IF (a55on) array5(1:lsize) = avtmp5%rAttr(nff,1:lsize)
+
+           CALL mct_avect_clean(avtmp)
+           IF (a22on) THEN
+               CALL mct_avect_clean(avtmp2)
+           ENDIF
+           IF (a33on) THEN
+               CALL mct_avect_clean(avtmp3)
+           ENDIF
+           IF (a44on) THEN
+               CALL mct_avect_clean(avtmp4)
+           ENDIF
+           IF (a55on) THEN
+               CALL mct_avect_clean(avtmp5)
+           ENDIF
+       ENDIF
+
 
        !------------------------------------------------
        ! check that model op matches coupler op
@@ -438,6 +472,7 @@ contains
 
        if (OASIS_debug >= 20) then
           write(nulprt,*) subname,'  DEBUG msec,mseclag = ',msec,mseclag
+          CALL oasis_flush(nulprt)
        endif
 
        time_now = .false.
@@ -524,6 +559,7 @@ contains
        call oasis_debug_note(subname//' compute field index and sizes')
        nfav = mct_avect_indexra(prism_coupler(cplid)%avect1,trim(vname))
        nsav = mct_avect_lsize(prism_coupler(cplid)%avect1)
+       if (lag > 0 .and. readrest == .true. ) nsa=size(array1din)
        if (present(array1din )) nsa = size(array1din )
        if (present(array1dout)) nsa = size(array1dout)
        if (present(array2dout)) nsa = size(array2dout)
@@ -547,6 +583,7 @@ contains
        ! optional args only on put side
        !------------------------------------------------
 
+       IF (readrest /= .TRUE.) THEN
        arrayon = .false.
        arrayon(1) = .true.
        if (present(a2on)) arrayon(2) = a2on
@@ -620,6 +657,7 @@ contains
              write(nulprt,*) subname,' at ',msec,mseclag,' ALLO: ',&
                              trim(vname),' ','aVect5'
           endif
+       endif
        endif
 
        !------------------------------------------------
@@ -885,6 +923,7 @@ contains
                    write(nulprt,*) subname,'  DEBUG loctrans calc1 = ',cplid,nf,&
                                    minval(prism_coupler(cplid)%avect1%rAttr(nf,:)),&
                                    maxval(prism_coupler(cplid)%avect1%rAttr(nf,:))
+                   call oasis_flush(nulprt)
                    if (prism_coupler(cplid)%aVon(2)) &
                    write(nulprt,*) subname,'  DEBUG loctrans calc2 = ',cplid,nf,&
                                    minval(prism_coupler(cplid)%avect2%rAttr(nf,:)),&
@@ -1392,6 +1431,7 @@ contains
        endif
     enddo
 
+
     if (locavon(1)) then
        if (mct_avect_nRattr(av1) /= mct_avect_nRattr(avd)) then
           WRITE(nulprt,*) subname,' ERROR in av1 num of flds'
@@ -1453,11 +1493,12 @@ contains
        call mct_aVect_clean(avdtmp)
     endif
 
+
     call oasis_debug_note(subname//' map')
 
-    if (present(conserv)) then
+    IF (PRESENT(conserv)) THEN
     call oasis_debug_note(subname//' conserv')
-    if (conserv /= ip_cnone) then
+    IF (conserv /= ip_cnone) THEN
        fsize = mct_avect_nRattr(av1)
        allocate(av_sums(fsize),av_sumd(fsize))
 
@@ -1628,8 +1669,8 @@ contains
 
        deallocate(imasks,imaskd,areas,aread)
        deallocate(av_sums,av_sumd)
-    endif
-    endif  ! present conserve
+   ENDIF
+   ENDIF  ! present conserve
 
     call oasis_debug_exit(subname)
 

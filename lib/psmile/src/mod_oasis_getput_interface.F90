@@ -46,12 +46,12 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(in) :: fld1(:)
+    real(kind=ip_single_p) :: fld1(:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), intent(in) , optional :: fld2(:)
-    real(kind=ip_single_p), intent(in) , optional :: fld3(:)
-    real(kind=ip_single_p), intent(in) , optional :: fld4(:)
-    real(kind=ip_single_p), intent(in) , optional :: fld5(:)
+    real(kind=ip_single_p), optional :: fld2(:)
+    real(kind=ip_single_p), optional :: fld3(:)
+    real(kind=ip_single_p), optional :: fld4(:)
+    real(kind=ip_single_p), optional :: fld5(:)
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
@@ -135,25 +135,25 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1))
+                               array1din= DBLE(fld1),readrest=.FALSE.)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1),&
+                               array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2))
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1),&
+                               array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
                                a3on=a3on,array3=DBLE(fld3))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1),&
+                               array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
                                a3on=a3on,array3=DBLE(fld3),&
                                a4on=a4on,array4=DBLE(fld4))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1),&
+                               array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
                                a3on=a3on,array3=DBLE(fld3),&
                                a4on=a4on,array4=DBLE(fld4),&
@@ -177,10 +177,10 @@ contains
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
     real(kind=ip_double_p)             :: fld1(:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), intent(in) , optional :: fld2(:)
-    real(kind=ip_double_p), intent(in) , optional :: fld3(:)
-    real(kind=ip_double_p), intent(in) , optional :: fld4(:)
-    real(kind=ip_double_p), intent(in) , optional :: fld5(:)
+    real(kind=ip_double_p), optional :: fld2(:)
+    real(kind=ip_double_p), optional :: fld3(:)
+    real(kind=ip_double_p), optional :: fld4(:)
+    real(kind=ip_double_p), optional :: fld5(:)
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
@@ -263,25 +263,25 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din=fld1)
+                               array1din=fld1,readrest=.FALSE.)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din=fld1,&
+                               array1din=fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2)
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= fld1,&
+                               array1din= fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
                                a3on=a3on,array3=fld3)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din=fld1,&
+                               array1din=fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
                                a3on=a3on,array3=fld3,&
                                a4on=a4on,array4=fld4)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din=fld1,&
+                               array1din=fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
                                a3on=a3on,array3=fld3,&
                                a4on=a4on,array4=fld4,&
@@ -303,12 +303,12 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(in) :: fld1(:,:)
+    real(kind=ip_single_p) :: fld1(:,:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), intent(in) , optional :: fld2(:,:)
-    real(kind=ip_single_p), intent(in) , optional :: fld3(:,:)
-    real(kind=ip_single_p), intent(in) , optional :: fld4(:,:)
-    real(kind=ip_single_p), intent(in) , optional :: fld5(:,:)
+    real(kind=ip_single_p), optional :: fld2(:,:)
+    real(kind=ip_single_p), optional :: fld3(:,:)
+    real(kind=ip_single_p), optional :: fld4(:,:)
+    real(kind=ip_single_p), optional :: fld5(:,:)
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
@@ -398,25 +398,25 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .true.)))
+                               array1din= DBLE(PACK(fld1, mask= .true.)),readrest=.FALSE.)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),&
+                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .true.)))
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),&
+                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),&
+                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=DBLE(PACK(fld4, mask= .TRUE.)))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),&
+                               array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=DBLE(PACK(fld4, mask= .TRUE.)),&
@@ -438,12 +438,12 @@ contains
     IMPLICIT none
     !-------------------------------------
     integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(in) :: fld1(:,:)
+    real(kind=ip_double_p) :: fld1(:,:)
     integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), intent(in) , optional :: fld2(:,:)
-    real(kind=ip_double_p), intent(in) , optional :: fld3(:,:)
-    real(kind=ip_double_p), intent(in) , optional :: fld4(:,:)
-    real(kind=ip_double_p), intent(in) , optional :: fld5(:,:)
+    real(kind=ip_double_p), optional :: fld2(:,:)
+    real(kind=ip_double_p), optional :: fld3(:,:)
+    real(kind=ip_double_p), optional :: fld4(:,:)
+    real(kind=ip_double_p), optional :: fld5(:,:)
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
@@ -532,26 +532,26 @@ contains
 
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
-        CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= (PACK(fld1, mask= .true.)))
+        CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo, &
+                               array1din= (PACK(fld1, mask= .true.)),readrest=.FALSE.)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= (PACK(fld1, mask= .TRUE.)),&
+                               array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .true.)))
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= (PACK(fld1, mask= .TRUE.)),&
+                               array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= (PACK(fld1, mask= .TRUE.)),&
+                               array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=(PACK(fld4, mask= .TRUE.)))
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= (PACK(fld1, mask= .TRUE.)),&
+                               array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=(PACK(fld4, mask= .TRUE.)),&
@@ -608,7 +608,7 @@ contains
 
     allocate(array(ns))
 
-    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array1dout=array)
+    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array1dout=array,readrest=.FALSE.)
 
     IF (kinfo /= OASIS_Ok) THEN
         rd_field(:) = REAL(array(:))
@@ -656,7 +656,7 @@ contains
        return
     endif
 
-    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array1dout=rd_field)
+    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array1dout=rd_field,readrest=.FALSE.)
 
     call oasis_debug_exit(subname)
 
@@ -706,7 +706,7 @@ contains
 
     ALLOCATE(array(nis,njs))
 
-    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array2dout=array)
+    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array2dout=array,readrest=.FALSE.)
 
     IF (kinfo /= OASIS_Ok) THEN
         rd_field(:,:) = REAL(array(:,:))
@@ -754,7 +754,7 @@ contains
        return
     endif
 
-    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array2dout=rd_field)
+    CALL oasis_advance_run(OASIS_In,nfld,kstep,kinfo,array2dout=rd_field,readrest=.FALSE.)
 
     call oasis_debug_exit(subname)
 
