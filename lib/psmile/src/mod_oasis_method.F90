@@ -126,13 +126,15 @@ CONTAINS
    ! the different structures are not allocated
    !
    IF ( nnamcpl == 0 ) THEN
-       WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
-       WRITE (UNIT = nulprt1,FMT = *)  &
-          ' The models are not exchanging any field ($NFIELDS = 0) '
-       WRITE (UNIT = nulprt1,FMT = *)  &
-          ' so we force OASIS_debug = 0 for all processors '
-       OASIS_debug = 0
-       CALL oasis_flush(nulprt1)
+       IF (mpi_rank_global == 0) THEN
+           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+           WRITE (UNIT = nulprt1,FMT = *)  &
+              ' The models are not exchanging any field ($NFIELDS = 0) '
+           WRITE (UNIT = nulprt1,FMT = *)  &
+              ' so we force OASIS_debug = 0 for all processors '
+           OASIS_debug = 0
+           CALL oasis_flush(nulprt1)
+       ENDIF
    ENDIF
 
    ! Determines the total number of fields to avoid a parameter in oasis_def_var
@@ -142,8 +144,10 @@ CONTAINS
      n = namfldsort(nns)
      mvar = mvar + oasis_string_listGetNum(namsrcfld(n))
    ENDDO
-   WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
-   CALL oasis_flush(nulprt1)
+   IF (mpi_rank_global == 0) THEN
+       WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',mvar
+       CALL oasis_flush(nulprt1)
+   ENDIF
 
    ALLOCATE(prism_var(mvar))
 
@@ -174,11 +178,13 @@ CONTAINS
      ENDDO
    ENDDO
    DO m=1,mvar
-     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields  namsrcfld:',&
+     IF (mpi_rank_global == 0) THEN
+         WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields  namsrcfld:',&
                                      TRIM(total_namsrcfld(m))
-     WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields namdstfld:',&
+         WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields namdstfld:',&
                                      TRIM(total_namdstfld(m))
-     CALL oasis_flush(nulprt1)
+         CALL oasis_flush(nulprt1)
+     ENDIF
    ENDDO
 
    !
@@ -192,8 +198,10 @@ CONTAINS
       if (trim(cdnam) == trim(prism_modnam(n))) compid = n
    enddo
    mynummod = compid
-   WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynummod :',mynummod
-   CALL oasis_flush(nulprt1)
+   IF (mpi_rank_global == 0) THEN
+       WRITE(nulprt1,*) subname, 'cdnam :',TRIM(cdnam),' mynummod :',mynummod
+       CALL oasis_flush(nulprt1)
+   ENDIF
 
    if (compid < 0) then
        IF (mpi_rank_global == 0) THEN
@@ -249,21 +257,25 @@ CONTAINS
       string=subname//':mpi_root_global',all=.true.)
    deallocate(tmparr)
 
-   DO n = 1,prism_nmodels
-     WRITE(nulprt1,*) subname,'   n,prism_model,root = ',&
-        n,TRIM(prism_modnam(n)),mpi_root_global(n)
-   ENDDO
-   CALL oasis_flush(nulprt1)
+   IF (mpi_rank_global == 0) THEN
+       DO n = 1,prism_nmodels
+         WRITE(nulprt1,*) subname,'   n,prism_model,root = ',&
+            n,TRIM(prism_modnam(n)),mpi_root_global(n)
+       ENDDO
+       CALL oasis_flush(nulprt1)
+   ENDIF
 
    do n = 1,prism_nmodels
-      if (mpi_root_global(n) < 0) then
-         write(nulprt1,*) subname,'   n,prism_model,root = ',&
-         n,trim(prism_modnam(n)),mpi_root_global(n)
-         write(nulprt1,*) subname,' ERROR: global root invalid, &
-         & check couplcomm for active tasks'
-         CALL oasis_flush(nulprt1)
-         call oasis_abort_noarg()
-      endif
+      IF (mpi_root_global(n) < 0) THEN
+          IF (mpi_rank_global == 0) THEN
+              WRITE(nulprt1,*) subname,'   n,prism_model,root = ',&
+                 n,TRIM(prism_modnam(n)),mpi_root_global(n)
+              WRITE(nulprt1,*) subname,' ERROR: global root invalid, &
+                 & check couplcomm for active tasks'
+              CALL oasis_flush(nulprt1)
+              CALL oasis_abort_noarg()
+          ENDIF
+      ENDIF
    enddo
 
    IF (mpi_rank_global == 0) CLOSE(nulprt1)
