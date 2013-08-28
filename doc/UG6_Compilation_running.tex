@@ -46,6 +46,10 @@ linking. If module {\tt mod\_prism} is used in the models, it is necessary to
 include the path of the psmile and of the mct objects and modules for
 the compilation (i.e. {\tt \$ARCHDIR/build/lib/psmile.MPI1} and {\tt /mct} and to use both the psmile and mct libraries {\tt \$ARCHDIR/lib/libpsmile.MPI1.a} and {\tt libmct.a} and {\tt libmpeu.a} when linking.
 
+Exchange of coupling fields in single and double precision is now supported directly through the interface 
+(see section \ref{subsubsec_Declaration}), even if all real variables are now treated in double precision internally.
+For double precision coupling field, there is no need anymore to promote REAL variables to double precision at compilation.
+
 \section{CPP keys}
 \label{subsec_cpp}
 

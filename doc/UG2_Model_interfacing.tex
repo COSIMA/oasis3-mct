@@ -561,10 +561,10 @@ In the model time step loop, each process sends its part of the
 coupling (or I/O) field.
 
 \begin{itemize}
-\item {\tt CALL oasis\_put (var\_id, date, fld1, fld2, fld3, fld4,
-    fld5, info)}
-\item {\tt CALL prism\_put\_proto(var\_id, date, fld1, fld2, fld3,
-    fld4, fld5, info)}
+\item {\tt CALL oasis\_put (var\_id, date, fld1, info, fld2, fld3,
+    fld4, fld5)}
+\item {\tt CALL prism\_put\_proto(var\_id, date, fld1, info, fld2,
+    fld3, fld4, fld5)}
   \begin{itemize}
   \item {\tt var\_id [INTEGER; IN]}: field ID (from corresponding {\tt
       oasis\_def\_var}, see section \ref{subsubsec_Declaration})
@@ -574,14 +574,6 @@ coupling (or I/O) field.
     beginning of the timestep)
   \item {\tt fld1 [REAL, IN]}: coupling (or I/O) field array; can be
     1D or 2D
-  \item {\tt fld2 [REAL, IN, OPTIONAL]}: optional $2^{nd}$ coupling
-    field array; can be 1D or 2D
-  \item {\tt fld3 [REAL, IN, OPTIONAL]}: optional $3^{rd}$ coupling
-    field array; can be 1D or 2D
-  \item {\tt fld4 [REAL, IN, OPTIONAL]}: optional $4^{th}$ coupling
-    field array; can be 1D or 2D
-  \item {\tt fld5 [REAL, IN, OPTIONAL]}: optional $5^{th}$ coupling
-    field array; can be 1D or 2D
   \item {\tt info [INTEGER; OUT]}: returned info code:
     \begin{itemize}
     \item OASIS\_Sent(=4) if the field was sent to another model
@@ -598,6 +590,14 @@ coupling (or I/O) field.
       restart file and to an output file.
     \item OASIS\_Ok (=0) otherwise and no error occurred.
     \end{itemize}
+  \item {\tt fld2 [REAL, IN, OPTIONAL]}: optional $2^{nd}$ coupling
+    field array; can be 1D or 2D
+  \item {\tt fld3 [REAL, IN, OPTIONAL]}: optional $3^{rd}$ coupling
+    field array; can be 1D or 2D
+  \item {\tt fld4 [REAL, IN, OPTIONAL]}: optional $4^{th}$ coupling
+    field array; can be 1D or 2D
+  \item {\tt fld5 [REAL, IN, OPTIONAL]}: optional $5^{th}$ coupling
+    field array; can be 1D or 2D
   \end{itemize}
 \end{itemize}
 
