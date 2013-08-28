@@ -389,7 +389,7 @@ contains
        !------------------------------------------------
 
        call oasis_debug_note(subname//' check for lag restart')
-       IF (getput == OASIS3_PUT .AND. lag > 0 .AND. readrest == .TRUE.) THEN
+       IF (getput == OASIS3_PUT .AND. lag > 0 .AND. readrest .eqv. .TRUE.) THEN
        ! effective model time of restart : msec
            mseclag = msec + lag
            IF (LEN_TRIM(rstfile) < 1) THEN
@@ -559,7 +559,7 @@ contains
        call oasis_debug_note(subname//' compute field index and sizes')
        nfav = mct_avect_indexra(prism_coupler(cplid)%avect1,trim(vname))
        nsav = mct_avect_lsize(prism_coupler(cplid)%avect1)
-       if (lag > 0 .and. readrest == .true. ) nsa=size(array1din)
+       if (lag > 0 .and. readrest .eqv. .true. ) nsa=size(array1din)
        if (present(array1din )) nsa = size(array1din )
        if (present(array1dout)) nsa = size(array1dout)
        if (present(array2dout)) nsa = size(array2dout)
@@ -583,7 +583,7 @@ contains
        ! optional args only on put side
        !------------------------------------------------
 
-       IF (readrest /= .TRUE.) THEN
+       IF (readrest .neqv. .TRUE.) THEN
        arrayon = .false.
        arrayon(1) = .true.
        if (present(a2on)) arrayon(2) = a2on
@@ -1526,7 +1526,9 @@ contains
              enddo
           endif
           call oasis_mpi_bcast(wts_sums,mpi_comm_local,subname//" bcast wts_sums")
+       if (mpi_rank_local == 0) then 
           call mct_avect_clean(av2g)
+       endif 
        else
           sumtmp = 0.0_ip_r8_p
           do n = 1,lsizes
@@ -1557,7 +1559,9 @@ contains
              enddo
           endif
           call oasis_mpi_bcast(wts_sumd,mpi_comm_local,subname//" bcast wts_sumd")
+       if (mpi_rank_local == 0) then
           call mct_avect_clean(av2g)
+       endif
        else
           sumtmp = 0.0_ip_r8_p
           do n = 1,lsized
@@ -1762,7 +1766,9 @@ contains
        endif
        call oasis_mpi_bcast(sum,mpicom,subname//" bcast sum")
        call mct_avect_clean(av1)
+    if (mytask == 0) then 
        call mct_avect_clean(av1g)
+    endif
     else
        lsum = 0.0_ip_r8_p
        do n = 1,lsize
