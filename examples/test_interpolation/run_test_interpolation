@@ -138,9 +138,9 @@ elif [ $arch == corail ] ; then
 
   cat <<EOF > $rundir/run_$casename.$arch
 # Nom du job
-#PBS -N ${casename}
+#PBS -N tests
 # Temps limite du job
-#PBS -l walltime=00:10:00
+#PBS -l walltime=01:30:00
 # Nombre de processus
 #PBS -l select=1:mpiprocs=24:ncpus=24
 #PBS -l place=scatter:excl
