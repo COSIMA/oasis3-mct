@@ -16,7 +16,7 @@ COUPLE          = $(HOME)/oasis3-mct
 ARCHDIR         = $(COUPLE)/NEPTUNE
 #
 # MPI library
-MPIDIR           = /softs/intel/ics-2012.0.032/impi/4.0.3.008/intel64
+MPIDIR           = /softs/intel/impi/4.1.0.030/intel64
 MPIBIN           = $(MPIDIR)/bin
 MPI_INCLUDE      = $(MPIDIR)/include/gfortran/4.4.0
 MPILIB           = -L$(MPIDIR)/lib

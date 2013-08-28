@@ -16,15 +16,15 @@ COUPLE          = $(HOME)/oasis3-mct
 ARCHDIR         = $(COUPLE)/compile_oa3-mct_gfopenmpi
 #
 # MPI library
-MPIDIR      = /usr/lib64/openmpi
+MPIDIR      = /usr/local/openmpi163_gcc
 MPIBIN      = $(MPIDIR)/bin
-MPI_INCLUDE = /usr/include/openmpi-x86_64
+MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib -lmpi_f90 -lmpi_f77 -lmpi
 #
 # NETCDF library
 NETCDF_INCLUDE1  = /usr/include 
 NETCDF_INCLUDE2  = /usr/lib64/gfortran/modules
-NETCDF_LIBRARY  = -L/usr/lib64 -lnetcdf -lnetcdff -L/usr/local/HDF5-1.8.6/lib -lhdf5_hl -lhdf5 -lz -lm -lhdf5_hl -lhdf5 -lz -lcurl
+NETCDF_LIBRARY  = -L/usr/lib64 -lnetcdff -lnetcdf -L/usr/local/HDF5-1.8.6/lib -lhdf5_hl -lhdf5 -lz -lm -lhdf5_hl -lhdf5 -lz -lcurl
 #
 # Compiling and other commands
 MAKE        = gmake
