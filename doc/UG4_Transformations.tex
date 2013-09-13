@@ -76,8 +76,10 @@ noted with the string UNUSED but not described.
   {\tt CHECKIN} calculates the global minimum, the maximum and the sum
   of the source field values (not weighted by the grid cell area) and
   prints them to the OASIS3-MCT debug file (for the master process of
-  the source component model only). This operation does not transform
-  the field.
+  the source component model only). These informations are found in 
+  the debug file of the master process of the source model under the 
+  attribute ``diags''. 
+  This operation does not transform the field.
 
   The generic input line is as follows:
  \begin{verbatim}
@@ -690,7 +692,9 @@ noted with the string UNUSED but not described.
   {\tt CHECKOUT} calculates the global minimum, the maximum and the
   sum of the target field values (not weighted by the grid cell area)
   and prints them to the OASIS3-MCT debug file (for the master process
-  of the target component model only). This operation does not
+  of the target component model only). These informations are found in 
+  the debug file of the master process of the target model under the 
+  attribute ``diags''. This operation does not
   transform the field.  The generic input line is as for {\tt CHECKIN}
   (see above).
 
