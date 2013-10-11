@@ -277,11 +277,11 @@ where the different entries are:
 \item Field first line:
   \begin{itemize}
   \item {\tt SOSSTSST} : symbolic name for the field in the source
-    model ({\tt CHARACTER*8}). It has to match the argument {\tt name}
+    model ({\tt CHARACTER*128}). It has to match the argument {\tt name}
     of the corresponding field declaration in the source model; see
     {\tt oasis\_def\_var} in section \ref{subsubsec_Declaration}
   \item {\tt SISUTESU} : symbolic name for the field in the target
-    model ({\tt CHARACTER*8}).  It has to match the argument {\tt
+    model ({\tt CHARACTER*128}).  It has to match the argument {\tt
       name} of the corresponding field declaration in the target
     model; see {\tt oasis\_def\_var} in section
     \ref{subsubsec_Declaration}
@@ -379,7 +379,7 @@ The first and only line for fields with status {\tt INPUT} is:
 where the different entries are:
 \begin{itemize}
 \item {\tt SOALBEDO}: symbolic name for the field in the target model
-  ({\tt CHARACTER*8} repeated twice)
+  ({\tt CHARACTER*128} repeated twice)
 \item 17: index in auxiliary file cf\_name\_table.txt (see above for
   EXPORTED fields)
 \item 86400: input period in seconds
