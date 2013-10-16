@@ -278,6 +278,19 @@ CONTAINS
       ENDIF
    enddo
 
+#if defined balance
+   ! CPP key balance incompatible with OASIS_Debug < 2
+   IF ( OASIS_debug < 2 ) THEN
+      WRITE (UNIT = nulprt1,FMT = *) '        ***ABORT***'
+      WRITE (UNIT = nulprt1,FMT = *)  &
+       ' With load balance CPP option (-Dbalance) '
+      WRITE (UNIT = nulprt1,FMT = *)  &
+       ' you must define a minimum NLOGPRT = 2 '
+      CALL oasis_flush(nulprt1)
+      CALL oasis_abort_noarg()
+   ENDIF
+#endif
+
    IF (mpi_rank_global == 0) CLOSE(nulprt1)
 
    !------------------------
