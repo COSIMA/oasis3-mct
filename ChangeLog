@@ -1,6 +1,21 @@
 This file describes what tags were created and why
 ================================================================================
 Originator: tcraig
+Date: Sept 30 2013
+Model: oasis3-mct
+Version: oasis3-mct tc13a branch
+Notes:
+ - add checks for enddef, ticket #718
+ - update abort methods, remove noarg version, convert all abort_noarg calls to
+    abort calls, add flush call, add explicit output indicating an abort is occuring in the
+    abort method
+ - cleanup of subname values, add ( ) around name for clarity in output
+ - modify enter/exit/note syntax, change **** to -- to make outmore more readable
+ - move nulprt,nulprt1, OASIS_debug and TIMER_debug from the kinds to data module
+ - rename debug_notroot to debug.notroot
+	
+================================================================================
+Originator: tcraig
 Date: Oct 22 2012
 Model: oasis3-mct
 Version: oasis3-mct_121022
