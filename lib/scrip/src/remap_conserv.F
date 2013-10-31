@@ -161,6 +161,8 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_conserv'
          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
+
+      weights = 0.
 !
 !-----------------------------------------------------------------------
 !
@@ -567,16 +569,6 @@ C***********************************************************************
      $                      grid2_frac(grid2_overlap(grid2_add)) +
      $                      weights(num_wts+1)
 #endif
-                    else if (lfracnnei) THEN
-                        weights = 0  
-                        call store_link_cnsrv(grid1_add, 
-     $                      grid2_add, weights)
-
-                        IF (ll_debug) THEN
-           WRITE(88,*) '      after store_link_cnsrv fracnnei1'
-           WRITE(88,1122) grid1_add, grid2_add,beglon, beglat,
-     &   intrsct_lon,intrsct_lat,weights(1)
-                        ENDIF
                     endif
                  endif
 
@@ -872,14 +864,6 @@ C***********************************************************************
      &                                  weights(1)
                   grid2_frac(grid2_add) = grid2_frac(grid2_add) + 
      &                                  weights(num_wts+1)
-              else if (lfracnnei) THEN
-                  weights = 0  
-                  call store_link_cnsrv(grid1_add, grid2_add, weights)
-                        IF (ll_debug) THEN
-           WRITE(88,*) '      after store_link_cnsrv fracnnei2'
-           WRITE(88,1122) grid1_add, grid2_add,beglon, beglat,
-     &   intrsct_lon,intrsct_lat,weights(1)
-                        ENDIF
               endif
 
             endif

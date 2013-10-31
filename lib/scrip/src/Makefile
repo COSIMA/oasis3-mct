@@ -50,10 +50,11 @@ remap_vars.o: constants.o grids.o kinds_mod.o
 scrip.o: constants.o grids.o iounits.o kinds_mod.o remap_bicubic.o \
 	remap_bicubic_reduced.o remap_bilinear.o remap_bilinear_reduced.o \
 	remap_conserv.o remap_distwgt.o remap_gauswgt.o remap_vars.o \
-	remap_write.o timers.o
+	remap_write.o timers.o fracnnei.o fracnnei_vmm.o
 constants.o: kinds_mod.o
 distance.o: constants.o kinds_mod.o
 fracnnei.o: constants.o grids.o kinds_mod.o remap_vars.o 
+fracnnei_vmm.o: constants.o kinds_mod.o remap_vars.o
 gradient_bicubic.o: constants.o kinds_mod.o 
 grids.o: constants.o iounits.o kinds_mod.o 
 iounits.o: kinds_mod.o 

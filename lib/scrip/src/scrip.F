@@ -120,6 +120,20 @@ C***********************************************************************
      &           output_opt,   ! option for output conventions
      &           map_method,   ! choice for mapping method
      &           normalize_opt ! option for normalizing weights
+
+!---for the fracnnei options
+
+          REAL (kind=dbl_kind),allocatable ::
+     $weights_temp(:,:) ! temporary remapping weights
+
+      INTEGER (kind=int_kind),allocatable ::
+     $src_addr_temp(:), ! temporary remapping source addresses
+     $dst_addr_temp(:)  ! temporary remapping target addresses 
+
+      INTEGER (kind=int_kind) :: num_neigh !total number of Vmm 
+
+      logical (kind=log_kind) ::
+     $    lnnei(grid2_size)       ! flag for tricky points  
 !-----------------------------------------------------------------------
 !
       IF (nlogprt .GE. 2) THEN
@@ -169,12 +183,12 @@ C***********************************************************************
       case default
         stop 'unknown mapping method'
       end select
-
-      SELECT CASE (normalize_opt)
+      
+       SELECT CASE (normalize_opt)
       CASE ('FRACNNEI')
-          lfracnnei = .true.
+	  lfracnnei = .true.
       END SELECT
-
+         
       select case(normalize_opt(1:4))
       case ('NONE')
         norm_opt = norm_opt_none
@@ -234,11 +248,36 @@ C***********************************************************************
       CALL sort_add(grid2_add_map1, grid1_add_map1, wts_map1,
      $   num_links_map1, num_wts)
       IF (lfracnnei) THEN
+          CALL fracnnei_vmm(grid2_size, grid2_mask, num_links_map1,
+     $          grid2_add_map1, grid1_add_map1, num_neigh, lnnei)
+
+          allocate(weights_temp(num_wts,num_links_map1))
+          allocate(src_addr_temp(num_links_map1))
+          allocate(dst_addr_temp(num_links_map1))
+
+C* -- Store the weights, src_addr, dst_addr in temporary array
+          DO n=1,num_links_map1
+            weights_temp(:,n)= wts_map1(:,n) 
+            src_addr_temp(n) = grid1_add_map1(n)
+            dst_addr_temp(n) = grid2_add_map1(n)
+          enddo
+
+C  -- Deallocate and reallocate the weights, src_addr, dst_addr
+          deallocate(wts_map1,grid1_add_map1,grid2_add_map1)
+          max_links_map1 = num_links_map1 + num_neigh
+          allocate(wts_map1(num_wts,max_links_map1))
+          allocate(grid1_add_map1(max_links_map1))
+          allocate(grid2_add_map1(max_links_map1))
+
           CALL fracnnei(grid1_size, grid2_size, grid1_mask, grid2_mask,
      $        grid1_center_lon, grid1_center_lat,
      $        grid2_center_lon, grid2_center_lat,
-     $        num_links_map1, num_wts,
+     $        num_links_map1, num_wts, num_neigh, lnnei,
+     $        weights_temp,src_addr_temp,dst_addr_temp,
      $        wts_map1, grid1_add_map1, grid2_add_map1)
+
+          num_links_map1 = num_links_map1 + num_neigh
+          deallocate(weights_temp,src_addr_temp,dst_addr_temp)
           lfracnnei = .false.
       ENDIF
 !
@@ -255,6 +294,9 @@ C***********************************************************************
 !
 #endif
 !
+      DO n = 1, num_links_map1
+        IF (.not. grid2_mask(grid2_add_map1(n)))  wts_map1(:,n)=0.
+      enddo
 !
 !-----------------------------------------------------------------------
 !
