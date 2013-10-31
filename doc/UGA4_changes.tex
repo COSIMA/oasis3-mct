@@ -32,9 +32,9 @@ following:
   define the total number of grid cells on the grid (see section
   \ref{subsubsec_Partition}).
 
-\item The CPP key "balance" in mod\_oasis\_advance was added; this
-  option can be used to produce timestamps in OASIS debug file (see
-  section \ref{subsec_cpp}).
+%\item The CPP key "balance" in mod\_oasis\_advance was added; this
+%  option can be used to produce timestamps in OASIS debug file (see
+%  section \ref{subsec_cpp}).
 
 \item The variable {\tt TIMER\_Debug} controlling the amount of time
   statistics written out is now an optional argument read in the {\it
@@ -278,7 +278,9 @@ If needed, LOCTRANS transformations write partially
   reason, coupling restart filenames are now required for all {\it
     namcouple} entries that use LOCTRANS (with non INSTANT
   values). This is the reason an optional restart file is now provided
-  on the OUTPUT {\it namcouple} input line.
+  on the OUTPUT {\it namcouple} input line. If the coupling periods of
+  two (or more) coupling fields are different, it is necessary to define 
+  two (or more) restart files, one for each field.
 
 \item Support to couple multiple fields via a single communication.
 
@@ -293,7 +295,10 @@ these fields are still sent (``put'') or received (``get'') one at a
 time. Inside OASIS3-MCT, the fields are stored and a single mapping
 and send or receive instruction is executed for all fields. This is
 useful in cases where multiple fields have the same coupling
-transformations and to reduce communication costs by aggregating multiple fields into a single communication.
+transformations and to reduce communication costs by aggregating multiple 
+fields into a single communication. If a LOCTRAN transformation is needed
+for these multiple fields, it is necessary to define a restart file for 
+these multiple fields.
 
 \item Matching one source filed with multiple targets
 
