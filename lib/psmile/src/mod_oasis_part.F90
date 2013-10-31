@@ -59,7 +59,7 @@ CONTAINS
 !  ----------------------------------------------------------------
    integer(kind=ip_intwp_p) :: n,k,nsegs
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
-   character(len=*),parameter :: subname = 'oasis_def_partition'
+   character(len=*),parameter :: subname = '(oasis_def_partition)'
 !  ----------------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -83,8 +83,7 @@ CONTAINS
    if (prism_npart > mpart) then
       write(nulprt,*) subname,' ERROR prism_npart too large ',prism_npart,mpart
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      call oasis_abort()
    endif
 
    if (kparal(CLIM_Strategy) == CLIM_Serial) then
@@ -134,8 +133,7 @@ CONTAINS
    else
       write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      call oasis_abort()
    endif
 
    if (mpi_comm_local /= MPI_COMM_NULL) then
@@ -194,7 +192,7 @@ CONTAINS
   integer(ip_i4_p),pointer :: start(:),length(:)
   integer(ip_i4_p) :: pts
   integer(ip_i4_p) :: n
-  character(len=*),parameter :: subname = 'oasis_part_create'
+  character(len=*),parameter :: subname = '(oasis_part_create)'
   !--------------------------------------------------------
 
   call oasis_debug_enter(subname)
@@ -230,8 +228,7 @@ CONTAINS
   else
      write(nulprt,*) subname,' ERROR type unknown ',trim(type)
      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-     CALL oasis_flush(nulprt)
-     call oasis_abort_noarg()
+     call oasis_abort()
   endif
 
   id_part = prism_npart

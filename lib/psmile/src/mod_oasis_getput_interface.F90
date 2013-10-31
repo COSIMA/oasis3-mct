@@ -57,17 +57,23 @@ contains
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r14'
+    character(len=*),parameter :: subname = '(oasis_put_r14)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+          ' oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -94,8 +100,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld2 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -105,8 +110,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld3 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -116,8 +120,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR array4 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -127,8 +130,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld5 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -186,17 +188,23 @@ contains
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r18'
+    character(len=*),parameter :: subname = '(oasis_put_r18)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+          ' oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -223,8 +231,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -234,8 +241,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -245,8 +251,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -256,8 +261,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -314,17 +318,23 @@ contains
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r24'
+    character(len=*),parameter :: subname = '(oasis_put_r24)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       if (OASIS_debug >= 1) write(nulprt,*) trim(subname), &
+          ' oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -354,8 +364,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -366,8 +375,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -378,8 +386,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -390,8 +397,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -449,17 +455,23 @@ contains
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r28'
+    character(len=*),parameter :: subname = '(oasis_put_r28)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       if (OASIS_debug >= 1) write(nulprt,*) trim(subname), &
+          ' oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -489,8 +501,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -501,8 +512,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -513,8 +523,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -525,8 +534,7 @@ contains
        if (nisx /= nis .or. njsx /= njs) then
           write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -579,18 +587,24 @@ contains
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
     real(kind=ip_r8_p), allocatable :: array(:)
-    character(len=*),parameter :: subname = 'oasis_get_r14'
+    character(len=*),parameter :: subname = '(oasis_get_r14)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+          ' oasis_get is called for a variable not in namcouple'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -631,18 +645,24 @@ contains
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
-    character(len=*),parameter :: subname = 'oasis_get_r18'
+    character(len=*),parameter :: subname = '(oasis_get_r18)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+          ' oasis_get is called for a variable not in namcouple'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -675,18 +695,24 @@ contains
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
     REAL(kind=ip_r8_p), ALLOCATABLE :: array(:,:)
-    character(len=*),parameter :: subname = 'oasis_get_r24'
+    character(len=*),parameter :: subname = '(oasis_get_r24)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+          ' oasis_get is called for a variable not in namcouple'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -729,18 +755,24 @@ contains
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
-    character(len=*),parameter :: subname = 'oasis_get_r28'
+    character(len=*),parameter :: subname = '(oasis_get_r28)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
 
     kinfo = OASIS_OK
 
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       call oasis_abort()
+    endif
+
     if (id_port_id == OASIS_Var_Uncpl) then
        if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
+          ' oasis_get is called for a variable not in namcouple'
        if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 

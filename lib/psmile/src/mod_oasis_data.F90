@@ -16,14 +16,19 @@ MODULE mod_oasis_data
 
   integer(kind=ip_i4_p) :: compid
   character(len=ic_lvar):: compnm
-  !
-  ! Variables 
+  logical               :: enddef_called   ! true when enddef is called, for error checking
+
+  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1
+  INTEGER(kind=ip_i4_p)	    :: OASIS_debug
+  INTEGER(kind=ip_i4_p)     :: TIMER_debug
+
+! Variables 
 
   integer(ip_intwp_p)   :: mvar
   integer(kind=ip_i4_p),parameter :: mvarcpl = 10
-  !
+
   CHARACTER(len=ic_field), POINTER :: total_namsrcfld(:), total_namdstfld(:)
-  !
+
   type prism_var_type
      character(len=ic_lvar):: name
      integer(kind=ip_i4_p) :: part
@@ -51,6 +56,8 @@ MODULE mod_oasis_data
   INTEGER(kind=ip_i4_p),allocatable :: mpi_root_global(:)  ! for each model, the rank in comm_world 
                                                            ! of the root process
 
+! PARAMETERS
+
   character(len=*) ,parameter :: cspval = "spval_undef"
   real(ip_double_p),parameter :: rspval = 1.0e36
   integer(ip_i4_p) ,parameter :: ispval = -999999
@@ -66,7 +73,7 @@ CONTAINS
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname = 'oasis_data_zero'
+  character(len=*),parameter :: subname = '(oasis_data_zero)'
 
   nulprt = 6
   nulprt1 = 6
@@ -80,6 +87,7 @@ CONTAINS
   mpi_comm_local = -1
   mpi_rank_local = -1
   mpi_size_local = -1
+  enddef_called = .false.
   
 END SUBROUTINE oasis_data_zero
 

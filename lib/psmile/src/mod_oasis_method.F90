@@ -61,7 +61,7 @@ CONTAINS
    INTEGER(kind=ip_intwp_p) :: k,i,m
    INTEGER(kind=ip_intwp_p) :: nt
    character(len=ic_field)  :: i_name
-   character(len=*),parameter :: subname = 'oasis_init_comp'
+   character(len=*),parameter :: subname = '(oasis_init_comp)'
 !  ---------------------------------------------------------
 
    if (present(kinfo)) then
@@ -209,7 +209,7 @@ CONTAINS
                             TRIM(cdnam)
            CALL oasis_flush(nulprt1)
        ENDIF
-       CALL oasis_abort_noarg()
+       CALL oasis_abort()
    endif
 
 
@@ -273,7 +273,7 @@ CONTAINS
               WRITE(nulprt1,*) subname,' ERROR: global root invalid, &
                  & check couplcomm for active tasks'
               CALL oasis_flush(nulprt1)
-              CALL oasis_abort_noarg()
+              CALL oasis_abort()
           ENDIF
       ENDIF
    enddo
@@ -287,7 +287,7 @@ CONTAINS
       WRITE (UNIT = nulprt1,FMT = *)  &
        ' you must define a minimum NLOGPRT = 2 '
       CALL oasis_flush(nulprt1)
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
    ENDIF
 #endif
 
@@ -310,7 +310,7 @@ CONTAINS
                call oasis_flush(nulprt)
            ELSE
                nulprt=iu+mpi_size_global
-               WRITE(filename2,'(a,i2.2)') 'debug_notroot.',compid
+               WRITE(filename2,'(a,i2.2)') 'debug.notroot.',compid
                OPEN(nulprt,file=filename2,position='append')
 !               WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
 !               CALL oasis_flush(nulprt)
@@ -385,7 +385,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
-   character(len=*),parameter :: subname = 'oasis_terminate'
+   character(len=*),parameter :: subname = '(oasis_terminate)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -410,7 +410,7 @@ CONTAINS
        ENDIF
    ENDIF
 
-   IF (OASIS_debug >= 2)  THEN
+   IF (mpi_rank_local == 0)  THEN
        WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
        CALL oasis_flush(nulprt)
    ENDIF
@@ -427,7 +427,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(out)   :: localcomm
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_get_localcomm'
+   character(len=*),parameter :: subname = '(oasis_get_localcomm)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -453,7 +453,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_set_couplcomm'
+   character(len=*),parameter :: subname = '(oasis_set_couplcomm)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -493,7 +493,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
-   character(len=*),parameter :: subname = 'oasis_create_couplcomm'
+   character(len=*),parameter :: subname = '(oasis_create_couplcomm)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -508,8 +508,7 @@ CONTAINS
    CALL MPI_COMM_Split(allcomm,icpl,1,cplcomm,mpi_err)
    IF (mpi_err /= 0) THEN
       WRITE (nulprt,*) subname,' ERROR: MPI_Comm_Split abort ',mpi_err
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      call oasis_abort()
    ENDIF
 
    !------------------------
@@ -534,7 +533,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(out)   :: debug
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_get_debug'
+   character(len=*),parameter :: subname = '(oasis_get_debug)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -555,7 +554,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(in)   :: debug
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_set_debug'
+   character(len=*),parameter :: subname = '(oasis_set_debug)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -584,7 +583,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p)	:: n, il, ierr, tag
    LOGICAL :: found
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_get_intercomm'
+   character(len=*),parameter :: subname = '(oasis_get_intercomm)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -599,8 +598,7 @@ CONTAINS
             write(nulprt,*) subname,' ERROR: found same model name twice'
             WRITE(nulprt,*) subname,' abort by model :',compid,&
             ' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            call oasis_abort()
          endif
          il = n
          found = .true.
@@ -611,8 +609,7 @@ CONTAINS
       write(nulprt,*) subname,' ERROR: input model name not found'
       WRITE(nulprt,*) subname,' abort by model :',compid,&
       ' proc :',mpi_rank_local
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      call oasis_abort()
    endif
 
    IF (OASIS_debug >= 2) THEN
@@ -641,7 +638,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p)	:: tmp_intercomm
    INTEGER (kind=ip_intwp_p)	:: ierr
 !  ---------------------------------------------------------
-   character(len=*),parameter :: subname = 'oasis_get_intracomm'
+   character(len=*),parameter :: subname = '(oasis_get_intracomm)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
@@ -665,10 +662,17 @@ CONTAINS
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
-   character(len=*),parameter :: subname = 'oasis_enddef'
+   character(len=*),parameter :: subname = '(oasis_enddef)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
+
+   if (enddef_called) then
+       write(nulprt,*) subname,' ERROR: enddef called already'
+       CALL oasis_abort()
+   endif
+   enddef_called = .true.
+
    lkinfo = OASIS_OK
 
    !------------------------

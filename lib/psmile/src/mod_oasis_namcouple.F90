@@ -258,7 +258,7 @@ CONTAINS
   integer(kind=ip_i4_p) :: ja, jf, jc
   integer(kind=ip_i4_p) :: il_iost
   integer(kind=ip_i4_p) :: maxunit
-  character(len=*),parameter :: subname='oasis_namcouple_init'
+  character(len=*),parameter :: subname='(oasis_namcouple_init)'
   !-----------------------------------------------------------
 
   CALL oasis_unitget(nulin)
@@ -271,8 +271,7 @@ CONTAINS
                            ' with unit number ', nulin
           WRITE (nulprt,'(a,i4)') ' abort by model ',compid
           WRITE (nulprt,'(a)') ' error = ERROR opening namcouple file'
-          CALL oasis_flush(nulprt1)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
       ELSE
           WRITE(nulprt1,*) subname,' open namcouple file ',TRIM(cl_namcouple),' with unit number ', &
                            nulin
@@ -476,7 +475,7 @@ CONTAINS
             WRITE (nulprt1,'(a)') ' error = STOP in oasis_namcouple_init'
             CALL oasis_flush(nulprt1)
         ENDIF
-        call oasis_abort_noarg()
+        call oasis_abort()
     endif
     if (namfldops(jf) == ip_ignored) then
         namfldops(jf) = ip_exported
@@ -523,7 +522,7 @@ CONTAINS
                       WRITE (nulprt1,'(a)') ' error = ERROR in SCRIPR CFTYP option'
                       CALL oasis_flush(nulprt1)
                   ENDIF
-                  CALL oasis_abort_noarg()
+                  CALL oasis_abort()
               ENDIF
 
           elseif (canal(ja,ig_number_field(jf)) .EQ. 'MAPPING') then
@@ -546,7 +545,7 @@ CONTAINS
                       WRITE (nulprt1,'(a)') ' error = ERROR in CONSERV option'
                       CALL oasis_flush(nulprt1)
                   ENDIF
-                  CALL oasis_abort_noarg()
+                  CALL oasis_abort()
               endif
 
           elseif (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN' ) then
@@ -568,7 +567,7 @@ CONTAINS
                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASOLD option'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    call oasis_abort_noarg()
+                    call oasis_abort()
                 endif
               enddo
 
@@ -585,7 +584,7 @@ CONTAINS
                         WRITE (nulprt1,'(a)') ' error = ERROR in BLASNEW option'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    call oasis_abort_noarg()
+                    call oasis_abort()
                 endif
               enddo
 
@@ -672,7 +671,7 @@ CONTAINS
             WRITE (nulprt1,'(a)') ' error = ERROR in seq sort'
             CALL oasis_flush(nulprt1)
         ENDIF
-        call oasis_abort_noarg()
+        call oasis_abort()
     endif
   enddo
 
@@ -733,7 +732,7 @@ SUBROUTINE inipar_alloc()
   integer (kind=ip_intwp_p) :: ja,jz,jm,jf,ilen
   integer (kind=ip_intwp_p) :: ig_clim_maxport
   logical :: lg_bsend,endflag
-  character(len=*),parameter :: subname='mod_oasis_namcouple:inipar_alloc'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:inipar_alloc)'
 
   !* ---------------------------- Poema verses --------------------------
 
@@ -1009,7 +1008,7 @@ SUBROUTINE inipar_alloc()
                 WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
                 CALL oasis_flush(nulprt1)
             ENDIF
-            CALL OASIS_ABORT_NOARG() 
+            CALL OASIS_ABORT() 
         ENDIF
         READ (UNIT = nulin,FMT = 2002) clline
         CALL skip(clline, jpeighty)
@@ -1055,7 +1054,7 @@ SUBROUTINE inipar_alloc()
                     WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
                     CALL oasis_flush(nulprt1)
                 ENDIF
-                CALL OASIS_ABORT_NOARG() 
+                CALL OASIS_ABORT() 
             ENDIF
             DO ja=1,ig_total_ntrans(jf)
               READ (UNIT = nulin,FMT = 2002) clline
@@ -1421,7 +1420,7 @@ SUBROUTINE inipar_alloc()
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                             CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL OASIS_ABORT_NOARG()
+                        CALL OASIS_ABORT()
                     ENDIF
                     READ (UNIT = nulin,FMT = 2002) clline
                     CALL skip(clline, jpeighty)
@@ -1530,7 +1529,7 @@ SUBROUTINE inipar_alloc()
         WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
         CALL oasis_flush(nulprt1)
     ENDIF
-    CALL oasis_abort_noarg()
+    CALL oasis_abort()
 210 CONTINUE
     IF (mpi_rank_global == 0) THEN
         WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -1545,7 +1544,7 @@ SUBROUTINE inipar_alloc()
         WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
         CALL oasis_flush(nulprt1)
     ENDIF
-    CALL oasis_abort_noarg()
+    CALL oasis_abort()
 230 CONTINUE
     IF (mpi_rank_global == 0) THEN
         WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -1560,7 +1559,7 @@ SUBROUTINE inipar_alloc()
         WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
         CALL oasis_flush(nulprt1)
     ENDIF
-    CALL oasis_abort_noarg()
+    CALL oasis_abort()
 232 CONTINUE
     IF (mpi_rank_global == 0) THEN
         WRITE (UNIT = nulprt1,FMT = *) subname,':   ***WARNING***'
@@ -1577,7 +1576,7 @@ SUBROUTINE inipar_alloc()
         WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
         CALL oasis_flush(nulprt1)
     ENDIF
-    CALL oasis_abort_noarg()
+    CALL oasis_abort()
 241 CONTINUE
     IF (mpi_rank_global == 0) THEN
         WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -1592,7 +1591,7 @@ SUBROUTINE inipar_alloc()
         WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
         CALL oasis_flush(nulprt1)
     ENDIF
-    CALL oasis_abort_noarg()
+    CALL oasis_abort()
 
   END SUBROUTINE inipar_alloc
 
@@ -1646,7 +1645,7 @@ SUBROUTINE inipar_alloc()
   integer (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
   integer (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
   integer (kind=ip_intwp_p) :: icofld,imodel
-  character(len=*),parameter :: subname='mod_oasis_namcouple:inipar'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:inipar)'
 
 !* ---------------------------- Poema verses --------------------------
 
@@ -2136,7 +2135,7 @@ SUBROUTINE inipar_alloc()
                    WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                    CALL oasis_flush(nulprt1)
                ENDIF
-               CALL OASIS_ABORT_NOARG()
+               CALL OASIS_ABORT()
            ENDIF
 !     
            CALL parse(clline, clvari, 2, jpeighty, ilen)
@@ -2155,7 +2154,7 @@ SUBROUTINE inipar_alloc()
                   WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                   CALL oasis_flush(nulprt1)
               ENDIF
-              CALL OASIS_ABORT_NOARG()
+              CALL OASIS_ABORT()
            ENDIF
 !     
            CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -2194,7 +2193,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG()  
+                    CALL OASIS_ABORT()  
                  ENDIF
               ENDDO
            ENDIF
@@ -2232,7 +2231,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG()  
+                    CALL OASIS_ABORT()  
                  ENDIF
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'CHECKIN')THEN
                   CALL parse(clline, clvari, 1, jpeighty, ILEN)
@@ -2262,7 +2261,7 @@ SUBROUTINE inipar_alloc()
                               WRITE (nulprt1,'(a)') ' error = STOP in inipar cmaptyp or loc'
                               CALL oasis_flush(nulprt1)
                           ENDIF
-                          call oasis_abort_noarg()
+                          call oasis_abort()
                        endif
                     endif
                  enddo
@@ -2288,7 +2287,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG() 
+                    CALL OASIS_ABORT() 
                  ENDIF
                  IF (cmap_method(ig_number_field(jf)) .eq. 'BILINEAR'  &
                     .and. cgrdtyp(ig_number_field(jf)) .ne. 'LR' &
@@ -2305,7 +2304,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG() 
+                    CALL OASIS_ABORT() 
                  ENDIF
 !* Get field type (scalar/vector)
                  CALL parse(clline, clvari, 3, jpeighty, ilen)
@@ -2325,7 +2324,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG()
+                    CALL OASIS_ABORT()
                  ENDIF
 !* Get restriction type for SCRIP search
                  CALL parse(clline, clvari, 4, jpeighty, ilen)
@@ -2345,7 +2344,7 @@ SUBROUTINE inipar_alloc()
                                 WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                                 CALL oasis_flush(nulprt1)
                             ENDIF
-                            CALL OASIS_ABORT_NOARG()
+                            CALL OASIS_ABORT()
                         ELSE  
                             crsttype(ig_number_field(jf)) = 'REDUCED'
                         ENDIF
@@ -2365,7 +2364,7 @@ SUBROUTINE inipar_alloc()
                         WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                         CALL oasis_flush(nulprt1)
                     ENDIF
-                    CALL OASIS_ABORT_NOARG()
+                    CALL OASIS_ABORT()
                  ENDIF
 !*
 !* Get number of search bins for SCRIP search
@@ -2390,7 +2389,7 @@ SUBROUTINE inipar_alloc()
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                             CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL OASIS_ABORT_NOARG()
+                        CALL OASIS_ABORT()
                     ENDIF
 !* Get order of remapping for CONSERV
                     CALL parse(clline, clvari, 7, jpeighty, ilen)
@@ -2406,7 +2405,7 @@ SUBROUTINE inipar_alloc()
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                             CALL oasis_flush(nulprt1)
                         ENDIF
-                        CALL OASIS_ABORT_NOARG()
+                        CALL OASIS_ABORT()
                     ENDIF
                     READ(clvari,FMT = 2009) corder(ig_number_field(jf))                   
                  ELSE
@@ -2428,7 +2427,7 @@ SUBROUTINE inipar_alloc()
                             WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                             CALL oasis_flush(nulprt1)
                         ENDIF
-                       CALL OASIS_ABORT_NOARG()
+                       CALL OASIS_ABORT()
                     ELSE
                        READ(clvari,FMT=2003)nscripvoi(ig_number_field(jf))
                     ENDIF 
@@ -2448,7 +2447,7 @@ SUBROUTINE inipar_alloc()
                            WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                            CALL oasis_flush(nulprt1)
                        ENDIF
-                       CALL OASIS_ABORT_NOARG()
+                       CALL OASIS_ABORT()
                     ELSE
                        READ(clvari,FMT=2006) varmul(ig_number_field(jf))
                     ENDIF
@@ -2500,7 +2499,7 @@ SUBROUTINE inipar_alloc()
                            WRITE (nulprt1,'(a)') ' error = STOP in inipar cconopt'
                            CALL oasis_flush(nulprt1)
                        ENDIF
-                       call oasis_abort_noarg()
+                       call oasis_abort()
                     endif
                  endif
               ELSE IF (canal(ja,ig_number_field(jf)) .EQ. 'BLASOLD')THEN
@@ -2549,7 +2548,7 @@ SUBROUTINE inipar_alloc()
                       WRITE (nulprt1,'(a)') ' error = STOP in inipar'
                       CALL oasis_flush(nulprt1)
                   ENDIF
-                 CALL oasis_abort_noarg()
+                 CALL oasis_abort()
              ENDIF
  270       CONTINUE
           ENDIF
@@ -2735,7 +2734,7 @@ SUBROUTINE inipar_alloc()
               WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
               WRITE (nulprt1,'(a)') ' error = STOP in inipar'
               CALL oasis_flush(nulprt1)
-              CALL oasis_abort_noarg()
+              CALL oasis_abort()
           ENDIF
  320    CONTINUE
       ENDIF
@@ -2838,7 +2837,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
 
  191  CONTINUE
       IF (mpi_rank_global == 0) THEN
@@ -2854,7 +2853,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
  199  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2869,7 +2868,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
  210  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2884,7 +2883,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
  230  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
@@ -2899,7 +2898,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
  233  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -2913,7 +2912,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
  235  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -2930,7 +2929,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg() 
+      CALL oasis_abort() 
  236  CONTINUE
       IF (mpi_rank_global == 0) THEN
           WRITE (UNIT = nulprt1,FMT = *) ' '
@@ -2947,7 +2946,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar.f'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg() 
+      CALL oasis_abort() 
 
       END SUBROUTINE inipar
 !===============================================================================
@@ -2956,7 +2955,7 @@ ENDIF
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname='mod_oasis_namcouple:alloc'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:alloc)'
 
 !  call oasis_debug_enter(subname)
 
@@ -3227,7 +3226,7 @@ ENDIF
 
   IMPLICIT NONE
 
-  character(len=*),parameter :: subname='mod_oasis_namcouple:dealloc'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:dealloc)'
 
   !--- alloc_anais1
   DEALLOCATE (varmul, stat=il_err)
@@ -3478,7 +3477,7 @@ ENDIF
       character(len=*),PARAMETER :: cbase = '-'
       character(len=*),PARAMETER :: cprpt = '* ===>>> :'
       character(len=*),PARAMETER :: cdots = '  ------  '
-      character(len=*),parameter :: subname='mod_oasis_namcouple:prtout'
+      character(len=*),parameter :: subname='(mod_oasis_namcouple:prtout)'
 
 !* ---------------------------- Poema verses ----------------------------
 
@@ -3583,7 +3582,7 @@ ENDIF
       character(len=*), PARAMETER :: cpbase = '-'
       character(len=*), PARAMETER :: cprpt = '* ===>>> :'
       character(len=*), PARAMETER :: cpdots = '  ------  ' 
-      character(len=*),parameter :: subname='mod_oasis_namcouple:prcout'
+      character(len=*),parameter :: subname='(mod_oasis_namcouple:prcout)'
 !
 !* ---------------------------- Poema verses ----------------------------
 !
@@ -3690,7 +3689,7 @@ ENDIF
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
-  character(len=*),parameter :: subname='mod_oasis_namcouple:parse'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:parse)'
 !
 !* ---------------------------- Poema verses ----------------------------
 
@@ -3777,7 +3776,7 @@ ENDIF
           WRITE (nulprt1,'(a)') ' error = STOP in inipar_alloc'
           CALL oasis_flush(nulprt1)
       ENDIF
-      CALL oasis_abort_noarg()
+      CALL oasis_abort()
 
 
   END SUBROUTINE parse
@@ -3848,7 +3847,7 @@ ENDIF
   CHARACTER (len=klen) :: clline
   CHARACTER (len=klen) :: clwork
   CHARACTER (len=1), SAVE :: clblank = ' ', clcmt = '#'
-  character(len=*),parameter :: subname='mod_oasis_namcouple:parseblk'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:parseblk)'
 !
 !* ---------------------------- Poema verses ----------------------------
 
@@ -3989,7 +3988,7 @@ ENDIF
   INTEGER (kind=ip_intwp_p) :: ib
   CHARACTER(len=1000) :: cl_line
   CHARACTER(len=1) :: cl_two
-  character(len=*),parameter :: subname='mod_oasis_namcouple:skip'
+  character(len=*),parameter :: subname='(mod_oasis_namcouple:skip)'
 !
 !*-----------------------------------------------------------------------
 !

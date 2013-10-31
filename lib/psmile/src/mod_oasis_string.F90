@@ -1676,10 +1676,9 @@ subroutine oasis_string_abort(string)
    if (present(string)) lstring = string
 
    if (doabort) then
-       WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
+      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      call oasis_abort()
    else
       write(nulprt,F00) ' no abort:'//trim(lstring)
       CALL oasis_flush(nulprt)

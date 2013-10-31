@@ -36,10 +36,6 @@ SAVE
 !
 ! !PUBLIC DATA MEMBERS:
 !
-  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1
-  INTEGER(kind=ip_i4_p)	    :: OASIS_debug
-  INTEGER(kind=ip_i4_p)     :: TIMER_debug
-!
 ! !DESCRIPTION:
 ! This modules contains the parameters defining the precision used for 
 ! real and integer variables

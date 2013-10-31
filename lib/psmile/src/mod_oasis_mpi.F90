@@ -5,7 +5,7 @@ MODULE mod_oasis_mpi
 !-------------------------------------------------------------------------------
 
    use mod_oasis_kinds
-   USE mod_oasis_data, ONLY: compid, mpi_rank_local
+   USE mod_oasis_data, ONLY: compid, mpi_rank_local, nulprt
    USE mod_oasis_sys, ONLY: oasis_debug_enter, oasis_debug_exit, oasis_flush
 
    implicit none
@@ -107,7 +107,7 @@ SUBROUTINE oasis_mpi_chkerr(rcode,string)
    character(*),         intent(in) :: string ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_chkerr'
+   character(*),parameter           :: subName = '(oasis_mpi_chkerr)'
    character(MPI_MAX_ERROR_STRING)  :: lstring
    integer(ip_i4_p)             :: len
    integer(ip_i4_p)             :: ierr
@@ -146,7 +146,7 @@ SUBROUTINE oasis_mpi_sendi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sendi0'
+   character(*),parameter           :: subName = '(oasis_mpi_sendi0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -184,7 +184,7 @@ SUBROUTINE oasis_mpi_sendi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sendi1'
+   character(*),parameter           :: subName = '(oasis_mpi_sendi1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -222,7 +222,7 @@ SUBROUTINE oasis_mpi_sendr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sendr0'
+   character(*),parameter           :: subName = '(oasis_mpi_sendr0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -260,7 +260,7 @@ SUBROUTINE oasis_mpi_sendr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sendr1'
+   character(*),parameter           :: subName = '(oasis_mpi_sendr1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -298,7 +298,7 @@ SUBROUTINE oasis_mpi_sendr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sendr3'
+   character(*),parameter           :: subName = '(oasis_mpi_sendr3)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -336,7 +336,7 @@ SUBROUTINE oasis_mpi_recvi0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_recvi0'
+   character(*),parameter           :: subName = '(oasis_mpi_recvi0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -375,7 +375,7 @@ SUBROUTINE oasis_mpi_recvi1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_recvi1'
+   character(*),parameter           :: subName = '(oasis_mpi_recvi1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -414,7 +414,7 @@ SUBROUTINE oasis_mpi_recvr0(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_recvr0'
+   character(*),parameter           :: subName = '(oasis_mpi_recvr0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -453,7 +453,7 @@ SUBROUTINE oasis_mpi_recvr1(lvec,pid,tag,comm,string)
    character(*),optional,intent(in) :: string   ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_recvr1'
+   character(*),parameter           :: subName = '(oasis_mpi_recvr1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -492,7 +492,7 @@ SUBROUTINE oasis_mpi_recvr3(array,pid,tag,comm,string)
    character(*),optional,intent(in) :: string        ! message
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_recvr3'
+   character(*),parameter           :: subName = '(oasis_mpi_recvr3)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -530,7 +530,7 @@ SUBROUTINE oasis_mpi_bcasti0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcasti0'
+   character(*),parameter             :: subName = '(oasis_mpi_bcasti0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -570,7 +570,7 @@ SUBROUTINE oasis_mpi_bcastl0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastl0'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastl0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -610,7 +610,7 @@ SUBROUTINE oasis_mpi_bcastc0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastc0'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastc0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -650,7 +650,7 @@ SUBROUTINE oasis_mpi_bcastc1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastc1'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastc1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -690,7 +690,7 @@ SUBROUTINE oasis_mpi_bcastr0(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastr0'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastr0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -730,7 +730,7 @@ SUBROUTINE oasis_mpi_bcasti1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcasti1'
+   character(*),parameter             :: subName = '(oasis_mpi_bcasti1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -770,7 +770,7 @@ SUBROUTINE oasis_mpi_bcastl1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastl1'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastl1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -810,7 +810,7 @@ SUBROUTINE oasis_mpi_bcastr1(vec,comm,string,pebcast)
    integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_bcastr1'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastr1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -855,7 +855,7 @@ SUBROUTINE oasis_mpi_bcastr2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_bcastr2'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastr2)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of reals
@@ -897,7 +897,7 @@ SUBROUTINE oasis_mpi_bcasti2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_bcasti2'
+   character(*),parameter             :: subName = '(oasis_mpi_bcasti2)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of integers
@@ -939,7 +939,7 @@ SUBROUTINE oasis_mpi_bcastr3(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_bcastr3'
+   character(*),parameter             :: subName = '(oasis_mpi_bcastr3)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 3d array of reals
@@ -991,7 +991,7 @@ SUBROUTINE oasis_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    integer(ip_i4_p)               :: maxSize       ! Maximum size
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_gathScatvInitr1'
+   character(*),parameter             :: subName = '(oasis_mpi_gathScatvInitr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Setup arrays for a gatherv/scatterv operation
@@ -1071,7 +1071,7 @@ SUBROUTINE oasis_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, roo
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_gathervr1'
+   character(*),parameter             :: subName = '(oasis_mpi_gathervr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Gather a 1D array of reals
@@ -1113,7 +1113,7 @@ SUBROUTINE oasis_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, ro
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = 'oasis_mpi_scattervr1'
+   character(*),parameter             :: subName = '(oasis_mpi_scattervr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Scatter a 1D array of reals
@@ -1149,7 +1149,7 @@ SUBROUTINE oasis_mpi_sumi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumi0'
+   character(*),parameter           :: subName = '(oasis_mpi_sumi0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1210,7 +1210,7 @@ SUBROUTINE oasis_mpi_sumi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumi1'
+   character(*),parameter           :: subName = '(oasis_mpi_sumi1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1271,7 +1271,7 @@ SUBROUTINE oasis_mpi_sumb0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumb0'
+   character(*),parameter           :: subName = '(oasis_mpi_sumb0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1332,7 +1332,7 @@ SUBROUTINE oasis_mpi_sumb1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumb1'
+   character(*),parameter           :: subName = '(oasis_mpi_sumb1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1393,7 +1393,7 @@ SUBROUTINE oasis_mpi_sumr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumr0'
+   character(*),parameter           :: subName = '(oasis_mpi_sumr0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1454,7 +1454,7 @@ SUBROUTINE oasis_mpi_sumr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumr1'
+   character(*),parameter           :: subName = '(oasis_mpi_sumr1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1515,7 +1515,7 @@ SUBROUTINE oasis_mpi_sumr2(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumr2'
+   character(*),parameter           :: subName = '(oasis_mpi_sumr2)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1576,7 +1576,7 @@ SUBROUTINE oasis_mpi_sumr3(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_sumr3'
+   character(*),parameter           :: subName = '(oasis_mpi_sumr3)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1637,7 +1637,7 @@ SUBROUTINE oasis_mpi_mini0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_mini0'
+   character(*),parameter           :: subName = '(oasis_mpi_mini0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1698,7 +1698,7 @@ SUBROUTINE oasis_mpi_mini1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_mini1'
+   character(*),parameter           :: subName = '(oasis_mpi_mini1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1759,7 +1759,7 @@ SUBROUTINE oasis_mpi_minr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_minr0'
+   character(*),parameter           :: subName = '(oasis_mpi_minr0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1820,7 +1820,7 @@ SUBROUTINE oasis_mpi_minr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_minr1'
+   character(*),parameter           :: subName = '(oasis_mpi_minr1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1881,7 +1881,7 @@ SUBROUTINE oasis_mpi_maxi0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_maxi0'
+   character(*),parameter           :: subName = '(oasis_mpi_maxi0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -1942,7 +1942,7 @@ SUBROUTINE oasis_mpi_maxi1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_maxi1'
+   character(*),parameter           :: subName = '(oasis_mpi_maxi1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -2003,7 +2003,7 @@ SUBROUTINE oasis_mpi_maxr0(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_maxr0'
+   character(*),parameter           :: subName = '(oasis_mpi_maxr0)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -2064,7 +2064,7 @@ SUBROUTINE oasis_mpi_maxr1(lvec,gvec,comm,string,all)
    logical,     optional,intent(in) :: all      ! allreduce if true
 
    !----- local ---
-   character(*),parameter           :: subName = 'oasis_mpi_maxr1'
+   character(*),parameter           :: subName = '(oasis_mpi_maxr1)'
    logical                          :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
@@ -2123,7 +2123,7 @@ SUBROUTINE oasis_mpi_commsize(comm,size,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_commsize'
+   character(*),parameter             :: subName = '(oasis_mpi_commsize)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2156,7 +2156,7 @@ SUBROUTINE oasis_mpi_commrank(comm,rank,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_commrank'
+   character(*),parameter             :: subName = '(oasis_mpi_commrank)'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2188,7 +2188,7 @@ SUBROUTINE oasis_mpi_initialized(flag,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_initialized'
+   character(*),parameter             :: subName = '(oasis_mpi_initialized)'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2219,7 +2219,7 @@ SUBROUTINE oasis_mpi_wtime(wtime)
    real(ip_r8_p), intent(out) :: wtime  ! time
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_wtime'
+   character(*),parameter             :: subName = '(oasis_mpi_wtime)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI wtime
@@ -2245,7 +2245,7 @@ SUBROUTINE oasis_mpi_abort(string,rcode)
    integer,optional,intent(in)        :: rcode    ! optional code
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_abort'
+   character(*),parameter             :: subName = '(oasis_mpi_abort)'
    integer(ip_i4_p)                   :: ierr
    integer                            :: rc       ! return code
 
@@ -2283,7 +2283,7 @@ SUBROUTINE oasis_mpi_barrier(comm,string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_barrier'
+   character(*),parameter             :: subName = '(oasis_mpi_barrier)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2314,7 +2314,7 @@ SUBROUTINE oasis_mpi_init(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_init'
+   character(*),parameter             :: subName = '(oasis_mpi_init)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2345,7 +2345,7 @@ SUBROUTINE oasis_mpi_finalize(string)
    character(*),optional,intent(in)   :: string   ! message
 
    !----- local ---
-   character(*),parameter             :: subName = 'oasis_mpi_finalize'
+   character(*),parameter             :: subName = '(oasis_mpi_finalize)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------

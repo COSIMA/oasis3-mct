@@ -136,7 +136,7 @@ CONTAINS
     integer(kind=ip_intwp_p), intent (OUT) :: iwrite ! flag to state whether
                                             ! grids file needs to be written
     !-------------------------------------------------
-    character(len=*),parameter :: subname = 'oasis_start_grids_writing'
+    character(len=*),parameter :: subname = '(oasis_start_grids_writing)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -144,8 +144,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     if (prism_ngrid == 0) then  ! first call
@@ -181,7 +180,7 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_grid_r8'
+    character(len=*),parameter :: subname = '(oasis_write_grid_r8)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -189,8 +188,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     call oasis_findgrid(cgrid,nx,ny,gridID)
@@ -229,7 +227,7 @@ CONTAINS
     real(kind=ip_double_p), allocatable :: lon8(:,:)
     real(kind=ip_double_p), allocatable :: lat8(:,:)
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_grid_r4'
+    character(len=*),parameter :: subname = '(oasis_write_grid_r4)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -267,7 +265,7 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_angle_r8'
+    character(len=*),parameter :: subname = '(oasis_write_angle_r8)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -275,8 +273,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     call oasis_findgrid(cgrid,nx,ny,gridID)
@@ -307,7 +304,7 @@ CONTAINS
     !-------------------------------------------------
     real(kind=ip_double_p),allocatable :: angle8(:,:)
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_angle_r4'
+    character(len=*),parameter :: subname = '(oasis_write_angle_r4)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -344,7 +341,7 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_corner_r8'
+    character(len=*),parameter :: subname = '(oasis_write_corner_r8)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -352,7 +349,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     call oasis_findgrid(cgrid,nx,ny,gridID)
@@ -391,7 +388,7 @@ CONTAINS
     !-------------------------------------------------
     real(kind=ip_double_p), allocatable :: clon8(:,:,:),clat8(:,:,:)
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_corner_r4'
+    character(len=*),parameter :: subname = '(oasis_write_corner_r4)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -431,7 +428,7 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_mask'
+    character(len=*),parameter :: subname = '(oasis_write_mask)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -439,8 +436,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     call oasis_findgrid(cgrid,nx,ny,gridID)
@@ -472,7 +468,7 @@ CONTAINS
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_area_r8'
+    character(len=*),parameter :: subname = '(oasis_write_area_r8)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -480,8 +476,7 @@ CONTAINS
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     call oasis_findgrid(cgrid,nx,ny,gridID)
@@ -513,7 +508,7 @@ CONTAINS
     !-------------------------------------------------
     real(kind=ip_double_p), allocatable :: area8(:,:)
     integer(kind=ip_intwp_p) :: ierror
-    character(len=*),parameter :: subname = 'oasis_write_area_r4'
+    character(len=*),parameter :: subname = '(oasis_write_area_r4)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -539,15 +534,14 @@ CONTAINS
 
     implicit none
     integer(kind=ip_i4_p) :: n
-    character(len=*),parameter :: subname = 'oasis_terminate_grids_writing'
+    character(len=*),parameter :: subname = '(oasis_terminate_grids_writing)'
 
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
        write(nulprt,*) subname,' ERROR subroutine call by non root processor'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     do n = 1,prism_ngrid
@@ -579,7 +573,7 @@ CONTAINS
     logical :: exists                  ! check if file exists
     integer(kind=ip_i4_p) :: n         ! counter
     integer(kind=ip_i4_p) :: nx,ny,nc  ! grid size
-    character(len=*),parameter :: subname = 'oasis_write2files'
+    character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -648,7 +642,7 @@ CONTAINS
     integer(kind=ip_intwp_p), intent(out) :: gridID      ! gridID matching cgrid
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: n
-    character(len=*),parameter :: subname = 'oasis_findgrid'
+    character(len=*),parameter :: subname = '(oasis_findgrid)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -662,8 +656,7 @@ CONTAINS
              write(nulprt,*) subname,' ERROR in predefined grid size',nx,ny, &
                 prism_grid(gridID)%nx,prism_grid(gridID)%ny
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
        endif
     enddo

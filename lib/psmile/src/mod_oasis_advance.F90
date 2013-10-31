@@ -47,15 +47,14 @@ contains
     integer(kind=ip_i4_p) :: mseclag   ! model time + lag
     character(len=ic_xl)  :: rstfile   ! restart filename
     character(len=ic_med) :: vstring   ! temporary string
-    character(len=*),parameter :: subname = 'oasis_advance_init'
+    character(len=*),parameter :: subname = '(oasis_advance_init)'
 
     call oasis_debug_enter(subname)
 
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,' ERROR called on non coupling task'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     kinfo = OASIS_OK
@@ -92,8 +91,7 @@ contains
       IF (lag > dt .OR. lag <= -dt) THEN
           WRITE(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
       ENDIF
 
       !------------------------------------------------
@@ -155,8 +153,7 @@ contains
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,' ERROR restart undefined'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
           if (OASIS_debug >= 2) then
              write(nulprt,*) subname,' at ',msec,mseclag,' RTRN: ',&
@@ -283,7 +280,7 @@ contains
     type(mct_avect)       :: avtmp3  ! data read from restart
     type(mct_avect)       :: avtmp4  ! data read from restart
     type(mct_avect)       :: avtmp5  ! data read from restart
-    character(len=*),parameter :: subname = 'oasis_advance_run '
+    character(len=*),parameter :: subname = '(oasis_advance_run)'
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
 
@@ -292,8 +289,7 @@ contains
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,' ERROR called on non coupling task'
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     kinfo = OASIS_OK
@@ -313,8 +309,7 @@ contains
        write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
        write(nulprt,*) subname,' ERROR mop invalid ',mop
        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       call oasis_abort()
     endif
 
     !------------------------------------------------
@@ -378,8 +373,7 @@ contains
       IF (ABS(lag) > dt) THEN
           WRITE(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
       ENDIF
 
        !------------------------------------------------
@@ -395,8 +389,7 @@ contains
            IF (LEN_TRIM(rstfile) < 1) THEN
                WRITE(nulprt,*) subname,' ERROR restart undefined'
                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
-               CALL oasis_abort_noarg()
+               CALL oasis_abort()
            ENDIF
            lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
            IF (OASIS_debug >= 2) THEN
@@ -454,8 +447,7 @@ contains
        else
           write(nulprt,*) subname,' ERROR model op does not match coupler op',mop,getput
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        endif
 
        !------------------------------------------------
@@ -487,8 +479,7 @@ contains
           write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',&
                           msec,maxtime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        endif
 
        !------------------------------------------------
@@ -501,8 +492,7 @@ contains
           write(nulprt,*) subname,' ERROR model seems to be running backwards',&
                           msec,lcouplertime
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        endif
 
        !------------------------------------------------
@@ -527,8 +517,7 @@ contains
                              prism_coupler(n)%ltime,prism_coupler(n)%dt
              WRITE(nulprt,*) subname,' ERROR model timestep does not match coupling timestep'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             call oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
           if ((prism_coupler(n)%ltime /= ispval) .and. &
               (sndrcv .and. prism_coupler(n)%sndrcv .and. getput == OASIS3_GET) .and. &
@@ -547,8 +536,7 @@ contains
              write(nulprt,*) subname,' skipped sequence number = ',prism_coupler(n)%seq
              WRITE(nulprt,*) subname,' ERROR model sequence does not match coupling sequence'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
        enddo
 
@@ -572,8 +560,7 @@ contains
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' ERROR sizes ',nsav,nsa
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        endif
 
        !------------------------------------------------
@@ -599,8 +586,7 @@ contains
              write(nulprt,*) subname,' higher order mapping not allowed on get side'
              write(nulprt,*) subname,' consider changing map location from dst to src'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
        endif
 
@@ -611,8 +597,7 @@ contains
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,' arrayon true but array not sent'
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        ! With the current way of using oasis_advance_run, the above test is useless but we keep the test
        ! as someone might be later adding an interface call that would violate the consistency
        endif
@@ -784,8 +769,7 @@ contains
                 write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
                 write(nulprt,*) subname,' higher order mapping with MAX trans not supported'
                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                CALL oasis_flush(nulprt)
-                call oasis_abort_noarg()      
+                call oasis_abort()      
              endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
@@ -805,8 +789,7 @@ contains
                 write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
                 write(nulprt,*) subname,' higher order mapping with MIN trans not supported'
                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                CALL oasis_flush(nulprt)
-                call oasis_abort_noarg()      
+                call oasis_abort()      
              endif
              do n = 1,nsav
                 if (prism_coupler(cplid)%avcnt(nfav) == 0) then
@@ -821,8 +804,7 @@ contains
           else
              write(nulprt,*) subname,' ERROR: trans not known ',prism_coupler(cplid)%trans
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
           call oasis_timer_stop(tstring)
 
@@ -881,8 +863,7 @@ contains
              write(nulprt,*) subname,' ERROR: model did not advance in time correctly',&
                              msec,prism_coupler(cplid)%ltime
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             call oasis_abort()
           endif
 
           !------------------------------------------------
@@ -1391,7 +1372,7 @@ contains
     integer(kind=ip_i4_p),parameter :: avsmax = prism_coupler_avsmax
     logical               :: locavon(avsmax)   ! local avon
     integer(kind=ip_i4_p) :: avonsize, nterm
-    character(len=*),parameter :: subname = 'oasis_advance_map'
+    character(len=*),parameter :: subname = '(oasis_advance_map)'
 
     call oasis_debug_enter(subname)
 
@@ -1416,8 +1397,7 @@ contains
        if (present(av2) .or. present(av3) .or. present(av4) .or. present(av5)) then
           WRITE(nulprt,*) subname,' ERROR av2-5 passed but avon not passed'
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -1426,8 +1406,7 @@ contains
        if (locavon(n) .and. n > mapper%nwgts) then
           WRITE(nulprt,*) subname,' ERROR in nwgts and coupling terms',mapper%nwgts,n
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     enddo
 
@@ -1436,8 +1415,7 @@ contains
        if (mct_avect_nRattr(av1) /= mct_avect_nRattr(avd)) then
           WRITE(nulprt,*) subname,' ERROR in av1 num of flds'
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
        call mct_sMat_avMult(av1, mapper%sMatP(1), avd)
     endif
@@ -1450,8 +1428,7 @@ contains
           if (mct_avect_nRattr(av2) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,' ERROR in av2 num of flds'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+             CALL oasis_abort()
           endif
           call mct_sMat_avMult(av2, mapper%sMatP(2), avdtmp)
           avd%rAttr = avd%rAttr + avdtmp%rAttr
@@ -1461,8 +1438,7 @@ contains
           if (mct_avect_nRattr(av3) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,' ERROR in av3 num of flds'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+             CALL oasis_abort()
           endif
           call mct_sMat_avMult(av3, mapper%sMatP(3), avdtmp)
           avd%rAttr = avd%rAttr + avdtmp%rAttr
@@ -1472,8 +1448,7 @@ contains
           if (mct_avect_nRattr(av4) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,' ERROR in av4 num of flds'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+             CALL oasis_abort()
           endif
           call mct_sMat_avMult(av4, mapper%sMatP(4), avdtmp)
           avd%rAttr = avd%rAttr + avdtmp%rAttr
@@ -1483,8 +1458,7 @@ contains
           if (mct_avect_nRattr(av5) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,' ERROR in av5 num of flds'
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+             CALL oasis_abort()
           endif
           call mct_sMat_avMult(av5, mapper%sMatP(5), avdtmp)
           avd%rAttr = avd%rAttr + avdtmp%rAttr
@@ -1601,8 +1575,7 @@ contains
               WRITE(nulprt,*) subname,' ERROR: conserve global wts_sumd/sums zero'
               WRITE(nulprt,*) subname,' abort by model :',compid,&
                               ' proc :',mpi_rank_local
-              CALL oasis_flush(nulprt)
-              CALL oasis_abort_noarg()
+              CALL oasis_abort()
           endif
           do m = 1,fsize
              zlagr = (av_sumd(m) - av_sums(m)) / wts_sumd
@@ -1616,8 +1589,7 @@ contains
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
                  WRITE(nulprt,*) subname,' abort by model :',compid,&
                                  ' proc :',mpi_rank_local
-                 CALL oasis_flush(nulprt)
-                 CALL oasis_abort_noarg()
+                 CALL oasis_abort()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = av_sums(m) / av_sumd(m)
                 do n = 1,lsized
@@ -1630,8 +1602,7 @@ contains
               WRITE(nulprt,*) subname,' ERROR: conserve wts_sumd/sums zero'
               WRITE(nulprt,*) subname,' abort by model :',compid,&
                               ' proc :',mpi_rank_local
-              CALL oasis_flush(nulprt)
-              CALL oasis_abort_noarg()
+              CALL oasis_abort()
           endif
           do m = 1,fsize
              zlagr = (av_sumd(m) - (av_sums(m)*(wts_sumd/wts_sums))) / wts_sumd
@@ -1645,8 +1616,7 @@ contains
                  WRITE(nulprt,*) subname,' ERROR: conserve cglbpos av_sumd/sums'
                  WRITE(nulprt,*) subname,' abort by model :',compid,&
                                  ' proc :',mpi_rank_local
-                 CALL oasis_flush(nulprt)
-                 CALL oasis_abort_noarg()
+                 CALL oasis_abort()
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = (av_sums(m)/av_sumd(m)) * (wts_sumd/wts_sums)
                 do n = 1,lsized
@@ -1657,8 +1627,7 @@ contains
        else
            WRITE(nulprt,*) subname,' ERROR: conserv option'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           CALL oasis_abort_noarg()
+           CALL oasis_abort()
        endif
 
        if (OASIS_debug >= 20) then
@@ -1699,7 +1668,7 @@ contains
     real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
     type(mct_aVect)       :: av1, av1g    ! use av1,av1g for gather and bfb sum
     logical               :: lconsbfb     ! local conserve bfb
-    character(len=*),parameter :: subname = 'oasis_advance_avsum'
+    character(len=*),parameter :: subname = '(oasis_advance_avsum)'
 
     call oasis_debug_enter(subname)
 
@@ -1719,16 +1688,14 @@ contains
     if (size(sum) /= fsize) then
         WRITE(nulprt,*) subname,' ERROR: size sum ne size av'
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+        CALL oasis_abort()
     endif
 
     if (present(mask)) then
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size mask ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           CALL oasis_abort_noarg()
+           CALL oasis_abort()
        endif
        do n = 1,lsize
           if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
@@ -1739,8 +1706,7 @@ contains
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size wts ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           CALL oasis_abort_noarg()
+           CALL oasis_abort()
        endif
        do n = 1,lsize
           lwts(n) = lwts(n) * wts(n)
@@ -1809,7 +1775,7 @@ contains
     real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
     type(mct_string) :: mstring     ! mct char type
     character(len=64):: itemc       ! string converted to char
-    character(len=*),parameter :: subname = 'oasis_advance_avdiag'
+    character(len=*),parameter :: subname = '(oasis_advance_avdiag)'
 
     call oasis_debug_enter(subname)
 
@@ -1831,8 +1797,7 @@ contains
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size mask ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           CALL oasis_abort_noarg()
+           CALL oasis_abort()
        endif
        do n = 1,lsize
           if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
@@ -1843,8 +1808,7 @@ contains
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,' ERROR: size wts ne size av'
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           CALL oasis_abort_noarg()
+           CALL oasis_abort()
        endif
        do n = 1,lsize
           lwts(n) = lwts(n) * wts(n)

@@ -29,7 +29,7 @@
      INTEGER(kind=ip_i4_p),optional :: kinfo
 !    ---------------------------------------------------------------
      INTEGER(kind=ip_i4_p) :: n
-     character(len=*),parameter :: subname = 'oasis_def_var'
+     character(len=*),parameter :: subname = '(oasis_def_var)'
      LOGICAL    :: l_field_in_namcouple
 !    ---------------------------------------------------------------
 
@@ -45,6 +45,9 @@
 
      if (.not. l_field_in_namcouple) then
         id_nports = OASIS_Var_Uncpl
+        if (OASIS_debug >= 2) then
+           write(nulprt,*) subname,' variable not in namcouple return ',trim(cdport)
+        endif
         call oasis_debug_exit(subname)
         return
      endif
@@ -54,8 +57,7 @@
         if (trim(cdport) == trim(prism_var(n)%name)) then
            write(nulprt,*) subname,' variable already defined with var_def ',trim(cdport)
            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-           CALL oasis_flush(nulprt)
-           call oasis_abort_noarg()
+           call oasis_abort()
         endif
      enddo
 
@@ -66,8 +68,7 @@
      if (prism_nvar > mvar) then
         write(nulprt,*) subname,' ERROR prism_nvar too large ',prism_nvar,mvar
         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        call oasis_abort_noarg()
+        call oasis_abort()
      endif
 
      prism_var(prism_nvar)%name = trim(cdport)

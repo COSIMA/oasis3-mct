@@ -92,7 +92,7 @@ module mod_oasis_timer
          integer          , intent (in)   :: nt
 
          integer :: ierror,n
-         character(len=*),parameter :: subname = 'oasis_timer_init'
+         character(len=*),parameter :: subname = '(oasis_timer_init)'
 
          app_name  = trim (app)
          file_name = trim (file)
@@ -147,7 +147,7 @@ module mod_oasis_timer
          integer :: ierr
          integer :: timer_id
          real :: cpu_time_arg
-         character(len=*),parameter :: subname = 'oasis_timer_start'
+         character(len=*),parameter :: subname = '(oasis_timer_start)'
 
          IF (TIMER_Debug >=1) THEN
          call oasis_timer_c2i(timer_label,timer_id)
@@ -159,8 +159,7 @@ module mod_oasis_timer
                 WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
                 WRITE(nulprt,*) subname,' WARNING timer number exceeded' 
                 WRITE(nulprt,*) subname,' Increase mtimer in mod_oasis_method'
-                CALL oasis_flush(nulprt)
-                CALL oasis_abort_noarg()
+                CALL oasis_abort()
             ENDIF
          endif
 
@@ -186,7 +185,7 @@ module mod_oasis_timer
          character(len=*), intent (in) :: timer_label
          real :: cpu_time_arg
          integer :: timer_id
-         character(len=*),parameter :: subname = 'oasis_timer_stop'
+         character(len=*),parameter :: subname = '(oasis_timer_stop)'
 
          IF (TIMER_Debug >=1) THEN
          call oasis_timer_c2i(timer_label,timer_id)
@@ -253,7 +252,7 @@ module mod_oasis_timer
          integer            :: pe1,pe2
          integer            :: minpe,maxpe,mcnt
          double precision   :: mintime,maxtime,meantime
-         character(len=*),parameter :: subname = 'oasis_timer_print'
+         character(len=*),parameter :: subname = '(oasis_timer_print)'
 
          IF (TIMER_Debug < 1) then
             return
