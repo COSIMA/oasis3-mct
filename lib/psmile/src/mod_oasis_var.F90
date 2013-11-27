@@ -47,6 +47,7 @@
         id_nports = OASIS_Var_Uncpl
         if (OASIS_debug >= 2) then
            write(nulprt,*) subname,' variable not in namcouple return ',trim(cdport)
+           call oasis_flush(nulprt)
         endif
         call oasis_debug_exit(subname)
         return
