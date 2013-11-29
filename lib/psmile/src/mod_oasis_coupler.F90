@@ -918,7 +918,7 @@ CONTAINS
            endif
            prism_mapper(mapID)%optval = trim(cstring)
 
-           call oasis_timer_start('cpl_smatrd')
+!           call oasis_timer_start('cpl_smatrd')
            !-------------------------------
            ! smatreaddnc allocates sMati to nwgts
            ! then instantiate an sMatP for each set of wgts
@@ -935,7 +935,7 @@ CONTAINS
               call mct_sMat_Clean(sMati(n))
            enddo
            deallocate(sMati)
-           call oasis_timer_stop('cpl_smatrd')
+!           call oasis_timer_stop('cpl_smatrd')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
