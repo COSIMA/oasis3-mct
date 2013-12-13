@@ -1,3 +1,5 @@
+#define NEW_LGI_METHOD2a
+!!#define NEW_LGI_METHOD2b
 !===============================================================================
 !BOP ===========================================================================
 !
@@ -21,6 +23,7 @@ module mod_oasis_string
    use mod_oasis_parameters
    use mod_oasis_data
    use mod_oasis_sys
+   use mod_oasis_timer
 
    implicit none
    private
@@ -1302,6 +1305,7 @@ integer function oasis_string_listGetIndexF(string,fldStr)
 
 end function oasis_string_listGetIndexF
 
+#if (defined NEW_LGI_METHOD2a || defined NEW_LGI_METHOD2b)
 !===============================================================================
 !BOP ===========================================================================
 !
@@ -1330,13 +1334,10 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
 !EOP
 
    !----- local -----
-   integer(ip_i4_p)   :: n                ! index for colon position
-   integer(ip_i4_p)   :: k                ! index for field name position
-   integer(ip_i4_p)   :: nFields          ! number of fields in a string
-   integer(ip_i4_p)   :: i0,i1            ! fldStr == string(i0,i1) ??
-   integer(ip_i4_p)   :: j0,j1            ! fldStr == string(j0,j1) ??
-   logical                :: found            ! T => field found in fieldNames
-   logical                :: lprint           ! local print flag
+   integer(ip_i4_p)   :: n,n1,n2          ! index for colon position
+   integer(ip_i4_p)   :: lens             ! length of string
+   logical            :: found            ! T => field found in fieldNames
+   logical            :: lprint           ! local print flag
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listGetIndex) "
@@ -1346,8 +1347,13 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
 !-------------------------------------------------------------------------------
 
    call oasis_debug_enter(subname)
+!   call oasis_timer_start('tcx_slgi0')
 
+!   call oasis_timer_start('tcx_slgia')
    if (present(rc)) rc = 0
+
+   kfld   = 0
+   found  = .false.
 
    lprint = .false.
    if (present(print)) lprint = print
@@ -1362,62 +1368,95 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
        CALL oasis_string_abort(subName//"invalid field name")
    end if
 
-   !--- search for field name in string's list of fields ---
-   found   = .false.
-   kFld    = 0
-   i0      =  1  ! ?? fldStr == string(i0:i1) ??
-   i1      = -1
-   j0      = -1  ! ?? fldStr == string(j0:j1) ??
-   j1      =  len_trim(string)
-   nFields = oasis_string_listGetNum(string)
-   do k = 1,nFields
-      !--------------------------------------------------------
-      ! search from end of list to end of list
-      !--------------------------------------------------------
-      !--- get end index of of field number k ---
-      n = index(string(i0:len_trim(string)),listDel)
-      if (n > 0) then   
-         i1 = i0 + n - 2       ! *not*  the  last field name in fieldNames
-      else               
-         i1 = len_trim(string) ! this is the last field name in fieldNames
-      endif
-      !--- sanity check ---
-   !  if ((k <nFields .and. n<1) .or. (k==nFields .and. n>0)) then
-   !     call oasis_string_abort(subName//"ERROR: wrong string%nf ?")
-   !  end if
-      !--- is it a match? ---
-      if (trim(fldStr) == string(i0:i1)) then
+!   call oasis_timer_stop('tcx_slgia')
+!   call oasis_timer_start('tcx_slgib')
+
+   lens = len_trim(string)
+
+!   write(nulprt,*) subname,' tcx1 ',string
+!   write(nulprt,*) subname,' tcx2 ',fldStr
+
+   n = index(string,listDel,back=.false.)
+!   write(nulprt,*) subname,' tcx3 ',n
+!   call oasis_timer_start('tcx_slgib')
+!   call oasis_timer_start('tcx_slgic')
+   if (n <= 0) then  ! single field only
+!      call oasis_timer_start('tcx_slgic1')
+      if (trim(fldStr) == string(1:lens)) then
          found = .true.
-         kFld = k
-         exit
+         kFld = 1
       endif
-      i0 = i1 + 2 ! start index for next iteration
-      !--------------------------------------------------------
-      ! search from end of list to start of list
-      !--------------------------------------------------------
-      !--- get start index of field number (nFields + 1 - k ) ---
-      n = index(string(1:j1),listDel,back=.true.)
-      j0 = n + 1 ! n==0 => the first field name in fieldNames
-      !--- sanity check ---
-   !  if ((k <nFields .and. n<1) .or. (k==nFields .and. n>0)) then
-   !     call oasis_string_abort(subName//"ERROR: wrong string%nf ?")
-   !  end if
-      !--- is it a match? ---
-      if (trim(fldStr) == string(j0:j1)) then
+!      call oasis_timer_stop('tcx_slgic1')
+!      write(nulprt,*) subname,' tcx4a ',found,kfld
+   elseif (n > 0) then
+      !--- check first string ---
+!      call oasis_timer_start('tcx_slgic2')
+      if (trim(fldStr) == string(1:n-1)) then
          found = .true.
-         kFld = nFields + 1 - k
-         exit
+         kFld = 1
+      endif          
+!      write(nulprt,*) subname,' tcx4b ',found,kfld
+!      call oasis_timer_stop('tcx_slgic2')
+      !--- check last string ---
+      if (.not.found) then
+!         call oasis_timer_start('tcx_slgic3')
+         n = index(string,listDel,back=.true.)
+         if (trim(fldStr) == string(n+1:lens)) then
+            found = .true.
+            kFld = oasis_string_listGetNum(string)
+         endif
+!         call oasis_timer_stop('tcx_slgic3')
+!         write(nulprt,*) subname,' tcx4c ',found,kfld
       endif
-      j1 = j0 - 2 ! end index for next iteration
-      !--------------------------------------------------------
-      ! exit if all field names have been checked
-      !--------------------------------------------------------
-      if (2*k >= nFields) exit
-   end do
+      !--- check other strings ---
+      if (.not.found) then
+!         call oasis_timer_start('tcx_slgic4')
+         n = index(string,':'//trim(fldStr)//':',back=.false.)
+!         write(nulprt,*) subname,' tcx5a ',n
+         if (n > 0) then
+            found = .true.
+#if defined NEW_LGI_METHOD2a
+            if (n <= lens) then
+#endif
+#if defined NEW_LGI_METHOD2b
+            if (n <= lens/2) then
+#endif
+!               call oasis_timer_start('tcx_slgic4a')
+               n1 = 0
+               kFld = 1
+               do while (n1 < n) 
+                  kFld = kFld + 1
+                  n2 = index(string(n1+1:lens),listDel,back=.false.)
+                  n1 = n1 + n2
+!                  write(nulprt,*) subname,' tcx5b ',kfld,n2,n1,n
+               enddo
+!               call oasis_timer_stop('tcx_slgic4a')
+            else
+!               call oasis_timer_start('tcx_slgic4b')
+               n1 = lens+1
+               kFld = oasis_string_listGetNum(string) + 1
+!               call oasis_timer_stop('tcx_slgic4b')
+!               call oasis_timer_start('tcx_slgic4c')
+               do while (n1 > n) 
+                  kFld = kFld - 1
+                  n2 = index(string(1:n1-1),listDel,back=.true.)
+                  n1 = n2
+!                  write(nulprt,*) subname,' tcx5c ',kfld,n2,n1,n
+               enddo
+!               call oasis_timer_stop('tcx_slgic4c')
+            endif
+         endif
+!         write(nulprt,*) subname,' tcx4d ',found,kfld
+!         call oasis_timer_stop('tcx_slgic4')
+      endif
+   endif
+
+!   call oasis_timer_stop('tcx_slgic')
+
+!   call oasis_timer_start('tcx_slgid')
 
    !--- not finding a field is not a fatal error ---
    if (.not. found) then
-      kFld = 0
       IF (lprint) THEN
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
           WRITE(nulprt,F00) "FYI: field ",TRIM(fldStr)," not found in list ",TRIM(string)
@@ -1426,10 +1465,12 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
       if (present(rc)) rc = 1
    end if
 
+!   call oasis_timer_stop('tcx_slgid')
+!   call oasis_timer_stop('tcx_slgi0')
    call oasis_debug_exit(subname)
 
 end subroutine oasis_string_listGetIndex
-
+#endif
 !===============================================================================
 !BOP ===========================================================================
 !
@@ -1678,6 +1719,7 @@ subroutine oasis_string_abort(string)
    if (doabort) then
       WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      call oasis_flush(nulprt)
       call oasis_abort()
    else
       write(nulprt,F00) ' no abort:'//trim(lstring)
