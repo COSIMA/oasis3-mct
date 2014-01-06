@@ -43,10 +43,12 @@ CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
 #F90FLAGS_1  = -g -check all -CB -traceback -vec-report0 -O0 -fno-alias -ip -align -msse3
+#F90FLAGS_1  = -vec-report0 -O0 -g -traceback -fp-model source -dno-alias -align
 F90FLAGS_1  = -vec-report0 -O0 -fno-alias -ip -align -msse3
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
+#CCFLAGS_1   = -vec-report0 -O0 -g -traceback -fno-alias -align -fp-model precise
 CCFLAGS_1   = -vec-report0 -O0 -fno-alias -ip -align -msse3
 LDFLAGS     = 
 #
