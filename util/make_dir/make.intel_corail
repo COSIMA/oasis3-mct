@@ -16,7 +16,7 @@ COUPLE          = $(HOME)/oasis3-mct
 ARCHDIR         = $(COUPLE)/CORAIL
 #
 # MPI library
-MPIDIR      = /opt/intel/impi/4.1.2.040/intel64 
+MPIDIR      = /opt/intel/impi/4.1.2.040/intel64
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib
