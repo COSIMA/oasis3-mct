@@ -151,7 +151,7 @@ CONTAINS
   character(len=ic_lvar):: myfld
   integer(kind=ip_i4_p) :: myfldi
   character(len=ic_lvar):: otfld
-  integer(kind=ip_i4_p) :: otfldi
+  character(len=ic_lvar):: otfldmatch
   integer(kind=ip_i4_p) :: nx,ny
   character(len=ic_lvar):: gridname
   character(len=ic_long):: tmp_mapfile
@@ -438,6 +438,18 @@ CONTAINS
            endif
 
            !--------------------------------
+           ! determine matching field name
+           !--------------------------------
+
+           otfldmatch = 'NOmatchNOyesNO_zyxbca_ZYXBCA'
+           if (flag == OASIS_Out) &
+              call oasis_string_listGetName(namdstfld(nn),myfldi,otfldmatch)
+           if (flag == OASIS_In) &
+              call oasis_string_listGetName(namsrcfld(nn),myfldi,otfldmatch)
+           if (OASIS_debug >= 2) write(nulprt,*) subname,' otfldmatch ',&
+                                        nns,nv1,trim(otfldmatch)
+
+           !--------------------------------
            ! look for namcouple coupling variable in all other model variables
            !--------------------------------
 
@@ -452,34 +464,19 @@ CONTAINS
               ENDIF
 
               otfld  = trim(allvar(nv,nm))
-              otfldi = -1
 
               !--------------------------------
-              ! check if other variable is in this namcouple
+              ! matches if the var field and nam field are the same
               !--------------------------------
 
-              if (flag == OASIS_Out) &
-                 otfldi = oasis_string_listGetIndexF(namdstfld(nn),otfld)
-              if (flag == OASIS_In) &
-                 otfldi = oasis_string_listGetIndexF(namsrcfld(nn),otfld)
-
-              IF (OASIS_debug >= 20) THEN
-                  WRITE(nulprt,*) subname,' check other fld ',trim(otfld),otfldi
-                  CALL oasis_flush(nulprt)
-              ENDIF
-
-              !--------------------------------
-              ! matches if they are in the same position in namcouple fld list
-              !--------------------------------
-
-              if (otfldi == myfldi) then
+              if (trim(otfldmatch) == trim(otfld)) then
 
                  if (OASIS_debug >= 2) write(nulprt,*) subname,' check fld ',&
-                                                       nns,nv1,nm,nv,otfldi
+                                                       nns,nv1,nm,nv,trim(otfld)
 
                  if (OASIS_debug >= 5) then
-                    write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: otfld',nn,nm,&
-                                                   nv,otfldi,' ',trim(otfld)
+                    write(nulprt,'(1x,2a,3i6,2a)') subname,' ca: otfld',nn,nm,&
+                                                   nv,' ',trim(otfld)
                     call oasis_flush(nulprt)
                  endif
 
@@ -918,12 +915,12 @@ CONTAINS
            endif
            prism_mapper(mapID)%optval = trim(cstring)
 
-!           call oasis_timer_start('cpl_smatrd')
            !-------------------------------
            ! smatreaddnc allocates sMati to nwgts
            ! then instantiate an sMatP for each set of wgts
            ! to support higher order mapping
            !-------------------------------
+           ! call oasis_timer_start('cpl_smatrd')
            call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
               trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local, &
               nwgts)
@@ -935,7 +932,7 @@ CONTAINS
               call mct_sMat_Clean(sMati(n))
            enddo
            deallocate(sMati)
-!           call oasis_timer_stop('cpl_smatrd')
+           ! call oasis_timer_stop('cpl_smatrd')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.

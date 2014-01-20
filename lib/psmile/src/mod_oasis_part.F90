@@ -57,7 +57,8 @@ CONTAINS
    INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo
    INTEGER(kind=ip_intwp_p), optional    ,intent(in)  :: ig_size
 !  ----------------------------------------------------------------
-   integer(kind=ip_intwp_p) :: n,k,nsegs
+   integer(kind=ip_intwp_p) :: n,k,nsegs,numel
+   INTEGER(kind=ip_intwp_p) :: len 
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
    character(len=*),parameter :: subname = '(oasis_def_partition)'
 !  ----------------------------------------------------------------
@@ -91,11 +92,15 @@ CONTAINS
       allocate(start(nsegs),length(nsegs))
       start (1) = 1
       length(1) = kparal(CLIM_Length)
+      numel = nsegs
+      if (length(1) == 0) numel = 0
    elseif (kparal(CLIM_Strategy) == CLIM_Apple) then
       nsegs = 1
       allocate(start(nsegs),length(nsegs))
       start (1) = kparal(CLIM_Offset) + 1
       length(1) = kparal(CLIM_Length)
+      numel = nsegs
+      if (length(1) == 0) numel = 0
    elseif (kparal(CLIM_Strategy) == CLIM_Box) then
       nsegs = kparal(CLIM_SizeY)
       allocate(start(nsegs),length(nsegs))
@@ -103,13 +108,20 @@ CONTAINS
          start (n) = kparal(CLIM_Offset) + (n-1)*kparal(CLIM_LdX) + 1
          length(n) = kparal(CLIM_SizeX)
       enddo
+      numel = nsegs
+      if (kparal(CLIM_SizeY)*kparal(CLIM_SizeX) == 0) numel = 0
    elseif (kparal(CLIM_Strategy) == CLIM_Orange) then
       nsegs = kparal(CLIM_Segments)
       allocate(start(nsegs),length(nsegs))
-      do n = 1,nsegs
-         start(n)  = kparal((n-1)*2 + 3) + 1
-         length(n) = kparal((n-1)*2 + 4)
-      enddo
+      numel = 0
+      DO n = 1,nsegs
+        len = kparal((n-1)*2 + 4)
+        IF (len > 0) THEN
+            numel = numel + 1
+            start(numel)  = kparal((n-1)*2 + 3) + 1
+            length(numel) = len
+        ENDIF
+      ENDDO 
    elseif (kparal(CLIM_Strategy) == CLIM_Points) then
       nsegs = kparal(CLIM_Segments)
       allocate(start(nsegs),length(nsegs))
@@ -130,6 +142,7 @@ CONTAINS
             length(nsegs) = 1
          endif
       enddo
+      numel = nsegs
    else
       write(nulprt,*) subname,' ERROR part strategy unknown ',kparal(CLIM_Strategy)
       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
@@ -139,10 +152,10 @@ CONTAINS
    if (mpi_comm_local /= MPI_COMM_NULL) then
       if (present(ig_size)) then
          call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
-                             mpi_comm_local,compid,numel=nsegs,gsize=ig_size)
+                             mpi_comm_local,compid,numel=numel,gsize=ig_size)
       else
          call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,mpi_root_local,&
-                             mpi_comm_local,compid,numel=nsegs)
+                             mpi_comm_local,compid,numel=numel)
       endif
       prism_part(prism_npart)%gsize = mct_gsmap_gsize(prism_part(prism_npart)%gsmap)
    else
