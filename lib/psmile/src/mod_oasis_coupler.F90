@@ -1065,6 +1065,17 @@ CONTAINS
      CALL oasis_flush(nulprt)
   endif
 
+  IF (LUCIA_debug > 0) THEN
+      DO nc = 1, prism_ncoupler
+        IF (prism_coupler(nc)%getput == OASIS3_PUT) &
+           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: SN ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
+        IF (prism_coupler(nc)%getput == OASIS3_GET) &                       
+           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: RC ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
+      ENDDO
+  ENDIF
+
+
+
   call oasis_timer_stop('cpl_setup')
 
   call oasis_debug_exit(subname)

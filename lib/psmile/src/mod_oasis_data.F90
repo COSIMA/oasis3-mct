@@ -18,9 +18,10 @@ MODULE mod_oasis_data
   character(len=ic_lvar):: compnm
   logical               :: enddef_called   ! true when enddef is called, for error checking
 
-  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1
+  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1, nullucia
   INTEGER(kind=ip_i4_p)	    :: OASIS_debug
   INTEGER(kind=ip_i4_p)     :: TIMER_debug
+  INTEGER(kind=ip_i4_p)     :: LUCIA_debug
 
 ! Variables 
 
@@ -77,8 +78,10 @@ CONTAINS
 
   nulprt = 6
   nulprt1 = 6
+  nullucia = 6
   OASIS_debug = 0
   TIMER_debug = 0
+  LUCIA_debug = 0
   compid = -1
   compnm = trim(cspval)
   mpi_comm_global = -1

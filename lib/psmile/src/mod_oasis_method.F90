@@ -121,6 +121,9 @@ CONTAINS
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
 
+   ! If TIMER_debug < 0 activate LUCIA load balancing analysis
+   LUCIA_debug = ABS(MIN(namtlogprt,0))
+
    ! If NFIELDS=0 there is no coupling
    ! No information must be written in the debug files as
    ! the different structures are not allocated
@@ -278,18 +281,16 @@ CONTAINS
       ENDIF
    enddo
 
-#if defined balance
-   ! CPP key balance incompatible with OASIS_Debug < 2
-   IF ( OASIS_debug < 2 ) THEN
-      WRITE (UNIT = nulprt1,FMT = *) '        ***ABORT***'
+   ! We change debug level (verbose level disabled if load balance analysis)
+   IF ( LUCIA_debug > 0 .AND. OASIS_debug > 0 ) THEN
+      WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
       WRITE (UNIT = nulprt1,FMT = *)  &
-       ' With load balance CPP option (-Dbalance) '
+       ' With LUCIA load balance analysis '
       WRITE (UNIT = nulprt1,FMT = *)  &
-       ' you must define a minimum NLOGPRT = 2 '
+       ' we set OASIS_debug = 0 '
+      OASIS_debug = 0
       CALL oasis_flush(nulprt1)
-      CALL oasis_abort()
    ENDIF
-#endif
 
    IF (mpi_rank_global == 0) CLOSE(nulprt1)
 
@@ -329,6 +330,30 @@ CONTAINS
            WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
            CALL oasis_flush(nulprt)
        ENDIF
+
+   iu=-1
+   CALL oasis_unitget(iu)
+
+   ! If load balance analysis, new log files opened (lucia.*)
+   IF ( LUCIA_debug > 0 ) THEN
+      IF (mpi_size_local < 20 ) THEN
+         nullucia=iu
+      ! Open LUCIA log file on a subset of process only
+      ELSE IF (mpi_size_local < 100 .AND. MOD(mpi_rank_local,mpi_size_local/5) == 0 ) THEN
+         nullucia=iu
+      ELSE IF (mpi_size_local >= 100 .AND. MOD(mpi_rank_local,mpi_size_local/20) == 0 ) THEN
+         nullucia=iu
+      ELSE
+         nullucia = 0
+      ENDIF
+      ! Define log file name and open it
+      IF (nullucia /= 0) THEN
+         WRITE(filename,'(a,i2.2,a,i6.6)') 'lucia.',compid,'.',mpi_rank_local
+         OPEN(nullucia,file=filename)
+!         WRITE(nullucia,*) subname,' OPEN LUCIA load balancing analysis file, unit :',nullucia
+!         CALL oasis_flush(nullucia)
+      ENDIF
+   ENDIF
 
    call oasis_debug_enter(subname)
 
@@ -372,6 +397,19 @@ CONTAINS
       write(nulprt,*) subname,' prism models: '
       call oasis_flush(nulprt)
    endif
+
+   IF ( LUCIA_debug > 0 ) THEN
+      ! We stop all process to read clock time (almost) synchroneously
+      call oasis_mpi_barrier(mpi_comm_global)
+      IF ( nullucia /= 0 ) THEN
+         WRITE(nullucia, FMT='(A,F16.5)') 'Balance: IT                  ', MPI_Wtime()
+         WRITE(nullucia, FMT='(A12,A)'  ) 'Balance: MD ', trim(compnm)
+         call oasis_flush(nullucia)
+      ELSE
+         ! Since now, non printing process do not participate to load balance analysis
+         LUCIA_debug = 0
+      ENDIF
+   ENDIF
 
    call oasis_debug_exit(subname)
 

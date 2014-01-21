@@ -1014,12 +1014,18 @@ contains
                                    maxval(prism_coupler(cplid)%avect5%rAttr)
                 endif
                 call oasis_timer_start(tstring)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before interpo ', MPI_Wtime()
                 call mct_avect_zero(prism_coupler(cplid)%avect1m)
                 call oasis_advance_map(prism_coupler(cplid)%avect1, &
                      prism_coupler(cplid)%avect1m,prism_mapper(mapid),conserv,consbfb, &
                      prism_coupler(cplid)%aVon  ,prism_coupler(cplid)%avect2, &
                      prism_coupler(cplid)%avect3,prism_coupler(cplid)%avect4, &
                      prism_coupler(cplid)%avect5)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  interpo ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
                 write(tstring,F01) 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
@@ -1029,16 +1035,14 @@ contains
                                    maxval(prism_coupler(cplid)%avect1m%rAttr)
                 endif
                 call oasis_timer_start(tstring)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI put ', MPI_Wtime()
                 call mct_waitsend(prism_router(rouid)%router)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' Before MPI put ', MPI_Wtime()
-#endif
                 call mct_isend(prism_coupler(cplid)%avect1m,prism_router(rouid)%router,tag)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' After MPI put ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  MPI put ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
             ELSE
                 write(tstring,F01) 'psnd_',cplid
@@ -1049,16 +1053,14 @@ contains
                                    maxval(prism_coupler(cplid)%avect1%rAttr)
                 endif
                 call oasis_timer_start(tstring)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI get ', MPI_Wtime()
                 call mct_waitsend(prism_router(rouid)%router)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' Before MPI put ', MPI_Wtime()
-#endif
                 call mct_isend(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' After MPI put ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  MPI put ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
              endif
           elseif (getput == OASIS3_GET) then
@@ -1073,15 +1075,13 @@ contains
                 write(tstring,F01) 'grcv_',cplid
                 call oasis_timer_start(tstring)
                 call mct_avect_zero(prism_coupler(cplid)%avect1m)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' Before MPI get ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI get ', MPI_Wtime()
                 call mct_recv(prism_coupler(cplid)%avect1m,prism_router(rouid)%router,tag)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' After MPI get ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  MPI get ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,&
@@ -1091,9 +1091,15 @@ contains
                 call oasis_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
                 call oasis_timer_start(tstring)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before interpo ', MPI_Wtime()
                 call mct_avect_zero(prism_coupler(cplid)%avect1)
                 call oasis_advance_map(prism_coupler(cplid)%avect1m, &
                      prism_coupler(cplid)%avect1,prism_mapper(mapid),conserv,consbfb)
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  interpo ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG get af map = ',cplid,&
@@ -1104,15 +1110,13 @@ contains
                 write(tstring,F01) 'grcv_',cplid
                 call oasis_debug_note(subname//' get recv')
                 call oasis_timer_start(tstring)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' Before MPI get ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI get ', MPI_Wtime()
                 call mct_recv(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
-#if defined balance
-                WRITE(nulprt, FMT='(A,I2.2,A,F16.5)') &
-                              'Balance: ',cplid,' After MPI get ', MPI_Wtime()
-#endif
+                if (LUCIA_debug > 0) &
+                   WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
+                              'Balance: ',prism_coupler(cplid)%namID,' After  MPI get ', MPI_Wtime()
                 call oasis_timer_stop(tstring)
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,'  DEBUG get af recv = ',cplid,&
