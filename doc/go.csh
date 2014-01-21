@@ -1,4 +1,4 @@
 #!/bin/csh 
 
-pdflatex oasis3doc.tex
-pdflatex oasis3doc.tex
+pdflatex oasis3mct_UserGuide.tex
+pdflatex oasis3mct_UserGuide.tex

@@ -377,8 +377,8 @@ below).
   \item {\tt ig\_paral [INTEGER, DIMENSION(:), IN]}: vector of
     integers describing the local partition in the global index space;
     has a different expression depending on the type of the partition;
-    in OASIS3-MCT, 4 types of partition are supported: Serial (no
-    partition), Apple, Box, and Orange (see below).
+    in OASIS3-MCT, 5 types of partition are supported: Serial (no
+    partition), Apple, Box, Orange, and Points (see below).
   \item {\tt ierror [INTEGER; OUT]}: returned error code.
   \item {\tt isize [INTEGER, OPTIONAL, IN]}: Optional argument needed
     if the coupling data is exchanged for only a subdomain of the
@@ -481,6 +481,27 @@ illustrated.
     the index start at 0 in the upper left corner.}
   \label{orange_partition}
 \end{figure}
+
+\subsection{Points partition}
+
+This partition is a list of global indices associated with each
+processor.  The index naming
+is arbitrary but must be consistent between all processors involved
+in the partition description.  In
+this case, we have {\tt ig\_paral(1:N)} where {\tt N = 2 + 2*number of
+  points}
+% \footnote{As for the Box partition, the maximum number of segments
+%   is presently 338; it can be increased by modifying the value of
+%   {\tt Clim\_MaxSegments}}.
+
+\begin{itemize}
+\item {\tt ig\_paral(1)} = 4 (indicates a Points partition)
+\item {\tt ig\_paral(2)} = currently not used
+\item {\tt ig\_paral(3)} = the first global index
+\item {\tt ig\_paral(4)} = the second global index
+\item ...
+\item {\tt ig\_paral(N)} = the last global index
+\end{itemize}
 
 % {Partition definition}
 
