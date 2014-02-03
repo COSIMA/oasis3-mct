@@ -1055,7 +1055,7 @@ contains
                 call oasis_timer_start(tstring)
                 if (LUCIA_debug > 0) &
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
-                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI get ', MPI_Wtime()
+                              'Balance: ',prism_coupler(cplid)%namID,' Before MPI put ', MPI_Wtime()
                 call mct_waitsend(prism_router(rouid)%router)
                 call mct_isend(prism_coupler(cplid)%avect1,prism_router(rouid)%router,tag)
                 if (LUCIA_debug > 0) &
