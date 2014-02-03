@@ -1,0 +1,17 @@
+===========================================================
+This tool was developped by Eric Maisonnave (Cerfacs) 
+to perform an analysis of the coupled components load balance
+===========================================================
+In /oasis3-mct/util/lucia, compile main-lucia.F90 : 
+* first add your compiler by modifying "F90=my_compiler" 
+in lucia
+* compile using the command : lucia -c
+* creation of the executable lucia.exe
+
+In your results directory, post-treat of files lucia.MM.PPPPP :
+* /oasis3-mct/util/lucia/lucia : this command will post-treat
+all the lucia.MM.PPPPP located in the directory using lucia.exe
+
+
+For more details, see the document XXX
+ 
