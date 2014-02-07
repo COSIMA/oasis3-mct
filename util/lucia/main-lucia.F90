@@ -89,6 +89,7 @@ end type FIELD_SEQUENCE
     real*8 :: r_min_time, r_max_time   ! time boundaries
     real*8 :: r_reference = -1.E8      ! reference time
     real*8 :: r_mean                   ! tmp buffer
+    real*8 :: temp_t                   ! tmp buffer
 
     real*8, dimension(:), allocatable ::  calc_time, noncalc_time   ! calculation and non calculation time per model
 
@@ -774,10 +775,10 @@ end type FIELD_SEQUENCE
 !   WRITE INFO ON STANDARD OUTPUT
 !
     WRITE(6,*) ' '
-    WRITE(6,*), ' Component -           Computation -       Waiting time (s) -  done on tstep nb '
+    WRITE(6,*), ' Component -           Computation -       Waiting time (s) -  # cpl step '
 
     DO i = 1, nb_models
-       WRITE(6,'(2X, A6, 5X, F10.2, A7, F6.2, A3, 5X, F10.2, A7, F6.2, A4, I3)'), &
+       WRITE(6,'(2X, A6, 5X, F10.2, A7, F6.2, A3, 5X, F10.2, A7, F6.2, A4, I4)'), &
                   model_name(i), &
                   calc_time(i), &
                   ' ( +/- ', calc_spread(i) , ' ) ', &
@@ -786,6 +787,7 @@ end type FIELD_SEQUENCE
                   valid_comm_nb(i)-first_valid_comm(i)+1
     END DO
     WRITE(6,*), ' '
+    call flush(6)
 !
 !   7.2 ANALYSIS ON BOUNDARY VALUES AMONG LOG FILES
 !
@@ -853,17 +855,17 @@ end type FIELD_SEQUENCE
           ! on target model
           IF ( cpl_fields(i)%target_model == k ) THEN
              ! Measure first valid time when field received (after receiving)
-             l = max_clock_measure(i,first_valid_comm(k)-1,4)
+             temp_t = max_clock_measure(i,first_valid_comm(k)-1,4)
              ! If later than reference
-             IF ( l > r_min_time .and. l < 1.E9 ) &
+             IF ( temp_t > r_min_time .and. temp_t < 1.E9 ) &
                 ! Set it as reference 
-                r_min_time = l
+                r_min_time = temp_t
              ! Measure last valid time when field received (after receiving)
-             l = max_clock_measure(i,valid_comm_nb(k),4)
+             temp_t = max_clock_measure(i,valid_comm_nb(k),4)
              ! If later than reference
-             IF ( l > r_max_time .and. l < 1.E9 ) &
+             IF ( temp_t > r_max_time .and. temp_t < 1.E9 ) &
                 ! Set it as reference 
-                r_max_time = l
+                r_max_time = temp_t
              l_put = .false.
           ENDIF
        ENDDO
@@ -875,17 +877,17 @@ end type FIELD_SEQUENCE
              ! on target model
              IF ( cpl_fields(i)%source_model == k ) THEN
                 ! Measure first valid time when field received (after receiving)
-                l = max_clock_measure(i,first_valid_comm(k)-1,2)
+                temp_t = max_clock_measure(i,first_valid_comm(k)-1,2)
                 ! If later than reference
-                IF ( l > r_min_time .and. l < 1.E9 ) &
+                IF ( temp_t > r_min_time .and. temp_t < 1.E9 ) &
                    ! Set it as reference 
-                   r_min_time = l
+                   r_min_time = temp_t
                 ! Measure last valid time when field received (after receiving)
-                l = max_clock_measure(i,valid_comm_nb(k),2)
+                temp_t = max_clock_measure(i,valid_comm_nb(k),2)
                 ! If later than reference
-                IF ( l > r_max_time .and. l < 1.E9 ) &
+                IF ( temp_t > r_max_time .and. temp_t < 1.E9 ) &
                    ! Set it as reference 
-                   r_max_time = l
+                   r_max_time = temp_t
              ENDIF
           ENDDO
        ENDIF
@@ -898,7 +900,7 @@ end type FIELD_SEQUENCE
 !
     WRITE(6,*), ' New analysis '
     WRITE(6,*) ' '
-    WRITE(6,*), ' Component -         Calculations   -     Waiting time (s) -  done on tstep nb:'
+    WRITE(6,*), ' Component -         Calculations   -     Waiting time (s) - # cpl step :'
 !
 !   WRITE INFO ON DAT FILE FOR GNUPLOT AND STANDARD OUTPUT
 !
@@ -907,7 +909,7 @@ end type FIELD_SEQUENCE
     DO i = 1, nb_models
        WRITE(10,'(I2, 2X, F10.3, 2X, F10.3, 2X, A6)'), &
                   i, calc_time(i), noncalc_time(i), model_name(i)
-       WRITE(6,'(2X, A6, 16X, F10.2, 12X, F10.2, 10X, I3)'), &
+       WRITE(6,'(2X, A6, 16X, F10.2, 12X, F10.2, 10X, I4)'), &
                     model_name(i), calc_time(i), noncalc_time(i), valid_comm_nb(i)-first_valid_comm(i)+1
     ENDDO
     CLOSE (10)
