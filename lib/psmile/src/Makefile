@@ -2,12 +2,6 @@
 SRCS1	= $(shell ls $(COUPLE)/lib/psmile/src/*.F90)
 OBJS1	= $(patsubst $(COUPLE)/lib/psmile/src/%.F90, %.o, $(SRCS1))
 
-SRCS2 =  $(shell ls $(COUPLE)/lib/psmile/src/*.f90)
-OBJS2 =  $(patsubst $(COUPLE)/lib/psmile/src/%.f90, %.o, $(SRCS2))
-
-SRCS3 	= $(shell ls $(COUPLE)/lib/psmile/src/*.F)
-OBJS3 	= $(patsubst $(COUPLE)/lib/psmile/src/%.F, %.o, $(SRCS3))
-
 VPATH 	= .:$(COUPLE)/lib/psmile/src:\
 	     $(COUPLE)/lib/psmile/include:\
 	     $(NETCDF_INCLUDE):$(MPI_INCLUDE)
@@ -19,8 +13,8 @@ clean:
 
 all:	$(LIBRARY)
 
-$(LIBRARY): $(OBJS1) $(OBJS2) $(OBJS3) 
-	$(AR) $(ARFLAGS) $(LIBRARY) $(OBJS1) $(OBJS2) $(OBJS3)
+$(LIBRARY): $(OBJS1) 
+	$(AR) $(ARFLAGS) $(LIBRARY) $(OBJS1) 
 
 INCLS = -I$(COUPLE)/lib/psmile/include \
         -I$(ARCHDIR)/build/lib/mct \
@@ -29,19 +23,10 @@ INCLS = -I$(COUPLE)/lib/psmile/include \
 
 INCLSC = -I$(COUPLE)/lib/psmile/include
 .SUFFIXES:
-.SUFFIXES: .o .f .F .f90 .F90 .c
+.SUFFIXES: .o .F90 .c
 
 %.o: %.F90
 	$(F90) $(F90FLAGS) $(INCLS)  -c   $<
-
-%.o: %.f90
-	$(f90) $(f90FLAGS) $(INCLS)  -c   $<
-
-%.o: %.F
-	$(F) $(FFLAGS) $(INCLS)  -c   $<
-
-%.o: %.f
-	$(f) $(fFLAGS) $(INCLS)  -c   $<
 
 %.o: %.c
 	$(CC) $(CCFLAGS) $(INCLSC) -c   $<
@@ -91,5 +76,4 @@ mod_prism.o: mod_oasis_kinds.o mod_oasis_part.o mod_oasis_sys.o \
 mod_oasis.o: mod_oasis_kinds.o mod_oasis_part.o mod_oasis_sys.o \
 	mod_oasis_getput_interface.o mod_oasis_parameters.o \
 	mod_oasis_grid.o mod_oasis_method.o mod_oasis_var.o
-
 
