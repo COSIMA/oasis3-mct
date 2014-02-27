@@ -67,6 +67,13 @@ end type FIELD_SEQUENCE
                                       !                2: after  send
                                       !                3: before receive
                                       !                4: after  receive
+
+    integer*4  ::  before_send = 1
+    integer*4  ::  after_send  = 2
+    integer*4  ::  before_recv = 3
+    integer*4  ::  after_recv  = 4
+    integer*4  ::  after_send_or_recv  = 2
+
     integer*4  :: max_comm_nb         ! maximum nb of coupling tstep among coupling fields
     integer*4  :: i_first_exchg(2)    ! indexes of first coupling field exchanged
 
@@ -602,15 +609,15 @@ end type FIELD_SEQUENCE
 
              IF ( l_before ) THEN
                 IF ( l_put ) THEN
-                   clk_i = 1
+                   clk_i = before_send
                 ELSE
-                   clk_i = 3
+                   clk_i = before_recv
                 ENDIF
              ELSE
                 IF ( l_put ) THEN
-                   clk_i = 2
+                   clk_i = after_send
                 ELSE
-                   clk_i = 4
+                   clk_i = after_recv
                 ENDIF
              ENDIF
 
@@ -677,22 +684,22 @@ end type FIELD_SEQUENCE
 
              ! Fill calc/noncalc array for each log file
              ! Sending time
-             IF ( clk_i == 2 ) THEN
+             IF ( clk_i == after_send ) THEN
                  calc_noncalc_measure ( log_nb, mi, 2 ) = &
                  calc_noncalc_measure ( log_nb, mi, 2 ) +  r_clock
-             ELSE IF ( clk_i == 1 ) THEN
+             ELSE IF ( clk_i == before_send ) THEN
                  calc_noncalc_measure ( log_nb, mi, 2 ) = &
                  calc_noncalc_measure ( log_nb, mi, 2 ) -  r_clock
              ! Receiving time
-             ELSE IF ( clk_i == 4 ) THEN
+             ELSE IF ( clk_i == after_recv ) THEN
                  calc_noncalc_measure ( log_nb, mi, 3 ) = &
                  calc_noncalc_measure ( log_nb, mi, 3 ) +  r_clock
-             ELSE IF ( clk_i == 3 ) THEN
+             ELSE IF ( clk_i == before_recv ) THEN
                  calc_noncalc_measure ( log_nb, mi, 3 ) = &
                  calc_noncalc_measure ( log_nb, mi, 3 ) -  r_clock
              ENDIF
              ! Calculation time
-             IF ( MOD ( clk_i , 2 ) == 1 ) THEN
+             IF ( MOD ( clk_i , after_send_or_recv ) == 1 ) THEN
                  calc_noncalc_measure ( log_nb, mi, 1 ) = &
                  calc_noncalc_measure ( log_nb, mi, 1 ) +  r_clock
              ELSE
@@ -774,20 +781,22 @@ end type FIELD_SEQUENCE
 !
 !   WRITE INFO ON STANDARD OUTPUT
 !
-    WRITE(6,*) ' '
-    WRITE(6,*), ' Component -           Computation -       Waiting time (s) -  # cpl step '
+!   Old analysis, no more active
+!
+!    WRITE(6,*) ' '
+!    WRITE(6,*), ' Component -           Computation -       Waiting time (s) -  # cpl step '
 
-    DO i = 1, nb_models
-       WRITE(6,'(2X, A6, 5X, F10.2, A7, F6.2, A3, 5X, F10.2, A7, F6.2, A4, I4)'), &
-                  model_name(i), &
-                  calc_time(i), &
-                  ' ( +/- ', calc_spread(i) , ' ) ', &
-                  noncalc_time(i), &
-                  ' ( +/- ', send_spread(i)+receive_spread(i), ' )  ', &
-                  valid_comm_nb(i)-first_valid_comm(i)+1
-    END DO
-    WRITE(6,*), ' '
-    call flush(6)
+!    DO i = 1, nb_models
+!       WRITE(6,'(2X, A6, 5X, F10.2, A7, F6.2, A3, 5X, F10.2, A7, F6.2, A4, I4)'), &
+!                  model_name(i), &
+!                  calc_time(i), &
+!                  ' ( +/- ', calc_spread(i) , ' ) ', &
+!                  noncalc_time(i), &
+!                  ' ( +/- ', send_spread(i)+receive_spread(i), ' )  ', &
+!                  valid_comm_nb(i)-first_valid_comm(i)+1
+!    END DO
+!    WRITE(6,*), ' '
+!    call flush(6)
 !
 !   7.2 ANALYSIS ON BOUNDARY VALUES AMONG LOG FILES
 !
@@ -898,7 +907,8 @@ end type FIELD_SEQUENCE
     ! End loop on models
     ENDDO
 !
-    WRITE(6,*), ' New analysis '
+    WRITE(6,*) ' '
+    WRITE(6,*), ' Load balance analysis '
     WRITE(6,*) ' '
     WRITE(6,*), ' Component -         Calculations   -     Waiting time (s) - # cpl step :'
 !

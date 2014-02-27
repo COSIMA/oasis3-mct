@@ -84,8 +84,6 @@ if [ "$compil" == "1" -o ! -f ${lucia_PATH}/lucia.exe ]; then
 #
 # You could add compiler here
 F90=my_compiler
-# for curie
-#F90=gfortran
 #
 # Find a fortran compiler 
 #
