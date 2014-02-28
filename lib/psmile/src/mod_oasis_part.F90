@@ -25,7 +25,7 @@ MODULE mod_oasis_part
       integer(kind=ip_i4_p)  :: gsize
       integer(kind=ip_i4_p)  :: nx
       integer(kind=ip_i4_p)  :: ny
-      character(len=ic_med)  :: gridname
+      character(len=ic_lvar) :: gridname
    end type prism_part_type
 
    integer(kind=ip_intwp_p),public :: prism_npart = 0

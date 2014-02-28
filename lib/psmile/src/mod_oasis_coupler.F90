@@ -70,6 +70,7 @@ MODULE mod_oasis_coupler
      character(len=ic_xl)  :: fldlist  ! field list
      integer(kind=ip_i4_p) :: nflds    ! number of fields
      integer(kind=ip_i4_p),pointer :: varid(:)    ! varid for each field
+     logical               :: valid    ! is this valid
      integer(kind=ip_i4_p) :: namID    ! namcouple ID
      integer(kind=ip_i4_p) :: partID   ! associated partition ID
      integer(kind=ip_i4_p) :: routerID ! router ID
@@ -109,8 +110,7 @@ MODULE mod_oasis_coupler
   integer(kind=ip_i4_p)           :: prism_nmapper = 0
   type(prism_mapper_type) ,public, pointer :: prism_mapper(:)
 
-  integer(kind=ip_i4_p)           :: prism_mcoupler   ! max couplers
-  integer(kind=ip_i4_p)   ,public :: prism_ncoupler = 0
+  integer(kind=ip_i4_p)   ,public :: prism_mcoupler   ! max couplers
   type(prism_coupler_type),public, pointer :: prism_coupler(:)
 
   integer(kind=ip_i4_p)   ,public :: lcouplerid    ! last coupler id
@@ -131,7 +131,7 @@ CONTAINS
 
   IMPLICIT none
 
-  integer(kind=ip_i4_p) :: n,n1,nn,nv,nm,nv1,nns,lnn,nc
+  integer(kind=ip_i4_p) :: n,n1,n2,nn,nv,nm,nv1,nns,lnn,nc,nf,nvf
   integer(kind=ip_i4_p) :: pe
   integer(kind=ip_i4_p) :: part1, part2
   integer(kind=ip_i4_p) :: spart,dpart,rpart ! src, dst, router partition id
@@ -147,11 +147,10 @@ CONTAINS
   integer(kind=ip_i4_p) :: svarid
   integer(kind=ip_i4_p),allocatable :: varidtmp(:)
   integer(kind=ip_i4_p) :: part
-  character(len=ic_lvar):: cstring
+  character(len=ic_med) :: cstring
   character(len=ic_lvar):: myfld
   integer(kind=ip_i4_p) :: myfldi
   character(len=ic_lvar):: otfld
-  character(len=ic_lvar):: otfldmatch
   integer(kind=ip_i4_p) :: nx,ny
   character(len=ic_lvar):: gridname
   character(len=ic_long):: tmp_mapfile
@@ -159,11 +158,32 @@ CONTAINS
   logical               :: found, exists
   integer(kind=ip_i4_p) :: mynvar
   integer(kind=ip_i4_p) :: nwgts
+  character(len=ic_lvar):: tmpfld
+  integer(kind=ip_i4_p) :: ifind,nfind
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
   integer(kind=ip_i4_p) ,pointer :: nallvar(:)
   character(len=ic_lvar),pointer :: allvar(:,:)
   integer(kind=ip_i4_p) ,pointer :: allops(:,:)
+  type sortnamfld_type
+     integer(kind=ip_i4_p) :: num                 ! total number of namcouple fields
+     integer(kind=ip_i4_p) ,pointer :: namnum(:)  ! namcouple number
+     integer(kind=ip_i4_p) ,pointer :: fldnum(:)  ! namcouple field number in namcouple
+     character(len=ic_lvar),pointer :: fld(:)     ! namcouple field name
+  end type sortnamfld_type
+  type(sortnamfld_type) :: sortnsrc
+  type(sortnamfld_type) :: sortndst
+  type sortvarfld_type
+     integer(kind=ip_i4_p) :: num                 ! total number of var fields
+     integer(kind=ip_i4_p) ,pointer :: modnum(:)  ! model number
+     integer(kind=ip_i4_p) ,pointer :: varnum(:)  ! var field number in model
+     character(len=ic_lvar),pointer :: fld(:)     ! variable field name
+  end type sortvarfld_type
+  type(sortvarfld_type) :: sortvars
+  type(sortvarfld_type) :: sorttest
+  integer(kind=ip_i4_p) ,pointer :: sortkey(:)
+  logical, parameter :: timers_on = .false.
+
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
 
   !----------------------------------------------------------
@@ -173,8 +193,10 @@ CONTAINS
   !----------------------------------------------------------
 
   call oasis_debug_enter(subname)
+  call oasis_mpi_barrier(mpi_comm_global)
   call oasis_timer_start('cpl_setup')
 
+  if (timers_on) call oasis_timer_start('cpl_setup_n1')
   allocate(model_root(prism_nmodels))
   model_root = -99
   do n = 1,prism_nmodels
@@ -190,7 +212,6 @@ CONTAINS
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
 
-  lnn=-1
   call oasis_debug_note(subname//' set defaults for datatypes')
 
   prism_mrouter = nnamcpl
@@ -212,11 +233,12 @@ CONTAINS
 
   prism_mcoupler = nnamcpl
   allocate(prism_coupler(prism_mcoupler))
-  prism_ncoupler = 0
   prism_coupler(:)%rstfile = ""
   prism_coupler(:)%inpfile = ""
   prism_coupler(:)%fldlist = ""
   prism_coupler(:)%nflds   = 0
+  prism_coupler(:)%namID   = 0
+  prism_coupler(:)%valid   = .false.
   do nc = 1,nnamcpl
      allocate(prism_coupler(nc)%varid(1))
      prism_coupler(nc)%varid(:) = ispval
@@ -273,6 +295,15 @@ CONTAINS
         do n1 = 1, prism_nvar
            myvar(n1) = trim(prism_var(n1)%name)
            myops(n1) = prism_var(n1)%ops
+           ! check that each var name is unique for a given model
+           do n2 = 1,n1-1
+              if (myvar(n1) == myvar(n2)) then
+                 WRITE(nulprt,*) subname,' abort by model :',compid
+                 WRITE(nulprt,*) subname,' abort variable name defined more than once:'//trim(myvar(n1))
+                 CALL oasis_flush(nulprt)
+                 call oasis_abort()
+              endif
+           enddo
         enddo
      endif
      if (OASIS_debug >= 5) then
@@ -319,6 +350,42 @@ CONTAINS
      call oasis_flush(nulprt)
   endif
 
+  ! generate sortvars sorted list
+
+  n1 = 0
+  do n = 1,prism_nmodels
+     n1 = n1 + nallvar(n)
+  enddo
+  allocate(sortvars%fld(n1))
+  allocate(sortvars%modnum(n1))
+  allocate(sortvars%varnum(n1))
+  allocate(sortkey(n1))
+  sortvars%num = n1
+
+  n1 = 0
+  do n = 1,prism_nmodels
+  do n2 = 1,nallvar(n)
+     n1 = n1 + 1
+     sortkey(n1) = n1
+     sortvars%fld(n1) = allvar(n2,n)
+     sortvars%modnum(n1) = n
+     sortvars%varnum(n1) = n2
+  enddo
+  enddo
+
+  call cplsort(sortvars%num, sortvars%fld, sortkey)
+  call cplsortkey(sortvars%num, sortvars%modnum, sortkey)
+  call cplsortkey(sortvars%num, sortvars%varnum, sortkey)
+
+  if (OASIS_debug >= 15) then
+     write(nulprt,*) subname//' Sorted array : sortvars'
+     do n1 = 1,sortvars%num
+        write(nulprt,*) subname,'sort sortvars',n1,sortkey(n1),sortvars%modnum(n1),sortvars%varnum(n1),trim(sortvars%fld(n1))
+     enddo
+  endif
+
+  deallocate(sortkey)
+
   !----------------------------------------------------------
   ! Setup couplers based on namcouple and model variable info
   ! These must be paired up consistently, create couplers in
@@ -329,7 +396,213 @@ CONTAINS
   ! nv1 = my variable counter
   !----------------------------------------------------------
 
-  prism_ncoupler = 0
+  if (timers_on) call oasis_timer_stop ('cpl_setup_n1')
+
+  !--------------------------------
+  ! preprocess namcouple strings
+  !--------------------------------
+
+  ! count namcouple field names
+
+  if (timers_on) call oasis_timer_start('cpl_setup_n2')
+  n1 = 0
+  n2 = 0
+  do nn = 1,nnamcpl
+     n1 = n1 + oasis_string_listGetNum(namsrcfld(nn))
+     n2 = n2 + oasis_string_listGetNum(namdstfld(nn))
+     if (n1 /= n2) then
+        WRITE(nulprt,*) subname,' abort on namsrc, namdst count ',nn,n1,n2
+        CALL oasis_flush(nulprt)
+        call oasis_abort()
+     endif
+  enddo
+
+  ! allocate space
+  ! note: n2==n1
+
+  sortnsrc%num = n1
+  allocate(sortnsrc%fld(n1))
+  allocate(sortnsrc%namnum(n1))
+  allocate(sortnsrc%fldnum(n1))
+  sortndst%num = n2
+  allocate(sortndst%fld(n2))
+  allocate(sortndst%namnum(n2))
+  allocate(sortndst%fldnum(n2))
+
+  ! fill and sort sortnsrc
+
+  allocate(sortkey(sortnsrc%num))
+  n1 = 0
+  do nn = 1,nnamcpl
+  do n2 = 1,oasis_string_listGetNum(namsrcfld(nn))
+     n1 = n1 + 1
+     sortkey(n1) = n1
+     sortnsrc%namnum(n1) = nn
+     sortnsrc%fldnum(n1) = n2
+     call oasis_string_listGetName(namsrcfld(nn),n2,sortnsrc%fld(n1))
+  enddo
+  enddo
+
+  call cplsort(sortnsrc%num, sortnsrc%fld, sortkey)
+  call cplsortkey(sortnsrc%num, sortnsrc%namnum, sortkey)
+  call cplsortkey(sortnsrc%num, sortnsrc%fldnum, sortkey)
+
+  if (OASIS_debug >= 15) then
+     write(nulprt,*) subname//' Sorted array : sortnsrc'
+     do n1 = 1,sortnsrc%num
+        write(nulprt,*) subname,'sort sortnsrc',n1,sortkey(n1), &
+           sortnsrc%namnum(n1),sortnsrc%fldnum(n1),trim(sortnsrc%fld(n1))
+     enddo
+  endif
+  deallocate(sortkey)
+
+  ! fill and sort sortndst
+
+  allocate(sortkey(sortndst%num))
+  n1 = 0
+  do nn = 1,nnamcpl
+  do n2 = 1,oasis_string_listGetNum(namdstfld(nn))
+     n1 = n1 + 1
+     sortkey(n1) = n1
+     sortndst%namnum(n1) = nn
+     sortndst%fldnum(n1) = n2
+     call oasis_string_listGetName(namdstfld(nn),n2,sortndst%fld(n1))
+  enddo
+  enddo
+
+  call cplsort(sortndst%num, sortndst%fld, sortkey)
+  call cplsortkey(sortndst%num, sortndst%namnum, sortkey)
+  call cplsortkey(sortndst%num, sortndst%fldnum, sortkey)
+
+  if (OASIS_debug >= 15) then
+     write(nulprt,*) subname//' Sorted array : sortndst'
+     do n1 = 1,sortndst%num
+        write(nulprt,*) subname,'sort sortndst',n1,sortkey(n1), &
+           sortndst%namnum(n1),sortndst%fldnum(n1),trim(sortndst%fld(n1))
+     enddo
+  endif
+  deallocate(sortkey)
+
+  if (OASIS_debug >= 15) then
+
+     write(nulprt,*) subname,' Test sort code: '
+
+     n1 = 10
+     allocate(sorttest%fld(n1))
+     allocate(sorttest%modnum(n1))
+     allocate(sorttest%varnum(n1))
+     allocate(sortkey(n1))
+     sorttest%num = n1
+
+     sorttest%fld(:) = 'A'
+     do n1 = 1,sorttest%num
+        sortkey(n1) = n1
+        if (n1 ==  1) sorttest%fld(n1) = 'D'
+        if (n1 ==  2) sorttest%fld(n1) = 'C'
+        if (n1 ==  4) sorttest%fld(n1) = 'C'
+        if (n1 ==  5) sorttest%fld(n1) = 'D'
+        if (n1 ==  8) sorttest%fld(n1) = 'C'
+        if (n1 ==  9) sorttest%fld(n1) = 'B'
+        if (n1 == 10) sorttest%fld(n1) = 'C'
+        sorttest%modnum(n1) = n1+100
+        sorttest%varnum(n1) = n1
+     enddo
+
+     call cplsort(sorttest%num, sorttest%fld, sortkey)
+     call cplsortkey(sorttest%num, sorttest%modnum, sortkey)
+     call cplsortkey(sorttest%num, sorttest%varnum, sortkey)
+
+     write(nulprt,*) subname//' Sorted array : sorttest'
+     do n1 = 1,sorttest%num
+        write(nulprt,*) subname,'sort sorttest',n1,sortkey(n1), &
+           sorttest%modnum(n1),sorttest%varnum(n1),trim(sorttest%fld(n1))
+     enddo
+
+     tmpfld = 'A'
+     call cplfind(sorttest%num, sorttest%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sorttest%fld(n1))
+     enddo
+
+     tmpfld = 'B'
+     call cplfind(sorttest%num, sorttest%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sorttest%fld(n1))
+     enddo
+
+     tmpfld = 'C'
+     call cplfind(sorttest%num, sorttest%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sorttest%fld(n1))
+     enddo
+
+     tmpfld = 'D'
+     call cplfind(sorttest%num, sorttest%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sorttest%fld(n1))
+     enddo
+
+     tmpfld = 'E'
+     call cplfind(sorttest%num, sorttest%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sorttest%fld(n1))
+     enddo
+
+     deallocate(sortkey)
+     deallocate(sorttest%fld)
+     deallocate(sorttest%modnum)
+     deallocate(sorttest%varnum)
+
+     write(nulprt,*) subname,' Test cplfind: '
+     n1 = max(min(sortndst%num,sortndst%num/3),1)
+     tmpfld = sortndst%fld(n1)
+     call cplfind(sortndst%num, sortndst%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sortndst%fld(n1))
+     enddo
+
+     n1 = max(min(sortndst%num,1),1)
+     tmpfld = sortndst%fld(n1)
+     call cplfind(sortndst%num, sortndst%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sortndst%fld(n1))
+     enddo
+
+     n1 = max(min(sortndst%num,2),1)
+     tmpfld = sortndst%fld(n1)
+     call cplfind(sortndst%num, sortndst%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sortndst%fld(n1))
+     enddo
+
+     n1 = max(min(sortndst%num,sortndst%num-1),1)
+     tmpfld = sortndst%fld(n1)
+     call cplfind(sortndst%num, sortndst%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sortndst%fld(n1))
+     enddo
+
+     n1 = max(min(sortndst%num,sortndst%num),1)
+     tmpfld = sortndst%fld(n1)
+     call cplfind(sortndst%num, sortndst%fld, tmpfld, ifind, nfind)
+     write(nulprt,*) subname,' cpl find1 ',trim(tmpfld),ifind,nfind
+     do n1 = ifind,ifind+nfind-1
+        write(nulprt,*) subname,' cpl find2 ',n1,trim(sortndst%fld(n1))
+     enddo
+
+     CALL oasis_flush(nulprt)
+  endif
+
+  if (timers_on) call oasis_timer_stop ('cpl_setup_n2')
 
   !--------------------------------
   ! for all namcoupler input
@@ -338,64 +611,70 @@ CONTAINS
   call oasis_debug_note(subname//' compare vars and namcouple')
   call oasis_debug_note(subname//' setup couplers')
 
-  do nns = 1,nnamcpl
-     nn = namfldsort(nns)
+  if (timers_on) call oasis_timer_start('cpl_setup_n3')
 
-     !--- tcx require for run time error on corail ????----
-     call oasis_mpi_barrier(mpi_comm_global)
-     IF (OASIS_debug >= 2) THEN
-         WRITE(nulprt,*) subname,' check nam ',nns
-         CALL oasis_flush(nulprt)
+  !--------------------------------
+  ! for all my variables
+  !--------------------------------
+
+  do nv1 = 1,nallvar(compid)
+
+     !--------------------------------
+     ! get my parition and fld
+     !--------------------------------
+
+     part1  = prism_var(nv1)%part
+     myfld  = trim(allvar(nv1,compid))
+
+     IF (OASIS_debug >= 20) THEN
+        WRITE(nulprt,*) subname,' get part and fld ',nv1,part1,trim(myfld)
+        CALL oasis_flush(nulprt)
      ENDIF
 
      !--------------------------------
-     ! for all my variables
+     ! check if i'm an In or Out variable and then find namcouple matches
      !--------------------------------
 
-     do nv1 = 1,nallvar(compid)
+     if (timers_on) call oasis_timer_start('cpl_setup_n3a')
+     if (allops(nv1,compid) == OASIS_Out) then
+        call cplfind(sortnsrc%num, sortnsrc%fld, myfld, ifind, nfind)
+     elseif (allops(nv1,compid) == OASIS_In) then
+        call cplfind(sortndst%num, sortndst%fld, myfld, ifind, nfind)
+     endif
+     if (timers_on) call oasis_timer_stop ('cpl_setup_n3a')
 
-        !--- tcx require for run time error on corail ????----
-        IF (OASIS_debug >= 2) THEN
-           WRITE(nulprt,*) subname,' check var ',nns,nv1
-           CALL oasis_flush(nulprt)
-        ENDIF
-
-        !--------------------------------
-        ! get my parition and fld
-        !--------------------------------
-
-        part1  = prism_var(nv1)%part
-        myfld  = trim(allvar(nv1,compid))
-
-        IF (OASIS_debug >= 20) THEN
-            WRITE(nulprt,*) subname,' get part and fld ',part1,trim(myfld)
-            CALL oasis_flush(nulprt)
-        ENDIF
-
-        !--------------------------------
-        ! check if i'm an In or Out variable
-        ! check if my variable matches this namcouple dst or src
-        !--------------------------------
+     do nf = ifind,ifind+nfind-1
+        if (timers_on) call oasis_timer_start('cpl_setup_n3b')
 
         flag = OASIS_NotDef
+
         if (allops(nv1,compid) == OASIS_Out) then
-           myfldi = oasis_string_listGetIndexF(namsrcfld(nn),myfld)
-           if (myfldi > 0) flag = OASIS_Out
+           nn = sortnsrc%namnum(nf)
+           myfldi = sortnsrc%fldnum(nf)
+           flag = OASIS_Out
         elseif (allops(nv1,compid) == OASIS_In) then
-           myfldi = oasis_string_listGetIndexF(namdstfld(nn),myfld)
-           if (myfldi > 0) flag = OASIS_In
+           nn = sortndst%namnum(nf)
+           myfldi = sortndst%fldnum(nf)
+           flag = OASIS_In
         endif
 
+        nns = namnn2sort(nn)
+
         IF (OASIS_debug >= 20) THEN
-            WRITE(nulprt,*) subname,' check fld ',myfldi,flag
+            WRITE(nulprt,*) subname,' found fld1 ',trim(myfld),nv1,nf
+            WRITE(nulprt,*) subname,' found fld2 ',trim(myfld),nns,nn,myfldi,flag
             CALL oasis_flush(nulprt)
         ENDIF
+
+        if (timers_on) call oasis_timer_stop ('cpl_setup_n3b')
 
         !--------------------------------
         ! my variable is in this namcouple input
         !--------------------------------
 
         if (flag /= OASIS_NotDef) then
+
+           if (timers_on) call oasis_timer_start('cpl_setup_n3c')
 
            !--------------------------------
            ! migrate namcouple info into part
@@ -431,7 +710,7 @@ CONTAINS
               call oasis_abort()
            endif
 
-           if (OASIS_debug >= 5) then
+           if (OASIS_debug >= 20) then
               write(nulprt,'(1x,2a,4i6,2a)') subname,' ca: myfld',nn,compid,&
                                              nv1,myfldi,' ',trim(myfld)
               call oasis_flush(nulprt)
@@ -441,198 +720,186 @@ CONTAINS
            ! determine matching field name
            !--------------------------------
 
-           otfldmatch = 'NOmatchNOyesNO_zyxbca_ZYXBCA'
-           if (flag == OASIS_Out) &
-              call oasis_string_listGetName(namdstfld(nn),myfldi,otfldmatch)
-           if (flag == OASIS_In) &
-              call oasis_string_listGetName(namsrcfld(nn),myfldi,otfldmatch)
-           if (OASIS_debug >= 2) write(nulprt,*) subname,' otfldmatch ',&
-                                        nns,nv1,trim(otfldmatch)
+           if (timers_on) call oasis_timer_start('cpl_setup_n3c1')
+           otfld = 'NOmatchNOyesNOyesNO'
+           if (flag == OASIS_Out) then
+              call oasis_string_listGetName(namdstfld(nn),myfldi,otfld)
+           endif
+           if (flag == OASIS_In) then
+              call oasis_string_listGetName(namsrcfld(nn),myfldi,otfld)
+           endif
+           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c1')
+
+           IF (OASIS_debug >= 20) THEN
+              WRITE(nulprt,*) subname,' otfld ',trim(otfld)
+              CALL oasis_flush(nulprt)
+           ENDIF
 
            !--------------------------------
            ! look for namcouple coupling variable in all other model variables
            !--------------------------------
 
-           found = .false.
-           do nm = 1,prism_nmodels
-           do nv = 1,nallvar(nm)
+           if (timers_on) call oasis_timer_start('cpl_setup_n3c2')
+           call cplfind(sortvars%num, sortvars%fld, otfld, ifind, nfind)
+           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c2')
+           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c')
 
-              !--- tcx require for run time error on corail ????----
-              IF (OASIS_debug >= 2) THEN
-                  WRITE(nulprt,*) subname,' check mod ',nns,nv1,nm,nv
+           found = .false.
+           do nvf = ifind, ifind+nfind-1
+              if (timers_on) call oasis_timer_start('cpl_setup_n3d')
+              nm = sortvars%modnum(nvf)
+              nv = sortvars%varnum(nvf)
+              
+              if (OASIS_debug >= 20) then
+                 write(nulprt,*) subname,' match otfld ', &
+                    trim(otfld),nn
+                 call oasis_flush(nulprt)
+              endif
+
+              !--------------------------------
+              ! Do not allow src and dst to be on same model for communication
+              ! Make sure one side is In and other side is Out for communication
+              ! If input or output, field name should match
+              !--------------------------------
+
+              if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
+                 if (nm == compid) then
+                    write(nulprt,*) subname,' ERROR send recv pair on same model',nm,' ', &
+                       trim(myfld),' ',trim(otfld)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    call oasis_abort()
+                 endif
+                 if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
+                    write(nulprt,*) subname,' ERROR send recv pair both Out ', &
+                       trim(myfld),' ',trim(otfld)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    call oasis_abort()
+                 endif
+                 if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
+                    write(nulprt,*) subname,' ERROR send recv pair both In ', &
+                       trim(myfld),' ',trim(otfld)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    call oasis_abort()
+                 endif
+              endif
+
+              if (namfldops(nn) == ip_input .or. namfldops(nn) == ip_output) then
+                 if (trim(myfld) /= trim(otfld)) then
+                    write(nulprt,*) subname,' ERROR namcouple field names do not match in/out ', &
+                       trim(myfld),' ',trim(otfld)
+                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                    call oasis_abort()
+                 endif
+              endif
+
+              !--------------------------------
+              ! Only an error to find two sources for a destination
+              ! Not an error if a two destinations have a single source
+              !--------------------------------
+
+              if (flag == OASIS_In .and. found) then
+                 write(nulprt,*) subname,' ERROR found two sources for ',trim(otfld)
+                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                 call oasis_abort()
+              endif
+              found = .true.
+
+              nc = nns
+
+              !--------------------------------
+              ! prism_coupler fields, multiple field support
+              !--------------------------------
+
+              IF (OASIS_debug >= 20) THEN
+                  WRITE(nulprt,*) subname,' set prism_coupler '
                   CALL oasis_flush(nulprt)
               ENDIF
 
-              otfld  = trim(allvar(nv,nm))
+              prism_coupler(nc)%nflds = prism_coupler(nc)%nflds + 1
+              if (prism_coupler(nc)%nflds == 1) then
+                 prism_coupler(nc)%fldlist = trim(myfld)
+              else
+                 prism_coupler(nc)%fldlist = trim(prism_coupler(nc)%fldlist)//':'//trim(myfld)
+              endif
+
+              svarid = size(prism_coupler(nc)%varid)
+              if (prism_coupler(nc)%nflds > svarid) then
+                  allocate(varidtmp(svarid))
+                  varidtmp(1:svarid) = prism_coupler(nc)%varid(1:svarid)
+                  deallocate(prism_coupler(nc)%varid)
+                  allocate(prism_coupler(nc)%varid(prism_coupler(nc)%nflds+10))
+                  prism_coupler(nc)%varid(1:svarid) = varidtmp(1:svarid)
+                  deallocate(varidtmp)
+              endif
+              prism_coupler(nc)%varid(prism_coupler(nc)%nflds) = nv1
 
               !--------------------------------
-              ! matches if the var field and nam field are the same
+              ! prism_coupler other settings
               !--------------------------------
 
-              if (trim(otfldmatch) == trim(otfld)) then
+              prism_coupler(nc)%comp   = nm
+              prism_coupler(nc)%seq    = namfldseq(nn)
+              prism_coupler(nc)%dt     = namflddti(nn)
+              prism_coupler(nc)%lag    = namfldlag(nn)
+              prism_coupler(nc)%maxtime= namruntim
+              prism_coupler(nc)%rstfile= trim(namrstfil(nn))
+              prism_coupler(nc)%inpfile= trim(naminpfil(nn))
+              prism_coupler(nc)%mapperID = -1
+              prism_coupler(nc)%partID = part1
+              prism_coupler(nc)%namID  = nn
+              prism_coupler(nc)%valid  = .true.
+              prism_coupler(nc)%trans  = namfldtrn(nn)
+              prism_coupler(nc)%conserv= namfldcon(nn)
+              prism_coupler(nc)%consopt= namfldcoo(nn)
+              prism_coupler(nc)%ops    = namfldops(nn)
+              prism_coupler(nc)%tag    = compid*100*1000 + compid*1000 + nn
+              prism_coupler(nc)%getput = OASIS_NotDef
+              prism_coupler(nc)%sndrcv = .false.
+              prism_coupler(nc)%output = .false.
+              prism_coupler(nc)%input  = .false.
+              prism_coupler(nc)%sndmult= namfldsmu(nn)
+              prism_coupler(nc)%sndadd = namfldsad(nn)
+              prism_coupler(nc)%rcvmult= namflddmu(nn)
+              prism_coupler(nc)%rcvadd = namflddad(nn)
+              prism_coupler(nc)%snddiag= namchecki(nn)
+              prism_coupler(nc)%rcvdiag= namchecko(nn)
 
-                 if (OASIS_debug >= 2) write(nulprt,*) subname,' check fld ',&
-                                                       nns,nv1,nm,nv,trim(otfld)
+              !--------------------------------
+              ! prism_coupler input and output flags
+              ! prism_coupler comm flags, need for tags to match up on both sides
+              ! tags assume up to 1000 namcouple inputs and 100 models
+              !--------------------------------
 
-                 if (OASIS_debug >= 5) then
-                    write(nulprt,'(1x,2a,3i6,2a)') subname,' ca: otfld',nn,nm,&
-                                                   nv,' ',trim(otfld)
-                    call oasis_flush(nulprt)
-                 endif
+              IF (OASIS_debug >= 20) THEN
+                 WRITE(nulprt,*) subname,' inout flags '
+                 CALL oasis_flush(nulprt)
+              ENDIF
 
-                 !--------------------------------
-                 ! Do not allow src and dst to be on same model for communication
-                 ! Make sure one side is In and other side is Out for communication
-                 ! If input or output, field name should match
-                 !--------------------------------
+              if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
+                 prism_coupler(nc)%output = .true.
+                 prism_coupler(nc)%getput = OASIS3_PUT
+              endif
+              if (namfldops(nn) == ip_input) then
+                 prism_coupler(nc)%input  = .true.
+                 prism_coupler(nc)%getput = OASIS3_GET
+              endif
 
-                 if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
-                    if (nm == compid) then
-                       write(nulprt,*) subname,' ERROR send recv pair on same model',nm,' ', &
-                          trim(myfld),' ',trim(otfld)
-                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                       call oasis_abort()
-                    endif
-                    if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
-                       write(nulprt,*) subname,' ERROR send recv pair both Out ', &
-                          trim(myfld),' ',trim(otfld)
-                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                       call oasis_abort()
-                    endif
-                    if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
-                       write(nulprt,*) subname,' ERROR send recv pair both In ', &
-                          trim(myfld),' ',trim(otfld)
-                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                       call oasis_abort()
-                    endif
-                 endif
-
-                 if (namfldops(nn) == ip_input .or. namfldops(nn) == ip_output) then
-                    if (trim(myfld) /= trim(otfld)) then
-                       write(nulprt,*) subname,' ERROR namcouple field names to not match for in/out', &
-                          trim(myfld),' ',trim(otfld)
-                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                       call oasis_abort()
-                    endif
-                 endif
-
-                 !--------------------------------
-                 ! Only an error to find two sources for a destination
-                 ! Not an error if a two destinations have a single source
-                 !--------------------------------
-
-                 if (flag == OASIS_In .and. found) then
-                    write(nulprt,*) subname,' ERROR found two sources for ',trim(otfld)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                    call oasis_abort()
-                 endif
-                 found = .true.
-
-                 !--------------------------------
-                 ! only increment prism_ncoupler if new nn (coupler), otherwise use prior prism_ncoupler
-                 ! this supports multiple fields coupled in one communication step
-                 !--------------------------------
-
-                 if (nn /= lnn) prism_ncoupler = prism_ncoupler + 1
-                 lnn = nn
-                 if (prism_ncoupler > prism_mcoupler) then
-                    write(nulprt,*) subname,' ERROR prism_ncoupler too large',prism_ncoupler,prism_mcoupler
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                    call oasis_abort()
-                 endif
-                 nc = prism_ncoupler
-
-                 !--------------------------------
-                 ! prism_coupler fields, multiple field support
-                 !--------------------------------
-
-                 IF (OASIS_debug >= 20) THEN
-                     WRITE(nulprt,*) subname,' set prism_coupler '
-                     CALL oasis_flush(nulprt)
-                 ENDIF
-
-                 prism_coupler(nc)%nflds = prism_coupler(nc)%nflds + 1
-                 if (prism_coupler(nc)%nflds == 1) then
-                    prism_coupler(nc)%fldlist = trim(myfld)
-                 else
-                    prism_coupler(nc)%fldlist = trim(prism_coupler(nc)%fldlist)//':'//trim(myfld)
-                 endif
-
-                 svarid = size(prism_coupler(nc)%varid)
-                 if (prism_coupler(nc)%nflds > svarid) then
-                     allocate(varidtmp(svarid))
-                     varidtmp(1:svarid) = prism_coupler(nc)%varid(1:svarid)
-                     deallocate(prism_coupler(nc)%varid)
-                     allocate(prism_coupler(nc)%varid(prism_coupler(nc)%nflds+10))
-                     prism_coupler(nc)%varid(1:svarid) = varidtmp(1:svarid)
-                     deallocate(varidtmp)
-                 endif
-                 prism_coupler(nc)%varid(prism_coupler(nc)%nflds) = nv1
-
-                 !--------------------------------
-                 ! prism_coupler other settings
-                 !--------------------------------
-
-                 prism_coupler(nc)%comp   = nm
-                 prism_coupler(nc)%seq    = namfldseq(nn)
-                 prism_coupler(nc)%dt     = namflddti(nn)
-                 prism_coupler(nc)%lag    = namfldlag(nn)
-                 prism_coupler(nc)%maxtime= namruntim
-                 prism_coupler(nc)%rstfile= trim(namrstfil(nn))
-                 prism_coupler(nc)%inpfile= trim(naminpfil(nn))
-                 prism_coupler(nc)%mapperID = -1
-                 prism_coupler(nc)%partID = part1
-                 prism_coupler(nc)%namID  = nn
-                 prism_coupler(nc)%trans  = namfldtrn(nn)
-                 prism_coupler(nc)%conserv= namfldcon(nn)
-                 prism_coupler(nc)%consopt= namfldcoo(nn)
-                 prism_coupler(nc)%ops    = namfldops(nn)
-                 prism_coupler(nc)%tag    = compid*100*1000 + compid*1000 + nn
-                 prism_coupler(nc)%getput = OASIS_NotDef
-                 prism_coupler(nc)%sndrcv = .false.
-                 prism_coupler(nc)%output = .false.
-                 prism_coupler(nc)%input  = .false.
-                 prism_coupler(nc)%sndmult= namfldsmu(nn)
-                 prism_coupler(nc)%sndadd = namfldsad(nn)
-                 prism_coupler(nc)%rcvmult= namflddmu(nn)
-                 prism_coupler(nc)%rcvadd = namflddad(nn)
-                 prism_coupler(nc)%snddiag= namchecki(nn)
-                 prism_coupler(nc)%rcvdiag= namchecko(nn)
-
-                 !--------------------------------
-                 ! prism_coupler input and output flags
-                 ! prism_coupler comm flags, need for tags to match up on both sides
-                 ! tags assume up to 1000 namcouple inputs and 100 models
-                 !--------------------------------
-
-                 IF (OASIS_debug >= 20) THEN
-                     WRITE(nulprt,*) subname,' inout flags '
-                     CALL oasis_flush(nulprt)
-                 ENDIF
-
-                 if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
-                    prism_coupler(nc)%output = .true.
+              if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
+                 prism_coupler(nc)%sndrcv = .true.
+                 if (flag == OASIS_Out) then
+                    prism_coupler(nc)%tag = nm*100*1000 + compid*1000 + nn
                     prism_coupler(nc)%getput = OASIS3_PUT
-                 endif
-                 if (namfldops(nn) == ip_input) then
-                    prism_coupler(nc)%input  = .true.
+                 elseif (flag == OASIS_In) then
+                    prism_coupler(nc)%tag = compid*100*1000 + nm*1000 + nn
                     prism_coupler(nc)%getput = OASIS3_GET
                  endif
-
-                 if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
-                    prism_coupler(nc)%sndrcv = .true.
-                    if (flag == OASIS_Out) then
-                       prism_coupler(nc)%tag = nm*100*1000 + compid*1000 + nn
-                       prism_coupler(nc)%getput = OASIS3_PUT
-                    elseif (flag == OASIS_In) then
-                       prism_coupler(nc)%tag = compid*100*1000 + nm*1000 + nn
-                       prism_coupler(nc)%getput = OASIS3_GET
-                    endif
-                    !--------------------------------
-                    ! prism_coupler router
-                    ! cannot reuse router because don't really know what's on the other side
-                    !--------------------------------
-                    if (prism_coupler(nc)%nflds == 1) prism_nrouter = prism_nrouter + 1
+                 !--------------------------------
+                 ! prism_coupler router
+                 ! cannot reuse router because don't really know what's on the other side
+                 ! if router is already set for the coupler, then fine, otherwise, set new router
+                 !--------------------------------
+                 if (prism_coupler(nc)%routerID == ispval) then
+                    prism_nrouter = prism_nrouter+1
                     if (prism_nrouter > prism_mrouter) then
                        write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,&
                                        prism_mrouter
@@ -641,29 +908,30 @@ CONTAINS
                     endif
                     prism_coupler(nc)%routerID = prism_nrouter
                  endif
+              endif
 
-                 !--------------------------------
-                 ! prism_coupler mapper
-                 !--------------------------------
+              !--------------------------------
+              ! prism_coupler mapper
+              !--------------------------------
 
-                 IF (OASIS_debug >= 20) THEN
-                     WRITE(nulprt,*) subname,' mapper '
-                     CALL oasis_flush(nulprt)
-                 ENDIF
+              IF (OASIS_debug >= 20) THEN
+                 WRITE(nulprt,*) subname,' mapper '
+                 CALL oasis_flush(nulprt)
+              ENDIF
 
-                 tmp_mapfile = nammapfil(nn)
+              tmp_mapfile = nammapfil(nn)
 
-                 if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
-                    if (trim(namscrmet(nn)) == 'CONSERV') then
-                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
-                                     &'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
-                    else
-                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
-                                     &'_'//trim(namscrmet(nn))//'.nc'
-                    endif
+              if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
+                 if (trim(namscrmet(nn)) == 'CONSERV') then
+                    tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                  &'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
+                 else
+                    tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                  &'_'//trim(namscrmet(nn))//'.nc'
                  endif
+              endif
 
-                 if (trim(tmp_mapfile) /= 'idmap') then
+              if (trim(tmp_mapfile) /= 'idmap') then
                  prism_coupler(nc)%maploc = trim(nammaploc(nn))
                  if ((flag == OASIS_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
                      (flag == OASIS_Out .and. trim(nammaploc(nn)) == 'src')) then
@@ -704,34 +972,49 @@ CONTAINS
                     endif
                     prism_coupler(nc)%mapperID = mapID
                  endif  ! flag and nammaploc match
-                 endif  ! nammapfil
+              endif  ! nammapfil
 
-                 !--------------------------------
-                 ! add this coupler to list of prism_var couplers
-                 !--------------------------------
+              !--------------------------------
+              ! add this coupler to list of prism_var couplers
+              !--------------------------------
 
-                 prism_var(nv1)%ncpl = prism_var(nv1)%ncpl + 1
-                 prism_var(nv1)%cpl(prism_var(nv1)%ncpl) = nc
+              prism_var(nv1)%ncpl = prism_var(nv1)%ncpl + 1
+              if (prism_var(nv1)%ncpl > mvarcpl) then
+                 WRITE(nulprt,*) subname,' ncpl too high, max (mvarcpl) = ',mvarcpl
+                 call oasis_abort()
+              endif
+              prism_var(nv1)%cpl(prism_var(nv1)%ncpl) = nc
 
-              endif  ! other var in this namcouple
+              if (timers_on) call oasis_timer_stop('cpl_setup_n3d')
 
-           enddo  ! nv
-           enddo  ! nm
+           enddo  ! nvf
 
-        endif  ! my var in this namcouple
+        endif  ! my var found
 
-     enddo  ! nv1
-  enddo  ! nns
+     enddo  ! nfind
+  enddo  ! nv1
+  if (timers_on) call oasis_timer_stop ('cpl_setup_n3')
+  if (timers_on) call oasis_timer_start('cpl_setup_n4')
 
 
+  !--- deallocate temporary ---
   deallocate(allvar,nallvar,allops)
+  deallocate(sortnsrc%fld)
+  deallocate(sortnsrc%namnum)
+  deallocate(sortnsrc%fldnum)
+  deallocate(sortndst%fld)
+  deallocate(sortndst%namnum)
+  deallocate(sortndst%fldnum)
+  deallocate(sortvars%fld)
+  deallocate(sortvars%modnum)
+  deallocate(sortvars%varnum)
 
   if (OASIS_debug >= 20) then
      write(nulprt,*) ' '
      write(nulprt,*) subname,' couplers setup'
-     do nc = 1,prism_ncoupler
+     do nc = 1,prism_mcoupler
 !tcx can't write here, something uninitialized???
-!        call prism_coupler_print(nc)
+!        if (prism_coupler(nc)%valid) call prism_coupler_print(nc)
      enddo
      write(nulprt,*) ' '
      call oasis_flush(nulprt)
@@ -745,7 +1028,8 @@ CONTAINS
 
   call oasis_debug_note(subname//' initialize coupling datatypes')
 
-  do nc = 1,prism_ncoupler
+  do nc = 1,prism_mcoupler
+  if (prism_coupler(nc)%valid) then
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc
         call oasis_flush(nulprt)
@@ -1049,7 +1333,8 @@ CONTAINS
         endif
      endif
 
-  enddo
+  endif   ! valid
+  enddo   ! prism_mcoupler
 
   !----------------------------------------------------------
   ! Diagnostics
@@ -1058,24 +1343,25 @@ CONTAINS
   if (OASIS_debug >= 2) then
      write(nulprt,*) ' '
      write(nulprt,*) subname,' couplers initialized'
-     do nc = 1,prism_ncoupler
-        call oasis_coupler_print(nc)
+     do nc = 1,prism_mcoupler
+        if (prism_coupler(nc)%valid) call oasis_coupler_print(nc)
      enddo
      write(nulprt,*) ' '
      CALL oasis_flush(nulprt)
   endif
 
   IF (LUCIA_debug > 0) THEN
-      DO nc = 1, prism_ncoupler
+      DO nc = 1, prism_mcoupler
+      IF (prism_coupler(nc)%valid) then
         IF (prism_coupler(nc)%getput == OASIS3_PUT) &
            WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: SN ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
         IF (prism_coupler(nc)%getput == OASIS3_GET) &                       
            WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: RC ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
+      ENDIF
       ENDDO
   ENDIF
 
-
-
+  if (timers_on) call oasis_timer_stop ('cpl_setup_n4')
   call oasis_timer_stop('cpl_setup')
 
   call oasis_debug_exit(subname)
@@ -1123,6 +1409,7 @@ CONTAINS
      write(nulprt,*) subname,'   rcv fld add  ',prism_coupler(cplid)%rcvadd
   endif
      write(nulprt,*) subname,'   namcouple op ',prism_coupler(cplid)%ops
+     write(nulprt,*) subname,'   valid        ',prism_coupler(cplid)%valid
      write(nulprt,*) subname,'   namcouple id ',namid
      write(nulprt,*) subname,'   variable ids ',prism_coupler(cplid)%varid(1:nflds)
      write(nulprt,*) subname,'   sndrcv flag  ',prism_coupler(cplid)%sndrcv
@@ -1882,6 +2169,312 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
 end subroutine oasis_coupler_sMatReaddnc
 
+!------------------------------------------------------------
+! !BOP ===========================================================================
+!
+! !IROUTINE:  cplsort - sort a character array and associated field
+!
+! !DESCRIPTION: 
+!     Sort a character array and the associated array(s) based on a
+!     reasonably fast sort algorithm
+!
+! !INTERFACE:  -----------------------------------------------------------------
+
+subroutine cplsort(num, fld, sortkey)
+
+! !USES:
+
+   !--- local kinds ---
+   integer,parameter :: R8 = ip_double_p
+   integer,parameter :: IN = ip_i4_p
+   integer,parameter :: CL = ic_lvar
+
+! !INPUT/OUTPUT PARAMETERS:
+
+   integer(IN),intent(in) :: num       ! size of array
+   character(len=CL),intent(inout) :: fld(:)     ! sort field
+   integer(IN)      ,intent(inout) :: sortkey(:) ! sortkey
+
+! !EOP
+
+   !--- local ---
+   integer(IN)    :: n1,n2
+   logical        :: stopnow
+   character(CL), pointer :: tmpfld(:)
+   integer(IN)  , pointer :: tmpkey(:)
+
+   !--- formats ---
+   character(*),parameter :: subName = '(cplsort) '
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+!   call oasis_debug_enter(subname)
+
+   allocate(tmpfld((num+1)/2))
+   allocate(tmpkey((num+1)/2))
+   call MergeSort(num,fld,tmpfld,sortkey,tmpkey)
+   deallocate(tmpfld)
+   deallocate(tmpkey)
+    
+!   call oasis_debug_exit(subname)
+
+end subroutine cplsort
+
+!------------------------------------------------------------
+! !BOP ===========================================================================
+!
+! !IROUTINE:  cplsortkey - sort a character array and associated field
+!
+! !DESCRIPTION: 
+!     Rearrange and integer array based on an input sortkey
+!
+! !INTERFACE:  -----------------------------------------------------------------
+
+subroutine cplsortkey(num, arr, sortkey)
+
+! !USES:
+
+   !--- local kinds ---
+   integer,parameter :: R8 = ip_double_p
+   integer,parameter :: IN = ip_i4_p
+   integer,parameter :: CL = ic_lvar
+
+! !INPUT/OUTPUT PARAMETERS:
+
+   integer(IN),intent(in) :: num       ! size of array
+   integer(IN),intent(inout) :: arr(:)     ! field to sort
+   integer(IN),intent(in)    :: sortkey(:) ! sortkey
+
+! !EOP
+
+   !--- local ---
+   integer(IN)    :: n1,n2
+   integer(IN), pointer :: tmparr(:)
+
+   !--- formats ---
+   character(*),parameter :: subName = '(cplsortkey) '
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+!   call oasis_debug_enter(subname)
+
+   if (num /= size(arr) .or. num /= size(sortkey)) then
+      WRITE(nulprt,*) subname,' abort size of input arrays :',num,size(arr),size(sortkey)
+      CALL oasis_flush(nulprt)
+      call oasis_abort()
+   endif
+
+   allocate(tmparr(num))
+   tmparr(1:num) = arr(1:num)
+   do n1 = 1,num
+      arr(n1) = tmparr(sortkey(n1))
+   enddo
+   deallocate(tmparr)
+    
+!   call oasis_debug_exit(subname)
+
+end subroutine cplsortkey
+
+!------------------------------------------------------------
+! !BOP ===========================================================================
+!
+! !IROUTINE:  cplfind - sort a character array and associated field
+!
+! !DESCRIPTION: 
+!     Sort a character array and the associated array(s) based on a
+!     reasonably fast sort algorithm
+!
+! !INTERFACE:  -----------------------------------------------------------------
+
+subroutine cplfind(num, fldlist, fld, ifind, nfind)
+
+! !USES:
+
+   !--- local kinds ---
+   integer,parameter :: R8 = ip_double_p
+   integer,parameter :: IN = ip_i4_p
+   integer,parameter :: CL = ic_lvar
+
+! !INPUT/OUTPUT PARAMETERS:
+
+   integer(IN),intent(in) :: num       ! size of array
+   character(len=CL),intent(in)  :: fldlist(:)  ! sorted field list
+   character(len=CL),intent(in)  :: fld         ! field to find
+   integer(IN)      ,intent(out) :: ifind       ! first match index
+   integer(IN)      ,intent(out) :: nfind       ! number that match
+
+! !EOP
+
+   !--- local ---
+   integer(IN)    :: is,ie,im
+   logical        :: found
+
+   !--- formats ---
+   character(*),parameter :: subName = '(cplfind) '
+
+!-------------------------------------------------------------------------------
+!
+!-------------------------------------------------------------------------------
+
+!   call oasis_debug_enter(subname)
+
+    ifind = 0
+    nfind = 0
+
+    is = 1
+    ie = num
+    found = .false.
+
+    ! check endpoints first, the binary search uses integer
+    ! math which makes hitting the endpoints more difficult
+    ! so check manually.  also if list size is 1, need to do this.
+
+    if (.not.found) then
+       im = 1
+       if (fld == fldlist(im)) found = .true.
+    endif
+    if (.not.found) then
+       im = num
+       if (fld == fldlist(im)) found = .true.
+    endif
+
+    ! do a binary search
+
+    do while (.not.found .and. ie > is)
+       im = (is + ie) / 2
+       im = max(im,is)
+       im = min(im,ie)
+!       write(nulprt,*) subname,'tcx',is,ie,im,trim(fld),' ',trim(fldlist(im))
+       if (fld == fldlist(im)) then
+          found = .true.
+       elseif (fld > fldlist(im)) then
+          is = max(im,is+1)
+       else
+          ie = min(im,ie-1)
+       endif
+    enddo
+
+    ! if a match was found, find first and last instance of match in list
+
+    if (found) then
+       is = im
+       ie = im
+       if (is > 1) then
+          do while (fld == fldlist(is-1) .and. is > 1)
+             is = is - 1
+          enddo
+       endif
+       if (ie < num) then
+          do while (fld == fldlist(ie+1) .and. ie < num)
+             ie = ie + 1
+          enddo
+       endif
+       ifind = is
+       nfind = (ie - is + 1)    
+    endif
+
+!   call oasis_debug_exit(subname)
+
+end subroutine cplfind
+
+!------------------------------------------------------------
+
+subroutine Merge(A,X,NA,B,Y,NB,C,Z,NC)
+ 
+   !--- local kinds ---
+   integer,parameter :: R8 = ip_double_p
+   integer,parameter :: IN = ip_i4_p
+   integer,parameter :: CL = ic_lvar
+
+   integer, intent(in) :: NA,NB,NC         ! Normal usage: NA+NB = NC
+   character(CL), intent(inout) :: A(NA)        ! B overlays C(NA+1:NC)
+   integer(IN)  , intent(inout) :: X(NA)        ! B overlays C(NA+1:NC)
+   character(CL), intent(in)    :: B(NB)
+   integer(IN)  , intent(in)    :: Y(NB)
+   character(CL), intent(inout) :: C(NC)
+   integer(IN)  , intent(inout) :: Z(NC)
+ 
+   integer :: I,J,K
+   character(*),parameter :: subName = '(Merge) '
+ 
+!   write(nulprt,*) subname//' NA,NB,NC = ',NA,NB,NC
+
+   I = 1; J = 1; K = 1;
+   do while(I <= NA .and. J <= NB)
+      if (A(I) <= B(J)) then
+         C(K) = A(I)
+         Z(K) = X(I)
+         I = I+1
+      else
+         C(K) = B(J)
+         Z(K) = Y(J)
+         J = J+1
+      endif
+      K = K + 1
+   enddo
+   do while (I <= NA)
+      C(K) = A(I)
+      Z(K) = X(I)
+      I = I + 1
+      K = K + 1
+   enddo
+   return
+ 
+end subroutine merge
+
+!------------------------------------------------------------
+ 
+recursive subroutine MergeSort(N,A,T,S,Z)
+ 
+   !--- local kinds ---
+   integer,parameter :: R8 = ip_double_p
+   integer,parameter :: IN = ip_i4_p
+   integer,parameter :: CL = ic_lvar
+
+   integer                          , intent(in)    :: N   ! size
+   character(CL), dimension(N)      , intent(inout) :: A   ! data to sort
+   character(CL), dimension((N+1)/2), intent(out)   :: T   ! data tmp
+   integer(IN)  , dimension(N)      , intent(inout) :: S   ! sortkey
+   integer(IN)  , dimension((N+1)/2), intent(out)   :: Z   ! sortkey tmp
+ 
+   integer :: NA,NB
+   character(CL) :: V
+   integer(IN) :: Y
+   character(*),parameter :: subName = '(MergeSort) '
+
+!   write(nulprt,*) subname//' N = ',N
+ 
+   if (N < 2) return
+   if (N == 2) then
+      if (A(1) > A(2)) then
+         V = A(1)
+         Y = S(1)
+         A(1) = A(2)
+         S(1) = S(2)
+         A(2) = V
+         S(2) = Y
+      endif
+      return
+   endif      
+   NA=(N+1)/2
+   NB=N-NA
+ 
+   call MergeSort(NA,A,T,S,Z)
+   call MergeSort(NB,A(NA+1),T,S(NA+1),Z)
+ 
+   if (A(NA) > A(NA+1)) then
+      T(1:NA)=A(1:NA)
+      Z(1:NA)=S(1:NA)
+      call Merge(T,Z,NA,A(NA+1),S(NA+1),NB,A,S,N)
+   endif
+   return
+ 
+end subroutine MergeSort
+ 
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !

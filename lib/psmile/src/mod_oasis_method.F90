@@ -60,7 +60,7 @@ CONTAINS
    INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
    INTEGER(kind=ip_intwp_p) :: k,i,m
    INTEGER(kind=ip_intwp_p) :: nt
-   character(len=ic_field)  :: i_name
+   character(len=ic_lvar)   :: i_name
    character(len=*),parameter :: subname = '(oasis_init_comp)'
 !  ---------------------------------------------------------
 
@@ -144,7 +144,7 @@ CONTAINS
    ! and mod_oasis_coupler
    mvar=0
    DO nns = 1,nnamcpl
-     n = namfldsort(nns)
+     n = namsort2nn(nns)
      mvar = mvar + oasis_string_listGetNum(namsrcfld(n))
    ENDDO
    IF (mpi_rank_global == 0) THEN
@@ -161,7 +161,7 @@ CONTAINS
    ALLOCATE(total_namdstfld(mvar))
    m=0
    DO nns = 1,nnamcpl
-     n = namfldsort(nns)
+     n = namsort2nn(nns)
      k=oasis_string_listGetNum(namsrcfld(n))
      DO i=1,k 
        m=m+1
@@ -172,7 +172,7 @@ CONTAINS
    !
    m=0
    DO nns = 1,nnamcpl
-     n = namfldsort(nns)
+     n = namsort2nn(nns)
      k=oasis_string_listGetNum(namdstfld(n))
      DO i=1,k 
        m=m+1
@@ -190,10 +190,15 @@ CONTAINS
      ENDIF
    ENDDO
 
-   !
+
    !------------------------
    !--- Set compid (need namcouple model names)
    !------------------------
+
+   if (len_trim(cdnam) > ic_lvar) then
+      WRITE(nulprt,*) subname,' Abort model name '//trim(cdnam)//' too long. max len (ic_lvar) = ',ic_lvar
+      call oasis_abort()
+   endif
 
    compid = -1
    compnm = trim(cdnam)
@@ -377,6 +382,7 @@ CONTAINS
    nt = 7*mvar+30
    call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers',nt)
    call oasis_timer_start('total after init')
+   call oasis_timer_start('init to enddef')
 
    !------------------------
    !--- Diagnostics
@@ -753,6 +759,8 @@ CONTAINS
    if (present(kinfo)) then
       kinfo = OASIS_OK
    endif
+
+   call oasis_timer_stop('init to enddef')
 
    call oasis_debug_exit(subname)
 

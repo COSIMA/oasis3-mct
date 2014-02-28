@@ -17,12 +17,9 @@ MODULE mod_oasis_namcouple
 
 ! NAMCOUPLE PUBLIC DATA
 
-  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 1000 ! max number of characters to be read 
+  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 ! max number of characters to be read 
                                                          ! in each line of the file namcouple 
-                                                         ! to be changed in mod_oasis_kinds for
-                                                         ! ic_field = jpeighty
-                                                         ! if changed here
-  !
+
   INTEGER(kind=ip_i4_p) ,public :: prism_nmodels   ! number of models
   character(len=ic_lvar),public,pointer :: prism_modnam(:)  ! model names
 
@@ -31,8 +28,8 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_i4_p)   ,public :: namlogprt     ! namcouple nlogprt value
   INTEGER(kind=ip_i4_p)   ,public :: namtlogprt    ! namcouple ntlogprt value
  
-  character(len=jpeighty)  ,public,pointer :: namsrcfld(:)  ! list of src fields
-  character(len=jpeighty)  ,public,pointer :: namdstfld(:)  ! list of dst fields
+  character(len=jpeighty) ,public,pointer :: namsrcfld(:)  ! list of src fields
+  character(len=jpeighty) ,public,pointer :: namdstfld(:)  ! list of dst fields
   character(len=ic_lvar)  ,public,pointer :: namsrcgrd(:)  ! src grid name
   integer(kind=ip_i4_p)   ,public,pointer :: namsrc_nx(:)  ! src nx grid size
   integer(kind=ip_i4_p)   ,public,pointer :: namsrc_ny(:)  ! src ny grid size
@@ -68,7 +65,8 @@ MODULE mod_oasis_namcouple
   integer(kind=ip_i4_p)   ,public,pointer :: namscrbin(:)  ! script number of search bins
 
   !--- derived ---
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldsort(:) ! sorted namcpl list based on seq
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namsort2nn(:) ! sorted namcpl for sort, define nn order
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namnn2sort(:) ! sorted namcpl for nn, define sort number
 
 !----------------------------------------------------------------
 !   LOCAL ONLY BELOW HERE
@@ -254,7 +252,7 @@ CONTAINS
   IMPLICIT NONE
 
   !-----------------------------------------------------------
-  integer(kind=ip_i4_p) :: n, nv, n1, loc
+  integer(kind=ip_i4_p) :: n, nv, n1, n2, loc
   integer(kind=ip_i4_p) :: ja, jf, jc
   integer(kind=ip_i4_p) :: il_iost
   integer(kind=ip_i4_p) :: maxunit
@@ -356,8 +354,11 @@ CONTAINS
   allocate(naminpfil(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "naminpfil" allocation of experiment module',il_err,1)
 
-  allocate(namfldsort(ig_total_nfield), stat=il_err)
-  IF (il_err.NE.0) CALL prtout('Error in "namfldsort" allocation of experiment module',il_err,1)
+  allocate(namsort2nn(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namsort2nn" allocation of experiment module',il_err,1)
+
+  allocate(namnn2sort(ig_total_nfield), stat=il_err)
+  IF (il_err.NE.0) CALL prtout('Error in "namnn2sort" allocation of experiment module',il_err,1)
 
   allocate(namchecki(ig_total_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namchecki" allocation of experiment module',il_err,1)
@@ -638,25 +639,30 @@ CONTAINS
   ENDIF
 
   !--- compute seq sort ---
-  namfldsort(:) = -1
+  namsort2nn(:) = -1
   do nv = 1,nnamcpl
     loc = nv    ! default at end
     n1 = 1
     do while (loc == nv .and. n1 < nv)
-      if (namfldseq(nv) < namfldseq(namfldsort(n1))) loc = n1
+      if (namfldseq(nv) < namfldseq(namsort2nn(n1))) loc = n1
       n1 = n1 + 1
     enddo
     ! nv goes into loc location, shift then set
     do n1 = nv,loc+1,-1
-      namfldsort(n1) = namfldsort(n1-1)
+      namsort2nn(n1) = namsort2nn(n1-1)
     enddo
-    namfldsort(loc) = nv
+    namsort2nn(loc) = nv
+  enddo
+
+  do nv = 1,nnamcpl
+    namnn2sort(namsort2nn(nv)) = nv
   enddo
 
   IF (mpi_rank_global == 0) THEN
       DO nv = 1,nnamcpl
-        n1 = namfldsort(nv)
-        WRITE(nulprt1,*) subname,' sort ',nv,n1,namfldseq(n1)
+        n1 = namsort2nn(nv)
+        n2 = namnn2sort(nv)
+        WRITE(nulprt1,*) subname,' sort ',nv,n1,n2,namfldseq(n1)
         CALL oasis_flush(nulprt1)
       ENDDO
   ENDIF
@@ -664,7 +670,7 @@ CONTAINS
 
   !--- check they are sorted ---
   do n = 2,nnamcpl
-    if (namfldseq(namfldsort(n)) < namfldseq(namfldsort(n-1))) then
+    if (namfldseq(namsort2nn(n)) < namfldseq(namsort2nn(n-1))) then
         IF (mpi_rank_global == 0) THEN
             WRITE(nulprt1,*) subname,' ERROR in seq sort'
             WRITE (nulprt1,'(a,i4)') ' abort by model ',compid
@@ -714,7 +720,7 @@ SUBROUTINE inipar_alloc()
 
   !* ---------------------------- Local declarations --------------------
   
-  CHARACTER*1000 clline, clline_aux, clvari
+  CHARACTER*5000 clline, clline_aux, clvari
   CHARACTER*9 clword, clfield, clstring, clmod, clchan
   CHARACTER*3 clind
   CHARACTER*2 cldeb
@@ -817,12 +823,12 @@ SUBROUTINE inipar_alloc()
   !* Formats
 
 1001 FORMAT(A9)
-1002 FORMAT(A1000)
+1002 FORMAT(A5000)
 1003 FORMAT(I1)
 
 
   !*    2. Get field information
-  !        ---------------------
+  !        --------------------
   
   !* Read total number of fields exchanged by this OASIS process
   
@@ -1495,7 +1501,7 @@ SUBROUTINE inipar_alloc()
     !*    Formats
 
 2001    FORMAT(A9)
-2002    FORMAT(A1000)
+2002    FORMAT(A5000)
 2003    FORMAT(I4)
 2004    FORMAT(I8)
 2009    FORMAT(A8)
@@ -1628,7 +1634,7 @@ SUBROUTINE inipar_alloc()
 
 !* ---------------------------- Local declarations --------------------
   
-  CHARACTER*1000 clline, clvari
+  CHARACTER*5000 clline, clvari
   CHARACTER*9 clword, clstring, clprint, clcal, clchan
   CHARACTER*9 cljob, clmod, cltime, clseq, cldate, clhead
   CHARACTER*8 cl_print_trans, cl_print_state
@@ -1922,7 +1928,7 @@ SUBROUTINE inipar_alloc()
    !* Formats
 
 1001 FORMAT(A9)
-1002 FORMAT(A1000)
+1002 FORMAT(A5000)
 1003 FORMAT(I3)
 1004 FORMAT(I8)
 
@@ -2564,7 +2570,7 @@ SUBROUTINE inipar_alloc()
 !* Formats
 
  2001 FORMAT(A9)
- 2002 FORMAT(A1000)
+ 2002 FORMAT(A5000)
  2003 FORMAT(I4)
  2004 FORMAT(I8)
  2005 FORMAT(I2)
@@ -3706,7 +3712,7 @@ ENDIF
   cdone(1:klen) = clline(1:klen)
   GO TO 100
 120 CONTINUE 
-1001 FORMAT(A1000)
+1001 FORMAT(A5000)
 !
 !
 !*    2. Do the extraction job
@@ -3864,7 +3870,7 @@ ENDIF
   cdone(1:klen) = clline(1:klen)
   GO TO 100
 120 CONTINUE 
-1001 FORMAT(A1000)
+1001 FORMAT(A5000)
 !
 !
 !*    2. Do the extraction job
@@ -3986,7 +3992,7 @@ ENDIF
 !** ++ Local declarations
 !
   INTEGER (kind=ip_intwp_p) :: ib
-  CHARACTER(len=1000) :: cl_line
+  CHARACTER(len=id_len) :: cl_line
   CHARACTER(len=1) :: cl_two
   character(len=*),parameter :: subname='(mod_oasis_namcouple:skip)'
 !
@@ -4009,7 +4015,7 @@ ENDIF
 140 CONTINUE
   ENDFLAG = .true.
   RETURN
-1001 FORMAT(A1000)
+1001 FORMAT(A5000)
 !
 !*-----------------------------------------------------------------------
 !

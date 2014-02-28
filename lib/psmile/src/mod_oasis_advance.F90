@@ -68,38 +68,39 @@ contains
 
     call oasis_debug_note(subname//' loop over cplid')
     cplid=1
-    DO WHILE (cplid <= prism_ncoupler)
-      dt    = prism_coupler(cplid)%dt
-      lag   = prism_coupler(cplid)%lag
-      ltime = prism_coupler(cplid)%ltime
-      getput= prism_coupler(cplid)%getput
-      rstfile=TRIM(prism_coupler(cplid)%rstfile)
-      partid= prism_coupler(cplid)%partID
-      msec = 0   ! reasonable default to start with
-      mseclag = msec
+    DO WHILE (cplid <= prism_mcoupler)
+    if (prism_coupler(cplid)%valid) then
+       dt    = prism_coupler(cplid)%dt
+       lag   = prism_coupler(cplid)%lag
+       ltime = prism_coupler(cplid)%ltime
+       getput= prism_coupler(cplid)%getput
+       rstfile=TRIM(prism_coupler(cplid)%rstfile)
+       partid= prism_coupler(cplid)%partID
+       msec = 0   ! reasonable default to start with
+       mseclag = msec
 
-      IF (OASIS_Debug >= 2) THEN
+       IF (OASIS_Debug >= 2) THEN
           WRITE(nulprt,*) subname,' Field cplid :',cplid,TRIM(prism_coupler(cplid)%fldlist)
-          WRITE(nulprt,*) subname,' lag prism_ncoupler :',lag,prism_ncoupler
+          WRITE(nulprt,*) subname,' lag prism_mcoupler :',lag,prism_mcoupler
           CALL oasis_flush(nulprt)
-      ENDIF
+       ENDIF
 
-      !------------------------------------------------
-      ! check that lag is reasonable
-      !------------------------------------------------
+       !------------------------------------------------
+       ! check that lag is reasonable
+       !------------------------------------------------
 
-      IF (lag > dt .OR. lag <= -dt) THEN
+       IF (lag > dt .OR. lag <= -dt) THEN
           WRITE(nulprt,*) subname,' ERROR lag out of dt range cplid/dt/lag=',cplid,dt,lag
           WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
           CALL oasis_abort()
-      ENDIF
+       ENDIF
 
-      !------------------------------------------------
-      ! read restart and call advance for the current fields
-      ! right now, do not know whether any hot map terms are there
-      ! assume they are if something is read, otherwise not
-      !------------------------------------------------
-      IF ( (getput == OASIS3_PUT .AND. lag > 0) ) THEN
+       !------------------------------------------------
+       ! read restart and call advance for the current fields
+       ! right now, do not know whether any hot map terms are there
+       ! assume they are if something is read, otherwise not
+       !------------------------------------------------
+       IF ( (getput == OASIS3_PUT .AND. lag > 0) ) THEN
           msec=0-lag
           lsize = mct_aVect_lsize(prism_coupler(cplid)%aVect1)
           nflds = mct_aVect_nRAttr(prism_coupler(cplid)%aVect1)
@@ -111,8 +112,8 @@ contains
           ALLOCATE(array5(lsize))
 
           DO nf = 1,nflds
-            varid = prism_coupler(cplid)%varid(nf)
-            CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,icount=icount,nff=nf,array1din=array,&
+             varid = prism_coupler(cplid)%varid(nf)
+             CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,icount=icount,nff=nf,array1din=array,&
                                  readrest=.TRUE., array2=array2,array3=array3, &
                                  array4=array4,array5=array5)
           ENDDO
@@ -123,25 +124,30 @@ contains
           DEALLOCATE(array3)
           DEALLOCATE(array4)
           DEALLOCATE(array5)
-      ELSE
+       ELSE
           cplid=cplid+1
-      ENDIF
+       ENDIF
+    ELSE
+       cplid=cplid+1
+    ENDIF ! valid
     ENDDO ! cplid
     !
-    DO cplid=1, prism_ncoupler
-      dt    = prism_coupler(cplid)%dt
-      lag   = prism_coupler(cplid)%lag
-      ltime = prism_coupler(cplid)%ltime
-      getput= prism_coupler(cplid)%getput
-      rstfile=TRIM(prism_coupler(cplid)%rstfile)
-      partid= prism_coupler(cplid)%partID
-      msec = 0   ! reasonable default to start with
-      mseclag = msec
+    DO cplid=1, prism_mcoupler
+    IF (prism_coupler(cplid)%valid) then
+       dt    = prism_coupler(cplid)%dt
+       lag   = prism_coupler(cplid)%lag
+       ltime = prism_coupler(cplid)%ltime
+       getput= prism_coupler(cplid)%getput
+       rstfile=TRIM(prism_coupler(cplid)%rstfile)
+       partid= prism_coupler(cplid)%partID
+       msec = 0   ! reasonable default to start with
+       mseclag = msec
       
-      IF (OASIS_Debug >= 2) THEN
-          WRITE(nulprt,*) subname,' Field cplid :',cplid,TRIM(prism_coupler(cplid)%fldlist)
-          CALL oasis_flush(nulprt)
-      ENDIF
+       IF (OASIS_Debug >= 2) THEN
+           WRITE(nulprt,*) subname,' Field cplid :',cplid,TRIM(prism_coupler(cplid)%fldlist)
+           CALL oasis_flush(nulprt)
+       ENDIF
+
        !------------------------------------------------
        ! read restart for LOCTRANS fields
        ! do after restart and advance above because prism_advance_run
@@ -217,7 +223,8 @@ contains
                              maxval(prism_coupler(cplid)%avect1%rAttr)
           endif
        endif
-     ENDDO  ! cplid
+    ENDIF  ! valid
+    ENDDO  ! cplid
     call oasis_timer_stop ('advance_init')
 
     call oasis_debug_exit(subname)
@@ -502,7 +509,8 @@ contains
        ! attempts to trap deadlocks before they happen
        !------------------------------------------------
 
-       do n = 1,prism_ncoupler
+       do n = 1,prism_mcoupler
+       if (prism_coupler(n)%valid) then
           if ((prism_coupler(n)%ltime /= ispval) .and. &
               (sndrcv .and. prism_coupler(n)%sndrcv) .and. &
               (msec >  prism_coupler(n)%ltime + prism_coupler(n)%dt)) then
@@ -538,7 +546,8 @@ contains
              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
              call oasis_abort()
           endif
-       enddo
+       endif  ! valid
+       enddo  ! prism_mcoupler
 
        !------------------------------------------------
        ! compute field index and check sizes
