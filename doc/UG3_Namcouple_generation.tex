@@ -1,0 +1,391 @@
+\newpage
+\chapter{The configuration file {\it namcouple}}
+\label{sec_namcouple}
+
+The OASIS3-MCT configuration file {\it namcouple} contains, below
+pre-defined keywords, all user's defined information necessary to
+configure a particular coupled run.
+
+The {\it namcouple} is a text file with the following characteristics:
+
+\begin{itemize}
+\item the keywords used to separate the information can appear in any
+  order;
+\item the number of blanks between two character strings is
+  non-significant;
+\item all lines beginning with \# are ignored and considered as
+  comments.
+\item {\bf blank lines are not allowed.}
+\end{itemize}
+
+The first part of {\it namcouple } is devoted to configuration of
+general parameters such as the number of models involved in the
+simulation or the number of fields.  The second part gathers specific
+information on each coupling (or I/O) field, e.g. their coupling
+period, the list of transformations or interpolations to be performed
+by OASIS3-MCT and associated configuring lines (described in more
+details in chapter \ref{sec_transformations}), etc.
+
+In OASIS3-MCT, several {\it namcouple} inputs have been deprecated
+but, for backwards compatibility, they are still allowed.  These
+inputs will be noted in the following text using the notation
+``UNUSED'' and not fully described. Information below these keywords
+is obsolete in OASIS3-MCT; it will not be read and will not be used.
+
+In the next sections, a simple {\it namcouple} example is given and
+all configuring parameters are described. The additional lines
+containing the different parameters required for each transformation
+are described in section \ref{sec_transformations}. A realistic {\it
+  namcouple} can be found in {\tt
+  oasis3-mct/examples/tutorial/data\_oasis3/} directory.
+
+\section{An example of a simple {\it namcouple}}
+\label{subsec_examplenamcouple}
+
+The following simple {\it namcouple} configures a run into which an
+ocean, an atmosphere and an atmospheric chemistry models are
+coupled. The ocean provides only the SOSSTSST field to the atmosphere,
+which in return provides the field CONSFTOT to the ocean. One field
+(COSENHFL) is exchanged from the atmosphere to the atmospheric
+chemistry, and one field (SOALBEDO) is read from a file by the ocean.
+
+\begin{verbatim}
+######################################################################
+# First section
+#
+ $SEQMODE
+#
+ $CHANNEL
+#
+ $NFIELDS
+    4  
+#
+ $JOBNAME
+#
+ $NBMODEL
+    3  ocemod   atmmod  chemod  55  70   99 
+#
+ $RUNTIME
+    432000
+#
+ $INIDATE
+#
+ $MODINFO
+#
+ $NLOGPRT
+   2     1
+#
+ $CALTYPE
+#
+######################################################################
+# Second section 
+ $STRINGS
+#
+# Field 1
+ SOSSTSST SISUTESU 1 86400  5  sstoc.nc  EXPORTED
+ 182  149  128  64  toce  atmo   LAG=+14400  SEQ=+1
+ P 2 P 0
+ LOCTRANS CHECKIN MAPPING  BLASNEW CHECKOUT 
+#
+  AVERAGE 
+  INT=1
+  map_toce_atmo_120315.nc src opt
+  1.0  1
+  CONSTANT     273.15 
+  INT=1
+#
+# Field 2
+ CONSFTOT SOHEFLDO 6 86400  4   flxat.nc  EXPORTED
+ atmo   toce  LAG=+14400  SEQ=+2
+ P 0 P 2
+ LOCTRANS  CHECKIN  SCRIPR CHECKOUT
+#
+  ACCUMUL 
+  INT=1
+  BILINEAR LR SCALAR LATLON 1
+  INT=1
+#
+# Field 3
+ COSENHFL  SOSENHFL  37  86400   1  flda3.nc  IGNOUT 
+ atmo   atmo LAG=+7200 
+ LOCTRANS
+ AVERAGE
+#
+# Field 4
+ SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT
+#####################################################################
+ $END
+\end{verbatim}
+
+% section{An example of a simple {\it namcouple}}
+
+\section{ First section of {\it namcouple} file}
+\label{subsec_namcouplefirst}
+
+The first section of {\it namcouple } uses some predefined keywords
+prefixed by the \$ sign to locate the related information. The \$ sign
+must be in the second column. The first ten keywords are described
+hereafter:
+
+\begin{itemize}
+
+\item {\tt \$SEQMODE}: UNUSED
+
+\item {\tt \$CHANNEL}: UNUSED
+
+\item {\tt \$NFIELDS}: On the line below this keyword is the total
+  number of field entries in the second part of the {\it
+    namcouple}. If more than one field are described on the same line
+  (new in OASIS3-MCT\_1.0, see appendix \ref{sec_changes_new}) this
+  counts as only one entry.
+
+\item {\tt \$JOBNAME}: UNUSED
+
+\item {\tt \$NBMODEL}: On the line below this keyword is the number of
+  models running in the given experiment followed by {\tt
+    CHARACTER$\star$6} variables giving their names, which must
+  correspond to the name announced by each model when calling {\tt
+    oasis\_init\_comp} (second argument, see section
+  \ref{subsubsec_Initialisation}).
+
+  Then the user may indicate on the same line the maximum Fortran unit
+  number used by the models. In the example, Fortran units above 55,
+  70, and 99 are free for respectively the ocean, atmosphere, and
+  atmospheric chemistry models. {\bf In all cases, OASIS3-MCT library
+    assumes, during the initialization phase, that units 1025 and 1026
+    are free and temporarily uses these units to read the {\it
+      namcouple} and to write corresponding log messages to file {\tt
+      nout.000000}.} After the initialization phase, OASIS3-MCT will
+  still suppose that units above 1024 are free, unless maximum unit
+  numbers are indicated here in the {\it namcouple}.
+  % If {\tt \$CHANNEL} is {\tt NONE}, {\tt \$NBMODEL} has to be 0 and
+  % there should be no model name and no unit number.
+
+\item {\tt \$RUNTIME}: On the line below this keyword is the total
+  simulated time of the run, expressed in seconds (or any other time
+  units as long as the same are used in all models and in the {\it
+    namcouple}, see \ref{subsubsec_sendingreceiving}).
+  % If {\tt \$CHANNEL} is {\tt NONE}, {\tt \$RUNTIME} has to be the
+  % number of time occurrences of the field to interpolate from the
+  % restart file.
+
+\item {\tt \$INIDATE}: UNUSED
+
+\item {\tt \$MODINFO}: UNUSED
+ 
+\item {\tt \$NLOGPRT}: The first and second numbers on the line below
+  this keyword refer to the amount of debug and time statistic
+  information written by OASIS3-MCT for each model and processor.
+
+  The first number (that can be changed at runtime with the {\tt
+    oasis\_set\_debug} routine, see section
+  \ref{subsubsec_auxroutines}) may be:
+  \begin{itemize}
+  \item 0 : one file debug.root.xx is open by the master proces of
+    each model and one file debug\_notroot.xx is open for all the
+    other processes of each model to write only error information.
+  \item 1 : one file debug.root.xx is open by the master proces of
+    each model to write information equivalent to level 10 (see
+    below); one file debug\_notroot.xx is open for all the other
+    processes of each model to write error information.
+  \item 2 : one file debug.xx.xxxxxx is open by each process of each
+    model to write normal production diagnostics
+  \item 5 : as for 2 with in addition some initial debug info
+  \item 10: as for 5 with in addition the routine calling tree
+  \item 12: as for 10 with in addition some routine calling notes
+  \item 15: as for 12 with even more debug diagnostics
+  \item 20: as for 15 with in addition some extra runtime analysis
+  \item 30: full debug information
+  \end{itemize}
+  The second number defines how time statistics are written out to
+  file {\tt *.timers\_xxxx}; it can be:
+  \begin{itemize}
+  \item 0 : nothing is calculated, nothing is written.
+  \item 1 : some time statistics are calculated and written in a
+    single file by the processor 0 as well as the min and the max
+    times over all the processors.
+  \item 2 : some time statistics are calculated and each processor
+    writes its own file ; processor 0 also writes the min and the max
+    times over all the processors in its file.
+  \item 3 : some time statistics are calculated and each processor
+    writes its own file ; processor 0 also writes in its file the min
+    and the max times over all processors and also writes in its file
+    all the results for each processor.
+  \end{itemize}
+  For more information on the time statistics written out, see section
+  \ref{timestat}.
+
+\item {\tt \$CALTYPE}: UNUSED
+
+\end{itemize}
+
+% {Description of {\it namcouple} first section}
+
+\section{Second section of {\it namcouple} file }
+\label{subsec_namcouplesecond}
+
+The second part of the {\it namcouple}, starting after the keyword
+{\tt \$STRINGS}, contains coupling information for each coupling (or
+I/O) field.  Its format depends on the field status given by the last
+entry on the field first line ({\tt EXPORTED}, {\tt IGNOUT} or {\tt
+  INPUT} in the example above). The field may be :
+
+\begin{itemize}
+\item {\tt AUXILARY}: UNUSED
+\item {\tt EXPORTED}: exchanged between component models and
+  transformed by OASIS3-MCT
+\item {\tt EXPOUT}: exchanged, transformed and also written to two
+  debug NetCDF files, one before the sending action in the source
+  model below the {\tt oasis\_put} call (after local transformations
+  {\tt LOCTRANS} and {\tt BLASOLD} if present), and one after the
+  receiving action in the target model below the {\tt oasis\_get} call
+  (after all transformations). {\tt EXPOUT} should be used when
+  debugging the coupled model only. The name of the debug NetCDF file
+  (one per field) is automatically defined based on the field and
+  component model names.
+\item {\tt IGNORED}: with OASIS3-MCT, this setting is equivalent to
+  and converted to EXPORTED
+\item {\tt IGNOUT}: with OASIS3-MCT, this setting is equivalent to and
+  converted to EXPOUT
+\item {\tt INPUT}: read in from the input file by the target model
+  below the {\tt oasis\_get} call at
+  appropriate times corresponding to the input period indicated by the
+  user in the {\it namcouple}. See section \ref{subsec_inputdata} for
+  the format of the input file.
+\item {\tt OUTPUT}: written out to an output debug NetCDF file by the
+  source model below the {\tt oasis\_put} call, after local
+  transformations {\tt LOCTRANS} and {\tt BLASOLD}, at appropriate
+  times corresponding to the output period indicated by the user in
+  the {\it namcouple}.
+
+\end{itemize}
+
+\subsection{Second section of {\it namcouple} for {\tt EXPORTED} and
+  {\tt EXPOUT} fields}
+\label{subsubsec_secondEXPORTED}
+
+The first 3 lines for fields with status {\tt EXPORTED} and {\tt
+  EXPOUT} are as follows:
+  \begin{verbatim}
+   SOSSTSST SISUTESU 1 86400  5  sstoc.nc  EXPORTED
+   182  149    128  64  toce  atmo   LAG=+14400 SEQ=+1
+   P 2 P 0 
+\end{verbatim}
+%\vspace{-0.2cm} 
+where the different entries are:
+\begin{itemize}
+\item Field first line:
+  \begin{itemize}
+  \item {\tt SOSSTSST} : symbolic name for the field in the source
+    model ({\tt CHARACTER*128}). It has to match the argument {\tt name}
+    of the corresponding field declaration in the source model; see
+    {\tt oasis\_def\_var} in section \ref{subsubsec_Declaration}
+  \item {\tt SISUTESU} : symbolic name for the field in the target
+    model ({\tt CHARACTER*128}).  It has to match the argument {\tt
+      name} of the corresponding field declaration in the target
+    model; see {\tt oasis\_def\_var} in section
+    \ref{subsubsec_Declaration}
+  \item 1 : UNUSED but still required for parsing
+  \item 86400 : coupling and/or I/O period for the field, in seconds
+  \item 5 : number of transformations to be performed by OASIS3 on
+    this field
+  \item sstoc.nc : name of the coupling restart file for the field
+    ({\tt CHARACTER*8}); mandatory even if no coupling restart file is
+    effectively used (for more detail, see section
+    \ref{subsec_restartdata})
+  \item {\tt EXPORTED} : field status
+  \end{itemize}
+\item Field second line:
+  \begin{itemize}
+  \item 182 : number of points for the source grid first dimension
+    (optional)
+  \item 149 : number of points for the source grid second dimension
+    (optional)\footnote{For 1D field, put {\tt 1} as the second dimension}
+  \item 128 : number of points for the target grid first dimension
+    (optional)
+  \item 64 : number of points for the target grid second dimension
+    (optional)$^{1}$
+
+    {\bf These source and target grid dimensions are optional but note that
+    in order to have 2D fields written as 2D arrays in the debug
+    files, these dimensions must be provided in the {\it namcouple};
+    otherwise, the fields will be written out as 1D arrays.}
+  
+  \item toce : prefix of the source grid name in grid data files (see
+    section \ref{subsec_griddata}) ({\tt CHARACTER*4})
+  \item atmo : prefix of the target grid name in grid data files ({\tt
+      CHARACTER*4})
+  \item {\tt LAG=+14400}: optional lag index for the field (see section \ref{subsub_lag})
+  \item {\tt SEQ=+1}: optional sequence index for the field (see
+    section \ref{subsec_sec})
+  \end{itemize}
+\item Field third line
+  \begin{itemize}
+  \item P : source grid first dimension characteristic (`P':
+    periodical; `R': regional).
+  \item 2 : source grid first dimension number of overlapping grid
+    points.
+  \item P : target grid first dimension characteristic (`P':
+    periodical; `R': regional).
+  \item 0 : target grid first dimension number of overlapping grid
+    points.
+  \end{itemize}
+     
+\end{itemize}
+    
+The fourth line gives the list of transformations to be performed for
+this field. In addition, there is one or more configuring lines
+describing some parameters for each transformation. These additional
+lines are described in more details in the chapter
+\ref{sec_transformations}.
+
+\subsection{Second section of {\it namcouple} for {\tt OUTPUT} fields}
+\label{subsubsec_secondOUTPUT}
+The first 2 lines for fields with status {\tt OUTPUT} are as follows:
+  \begin{verbatim}
+  COSHFTOT  COSHFTOT   7   86400  0  fldhftot.nc OUTPUT 
+  atmo   atmo 
+\end{verbatim}
+% \vspace{-0.2cm}
+where the different entries are as for {\tt EXPOUT} fields, except
+that:
+\begin{itemize}
+\item the source symbolic name must be repeated twice on the field
+  first line,
+\item the restart file name (here {\tt fldhftot.nc}) is needed only if
+  a {\tt LOCTRANS} transformation is present,
+\item there is no output file name on the first line,
+\item there is no grid dimension\footnote{This means that all output
+    fields will be written out in the output files as 1D arrays (this
+    should be fixed in the next OASIS3-MCT version).} and no LAG or SEQ
+  index on the second line; ;
+\end{itemize}
+The name of the output file is automatically defined based on the
+field and component model names.
+
+The third line is {\tt LOCTRANS} if this transformation is chosen for
+the field. Note that {\tt LOCTRANS} is the only transformation
+supported for {\tt OUTPUT} fields.
+
+\subsection{Second section of {\it namcouple} for {\tt INPUT} fields}
+\label{subsubsec_secondINPUT}
+
+The first and only line for fields with status {\tt INPUT} is:
+
+  \begin{verbatim}
+  SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT
+  \end{verbatim}
+\vspace{-0.5cm}
+where the different entries are:
+\begin{itemize}
+\item {\tt SOALBEDO}: symbolic name for the field in the target model
+  ({\tt CHARACTER*128} repeated twice)
+\item 17: index in auxiliary file cf\_name\_table.txt (see above for
+  EXPORTED fields)
+\item 86400: input period in seconds
+\item 0: number of transformations (always 0 for {\tt INPUT} fields)
+\item {\tt SOALBEDO.nc}: {\tt CHARACTER*32} giving the input file name
+  (for more detail on its format, see section \ref{subsec_inputdata})
+\item {\tt INPUT}: field status.
+\end{itemize}
+

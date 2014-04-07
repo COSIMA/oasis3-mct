@@ -1,0 +1,161 @@
+------------------------------------------------------------------------
+r954 | coquart | 2014-04-01 20:10:58 +1100 (Tue, 01 Apr 2014) | 2 lines
+
+Fix small bug in compilation options for beaufix.
+
+------------------------------------------------------------------------
+r941 | coquart | 2014-03-05 22:39:15 +1100 (Wed, 05 Mar 2014) | 2 lines
+
+Add header Makefile to compile on Beaufix (BULL at Meteo-France).
+
+------------------------------------------------------------------------
+r932 | coquart | 2014-02-27 21:14:48 +1100 (Thu, 27 Feb 2014) | 3 lines
+
+Add Makefile header to compile on ADA at Idris (thanks to Marie-Alice Foujols).
+
+
+------------------------------------------------------------------------
+r926 | coquart | 2014-02-13 20:02:21 +1100 (Thu, 13 Feb 2014) | 3 lines
+
+Remove SRCS2, SRCS3, OBJS2, OBJS3 and compilation of .f90, .F and .f files as they do not exist anymore in the sources of OASIS3-MCT.
+This was leading to messages in the COMP.err file that could be misleading for the users.
+
+------------------------------------------------------------------------
+r911 | coquart | 2014-01-28 19:21:39 +1100 (Tue, 28 Jan 2014) | 3 lines
+
+Update user guide to include POINTS partition
+
+
+------------------------------------------------------------------------
+r910 | coquart | 2014-01-28 19:16:32 +1100 (Tue, 28 Jan 2014) | 4 lines
+
+- mod_oasis_part.F90 :  fix for redmine #843 partitions with no gridcells defined on some processes
+- mod_oasis_coupler.F90 : mods for cpl_setup performance improvement
+
+
+------------------------------------------------------------------------
+r895 | coquart | 2014-01-07 21:10:18 +1100 (Tue, 07 Jan 2014) | 3 lines
+
+Remove blank character
+
+
+------------------------------------------------------------------------
+r893 | coquart | 2014-01-07 20:06:14 +1100 (Tue, 07 Jan 2014) | 6 lines
+
+Update version of compiler and mpi library on corail:
+- compiler version 13.1 
+- intel mpi version 4.1
+
+
+
+------------------------------------------------------------------------
+r881 | coquart | 2013-12-11 19:39:55 +1100 (Wed, 11 Dec 2013) | 2 lines
+
+Optimization of the routine oasis_string_listGetIndex in mod_oasis_string.F90 in the case where coupling fields are grouped together into a single communication.
+
+------------------------------------------------------------------------
+r852 | coquart | 2013-11-28 00:18:12 +1100 (Thu, 28 Nov 2013) | 3 lines
+
+- Print SUCCESSFULL RUN in the debug files of the root even if OASIS_Debug=0 .
+- Print the name of the field not defined in the namcouple to debug  more easily.
+
+------------------------------------------------------------------------
+r846 | coquart | 2013-10-31 21:10:05 +1100 (Thu, 31 Oct 2013) | 3 lines
+
+Add informations on restart files (see ticket 842).
+
+
+------------------------------------------------------------------------
+r840 | coquart | 2013-10-29 21:28:06 +1100 (Tue, 29 Oct 2013) | 2 lines
+
+Add that dimensions of source grid and target grid are necessary in the remapping files (section 5.4). 
+
+------------------------------------------------------------------------
+r814 | coquart | 2013-10-17 01:05:02 +1100 (Thu, 17 Oct 2013) | 2 lines
+
+Abort if -Dbalance is activated and NLOGPRT < 2 (see ticket 841).
+
+------------------------------------------------------------------------
+r801 | coquart | 2013-10-11 20:11:42 +1100 (Fri, 11 Oct 2013) | 2 lines
+
+The name of the coupling fields can be coded on 128 characters, instead of only 8 characters (functionnality asked by Sebastien Masson and Uwe Fladrich).
+
+------------------------------------------------------------------------
+r797 | coquart | 2013-10-10 21:37:24 +1100 (Thu, 10 Oct 2013) | 2 lines
+
+Add a comment on the use of the CPP key balance.
+
+------------------------------------------------------------------------
+r793 | coquart | 2013-10-10 21:03:23 +1100 (Thu, 10 Oct 2013) | 2 lines
+
+Remove CPP key balance as it is temporarily not recommended (see ticket 841).
+
+------------------------------------------------------------------------
+r775 | coquart | 2013-09-23 23:40:05 +1000 (Mon, 23 Sep 2013) | 4 lines
+
+Increase ic_lvar to 128 so that Sebastien Masson can use more than 32 characters for the names of his coupling fields.
+
+
+
+------------------------------------------------------------------------
+r762 | coquart | 2013-09-13 23:00:35 +1000 (Fri, 13 Sep 2013) | 5 lines
+
+Add precision about CHECKIN and CHECKOUT :
+the min, max and sum of the source/target field values are written under the attribute "diags" in the debug file of the root processes.
+
+
+
+------------------------------------------------------------------------
+r757 | coquart | 2013-09-05 19:08:03 +1000 (Thu, 05 Sep 2013) | 6 lines
+
+Fix 2 small bugs in the namcouple given as example in the documentation:
+- There was no $XMULT et $NBFIELDS associated to BLASNEW (reported by Anthony Thevenin)
+- There was no $END (reported by Eric Maisonnave)
+
+
+
+------------------------------------------------------------------------
+r722 | coquart | 2013-07-23 19:37:12 +1000 (Tue, 23 Jul 2013) | 2 lines
+
+Modify the order of the optional arguments in the routine oasis_put to be coherent with the source code.
+
+------------------------------------------------------------------------
+r719 | coquart | 2013-06-19 17:11:38 +1000 (Wed, 19 Jun 2013) | 2 lines
+
+Bug fix to run on Neptune (BULL computer at Cerfacs): deallocate global structures av2g and av1g only on the master process.
+
+------------------------------------------------------------------------
+r693 | coquart | 2013-06-11 18:17:47 +1000 (Tue, 11 Jun 2013) | 2 lines
+
+Update documentation about coupling fields in single and double precision: the exchange is now supported directly through the interface and it is not need anymore to promote REAL variables to double precision at compilation to couple double precision fields.
+
+------------------------------------------------------------------------
+r692 | coquart | 2013-06-11 17:43:57 +1000 (Tue, 11 Jun 2013) | 2 lines
+
+Bug fix in mod_oasis_advance.F90: Symbol '==' was used with a logical variable instead of '.EQV.' leading to an error when compiling oasis3-mct with gfortran and xlf (on IMB AIX). 
+
+------------------------------------------------------------------------
+r672 | valcke | 2013-05-27 20:27:52 +1000 (Mon, 27 May 2013) | 1 line
+
+"branch_copy_by_TkSVN"
+------------------------------------------------------------------------
+r671 | valcke | 2013-05-27 20:27:52 +1000 (Mon, 27 May 2013) | 1 line
+
+"branch_copy_by_TkSVN"
+------------------------------------------------------------------------
+r670 | valcke | 2013-05-27 20:27:52 +1000 (Mon, 27 May 2013) | 1 line
+
+"branch_copy_by_TkSVN"
+------------------------------------------------------------------------
+r669 | valcke | 2013-05-27 20:27:52 +1000 (Mon, 27 May 2013) | 1 line
+
+"branch_copy_by_TkSVN"
+------------------------------------------------------------------------
+r668 | valcke | 2013-05-27 20:27:52 +1000 (Mon, 27 May 2013) | 1 line
+
+"branch_copy_by_TkSVN"
+------------------------------------------------------------------------
+r667 | valcke | 2013-05-27 20:27:51 +1000 (Mon, 27 May 2013) | 1 line
+
+"branches_directory_path_by_TkSVN"
+------------------------------------------------------------------------

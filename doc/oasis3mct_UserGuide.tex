@@ -1,0 +1,76 @@
+\documentclass[rs,english,toc,lot,lof,index,wide,overfull]{prismdoc}
+%====================================
+% PRISMDOC: Start Dokument Information
+%====================================
+%\usepackage{longtable}
+\usepackage{natbib}
+\usepackage{verbatim}
+\usepackage{epsfig}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{longtable}
+%
+% Specifications for cover pages: 
+
+\prismdocNum{}
+\prismdocTitel{{\fontsize{13}{16}\selectfont
+    OASIS3-MCT User Guide \\ [0.5ex]
+    \it{OASIS3-MCT\_2.0 }}}
+\prismdocAutor{Edited by:  \\ [0.5ex]
+            S. Valcke, T. Craig, L. Coquart  \\[0.5ex]
+            CERFACS/CNRS SUC URA No1875 \\[0.5ex]
+}
+\prismdocVersion{CERFACS TR/CMGC/13/17}
+\prismdocSName{Sophie Valcke}
+\prismdocFAff{CNRS}
+\prismdocSAff{CERFACS}
+%\prismdocFEM{toto}
+\prismdocFEm{oasishelp(at)cerfacs.fr} 
+\prismdocFName{Laure Coquart}
+\prismdocSPhone{}
+\prismdocFPhone{}
+%\prismdocFWp{wpnn}
+%\prismdocSWp{wpnn}
+\prismdocDate{May 2013}
+
+
+%====================================
+% PRISMDOC: End Dokument Information
+%====================================
+\newcommand{\antispace}{\vspace*{-2ex}}
+\newcommand{\bigspace}{\vspace*{+4ex}}
+\newcommand{\medspace}{\vspace*{+2ex}}
+\newcommand{\smallspace}{\vspace*{+0ex}}
+\newcommand{\marginlabel}[1]{\mbox{}\marginpar{\raggedleft\hspace{0pt}#1}}
+\newcommand{\imprt}{\marginlabel{{\bfseries\Huge !}}}
+\newcommand{\imprtbig}{\marginlabel{{\bfseries\Huge !}}}
+\newcommand{\bignote}{\marginlabel{{\bfseries\Huge !!!}}}
+\newcommand{\imprtsm}{\marginlabel{{\bfseries\LARGE !}}}
+\newcommand{\imnote}{\marginlabel{{\bfseries\LARGE !!!}}}
+\newcommand{\bcntr}{\begin{center}}
+\newcommand{\ecntr}{\end{center}}
+
+%\includeonly{documentation}
+\begin{document}
+%\setcounter{secnumdepth}{-1} 
+\prismdocHeader
+
+\include{defines}
+\include{UG_Acknowledgements}
+\include{UG0_Stepbystep_overview}
+%\include{UG1_Obtaining}
+\include{UG2_Model_interfacing}
+\include{UG3_Namcouple_generation}
+\include{UG4_Transformations}
+\include{UG5_Auxiliary_files}
+\include{UG6_Compilation_running}
+% > appendices
+\include{UGA1_Grid_description}
+\include{UGA4_changes}
+%\include{UGA2_SCRIP}
+%\include{UGA3_couplings}
+\include{UGA5_notinvolved}
+
+\include{UGRefs}
+\end{document}

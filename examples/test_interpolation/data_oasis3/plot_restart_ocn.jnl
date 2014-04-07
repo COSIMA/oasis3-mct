@@ -1,0 +1,3 @@
+use fdocn.nc
+shade FSENDOCN
+frame/file=restart_ocn.gif

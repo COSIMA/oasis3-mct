@@ -1,0 +1,5 @@
+use FSENDOCN_model1_01.nc
+shade FSENDOCN[k=1,d=1]
+
+
+

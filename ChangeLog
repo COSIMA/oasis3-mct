@@ -1,0 +1,626 @@
+This file describes what tags were created and why
+================================================================================
+Originator: tcraig
+Date: Oct 22 2012
+Model: oasis3-mct
+Version: oasis3-mct_121022
+
+- add check for coupling comms with no tasks, now abort instead of hangs 
+  (redmine #475)
+- modify mapping initialization to separate mask/area reading from map read, 
+  add AVred attribute to mapping datatype (redmine #394)
+	
+M      lib/psmile/src/mod_oasis_coupler.F90
+M      lib/psmile/src/mod_oasis_method.F90
+================================================================================
+Originator: tcraig
+Date: July 25 2012
+Model: oasis3-mct
+Version: oasis3-mct_120724
+
+- update kinfo return codes for get and put calls
+- modify conserv to support bfb on different pes, set by
+  optional argument to CONSERV namcouple (bfb or opt), 
+  default is now bfb.
+- fix bug asssociated with nrouter count (not answer changing)
+- add prism_method_createcouplcomm and change setlocalcomm interface
+  name to setcouplcomm.
+- update namcouple init to read namcouple on root pe first then other
+  pes.  improves error detection.
+- update psmile Makefile dependencies
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_getput_interface.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/Makefile
+
+================================================================================
+Originator: tcraig
+Date: July 11 2012
+Model: oasis3-mct
+Version: oasis3-mct_120711
+
+- add prism_method_setlocalcomm to allow components to reset the
+  coupling communicator to support coupling on a subset of pes
+- minor refactor of coupling initialization to support coupling
+  on subset of pes
+- add pes_coupling example test case
+- add a few additional debug statements
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_sys.F90
+M      lib/psmile/src/mod_prism.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/mod_prism_part.F90
+	
+================================================================================
+Originator: tcraig
+Date: June 12 2012
+Model: oasis3-mct
+Version: oasis3-mct_120612
+
+ - add run-time checking that NFIELDS is consistent with rest of namcouple.
+   if NFIELDS is too small or too large, the model will stop.
+ - remove requirement that grid nx and ny be set in namcouple, it's now optional
+   (again).
+ - remove requirement that SEQMODE be set properly in namcouple, it's now ignored
+   as it plays no role. (accidently removed after tag 120425)
+ - get all test cases running on corail
+	
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_part.F90
+M      lib/psmile/src/mod_prism_io.F90
+================================================================================
+Originator: tcraig
+Date: April 25 2012
+Model: oasis3-mct
+Version: oasis3-mct_120425
+
+- remove aborts due to inconsistent SEQMODE value vs SEQ values.  the SEQMODE
+  input is not needed.
+
+M      lib/psmile/src/mod_prism_namcouple.F90
+================================================================================
+Originator: tcraig
+Date: April 24 2012
+Model: oasis3-mct
+Version: oasis3-mct_120424
+
+- update loctrans restart files logic so restarts are only written
+  in the last coupling period of the run for the field
+
+M      lib/psmile/src/mod_prism_advance.F90
+================================================================================
+Originator: tcraig
+Date: April 11 2012
+Model: oasis3-mct
+Version: oasis3-mct_120411
+
+- add scrip to build system, update Makefiles
+- add capability to use SCRIPR in namcouple for a subset
+  of scrip options.  bilinear and conserve first order tested in tc3a.
+- use oasis3 based scrip version for oasis3-mct.  remove
+  oasis3 low level code dependencies like "mod" modules.  replace 
+  as needed with local implementations.  very minor changes.  otherwise,
+  scrip should be intact as in oasis3.
+- call into scrip from mod_prism_coupler, in particular, grid_init and
+  scrip to generate a mapping file.  later, that file is read into the
+  mct sparse matrix mapping datatype as if it had been generated offline.
+	
+M      lib/scrip/src/rotations.F90
+M      lib/scrip/src/gradient.f
+M      lib/scrip/src/scriprmp.F
+M      lib/scrip/src/timers.f
+M      lib/scrip/src/netcdf.F
+M      lib/scrip/src/remap_bilinear_reduced.f
+M      lib/scrip/src/kinds_mod.f
+M      lib/scrip/src/grids.f
+M      lib/scrip/src/remap_bilinear.f
+M      lib/scrip/src/vector.F90
+M      lib/scrip/src/corners.F
+M      lib/scrip/src/gradient_bicubic.f
+M      lib/scrip/src/scrip.F
+M      lib/scrip/src/remap_bicubic_reduced.F90
+M      lib/scrip/src/Makefile
+M      lib/scrip/src/iounits.f
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_io.F90
+M      lib/psmile/src/Makefile
+M      util/make_dir/TopMakefileOasis3
+M      examples/tutorial/run_tutorial
+M      examples/tutorial/Makefile
+================================================================================
+Originator: tcraig
+Date: April 3 2012
+Model: oasis3-mct
+Version: oasis3-mct_120403
+
+- fix restart issues with LOCTRANS
+- fix restart issues with LOCTRANS and lag, tested in tc3a
+- some initial mods to support map generation using scrip 
+
+M      lib/psmile/src/mod_prism_data.F90
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_io.F90
+================================================================================
+Originator: tcraig
+Date: March 31 2012
+Model: oasis3-mct
+Version: oasis3-mct_120331
+
+- add prism_get_intracomm and prism_get_intercomm and test in tc3a testcase
+	
+M      lib/psmile/src/mod_prism_data.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism.F90
+M      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/Makefile
+================================================================================
+Originator: tcraig
+Date: March 23 2012
+Model: oasis3-mct
+Version: oasis3-mct_120323
+
+- remove compilation of oasis executable and use of oasis
+  central coupler in examples.  oasis src still in repository.
+
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      util/make_dir/TopMakefileOasis3
+M      examples/tutorial/run_tutorial
+================================================================================
+Originator: tcraig
+Date: March 20 2012
+Model: oasis3-mct
+Version: oasis3-mct_120320
+
+- Update grids writing to prevent multiple pes writing at the same time
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/Makefile
+	
+================================================================================
+Originator: tcraig
+Date: March 15 2012
+Model: oasis3-mct
+Version: oasis3-mct_120315
+
+- generalize prism_debug implementation, use nlogprt in namcoupler
+- add prism_set_debug and prism_get_debug interfaces to update
+  prism_debug at runtime
+- add enter, exit, and notes to create calling tree
+- add restart capability for loctrans operations
+- add prism_io_read_array, prism_io_write_array
+- update oasis interface names, remove proto
+	
+M      lib/psmile/src/mod_prism_data.F90
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_sys.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism.F90
+M      lib/psmile/src/mod_prism_timer.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_ioshr.F90
+M      lib/psmile/src/mod_prism_mpi.F90
+M      lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/mod_prism_getput_interface.F90
+M      lib/psmile/src/mod_prism_var.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_parameters.F90
+M      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/mod_prism_part.F90
+M      lib/psmile/src/mod_prism_string.F90
+M      lib/psmile/src/mod_prism_io.F90
+M      lib/psmile/src/Makefile
+M      lib/psmile/src/mod_prism_kinds.F90
+M      examples/tutorial/run_tutorial
+M      examples/tutorial/data_oasis3/namcouple
+================================================================================
+Originator: tcraig
+Date: Jan 29 2012
+Model: oasis3-mct
+Version: oasis3-mct_120129
+
+ - add bfb, sum, opt mapping options
+ - add support for CHECKIN, CHECKOUT
+ - add support for BLASOLD, BLASNEW for constants only
+ - add mapchk example for ORANGE decomp and all map options
+ - add support for MPI INIT/FINALIZE calls in models
+ - update testcases
+
+	M      lib/psmile/src/mod_prism_coupler.F90
+	M      lib/psmile/src/mod_prism_method.F90
+	M      lib/psmile/src/mod_prism_namcouple.F90
+	M      lib/psmile/src/mod_prism_advance.F90
+	M      examples/tutorial/run_tutorial
+	M      examples/tutorial/data_oasis3/namcouple
+	A      examples/mapchk
+	A      examples/mapchk/model2.F90
+	A      examples/mapchk/go.csh
+	A      examples/mapchk/decomp_def.F90
+	A      examples/mapchk/routine_hdlerr.F90
+	A      examples/mapchk/read_grid_irreg.F90
+	A      examples/mapchk/run_mapchk
+	A      examples/mapchk/read_dim_irreg.F90
+	A      examples/mapchk/read_grid_reg.F90
+	A      examples/mapchk/data_oasis3
+	A      examples/mapchk/data_oasis3/rmp_torc_to_lmdz_BILINEA.nc
+	A      examples/mapchk/data_oasis3/rmp_lmdz_to_torc_BILINEA.nc
+	A      examples/mapchk/data_oasis3/namcouple
+	A      examples/mapchk/data_oasis3/grid_model1.nc
+	A      examples/mapchk/data_oasis3/grid_model2.nc
+	A      examples/mapchk/data_oasis3/fdocn.nc
+	A      examples/mapchk/data_oasis3/postproc.out.base
+	A      examples/mapchk/data_oasis3/fdatm.nc
+	A      examples/mapchk/data_oasis3/cf_name_table.txt
+	A      examples/mapchk/function_sent.F90
+	A      examples/mapchk/oasis3_local_grid.F90
+	A      examples/mapchk/Makefile
+	A      examples/mapchk/read_dim_reg.F90
+	A      examples/mapchk/model1.F90
+	M      examples/restart/data_oasis3/namcouple
+	M      examples/tc3a/model2.F90
+	M      examples/tc3a/model3.F90
+	M      examples/tc3a/data_oasis3/namcouple
+	M      examples/tc3a/model1.F90
+	M      examples/tc3a/run_tc3a
+	
+================================================================================
+Originator: tcraig
+Date: Jan 24 2012
+Model: oasis3-mct
+Version: oasis3-mct_120124
+
+ - add mod_oasis and "oasis" parameters and interfaces, "prism" still allowed
+ - add restart test
+ - verify restart working for lags
+ - verify negative lag works and modify lag validation test to -dt < lag >= dt
+ - modify tc3a to test negative lag and oasis interfaces
+ - update some diagnostic output slightly
+ - update psmile Makefile dependencies
+ - change make build path to $(HOME)/oasis3-mct
+ - update tc3a M1FLD07 input file, verify "input" option works
+	
+M      lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_parameters.F90
+A      lib/psmile/src/mod_oasis.F90
+M      lib/psmile/src/Makefile
+M      util/make_dir/make.intel_corail
+M      util/make_dir/make.inc
+M      examples/tutorial/run_tutorial
+A      examples/restart
+A      examples/restart/model2.F90
+A      examples/restart/model3.F90
+A      examples/restart/go.csh
+A      examples/restart/decomp_def.F90
+A      examples/restart/routine_hdlerr.F90
+A      examples/restart/flddiag.F90
+A      examples/restart/read_dim_irreg.F90
+A      examples/restart/data_oasis3
+A      examples/restart/data_oasis3/rmp_torc_to_lmdz_BILINEA.nc
+A      examples/restart/data_oasis3/rmp_lmdz_to_torc_BILINEA.nc
+A      examples/restart/data_oasis3/namcouple
+A      examples/restart/data_oasis3/grid_model1.nc
+A      examples/restart/data_oasis3/grid_model2.nc
+A      examples/restart/data_oasis3/grid_model3.nc
+A      examples/restart/data_oasis3/rst1.nc
+A      examples/restart/data_oasis3/rst2.nc
+A      examples/restart/data_oasis3/rst3.nc
+A      examples/restart/data_oasis3/M1FLD07_input3.nc
+A      examples/restart/data_oasis3/cf_name_table.txt
+A      examples/restart/read_dim_reg.F90
+A      examples/restart/read_grid_irreg.F90
+A      examples/restart/run_restart
+A      examples/restart/read_grid_reg.F90
+A      examples/restart/function_sent.F90
+A      examples/restart/oasis3_local_grid.F90
+A      examples/restart/Makefile
+A      examples/restart/model1.F90
+M      examples/tc3a/model2.F90
+M      examples/tc3a/data_oasis3/namcouple
+A      examples/tc3a/data_oasis3/M1FLD07_input2.nc
+M      examples/tc3a/run_tc3a
+	
+================================================================================
+Originator: tcraig
+Date: Dec 14 2011
+Model: oasis3-mct
+Version: dev_tcraig_111214
+
+- add conserv methods
+- fix/add grids and area in model1/model2 fields
+- update grids writing to use grids.nc, areas.nc, masks.nc as output files
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_data.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_parameters.F90
+M      lib/psmile/src/Makefile
+M      lib/psmile/src/mod_prism_io.F90
+M      examples/tc3a/model2.F90
+M      examples/tc3a/model3.F90
+M      examples/tc3a/data_oasis3/namcouple
+A  +   examples/tc3a/data_oasis3/grids.nc.0
+D      examples/tc3a/data_oasis3/grids.nc
+A  +   examples/tc3a/data_oasis3/masks.nc.0
+D      examples/tc3a/data_oasis3/masks.nc
+M      examples/tc3a/model1.F90
+================================================================================
+Originator: tcraig
+Date: Nov 17 2011
+Model: oasis3-mct
+Version: dev_tcraig_111117
+
+- add input capability
+- turn off pio build and use of pio lib
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_io.F90
+M      src/Makefile
+M      ChangeLog
+M      util/make_dir/TopMakefileOasis3
+M      examples/tutorial/Makefile
+M      examples/tc3a/data_oasis3/namcouple
+M      examples/tc3a/Makefile
+A      examples/HR_tutorial/data_oasis3/cf_name_table.txt
+M      examples/HR_tutorial/Makefile
+================================================================================
+Originator: tcraig
+Date: Nov 4 2011
+Model: oasis3-mct
+Version: dev_tcraig_111104
+
+ - add restart capability
+ - make prism_coupler datatypes pointers
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_method.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_io.F90
+M      examples/tc3a/model2.F90
+M      examples/tc3a/model3.F90
+M      examples/tc3a/data_oasis3/namcouple
+A      examples/tc3a/data_oasis3/rst1.nc
+A      examples/tc3a/data_oasis3/rst2.nc
+A      examples/tc3a/data_oasis3/rst3.nc
+M      examples/tc3a/model1.F90
+================================================================================
+Originator: tcraig
+Date: Oct 26 2011
+Model: oasis3-mct
+Version: dev_tcraig_111025
+
+ - update control logic
+
+A      doc/oasis3-mct.txt
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_getput_interface.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_parameters.F90
+M      lib/psmile/src/mod_prism_io.F90
+M      examples/tc3a/data_oasis3/namcouple
+M      examples/tc3a/model1.F90
+================================================================================
+Originator: tcraig
+Date: Oct 23 2011
+Model: oasis3-mct
+Version: dev_tcraig_111024
+
+ - update prism_io_write_avfbf and read_avfbf to create timeseries of data,
+   should be usable for both "OUTPUT" and "INPUT"
+ - extend methods to include EXPOUT, EXPORTED, IGNORED==EXPORTED, IGNOUT==EXPOUT,
+   OUTPUT.  still need to work on INPUT.  AUXILARY not supported in general.
+ - add proper 2d output capability of fields
+
+M      lib/psmile/src/mod_prism_coupler.F90
+M      lib/psmile/src/mod_prism_namcouple.F90
+M      lib/psmile/src/mod_prism_advance.F90
+M      lib/psmile/src/mod_prism_io.F90
+================================================================================
+Originator: tcraig
+Date: Oct 22 2011
+Model: oasis3-mct
+Version: dev_tcraig_111023
+
+- extend getput interfaces to r14, r18, r24
+- rename mod_prism_grids_writing.F90 to mod_prism_grid.F90
+- refactor mod_prism_grid so it stores grids, writes at terminate
+
+D      lib/psmile/src/mod_prism_grids_writing.F90
+M      lib/psmile/src/mod_prism.F90
+A  +   lib/psmile/src/mod_prism_grid.F90
+M      lib/psmile/src/mod_prism_getput_interface.F90
+M      lib/psmile/src/Makefile
+M      examples/tc3a/model3.F90
+================================================================================
+Originator: tcraig
+Date: Oct 22 2011
+Model: oasis3-mct
+Version: dev_tcraig_111022
+
+- add I/O capabilities (not pio)
+- add nx,ny,gridname to prism_part
+- write grid files (need to change files)
+- write field output (need logic)
+
+M      oasis3-mct/lib/psmile/src/mod_prism_data.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_coupler.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_grids_writing.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_sys.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_timer.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_method.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_namcouple.F90
+A      oasis3-mct/lib/psmile/src/mod_prism_ioshr.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_advance.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_parameters.F90
+M      oasis3-mct/lib/psmile/src/mod_prism_part.F90
+M      oasis3-mct/lib/psmile/src/Makefile
+A      oasis3-mct/lib/psmile/src/mod_prism_io.F90
+M      oasis3-mct/src/Makefile
+M      oasis3-mct/util/make_dir/make.intel_corail
+M      oasis3-mct/examples/tutorial/run_tutorial
+M      oasis3-mct/examples/tc3a/model3.F90
+M      oasis3-mct/examples/tc3a/run_tc3a
+================================================================================
+Originator: tcraig
+Date: Oct 18 2011
+Model: oasis3-mct
+Version: dev_tcraig_111018
+
+- port to corail
+- add pio lib (pio1_3_11)
+
+M      lib/mpp_io/src/Makefile
+A      lib/pio
+A      lib/pio/m4
+A      lib/pio/m4/acx_mpi.m4
+A      lib/pio/m4/pkg.m4
+A      lib/pio/m4/acx_hdf5.m4
+A      lib/pio/m4/netcdf.m4
+A      lib/pio/m4/ax_fc_version.m4
+A      lib/pio/m4/fortran.m4
+A      lib/pio/pio_msg_getput_callbacks.F90
+A      lib/pio/configure
+A      lib/pio/pionfwrite_mod.F90
+A      lib/pio/alloc_mod.F90
+A      lib/pio/pionfwrite_mod.F90.in
+A      lib/pio/piodarray.F90
+A      lib/pio/pio_nf_utils.F90
+A      lib/pio/pio_msg_callbacks.F90
+A      lib/pio/alloc_mod.F90.in
+A      lib/pio/pio_spmd_utils.F90.in
+A      lib/pio/pionfput_mod.F90
+A      lib/pio/README.config
+A      lib/pio/configure.ac
+A      lib/pio/pionfread_mod.F90
+A      lib/pio/calcdisplace_mod.F90
+A      lib/pio/rearrange.F90
+A      lib/pio/pio_utils.F90
+A      lib/pio/pionfput_mod.F90.in
+A      lib/pio/pio_types.F90
+A      lib/pio/iompi_mod.F90
+A      lib/pio/pio_mpi_utils.F90
+A      lib/pio/fdepends.awk
+A      lib/pio/piolib_mod.F90
+A      lib/pio/pio_kinds.F90
+A      lib/pio/pionfget_mod.F90.in
+A      lib/pio/Makefile
+A      lib/pio/pionfatt_mod.F90
+A      lib/pio/box_rearrange.F90.in
+A      lib/pio/pio_support.F90
+A      lib/pio/pio.F90
+A      lib/pio/pionfatt_mod.F90.in
+A      lib/pio/pio_support.F90.in
+A      lib/pio/pio_msg_getput_callbacks.F90.in
+A      lib/pio/calcdecomp.F90
+A      lib/pio/ionf_mod.F90
+A      lib/pio/pio_spmd_utils.F90
+A      lib/pio/pio_quicksort.F90
+A      lib/pio/pio_msg_mod.F90
+A      lib/pio/piodarray.F90.in
+A      lib/pio/README
+A      lib/pio/topology.c
+A      lib/pio/dtypes.h
+A      lib/pio/nf_mod.F90
+A      lib/pio/config.h.in
+A      lib/pio/genf90.pl
+A      lib/pio/Makefile.conf.in
+A      lib/pio/pionfget_mod.F90
+A      lib/pio/pionfread_mod.F90.in
+A      lib/pio/rearrange.F90.in
+A      lib/pio/box_rearrange.F90
+A      lib/pio/aclocal.m4
+A      lib/pio/iompi_mod.F90.in
+M      lib/psmile/src/Makefile
+A      util/make_dir/make.intel_corail
+A      util/make_dir/make.intel_corail.oasis4
+M      util/make_dir/TopMakefileOasis3
+M      util/make_dir/make.inc
+A      util/make_dir/make.pgi_cerfacs_tioman
+M      examples/tutorial/go.csh
+M      examples/tutorial/Makefile
+M      examples/tc3a/go.csh
+M      examples/tc3a/Makefile
+
+================================================================================
+Originator: tcraig
+Date: Sep 22 2011
+Model: oasis3-mct
+Version: dev_tcraig_110922	
+
+- add timing module, mod_prism_timer.F90, from oasis4 with mods
+- rename mod_kinds_model to mod_prism_kinds
+- update model1, model2, model3 to use flddiag to diagnose global sum of fields
+- modify tc3a example to use 3 models and run in parallel
+	
+	M       oasis3-mct/lib/mpp_io/src/mod_kinds_mpp.F90
+	M       oasis3-mct/lib/mpp_io/src/Makefile
+	M       oasis3-mct/lib/psmile/src/mod_prism_coupler.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_data.F90
+	D       oasis3-mct/lib/psmile/src/mod_kinds_model.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_sys.F90
+	A       oasis3-mct/lib/psmile/src/mod_prism_timer.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_method.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_namcouple.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_mpi.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_var.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_getput_interface.F90
+	D       oasis3-mct/lib/psmile/src/mod_prism_time.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_advance.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_parameters.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_part.F90
+	M       oasis3-mct/lib/psmile/src/mod_prism_string.F90
+	M       oasis3-mct/lib/psmile/src/Makefile
+	A  +    oasis3-mct/lib/psmile/src/mod_prism_kinds.F90
+	M       oasis3-mct/util/make_dir/COMP.err
+	M       oasis3-mct/util/make_dir/COMP.log
+	M       oasis3-mct/examples/tc3a/model2.F90
+	M       oasis3-mct/examples/tc3a/model3.F90
+	A       oasis3-mct/examples/tc3a/flddiag.F90
+	M       oasis3-mct/examples/tc3a/data_oasis3/namcouple
+	M       oasis3-mct/examples/tc3a/Makefile
+	M       oasis3-mct/examples/tc3a/model1.F90
+	M       oasis3-mct/examples/tc3a/run_tc3a
+================================================================================
+Originator: tcraig
+Date: Sep 21 2011
+Model: oasis3-mct
+Version: dev_tcraig_110921
+
+One-line: initial import of oasis3-mct based on oasis3 Sept 6 2011.
+
+  examples tc3a and tutorial run as configured
+  weights generation still unavailable
+  IO still unavailable
+
+ Add everything under oasis3-mct
+
+================================================================================
+Originator: tcraig
+Date: Sep 21 2011
+Model: oasis3-mct
+Version: dev_tcraig_110920
+
+One-line: initial import of trunk based on Sept 6 2011 version
+
+==============================================================================

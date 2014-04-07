@@ -1,0 +1,92 @@
+# This is a typical input file for OASIS3-MCT.
+# Keywords used in previous versions of OASIS3 
+# but now obsolete are marked "Not used"
+# Don't hesitate to ask precisions or make suggestions (oasishelp@cerfacs.fr). 
+#
+# Any line beginning with # is ignored. Blank lines are not allowed.
+#
+#########################################################################
+ $NFIELDS
+# The number of fields described in the second part of the namcouple.
+#
+             3
+ $END
+#########################################################################
+ $NBMODEL
+# The number of models in this experiment + their names (6 characters)
+#
+   2  model1   model2
+ $END
+###########################################################################
+ $RUNTIME
+# The total simulated time for this run in seconds
+#
+  21600
+ $END
+###########################################################################
+ $NLOGPRT
+# Amount of information written to OASIS3-MCT log files (see User Guide)
+  10
+ $END
+###########################################################################
+ $STRINGS
+#
+# The above variables are the general parameters for the experiment.
+# Everything below has to do with the fields being exchanged.
+#
+######################################################
+#
+# Field 1: model1 to model2 
+#
+#   First line:
+# 1) and 2) Symbolic names for the field before and after interpolation
+#           (8 characters maximum)
+# 3) Index of field in cf_name_table.txt
+# 4) Exchange frequency for the field in seconds (here 1 day)
+# 5) Number of analysis to be performed
+# 6) Restart input NetCDF file names
+# 7) Field status: EXPORTED, EXPOUT, INPUT, OUTPUT
+#    (For OASIS3-MCT, IGNORED/IGNOUT are converted to EXPORTED/EXPOUT)
+#
+FSENDOCN FRECVATM 1 7200  1  fdocn.nc EXPOUT
+#
+#   Second line:
+# 1)-2) and 3)-4) Source and target grids first and 2nd dimensions (optional)
+# 5) and 6) Source and target locator prefix (4 characters)
+# 7) LAG index if needed
+# 8) SEQ index if needed
+#
+182 149 96 72 torc  lmdz 
+#
+#   Third line:
+# Overlap (P or R) and nbr of overlap grid points for source and target grids.
+P  2  P  0
+#
+# List of analyses
+#
+MAPPING
+# Specific parameters for each analysis
+my_remapping_file_bilinear.nc src
+#
+######################################################
+#
+# Field 2: model1 output
+#
+FSENDOCN FSENDOCN 1 7200 1 f2avg.nc OUTPUT
+torc  torc
+LOCTRANS
+  AVERAGE
+#
+######################################################
+#
+# Field 3: model2 to model1
+#
+FSENDATM  FRECVOCN  1 10800  1  fdatm.nc EXPOUT
+#
+96 72 182 149 lmdz torc 
+#
+P  0  P  2
+SCRIPR
+BILINEAR LR SCALAR LATLON 1
+#
+ $END

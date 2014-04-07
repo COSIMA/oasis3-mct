@@ -1,0 +1,201 @@
+\newpage
+\chapter{OASIS3-MCT auxiliary data files}
+\label{sec_auxiliary}
+
+In some cases, OASIS3-MCT uses auxiliary data files, e.g. defining the
+grids of the models being coupled, containing the field coupling
+restart values or input data values, or the remapping weights and
+addresses.
+
+\section{Grid data files}
+\label{subsec_griddata}
+
+With OASIS3-MCT, the grid data files {\em grids.nc, masks.nc} and {\em
+  areas.nc} are required only for certain operations, i.e.  {\em
+  grids.nc}, and {\em masks.nc} for {\tt SCRIPR} (see section
+\ref{subsec_interp}) and {\em masks.nc} and {\em areas.nc} for {\tt
+  CONSERV} (see section \ref{subsec_cooking}). These NetCDF files can
+be created by the user before the run or can be written directly at
+run time by the master process of each component model using the grid
+data definition routines (see section \ref{subsubsec_griddef}).  These
+routines can be used by the component models to add grid fields to the
+grid files but grid fields are {\bf never} overwritten in the grid
+files.
+
+The arrays containing the grid information are dimensioned {\tt (nx,
+  ny)}, where {\tt nx} and {\tt ny} are the grid first and second
+dimension.  Unstructured grids or other grids expressed with 1D
+vectors are supported by setting {\tt nx} to the total number of grid
+points and {\tt ny} to 1.
+
+\begin{enumerate}
+
+\item {\em grids.nc}: contains the model grid longitudes and latitudes
+  in double precision {\tt REAL} arrays. The array names must be
+  composed of a prefix (4 characters), given by the user in the {\it
+    namcouple} on the second line of each field (see section
+  \ref{subsec_namcouplesecond}), and of a suffix (4 characters); this
+  suffix is ``.lon'' or ``.lat'' for respectively the grid point
+  longitudes or latitudes.
+
+  If the {\tt SCRIPR/CONSERV} remapping is used, longitudes and
+  latitudes for the source and target grid {\bf corners} must also be
+  available in the {\em grids.nc} file as double precision {\tt
+    REAL} arrays dimensioned {\tt (nx,ny,4)} or {\tt (nbr\_pts,1,4)}
+  where {\tt 4} is the number of corners (in the counterclockwize
+  sense). The names of the arrays must be composed of the grid prefix
+  and the suffix ``.clo'' or ``.cla'' for respectively the grid corner
+  longitudes or latitudes.  As for the other grid information, the
+  corners can be provided in {\em grids.nc} before the run by the user
+  or directly by the model through specific calls (see section
+  \ref{subsubsec_griddef}).
+
+  % For source grids of Logically Rectangular LR type only, the grid
+  % corners will however be automatically calculated and stored by
+  % OASIS if they are not initially available in {\em
+  %   grids.nc}\footnote{Tip: to automatically calculate the corners
+  %   of a Logically Rectangular LR target grid, use the corresponding
+  %   reverse remapping in which the current target grid becomes the
+  %   source grid.}.
+ 
+  Longitudes must be given in degrees East in the interval -360.0 to
+  720.0. Latitudes must be given in degrees North in the interval
+  -90.0 to 90.0. Note that if some grid points overlap, it is
+  recommended to define those points with the same number (e.g. 360.0
+  for both, not 450.0 for one and 90.0 for the other) to ensure
+  automatic detection of overlap by OASIS3-MCT.
+ 
+  The corners of a cell cannot be defined modulo 360 degrees. For
+  example, a cell located over Greenwich will have to be defined with
+  corners at -1.0 deg and 1.0 deg but not with corners at 359.0 deg
+  and 1.0 deg.
+ 
+  Cells larger than 180.0 degrees in longitude are not supported.
+ 
+\item {\em masks.nc}: contains the masks for all component model grids
+  in {\tt INTEGER} arrays. {\bf Be careful to note the historical
+    OASIS convention: 0 -not masked i.e.  active- or 1 -masked
+    i.e. not active- for each grid point}. The array names must be
+  composed of the grid prefix and the suffix ``.msk''. This file, {\em
+    masks} or {\em masks.nc}, is mandatory.
+
+\item {\em areas.nc}: this file contains mesh surfaces for the
+  component model grids in double precision {\tt REAL} arrays. The
+  array names must be composed of the grid prefix and the suffix
+  ``.srf''.  The surfaces may be given in any units but they must be
+  all the same. This file {\em areas.nc} is mandatory for {\tt
+    CONSERV/GLOBAL},{\tt /GLBPOS}, {\tt /BASBAL}, and {\tt /BASPOS};
+  it is not required otherwise.
+
+\end{enumerate}
+
+\section{Coupling restart files}
+\label{subsec_restartdata}
+
+At the beginning of a coupled run, some coupling fields may have to be
+initially read from their coupling restart file on their source grid
+(see the LAG concept in section \ref{subsubsec_Algoritms}). When
+needed, these files are also automatically updated by the last active
+{\tt oasis\_put} or {\tt prism\_put\_proto} call of the run (see
+section \ref{prismput}) .
+% To force the writing of the field in its coupling restart file, one
+% can use the routine {\tt prism\_put\_restart\_proto} (see section
+% \ref{subsec:auxiliary}).
+{\bf Warning}: the date is not written or read to/from the restart
+file; therefore, the user has to make sure that the appropriate
+coupling restart file is present in the working directory. The
+coupling restart files must follow the NetCDF format.
+
+% Note that all restart files have to be present in the working
+% directory at the %beginning of the
+% run even if one model is delayed with respect to the others.
+
+The name of the coupling restart file is given by the 6th character
+string on the first configuring line for each field in the {\it
+  namcouple} (see section \ref{subsec_namcouplesecond}). Coupling
+fields coming from different models cannot be in the same coupling
+restart files, but for each model, there can be an arbitrary number of
+fields written in one coupling restart file. The only exception is when a coupling field sent by a source component model is associated with more than one target field and model; in that case, if coupling restart files are required, it is mandatory to specify different files for the different fields. 
+
+In the coupling restart files, the fields must be provided on the
+source grid in single or double precision REAL arrays and, as the grid
+data files, must be dimensioned {\tt (nx, ny)}, where {\tt nx} and
+{\tt ny} are the grid first and second dimension (see section
+\ref{subsec_griddata} above).  The shape and orientation of each
+restart field (and of the corresponding coupling fields exchanged
+during the simulation) must be coherent with the shape of its grid
+data arrays.
+
+The coupling restart files are also used automatically by OASIS3-MCT
+to allow partial LOCTRANS time transformation to be saved at the end
+of a run for exact restart at the start of the next run. For that
+reason, coupling restart filenames are now required for all {\it
+  namcouple} transformations that use LOCTRANS (with non INSTANT
+values).
+
+\section{Input data files}
+\label{subsec_inputdata}
+
+Fields with status {\tt INPUT} in the {\it namcouple} will, at
+runtime, simply be read in from a NetCDF input file by the target
+model below the {\tt oasis\_get} call, at appropriate times
+corresponding to the input period indicated by the user in the {\it
+  namcouple}.
+
+The name of the file must be the one given on the field first
+configuring line in the {\it namcouple} (see section
+\ref{subsubsec_secondINPUT}). There must be one input file per {\tt
+  INPUT} field, containing a time sequence of the field in a single or
+double precision REAL array named with the field symbolic name in the
+{\it namcouple} and dimensioned {\tt (nx,ny,time)}.  The time variable
+has to be an array {\tt time(time)} expressed in ``seconds since
+beginning of run''. The ``time'' dimension has to be the unlimited
+dimension.
+% For a practical example, see the file SOALBEDO.nc in {\tt
+%   oasis3/examples/toyoasis3/data}.
+
+% subsection{Input data files}
+
+\section{Transformation auxiliary data files}
+\label{subsec_mapdata}
+
+The mapping files to be used for the MAPPING option must be consistent
+with the files generated by the SCRIP library to be used for the {\tt
+  SCRIPR} transformations (see also section \ref{subsec_interp}). The
+files are NetCDF containing the following fields:
+\begin{verbatim}
+dimensions:
+      src_grid_size = xxx ;
+      dst_grid_size = xxx ;
+      num_links = xxx ;
+      num_wgts = xxx ;
+variables:
+      int src_address(num_links) 
+      int dst_address(num_links) 
+      double remap_matrix(num_links, num_wgts) 
+\end{verbatim}
+where
+\begin{itemize}
+\item {\tt src\_grid\_size} is a scalar integer indicating the total number
+  of points in the source grid.  This is typically a large number.  
+  This field is a netCDF dimension.
+\item {\tt dst\_grid\_size} is a scalar integer indicating the total number
+  of points in the target grid.  This is typically a large number.  
+  This field is a netCDF dimension.
+\item {\tt num\_links} is a scalar integer indicating the total number
+  of associated grid point pairs in the file.  This is typically a
+  large number.  This field is a netCDF dimension.
+\item {\tt num\_wgts} is a scalar integer indicating the number of
+  weights per associated grid point pair (up to 5 are supported, see
+  section \ref{prismput}).  This field is a netCDF dimension.
+\item {\tt src\_address} is a one dimensional array of size {\tt
+    num\_links}.  It contains the integer source address associated
+  with each weight.  This field is a netCDF variable.
+\item {\tt dst\_address} is a one dimensional array of size {\tt
+    num\_links}.  It contains the integer destination address
+  associated with each weight.  This field is a netCDF variable.
+\item {\tt remap\_matrix} is a two dimensional array of size {\tt
+    (num\_links, num\_wgts)}.  It contains the real weight value(s)
+  associated with the source and destination address.  This field is a
+  netCDF variable.
+\end{itemize}

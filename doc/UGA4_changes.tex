@@ -1,0 +1,378 @@
+\newpage
+
+\chapter{Changes between the different versions of OASIS3-MCT}
+\label{sec_changes}
+
+The evolution between the different versions of OASIS3-MCT can be
+followed in real-time by registering on the Redmine project management
+site at https://inle.cerfacs.fr/ (see "Register" at the right top of
+the page). On this site, registered users can browse the sources and
+consult tickets describing bug fixes and developments. To follow day
+to day evolution of the OASIS3-MCT sources, it is also possible to
+have your e-mail added to the list of addresses to which the log files
+of the SVN checkins are automatically sent; please contact
+oasishelp@cerfacs.fr if you wish to be added to that list.
+
+\section{Changes between OASIS3-MCT\_1.0 and OASIS3-MCT\_2.0}
+\label{sec_oa1_oa2}
+
+The main changes and bug fixes new in OASIS3-MCT\_2.0 are the
+following:
+\begin{itemize}
+
+\item Support of {\tt BICUBIC} interpolation, see paragraph {\tt
+    BICUBIB} in section \ref{subsec_interp}.
+
+\item Support of {\tt CONSERV/SECOND} regridding, see paragraph {\tt
+    CONSERV/SECOND} in section \ref{subsec_interp}.
+
+\item Support of components exchanging data on only a subdomain of the
+  global grid: a new optional argument, ig\_size was added to
+  oasis\_def\_partition, that provides the user with the ability to
+  define the total number of grid cells on the grid (see section
+  \ref{subsubsec_Partition}).
+
+%\item The CPP key "balance" in mod\_oasis\_advance was added; this
+%  option can be used to produce timestamps in OASIS debug file (see
+%  section \ref{subsec_cpp}).
+
+\item The variable {\tt TIMER\_Debug} controlling the amount of time
+  statistics written out is now an optional argument read in the {\it
+    namcouple}; see the {\tt NLOGPRT} line in
+  \ref{subsec_namcouplefirst} and all details about time statistics in
+  section \ref{timestat}.
+
+\item Specific problems in writing out the time statistics when all
+  the processors are not coupling were solved (see Redmine issue
+  \#497)
+
+\item The problem with restart files when one coupling field is sent
+  to 2 target components was solved (see Redmine ticket \#522)
+
+\item A memory leak in mod\_oasis\_getput\_interface.F90 was fixed
+  thanks to R. Hill from the MetOffice (see Redmine ticket \#437)
+
+\item A bug fix was provided to ensure that the nearest neighbour
+  option is activated when the option {\tt FRACNNEI} is defined in the
+  {\it namcouple} for the conservative interpolation .
+
+\item The behaviour of OASIS3-MCT was changed in the case a
+  component model tries to send with {\tt oasis\_put} a field declared
+  with a {\tt oasis\_def\_var} but not defined in the configuration
+  file {\it namcouple}; this will now lead to an abort. In this case,
+  the field ID returned by the {\tt oasis\_def\_var} is equal to -1
+  and the corresponding {\tt oasis\_put} should not be called.
+
+\item OASIS3-MCT developments are now continuously tested and
+  validated on different computers with a test suite under Buildbot,
+  which is a software written in Python to automate compile and test
+  cycles required in software project (see
+  https://inle.cerfacs.fr/projects/oasis3-mct/wiki/Buildbot on the
+  Redmine site).
+
+\end{itemize}
+
+\section{Changes between OASIS3.3 and OASIS3-MCT\_1.0}
+
+\subsection{General architecture}
+\label{sec_changes_gen}
+
+\begin{itemize}
+\item OASIS3-MCT is (only) a coupling library
+
+Much of the underlying implementation of OASIS3 was refactored to
+leverage the Model Coupling Toolkit (MCT). OASIS3-MCT is a coupling
+library to be linked to the component models and that
+carries out the coupling field transformations (e.g. remappings/interpolations)
+in parallel on either the source or target processes and that performs
+all communication in parallel directly between the component models; there
+is no central coupler executable anymore\footnote{As with OASIS3.3,
+  the ``put'' calls are non-blocking but the ``get'' calls are
+blocking. As before, the user has to take care of implementing a coupling
+algorithm that will result in matching ``put'' and ``get'' calls to
+avoid deadlocks (see section \ref{subsubsec_sendingreceiving}). The lag (LAG) index works as
+before in OASIS3.3 (see section \ref{subsubsec_Algoritms})}. 
+
+\item {\tt MAPPING} transformation to use a pre-defined mapping file
+
+With {\tt MAPPING}, OASIS3-MCT has the ability to read a predefined
+set of weights and addresses (mapping file) specified in the {\it
+  namcouple} to perform the interpolation/remapping. The user also has
+the flexibility to choose the location and the parallelization strategy of the
+remapping with specific {\tt MAPPING} options (see section \ref{subsec_interp}).
+
+\item Mono-process mapping file generation with the SCRIP library
+
+But as before, OASIS3-MCT\_1.0 can
+also generate the mapping file using the SCRIP library
+\citep{Jones99}. When this is the case, the mapping file generation is
+done on one process of the model components; all previous {\tt SCRIPR} remapping
+schemes available in OASIS3.3 are still supported besides {\tt
+  BICUBIC} and {\tt CONSERV/SECOND}. (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
+
+\item MPI2 job launching is NOT supported. 
+
+  Only MPI1 start mode is allowed. As before with the MPI1 mode, all
+  component models must be started by the user in the job script in a
+  pseudo-MPMD mode; in this case, they will automatically share the
+  same {\tt MPI\_COMM\_WORLD} communicator and an internal
+  communicator created by OASIS3-MCT needs to be used for internal
+  parallelization (see section \ref{subsec_MPI1}).
+
+\end{itemize}
+
+\subsection{Changes in the coupling interface in the component models}
+\label{sec_changes_API}
+
+\begin{itemize}
+
+\item Use statement
+
+The different OASIS3.3 {\tt USE} statements were gathered into one {\tt
+  USE mod\_oasis} (or one {\tt USE mod\_prism}), therefore much
+  simpler to use.
+
+\item Support of previous {\tt prism\_xxx} and new {\tt oasis\_xxx}
+  interfaces
+
+OASIS3-MCT retains prior interface names of OASIS3.3
+  (e.g. {\tt prism\_put\_proto}) to ensure full backward
+  compatibility. However, new interface names such as {\tt
+    oasis\_put} are also available and should be prefered. Both
+  routine names are listed in chapter \ref{sec_modelinterfacing}.
+
+\item Auxiliary routines not supported yet
+
+Auxiliary routines {\tt prism\_put\_inquire}, {\tt
+  prism\_put\_restart\_proto}, {\tt prism\_get\_freq} are not
+  supported yet.
+
+\item Support of components for which only a subset of processes
+  participate in the coupling
+
+New routines {\tt oasis\_create\_couplcomm} and {\tt
+  oasis\_set\_couplcomm} are now available to create or set a coupling
+  communicator in the case only a subset of the component processes
+  participate in the coupling (see section \ref{subsec_subset}). But
+  even in this case, all OASIS3-MCT interface routines, besides the
+  grid definition (see section \ref{subsubsec_griddef}) and the
+  ``put'' and `` get'' call per se (see section
+  \ref{subsubsec_sendingreceiving}), are collective and must be called
+  by all processes.
+
+\item New routines {\tt oasis\_get\_debug} and {\tt oasis\_set\_debug}
+
+New routines {\tt oasis\_get\_debug} and {\tt oasis\_set\_debug}
+  are now available to respectively retrieve the current OASIS3-MCT
+  internal debug level (set by {\tt \$NLOGPRT} in the {\it namcouple}) or to change it (see section
+  \ref{subsubsec_auxroutines}).
+
+\end{itemize}
+
+\subsection{Functionality not offered anymore}
+\label{sec_changes_old}
+
+\begin{itemize}
+
+\item {\tt SCRIPR/BICUBIC} and {\tt SCRIPR/CONSERV/SECOND} remappings
+
+As in OASIS3.3, the SCRIP library can be used to generate the
+  remapping/interpolation weights and addresses and write them to a
+  mapping file. All previous {\tt SCRIPR} remapping
+schemes available in OASIS3.3 are still supported in OASIS3-MCT\_1.0 besides {\tt
+  BICUBIC} and {\tt CONSERV/SECOND} because these remapping involve
+at each source grid point the value of the field but also the value of the
+gradients of the field (which are not known or calculated). (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
+
+\item Vector field remapping
+
+Vector field remapping is not and will not be supported (see ``Support
+  of vector fields with the SCRIPR remappings'' in section \ref{subsec_interp}).
+
+\item Automatic calculation of grid mesh corners in {\tt SCRIPR/CONSERV}
+
+For {\tt SCRIPR/CONSERV} remapping, grid mesh corners will not
+  be compute automatically if they are needed but not provided.  
+
+\item Other transformations not supported
+
+\begin{itemize}
+
+\item The following transformations are not available in OASIS3.3
+and will most probably not be implemented as it should be not
+too difficult to implement the equivalent operations in the component
+models themselves: {\tt CORRECT}, {\tt FILLING}, {\tt SUBGRID}, {\tt MASKP}
+
+\item {\tt LOCTRANS/ONCE} is not explicitely offered as it is equivalent to
+defining a coupling period equal to the total runtime.
+
+\item The following transformations are not available as they were already
+deprecated in OASIS3.3 (see OASIS3.3 User Guide): {\tt REDGLO}, {\tt INVERT},
+{\tt REVERSE}, {\tt GLORED}
+
+\item {\tt MASK} and {\tt EXTRAP} are not available but the corresponding
+linear extrapolation can be replaced by the more efficient option
+using the nearest non-masked source neighbour for target points having
+their original neighbours all masked. This is now the default option for {\tt SCRIPR/}{\tt DISTWGT}, {\tt GAUSWGT} and {\tt BILINEAR} interpolations. It is
+also included in \newline {\tt SCRIPR/CONSERV} if {\tt FRACNNEI}
+normalization option is chosen (see section \ref{subsec_interp}).
+
+\item {\tt INTERP} interpolations are not available; {\tt SCRIPR}
+  should be used instead.
+
+\item {\tt MOZAIC} is not available as {\tt MAPPING} should be used
+  instead.
+
+\item{\tt NOINTERP} does not need to be specified anymore if no
+  interpolation is required.
+ 
+\item Field combination with {\tt BLASOLD} and {\tt BLASNEW}; these
+  transformations only support multiplication and addition terms to
+the fields (see section \ref{subsec_preproc}). 
+
+\end{itemize}
+
+\item Using the coupler in interpolator-only mode
+
+This is not possible anymore as OASIS3-MCT is now only a coupling
+library. However, it is planned, in a further release, to provide a
+toy coupled model that could be use to check the quality of the
+remapping for any specific couple of grids.
+
+\item Coupling field CF standard names
+
+The file cf\_name\_table.txt is not needed or used anymore. The CF
+  standard names of the coupling fields are not written to the debug
+  files.
+
+\item Binary auxiliay files
+
+All auxiliary files, besides the {\it namcouple} must be NetCDF;
+  binary files are not supported anymore.
+\end{itemize}
+
+\subsection{New functionality offered}
+\label{sec_changes_new}
+
+\begin{itemize}
+
+\item Better support of components for which only a subset of processes
+  participate in the coupling
+
+In OASIS3.3, components for which only a subset of processes
+  participated in the coupling were supported in a very restricted
+  way. In fact, this subset had to be composed of the N first
+  processes and N had to be specified in the {\it namcouple}. Now, the
+  subset of processes can be composed of any of the component
+  processes and does not have to be pre-defined in the {\it
+    namcouple}. New routines {\tt oasis\_create\_couplcomm} and {\tt
+  oasis\_set\_couplcomm} are now available to create or set a coupling
+  communicator gathering only these processes (see section \ref{subsec_subset}).
+
+\item Exact restart for {\tt LOCTRANS} transformations
+
+If needed, LOCTRANS transformations write partially
+  transformed fields  in the coupling restart file at the end of a run
+  to ensure an exact restart of the next run (see section
+  \ref{subsec_timetrans}). For that
+  reason, coupling restart filenames are now required for all {\it
+    namcouple} entries that use LOCTRANS (with non INSTANT
+  values). This is the reason an optional restart file is now provided
+  on the OUTPUT {\it namcouple} input line. If the coupling periods of
+  two (or more) coupling fields are different, it is necessary to define 
+  two (or more) restart files, one for each field.
+
+\item Support to couple multiple fields via a single communication.
+
+ This is supported through colon
+delimited field lists in the {\it namcouple}, for example 
+
+{\tt ATMTAUX:ATMTAUY:ATMHFLUX  TAUX:TAUY:HEATFLUX 1 3600 3 rstrt.nc EXPORTED}
+
+ in a single {\it namcouple} entry. All fields will use the
+{\it namcouple} settings for that entry. In the component model codes,
+these fields are still sent (``put'') or received (``get'') one at a
+time. Inside OASIS3-MCT, the fields are stored and a single mapping
+and send or receive instruction is executed for all fields. This is
+useful in cases where multiple fields have the same coupling
+transformations and to reduce communication costs by aggregating multiple 
+fields into a single communication. If a LOCTRAN transformation is needed
+for these multiple fields, it is necessary to define a restart file for 
+these multiple fields.
+
+\item Matching one source filed with multiple targets
+
+  A coupling field sent by a source component model can be associated
+  with more than one target field and model (get). In that case, the
+  source model needs to send (``put'') the field only once and the
+  corresponding data will arrive at multiple targets as specified in
+  the {\it namcouple} configuration file. Different coupling
+  frequencies and transformations are allowed for different coupling
+  exchanges of the same field. If coupling restart files are required
+  (either if a {\tt LAG} or if a {\tt LOCTRANS} transformation is
+  specified), it is mandatory to specify different files for the
+  different fields.
+
+%In addition, a single
+%  coupling field can be sent to the same destination model using
+%  multiple transforms as long as the destination field name is
+%  unique.
+The inverse feature is not allowed, i.e. a single target (get) field
+CANNOT be associated with multiple source (put) fields.
+
+\item The debug files
+
+The debug mode was greatly improved as compared to OASIS3.3. The level
+of debug information written out to the OASIS3-MCT debug files for
+each model process is defined by the \$NLOGPRT value in the {\it
+  namcouple}. All details are provided in section
+\ref{subsec_namcouplefirst}.
+
+\end{itemize}
+
+\subsection{Changes in the configuration file {\it namcouple}}
+\label{sec_changes_namcouple}
+
+\begin{itemize}
+
+\item The {\it namcouple} configuration file of OASIS3-MCT is fully backward
+compatible with OASIS3.3. However, several {\it namcouple} keywords
+have been deprecated even if they are still 
+allowed.  These keywords are noted ``UNUSED'' in sections
+\ref{subsec_namcouplefirst} and \ref{subsec_namcouplesecond} and are
+not fully described. Information below these keywords will not be read
+and will not be used: \$SEQMODE , \$CHANNEL, \$JOBNAME, \$INIDATE,
+\$MODINFO, \$CALTYPE.
+
+\item Also the following inputs should not appear in the {\it namcouple}
+anymore as the related functionality are not supported anymore in
+OASIS3-MCT (see above): field status AUXILARY, time transformation
+ONCE, REDGLO, INVERT, MASK, EXTRAP, CORRECT, INTERP, MOZAIC, FILLING,
+SUBGRID, MASKP, REVERSE, GLORED. 
+
+\item To get 2D fields in the debug output NetCDF files, the 2D dimensions of the
+  grids must be provided in the {\it namcouple} (except if the field
+  has the status OUTPUT); otherwise, the fields in the debug output files will be 1D.
+
+\end{itemize}
+
+\subsection{Other differences}
+\label{sec_changes_other}
+
+\begin{itemize}
+
+\item IGNORED and IGNOUT fields are converted to EXPORTED and EXPOUT
+  respectively.
+
+\item The file {\tt areas.nc} is not needed anymore to calculate some
+  statistics with options CHECKIN and/or CHECKOUT (see section \ref{subsec_preproc}).
+
+\item SEQ index is no longer needed to ensure correct coupling
+  sequencing within the coupler. Use of SEQ allows the coupling layer
+  to detect potential deadlocks before they happen and to exit
+  gracefully (see section \ref{subsec_sec}).
+
+\item The I/O library mpp\_io is no longer used to write the restart and output files.
+
+
+\end{itemize}
