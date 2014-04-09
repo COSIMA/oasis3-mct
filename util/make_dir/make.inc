@@ -10,6 +10,6 @@
 # Note: Choose one of these includes files and modify it according to your
 #       local settings. Replace the currently active file with your own.
 #
-include  $(HOME)/oasis3-mct/util/make_dir/make.intel_corail
+include  $(HOME)/oasis3-mct/util/make_dir/make.nci
 #
 ### End User configurable options ###
