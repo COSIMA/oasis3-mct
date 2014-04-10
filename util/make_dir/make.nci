@@ -1,6 +1,6 @@
 
 # 
-COUPLE=/short/v45/nah599/auscom/submodels/oasis3-mct
+COUPLE=$(OASIS_HOME)
 ARCHDIR=$(COUPLE)/Linux
 
 # CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
