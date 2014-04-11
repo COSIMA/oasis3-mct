@@ -19,6 +19,7 @@ MODULE mod_oasis_method
    USE mod_oasis_mpi
    USE mod_oasis_string
    USE mct_mod
+   USE m_errorhandler
 
    IMPLICIT NONE
 
@@ -76,6 +77,7 @@ CONTAINS
    logical                  :: tmp_modcpl
    character(len=ic_lvar)   :: i_name
    character(len=*),parameter :: subname = '(oasis_init_comp)'
+   integer(kind=ip_intwp_p) :: traceback_handler
 
    character(len=MPI_MAX_PROCESSOR_NAME), dimension(:), allocatable :: cla_nodes
    character(len=MPI_MAX_PROCESSOR_NAME) :: cl_node
@@ -117,6 +119,10 @@ CONTAINS
 #elif defined use_comm_MPI2
    mpi_comm_global = ??
 #endif
+
+   ! Install MPI error handlers.
+   CALL MPI_Comm_create_errhandler(error_handler_traceback, traceback_handler, mpi_err)
+   CALL MPI_Comm_set_errhandler(mpi_comm_global_world, traceback_handler, mpi_err)
 
    CALL MPI_Comm_Size(mpi_comm_global_world,mpi_size_world,ierr)
    CALL MPI_Comm_Rank(mpi_comm_global_world,mpi_rank_world,ierr)
@@ -391,6 +397,12 @@ CONTAINS
    if (.not.oasis_coupled) icolor = 0
    call MPI_COMM_SPLIT(mpi_comm_global_world,icolor,ikey,mpi_comm_global,ierr)
 !tcx   if (.not.oasis_coupled) mpi_comm_global = MPI_COMM_NULL
+   IF (ierr /= 0) THEN
+      WRITE (nulprt1,*) subname,' ERROR: MPI_Comm_Split abort ',ierr
+      PRINT *, subname,' ERROR: MPI_Comm_Split abort ',ierr
+      CALL oasis_flush(nulprt)
+      call oasis_abort_noarg()
+   ENDIF
 
 #elif defined use_comm_MPI2
 
