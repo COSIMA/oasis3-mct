@@ -13,6 +13,7 @@ MODULE mod_oasis_method
    USE mod_oasis_mpi
    USE mod_oasis_string
    USE mct_mod
+   USE m_errorhandler
 
    IMPLICIT NONE
 
@@ -61,6 +62,7 @@ CONTAINS
    INTEGER(kind=ip_intwp_p) :: k,i,m
    INTEGER(kind=ip_intwp_p) :: nt
    character(len=ic_field)  :: i_name
+   integer(kind=ip_intwp_p) :: traceback_handler
    character(len=*),parameter :: subname = 'oasis_init_comp'
 !  ---------------------------------------------------------
 
@@ -87,6 +89,10 @@ CONTAINS
 #elif defined use_comm_MPI2
    mpi_comm_global = ??
 #endif
+
+   ! Install MPI error handlers.
+   CALL MPI_Comm_create_errhandler(error_handler_traceback, traceback_handler, mpi_err)
+   CALL MPI_Comm_set_errhandler(mpi_comm_global, traceback_handler, mpi_err)
 
    CALL MPI_Comm_Size(mpi_comm_global,mpi_size_global,mpi_err)
    CALL MPI_Comm_Rank(mpi_comm_global,mpi_rank_global,mpi_err)
@@ -223,6 +229,13 @@ CONTAINS
    ikey = compid
    icolor = compid
    call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_local,mpi_err)
+   IF (mpi_err /= 0) THEN
+      WRITE (nulprt1,*) subname,' ERROR: MPI_Comm_Split abort ',mpi_err
+      PRINT *, subname,' ERROR: MPI_Comm_Split abort ',mpi_err
+      CALL oasis_flush(nulprt)
+      call oasis_abort_noarg()
+   ENDIF
+
 
 #elif defined use_comm_MPI2
 
