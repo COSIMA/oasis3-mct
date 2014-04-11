@@ -339,6 +339,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
             if (dlen /= 2 .or. nx*ny /= nxf*nyf) then
                WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                WRITE(nulprt,*) subname,' abort ERROR: ndims and size does not match on file'
+               WRITE(nulprt,*) subname,' ndims: ',dlen, ' sizes: ', nx*ny, ',', nxf*nyf, ' file: ', trim(rstfile)
                CALL oasis_flush(nulprt)
                call oasis_abort_noarg()
             endif
@@ -1319,7 +1320,8 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
-         write(nulprt,*) subname,' ERROR: mismatch in field and data'
+         write(nulprt,*) subname,' ERROR: mismatch in field and data in: filename, fieldname: ',&
+                         trim(filename), ',', trim(fldname)
          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
          CALL oasis_flush(nulprt)
          call oasis_abort_noarg()
