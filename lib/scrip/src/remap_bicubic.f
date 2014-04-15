@@ -80,7 +80,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &    max_iter = 100   ! max iteration count for i,j iteration
 
       real (kind=dbl_kind), parameter ::
-     &     converge = epsilon(1.0_dbl_kind) ! convergence criterion
+     &     converge = 1.e-10_dbl_kind ! convergence criterion
 
 !***********************************************************************
 
