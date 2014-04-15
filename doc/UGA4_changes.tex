@@ -21,7 +21,14 @@ following:
 \begin{itemize}
 
 \item Support of {\tt BICUBIC} interpolation, see paragraph {\tt
-    BICUBIB} in section \ref{subsec_interp}.
+    BICUBIB} in section \ref{subsec_interp}. If the source grid
+    is not a gaussian reduced grid (D), the gradient in the first dimension, 
+    the gradient in the second dimension, and the cross-gradient 
+    of the coupling field must be calculated by the model and 
+    given as arguments to {\tt oasis\_put}, as explained in section \ref{prismput}.
+    If the source grid is a gaussian reduced grid (D), OASIS3-MCT\_2.0 
+    can calculate the interpolated field using only the values of the source
+    field points.
 
 \item Support of {\tt CONSERV/SECOND} regridding, see paragraph {\tt
     CONSERV/SECOND} in section \ref{subsec_interp}.
