@@ -115,7 +115,8 @@ also generate the mapping file using the SCRIP library
 \citep{Jones99}. When this is the case, the mapping file generation is
 done on one process of the model components; all previous {\tt SCRIPR} remapping
 schemes available in OASIS3.3 are still supported besides {\tt
-  BICUBIC} and {\tt CONSERV/SECOND}. (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
+  BICUBIC} and {\tt CONSERV/SECOND}. (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 
+  were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
 
 \item MPI2 job launching is NOT supported. 
 
@@ -189,7 +190,8 @@ As in OASIS3.3, the SCRIP library can be used to generate the
 schemes available in OASIS3.3 are still supported in OASIS3-MCT\_1.0 besides {\tt
   BICUBIC} and {\tt CONSERV/SECOND} because these remapping involve
 at each source grid point the value of the field but also the value of the
-gradients of the field (which are not known or calculated). (Note: these remapping schemes, not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
+gradients of the field (which are not known or calculated). (Note: these remapping schemes, 
+not available in OASIS3-MCT\_1.0 were reactivated in OASIS3-MCT\_2.0, see \ref{sec_oa1_oa2}.)
 
 \item Vector field remapping
 
@@ -305,7 +307,8 @@ useful in cases where multiple fields have the same coupling
 transformations and to reduce communication costs by aggregating multiple 
 fields into a single communication. If a LOCTRAN transformation is needed
 for these multiple fields, it is necessary to define a restart file for 
-these multiple fields.
+these multiple fields. {\bf The coupling fields must be sent and received in the same order 
+as they are defined in the corresponding single entry of the namcouple}.
 
 \item Matching one source filed with multiple targets
 
