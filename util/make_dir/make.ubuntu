@@ -10,29 +10,24 @@ CHAN            = MPI1
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3-mct main directory
-COUPLE          = $(HOME)/oasis3-mct
+COUPLE          = $(OASIS_HOME)
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = $(COUPLE)/../compile_oa3-mct
-#
-# MPI library
-MPIDIR      = /usr
-MPIBIN      = $(MPIDIR)/bin
-MPI_INCLUDE = $(MPIDIR)/include
-MPILIB      = -L$(MPIDIR)/lib 
+ARCHDIR         = $(COUPLE)/Linux
+
 #
 # NETCDF library
 NETCDF_INCLUDE  = /usr/include
 NETCDF_LIBRARY  = -L/usr/lib -lnetcdff
 #
 # Compiling and other commands
-MAKE        = gmake
-F90         = $(MPIBIN)/mpif90 -Wall -I$(MPI_INCLUDE)
+MAKE        = make
+F90         = mpif90
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
-CC          = gcc -I$(MPI_INCLUDE)
-LD          = $(MPIBIN)/mpif90 $(MPILIB)
+CC          = gcc
+LD          = mpif90
 AR          = ar
 ARFLAGS     = -ruv
 #
@@ -41,7 +36,7 @@ ARFLAGS     = -ruv
 CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # 
-F90FLAGS_1  = 
+F90FLAGS_1  = -Wall
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
