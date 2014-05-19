@@ -6,10 +6,6 @@
 !
 ! !INTERFACE:
 
-#if !defined(__INTEL_COMPILER)
-#error "Only Intel compiler is supported."
-#endif
-
 module m_ErrorHandler
 
 #if defined(__INTEL_COMPILER)
