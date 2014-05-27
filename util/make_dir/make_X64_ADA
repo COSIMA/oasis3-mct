@@ -10,7 +10,7 @@ CHAN            = MPI1
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3-mct main directory
-COUPLE          = /gpfs5r/workgpfs/rech/psl/rpsl003/ADA/IPSLCM6/IPSLCM6_rc0/T7/modipsl/oasis3-mct
+COUPLE          = /workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct
 #
 # ARCHDIR       : directory created when compiling
 ARCHDIR         = $(COUPLE)/BLD
@@ -22,8 +22,8 @@ MPI_INCLUDE =
 MPILIB      = 
 #
 # NETCDF library
-NETCDF_INCLUDE  = /smplocal/pub/NetCDF/4.1.3/mpi/include
-NETCDF_LIBRARY  = -L/smplocal/pub/NetCDF/4.1.3/mpi/lib -lnetcdff -lnetcdf -lnetcdf_c++ -L/smplocal/pub/HDF5/1.8.9/par/lib -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5 -Bdynamic -lz
+NETCDF_INCLUDE  = /smplocal/pub/NetCDF/4.1.3/include
+NETCDF_LIBRARY  = -L/smplocal/pub/NetCDF/4.1.3/lib -Bstatic -lnetcdff -lnetcdf -lnetcdf_c++ -L/smplocal/pub/HDF5/1.8.9/seq/lib -Bstatic -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5 -Bdynamic -lz
 #
 # Compiling and other commands
 MAKE        = gmake
@@ -31,10 +31,10 @@ F90         = mpiifort
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
-CC          = mpiicc
+CC          = cc
 LD          = mpiifort
 AR          = ar
-ARFLAGS     = -ruv
+ARFLAGS     = r
 #
 # CPP keys and compiler options
 # 
