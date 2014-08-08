@@ -11,7 +11,7 @@
 #######
 include make.inc
 #
-SHELL = /bin/sh
+SHELL = /bin/bash
 MAKEf = $(MAKE) -f TopMakefileOasis3
 #
 # Defining path for FORTRAN and C sources
