@@ -16,7 +16,7 @@ COUPLE          = $(HOME)/oasis3-mct
 ARCHDIR         = $(COUPLE)/MN3
 #
 # MPI library
-MPIDIR      = /gpfs/apps/MN3/INTEL/impi/4.1.1.036/intel64
+MPIDIR      = /gpfs/apps/MN3/INTEL/impi/4.1.3.049/intel64
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib -lmpi -lmpigf -lmpigi
