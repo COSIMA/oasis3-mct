@@ -14,35 +14,29 @@ MODULE mod_oasis_data
 
 ! GENERAL
 
-  integer(kind=ip_i4_p) :: compid
-  character(len=ic_lvar):: compnm
-  logical               :: enddef_called   ! true when enddef is called, for error checking
-
   INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1, nullucia
   INTEGER(kind=ip_i4_p)	    :: OASIS_debug
   INTEGER(kind=ip_i4_p)     :: TIMER_debug
   INTEGER(kind=ip_i4_p)     :: LUCIA_debug
 
-! Variables 
-
-  integer(ip_intwp_p)   :: mvar
-  integer(kind=ip_i4_p),parameter :: mvarcpl = 10
+  logical                   :: enddef_called   ! true when enddef is called, for error checking
 
   CHARACTER(len=ic_lvar), POINTER :: total_namsrcfld(:), total_namdstfld(:)
 
-  type prism_var_type
-     character(len=ic_lvar):: name
-     integer(kind=ip_i4_p) :: part
-     integer(kind=ip_i4_p) :: ndim
-     integer(kind=ip_i4_p) :: num
-     integer(kind=ip_i4_p) :: ops
-     integer(kind=ip_i4_p) :: type
-     integer(kind=ip_i4_p) :: size
-     integer(kind=ip_i4_p) :: ncpl
-     integer(kind=ip_i4_p) :: cpl(mvarcpl)
-  end type prism_var_type
+! Models
 
-  TYPE(prism_var_type),POINTER :: prism_var(:)
+  ! These are identical on all MPI tasks
+  INTEGER(kind=ip_i4_p),parameter :: prism_mmodels = 20
+  INTEGER(kind=ip_i4_p)           :: prism_nmodels    ! number of models
+  INTEGER(kind=ip_i4_p)           :: prism_amodels    ! number of active models
+  character(len=ic_lvar)          :: prism_modnam(prism_mmodels)  ! model names
+  logical                         :: prism_modcpl(prism_mmodels)  ! model coupling flags
+
+  ! These are task specific
+  character(len=ic_lvar):: compnm         ! name of model on TASK
+  integer(kind=ip_i4_p) :: compid         ! integer id associated with model on TASK
+  logical               :: oasis_coupled  ! flag whether this TASK is coupled
+
 
 ! MPI
 
@@ -84,6 +78,7 @@ CONTAINS
   LUCIA_debug = 0
   compid = -1
   compnm = trim(cspval)
+  oasis_coupled = .false.
   mpi_comm_global = -1
   mpi_rank_global = -1
   mpi_size_global = -1

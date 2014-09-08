@@ -8,6 +8,7 @@ MODULE mod_oasis_coupler
   USE mod_oasis_sys
   USE mod_oasis_var, only : prism_nvar
   USE mod_oasis_part
+  USE mod_oasis_var
   USE mod_oasis_mpi
   USE mod_oasis_string
   USE mod_oasis_io
@@ -27,9 +28,6 @@ MODULE mod_oasis_coupler
   public prism_router_type
   public prism_mapper_type
   public prism_coupler_type
-
-  !--- derived ---
-  INTEGER(kind=ip_i4_p),pointer :: model_root(:)
 
 ! COUPLING INFO
 
@@ -72,7 +70,8 @@ MODULE mod_oasis_coupler
      integer(kind=ip_i4_p),pointer :: varid(:)    ! varid for each field
      logical               :: valid    ! is this valid
      integer(kind=ip_i4_p) :: namID    ! namcouple ID
-     integer(kind=ip_i4_p) :: partID   ! associated partition ID
+     integer(kind=ip_i4_p) :: partID   ! local variable partition ID
+     integer(kind=ip_i4_p) :: rpartID  ! router partition ID
      integer(kind=ip_i4_p) :: routerID ! router ID
      integer(kind=ip_i4_p) :: mapperID ! mapper ID
      character(len=ic_med) :: maploc   ! map location: src,dst
@@ -111,10 +110,13 @@ MODULE mod_oasis_coupler
   type(prism_mapper_type) ,public, pointer :: prism_mapper(:)
 
   integer(kind=ip_i4_p)   ,public :: prism_mcoupler   ! max couplers
-  type(prism_coupler_type),public, pointer :: prism_coupler(:)
+  type(prism_coupler_type),public, pointer :: prism_coupler_put(:)
+  type(prism_coupler_type),public, pointer :: prism_coupler_get(:)
 
   integer(kind=ip_i4_p)   ,public :: lcouplerid    ! last coupler id
   integer(kind=ip_i4_p)   ,public :: lcouplertime  ! last coupler time 
+  integer(kind=ip_i4_p)   ,public :: lastseq       ! last coupler sequence
+  integer(kind=ip_i4_p)   ,public :: lastseqtime   ! last coupler sequence time
 
 
 !#include <netcdf.inc>
@@ -131,15 +133,14 @@ CONTAINS
 
   IMPLICIT none
 
-  integer(kind=ip_i4_p) :: n,n1,n2,nn,nv,nm,nv1,nns,lnn,nc,nf,nvf
+  integer(kind=ip_i4_p) :: n,n1,n2,nn,nv,nm,nv1,nv1a,nns,lnn,nc,nf,nvf,npc,r1
   integer(kind=ip_i4_p) :: pe
   integer(kind=ip_i4_p) :: part1, part2
-  integer(kind=ip_i4_p) :: spart,dpart,rpart ! src, dst, router partition id
-        ! part1 = my local part
-        ! part2 = other part
+  integer(kind=ip_i4_p) :: spart,dpart ! src, dst partitions for mapping
+        ! part1 = my local part, partID
+        ! part2 = other partition for mapping
         ! spart = src part for mapping; put=part1, get=part2
         ! dpart = dst part for mapping; put=part2, get=part1
-        ! rpart = part used for router init
   integer(kind=ip_i4_p) :: mapID,namID
   type(mct_sMat),pointer :: sMati(:)
   integer(kind=ip_i4_p) :: ncid,dimid,status
@@ -159,6 +160,8 @@ CONTAINS
   integer(kind=ip_i4_p) :: mynvar
   integer(kind=ip_i4_p) :: nwgts
   character(len=ic_lvar):: tmpfld
+  type(prism_coupler_type),pointer :: pcpointer
+  type(prism_coupler_type),pointer :: pcpntpair
   integer(kind=ip_i4_p) :: ifind,nfind
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
@@ -182,7 +185,7 @@ CONTAINS
   type(sortvarfld_type) :: sortvars
   type(sortvarfld_type) :: sorttest
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
-  logical, parameter :: timers_on = .false.
+  logical, parameter :: local_timers_on = .false.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
 
@@ -196,25 +199,14 @@ CONTAINS
   call oasis_mpi_barrier(mpi_comm_global)
   call oasis_timer_start('cpl_setup')
 
-  if (timers_on) call oasis_timer_start('cpl_setup_n1')
-  allocate(model_root(prism_nmodels))
-  model_root = -99
-  do n = 1,prism_nmodels
-     pe = -1
-     if (compid == n .and. mpi_rank_local == 0) pe = mpi_rank_global
-     call oasis_mpi_max(pe,model_root(n),mpi_comm_global, &
-        subname//':cg',.true.)
-  enddo
-
-  if ( OASIS_debug >= 2 ) write(nulprt,*) subname,' model_root = ',&
-                                          model_root(1:prism_nmodels)
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
 
   ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
 
   call oasis_debug_note(subname//' set defaults for datatypes')
 
-  prism_mrouter = nnamcpl
+  prism_mrouter = nnamcpl * 2   ! multiply by 2 for coupling to self
   allocate(prism_router(prism_mrouter))
   prism_nrouter = 0
 
@@ -232,45 +224,58 @@ CONTAINS
   prism_mapper(:)%AVred = .false.
 
   prism_mcoupler = nnamcpl
-  allocate(prism_coupler(prism_mcoupler))
-  prism_coupler(:)%rstfile = ""
-  prism_coupler(:)%inpfile = ""
-  prism_coupler(:)%fldlist = ""
-  prism_coupler(:)%nflds   = 0
-  prism_coupler(:)%namID   = 0
-  prism_coupler(:)%valid   = .false.
-  do nc = 1,nnamcpl
-     allocate(prism_coupler(nc)%varid(1))
-     prism_coupler(nc)%varid(:) = ispval
-     prism_coupler(nc)%aVon(:) = .false.
-  enddo
-  if (OASIS_debug >= 2) write(nulprt,*) subname,' initialize %varid ',&
-                                        nnamcpl,size(prism_coupler(nnamcpl)%varid)
-  prism_coupler(:)%ops     = ispval
-  prism_coupler(:)%comp    = ispval
-  prism_coupler(:)%routerID  = ispval
-  prism_coupler(:)%mapperID  = ispval
-  prism_coupler(:)%maploc  = ""
-  prism_coupler(:)%tag     = ispval
-  prism_coupler(:)%dt      = ispval
-  prism_coupler(:)%lag     = 0
-  prism_coupler(:)%maxtime = 0
-  prism_coupler(:)%getput  = ispval
-  prism_coupler(:)%sndrcv  = .false.
-  prism_coupler(:)%output  = .false.
-  prism_coupler(:)%input   = .false.
-  prism_coupler(:)%trans   = ip_instant
-  prism_coupler(:)%conserv = ip_cnone
-  prism_coupler(:)%ltime   = ispval
-  prism_coupler(:)%snddiag = .false.
-  prism_coupler(:)%rcvdiag = .false.
-  prism_coupler(:)%sndmult = 1.0_ip_double_p
-  prism_coupler(:)%sndadd  = 0.0_ip_double_p
-  prism_coupler(:)%rcvmult = 1.0_ip_double_p
-  prism_coupler(:)%rcvadd  = 0.0_ip_double_p
+  allocate(prism_coupler_put(prism_mcoupler))
+  allocate(prism_coupler_get(prism_mcoupler))
+
+  do nc = 1,prism_mcoupler
+  do npc = 1,2
+     if (npc == 1) then
+        pcpointer => prism_coupler_put(nc)
+        pcpntpair => prism_coupler_get(nc)
+     endif
+     if (npc == 2) then
+        pcpointer => prism_coupler_get(nc)
+        pcpntpair => prism_coupler_put(nc)
+     endif
+     pcpointer%rstfile = ""
+     pcpointer%inpfile = ""
+     pcpointer%fldlist = ""
+     pcpointer%nflds   = 0
+     pcpointer%namID   = 0
+     pcpointer%valid   = .false.
+!tcx is this alloc pcpointer or prism_coupler_*
+     allocate(pcpointer%varid(1))
+     pcpointer%varid(:) = ispval
+     pcpointer%aVon(:) = .false.
+     pcpointer%ops     = ispval
+     pcpointer%comp    = ispval
+     pcpointer%routerID  = ispval
+     pcpointer%mapperID  = ispval
+     pcpointer%maploc  = ""
+     pcpointer%tag     = ispval
+     pcpointer%dt      = ispval
+     pcpointer%lag     = 0
+     pcpointer%maxtime = 0
+     pcpointer%getput  = ispval
+     pcpointer%sndrcv  = .false.
+     pcpointer%output  = .false.
+     pcpointer%input   = .false.
+     pcpointer%trans   = ip_instant
+     pcpointer%conserv = ip_cnone
+     pcpointer%ltime   = ispval
+     pcpointer%snddiag = .false.
+     pcpointer%rcvdiag = .false.
+     pcpointer%sndmult = 1.0_ip_double_p
+     pcpointer%sndadd  = 0.0_ip_double_p
+     pcpointer%rcvmult = 1.0_ip_double_p
+     pcpointer%rcvadd  = 0.0_ip_double_p
+  enddo  ! npc
+  enddo  ! nc
 
   lcouplerid   = ispval
   lcouplertime = ispval
+  lastseq      = ispval
+  lastseqtime  = ispval
 
   !----------------------------------------------------------
   ! Share model variable information across all models
@@ -278,16 +283,16 @@ CONTAINS
 
   call oasis_debug_note(subname//' share var info between models')
 
-  allocate(allvar(mvar,prism_nmodels))
-  allocate(nallvar(prism_nmodels))
-  allocate(allops(mvar,prism_nmodels))
-  allocate(myvar(mvar))
-  allocate(myops(mvar))
+  allocate(allvar(maxvar,prism_amodels))
+  allocate(nallvar(prism_amodels))
+  allocate(allops(maxvar,prism_amodels))
+  allocate(myvar(maxvar))
+  allocate(myops(maxvar))
 
   allvar = " "
   nallvar = 0
   allops = -1
-  do n = 1,prism_nmodels
+  do n = 1,prism_amodels
      if (n == compid) then
         myvar = " "
         myops = 0
@@ -298,31 +303,29 @@ CONTAINS
            ! check that each var name is unique for a given model
            do n2 = 1,n1-1
               if (myvar(n1) == myvar(n2)) then
-                 WRITE(nulprt,*) subname,' abort by model :',compid
-                 WRITE(nulprt,*) subname,' abort variable name defined more than once:'//trim(myvar(n1))
-                 CALL oasis_flush(nulprt)
+                 WRITE(nulprt,*) subname,estr,'variable name defined more than once by def_var = ',trim(myvar(n1))
                  call oasis_abort()
               endif
            enddo
         enddo
      endif
      if (OASIS_debug >= 5) then
-        write(nulprt,*) subname,' BCAST from ',n,model_root(n)
+        write(nulprt,*) subname,' BCAST from ',n,mpi_root_global(n)
         call oasis_flush(nulprt)
      endif
-     call oasis_mpi_bcast(mynvar,mpi_comm_global,'mynvar',model_root(n))
+     call oasis_mpi_bcast(mynvar,mpi_comm_global,'mynvar',mpi_root_global(n))
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' bcast mynvar ',mynvar
         call oasis_flush(nulprt)
      endif
      nallvar(n) = mynvar
-     call oasis_mpi_bcast(myvar,mpi_comm_global,'myvar',model_root(n))
+     call oasis_mpi_bcast(myvar,mpi_comm_global,'myvar',mpi_root_global(n))
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' bcast myvar ',trim(myvar(1))
         call oasis_flush(nulprt)
      endif
      allvar(:,n) = myvar(:)
-     call oasis_mpi_bcast(myops,mpi_comm_global,'myops',model_root(n))
+     call oasis_mpi_bcast(myops,mpi_comm_global,'myops',mpi_root_global(n))
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' bcast myops ',myops(1)
         call oasis_flush(nulprt)
@@ -330,12 +333,11 @@ CONTAINS
      allops(:,n) = myops(:)
   enddo
 
-  deallocate(model_root)
   deallocate(myvar,myops)
 
   if (OASIS_debug >= 2) then
      write(nulprt,*) subname,' model variable info:'
-     do nm = 1,prism_nmodels
+     do nm = 1,prism_amodels
         write(nulprt,'(8x,a,2i6)') ' model,nvars = ',nm,nallvar(nm)
         do nv = 1,nallvar(nm)
            cstring = 'unknown'
@@ -353,7 +355,7 @@ CONTAINS
   ! generate sortvars sorted list
 
   n1 = 0
-  do n = 1,prism_nmodels
+  do n = 1,prism_amodels
      n1 = n1 + nallvar(n)
   enddo
   allocate(sortvars%fld(n1))
@@ -363,7 +365,7 @@ CONTAINS
   sortvars%num = n1
 
   n1 = 0
-  do n = 1,prism_nmodels
+  do n = 1,prism_amodels
   do n2 = 1,nallvar(n)
      n1 = n1 + 1
      sortkey(n1) = n1
@@ -396,7 +398,7 @@ CONTAINS
   ! nv1 = my variable counter
   !----------------------------------------------------------
 
-  if (timers_on) call oasis_timer_stop ('cpl_setup_n1')
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n1')
 
   !--------------------------------
   ! preprocess namcouple strings
@@ -404,15 +406,16 @@ CONTAINS
 
   ! count namcouple field names
 
-  if (timers_on) call oasis_timer_start('cpl_setup_n2')
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n2')
   n1 = 0
   n2 = 0
   do nn = 1,nnamcpl
      n1 = n1 + oasis_string_listGetNum(namsrcfld(nn))
      n2 = n2 + oasis_string_listGetNum(namdstfld(nn))
      if (n1 /= n2) then
-        WRITE(nulprt,*) subname,' abort on namsrc, namdst count ',nn,n1,n2
-        CALL oasis_flush(nulprt)
+        WRITE(nulprt,*) subname,estr,'number of fields in namcouple inconsistent ',nn,n1,n2
+        WRITE(nulprt,*) subname,estr,'namcouple src fields = ',trim(namsrcfld(nn))
+        WRITE(nulprt,*) subname,estr,'namcouple dst fields = ',trim(namdstfld(nn))
         call oasis_abort()
      endif
   enddo
@@ -483,7 +486,7 @@ CONTAINS
   endif
   deallocate(sortkey)
 
-  if (OASIS_debug >= 15) then
+  if (OASIS_debug >= 1500) then
 
      write(nulprt,*) subname,' Test sort code: '
 
@@ -602,7 +605,7 @@ CONTAINS
      CALL oasis_flush(nulprt)
   endif
 
-  if (timers_on) call oasis_timer_stop ('cpl_setup_n2')
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n2')
 
   !--------------------------------
   ! for all namcoupler input
@@ -611,22 +614,23 @@ CONTAINS
   call oasis_debug_note(subname//' compare vars and namcouple')
   call oasis_debug_note(subname//' setup couplers')
 
-  if (timers_on) call oasis_timer_start('cpl_setup_n3')
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n3')
 
   !--------------------------------
   ! for all my variables
   !--------------------------------
 
-  do nv1 = 1,nallvar(compid)
+  do nv1 = 1,prism_nvar
 
      !--------------------------------
      ! get my parition and fld
      !--------------------------------
 
      part1  = prism_var(nv1)%part
-     myfld  = trim(allvar(nv1,compid))
+     myfld  = prism_var(nv1)%name
 
      IF (OASIS_debug >= 20) THEN
+        WRITE(nulprt,*) ' '
         WRITE(nulprt,*) subname,' get part and fld ',nv1,part1,trim(myfld)
         CALL oasis_flush(nulprt)
      ENDIF
@@ -635,24 +639,24 @@ CONTAINS
      ! check if i'm an In or Out variable and then find namcouple matches
      !--------------------------------
 
-     if (timers_on) call oasis_timer_start('cpl_setup_n3a')
-     if (allops(nv1,compid) == OASIS_Out) then
+     if (local_timers_on) call oasis_timer_start('cpl_setup_n3a')
+     if (prism_var(nv1)%ops == OASIS_Out) then
         call cplfind(sortnsrc%num, sortnsrc%fld, myfld, ifind, nfind)
-     elseif (allops(nv1,compid) == OASIS_In) then
+     elseif (prism_var(nv1)%ops == OASIS_In) then
         call cplfind(sortndst%num, sortndst%fld, myfld, ifind, nfind)
      endif
-     if (timers_on) call oasis_timer_stop ('cpl_setup_n3a')
+     if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3a')
 
      do nf = ifind,ifind+nfind-1
-        if (timers_on) call oasis_timer_start('cpl_setup_n3b')
+        if (local_timers_on) call oasis_timer_start('cpl_setup_n3b')
 
         flag = OASIS_NotDef
 
-        if (allops(nv1,compid) == OASIS_Out) then
+        if (prism_var(nv1)%ops == OASIS_Out) then
            nn = sortnsrc%namnum(nf)
            myfldi = sortnsrc%fldnum(nf)
            flag = OASIS_Out
-        elseif (allops(nv1,compid) == OASIS_In) then
+        elseif (prism_var(nv1)%ops == OASIS_In) then
            nn = sortndst%namnum(nf)
            myfldi = sortndst%fldnum(nf)
            flag = OASIS_In
@@ -666,7 +670,7 @@ CONTAINS
             CALL oasis_flush(nulprt)
         ENDIF
 
-        if (timers_on) call oasis_timer_stop ('cpl_setup_n3b')
+        if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3b')
 
         !--------------------------------
         ! my variable is in this namcouple input
@@ -674,14 +678,14 @@ CONTAINS
 
         if (flag /= OASIS_NotDef) then
 
-           if (timers_on) call oasis_timer_start('cpl_setup_n3c')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n3c')
 
            !--------------------------------
            ! migrate namcouple info into part
            !--------------------------------
 
            IF (OASIS_debug >= 20) THEN
-               WRITE(nulprt,*) subname,' migrate namcouple '
+               WRITE(nulprt,*) subname,' migrate namcouple to part '
                CALL oasis_flush(nulprt)
            ENDIF
 
@@ -705,8 +709,7 @@ CONTAINS
            !--------------------------------
 
            if (flag /= OASIS_In .and. flag /= OASIS_Out) then
-              write(nulprt,*) subname,' ERROR flag problems',flag
-              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              write(nulprt,*) subname,estr,'var must be either OASIS_In or OASIS_Out for var = ',trim(myfld)
               call oasis_abort()
            endif
 
@@ -720,7 +723,7 @@ CONTAINS
            ! determine matching field name
            !--------------------------------
 
-           if (timers_on) call oasis_timer_start('cpl_setup_n3c1')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n3c1')
            otfld = 'NOmatchNOyesNOyesNO'
            if (flag == OASIS_Out) then
               call oasis_string_listGetName(namdstfld(nn),myfldi,otfld)
@@ -728,7 +731,7 @@ CONTAINS
            if (flag == OASIS_In) then
               call oasis_string_listGetName(namsrcfld(nn),myfldi,otfld)
            endif
-           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c1')
+           if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c1')
 
            IF (OASIS_debug >= 20) THEN
               WRITE(nulprt,*) subname,' otfld ',trim(otfld)
@@ -739,14 +742,14 @@ CONTAINS
            ! look for namcouple coupling variable in all other model variables
            !--------------------------------
 
-           if (timers_on) call oasis_timer_start('cpl_setup_n3c2')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n3c2')
            call cplfind(sortvars%num, sortvars%fld, otfld, ifind, nfind)
-           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c2')
-           if (timers_on) call oasis_timer_stop ('cpl_setup_n3c')
+           if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c2')
+           if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c')
 
            found = .false.
            do nvf = ifind, ifind+nfind-1
-              if (timers_on) call oasis_timer_start('cpl_setup_n3d')
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n3d')
               nm = sortvars%modnum(nvf)
               nv = sortvars%varnum(nvf)
               
@@ -763,31 +766,28 @@ CONTAINS
               !--------------------------------
 
               if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
-                 if (nm == compid) then
-                    write(nulprt,*) subname,' ERROR send recv pair on same model',nm,' ', &
-                       trim(myfld),' ',trim(otfld)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                    call oasis_abort()
-                 endif
+! tcraig allow this now
+ !                if (nm == compid) then
+ !                   write(nulprt,*) subname,estr,'send recv pair on same model = ', &
+ !                      trim(myfld),' ',trim(otfld)
+ !                   call oasis_abort()
+ !                endif
                  if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
-                    write(nulprt,*) subname,' ERROR send recv pair both Out ', &
+                    write(nulprt,*) subname,estr,'send recv pair both Out = ', &
                        trim(myfld),' ',trim(otfld)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call oasis_abort()
                  endif
                  if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
-                    write(nulprt,*) subname,' ERROR send recv pair both In ', &
+                    write(nulprt,*) subname,estr,'send recv pair both In = ', &
                        trim(myfld),' ',trim(otfld)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call oasis_abort()
                  endif
               endif
 
               if (namfldops(nn) == ip_input .or. namfldops(nn) == ip_output) then
                  if (trim(myfld) /= trim(otfld)) then
-                    write(nulprt,*) subname,' ERROR namcouple field names do not match in/out ', &
+                    write(nulprt,*) subname,estr,'namcouple field names do not match in/out = ', &
                        trim(myfld),' ',trim(otfld)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call oasis_abort()
                  endif
               endif
@@ -798,13 +798,14 @@ CONTAINS
               !--------------------------------
 
               if (flag == OASIS_In .and. found) then
-                 write(nulprt,*) subname,' ERROR found two sources for ',trim(otfld)
-                 WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+                 write(nulprt,*) subname,estr,'found two sources for field = ',trim(otfld)
                  call oasis_abort()
               endif
               found = .true.
 
               nc = nns
+              if (flag == OASIS_Out) pcpointer => prism_coupler_put(nc)
+              if (flag == OASIS_In)  pcpointer => prism_coupler_get(nc)
 
               !--------------------------------
               ! prism_coupler fields, multiple field support
@@ -815,164 +816,23 @@ CONTAINS
                   CALL oasis_flush(nulprt)
               ENDIF
 
-              prism_coupler(nc)%nflds = prism_coupler(nc)%nflds + 1
-              if (prism_coupler(nc)%nflds == 1) then
-                 prism_coupler(nc)%fldlist = trim(myfld)
+              pcpointer%nflds = pcpointer%nflds + 1
+              if (pcpointer%nflds == 1) then
+                 pcpointer%fldlist = trim(myfld)
               else
-                 prism_coupler(nc)%fldlist = trim(prism_coupler(nc)%fldlist)//':'//trim(myfld)
+                 pcpointer%fldlist = trim(pcpointer%fldlist)//':'//trim(myfld)
               endif
 
-              svarid = size(prism_coupler(nc)%varid)
-              if (prism_coupler(nc)%nflds > svarid) then
+              svarid = size(pcpointer%varid)
+              if (pcpointer%nflds > svarid) then
                   allocate(varidtmp(svarid))
-                  varidtmp(1:svarid) = prism_coupler(nc)%varid(1:svarid)
-                  deallocate(prism_coupler(nc)%varid)
-                  allocate(prism_coupler(nc)%varid(prism_coupler(nc)%nflds+10))
-                  prism_coupler(nc)%varid(1:svarid) = varidtmp(1:svarid)
+                  varidtmp(1:svarid) = pcpointer%varid(1:svarid)
+                  deallocate(pcpointer%varid)
+                  allocate(pcpointer%varid(pcpointer%nflds+10))
+                  pcpointer%varid(1:svarid) = varidtmp(1:svarid)
                   deallocate(varidtmp)
               endif
-              prism_coupler(nc)%varid(prism_coupler(nc)%nflds) = nv1
-
-              !--------------------------------
-              ! prism_coupler other settings
-              !--------------------------------
-
-              prism_coupler(nc)%comp   = nm
-              prism_coupler(nc)%seq    = namfldseq(nn)
-              prism_coupler(nc)%dt     = namflddti(nn)
-              prism_coupler(nc)%lag    = namfldlag(nn)
-              prism_coupler(nc)%maxtime= namruntim
-              prism_coupler(nc)%rstfile= trim(namrstfil(nn))
-              prism_coupler(nc)%inpfile= trim(naminpfil(nn))
-              prism_coupler(nc)%mapperID = -1
-              prism_coupler(nc)%partID = part1
-              prism_coupler(nc)%namID  = nn
-              prism_coupler(nc)%valid  = .true.
-              prism_coupler(nc)%trans  = namfldtrn(nn)
-              prism_coupler(nc)%conserv= namfldcon(nn)
-              prism_coupler(nc)%consopt= namfldcoo(nn)
-              prism_coupler(nc)%ops    = namfldops(nn)
-              prism_coupler(nc)%tag    = compid*100*1000 + compid*1000 + nn
-              prism_coupler(nc)%getput = OASIS_NotDef
-              prism_coupler(nc)%sndrcv = .false.
-              prism_coupler(nc)%output = .false.
-              prism_coupler(nc)%input  = .false.
-              prism_coupler(nc)%sndmult= namfldsmu(nn)
-              prism_coupler(nc)%sndadd = namfldsad(nn)
-              prism_coupler(nc)%rcvmult= namflddmu(nn)
-              prism_coupler(nc)%rcvadd = namflddad(nn)
-              prism_coupler(nc)%snddiag= namchecki(nn)
-              prism_coupler(nc)%rcvdiag= namchecko(nn)
-
-              !--------------------------------
-              ! prism_coupler input and output flags
-              ! prism_coupler comm flags, need for tags to match up on both sides
-              ! tags assume up to 1000 namcouple inputs and 100 models
-              !--------------------------------
-
-              IF (OASIS_debug >= 20) THEN
-                 WRITE(nulprt,*) subname,' inout flags '
-                 CALL oasis_flush(nulprt)
-              ENDIF
-
-              if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
-                 prism_coupler(nc)%output = .true.
-                 prism_coupler(nc)%getput = OASIS3_PUT
-              endif
-              if (namfldops(nn) == ip_input) then
-                 prism_coupler(nc)%input  = .true.
-                 prism_coupler(nc)%getput = OASIS3_GET
-              endif
-
-              if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
-                 prism_coupler(nc)%sndrcv = .true.
-                 if (flag == OASIS_Out) then
-                    prism_coupler(nc)%tag = nm*100*1000 + compid*1000 + nn
-                    prism_coupler(nc)%getput = OASIS3_PUT
-                 elseif (flag == OASIS_In) then
-                    prism_coupler(nc)%tag = compid*100*1000 + nm*1000 + nn
-                    prism_coupler(nc)%getput = OASIS3_GET
-                 endif
-                 !--------------------------------
-                 ! prism_coupler router
-                 ! cannot reuse router because don't really know what's on the other side
-                 ! if router is already set for the coupler, then fine, otherwise, set new router
-                 !--------------------------------
-                 if (prism_coupler(nc)%routerID == ispval) then
-                    prism_nrouter = prism_nrouter+1
-                    if (prism_nrouter > prism_mrouter) then
-                       write(nulprt,*) subname,' ERROR prism_nrouter too large',prism_nrouter,&
-                                       prism_mrouter
-                       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                       call oasis_abort()
-                    endif
-                    prism_coupler(nc)%routerID = prism_nrouter
-                 endif
-              endif
-
-              !--------------------------------
-              ! prism_coupler mapper
-              !--------------------------------
-
-              IF (OASIS_debug >= 20) THEN
-                 WRITE(nulprt,*) subname,' mapper '
-                 CALL oasis_flush(nulprt)
-              ENDIF
-
-              tmp_mapfile = nammapfil(nn)
-
-              if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
-                 if (trim(namscrmet(nn)) == 'CONSERV') then
-                    tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
-                                  &'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
-                 else
-                    tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
-                                  &'_'//trim(namscrmet(nn))//'.nc'
-                 endif
-              endif
-
-              if (trim(tmp_mapfile) /= 'idmap') then
-                 prism_coupler(nc)%maploc = trim(nammaploc(nn))
-                 if ((flag == OASIS_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
-                     (flag == OASIS_Out .and. trim(nammaploc(nn)) == 'src')) then
-                    !--------------------------------
-                    ! try to reuse mapper already defined
-                    ! must match mapping file and partition
-                    !--------------------------------
-                    mapID = -1
-                    do n = 1,prism_nmapper
-                       if (trim(prism_mapper(n)%file) == trim(tmp_mapfile) .and. &
-                           trim(prism_mapper(n)%opt ) == trim(nammapopt(nn))) then
-                          if (flag == OASIS_In  .and. prism_mapper(n)%dpart == part1) mapID = n
-                          if (flag == OASIS_Out .and. prism_mapper(n)%spart == part1) mapID = n
-                       endif
-                    enddo
-                    !--------------------------------
-                    ! or will need a new mapper
-                    !--------------------------------
-                    if (mapID < 1) then
-                       prism_nmapper = prism_nmapper + 1
-                       if (prism_nmapper > prism_mmapper) then
-                          write(nulprt,*) subname,' ERROR prism_nmapper too large',prism_nmapper,&
-                                          prism_mmapper
-                          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                          call oasis_abort()
-                       endif
-                       mapID = prism_nmapper
-                       prism_mapper(mapID)%file = trim(tmp_mapfile)
-                       prism_mapper(mapID)%loc  = trim(nammaploc(nn))
-                       prism_mapper(mapID)%opt  = trim(nammapopt(nn))
-                       if (flag == OASIS_In ) prism_mapper(mapID)%dpart = part1
-                       if (flag == OASIS_Out) prism_mapper(mapID)%spart = part1
-                       if (OASIS_debug > 15) then
-                          write(nulprt,*) subname,' DEBUG new mapper for file ',&
-                                          trim(prism_mapper(mapID)%file)
-                          call oasis_flush(nulprt)
-                       endif
-                    endif
-                    prism_coupler(nc)%mapperID = mapID
-                 endif  ! flag and nammaploc match
-              endif  ! nammapfil
+              pcpointer%varid(pcpointer%nflds) = nv1
 
               !--------------------------------
               ! add this coupler to list of prism_var couplers
@@ -980,12 +840,174 @@ CONTAINS
 
               prism_var(nv1)%ncpl = prism_var(nv1)%ncpl + 1
               if (prism_var(nv1)%ncpl > mvarcpl) then
-                 WRITE(nulprt,*) subname,' ncpl too high, max (mvarcpl) = ',mvarcpl
+                 WRITE(nulprt,*) subname,estr,'ncpl too high, max size (mvarcpl) = ',mvarcpl
+                 WRITE(nulprt,*) subname,estr,'increase mvarcpl in mod_oasis_var'
                  call oasis_abort()
               endif
               prism_var(nv1)%cpl(prism_var(nv1)%ncpl) = nc
 
-              if (timers_on) call oasis_timer_stop('cpl_setup_n3d')
+              !--------------------------------
+              ! prism_coupler settings
+              ! if already initialized (valid) then check consistency
+              ! otherwise initialize pcpointer
+              !--------------------------------
+
+              if (pcpointer%valid) then
+                 if (pcpointer%comp /= nm) then
+                    WRITE(nulprt,*) subname,estr,'mismatch in field comp for var = ',trim(myfld)
+                    call oasis_abort()
+                 endif
+                 if (pcpointer%namID /= nn) then
+                    WRITE(nulprt,*) subname,estr,'mismatch in field namID for var = ',trim(myfld)
+                    call oasis_abort()
+                 endif
+                 if (pcpointer%partID /= part1) then
+                    WRITE(nulprt,*) subname,estr,'mismatch in field partID for var = ',trim(myfld)
+                    call oasis_abort()
+                 endif
+
+             else
+                 pcpointer%comp   = nm
+                 pcpointer%seq    = namfldseq(nn)
+                 pcpointer%dt     = namflddti(nn)
+                 pcpointer%lag    = namfldlag(nn)
+                 pcpointer%maxtime= namruntim
+                 pcpointer%rstfile= trim(namrstfil(nn))
+                 pcpointer%inpfile= trim(naminpfil(nn))
+                 pcpointer%mapperID = -1
+                 pcpointer%partID = part1
+                 pcpointer%rpartID= part1
+                 pcpointer%namID  = nn
+                 pcpointer%trans  = namfldtrn(nn)
+                 pcpointer%conserv= namfldcon(nn)
+                 pcpointer%consopt= namfldcoo(nn)
+                 pcpointer%ops    = namfldops(nn)
+                 pcpointer%tag    = compid*100*1000 + compid*1000 + nn
+                 pcpointer%getput = OASIS_NotDef
+                 pcpointer%sndrcv = .false.
+                 pcpointer%output = .false.
+                 pcpointer%input  = .false.
+                 pcpointer%sndmult= namfldsmu(nn)
+                 pcpointer%sndadd = namfldsad(nn)
+                 pcpointer%rcvmult= namflddmu(nn)
+                 pcpointer%rcvadd = namflddad(nn)
+                 pcpointer%snddiag= namchecki(nn)
+                 pcpointer%rcvdiag= namchecko(nn)
+
+                 !--------------------------------
+                 ! prism_coupler input and output flags
+                 ! prism_coupler comm flags, need for tags to match up on both sides
+                 ! tags assume up to 1000 namcouple inputs and 100 models
+                 !--------------------------------
+
+                 IF (OASIS_debug >= 20) THEN
+                    WRITE(nulprt,*) subname,' inout flags '
+                    CALL oasis_flush(nulprt)
+                 ENDIF
+
+                 if (namfldops(nn) == ip_output .or. namfldops(nn) == ip_expout) then
+                    pcpointer%output = .true.
+                    pcpointer%getput = OASIS3_PUT
+                 endif
+                 if (namfldops(nn) == ip_input) then
+                    pcpointer%input  = .true.
+                    pcpointer%getput = OASIS3_GET
+                 endif
+
+                 if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
+                    pcpointer%sndrcv = .true.
+                    if (flag == OASIS_Out) then
+                       pcpointer%tag = nm*100*1000 + compid*1000 + nn
+                       pcpointer%getput = OASIS3_PUT
+                    elseif (flag == OASIS_In) then
+                       pcpointer%tag = compid*100*1000 + nm*1000 + nn
+                       pcpointer%getput = OASIS3_GET
+                    endif
+                    !--------------------------------
+                    ! prism_coupler router
+                    ! cannot reuse router because don't really know what's on the other side
+                    ! if router is already set for the coupler, then fine, otherwise, set new router
+                    !--------------------------------
+                    if (pcpointer%routerID == ispval) then
+                       prism_nrouter = prism_nrouter+1
+                       if (prism_nrouter > prism_mrouter) then
+                          write(nulprt,*) subname,estr,'prism_nrouter too large = ',prism_nrouter,prism_mrouter
+                          write(nulprt,*) subname,estr,'check prism_mrouter in oasis_coupler_setup '
+                          call oasis_abort()
+                       endif
+                       pcpointer%routerID = prism_nrouter
+                    endif
+                 endif
+
+                 !--------------------------------
+                 ! prism_coupler mapper
+                 !--------------------------------
+
+                 IF (OASIS_debug >= 20) THEN
+                    WRITE(nulprt,*) subname,' mapper '
+                    CALL oasis_flush(nulprt)
+                 ENDIF
+
+                 tmp_mapfile = nammapfil(nn)
+
+                 if (trim(tmp_mapfile) == 'idmap' .and. trim(namscrmet(nn)) /= trim(cspval)) then
+                    if (trim(namscrmet(nn)) == 'CONSERV') then
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                     &'_'//trim(namscrmet(nn))//'_'//trim(namscrnor(nn))//'.nc'
+                    else
+                       tmp_mapfile = 'rmp_'//trim(namsrcgrd(nn))//'_to_'//trim(namdstgrd(nn))//&
+                                     &'_'//trim(namscrmet(nn))//'.nc'
+                    endif
+                 endif
+
+                 if (trim(tmp_mapfile) /= 'idmap') then
+                    pcpointer%maploc = trim(nammaploc(nn))
+                    if ((flag == OASIS_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
+                        (flag == OASIS_Out .and. trim(nammaploc(nn)) == 'src')) then
+                       !--------------------------------
+                       ! try to reuse mapper already defined
+                       ! must match mapping file and partition
+                       !--------------------------------
+                       mapID = -1
+                       do n = 1,prism_nmapper
+                          if (trim(prism_mapper(n)%file) == trim(tmp_mapfile) .and. &
+                              trim(prism_mapper(n)%loc ) == trim(nammaploc(nn)) .and. &
+                              trim(prism_mapper(n)%opt ) == trim(nammapopt(nn))) then
+                             if (flag == OASIS_In  .and. prism_mapper(n)%dpart == part1) mapID = n
+                             if (flag == OASIS_Out .and. prism_mapper(n)%spart == part1) mapID = n
+                          endif
+                       enddo
+                       !--------------------------------
+                       ! or will need a new mapper
+                       !--------------------------------
+                       if (mapID < 1) then
+                          prism_nmapper = prism_nmapper + 1
+                          if (prism_nmapper > prism_mmapper) then
+                             write(nulprt,*) subname,estr,'prism_nmapper too large',prism_nmapper,prism_mmapper
+                             write(nulprt,*) subname,estr,'check prism_mmapper in oasis_coupler_setup '
+                             call oasis_abort()
+                          endif
+                          mapID = prism_nmapper
+                          prism_mapper(mapID)%file = trim(tmp_mapfile)
+                          prism_mapper(mapID)%loc  = trim(nammaploc(nn))
+                          prism_mapper(mapID)%opt  = trim(nammapopt(nn))
+                          if (flag == OASIS_In ) prism_mapper(mapID)%dpart = part1
+                          if (flag == OASIS_Out) prism_mapper(mapID)%spart = part1
+                          if (OASIS_debug > 15) then
+                             write(nulprt,*) subname,' DEBUG new mapper for file ',&
+                                             trim(prism_mapper(mapID)%file)
+                             call oasis_flush(nulprt)
+                          endif
+                       endif
+                       pcpointer%mapperID = mapID
+                    endif  ! flag and nammaploc match
+                 endif  ! nammapfil
+
+                 pcpointer%valid  = .true.
+
+              endif  !  valid
+
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n3d')
 
            enddo  ! nvf
 
@@ -993,8 +1015,8 @@ CONTAINS
 
      enddo  ! nfind
   enddo  ! nv1
-  if (timers_on) call oasis_timer_stop ('cpl_setup_n3')
-  if (timers_on) call oasis_timer_start('cpl_setup_n4')
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3')
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n4')
 
 
   !--- deallocate temporary ---
@@ -1014,13 +1036,16 @@ CONTAINS
      write(nulprt,*) subname,' couplers setup'
      do nc = 1,prism_mcoupler
 !tcx can't write here, something uninitialized???
-!        if (prism_coupler(nc)%valid) call prism_coupler_print(nc)
+!        if (prism_coupler_put(nc)%valid) call prism_coupler_print(nc,prism_coupler_put(nc))
+!        if (prism_coupler_get(nc)%valid) call prism_coupler_print(nc,prism_coupler_get(nc))
      enddo
      write(nulprt,*) ' '
      call oasis_flush(nulprt)
   endif
 
-  if (mpi_comm_local == MPI_COMM_NULL) return
+  if (mpi_comm_local == MPI_COMM_NULL) then
+     return
+  endif
 
   !----------------------------------------------------------
   ! Initialize coupling infrastructure based on couplers above
@@ -1029,19 +1054,31 @@ CONTAINS
   call oasis_debug_note(subname//' initialize coupling datatypes')
 
   do nc = 1,prism_mcoupler
-  if (prism_coupler(nc)%valid) then
+  do npc = 1,2
+  if (npc == 1) then
+     pcpointer => prism_coupler_put(nc)
+     pcpntpair => prism_coupler_get(nc)
+  endif
+  if (npc == 2) then
+     pcpointer => prism_coupler_get(nc)
+     pcpntpair => prism_coupler_put(nc)
+  endif
+  if (OASIS_debug >= 20) then
+     write(nulprt,*) subname,' DEBUG cb:initialize coupler ',nc,npc,pcpointer%valid
+     call oasis_flush(nulprt)
+  endif
+  if (pcpointer%valid) then
      if (OASIS_debug >= 5) then
-        write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc
+        write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc,npc
         call oasis_flush(nulprt)
      endif
 
-     namID = prism_coupler(nc)%namID
-     part1 = prism_coupler(nc)%partID
-     mapID = prism_coupler(nc)%mapperID
+     namID = pcpointer%namID
+     part1 = pcpointer%partID
+     mapID = pcpointer%mapperID
 
      if (part1 <= 0) then
-        write(nulprt,*) subname,' ERROR part1 invalid ',part1
-        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+        write(nulprt,*) subname,estr,'part1 invalid = ',part1
         call oasis_abort()
      endif
 
@@ -1052,7 +1089,7 @@ CONTAINS
      gsize = mct_gsmap_gsize(prism_part(part1)%gsmap)
      lsize = mct_gsmap_lsize(prism_part(part1)%gsmap,mpi_comm_local)
      if (OASIS_debug >= 15) then
-        write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1 info ',part1,mapID,gsize,lsize
+        write(nulprt,'(1x,2a,5i10)') subname,' DEBUG ci:part1 info ',namID,part1,mapID,gsize,lsize
         write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,&
                                      prism_part(part1)%gsmap%gsize
         do n1 = 1,prism_part(part1)%gsmap%ngseg
@@ -1063,9 +1100,9 @@ CONTAINS
         enddo
         call oasis_flush(nulprt)
      endif
-     call mct_avect_init(prism_coupler(nc)%avect1,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
-     call mct_avect_zero(prism_coupler(nc)%avect1)
-     prism_coupler(nc)%aVon(1) = .true.
+     call mct_avect_init(pcpointer%avect1,rList=trim(pcpointer%fldlist),lsize=lsize)
+     call mct_avect_zero(pcpointer%avect1)
+     pcpointer%aVon(1) = .true.
      if (OASIS_debug >= 15) then
         write(nulprt,*) subname,' DEBUG ci:avect1 initialized '
         call oasis_flush(nulprt)
@@ -1075,12 +1112,12 @@ CONTAINS
      ! compute nflds for this coupling and initialize avcnt and status
      !--------------------------------
 
-     prism_coupler(nc)%nflds = mct_aVect_nRAttr(prism_coupler(nc)%avect1)
-     allocate(prism_coupler(nc)%status(prism_coupler(nc)%nflds))
-     allocate(prism_coupler(nc)%avcnt (prism_coupler(nc)%nflds))
-     prism_coupler(nc)%avcnt(:) = 0
-     if (prism_coupler(nc)%getput == OASIS3_PUT) prism_coupler(nc)%status = OASIS_COMM_WAIT
-     if (prism_coupler(nc)%getput == OASIS3_GET) prism_coupler(nc)%status = OASIS_COMM_READY
+     pcpointer%nflds = mct_aVect_nRAttr(pcpointer%avect1)
+     allocate(pcpointer%status(pcpointer%nflds))
+     allocate(pcpointer%avcnt (pcpointer%nflds))
+     pcpointer%avcnt(:) = 0
+     if (pcpointer%getput == OASIS3_PUT) pcpointer%status = OASIS_COMM_WAIT
+     if (pcpointer%getput == OASIS3_GET) pcpointer%status = OASIS_COMM_READY
 
      !--------------------------------
      ! initialize mapper
@@ -1092,7 +1129,7 @@ CONTAINS
            !--------------------------------
            ! mapper already initialized
            !--------------------------------
-           if (prism_coupler(nc)%getput == OASIS3_PUT) then
+           if (pcpointer%getput == OASIS3_PUT) then
               part2 = prism_mapper(mapID)%dpart
            else
               part2 = prism_mapper(mapID)%spart
@@ -1113,7 +1150,7 @@ CONTAINS
            if (mpi_rank_local == 0) then
               inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
               if (OASIS_debug >= 15) then
-                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile',&
+                 write(nulprt,*) subname,' DEBUG ci: inquire mapfile ',&
                                  trim(prism_mapper(mapID)%file),exists
                  call oasis_flush(nulprt)
               endif
@@ -1125,9 +1162,8 @@ CONTAINS
                     !--------------------------------
                     call oasis_coupler_genmap(mapID,namID)
                  else
-                    write(nulprt,*) subname,' ERROR map file does not exist and SCRIPR not set ',&
+                    write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
                                     trim(prism_mapper(mapID)%file)
-                    WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
                     call oasis_abort()
                  endif
               endif
@@ -1136,15 +1172,23 @@ CONTAINS
               ! open mapping file
               !--------------------------------
               status = nf90_open(trim(prism_mapper(mapID)%file),nf90_nowrite,ncid)
-              if (prism_coupler(nc)%getput == OASIS3_PUT) &
+              if (OASIS_debug >= 15) then
                  status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
-              if (prism_coupler(nc)%getput == OASIS3_GET) &
+                 status = nf90_inquire_dimension(ncid,dimid,len=gsize)
+                 write(nulprt,*) subname," DEBUG dst_grid_size ",gsize
+                 status = nf90_inq_dimid(ncid,'src_grid_size',dimid)
+                 status = nf90_inquire_dimension(ncid,dimid,len=gsize)
+                 write(nulprt,*) subname," DEBUG src_grid_size ",gsize
+              endif
+              if (pcpointer%getput == OASIS3_PUT) &
+                 status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
+              if (pcpointer%getput == OASIS3_GET) &
                  status = nf90_inq_dimid(ncid,'src_grid_size',dimid)
               status = nf90_inquire_dimension(ncid,dimid,len=gsize)
-           endif
+           endif  ! rank = 0
            call oasis_mpi_bcast(gsize,mpi_comm_local,subname//' gsize')
 
-           if (prism_coupler(nc)%getput == OASIS3_PUT) then
+           if (pcpointer%getput == OASIS3_PUT) then
               nx = namdst_nx(namID)
               ny = namdst_ny(namID)
               gridname = trim(namdstgrd(namID))
@@ -1155,7 +1199,19 @@ CONTAINS
            endif
 
            !tcx improve match here with nx,ny,gridname 
-           call oasis_part_create(part2,'1d',gsize,nx,ny,gridname)
+           call oasis_part_create(part2,'1d',gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local)
+
+           if (OASIS_Debug >= 15) then
+              write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
+              do r1 = 1,prism_part(part1)%gsmap%ngseg
+                 write(nulprt,*) subname," DEBUG part_create part1 info ",prism_part(part1)%gsmap%start(r1),prism_part(part1)%gsmap%length(r1),prism_part(part1)%gsmap%pe_loc(r1)
+              enddo
+
+              write(nulprt,*) subname," DEBUG part_create part2 gsize",prism_part(part2)%gsize
+              do r1 = 1,prism_part(part2)%gsmap%ngseg
+                 write(nulprt,*) subname," DEBUG part_create part2 info ",prism_part(part2)%gsmap%start(r1),prism_part(part2)%gsmap%length(r1),prism_part(part2)%gsmap%pe_loc(r1)
+              enddo
+           endif
 
            if (prism_part(part2)%nx < 1) then
               prism_part(part2)%nx = nx
@@ -1163,7 +1219,7 @@ CONTAINS
               prism_part(part2)%gridname = trim(gridname)
            endif
 
-           if (prism_coupler(nc)%getput == OASIS3_PUT) then
+           if (pcpointer%getput == OASIS3_PUT) then
              !prism_mapper(mapID)%spart = part1   ! set above
               prism_mapper(mapID)%dpart = part2
            else
@@ -1186,15 +1242,13 @@ CONTAINS
            elseif (prism_mapper(mapID)%opt == 'sum') then
               cstring = 'dst'
            else
-              write(nulprt,*) subname,' ERROR mapper opt invalid ',trim(prism_mapper(mapID)%opt)
-              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+              write(nulprt,*) subname,estr,'mapper opt invalid expect bfb or sum  =',trim(prism_mapper(mapID)%opt)
               call oasis_abort()
            endif
            if (prism_mapper(mapID)%optval /= '' .and. &
                prism_mapper(mapID)%optval /= trim(cstring)) then
-              write(nulprt,*) subname,' ERROR mapper opt changed',&
+              write(nulprt,*) subname,estr,'mapper opt changed',&
                               trim(prism_mapper(mapID)%optval),' ',trim(cstring)
-              WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
               call oasis_abort()
            endif
            prism_mapper(mapID)%optval = trim(cstring)
@@ -1230,7 +1284,7 @@ CONTAINS
         !--------------------------------
         ! read mapper mask and area if not already done
         !--------------------------------
-        if (.not.prism_mapper(mapID)%AVred .and. prism_coupler(nc)%conserv /= ip_cnone) then
+        if (.not.prism_mapper(mapID)%AVred .and. pcpointer%conserv /= ip_cnone) then
            ! initialize and load AV_ms and AV_md
 
            spart = prism_mapper(mapID)%spart
@@ -1241,18 +1295,18 @@ CONTAINS
            call mct_avect_zero(prism_mapper(mapID)%av_ms)
            gridname = prism_part(spart)%gridname
            call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_ms, &
-              prism_part(spart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
+              prism_part(spart)%gsmap,mpi_comm_local,'mask',trim(gridname)//'.msk',fldtype='int')
            call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_ms, &
-              prism_part(spart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
+              prism_part(spart)%gsmap,mpi_comm_local,'area',trim(gridname)//'.srf',fldtype='real')
 
            lsize = mct_gsmap_lsize(prism_part(dpart)%gsmap,mpi_comm_local)
            call mct_avect_init(prism_mapper(mapID)%av_md,iList='mask',rList='area',lsize=lsize)
            call mct_avect_zero(prism_mapper(mapID)%av_md)
            gridname = prism_part(dpart)%gridname
            call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_md, &
-              prism_part(dpart)%gsmap,'mask',trim(gridname)//'.msk',fldtype='int')
+              prism_part(dpart)%gsmap,mpi_comm_local,'mask',trim(gridname)//'.msk',fldtype='int')
            call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_md, &
-              prism_part(dpart)%gsmap,'area',trim(gridname)//'.srf',fldtype='real')
+              prism_part(dpart)%gsmap,mpi_comm_local,'area',trim(gridname)//'.srf',fldtype='real')
 
            prism_mapper(mapID)%AVred = .true.
 
@@ -1288,8 +1342,8 @@ CONTAINS
            enddo
            call oasis_flush(nulprt)
         endif
-        call mct_avect_init(prism_coupler(nc)%avect1m,rList=trim(prism_coupler(nc)%fldlist),lsize=lsize)
-        call mct_avect_zero(prism_coupler(nc)%avect1m)
+        call mct_avect_init(pcpointer%avect1m,rList=trim(pcpointer%fldlist),lsize=lsize)
+        call mct_avect_zero(pcpointer%avect1m)
         if (OASIS_debug >= 15) then
            write(nulprt,*) subname,' DEBUG ci:avect1m initialized '
            call oasis_flush(nulprt)
@@ -1299,41 +1353,105 @@ CONTAINS
         ! router partition is always other part
         !--------------------------------
 
-        rpart = part2
+        pcpointer%rpartID = part2
 
      else
 
         !--------------------------------
         ! router partition is just coupler part
+        ! Set to this by default above
         !--------------------------------
 
-        rpart = prism_coupler(nc)%partID
+        ! pcpointer%rpartID = pcpointer%partID
 
      endif  ! no mapper
 
      !--------------------------------
-     ! initialize router based on rpart
+     ! initialize router based on rpartID
      !--------------------------------
 
-     if (prism_coupler(nc)%sndrcv) then
+     if (pcpointer%sndrcv) then
 
         if (OASIS_debug >= 15) then
-           write(nulprt,*) subname,' DEBUG ci:initialize router ',prism_coupler(nc)%routerID,&
-                           prism_coupler(nc)%comp,rpart
+           write(nulprt,*) subname,' DEBUG ci:initialize router ',pcpointer%routerID,&
+                           pcpointer%comp,pcpointer%rpartID
            call oasis_flush(nulprt)
         endif
 
-        call mct_router_init(prism_coupler(nc)%comp,prism_part(rpart)%gsmap, &
-           mpi_comm_local,prism_router(prism_coupler(nc)%routerID)%router)
+        if (compid == pcpointer%comp) then
+           ! routers for sending to self
+           ! setup router on second pass so rpartID is defined on both sides
+           ! setup both routers at the same time
+           if (npc == 2) then
+              if (OASIS_debug >= 15) then
+                 write(nulprt,*) subname,' DEBUG self router between part ',pcpointer%rpartID,' and part ',pcpntpair%rpartID, &
+                    ' with router ',pcpointer%routerID,' and router ',pcpntpair%routerID,' for compid ',compid
+              endif
+              call mct_router_init(prism_part(pcpointer%rpartID)%gsmap, prism_part(pcpntpair%rpartID)%gsmap, &
+                 mpi_comm_local, prism_router(pcpointer%routerID)%router)
+              call mct_router_init(prism_part(pcpntpair%rpartID)%gsmap, prism_part(pcpointer%rpartID)%gsmap, &
+                 mpi_comm_local, prism_router(pcpntpair%routerID)%router)
 
-        if (OASIS_debug >= 15) then
-           write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
-                           prism_coupler(nc)%routerID
-           call oasis_flush(nulprt)
+              if (OASIS_debug >= 15) then
+                 write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
+                                 pcpointer%routerID
+                 if (OASIS_debug >= 20) then
+                    do r1 = 1,prism_part(pcpointer%rpartID)%gsmap%ngseg
+                       write(nulprt,*) subname," DEBUG router gs1 info ",prism_part(pcpointer%rpartID)%gsmap%start(r1),prism_part(pcpointer%rpartID)%gsmap%length(r1),prism_part(pcpointer%rpartID)%gsmap%pe_loc(r1)
+                    enddo
+                    do r1 = 1,prism_part(pcpointer%partID)%gsmap%ngseg
+                       write(nulprt,*) subname," DEBUG router gs2 info ",prism_part(pcpointer%partID)%gsmap%start(r1),prism_part(pcpointer%partID)%gsmap%length(r1),prism_part(pcpointer%partID)%gsmap%pe_loc(r1)
+                    enddo
+                    do r1 = 1,prism_part(pcpntpair%rpartID)%gsmap%ngseg
+                       write(nulprt,*) subname," DEBUG router gs3 info ",prism_part(pcpntpair%rpartID)%gsmap%start(r1),prism_part(pcpntpair%rpartID)%gsmap%length(r1),prism_part(pcpntpair%rpartID)%gsmap%pe_loc(r1)
+                    enddo
+                    do r1 = 1,prism_part(pcpntpair%partid)%gsmap%ngseg
+                       write(nulprt,*) subname," DEBUG router gs4 info ",prism_part(pcpntpair%partid)%gsmap%start(r1),prism_part(pcpntpair%partid)%gsmap%length(r1),prism_part(pcpntpair%partid)%gsmap%pe_loc(r1)
+                    enddo
+                    do r1 = 1,prism_router(pcpointer%routerID)%router%nprocs
+                       write(nulprt,*) subname," DEBUG router info ",pcpointer%routerID,r1, &
+                          prism_router(pcpointer%routerID)%router%pe_list(r1),prism_router(pcpointer%routerID)%router%locsize(r1)
+                    enddo
+                 endif
+                 call oasis_flush(nulprt)
+              endif
+
+              if (OASIS_debug >= 15) then
+                 write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
+                                 pcpntpair%routerID
+                 if (OASIS_debug >= 20) then
+                    do r1 = 1,prism_router(pcpntpair%routerID)%router%nprocs
+                       write(nulprt,*) subname," DEBUG router info ",pcpntpair%routerID,r1, &
+                          prism_router(pcpntpair%routerID)%router%pe_list(r1),prism_router(pcpntpair%routerID)%router%locsize(r1)
+                    enddo
+                 endif
+                 call oasis_flush(nulprt)
+              endif
+           endif
+
+        else
+
+           call mct_router_init(pcpointer%comp,prism_part(pcpointer%rpartID)%gsmap, &
+              mpi_comm_local,prism_router(pcpointer%routerID)%router)
+
+           if (OASIS_debug >= 15) then
+              write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
+                              pcpointer%routerID
+              if (OASIS_debug >= 20) then
+                 do r1 = 1,prism_router(pcpointer%routerID)%router%nprocs
+                    write(nulprt,*) subname," DEBUG router info ",pcpointer%routerID,r1, &
+                       prism_router(pcpointer%routerID)%router%pe_list(r1),prism_router(pcpointer%routerID)%router%locsize(r1)
+                 enddo
+              endif
+              call oasis_flush(nulprt)
+           endif
+
         endif
+
      endif
 
   endif   ! valid
+  enddo   ! npc
   enddo   ! prism_mcoupler
 
   !----------------------------------------------------------
@@ -1344,24 +1462,23 @@ CONTAINS
      write(nulprt,*) ' '
      write(nulprt,*) subname,' couplers initialized'
      do nc = 1,prism_mcoupler
-        if (prism_coupler(nc)%valid) call oasis_coupler_print(nc)
+        if (prism_coupler_put(nc)%valid) call oasis_coupler_print(nc,prism_coupler_put(nc))
+        if (prism_coupler_get(nc)%valid) call oasis_coupler_print(nc,prism_coupler_get(nc))
      enddo
      write(nulprt,*) ' '
      CALL oasis_flush(nulprt)
   endif
 
   IF (LUCIA_debug > 0) THEN
-      DO nc = 1, prism_mcoupler
-      IF (prism_coupler(nc)%valid) then
-        IF (prism_coupler(nc)%getput == OASIS3_PUT) &
-           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: SN ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
-        IF (prism_coupler(nc)%getput == OASIS3_GET) &                       
-           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: RC ', prism_coupler(nc)%namID, TRIM(prism_coupler(nc)%fldlist)
-      ENDIF
-      ENDDO
+     DO nc = 1, prism_mcoupler
+        IF (prism_coupler_put(nc)%valid) &
+           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: SN ', prism_coupler_put(nc)%namID, TRIM(prism_coupler_put(nc)%fldlist)
+        IF (prism_coupler_get(nc)%valid) &
+           WRITE(nullucia, '(A12,I4.4,1X,A)') 'Balance: RC ', prism_coupler_get(nc)%namID, TRIM(prism_coupler_get(nc)%fldlist)
+     ENDDO
   ENDIF
 
-  if (timers_on) call oasis_timer_stop ('cpl_setup_n4')
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4')
   call oasis_timer_stop('cpl_setup')
 
   call oasis_debug_exit(subname)
@@ -1369,70 +1486,75 @@ CONTAINS
   END SUBROUTINE oasis_coupler_setup
 
 !------------------------------------------------------------
-  SUBROUTINE oasis_coupler_print(cplid)
+  SUBROUTINE oasis_coupler_print(cplid,pcprint)
 
   IMPLICIT NONE
 
   integer(ip_i4_p), intent(in) :: cplid
+  type(prism_coupler_type), intent(in) :: pcprint
   !----------------------------------------------------------
-  integer(ip_i4_p) :: mapid, rouid, parid, namid, nflds
+  integer(ip_i4_p) :: mapid, rouid, parid, namid, nflds, rpard
   integer(ip_i4_p) :: spart,dpart
   character(len=*),parameter :: subname = '(oasis_coupler_print)'
 
   call oasis_debug_enter(subname)
 
-  mapid = prism_coupler(cplid)%mapperid
-  rouid = prism_coupler(cplid)%routerid
-  parid = prism_coupler(cplid)%partid
-  namid = prism_coupler(cplid)%namid
-  nflds = prism_coupler(cplid)%nflds
+  mapid = pcprint%mapperid
+  rouid = pcprint%routerid
+  parid = pcprint%partid
+  rpard = pcprint%rpartid
+  namid = pcprint%namid
+  nflds = pcprint%nflds
 
      write(nulprt,*) ' '
      write(nulprt,*) subname,' model and cplid',compid,cplid
-  if (prism_coupler(cplid)%getput == OASIS3_PUT) then
-     write(nulprt,*) subname,'   send fields  ',trim(prism_coupler(cplid)%fldlist)
+  if (pcprint%getput == OASIS3_PUT) then
+     write(nulprt,*) subname,'   send fields  ',trim(pcprint%fldlist)
      write(nulprt,*) subname,'   from model   ',compid
-     write(nulprt,*) subname,'   to model     ',prism_coupler(cplid)%comp
+     write(nulprt,*) subname,'   to model     ',pcprint%comp
      write(nulprt,*) subname,'   using router ',rouid
-     write(nulprt,*) subname,'   transform    ',prism_coupler(cplid)%trans
-     write(nulprt,*) subname,'   snd diagnose ',prism_coupler(cplid)%snddiag
-     write(nulprt,*) subname,'   snd fld mult ',prism_coupler(cplid)%sndmult
-     write(nulprt,*) subname,'   snd fld add  ',prism_coupler(cplid)%sndadd
+     write(nulprt,*) subname,'   transform    ',pcprint%trans
+     write(nulprt,*) subname,'   snd diagnose ',pcprint%snddiag
+     write(nulprt,*) subname,'   snd fld mult ',pcprint%sndmult
+     write(nulprt,*) subname,'   snd fld add  ',pcprint%sndadd
   endif
-  if (prism_coupler(cplid)%getput == OASIS3_GET) then
-     write(nulprt,*) subname,'   recv fields  ',trim(prism_coupler(cplid)%fldlist)
-     write(nulprt,*) subname,'   from model   ',prism_coupler(cplid)%comp
+  if (pcprint%getput == OASIS3_GET) then
+     write(nulprt,*) subname,'   recv fields  ',trim(pcprint%fldlist)
+     write(nulprt,*) subname,'   from model   ',pcprint%comp
      write(nulprt,*) subname,'   to model     ',compid
      write(nulprt,*) subname,'   using router ',rouid
-     write(nulprt,*) subname,'   rcv diagnose ',prism_coupler(cplid)%rcvdiag
-     write(nulprt,*) subname,'   rcv fld mult ',prism_coupler(cplid)%rcvmult
-     write(nulprt,*) subname,'   rcv fld add  ',prism_coupler(cplid)%rcvadd
+     write(nulprt,*) subname,'   rcv diagnose ',pcprint%rcvdiag
+     write(nulprt,*) subname,'   rcv fld mult ',pcprint%rcvmult
+     write(nulprt,*) subname,'   rcv fld add  ',pcprint%rcvadd
   endif
-     write(nulprt,*) subname,'   namcouple op ',prism_coupler(cplid)%ops
-     write(nulprt,*) subname,'   valid        ',prism_coupler(cplid)%valid
+     write(nulprt,*) subname,'   namcouple op ',pcprint%ops
+     write(nulprt,*) subname,'   valid        ',pcprint%valid
      write(nulprt,*) subname,'   namcouple id ',namid
-     write(nulprt,*) subname,'   variable ids ',prism_coupler(cplid)%varid(1:nflds)
-     write(nulprt,*) subname,'   sndrcv flag  ',prism_coupler(cplid)%sndrcv
-     write(nulprt,*) subname,'   output flag  ',prism_coupler(cplid)%output
-     write(nulprt,*) subname,'   input flag   ',prism_coupler(cplid)%input
-     write(nulprt,*) subname,'   input file   ',trim(prism_coupler(cplid)%inpfile)
-     write(nulprt,*) subname,'   restart file ',trim(prism_coupler(cplid)%rstfile)
-     write(nulprt,*) subname,'   tag          ',prism_coupler(cplid)%tag
-     write(nulprt,*) subname,'   seq          ',prism_coupler(cplid)%seq
-     write(nulprt,*) subname,'   maxtime      ',prism_coupler(cplid)%maxtime
-     write(nulprt,*) subname,'   dt, lag      ',prism_coupler(cplid)%dt,prism_coupler(cplid)%lag
+     write(nulprt,*) subname,'   variable ids ',pcprint%varid(1:nflds)
+     write(nulprt,*) subname,'   sndrcv flag  ',pcprint%sndrcv
+     write(nulprt,*) subname,'   output flag  ',pcprint%output
+     write(nulprt,*) subname,'   input flag   ',pcprint%input
+     write(nulprt,*) subname,'   input file   ',trim(pcprint%inpfile)
+     write(nulprt,*) subname,'   restart file ',trim(pcprint%rstfile)
+     write(nulprt,*) subname,'   tag          ',pcprint%tag
+     write(nulprt,*) subname,'   seq          ',pcprint%seq
+     write(nulprt,*) subname,'   maxtime      ',pcprint%maxtime
+     write(nulprt,*) subname,'   dt, lag      ',pcprint%dt,pcprint%lag
      write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
                                                 prism_part(parid)%gsize
      write(nulprt,*) subname,'   partid, nx,ny',prism_part(parid)%nx,prism_part(parid)%ny
-     write(nulprt,*) subname,'   maploc       ',trim(prism_coupler(cplid)%maploc)
+     write(nulprt,*) subname,'   rpartid,size ',rpard,trim(prism_part(rpard)%gridname),&
+                                                prism_part(rpard)%gsize
+     write(nulprt,*) subname,'   rpartid,nx,ny',prism_part(rpard)%nx,prism_part(rpard)%ny
+     write(nulprt,*) subname,'   maploc       ',trim(pcprint%maploc)
 
   if (mapid > 0) then
      write(nulprt,*) subname,'   use map      ',mapid,trim(prism_mapper(mapid)%file)
      write(nulprt,*) subname,'   nwgts        ',mapid,prism_mapper(mapid)%nwgts
      spart = prism_mapper(mapid)%spart
      dpart = prism_mapper(mapid)%dpart
-     write(nulprt,*) subname,'   conserve     ',prism_coupler(cplid)%conserv
-     write(nulprt,*) subname,'   conserve opt ',prism_coupler(cplid)%consopt
+     write(nulprt,*) subname,'   conserve     ',pcprint%conserv
+     write(nulprt,*) subname,'   conserve opt ',pcprint%consopt
      write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
      write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',&
                                                 trim(prism_mapper(mapid)%optval)
@@ -1445,7 +1567,7 @@ CONTAINS
      if (dpart > 0) &
      write(nulprt,*) subname,'   to nx,ny     ',prism_part(dpart)%gsize, prism_part(dpart)%nx,&
                                                 prism_part(dpart)%ny
-  endif
+  endif  ! mapid > 0
 
   call oasis_flush(nulprt)
 
@@ -1489,8 +1611,7 @@ CONTAINS
   !--- checks first ---
 
   if (trim(namscrtyp(namID)) /= 'SCALAR') then
-     write(nulprt,*) subname,' ERROR: only scrip type SCALAR mapping supported'
-     WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+     write(nulprt,*) subname,estr,'only scrip type SCALAR mapping supported'
      CALL oasis_abort()
   endif
 
@@ -1831,7 +1952,6 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    !--- formats ---
    character(*),parameter :: subName = '(oasis_coupler_sMatReaddnc)'
-   character(*),parameter :: F00 = '("oasis_coupler_sMatReaddnc",1x,4a)'
    character(*),parameter :: F01 = '("oasis_coupler_sMatReaddnc",1x,2(a,i10))'
 
 !-------------------------------------------------------------------------------
@@ -1842,17 +1962,16 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
  call oasis_mpi_commsize(mpicom,commsize)
  nwgts = -1
  if (mytask == 0) then
-   if (OASIS_debug >= 2) write(nulprt,F00) "reading mapping matrix data decomposed..."
+   if (OASIS_debug >= 2) write(nulprt,*) subname," reading mapping matrix data decomposed..."
 
    !----------------------------------------------------------------------------
    ! open & read the file
    !----------------------------------------------------------------------------
-   if (OASIS_debug >=2 ) write(nulprt,F00) "* file name                  : ",trim(fileName)
+   if (OASIS_debug >=2 ) write(nulprt,*) subname," * file name                  : ",trim(fileName)
    status = nf90_open(trim(filename),NF90_NOWRITE,fid)
    if (status /= NF90_NOERR) then
-      write(nulprt,F00) trim(nf90_strerror(status))
-      WRITE(nulprt,*) subname,'ERROR filename'
-      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      write(nulprt,*) subname,' nf90_strerror = ',trim(nf90_strerror(status))
+      WRITE(nulprt,*) subname,estr,'mapping file not found = ',trim(filename)
       call oasis_abort()
    endif
 
@@ -1900,13 +2019,13 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 !     status = nf90_inq_varid     (fid,'area_a',vid)
       status = nf90_inq_varid     (fid,'src_grid_area',vid)
       IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+          WRITE(nulprt,*) subname,' nf90_strerrr = ',TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
       ENDIF
       status = nf90_get_var(fid, vid, areasrc0%rAttr)
       IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
       ENDIF
@@ -1931,13 +2050,13 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 !     status = nf90_inq_varid     (fid,'area_b',vid)
       status = nf90_inq_varid     (fid,'dst_grid_area',vid)
       IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
       ENDIF
       status = nf90_get_var(fid, vid, areadst0%rAttr)
       IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
           WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
           CALL oasis_flush(nulprt)
       ENDIF
@@ -1973,8 +2092,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    elseif (newdom == 'dst') then
       mygsmap => SgsMap
    else
-      write(nulprt,F00) 'ERROR: invalid newdom value = ',newdom
-      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+      write(nulprt,*) subname,estr,'invalid newdom value, expect src or dst = ',newdom
       call oasis_abort()
    endif
    lsize = 0
@@ -2009,8 +2127,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    enddo
    do n = 1,lsize-1
       if (lsstart(n) > lsstart(n+1)) then
-         write(nulprt,F00) ' ERROR: lsstart not properly sorted'
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+         write(nulprt,*) subname,estr,'lsstart not properly sorted'
          call oasis_abort()
       endif
    enddo
@@ -2051,7 +2168,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          status = nf90_get_var(fid,vid,remaps,start2,count2)
          Sbuf(:,:) = remaps(:,:)
          IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
              CALL oasis_flush(nulprt)
          ENDIF
@@ -2060,7 +2177,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          status = nf90_inq_varid      (fid,'dst_address',vid)
          status = nf90_get_var   (fid,vid,Rbuf,start,count)
          IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
              CALL oasis_flush(nulprt)
          ENDIF
@@ -2069,7 +2186,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          status = nf90_inq_varid      (fid,'src_address',vid)
          status = nf90_get_var   (fid,vid,Cbuf,start,count)
          IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,F00) TRIM(nf90_strerror(status))
+             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
              WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
              CALL oasis_flush(nulprt)
          ENDIF
@@ -2160,7 +2277,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (mytask == 0) then
       status = nf90_close(fid)
       IF (OASIS_debug >= 2) THEN
-          WRITE(nulprt,F00) "... done reading file"
+          WRITE(nulprt,*) subname," ... done reading file"
           CALL oasis_flush(nulprt)
       ENDIF
    endif
@@ -2263,8 +2380,7 @@ subroutine cplsortkey(num, arr, sortkey)
 !   call oasis_debug_enter(subname)
 
    if (num /= size(arr) .or. num /= size(sortkey)) then
-      WRITE(nulprt,*) subname,' abort size of input arrays :',num,size(arr),size(sortkey)
-      CALL oasis_flush(nulprt)
+      WRITE(nulprt,*) subname,estr,'on size of input arrays :',num,size(arr),size(sortkey)
       call oasis_abort()
    endif
 

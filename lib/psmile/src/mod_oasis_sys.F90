@@ -22,6 +22,10 @@ MODULE mod_oasis_sys
    integer(ip_intwp_p),parameter :: tree_delta = 2
    integer(ip_intwp_p),save :: tree_indent = 0
 
+   character(len=*),parameter,public :: astr = ' ABORT: '   ! abort string
+   character(len=*),parameter,public :: estr = ' ERROR: '   ! error string
+   character(len=*),parameter,public :: wstr = ' WARNING: ' ! warning string
+
 !--------------------------------------------------------------------
 CONTAINS
 !--------------------------------------------------------------------
@@ -40,10 +44,17 @@ CONTAINS
    character(len=*),parameter   :: subname = '(oasis_abort)'
 !--------------------------------------------------------------------
 
-   if (present(id_compid))  WRITE (nulprt,*) subname//' compid = ',id_compid
-   if (present(cd_routine)) WRITE (nulprt,*) subname//' from '//TRIM(cd_routine)
-   if (present(cd_message)) WRITE (nulprt,*) subname//' error = '//TRIM(cd_message)
-   WRITE (nulprt,*) subname//' CALLING ABORT FROM OASIS LAYER'
+   if (present(id_compid)) &
+   WRITE (nulprt,*) subname,astr,'compid    = ',id_compid
+   if (present(cd_routine)) &
+   WRITE (nulprt,*) subname,astr,'called by = ',trim(cd_routine)
+   if (present(cd_message))  &
+   WRITE (nulprt,*) subname,astr,'message   = ',trim(cd_message)
+
+   WRITE (nulprt,*) subname,astr,'on model  = ',trim(compnm)
+   WRITE (nulprt,*) subname,astr,'on global rank = ',mpi_rank_global
+   WRITE (nulprt,*) subname,astr,'on local  rank = ',mpi_rank_local
+   WRITE (nulprt,*) subname,astr,'CALLING ABORT FROM OASIS LAYER NOW'
    CALL oasis_flush(nulprt)
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
@@ -95,8 +106,7 @@ CONTAINS
    enddo
 
    if (.not.found) then
-      write(nulprt,*) subname,' ERROR no unitno available '
-      WRITE(nulprt,*) subname,' abort by model ',compid,' proc :',mpi_rank_local
+      write(nulprt,*) subname,estr,'no unit number available '
       call oasis_abort()
    endif
      

@@ -109,7 +109,6 @@ integer function oasis_string_countChar(str,char,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_countChar) "
-   character(*),parameter :: F00     = "('(oasis_string_countChar) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -156,7 +155,6 @@ function oasis_string_toUpper(str)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_toUpper) "
-   character(*),parameter :: F00     = "('(oasis_string_toUpper) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
@@ -204,7 +202,6 @@ function oasis_string_toLower(str)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_toLower) "
-   character(*),parameter :: F00     = "('(oasis_string_toLower) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
@@ -250,7 +247,6 @@ function oasis_string_getParentDir(str)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_getParentDir) "
-   character(*),parameter :: F00     = "('(oasis_string_getParentDir) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
@@ -301,7 +297,6 @@ integer function oasis_string_lastIndex(string,substr,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_lastIndex) "
-   character(*),parameter :: F00     = "('(oasis_string_lastIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Note: 
@@ -348,7 +343,6 @@ integer function oasis_string_endIndex(string,substr,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_endIndex) "
-   character(*),parameter :: F00     = "('(oasis_string_endIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -407,7 +401,6 @@ subroutine oasis_string_leftAlign(str,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_leftAlign) "
-   character(*),parameter :: F00     = "('(oasis_string_leftAlign) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! note: 
@@ -463,7 +456,6 @@ subroutine oasis_string_alphanum(str,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_alphaNum) "
-   character(*),parameter :: F00     = "('(oasis_string_alphaNum) ',4a)"
 
 !-------------------------------------------------------------------------------
 !
@@ -513,7 +505,7 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
    character(*)        ,intent(in)  :: startTag    ! start tag
    character(*)        ,intent(in)  :: endTag      ! end tag
    character(*)        ,intent(out) :: substr      ! sub-string between tags
-   integer(ip_i4_p),intent(out),optional :: rc ! retrun code
+   integer(ip_i4_p),intent(out),optional :: rc ! return code
 
 !EOP
 
@@ -524,7 +516,6 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_betweenTags) "
-   character(*),parameter :: F00     = "('(oasis_string_betweenTags) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -541,36 +532,36 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
 
    if (iStart < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) "ERROR: can't find start tag in string"
-       WRITE(nulprt,F00) "ERROR: start tag = ",TRIM(startTag)
-       WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       WRITE(nulprt,*) subname,estr,"can't find start tag in string"
+       WRITE(nulprt,*) subname,estr,"start tag = ",TRIM(startTag)
+       WRITE(nulprt,*) subname,estr,"string    = ",TRIM(string)
        CALL oasis_flush(nulprt)
        rCode = 1
    else if (iEnd < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) "ERROR: can't find end tag in string"
-       WRITE(nulprt,F00) "ERROR: end   tag = ",TRIM(  endTag)
-       WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       WRITE(nulprt,*) subname,estr,"can't find end tag in string"
+       WRITE(nulprt,*) subname,estr,"end   tag = ",TRIM(  endTag)
+       WRITE(nulprt,*) subname,estr,"string    = ",TRIM(string)
        CALL oasis_flush(nulprt)
        rCode = 2
    else if ( iEnd <= iStart) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) "ERROR: start tag not before end tag"
-       WRITE(nulprt,F00) "ERROR: start tag = ",TRIM(startTag)
-       WRITE(nulprt,F00) "ERROR: end   tag = ",TRIM(  endTag)
-       WRITE(nulprt,F00) "ERROR: string    = ",TRIM(string)
+       WRITE(nulprt,*) subname,estr,"start tag not before end tag"
+       WRITE(nulprt,*) subname,estr,"start tag = ",TRIM(startTag)
+       WRITE(nulprt,*) subname,estr,"end   tag = ",TRIM(  endTag)
+       WRITE(nulprt,*) subname,estr,"string    = ",TRIM(string)
        CALL oasis_flush(nulprt)
        rCode = 3
    else if ( iStart+1 == iEnd ) then
       substr = ""
       WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-      WRITE(nulprt,F00) "WARNING: zero-length substring found in ",TRIM(string)
+      WRITE(nulprt,*) subname,wstr,"zero-length substring found in ",TRIM(string)
       CALL oasis_flush(nulprt)
    else
       substr = string(iStart+1:iEnd-1)
       IF (LEN_TRIM(substr) == 0) THEN
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-          WRITE(nulprt,F00) "WARNING: white-space substring found in ",TRIM(string)
+          WRITE(nulprt,*) subname,wstr,"white-space substring found in ",TRIM(string)
           CALL oasis_flush(nulprt)
      ENDIF
    end if
@@ -624,7 +615,6 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_parseCFtunit) "
-   character(*),parameter :: F00     = "('(oasis_string_parseCFtunit) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -649,7 +639,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
    if (trim(unit) == 'none') then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) ' ERROR time unit unknown'
+       WRITE(nulprt,*) subname,estr,'time unit unknown'
        CALL oasis_flush(nulprt)
        CALL oasis_string_abort(subName//' time unit unknown')
    endif
@@ -657,7 +647,7 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
    i = oasis_string_lastIndex(string,' since ')
    if (i < 1) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) ' ERROR since does not appear in unit attribute for time '
+       WRITE(nulprt,*) subname,estr,'since does not appear in unit attribute for time '
        CALL oasis_flush(nulprt)
        CALL oasis_string_abort(subName//' no since in attr name')
    endif
@@ -727,9 +717,9 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
 200  continue
    WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-   write(nulprt,F00) 'ERROR 200 on char num read '
+   write(nulprt,*) subname,estr,'200 on char num read '
    CALL oasis_flush(nulprt)
-   call oasis_string_abort(subName//' ERROR on char num read')
+   call oasis_string_abort(subName//estr//'on char num read')
    call oasis_debug_exit(subname)
 
 end subroutine oasis_string_parseCFtunit
@@ -764,7 +754,6 @@ subroutine oasis_string_clean(string,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_clean) "
-   character(*),parameter :: F00     = "('(oasis_string_clean) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -810,7 +799,6 @@ logical function oasis_string_listIsValid(list,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listIsValid) "
-   character(*),parameter :: F00     = "('(oasis_string_listIsValid) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! check that the list conforms to the list format
@@ -837,7 +825,7 @@ logical function oasis_string_listIsValid(list,rc)
    if (rCode /= 0) then
       oasis_string_listIsValid = .false.
       WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-      write(nulprt,F00) "WARNING: invalid list = ",trim(list)
+      write(nulprt,*) subname,wstr,"invalid list = ",trim(list)
       CALL oasis_flush(nulprt)
    endif
 
@@ -881,7 +869,6 @@ subroutine oasis_string_listGetName(list,k,name,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listGetName) "
-   character(*),parameter :: F00     = "('(oasis_string_listGetName) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -894,19 +881,19 @@ subroutine oasis_string_listGetName(list,k,name,rc)
    !--- check that this is a valid list ---
    if (.not. oasis_string_listIsValid(list,rCode) ) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-      write(nulprt,F00) "ERROR: invalid list = ",trim(list)
+      write(nulprt,*) subname,estr,"invalid list = ",trim(list)
       CALL oasis_flush(nulprt)
-      call oasis_string_abort(subName//" ERROR: invalid list = "//trim(list))
+      call oasis_string_abort(subName//estr//"invalid list = "//trim(list))
    end if
 
    !--- check that this is a valid index ---
    kFlds = oasis_string_listGetNum(list)
    if (k<1 .or. kFlds<k) then
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,*) subName,"ERROR: invalid index = ",k
-       WRITE(nulprt,*) subName,"ERROR:          list = ",TRIM(list)
+       WRITE(nulprt,*) subname,estr,"invalid index = ",k
+       WRITE(nulprt,*) subname,estr,"         list = ",TRIM(list)
        CALL oasis_flush(nulprt)
-       CALL oasis_string_abort(subName//" ERROR: invalid index")
+       CALL oasis_string_abort(subName//estr//"invalid index")
    end if
 
    !--- start with whole list, then remove fields before and after desired field ---
@@ -967,7 +954,6 @@ subroutine oasis_string_listIntersect(list1,list2,listout,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listIntersect) "
-   character(*),parameter :: F00     = "('(oasis_string_listIntersect) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1026,7 +1012,6 @@ subroutine oasis_string_listUnion(list1,list2,listout,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listUnion) "
-   character(*),parameter :: F00     = "('(oasis_string_listUnion) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1094,7 +1079,6 @@ subroutine oasis_string_listMerge(list1,list2,listout,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listMerge) "
-   character(*),parameter :: F00     = "('(oasis_string_listMerge) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1107,7 +1091,7 @@ subroutine oasis_string_listMerge(list1,list2,listout,rc)
 
    !--- make sure temp strings are large enough ---
    if ( (len(l1) < len_trim(list1)) .or. (len(l2) < len_trim(list2))) then
-      call oasis_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//estr//"temp string not large enough")
    end if
 
    call oasis_string_clean(l1)
@@ -1118,7 +1102,7 @@ subroutine oasis_string_listMerge(list1,list2,listout,rc)
    call oasis_string_leftAlign(l1,rCode)
    call oasis_string_leftAlign(l2,rCode)
    if (len_trim(l1)+len_trim(l2)+1 > len(listout)) &
-      call oasis_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//estr//"output list string not large enough")
    if (len_trim(l1) == 0) then
      listout = trim(l2)
    else
@@ -1162,7 +1146,6 @@ subroutine oasis_string_listAppend(list,listadd,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listAppend) "
-   character(*),parameter :: F00     = "('(oasis_string_listAppend) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1175,14 +1158,14 @@ subroutine oasis_string_listAppend(list,listadd,rc)
 
    !--- make sure temp string is large enough ---
    if (len(l1) < len_trim(listAdd)) then
-      call oasis_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//estr//'temp string not large enough')
    end if
 
    call oasis_string_clean(l1)
    l1 = trim(listadd)
    call oasis_string_leftAlign(l1,rCode)
    if (len_trim(list)+len_trim(l1)+1 > len(list)) &
-      call oasis_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//estr//'output list string not large enough')
    if (len_trim(list) == 0) then
      list = trim(l1)
    else
@@ -1228,7 +1211,6 @@ subroutine oasis_string_listPrepend(listadd,list,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listPrepend) "
-   character(*),parameter :: F00     = "('(oasis_string_listPrepend) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1241,7 +1223,7 @@ subroutine oasis_string_listPrepend(listadd,list,rc)
 
    !--- make sure temp string is large enough ---
    if (len(l1) < len_trim(listAdd)) then
-      call oasis_string_abort(subName//'ERROR: temp string not large enough')
+      call oasis_string_abort(subName//estr//'temp string not large enough')
    end if
 
    call oasis_string_clean(l1)
@@ -1249,7 +1231,7 @@ subroutine oasis_string_listPrepend(listadd,list,rc)
    call oasis_string_leftAlign(l1,rCode)
    call oasis_string_leftAlign(list,rCode)
    if (len_trim(list)+len_trim(l1)+1 > len(list)) &
-      call oasis_string_abort(subName//'ERROR: output list string not large enough')
+      call oasis_string_abort(subName//estr//"output list string not large enough")
    if (len_trim(l1) == 0) then
      list = trim(list)
    else
@@ -1292,7 +1274,6 @@ integer function oasis_string_listGetIndexF(string,fldStr)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listGetIndexF) "
-   character(*),parameter :: F00     = "('(oasis_string_listGetIndexF) ',4a)"
 
 !-------------------------------------------------------------------------------
 
@@ -1341,7 +1322,6 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listGetIndex) "
-   character(*),parameter :: F00     = "('(oasis_string_listGetIndex) ',4a)"
 
 !-------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------
@@ -1362,7 +1342,7 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
    if (len_trim(fldStr) < 1) then
        IF (lprint) THEN
            WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-           WRITE(nulprt,F00) "ERROR: input field name has 0 length"
+           WRITE(nulprt,*) subname,estr,"input field name has 0 length"
            CALL oasis_flush(nulprt)
        ENDIF
        CALL oasis_string_abort(subName//"invalid field name")
@@ -1459,7 +1439,7 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
    if (.not. found) then
       IF (lprint) THEN
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-          WRITE(nulprt,F00) "FYI: field ",TRIM(fldStr)," not found in list ",TRIM(string)
+          WRITE(nulprt,*) subname,"FYI: field ",TRIM(fldStr)," not found in list ",TRIM(string)
           CALL oasis_flush(nulprt)
       ENDIF
       if (present(rc)) rc = 1
@@ -1497,7 +1477,6 @@ integer function oasis_string_listGetNum(str)
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_listGetNum) "
-   character(*),parameter :: F00     = "('(oasis_string_listGetNum) ',4a)"
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -1541,7 +1520,6 @@ subroutine oasis_string_listSetDel(cflag)
 
    !--- formats ---
    character(*),parameter :: subName =   "(oasis_string_listSetDel) "
-   character(*),parameter :: F00     = "('(oasis_string_listSetDel) ',a) "
 
 !-------------------------------------------------------------------------------
 
@@ -1549,7 +1527,7 @@ subroutine oasis_string_listSetDel(cflag)
 
    IF (debug > 0) THEN
        WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-       WRITE(nulprt,F00) 'changing listDel from '//TRIM(listDel)//' to '//TRIM(cflag)
+       WRITE(nulprt,*) subname,' changing listDel from '//TRIM(listDel)//' to '//TRIM(cflag)
        CALL oasis_flush(nulprt)
    ENDIF
    listDel = trim(cflag)
@@ -1584,7 +1562,6 @@ subroutine oasis_string_listGetDel(del)
 
    !--- formats ---
    character(*),parameter :: subName =   "(oasis_string_listGetDel) "
-   character(*),parameter :: F00     = "('(oasis_string_listGetDel) ',a) "
 
 !-------------------------------------------------------------------------------
 
@@ -1621,7 +1598,6 @@ subroutine oasis_string_setAbort(flag)
 
    !--- formats ---
    character(*),parameter :: subName =   "(oasis_string_setAbort) "
-   character(*),parameter :: F00     = "('(oasis_string_setAbort) ',a) "
 
 !-------------------------------------------------------------------------------
 
@@ -1630,11 +1606,11 @@ subroutine oasis_string_setAbort(flag)
    if (debug > 0) then
       if (flag) then
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-          WRITE(nulprt,F00) 'setting abort to true'
+          WRITE(nulprt,*) subname,' setting abort to true'
           CALL oasis_flush(nulprt)
       else
           WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-          WRITE(nulprt,F00) 'setting abort to false'
+          WRITE(nulprt,*) subname,' setting abort to false'
           CALL oasis_flush(nulprt)
       endif
    endif
@@ -1672,8 +1648,6 @@ subroutine oasis_string_setDebug(iFlag)
 
    !--- formats ---
    character(*),parameter :: subName =   "(oasis_string_setDebug) "
-   character(*),parameter :: F00     = "('(oasis_string_setDebug) ',a) "
-   character(*),parameter :: F01     = "('(oasis_string_setDebug) ',a,i3,a,i3) "
 
 !-------------------------------------------------------------------------------
 ! NTOE: write statement can be expensive if called many times.
@@ -1681,7 +1655,7 @@ subroutine oasis_string_setDebug(iFlag)
 
    call oasis_debug_enter(subname)
 
-!   if (OASIS_debug > 0) write(nulprt,F01) 'changing debug level from ',debug,' to ',iflag
+!   if (OASIS_debug > 0) write(nulprt,*) subname,' changing debug level from ',debug,' to ',iflag
    debug = iFlag
 
    call oasis_debug_exit(subname)
@@ -1704,7 +1678,6 @@ subroutine oasis_string_abort(string)
    !--- local ---
    character(ic_xl) :: lstring
    character(*),parameter :: subName =   "(oasis_string_abort)"
-   character(*),parameter :: F00     = "('(oasis_string_abort) ',a)"
 
 !-------------------------------------------------------------------------------
 ! NOTE:
@@ -1717,12 +1690,10 @@ subroutine oasis_string_abort(string)
    if (present(string)) lstring = string
 
    if (doabort) then
-      WRITE(nulprt,*) subname,' abort :',TRIM(lstring)
-      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      call oasis_flush(nulprt)
+      WRITE(nulprt,*) subname,estr,'abort for ',TRIM(lstring)
       call oasis_abort()
    else
-      write(nulprt,F00) ' no abort:'//trim(lstring)
+      write(nulprt,*) subname,wstr,'no abort for '//trim(lstring)
       CALL oasis_flush(nulprt)
    endif
 

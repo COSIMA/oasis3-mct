@@ -142,8 +142,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -186,8 +185,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -271,8 +269,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -347,8 +344,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -434,8 +430,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -474,8 +469,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -539,8 +533,7 @@ CONTAINS
     call oasis_debug_enter(subname)
 
     if (mpi_rank_local /= mpi_root_local) then
-       write(nulprt,*) subname,' ERROR subroutine call by non root processor'
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
+       write(nulprt,*) subname,estr,'subroutine call by non root processor'
        call oasis_abort()
     endif
 
@@ -653,9 +646,8 @@ CONTAINS
           gridID = n
           ! since grid is defined before, make sure nx,ny match
           if (nx /= prism_grid(gridID)%nx .or. ny /= prism_grid(gridID)%ny) then
-             write(nulprt,*) subname,' ERROR in predefined grid size',nx,ny, &
+             write(nulprt,*) subname,estr,'in predefined grid size = ',nx,ny, &
                 prism_grid(gridID)%nx,prism_grid(gridID)%ny
-             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
              call oasis_abort()
           endif
        endif

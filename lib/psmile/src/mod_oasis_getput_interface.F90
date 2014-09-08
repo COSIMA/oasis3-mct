@@ -61,17 +61,26 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_put is called for a variable not in namcouple'
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -98,7 +107,7 @@ contains
        a2on = .true.
        nsx = size(fld2,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -108,7 +117,7 @@ contains
        a3on = .true.
        nsx = size(fld3,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -118,7 +127,7 @@ contains
        a4on = .true.
        nsx = size(fld4,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR array4 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -128,7 +137,7 @@ contains
        a5on = .true.
        nsx = size(fld5,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -192,17 +201,26 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_put is called for a variable not in namcouple'
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -229,7 +247,7 @@ contains
        a2on = .true.
        nsx = size(fld2,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -239,7 +257,7 @@ contains
        a3on = .true.
        nsx = size(fld3,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -249,7 +267,7 @@ contains
        a4on = .true.
        nsx = size(fld4,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -259,7 +277,7 @@ contains
        a5on = .true.
        nsx = size(fld5,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -322,17 +340,26 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) trim(subname), &
-          ' oasis_put is called for a variable not in namcouple'
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -362,7 +389,7 @@ contains
        nisx = size(fld2,dim=1)
        njsx = size(fld2,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -373,7 +400,7 @@ contains
        nisx = size(fld3,dim=1)
        njsx = size(fld3,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -384,7 +411,7 @@ contains
        nisx = size(fld4,dim=1)
        njsx = size(fld4,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -395,7 +422,7 @@ contains
        nisx = size(fld5,dim=1)
        njsx = size(fld5,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -459,17 +486,26 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) trim(subname), &
-          ' oasis_put is called for a variable not in namcouple'
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -499,7 +535,7 @@ contains
        nisx = size(fld2,dim=1)
        njsx = size(fld2,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -510,7 +546,7 @@ contains
        nisx = size(fld3,dim=1)
        njsx = size(fld3,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -521,7 +557,7 @@ contains
        nisx = size(fld4,dim=1)
        njsx = size(fld4,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -532,7 +568,7 @@ contains
        nisx = size(fld5,dim=1)
        njsx = size(fld5,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
           CALL oasis_abort()
        endif
@@ -591,18 +627,27 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_get is called for a variable not in namcouple'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -649,18 +694,27 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_get is called for a variable not in namcouple'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -699,18 +753,27 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_get is called for a variable not in namcouple'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
@@ -759,18 +822,27 @@ contains
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
 
     if (.not. enddef_called) then
-       write(nulprt,*) subname,' ERROR called before oasis_enddef'
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
        call oasis_abort()
     endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' oasis_get is called for a variable not in namcouple'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
        call oasis_abort()
        call oasis_debug_exit(subname)
        return

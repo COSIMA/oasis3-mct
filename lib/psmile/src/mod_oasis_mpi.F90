@@ -2354,7 +2354,6 @@ SUBROUTINE oasis_mpi_finalize(string)
 
    call oasis_debug_enter(subname)
 
-   call MPI_BARRIER(MPI_COMM_WORLD,ierr)
    call MPI_FINALIZE(ierr)
    if (present(string)) then
      call oasis_mpi_chkerr(ierr,subName//trim(string))
