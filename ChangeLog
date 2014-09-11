@@ -645,9 +645,19 @@ Merge trunk rev 1064 + tc14c:
 mkdir oasis3-mct
 cd oasis3-mct
 svn checkout http://oasis3mct.cerfacs.fr/svn/trunk/oasis3-mct .
-svn merge --reintegrate
-http://oasis3mct.cerfacs.fr/svn/branches/tc14c/oasis3-mct
+svn merge --reintegrate http://oasis3mct.cerfacs.fr/svn/branches/tc14c/oasis3-mct
 - update abort code and some error messages
 - multiple components in one executable
 - cleaning calls for processes that are not coupling
+
+==============================================================================
+Originator: coquart
+Date : 11/09/2014
+Merge trunk rev 1074 + tc14d:
+mkdir oasis3-mct
+cd oasis3-mct
+svn checkout http://oasis3mct.cerfacs.fr/svn/trunk/oasis3-mct .
+svn merge --reintegrate http://oasis3mct.cerfacs.fr/svn/branches/tc14d/oasis3-mct
+- parallel grid writing capability added
+- add namcouple checking that all variables defined in namcouple are reconciled at run time with the components and will be used
 
