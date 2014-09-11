@@ -156,7 +156,7 @@ CONTAINS
   character(len=ic_lvar):: gridname
   character(len=ic_long):: tmp_mapfile
   integer(kind=ip_i4_p) :: flag
-  logical               :: found, exists
+  logical               :: found, exists, found2
   integer(kind=ip_i4_p) :: mynvar
   integer(kind=ip_i4_p) :: nwgts
   character(len=ic_lvar):: tmpfld
@@ -168,6 +168,8 @@ CONTAINS
   integer(kind=ip_i4_p) ,pointer :: nallvar(:)
   character(len=ic_lvar),pointer :: allvar(:,:)
   integer(kind=ip_i4_p) ,pointer :: allops(:,:)
+  integer(kind=ip_i4_p) ,pointer :: namsrc_checkused(:) ! 0 = not used
+  integer(kind=ip_i4_p) ,pointer :: namsrc_checkused_g(:)  ! 0 = not used
   type sortnamfld_type
      integer(kind=ip_i4_p) :: num                 ! total number of namcouple fields
      integer(kind=ip_i4_p) ,pointer :: namnum(:)  ! namcouple number
@@ -431,6 +433,10 @@ CONTAINS
   allocate(sortndst%fld(n2))
   allocate(sortndst%namnum(n2))
   allocate(sortndst%fldnum(n2))
+
+  ! this will check that all namcouple vars are used in application
+  allocate(namsrc_checkused(sortnsrc%num))
+  namsrc_checkused = 0
 
   ! fill and sort sortnsrc
 
@@ -749,13 +755,40 @@ CONTAINS
 
            found = .false.
            do nvf = ifind, ifind+nfind-1
+
+              ! check used appropriate array value, we are using "src" side sorted list
+              ! if output, just set the nf value
+              ! if input, search for an nn and myfldi match in the list
+              
+              if (prism_var(nv1)%ops == OASIS_Out) then
+                 namsrc_checkused(nf) = 1
+                 if (OASIS_debug >= 20) then
+                    write(nulprt,*) subname,' set src checkused ',trim(myfld),':',trim(otfld),nf
+                    call oasis_flush(nulprt)
+                 endif
+              endif
+              if (prism_var(nv1)%ops == OASIS_In) then
+                 n1 = 0
+                 found2 = .false.
+                 do while (n1 < sortnsrc%num .and. .not.found2)
+                    n1 = n1 + 1
+                    if (nn == sortnsrc%namnum(n1) .and. myfldi == sortnsrc%fldnum(n1)) then
+                       namsrc_checkused(n1) = 1
+                       found2 = .true.
+                       if (OASIS_debug >= 20) then
+                          write(nulprt,*) subname,' set dst checkused ',trim(myfld),':',trim(otfld),n1
+                          call oasis_flush(nulprt)
+                       endif
+                    endif
+                 enddo
+              endif
+
               if (local_timers_on) call oasis_timer_start('cpl_setup_n3d')
               nm = sortvars%modnum(nvf)
               nv = sortvars%varnum(nvf)
               
               if (OASIS_debug >= 20) then
-                 write(nulprt,*) subname,' match otfld ', &
-                    trim(otfld),nn
+                 write(nulprt,*) subname,' match otfld ',trim(otfld),nn
                  call oasis_flush(nulprt)
               endif
 
@@ -1018,9 +1051,23 @@ CONTAINS
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3')
   if (local_timers_on) call oasis_timer_start('cpl_setup_n4')
 
+  ! aggregate checkused info across all pes and then check on each component root
+  allocate(namsrc_checkused_g(sortnsrc%num))
+  call oasis_mpi_max(namsrc_checkused,namsrc_checkused_g,mpi_comm_global,string=trim(subname)//':srccheckused',all=.true.)
+  found = .false.
+  do n1 = 1,sortnsrc%num
+     if (namsrc_checkused_g(n1) /= 1) then
+        if (mpi_rank_local == 0) write(nulprt,*) subname,estr,'namcouple variable not used: ',trim(sortnsrc%fld(n1))
+        found = .true.
+     endif
+  enddo
+  call oasis_mpi_barrier(mpi_comm_global)
+  if (found) call oasis_abort()
+  deallocate(namsrc_checkused_g)
 
   !--- deallocate temporary ---
   deallocate(allvar,nallvar,allops)
+  deallocate(namsrc_checkused)
   deallocate(sortnsrc%fld)
   deallocate(sortnsrc%namnum)
   deallocate(sortnsrc%fldnum)

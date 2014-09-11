@@ -1222,12 +1222,15 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+   if (OASIS_debug >= 5) then
+      write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname)
+   endif
+
    inquire(file=trim(filename),exist=exists)
    if (exists) then
       status = nf90_open(filename,NF90_NOWRITE,ncid)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
-      status = nf90_redef(ncid)
    else
       write(nulprt,*) subname,estr,'in filename ',trim(filename)
       call oasis_abort()
@@ -1332,6 +1335,10 @@ subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny
+    endif
+
     ind = index(trim(fldname),'.')
     if (ind < 2) then
        write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
@@ -1429,6 +1436,10 @@ subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
+
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny
+    endif
 
     ind = index(trim(fldname),'.')
     if (ind < 2) then
@@ -1528,6 +1539,10 @@ subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
 
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
+
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny,nc
+    endif
 
     ind = index(trim(fldname),'.')
     if (ind < 2) then

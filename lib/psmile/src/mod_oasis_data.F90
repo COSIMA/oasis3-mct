@@ -21,6 +21,7 @@ MODULE mod_oasis_data
 
   logical                   :: enddef_called   ! true when enddef is called, for error checking
 
+  INTEGER(kind=ip_i4_p)     :: size_namfld
   CHARACTER(len=ic_lvar), POINTER :: total_namsrcfld(:), total_namdstfld(:)
 
 ! Models

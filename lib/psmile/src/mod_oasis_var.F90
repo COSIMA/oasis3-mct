@@ -76,7 +76,7 @@
      n = 0
      
      ! If either condition ceases to be true then bail out of the loop
-     DO WHILE (n < maxvar .AND. (.NOT.l_field_in_namcouple))
+     DO WHILE (n < size_namfld .AND. (.NOT.l_field_in_namcouple))
         n = n+1
         IF ( (trimmed_cdport == total_namsrcfld(n)).OR.    &
              (trimmed_cdport == total_namdstfld(n)) ) THEN 
@@ -319,7 +319,15 @@
          found = .false.
          do while (v < vcnt .and. .not.found)
             v = v + 1
-            if (vname0(n) == vname0(v)) found = .true.
+            if (vname0(n) == vname0(v)) then
+               found = .true.
+               !--- check that var, part, and inout consistent on all tasks
+               if (pname0(n) /= pname0(v) .or. inout0(n) /= inout0(v)) then
+                  write(nulprt,*) subname,estr,'inconsistent var and part name: ',trim(vname0(n)),' ',trim(pname0(n)),' ',trim(pname0(v))
+                  write(nulprt,*) subname,estr,'inconsistent var and inout opt: ',trim(vname0(n)),' ',inout0(n),' ',inout0(v)
+                  call oasis_abort()
+               endif
+            endif
          enddo
          if (.not.found) then
             vcnt = vcnt + 1

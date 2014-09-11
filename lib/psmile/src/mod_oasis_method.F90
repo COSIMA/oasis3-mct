@@ -160,11 +160,11 @@ CONTAINS
 
    ! Determines the total number of fields to avoid a parameter in oasis_def_var
    ! and mod_oasis_coupler
-   maxvar=0
+   size_namfld=0
    DO n = 1,nnamcpl
-     maxvar = maxvar + oasis_string_listGetNum(namsrcfld(n))
+     size_namfld = size_namfld + oasis_string_listGetNum(namsrcfld(n))
    ENDDO
-   maxvar = maxvar * 2    ! multiply by 2 to allow sending to self
+   maxvar = size_namfld * 2    ! multiply by 2 to allow sending to self
    IF (mpi_rank_world == 0) THEN
        WRITE (UNIT = nulprt1,FMT = *) 'Total number of coupling fields :',maxvar
        CALL oasis_flush(nulprt1)
@@ -175,8 +175,12 @@ CONTAINS
    ! Store all the names of the fields exchanged in the namcouple
    ! which can be different of namsrcfld(:) and namdstfld(:) if multiple 
    ! fields are exchanged together
-   ALLOCATE(total_namsrcfld(maxvar))
-   ALLOCATE(total_namdstfld(maxvar))
+
+   ALLOCATE(total_namsrcfld(size_namfld))
+   ALLOCATE(total_namdstfld(size_namfld))
+   total_namsrcfld = ''
+   total_namdstfld = ''
+
    m=0
    DO nns = 1,nnamcpl
      n = namsort2nn(nns)
@@ -885,8 +889,9 @@ CONTAINS
       !--- write grid info to files one model at a time
       !------------------------
 
+      call oasis_mpi_barrier(mpi_comm_global)
       do n = 1,prism_amodels
-         if (compid == n .and. mpi_rank_local == mpi_root_local) then
+         if (compid == n) then
             call oasis_write2files()
          endif
          call oasis_mpi_barrier(mpi_comm_global)
