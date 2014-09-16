@@ -3,7 +3,8 @@
 ! All rights reserved. Use is subject to OASIS3 license terms.
 !=============================================================================
 !
-PROGRAM model2
+!
+PROGRAM model1
   !
   ! Use for netCDF library
   USE netcdf
@@ -13,7 +14,6 @@ PROGRAM model2
   IMPLICIT NONE
 
   INCLUDE 'mpif.h'
-
   !
   ! By default OASIS3 exchanges data in double precision.
   ! To exchange data in single precision with OASIS3, 
@@ -25,25 +25,25 @@ PROGRAM model2
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
-  CHARACTER(len=30), PARAMETER :: data_filename='grid_model2.nc'
+  CHARACTER(len=30), PARAMETER   :: data_filename='grid_model1.nc'
   ! Component name (6 characters) same as in the namcouple
-  CHARACTER(len=6)   :: comp_name = 'model2'
-  CHARACTER(len=128) :: comp_out ! name of the output log file
+  CHARACTER(len=6)   :: comp_name = 'model1'
+  CHARACTER(len=128) :: comp_out ! name of the output log file 
   CHARACTER(len=3)   :: chout
   !
   ! Global grid parameters : 
   INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
   INTEGER :: ntot           ! total dimension
   INTEGER :: il_paral_size
-  INTEGER :: nc ! number of corners in the (i,j) plan
+  INTEGER :: nc             ! number of corners
   INTEGER :: indi_beg, indi_end, indj_beg, indj_end
   !
-  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat
-  DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla
-  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_srf
-  INTEGER, DIMENSION(:,:), POINTER            :: indice_mask ! mask, 0 == valid point, 1 == masked point 
+  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat ! lon, lat of the points
+  DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla ! lon, lat of the corners
+  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_srf ! surface of the grid meshes
+  INTEGER, DIMENSION(:,:), POINTER            :: indice_mask ! mask, 0 == valid point, 1 == masked point  
   !
-  INTEGER :: mype, npes ! rank and number of pe
+  INTEGER :: mype, npes ! rank and  number of pe
   INTEGER :: localComm  ! local MPI communicator and Initialized
   INTEGER :: comp_id    ! component identification
   !
@@ -53,8 +53,8 @@ PROGRAM model2
   INTEGER :: i, j
   !
   ! Names of exchanged Fields
-  CHARACTER(len=8), PARAMETER :: var_name1 = 'FRECVATM' ! 8 characters field received by the atmosphere from the ocean
-  CHARACTER(len=8), PARAMETER :: var_name2 = 'FSENDATM' ! 8 characters field sent by the atmosphere to the ocean
+  CHARACTER(len=8), PARAMETER :: var_name1 = 'FSENDOCN' ! 8 characters field sent by model1 to model2
+  CHARACTER(len=8), PARAMETER :: var_name2 = 'FRECVOCN' ! 8 characters field received by model1 from model2
   !
   ! Used in oasis_def_var and oasis_def_var
   INTEGER                   :: var_id(2) 
@@ -64,27 +64,28 @@ PROGRAM model2
   REAL (kind=wp), PARAMETER :: field_ini = -1. ! initialisation of received fields
   !
   INTEGER               ::  ib
-  INTEGER, PARAMETER    ::  il_nb_time_steps = 12 ! number of time steps
-  INTEGER, PARAMETER    ::  delta_t = 1800       ! time step
+  INTEGER, PARAMETER    ::  il_nb_time_steps = 6 ! number of time steps
+  INTEGER, PARAMETER    ::  delta_t = 3600       ! time step
   !
-  INTEGER                :: il_flag          ! Flag for grid writing
   !
-  INTEGER                :: itap_sec ! Time
+  INTEGER                 :: il_flag  ! Flag for grid writing by proc 0
   !
-  ! Grid parameter definition
-  INTEGER                :: part_id  ! use to connect the partition to the variables
-                                     ! in oasis_def_var
-  INTEGER                :: var_actual_shape(4) ! local dimensions of the arrays to the pe
-                                                ! 2 x field rank (= 4 because fields are of rank = 2)
+  INTEGER                 :: itap_sec ! Time used in oasis_put/get
+  !
+  ! Grid parameters definition
+  INTEGER                 :: part_id  ! use to connect the partition to the variables
+                                      ! in oasis_def_var
+  INTEGER                 :: var_actual_shape(4) ! local dimensions of the arrays to the pe
+                                                 ! 2 x field rank (= 4 because fields are of rank = 2)
   !
   ! Exchanged local fields arrays
   ! used in routines oasis_put and oasis_get
-  REAL (kind=wp), POINTER :: field1_recv(:,:)
-  REAL (kind=wp), POINTER :: field2_send(:,:)
+  REAL (kind=wp), POINTER :: field1_send(:,:)
+  REAL (kind=wp), POINTER :: field2_recv(:,:)
   !
-  !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  !   INITIALISATION
-  !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  !   INITIALISATION 
+  !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   CALL MPI_Init(ierror)
   !!!!!!!!!!!!!!!!! OASIS_INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -95,11 +96,11 @@ PROGRAM model2
   ! Unit for output messages : one file for each process
   CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
   IF (ierror /= 0) THEN
-      WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 102')
+      WRITE(0,*) 'MPI_Comm_Rank abort by model1 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 103')
   ENDIF
   !
-  w_unit=100+rank
+  w_unit = 100 + rank
   WRITE(chout,'(I3)') w_unit
   comp_out=comp_name//'.out_'//chout
   !
@@ -118,17 +119,17 @@ PROGRAM model2
   ! Get MPI size and rank
   CALL MPI_Comm_Size ( localComm, npes, ierror )
   IF (ierror /= 0) THEN
-      WRITE(w_unit,*) 'MPI_comm_size abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 127')
+      WRITE(w_unit,*) 'MPI_comm_size abort by model1 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 126')
   ENDIF
   !
   CALL MPI_Comm_Rank ( localComm, mype, ierror )
   IF (ierror /= 0) THEN
-      WRITE (w_unit,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
-      CALL oasis_abort(comp_id,comp_name,'Problem at line 133')
+      WRITE (w_unit,*) 'MPI_Comm_Rank abort by model1 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
   ENDIF
   !
-  WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' local rank ', mype
+  WRITE(w_unit,*) 'I am the ', TRIM(comp_name), 'local rank', mype
   WRITE (w_unit,*) 'Number of processors :',npes
   CALL flush(w_unit)
   !
@@ -136,9 +137,9 @@ PROGRAM model2
   !  GRID DEFINITION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  ! Reading netcdf file with pre-defined variable names
+  ! Reading global grid netcdf file
   !
-  ! Reading dimensions of the grid
+  ! Reading dimensions of the global grid
   CALL read_dimgrid(nlon,nlat,data_filename,w_unit)
   nc=4
   !
@@ -156,15 +157,15 @@ PROGRAM model2
   ALLOCATE(indice_mask(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating indice_mask'
   !
-  ! Reading of the longitudes, latitudes, longitude and latitudes of the corners, mask of the grid
-  CALL read_grid(nlon,nlat,nc,data_filename,w_unit, &
+  ! Reading of the longitudes, latitudes, longitude and latitudes of the corners, mask of the global grid
+  CALL read_grid(nlon,nlat,nc, data_filename, w_unit, &
                  globalgrid_lon,globalgrid_lat, &
                  globalgrid_clo,globalgrid_cla, &
                  globalgrid_srf, &
                  indice_mask)
   !
   ! (Global) grid definition for OASIS
-  ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in 
+  ! Writing of the file grids.nc and masks.nc by the processor 0 from the grid read in
   !
   IF (mype == 0) THEN
       !
@@ -202,14 +203,13 @@ PROGRAM model2
   ! The data are exchanged in the global grid so you do not need to pass 
   ! isize to oasis_def_partition
   !
-  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! DEFINITION OF THE LOCAL FIELDS  
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!! !!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  ! Define transient variables
+  !  Define transient variables
   !
   var_nodims(1) = 2    ! Rank of the field array is 2
   var_nodims(2) = 1    ! Bundles always 1 for OASIS3
@@ -223,12 +223,13 @@ PROGRAM model2
 #elif defined DECOMP_BOX
   var_actual_shape(4) = il_paral(4)
 #endif
-  ! Declaration of the field associated with the partition of the grid
   !
-  ! TOCOMPLETE - Put here OASIS call to declare the 2 coupling field
-  !              FRECVATM, FSENDATM !
-  ! var_name1 = 'FRECVATM'
-  ! var_name2 = 'FSENDATM'
+  ! Declaration of the field associated with the partition
+  !
+  ! TOCOMPLETE - Put here OASIS call to declare the coupling fields
+  !              FRECVOCN, FSENDOCN
+  ! var_name1 = 'FSENDOCN'
+  ! var_name2 = 'FRECVOCN'
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
@@ -246,36 +247,29 @@ PROGRAM model2
   !
   ! Allocate the fields send and received by the model
   !
-  ALLOCATE(field1_recv(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field1_recv'
   !
-  ALLOCATE(field2_send(var_actual_shape(2), var_actual_shape(4)),STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field2_send'
+  ALLOCATE(field1_send(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field1_send'
+  !
+  ALLOCATE(field2_recv(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field2_recv'
   !
   DEALLOCATE(il_paral)
   !
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
   !
   indi_beg=1 ; indi_end=nlon
-  indj_beg=((nlat/npes)*mype)+1 
+  indj_beg=1 ; indj_end=nlat 
   !
-  IF (mype .LT. npes - 1) THEN
-      indj_end = (nlat/npes)*(mype+1)
-  ELSE
-      indj_end = nlat 
-  ENDIF
-  !
-  ! Data exchange
-  !
+  ! Data exchange 
+  ! 
   ! Time loop
   DO ib=1, il_nb_time_steps
     itap_sec = delta_t * (ib-1) ! Time
     !
-    !
-    ! Get the field FRECVATM
-    field1_recv=field_ini
-    ! TOCOMPLETE - Put here the OASIS call to receive FRECVATM (field1_recv)
-    ! Let's suppose here that FRECVATM contains BC needed for the timestep
+    ! Get FRECVOCN 
+    ! TOCOMPLETE - Put here the OASIS call to receive FRECVOCN (field2_recv)
+    ! Let's suppose here that FRECVOCN contains BC needed for the timestep
     !
     ! Here the model computes its timestep
     !
@@ -284,17 +278,18 @@ PROGRAM model2
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
                        RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
-                                field2_send,ib)
+                                field1_send,ib)
     !
-    ! Send the field FSENDATM
-    ! TOCOMPLETE - Put here the OASIS call to send FSENDATM (field2_send)
+    ! Send FSENDOCN
+    ! TOCOMPLETE - Put here the OASIS call to send FSENDOCN (field1_send)
+    ! to the atmosphere and to the file
     !
     !
   ENDDO
   !
   WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
-  CLOSE(w_unit)
+  CLOSE (w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION 
@@ -306,7 +301,6 @@ PROGRAM model2
   !
   ! TOCOMPLETE - Put here the OASIS call to terminate the coupling
   !
-  !
-  call mpi_finalize(ierror)
-END PROGRAM MODEL2
+  CALL mpi_finalize(ierror)
+END PROGRAM MODEL1
 !

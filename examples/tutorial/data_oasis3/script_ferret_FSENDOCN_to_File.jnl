@@ -1,4 +1,4 @@
-use FSENDOCN_model1_02.nc
+use FSENDOCN_model1_03.nc
 shade FSENDOCN[k=3,d=1]
 
 

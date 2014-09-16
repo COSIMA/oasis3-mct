@@ -18,7 +18,7 @@ casename=`basename $srcdir`
 #
 ## - Define architecture and coupler 
 arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
-                        #crayXE6
+                        #crayXE6, beaufix, ada 
 #
 # - Define number of processes to run each executable
     nproc_exe1=1
@@ -37,11 +37,19 @@ elif [ ${arch} == curie ]; then
     rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == jade ]; then
     rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == neptune_gfortran ]; then
+    rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == ubuntu ]; then 
   MPIRUN=mpirun
   rundir=${srcdir}/work_${casename}
 elif [ ${arch} == crayXE6 ]; then
 rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
+elif [ ${arch} == beaufix ]; then
+# The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
+    rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
+elif [ ${arch} == ada ]; then
+  MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
+  rundir=/workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct/examples/tutorial/work_${casename}
 fi
 #
 ############### End of user's section ################################
@@ -141,6 +149,65 @@ time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 EOF
 
 ###---------------------------------------------------------------------
+### BEAUFIX
+###---------------------------------------------------------------------
+elif [ $arch == beaufix ] ; then
+
+   (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash
+#SBATCH --time=01:00:00
+#SBATCH -p  normal32        # partition/queue
+#SBATCH --job-name=toys     # job name
+#SBATCH -N 1                # number of nodes
+#SBATCH -n $nproc                # number of procs
+#SBATCH -o job.out%j
+#SBATCH -o job.err%j
+#SBATCH --exclusive
+
+ulimit -s unlimited
+# rundir must be in the TMPDIR
+cd $rundir
+module load intel/13.1.4.183
+module load intelmpi/4.1.1.036
+module load netcdf/4.3.0 
+#
+#
+# Activate next line to run in coupled mode
+#time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+# Activate next two lines to run both models stand alone
+time mpirun -np $nproc_exe1 ./$exe1
+time mpirun -np $nproc_exe2 ./$exe2
+#
+EOF
+
+###---------------------------------------------------------------------
+### NEPTUNE
+###---------------------------------------------------------------------
+elif [ $arch == neptune_gfortran ] ; then
+
+  cat <<EOF > $rundir/run_$casename.$arch
+# Nom du job
+#PBS -N tests
+# Temps limite du job
+#PBS -l walltime=00:10:00
+# Nombre de processus
+#PBS -l select=1:mpiprocs=16:ncpus=16
+#PBS -l place=scatter:excl
+
+cd $rundir
+
+export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+ulimit -s unlimited
+#
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+EOF
+
+
+###---------------------------------------------------------------------
 ### CURIE (normal nodes)
 ###---------------------------------------------------------------------
 elif [ $arch == curie ] ; then
@@ -237,6 +304,51 @@ aprun -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
 #
 EOF
 
+###---------------------------------------------------------------------
+### ada
+###---------------------------------------------------------------------
+elif [ $arch == ada ] ; then
+
+ (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/ksh
+# ######################
+# ##   ADA IDRIS   ##
+# ######################
+# Nom de la requete
+# @ job_name = ${casename}
+# Type de travail
+# @ job_type = parallel
+# Fichier de sortie standard
+# @ output = Script_Output_${casename}.000001
+# Fichier de sortie erreur (le meme)
+# @ error = Script_Output_${casename}.000001
+# Nombre de processus demandes
+# @ total_tasks = ${nproc}
+# @ environment = "BATCH_NUM_PROC_TOT=32"
+# Temps CPU max. par processus MPI hh:mm:ss
+# @ wall_clock_limit = 0:30:00
+# Fin de l entete
+# @ queue
+#
+# pour avoir l'echo des commandes
+set -x
+
+# on se place dans le repertoire rundir
+cd ${rundir}
+
+module load netcdf
+module load hdf5
+
+#
+export KMP_STACKSIZE=64m
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/smplocal/pub/NetCDF/4.1.3/lib
+
+poe -pgmmodel MPMD -cmdfile run_file
+#
+EOF
+
 fi 
 
 ######################################################################
@@ -245,13 +357,23 @@ fi
 
 if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
     echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
+#    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
+    $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
+    $MPIRUN -np $nproc_exe2 ./$exe2 >> runjob.err 
 elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
     qsub -q submit $rundir/run_$casename.$arch
+    qstat | grep $user
+elif [ $arch == beaufix ]; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $user
+elif [ $arch == neptune_gfortran ]; then
+    echo 'Submitting the job to queue using qsub'
+    qsub $rundir/run_$casename.$arch
     qstat | grep $user
 elif [ $arch == curie ]; then
     ccc_msub $rundir/run_$casename.$arch
@@ -264,9 +386,11 @@ elif [ $arch == crayXE6 ]; then
     chmod u+x $rundir/run_$casename.$arch
     qsub $rundir/run_$casename.$arch
     qstat
+elif [ $arch == ada ]; then
+    echo 'Submitting the job to queue using llsubmit'
+    llsubmit $rundir/run_$casename.$arch
 fi
 echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 
 
 ######################################################################
-

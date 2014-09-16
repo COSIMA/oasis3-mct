@@ -257,13 +257,7 @@ PROGRAM model2
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   indi_beg=1 ; indi_end=nlon
-  indj_beg=((nlat/npes)*mype)+1 
-  !
-  IF (mype .LT. npes - 1) THEN
-      indj_end = (nlat/npes)*(mype+1)
-  ELSE
-      indj_end = nlat 
-  ENDIF
+  indj_beg=1 ; indj_end=nlat  
   !
   ! Data exchange
   !

@@ -34,7 +34,7 @@ PROGRAM model1
   ! Global grid parameters : 
   INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
   INTEGER :: ntot           ! total dimension
-  INTEGER :: il_size
+  INTEGER :: il_paral_size
   INTEGER :: nc             ! number of corners
   INTEGER :: indi_beg, indi_end, indj_beg, indj_end
   !
@@ -187,19 +187,21 @@ PROGRAM model1
   ! Definition of the partition of the grid (calling oasis_def_partition)
   ntot=nlon*nlat
 #ifdef DECOMP_APPLE
-  il_size = 3
+  il_paral_size = 3
 #elif defined DECOMP_BOX
-  il_size = 5
+  il_paral_size = 5
 #endif
-  ALLOCATE(il_paral(il_size))
-  WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
+  ALLOCATE(il_paral(il_paral_size))
+  WRITE(w_unit,*) 'After allocate il_paral, il_paral_size', il_paral_size
   call flush(w_unit)
   !
-  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_paral_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
   !
   ! TOCOMPLETE - Put here OASIS call to define local partition !
+  ! The data are exchanged in the global grid so you do not need to pass 
+  ! isize to oasis_def_partition
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! DEFINITION OF THE LOCAL FIELDS  
@@ -224,11 +226,10 @@ PROGRAM model1
   !
   ! Declaration of the field associated with the partition
   !
-  ! TOCOMPLETE - Put here OASIS call to declare the 3 coupling fields
-  !              FRECVOCN, FSENDOCN, FOCNWRIT !
+  ! TOCOMPLETE - Put here OASIS call to declare the coupling fields
+  !              FRECVOCN, FSENDOCN
   ! var_name1 = 'FSENDOCN'
   ! var_name2 = 'FRECVOCN'
-  ! var_name3 = 'FOCNWRIT'
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
@@ -300,7 +301,7 @@ PROGRAM model1
   !         TERMINATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!! OASIS_TERMINATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Collective call to terminate the coupling exchanges
   !

@@ -34,7 +34,7 @@ SUBROUTINE decomp_def(id_paral,id_size,id_im,id_jm,id_rank,id_npes,id_unit)
   !
   WRITE (id_unit,*) 'BOX partitioning'
   !
-  ! Each process is responsible for a rectangular box of 32x48 points
+  ! Each process is responsible for a rectangular box of il_partj lines
   !
   id_paral (1) = 2
   id_paral (5) = id_im
