@@ -89,7 +89,7 @@ PROGRAM model2
   REAL (kind=wp), POINTER       :: field_recv(:,:), field_ana(:,:), error(:,:)
   !
   ! Global array to plot the error by proc 0 and calculate min and max
-  REAL (kind=wp), POINTER       :: global_error(:), global_fld_ana(:)
+  REAL (kind=wp), POINTER       :: global_error(:)
   INTEGER, POINTER              :: global_shapes(:,:)
   INTEGER, POINTER              :: displs(:),rcounts(:)
   !
@@ -347,8 +347,6 @@ PROGRAM model2
       !
       ALLOCATE(global_error(ntot),STAT=ierror )
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_error'
-      ALLOCATE(global_fld_ana(ntot),STAT=ierror )
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_fld_ana'
       ALLOCATE(global_shapes(4,npes),STAT=ierror )
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_shapes'
       ALLOCATE(displs(npes),STAT=ierror )
@@ -394,18 +392,10 @@ PROGRAM model2
                        global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
       !
-      CALL MPI_gatherv(field_ana, var_sh(2)*var_sh(4),MPI_REAL,&
-                       global_fld_ana,rcounts,displs,MPI_REAL,0,localComm,ierror)
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting fld ana'
-      !
 #elif defined USE_DOUBLE_PRECISION
       CALL MPI_gatherv(error, var_sh(2)*var_sh(4),MPI_REAL8,&
                        global_error,rcounts,displs,MPI_REAL8,0,localComm,ierror)
       IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
-      !
-      CALL MPI_gatherv(field_ana, var_sh(2)*var_sh(4),MPI_REAL8,&
-                       global_fld_ana,rcounts,displs,MPI_REAL8,0,localComm,ierror)
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting fld ana'
       !
 #endif
       !
@@ -417,14 +407,6 @@ PROGRAM model2
                        data_filename, field_name,  &
                        w_unit, FILE_Debug, &
                        gg_lon, gg_lat, global_error)
-      !
-      data_filename='fld_tgt_ana.nc'
-      field_name='fld_tgt_ana'
-      CALL write_field(nlon,nlat, &
-                       data_filename, field_name,  &
-                       w_unit, FILE_Debug, &
-                       gg_lon, gg_lat, global_fld_ana)
-      !
   ENDIF
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points calculated by proc 0 !!!!!!!!!!!!!!!!
