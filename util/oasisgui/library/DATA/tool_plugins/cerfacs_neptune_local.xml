@@ -1,0 +1,10 @@
+<model name="cerfacs_neptune_local" title="Cerfacs, tools execution on supercomputer NEPTUNE" >
+<info name="nbprocs" title="Procs number" type="integer" default="1" visibility="hidden" />
+<desc>
+Execution at Cerfacs, on the supercomputer NEPTUNE.
+[]
+[logo=plugin_local;caption=local execution]
+[]
+[logo=cerfacs;caption=Cerfacs only]
+</desc>
+</model>

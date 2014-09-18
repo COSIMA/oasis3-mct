@@ -1,0 +1,40 @@
+ <model name="cicotransfo" title="Checkin Checkout operations" layout="flat">
+   <desc>
+Please enter if the min and the max of the coupling fields must be calculated (it is recommended), 
+for the different coupling fields, selecting the different rows available.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+   </desc>
+</model>
+ <model name="transfcico" title="Checkin/Checkout" layout="flat">
+   <multiple name="checkinoutminmax" title="Checkin/Checkout options" require="field_names_list" custom_label="Fields">
+         <xor name="checkin" title="CHECKIN" default="checkin_off">
+	   <model name="checkin_off" title="No CHECKIN">
+           </model>
+	   <model name="checkin_on" title="CHECKIN">
+           </model>
+         </xor>
+         <xor name="checkout" title="CHECKOUT" default="checkout_off">
+	   <model name="checkout_off" title="No CHECKOUT">
+           </model>
+	   <model name="checkout_on" title="CHECKOUT">
+           </model>
+         </xor>
+    </multiple>
+    <docu>
+
+[section=CHECKIN]
+
+Calculates the global minimum, the maximum and the sum of the source field 
+values and prints them to the OASIS3-MCT debug file. These 
+informations are found in the debug file of the master process of the source model 
+under the attribute ``diags''. This operation does not transform the field.
+
+[section=CHECKOUT] 
+  
+Calculates the global minimum, the maximum and the sum of the target field values 
+and prints them to the OASIS3-MCT debug file. These informations are 
+found in the debug file of the master process of the target model under the attribute ``diags''. 
+This operation does not transform the field.
+    </docu>
+</model>

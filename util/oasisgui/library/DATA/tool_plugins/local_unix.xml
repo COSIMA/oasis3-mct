@@ -1,0 +1,11 @@
+<model name="local_unix" title="Cerfacs, tools execution on NFS network" >
+<info name="nbprocs" title="Procs number" type="integer" default="1" visibility="hidden" />
+<desc>
+Execution at Cerfacs, on the NFS network.
+Works for cobra, ptero , babylon, etc...
+[]
+[logo=plugin_local;caption=local execution]
+[]
+[logo=cerfacs;caption=Cerfacs only]
+</desc>
+</model>

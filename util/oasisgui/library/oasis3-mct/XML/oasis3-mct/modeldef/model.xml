@@ -1,0 +1,43 @@
+  <model name="mainmodelparam" title="Main model parameters" layout="flat">
+  <desc>
+Please enter the name of each model running in the experiment using the button "add Models", 
+double clicking on the new row created and filling the part "no label" under "Model names". 
+The name must be validated using the button "Enter" of the keyboard. 
+The "load" button is useless for the OASIS3-MCT application.
+The maximum fortran unit is optional, but if it is specified for one model, it 
+must be specified for all the models. []
+The blue (?), located at the right bottom of this window, gives more information on each data to fill up.
+When processing this window, it will be necessary to save the xml file.
+  </desc>
+  </model>
+  <model name="modelparam" title="Model parameters" layout="flat">
+    <multiple name="models" title="Models" custom_label="Model names">
+         <xor name="maxunits" title="Maximum fortran units" default="units_off">
+           <model name="units_off" title="No fortran units">
+           </model>
+           <model name="units_on" title="Max fortran units">
+             <param name="nunit" title="Max Fortran units (integer)" type="integer" />
+           </model>
+         </xor>
+    </multiple>
+    <info name="model_names_list" title="List of the models" type="liststring" visibility="hidden"/>
+    <docu> 
+[section=Model names]
+
+In this part the user must enter the names of the models running in the experiment, 
+which must correspond to the name announced by each model when calling the routine oasis_init_comp
+(see section 2.2.1 of the User Guide).
+
+Then the user may indicate the maximum Fortran unit number used by the models.
+
+More information can be found in the User Guide section 3.2 under the keyword $NBMODEL.
+<docuold>
+In all cases, OASIS3-MCT library assumes, during the
+initialization phase, that units 1025 and 1026 are free and temporarily uses these units to
+read the configuration file and to write corresponding log messages to file nout.000000. After the
+initialization phase, OASIS3-MCT will still suppose that units above 1024 are free, unless maximum
+unit numbers are indicated in the configuration file.
+</docuold>
+    </docu>
+  </model>
+

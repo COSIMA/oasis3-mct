@@ -1,0 +1,40 @@
+ <model name="transfblas" title="Blasold or Blasnew transformations" layout="flat">
+     <desc>
+Please enter if there is a multiplication and/or addition by a scalar, for the different coupling fields,
+selecting the different rows available.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+     </desc>
+</model>
+ <model name="transfblon" title="Blasold/Blasnew" layout="flat">
+    <multiple name="multaddoldnew" title="Blasold/Blasnew options" require="field_names_list" custom_label="Fields">
+         <xor name="blasold" title="BLASOLD" default="blasold_off">
+	   <model name="blasold_off" title="No BLASOLD">
+           </model>
+	   <model name="blasold_on" title="BLASOLD">
+	     <param name="xmult_blso" title="Multiplicative coef (real)" type="double" default="1."/>
+	     <param name="xadd_blso" title="Scalar value to be added (real)" type="double" default="0."/>	     
+           </model>
+         </xor>
+         <xor name="blasnew" title="BLASNEW" default="blasnew_off">
+	   <model name="blasnew_off" title="No BLASNEW">
+           </model>
+	   <model name="blasnew_on" title="BLASNEW">
+	     <param name="xmult_blsn" title="Multiplicative coef (real)" type="double" default="1."/>
+	     <param name="xadd_blsn" title="Scalar value to be added (real)" type="double" default="0."/>	     
+           </model>
+         </xor>
+	 </multiple>
+    <docu>
+
+[section=BLASOLD]
+
+BLASOLD allows the source field to be scaled and allows a scalar to be added to the field. 
+This transformation occurs before the interpolation per se. 
+
+[section=BLASNEW]
+
+BLASNEW performs a scalar multiply or scalar add to any destination field. This is the equivalent of BLASOLD 
+on the destination side. 
+    </docu>
+</model>

@@ -1,0 +1,58 @@
+ <model name="timetransfo" title="Time transfos" layout="flat">
+   <desc>
+Please enter the time tranformations, if any, for the different coupling fields,
+selecting the different rows available.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+   </desc>
+</model> 
+ <model name="transftime" title="Time transformations" layout="flat">
+ <multiple name="time" title="Time options" require="field_names_list" custom_label="Fields">
+	 <xor name="loctrans" title="LOCTRANS" layout="flat" default="loctrans_off">
+	   <model name="loctrans_off" title="NO LOCTRANS">
+           </model>
+	   <model name="loctrans_on" title="LOCTRANS">
+	     <choice name="loctransdef" title="Type of time transformation" type="string" default="average">
+               <option value="average" title="AVERAGE"/>
+	       <option value="accumul" title="ACCUMUL"/>
+               <option value="tmin" title="T_MIN"/>
+               <option value="tmax" title="T_MAX"/>
+	     </choice>
+           </model>
+         </xor>
+</multiple>
+    <docu> 
+
+[section=Time transformations definitions]
+
+[item=INSTANT (default, corresponds to NO LOCTRANS option):] No time transformation, the instantaneous field is transferred []
+[item=ACCUMUL:] The field accumulated over the previous coupling period is exchanged (the accumulation 
+is simply done over the arrays field_array provided as third argument to the oasis_put calls, 
+not weighted by the time interval between these calls) []
+[item=AVERAGE:] The field averaged over the previous coupling period is transferred (the average is 
+simply done over the arrays field_array provided as third argument to the oasis_put calls, not 
+weighted by the time interval between these calls)  []
+[item=T_MIN:] The minimum value of the field for each source grid point over the previous 
+coupling period is transferred []
+[item=T_MAX:] The maximum value of the field for each source grid point over the previous 
+coupling period is transferred []
+
+More details can be found in the User Guide section 4.1.
+
+<docuold>
+With OASIS3-MCT, time transformations are supported more generally with use of the coupling restart file.
+The coupling restart file allows the partial time transformation to be saved at the end of a run for exact
+restart at the start of the next run. For that reason, coupling restart filenames are now required for all
+namcouple entries that use LOCTRANS. This is the reason an optional restart file is
+now provided on the OUTPUT namcouple input line. 
+</docuold>
+    </docu>
+</model>
+
+
+
+
+
+
+
+

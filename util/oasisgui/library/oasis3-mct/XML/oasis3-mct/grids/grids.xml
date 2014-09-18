@@ -1,0 +1,47 @@
+<model name="modelgrids" title="Grids" layout="flat">
+    <desc> 
+Enter the name and characteristics of the grids involved in the coupling 
+using the button "add Grids", double clicking on the new row created 
+and filling the part "no label" under "Grid names". 
+The name must be validated using the button "Enter" of the keyboard. 
+The dimensions of the grids are optional, but if they are specified for one grid, they 
+must be specified for all the grids. 
+The "load" button is useless for the OASIS3-MCT application.[]
+The blue (?), located at the right bottom of this window, gives more information on each data to fill up. 
+    </desc>
+</model>
+<model name="defgrids" title="Grid" layout="flat">
+    <multiple name="gridsline" title="Grids" custom_label="Grid names (4 char)" size="1.5;1.5">
+      <choice name="gridstatus" title="Characteristics" type="string" >
+	<option value="periodical_grid" title="PERIODICAL"/>
+	<option value="regional_grid" title="REGIONAL"/>
+      </choice>
+      <param name="grid_overlap" title="Overlapping points (integer)" type="integer" />
+         <xor name="dimsgrid" title="Dimensions" default="dims_off">
+	   <model name="dims_off" title="No dimensions specified">
+           </model>
+	   <model name="dims_on" title="Dimensions">
+	     <param name="ni_grid" title="Dimension in i (integer)" type="integer" />
+	     <param name="nj_grid" title="Dimension in j (integer)" type="integer" />	     
+           </model>
+         </xor>
+    </multiple> 
+    <info name="grid_names_list" title="List of the grids" type="liststring" visibility="hidden"/>
+    <docu>
+
+[section=Grids]
+
+[item=Name of the grids:] The source grid names and the target grid names, coded on 4 characters,
+correpond to the prefix of the source grid names and the
+target grid names in the grid data files grids.nc, masks.nc and areas.nc (see the section 2.3 and 5.1
+of the User for more details). 
+[item=Characteristics:] For each grid, Periodical and Regional 
+correspond to the grid first dimension characteristic
+[item=Overlapping points:] Overlapping points correspond to the 
+first dimension number of overlapping grid points.[]
+[item=Dimensions:] The arrays containing the grid information are dimensioned 
+(ni, nj), where ni and nj are the grid first and second dimension. Unstructured grids or other grids expressed with 1D 
+vectors are supported by setting ni to the total number of grid points and nj to 1. []
+
+</docu>
+</model>

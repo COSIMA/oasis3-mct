@@ -1,0 +1,29 @@
+<model name="cerfacs_neptune_ssh" title="Cerfacs, code execution on NEPTUNE (DISTANT)" >
+    <param name="login" title="Login" type="ascii" default="mylogin"/>
+    <param name="directory" title="Distant directory" type="ascii" default="/scratch/cfd/mylogin" />
+    <choice name="nbtasks" title="Number of tasks" default="sixteen">
+        <option value="one" title="1 node, 1 core"/>
+        <option value="two" title="1 node, 2 cores"/>
+        <option value="four" title="1 node, 4 cores"/>
+        <option value="eight" title="1 node, 8 cores"/>
+        <option value="sixteen" title="1 node, 16 cores"/>
+        <option value="thirtytwo" title="2 nodes, 32 cores"/>
+        <option value="sixtyfour" title="4 nodes, 64 cores"/>
+        <option value="onehundredtwentyeight" title="8 nodes, 128 cores"/>
+    </choice>
+    <param name="nbnodes" title="Number of nodes" type="integer" default="16" />
+    <param name="jobname" title="Job name" type="string_strmax10" default="C3Sm_job" />
+    
+     <desc>
+        This plugin is for Cerfacs only
+        It allows to execute a code on NEPTUNE from an external computer, or from the Cerfacs NFS system.
+        []
+        On a production run, you can request a maximum of 128 cores (8 nodes , 16 cores each)
+        []
+        Check that you can log on the distant machine without password!!!
+        
+        [logo=plugin_ssh;caption=execution through ssh ]
+        []
+        [logo=cerfacs;caption=Cerfacs only]
+    </desc>
+</model>

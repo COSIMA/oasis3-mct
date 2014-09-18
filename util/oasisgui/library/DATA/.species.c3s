@@ -1,0 +1,19 @@
+<dataset name="atoms" title="Atoms">
+	<item name="o" weight="15.9994" colorrgb="0. 0. 255."/>
+	<item name="c" weight="12.0107" colorrgb="255. 0. 0."/>
+	<item name="h" weight="1.00794" colorrgb="0. 255. 0."/>
+	<item name="n" weight="14.00674" colorrgb="255. 255. 255."/>
+</dataset>
+
+<dataset name="species" title="Physical species">
+	<item name="o2" natom_o="2." natom_c="0." natom_h="0." natom_n="0." hform0k="0."/> 
+	<item name="n2" natom_o="0." natom_c="0." natom_h="0." natom_n="2." hform0k="0."/> 
+	<item name="h2" natom_o="0." natom_c="0." natom_h="2." natom_n="0." hform0k="0."/> 
+	<item name="ch4" natom_o="0." natom_c="1." natom_h="4." natom_n="0." hform0k="-4675."/>
+	<item name="c2h6" natom_o="0." natom_c="2." natom_h="6." natom_n="0." hform0k="-4675."/> 
+	<item name="c8h18" natom_o="0." natom_c="8." natom_h="18." natom_n="0." hform0k="-1829."/> 
+	<item name="co2" natom_o="2." natom_c="1." natom_h="0." natom_n="0." hform0k="-8943."/> 
+	<item name="h2o" natom_o="1." natom_c="0." natom_h="2." natom_n="0." hform0k="-13435."/>
+	<item name="kero_luche" natom_o="0." natom_c="10." natom_h="22." natom_n="0." hform0k="-13435."/> 
+	<item name="air" natom_o="2." natom_c="0." natom_h="0." natom_n="8" hform0k="-13435." />
+</dataset>

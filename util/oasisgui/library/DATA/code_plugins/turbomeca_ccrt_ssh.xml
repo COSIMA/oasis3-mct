@@ -1,0 +1,22 @@
+<model name="turbomeca_ccrt_ssh" title="Turbomeca, code execution by SSH to CCRT" >
+    <choice name="machinecea" default="curie" >
+        <option value="curie" />
+        <option value="airain" />
+    </choice>
+    <param name="login" title="Login" type="ascii" default="login"/>
+    <param name="nbprocs" title="Procs number" type="integer" default="1" />
+    <param name="timelimit" title="Time limit (s)" type="integer" default="70000" /> 
+    <param name="mail" title="Your e-mail" type="ascii"/>
+    <param name="distantdir" title="Distant directory" type="ascii" />
+     <desc>
+        []
+        This plugin is for Turbomeca only
+        It allows to execute a code on a CCRT from BTMCLX2
+        []
+        Check that you can log on the distant machine without password!!!
+        []
+        [logo=plugin_ssh;caption=execution through ssh ]
+        []
+        [logo=turbomeca;caption=Turbomeca only]
+    </desc>
+</model>

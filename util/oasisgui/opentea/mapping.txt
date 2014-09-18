@@ -1,0 +1,65 @@
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/c3sm                                  .tcl            / CERFACS
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/color_utilities                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/config                                .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_action                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_browser                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_choice                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_cluster                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_comment                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_comparator                     .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_dynlist                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_emptyNode                      .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_entry                          .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_glance                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_graph                          .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_gui                            .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_info                           .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_main                           .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_metaTree                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_modelframe                     .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_modelxor                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_modelxor_light                 .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_multiple                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_scrollform                     .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_selection                      .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_solverframe                    .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_status                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_switch                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_switchform                     .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_tabs                           .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_timeline                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_viewer                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/create_window                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/declare_faq                           .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/declare_icons                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/dTree                                 .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/dTreeBrowser                          .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/functions                             .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/functions_help                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/functions_theme                       .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/genPyFromXMLtree                      .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/grapher_utilities                     .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/load_save                             .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/metaWidget_functions                  .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/openpipe                              .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/opentea                               .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/recentProjects                        .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/smartpacker                           .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/test_vartypes                         .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/treeAnalyser                          .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/unwrapped                             .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/wrapper                               .tcl            / CECILL
+/Volumes/Data/Users/dauptain/Documents/DepotGIT/dev/c3sm/XMLparser                             .tcl            / CECILL
+
+
+Files : 						Licenses :
+	- f90 = 0 files						- Cerfacs = 1 files
+	- py = 0 files						- CeCILL-B = 51 files
+	- XML = 0 files						- Openscience = 0 files
+	- tcl = 52 files
+	- html = 0 files
+	- Others = 0 files
+
+TOTAL = 52 files
+
+Info : PRE --> There still is a header in this file. Please, execute again mapping

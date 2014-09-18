@@ -1,0 +1,7 @@
+<model name="scriptsummary" title="Summary" layout="flat">
+    <comment name="summaryscript" title="Summary of the characteristics of the different coupling fields (click on the Process button)" size="3;5" />
+    <docu>
+[section=Summary of the characteristics of the coupling fields]
+When processing this windows, a summary of all the coupling fields with their transformations will be printed.  
+    </docu>
+</model>

@@ -1,0 +1,15 @@
+<model name="distant_unix" title="Cerfacs, Tool execution from External to NFS network" >
+    <param name="login" title="Login" type="ascii"  default="login"/>
+    <param name="machine" title="Machine" type="ascii" default="cobra" />
+    <param name="directory" title="working directory" type="ascii" default="/wkdir/cfd1/mylogin" />
+    <info name="nbprocs" title="Procs number" type="integer" default="1" visibility="hidden" />
+    <desc>
+        This plugin is for Cerfacs only
+        It allows to execute a tool from an external computer, typically a mac, or any computer NOT on the NFS system.
+         Check that you can log on the distant machnine without password!!!
+[]
+[logo=plugin_ssh;caption=execution through ssh ]
+[]
+[logo=cerfacs;caption=Cerfacs only]
+</desc>
+    </model>

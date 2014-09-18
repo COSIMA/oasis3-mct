@@ -1,0 +1,37 @@
+<model name="groupedfld" title="Groups" layout="flat">
+  <desc>
+Please enter all the grouped field names that will be used
+by the GUI using the button "add groups" and double clicking in the different rows created.
+The name must be validated using the button "Enter" of the keyboard.
+This is a symbolic name used by the GUI to manage easily the fields of a same group.
+It will not appear in the configuration file. 
+The "load" button is useless for the OASIS3-MCT application.[] 
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+  </desc>
+</model>
+<model name="gpfld" title="Grouped fields" layout="flat" >
+  <multiple name="group" title="Groups" custom_label="Group names">
+      <comment name="group_comment" title="Group description (optional)" />
+  </multiple>
+    <docu>
+[section=Grouping coupling fields]
+OASIS3-MCT supports exchange of multiple fields via a single communication.
+In the component model codes, these fields are defined as usual, and sent (``put'') or received (``get'')
+one at a time.
+
+More details on this new functionality can be found in the User Guide, appendix B.2.4.
+
+<docuold>
+Inside OASIS3-MCT, the fields are stored and a
+single mapping and send or receive instruction is in fact executed for all fields.
+This is useful in cases where multiple fields have
+the same coupling transformations and to reduce communication costs by aggregating
+multiple fields into a single communication.
+The coupling fields must be sent and received in the same order as they are defined in the corresponding
+single entry of the namcouple.[]
+Note that if a LOCTRAN transformation is needed for these multiple fields, it is necessary to
+define one restart file per each group of fields. []
+</docuold>
+    </docu>
+</model>
+

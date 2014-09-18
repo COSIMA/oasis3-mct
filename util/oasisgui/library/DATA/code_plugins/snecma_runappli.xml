@@ -1,0 +1,27 @@
+<model name="snecma_runappli" title="Snecma, code execution by Runappli" >
+    <choice name="version_ra" title ="Version de Runappli" default="simu#V04R02" >
+        <option value="simu#V04R02" title="Simu/V04R02" />
+        <option value="oper#V04R02" title="Oper/V04R02" />
+        <option value="simu#V04R03" title="Simu/V04R03" />
+        <option value="oper#V04R03" title="Oper/V04R03" />
+    </choice>
+    <choice name="platform" title="Plateforme" default="airain" >
+        <option value="zephyr" />
+        <option value="curie" />
+        <option value="airain" />
+    </choice>
+    <param name="duration" title="Duree (sec.)" type="integer_ge500" default="500"/>
+    <param name="memory" title="Memoire (Mo)" type="integer_ge240" default="240"/>
+    <param name="nbprocs" title="Nombre de procs" type="integer_ge1" default="1" />
+    <param name="noclean" title="Conserver le rep; apres calcul" type="onoff" default="0" />
+    <desc>
+	Ce profil est a l'usage de Safran Villaroche.
+	[]
+	Il permet de lancer des jobs sur le CCRT et sur le cluster local Zephyr, au travers de la passerelle Runappli.
+	Il n'est pas necessaire d'utiliser Taucade.
+	[]
+[logo=plugin_robot;caption=execution par robot]
+[]
+[logo=snecma;caption=Uniquement pour Snecma]
+    </desc>
+</model>

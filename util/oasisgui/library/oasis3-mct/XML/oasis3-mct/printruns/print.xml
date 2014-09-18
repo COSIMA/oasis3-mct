@@ -1,0 +1,146 @@
+<model name="descprint" title="Comments on how to fill upt the degub window" layout="flat">
+   <desc>
+Enter the total simulation length, the amount of debug information written by OASIS3-MCT 
+in the "debug" files, whether or not some time statistic information must be printed
+and whether or not there will be some grouped fields in the namcouple.[]
+The blue (?) gives more information on each data to fill up. 
+  </desc>
+</model> 
+
+  <model name="runtime" title="Runtime" layout="flat">
+  <param name="duration" title="Simulation length in sec (integer)" type="integer"/>
+    <docu> 
+[section=Runtime]
+This number is the total simulated time of the run, expressed in seconds (or any other time units as 
+long as the same are used in all models and in the configuration file).
+      </docu>
+  </model>
+
+<model name="debug" title="Debug printing options" layout="flat">
+    <xor name="nlogprt" title="Select the Debugging level" default="none">
+        <model name="none" title="0">   
+        </model>
+        <model name="ptr_1" title="1">
+        </model>
+        <model name="ptr_2" title="2">
+        </model>
+        <model name="ptr_5" title="5">
+        </model>
+        <model name="ptr_10" title="10">
+        </model>
+        <model name="ptr_12" title="12">
+        </model>
+        <model name="ptr_15" title="15">
+        </model>
+        <model name="ptr_20" title="20">
+        </model>
+        <model name="ptr_30" title="30">
+        </model>
+    </xor>
+    <docu>
+
+[section=Debug files]
+The debug level number refers to the amount of debug information written by OASIS3-MCT
+in the "debug" files. In production mode, it should be 0.
+
+In debug mode on massively parallel computer, it should be 1. If it is not enough, it should be
+then 30, the maximum value.  
+
+Detailed information about the meaning of each Debugging level can be found in the User 
+Guide, section 3.2 (see the NLOGPRT keyword).  
+
+<docuold>
+
+The number corresponds to :[]
+0 : one file debug.root.xx is open by the master proces of each model
+and one file debug_notroot.xx is open for all the other processes of
+each model to write only error information. []
+1 : one file debug.root.xx is open by the master proces of each model to
+write information equivalent to level 10 (see below); one file debug.notroot.xx 
+is open for all the other processes of each model to write error information. []
+2 : one file debug.xx.xxxxxx is open by each process of each model to write normal
+production diagnostics. []
+5 : as for 2 with in addition some initial debug info. []
+10: as for 5 with in addition the routine calling tree. []
+12: as for 10 with in addition some routine calling notes. []
+15: as for 12 with even more debug diagnostics. []
+20: as for 15 with in addition some extra runtime analysis. []
+30: full debug information. []
+</docuold>
+  </docu>
+
+ </model>
+ <model name="timestat" title="Time satistics" layout="flat">
+    <xor name="opttime" title="Select the Time statistics option (TIMER_debug variable)" default="none">
+        <model name="none" title="0"> 
+        </model>
+        <model name="opt_1" title="1">
+        </model>
+        <model name="opt_2" title="2">
+        </model>
+        <model name="opt_3" title="3">
+        </model>
+    </xor>
+    <docu>
+
+[section=Timing files]
+This number refers to the amount of time statistic information written by OASIS3-MCT
+in the "timer" files. In production mode, it should be 0.
+
+When time statistic are needed, it should be 1.
+
+Detailed information about the meaning of each TIMER_debug level can be found in the User 
+Guide, section 3.2 (see the NLOGPRT keyword) and section 6.4.2.
+
+<docuold>
+
+The number corresponds to: []
+0 : nothing is calculated, nothing is written. []
+1 : some timings are performed and written in a single file by the process 0
+as well as the min and the max times over all the processes. []
+2 : some timings are performed and each process writes its own file ; process 0
+also writes the min and the max times over all the processes in its file. []
+3 : some timings are peformed and each process writes its own file ; process 0
+also writes in its file the min and the max times over all processes and also writes in
+its file all the results for each process.[]
+
+[section=Timing signification]
+The time given for each timer is calculated by the difference between calls to oasis_timer_start()
+and oasis_timer_stop() and is the accumulated time over the entire run. Here is an overview of the
+meaning of the different timers as implemented by default.[]
+
+[item=total after init:] total time of the simulation, implemented in mod_oasis_method, i.e. between
+the end of oasis_init_comp and the call to mpi_barrier and mpi_finalize in routine oasis_terminate. []
+</docuold>
+    </docu>
+    
+  </model> 
+
+  <model name="generalgroup" title="Group" layout="flat">
+  <param name="groups_onoff" title="Enable grouped fields" type="onoff" default="0" />
+  <info name="mult_fields_name" title="Group fields names" type="liststring" default="single" visibility="hidden"/>
+    <docu>
+[section=Grouping coupling fields]
+OASIS3-MCT supports exchange of multiple fields via a single communication.  
+In the component model codes, these fields are defined as usual, and sent (``put'') or received (``get'') 
+one at a time. 
+
+More details on this new functionality can be found in the User Guide, appendix B.2.4. 
+
+To enable grouped fields, the user must activate the option "Enable grouped fields". 
+In this case a new tab "Group" will appear to define the different groups.
+
+<docuold>
+Inside OASIS3-MCT, the fields are stored and a
+single mapping and send or receive instruction is in fact executed for all fields. 
+This is useful in cases where multiple fields have 
+the same coupling transformations and to reduce communication costs by aggregating
+multiple fields into a single communication. 
+The coupling fields must be sent and received in the same order as they are defined in the corresponding
+single entry of the namcouple.[]
+Note that if a LOCTRAN transformation is needed for these multiple fields, it is necessary to 
+define one restart file per each group of fields. []
+</docuold>
+    </docu>
+  </model>
+
