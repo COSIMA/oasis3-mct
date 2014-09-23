@@ -64,6 +64,8 @@ MODULE mod_oasis_grid
   public oasis_write2files
   public oasis_print_grid_data
 
+#include "oasis_os.h"
+
   interface oasis_write_grid
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_write_grid_r4

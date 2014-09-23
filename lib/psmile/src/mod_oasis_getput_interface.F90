@@ -40,6 +40,7 @@ MODULE mod_oasis_getput_interface
 !---------------------------------------------------------------------
 contains
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
   SUBROUTINE oasis_put_r14(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
@@ -177,6 +178,7 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_put_r14
+#endif
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
@@ -319,6 +321,7 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
   SUBROUTINE oasis_put_r24(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
@@ -462,6 +465,7 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_put_r24
+#endif
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
@@ -611,6 +615,7 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS 
   SUBROUTINE oasis_get_r14(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
@@ -677,6 +682,7 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r14
+#endif
 
 !---------------------------------------------------------------------
   SUBROUTINE oasis_get_r18(id_port_id,kstep,rd_field,kinfo)
@@ -737,6 +743,7 @@ contains
   END SUBROUTINE oasis_get_r18
 
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
   SUBROUTINE oasis_get_r24(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
@@ -805,6 +812,7 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r24
+#endif
 
 !---------------------------------------------------------------------
   SUBROUTINE oasis_get_r28(id_port_id,kstep,rd_field,kinfo)

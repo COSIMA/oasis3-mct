@@ -8,3 +8,7 @@
 #ifdef __crayx1
 #define  __NO_4BYTE_REALS
 #endif
+
+#ifdef __IBMC__ 
+#define __NO_4BYTE_REALS
+#endif
