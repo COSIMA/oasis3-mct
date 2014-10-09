@@ -82,9 +82,12 @@ contains
        mseclag = msec
 
        IF (OASIS_Debug >= 2) THEN
-          WRITE(nulprt,*) subname,' read restart:',cplid,npc,TRIM(pcpointer%fldlist)
-          WRITE(nulprt,*) subname,' lag prism_mcoupler :',lag,prism_mcoupler
-          CALL oasis_flush(nulprt)
+           WRITE(nulprt,*) '----------------------------------------------------------------'
+           WRITE(nulprt,*) subname,' Field cplid :',cplid
+           WRITE(nulprt,*) subname,' read restart:',npc,TRIM(pcpointer%fldlist)
+           WRITE(nulprt,*) subname,' lag prism_mcoupler :',lag,prism_mcoupler
+           WRITE(nulprt,*) '----------------------------------------------------------------'
+           CALL oasis_flush(nulprt)
        ENDIF
 
        !------------------------------------------------
@@ -148,7 +151,10 @@ contains
        mseclag = msec
       
        IF (OASIS_Debug >= 2) THEN
-           WRITE(nulprt,*) subname,' loctrans:',cplid,npc,TRIM(pcpointer%fldlist)
+           WRITE(nulprt,*) '----------------------------------------------------------------'
+           WRITE(nulprt,*) subname,' Field cplid :',cplid
+           WRITE(nulprt,*) subname,' loctrans:',npc,TRIM(pcpointer%fldlist)
+           WRITE(nulprt,*) '----------------------------------------------------------------'
            CALL oasis_flush(nulprt)
        ENDIF
 
