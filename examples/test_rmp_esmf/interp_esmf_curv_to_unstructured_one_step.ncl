@@ -1,24 +1,42 @@
+;----------------------------------------------------------------------
+; This script regrids dummy data from a curvilinear grid to an
+; unstructured grid. Both grids are on one NetCDF file.
+;
+; There's an issue with this script if you try to apply SrcMask2D,
+; because it causes the destination grid to be reduced in the number
+; of points (24,572 to 24,067). The fix seems to be in not setting
+; SrcMask2D, but I would like to figure out why this is the case.
+;----------------------------------------------------------------------
 ;--------------------------------------------
 ;---- Predefined ESMF modules
 ;--------------------------------------------
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
-load "$NCARG_ROOT/lib/ncarg/nclscripts/esmf/ESMF_regridding.ncl"
+;
+; Loading a personal ESMF regridding script to provide
+; a needed bug fix for curvilinear to unstructured.
+;
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/esmf/ESMF_regridding.ncl"
+load "./ESMF_regridding.ncl"
 
 begin
-
 ;--------------------------------------------
 ;--- PATHS
 ;--------------------------------------------
-  RUNDIR="wkdir_esmf_"+srcgrid+"_"+tgtgrid+"_"+interp_method
+  RUNDIR="wkdir_esmf_"+str_lower(srcgrid)+"_"+str_lower(tgtgrid)+"_"+str_lower(interp_method)
   PATH1="/home/evian/coquart/ESMF/ESMF_with_NCL/toy_calcul_weights_with_esmf/RUNDIR/"
   PATH2="/home/evian/coquart/ESMF/ESMF_with_NCL/toy_calcul_weights_with_esmf/RUNDIR/" 
   PATH1="./"
   PATH2="./"
 
+; WARNING : DOES NOT WORK YET FOR CONSERVATIVE REMAPPING
+  if (str_lower(interp_method) .eq. str_lower("conserve")) then
+     print("Does not work yet for conservative remapping")
+     exit
+  end if 
 ;--------------------------------------------
-;--- Files used with oasis3-mct for SCRIP
+;--- Source and Target grid Files used with oasis3-mct for SCRIP
 ;--------------------------------------------
   gridsfile = PATH1+"grids.nc"    ; File with grids at OASIS3-MCT description
   masksfile = PATH1+"masks.nc"    ; File with masks at OASIS3-MCT description
@@ -66,13 +84,11 @@ begin
   srcgrdclo = srcgrid+"_clo"
   srcgrdcla = srcgrid+"_cla"
   srcgrdmsk = srcgrid+"_msk"
-  srcgrdsrf = srcgrid+"_srf"
   tgtgrdlon = tgtgrid+"_lon"
   tgtgrdlat = tgtgrid+"_lat"
   tgtgrdclo = tgtgrid+"_clo"
   tgtgrdcla = tgtgrid+"_cla"
   tgtgrdmsk = tgtgrid+"_msk"
-  tgtgrdsrf = tgtgrid+"_srf"
 
 ;--------------------------------------------
 ;--- Read grids, masks, areas arrays
@@ -80,17 +96,22 @@ begin
   gfile   = addfile(gridsfile,"r")
   mfile   = addfile(masksfile,"r")
   
+  nt=0
   src_lon  = gfile->$srcgrdlon$
   src_lat  = gfile->$srcgrdlat$
+  src_clo  = gfile->$srcgrdclo$
+  src_cla  = gfile->$srcgrdcla$
   src_msk  = mfile->$srcgrdmsk$
-  tgt_lon  = gfile->$tgtgrdlon$
-  tgt_lat  = gfile->$tgtgrdlat$
-  tgt_msk  = mfile->$tgtgrdmsk$
+  tgt_lon  = gfile->$tgtgrdlon$(nt,:)
+  tgt_lat  = gfile->$tgtgrdlat$(nt,:)
+  tgt_clo  = gfile->$tgtgrdclo$(:,nt,:)
+  tgt_cla  = gfile->$tgtgrdcla$(:,nt,:)
+  tgt_msk  = mfile->$tgtgrdmsk$(nt,:)
 
   nlatsrc=dimsizes(src_lat(:,0))
   nlonsrc=dimsizes(src_lon(0,:))
-  nlattgt=dimsizes(tgt_lat(:,0))
-  nlontgt=dimsizes(tgt_lon(0,:))
+  nlattgt=dimsizes(tgt_lat)
+  nlontgt=dimsizes(tgt_lon)
 
 ;--------------------------------------------
 ;--- Calculate the function to regrid
@@ -105,51 +126,38 @@ begin
 ;----------------------------------------------------------------------
 ;--- Regridding all in one step
 ;----------------------------------------------------------------------
-  Opt             = True
-  Opt@SrcGridName = srcGridName 
-  Opt@DstGridName = tgtGridName
-  Opt@WgtFileName = wgtFile
-  Opt@SrcGridLat  = src_lat
-  Opt@SrcGridLon  = src_lon
-  Opt@DstGridLat  = tgt_lat
-  Opt@DstGridLon  = tgt_lon
+  Opt                   = True
+  Opt@SrcGridName       = srcGridName 
+  Opt@SrcGridLat        = src_lat
+  Opt@SrcGridLon        = src_lon
+  Opt@SrcMask2D         = 1-src_msk     ; Don't set this, otherwise you may get error.
+  Opt@DstGridName       = tgtGridName
+  Opt@DstGridLat        = tgt_lat
+  Opt@DstGridLon        = tgt_lon   
+  Opt@DstMask2D         = 1-tgt_msk
+  Opt@DstGridType       = "unstructured"
 
-  if ( interp_method .eq. "conserve" ) then
-    lat_name  = "y_" + srcgrid
-    lon_name  = "x_" + srcgrid
-    size_name = "crn_" + srcgrid
+  Opt@InterpMethod      = str_lower(interp_method)
+  Opt@WgtFileName       = wgtFile
+
+  if ( interp_method .eq. str_lower("conserve") ) then
+    dims = getfilevardims(gfile,srcgrdcla)
 ;---Make sure grid is nlat x nlon x 4
-    Opt@SrcGridCornerLat  = gfile->$srcgrdcla$($lat_name$|:,$lon_name$|:,$size_name$|:)     
-    Opt@SrcGridCornerLon  = gfile->$srcgrdclo$($lat_name$|:,$lon_name$|:,$size_name$|:)
+    Opt@SrcGridCornerLat  = gfile->$srcgrdcla$($dims(1)$|:,$dims(2)$|:,$dims(0)$|:)     
+    Opt@SrcGridCornerLon  = gfile->$srcgrdclo$($dims(1)$|:,$dims(2)$|:,$dims(0)$|:)
     printMinMax(Opt@SrcGridCornerLat,0)
     printMinMax(Opt@SrcGridCornerLon,0)
-  end if	 
+  end if
 
-  if ( interp_method .eq. "conserve" ) then
-    lat_name  = "y_" + tgtgrid
-    lon_name  = "x_" + tgtgrid
-    size_name = "crn_" + tgtgrid
-;---Make sure grid is nlat x nlon x 4
-    Opt@DstGridCornerLat  = gfile->$tgtgrdcla$($lat_name$|:,$lon_name$|:,$size_name$|:)
-    Opt@DstGridCornerLon  = gfile->$tgtgrdclo$($lat_name$|:,$lon_name$|:,$size_name$|:)
-    printMinMax(Opt@DstGridCornerLat,0)
-    printMinMax(Opt@DstGridCornerLon,0)
-  end if	 
+  if(Opt@InterpMethod.eq.str_lower("conserve")) then
+    Opt@DstGridCornerLat  = ndtooned(tgt_cla)
+    Opt@DstGridCornerLon  = ndtooned(tgt_clo)
+  end if
 
-  Opt@DstMask2D      = 1-tgt_msk
-  Opt@SrcMask2D      = 1-src_msk
-
-  Opt@InterpMethod   = interp_method
-;  Opt@Pole           = "none"
-  Opt@ForceOverwrite = True
-  Opt@PrintTimings   = True
-  Opt@Debug          = True
-
-;---You can choose to skip any of these three steps.
-; Opt@SkipSrcGrid   = True    ; Will assume source grid file has been generated
-; Opt@SkipDstGrid   = True    ; Will assume target grid file has been generated
-; Opt@SkipWgtGen    = True    ; Will assume weights file has been generated
-  
+  Opt@ForceOverwrite    = True
+  Opt@PrintTimings      = True
+  Opt@Debug             = True
+;
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; Points that receive no values are at _FillValue=9.96920996838687e+36 (blank points)
   func_regrid = ESMF_regrid(func_ana_src,Opt)
@@ -173,6 +181,8 @@ begin
   Opt@DstMask2D      = 1-tgt_msk
   Opt@SrcMask2D      = 1-src_msk
 
+  Opt@DstGridType       = "unstructured"
+
   Opt@InterpMethod   = "neareststod"
 ;  Opt@Pole           = "none"
   Opt@ForceOverwrite = True
@@ -186,7 +196,6 @@ begin
 
   func_neareststod = ESMF_regrid(func_ana_src,Opt)
   func_neareststod = where((1-tgt_msk) .eq. 1, func_neareststod, msk_field_value)
-
 ;----------------------------------------------------------------------
 ;--- Combine interp_method + neareststod
 ;----------------------------------------------------------------------
@@ -218,7 +227,7 @@ begin
   print("dst_size_n")
   print(dst_size_n)
 ;
-  if (interp_method .eq. "neareststod") then
+  if (interp_method .eq. str_lower("neareststod")) then
 ;--- Just write the new weights into the remapping file
      print("Nothing to do")
   else 
@@ -233,6 +242,7 @@ begin
             dst_missing(count) = i+1
          end if
       end do
+; count > 0 : there are some points that need nearest neighbours
       if (count .ge. 0) then
       dst_missing_good    = new((/count+1/),"integer")
       do i=0,count
@@ -264,6 +274,14 @@ begin
          end do
      end do
      delete(dst_missing_good)
+; count = 0
+     else
+     dst_address_new    = new((/numlinks/),"integer")
+     src_address_new    = new((/numlinks/),"integer")
+     S_regrid_new       = new((/numlinks/),double)
+     dst_address_new    = dst_address
+     src_address_new    = src_address
+     S_regrid_new       = S_regrid
      end if
 
      delete(S_regrid)
@@ -284,7 +302,7 @@ begin
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; Recalculate the interpolated function with the new weights with ESMF
 ; Points that receive no values are at _FillValue=9.96920996838687e+36 (blank points)
-  if (interp_method .eq. "neareststod") then
+  if (interp_method .eq. str_lower("neareststod")) then
 ;--- Just write the new weights into the remapping file
      print("Nothing to do")
   else 
@@ -292,19 +310,19 @@ begin
   globalAtt               = True
   globalAtt@title         = "ESMF Offline Regridding Weight Generator"
   globalAtt@normalization = "destarea"
-  if (interp_method .eq. "conserve") then
+  if (interp_method .eq. str_lower("conserve")) then
      globalAtt@map_method = "Conservative remapping"
      globalAtt@ESMF_regrid_method = "First-order Conservative"
   end if
-  if (interp_method .eq. "bilinear") then
+  if (interp_method .eq. str_lower("bilinear")) then
      globalAtt@map_method = "Bilinear remapping"
      globalAtt@ESMF_regrid_method = "Bilinear"
   end if
-  if (interp_method .eq. "patch") then
+  if (interp_method .eq. str_lower("patch")) then
      globalAtt@map_method = "Bilinear remapping"
      globalAtt@ESMF_regrid_method = "Higher-order Patch"
   end if
-  if (interp_method .eq. "neareststod") then
+  if (interp_method .eq. str_lower("neareststod")) then
      globalAtt@map_method = "Bilinear remapping"
      globalAtt@ESMF_regrid_method = "Nearest source to destination"
   end if
@@ -389,7 +407,7 @@ begin
 ; if nearest neighbour : num_wgts=1
 
 ;--- Normalize to obtain Fracarea option for OASIS3-MCT for conservative interpolation
-  if (interp_method .eq. "conserve") then
+  if (interp_method .eq. str_lower("conserve")) then
      do i=0,num_links-1
         if (frac_dst(dst_address(i)-1) .ne. 0.0) then
            S_regrid(i)=S_regrid(i)/frac_dst(dst_address(i)-1)
