@@ -1,5 +1,5 @@
 module purge
-module load intel-fc
-module load intel-cc
+module load intel-fc/14.3.174
+module load intel-cc/14.3.174
 module load netcdf
-module load openmpi/1.6.5
+module load openmpi/1.8.2
