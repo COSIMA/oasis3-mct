@@ -98,6 +98,7 @@ MODULE mod_oasis_grid
   public :: prism_grid_type
 
   integer(kind=ip_intwp_p),parameter :: mgrid = 100
+  integer(kind=ip_intwp_p),save :: writing_grids_call=0
 
   type prism_grid_type
      character(len=ic_med)  :: gridname
@@ -222,9 +223,11 @@ CONTAINS
        prism_grid(:)%area_set   = .false.
        prism_grid(:)%mask_set   = .false.
        prism_grid(:)%written    = .false.
+       prism_grid(:)%terminated = .false.
        prism_grid(:)%partid     = -1
     endif
     iwrite = 1   ! just set grids are needed always
+    writing_grids_call=1
 
     call oasis_debug_exit(subname)
 
@@ -823,6 +826,9 @@ CONTAINS
 
     call oasis_debug_enter(subname)
 
+    call oasis_mpi_bcast(writing_grids_call,mpi_comm_local,subname//'writing_grids_call')
+    if (writing_grids_call .eq. 1) then
+
     if (local_timers_on) call oasis_timer_start('grid_write_gather')
     allocate(gnum(mpi_size_local))
     gnum = 0
@@ -904,7 +910,8 @@ CONTAINS
                 if (pname0(g) == undefined_partname) then
                    pname0(g) = pname0(n)
                 elseif (pname0(n) /= undefined_partname .and. pname0(g) /= pname0(n)) then
-                   write(nulprt,*) subname,estr,'inconsistent grid and part name: ',trim(gname0(n)),' ',trim(pname0(n)),' ',trim(pname0(g))
+                   write(nulprt,*) subname,estr,'inconsistent grid and part name: ',&
+                                   trim(gname0(n)),' ',trim(pname0(n)),' ',trim(pname0(g))
                    call oasis_abort()
                 endif
              endif
@@ -925,6 +932,7 @@ CONTAINS
     if (mpi_rank_local == 0) then
        gname(1:gcnt) = gname0(1:gcnt)
        pname(1:gcnt) = pname0(1:gcnt)
+    endif
     endif
     deallocate(gname0)
     deallocate(pname0)
@@ -995,7 +1003,8 @@ CONTAINS
        endif
 
        if (OASIS_debug >= 15) then
-          write(nulprt,*) subname,' ',trim(gname(g)),':',trim(pname(g)),': partid_grid=',partid_grid,'active_task=',active_task,'write_task=',write_task
+          write(nulprt,*) subname,' ',trim(gname(g)),':',trim(pname(g)),': partid_grid=',&
+                          partid_grid,'active_task=',active_task,'write_task=',write_task
        endif
        !--------------
 
@@ -1171,6 +1180,7 @@ CONTAINS
     enddo  ! g = 1,gcnt
 
     if (local_timers_on) call oasis_timer_stop('grid_write_writefiles')
+    endif ! writing_grids_call
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write2files

@@ -323,8 +323,10 @@
                found = .true.
                !--- check that var, part, and inout consistent on all tasks
                if (pname0(n) /= pname0(v) .or. inout0(n) /= inout0(v)) then
-                  write(nulprt,*) subname,estr,'inconsistent var and part name: ',trim(vname0(n)),' ',trim(pname0(n)),' ',trim(pname0(v))
-                  write(nulprt,*) subname,estr,'inconsistent var and inout opt: ',trim(vname0(n)),' ',inout0(n),' ',inout0(v)
+                  write(nulprt,*) subname,estr,'inconsistent var and part name: ',&
+                                  trim(vname0(n)),' ',trim(pname0(n)),' ',trim(pname0(v))
+                  write(nulprt,*) subname,estr,'inconsistent var and inout opt: ',&
+                                  trim(vname0(n)),' ',inout0(n),' ',inout0(v)
                   call oasis_abort()
                endif
             endif
@@ -411,7 +413,9 @@
    
          if (OASIS_debug >= 2) then
             write(nulprt,*) ' '
-            write(nulprt,*) subname,' add var = ',prism_nvar,trim(prism_var(prism_nvar)%name),prism_var(prism_nvar)%part,trim(prism_part(prism_var(prism_nvar)%part)%partname),prism_var(prism_nvar)%ops
+            write(nulprt,*) subname,' add var = ',prism_nvar,trim(prism_var(prism_nvar)%name),&
+                            prism_var(prism_nvar)%part,&
+                            trim(prism_part(prism_var(prism_nvar)%part)%partname),prism_var(prism_nvar)%ops
             CALL oasis_flush(nulprt)
          ENDIF
       endif

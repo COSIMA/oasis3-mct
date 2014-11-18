@@ -1251,12 +1251,15 @@ CONTAINS
            if (OASIS_Debug >= 15) then
               write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
               do r1 = 1,prism_part(part1)%gsmap%ngseg
-                 write(nulprt,*) subname," DEBUG part_create part1 info ",prism_part(part1)%gsmap%start(r1),prism_part(part1)%gsmap%length(r1),prism_part(part1)%gsmap%pe_loc(r1)
+                 write(nulprt,*) subname," DEBUG part_create part1 info ",&
+                                 prism_part(part1)%gsmap%start(r1),prism_part(part1)%gsmap%length(r1),&
+                                 prism_part(part1)%gsmap%pe_loc(r1)
               enddo
 
               write(nulprt,*) subname," DEBUG part_create part2 gsize",prism_part(part2)%gsize
               do r1 = 1,prism_part(part2)%gsmap%ngseg
-                 write(nulprt,*) subname," DEBUG part_create part2 info ",prism_part(part2)%gsmap%start(r1),prism_part(part2)%gsmap%length(r1),prism_part(part2)%gsmap%pe_loc(r1)
+                 write(nulprt,*) subname," DEBUG part_create part2 info ",prism_part(part2)%gsmap%start(r1),&
+                                 prism_part(part2)%gsmap%length(r1),prism_part(part2)%gsmap%pe_loc(r1)
               enddo
            endif
 
@@ -1444,16 +1447,20 @@ CONTAINS
                                  pcpointer%routerID
                  if (OASIS_debug >= 20) then
                     do r1 = 1,prism_part(pcpointer%rpartID)%gsmap%ngseg
-                       write(nulprt,*) subname," DEBUG router gs1 info ",prism_part(pcpointer%rpartID)%gsmap%start(r1),prism_part(pcpointer%rpartID)%gsmap%length(r1),prism_part(pcpointer%rpartID)%gsmap%pe_loc(r1)
+                       write(nulprt,*) subname," DEBUG router gs1 info ",prism_part(pcpointer%rpartID)%gsmap%start(r1),&
+                                       prism_part(pcpointer%rpartID)%gsmap%length(r1),prism_part(pcpointer%rpartID)%gsmap%pe_loc(r1)
                     enddo
                     do r1 = 1,prism_part(pcpointer%partID)%gsmap%ngseg
-                       write(nulprt,*) subname," DEBUG router gs2 info ",prism_part(pcpointer%partID)%gsmap%start(r1),prism_part(pcpointer%partID)%gsmap%length(r1),prism_part(pcpointer%partID)%gsmap%pe_loc(r1)
+                       write(nulprt,*) subname," DEBUG router gs2 info ",prism_part(pcpointer%partID)%gsmap%start(r1),&
+                                       prism_part(pcpointer%partID)%gsmap%length(r1),prism_part(pcpointer%partID)%gsmap%pe_loc(r1)
                     enddo
                     do r1 = 1,prism_part(pcpntpair%rpartID)%gsmap%ngseg
-                       write(nulprt,*) subname," DEBUG router gs3 info ",prism_part(pcpntpair%rpartID)%gsmap%start(r1),prism_part(pcpntpair%rpartID)%gsmap%length(r1),prism_part(pcpntpair%rpartID)%gsmap%pe_loc(r1)
+                       write(nulprt,*) subname," DEBUG router gs3 info ",prism_part(pcpntpair%rpartID)%gsmap%start(r1),&
+                                       prism_part(pcpntpair%rpartID)%gsmap%length(r1),prism_part(pcpntpair%rpartID)%gsmap%pe_loc(r1)
                     enddo
                     do r1 = 1,prism_part(pcpntpair%partid)%gsmap%ngseg
-                       write(nulprt,*) subname," DEBUG router gs4 info ",prism_part(pcpntpair%partid)%gsmap%start(r1),prism_part(pcpntpair%partid)%gsmap%length(r1),prism_part(pcpntpair%partid)%gsmap%pe_loc(r1)
+                       write(nulprt,*) subname," DEBUG router gs4 info ",prism_part(pcpntpair%partid)%gsmap%start(r1),&
+                                       prism_part(pcpntpair%partid)%gsmap%length(r1),prism_part(pcpntpair%partid)%gsmap%pe_loc(r1)
                     enddo
                     do r1 = 1,prism_router(pcpointer%routerID)%router%nprocs
                        write(nulprt,*) subname," DEBUG router info ",pcpointer%routerID,r1, &
