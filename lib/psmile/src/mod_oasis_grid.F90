@@ -910,7 +910,7 @@ CONTAINS
                 if (pname0(g) == undefined_partname) then
                    pname0(g) = pname0(n)
                 elseif (pname0(n) /= undefined_partname .and. pname0(g) /= pname0(n)) then
-                   write(nulprt,*) subname,estr,'inconsistent grid and part name: ',&
+                   write(nulprt,*) subname,estr,'inconsistent grid and part name: ', &
                                    trim(gname0(n)),' ',trim(pname0(n)),' ',trim(pname0(g))
                    call oasis_abort()
                 endif
@@ -932,6 +932,11 @@ CONTAINS
     if (mpi_rank_local == 0) then
        gname(1:gcnt) = gname0(1:gcnt)
        pname(1:gcnt) = pname0(1:gcnt)
+    if (OASIS_debug >= 15) then
+       do n = 1,gcnt
+          write(nulprt,*) subname,' grid writing, n,grid:partition = ',n,trim(gname(n)),':',trim(pname(n))
+       enddo
+       call oasis_flush(nulprt)
     endif
     endif
     deallocate(gname0)
@@ -1003,7 +1008,7 @@ CONTAINS
        endif
 
        if (OASIS_debug >= 15) then
-          write(nulprt,*) subname,' ',trim(gname(g)),':',trim(pname(g)),': partid_grid=',&
+          write(nulprt,*) subname,' ',trim(gname(g)),':',trim(pname(g)),': partid_grid=', &
                           partid_grid,'active_task=',active_task,'write_task=',write_task
        endif
        !--------------
