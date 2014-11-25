@@ -38,9 +38,16 @@ usually used in the real coupled models.
 Defining LAG=dt implies that there will be a shift in time between the oasis_put and the oasis_get. 
 If I call tCPL a coupling time, the oasis_put done at tCPL + LAG will match the oasis_get done at tCPL.
 
-More information is avalable section 2.10 in the User Guide.
+More information is available section 2.10.1 in the User Guide.
 
 [section=SEQ]
+The order of coupling operations in the system is determined solely by the order of calls to send (put) and
+receive (get) data in the models in conjunction with the setting of the lag in the namcouple.
+Data that is received (get) is always blocking while data that is sent (put) is non-blocking with respect to the model
+making that call. It is possible to deadlock the system if the relative orders of puts and gets in different
+models are not compatible. The SEQ option can be used to avoid such deadlock.
+
+More information is available section 2.10.2 in the User Guide.
 <docuold>
 [section=Generalities]
 Using the OASIS3-MCT coupling library, the user has full flexibility to reproduce different coupling algorithms. In 
