@@ -75,24 +75,24 @@ If there is a problem in a tab (red (X) bullet), an error message giving more
 information is printed in the bottom window of the GUI.
 If the GUI is closed (File/Quit) before the proper creation of the configuration file in the last tab, it
 is possible to save only the "Green tabs". Once you saved your xml data, you can reload your xml file
-using the (File/Load as new) menu at the left top of the GUI.
+using the (File/Load as new) menu at the left top of the GUI (do not use the (File/Load as part) menu).
 Some documentation about the data to be provided by the user in the different windows is available by clicking on the 
 different blue bullets (?) entitled "Learn more".[]
 The first parameters to enter, in the tab "Gen", will be the simulation length, the debugging
-level and the timing information.
+level and the timing information printed by OASIS3-MCT.
 If grouped fields have to be defined (i.e. fields using the same configuration settings sent in a single communication) 
 the "Enable grouped field" must be activated.
 In this case a new tab "Group" will appear to define the different groups.
 Then the model components must be defined in the tab "Model", the grid characteristics of the coupling fields in
 the "Grids" window, and the different names of the coupling fields (before and after transformations), grouped or not,
 in the tab "Fld Name".[] 
-Finally all characteristics and transformations associated to each coupling field (or grouped fields) have be defined step 
+Finally all characteristics and transformations associated to each coupling field (or grouped fields) have to be defined step 
 by step in the following windows. 
 If the first four tabs "Main", "Gen", "Model", “Grids” and "Fld Names" are not filled up and processed before the others, 
 it will not be possible to enter information about the coupling fields in the following windows.[] 
 At some point when filling the GUI or when closing it, the data of the GUI must be saved in an xml file which name
 is chosen by the user.
-Then  configuration text file is saved in a directory named automatically after the name of the xml file at the
+The  configuration text file is saved, WHEN ALL THE TABS ARE VALIDATED in a directory named automatically after the name of the xml file at the
 same location (see the README file).[] 
 A summary of the transformations chosen for the coupling fields will be printed when processing 
 the tab "Sum" and the configuration text file will be created and printed in the last window 
