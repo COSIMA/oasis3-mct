@@ -1,9 +1,10 @@
  <model name="flddesc" title="Coupling field names" layout="flat">
   <desc> 
 Define here the coupling fields using the button "Add Coupling fields" 
-and double clicking in the new row created. A unique reference name must be given to each
+and double clicking in the new row created. A "user reference name" must be given to each
 coupling field under "Field label" by filling the part "no label" 
-and validated using the button "Enter" of the keyboard. 
+and validated using the button "Enter" of the keyboard. This name will not appear in the namcouple and is only
+used by the GUI.
 The "load" button is useless for the OASIS3-MCT application.[] 
 For each field, the symbolic name used in the source model and the symbolic name used in the target model
 must be specified as well as the associated source and target grids.
@@ -28,7 +29,9 @@ INPUT and OUTPUT field properties.
     <docu>
 [section=Field names definition]
 In this window, you must enter  the coupling fields exchanged by all the models. 
-For each coupling field, you must enter the symbolic name of the field used in the source model 
+For each coupling field you must first enter a "user reference name" in the "no label" part.
+This "user reference name" is only used by the GUI and will not appear in the namcouple. 
+Then for each coupling field, you must enter the symbolic name of the field used in the source model 
 and the corresponding symbolic name of the field used in the target model. 
 These names will appear in the configuration file.[]  
 You must also specify for each field if it will be grouped or not and to which group it belongs using the names 
