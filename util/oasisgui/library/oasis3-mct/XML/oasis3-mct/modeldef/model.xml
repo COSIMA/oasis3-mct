@@ -28,7 +28,7 @@ In this part the user must enter the names of the models running in the experime
 which must correspond to the name announced by each model when calling the routine oasis_init_comp
 (see section 2.2.1 of the User Guide).
 
-Then the user may indicate the maximum Fortran unit number used by the models.
+Then the user may indicate the maximum Fortran unit number used by the models (optional).
 
 More information can be found in the User Guide section 3.2 under the keyword $NBMODEL.
 <docuold>
