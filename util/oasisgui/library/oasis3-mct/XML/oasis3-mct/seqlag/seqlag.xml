@@ -35,7 +35,7 @@ models read their data at t=0 in their restart files
 and write a restart file at the end of the simulation for the next run. This configuration is the one that is 
 usually used in the real coupled models.
 
-Defining LAG=dt implies that there will be a shift in time between the oasis_put and the oasis_get. 
+Defining LAG=dt (time step of the model) implies that there will be a shift in time between the oasis_put and the oasis_get. 
 If I call tCPL a coupling time, the oasis_put done at tCPL + LAG will match the oasis_get done at tCPL.
 
 More information is available section 2.10.1 in the User Guide.
