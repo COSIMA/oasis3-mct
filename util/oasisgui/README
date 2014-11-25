@@ -1,5 +1,5 @@
 ============================================================================================
-The OASISGUI is an aplication of the software OPENTEA developped at CERFACS in the CFD group
+The OASISGUI is an application of the software OPENTEA developped at CERFACS in the CFD group
 by Antoine Dauptain.
 Below are the instructions to run oasisgui to create the configuration file namcouple of 
 OASIS3-MCT on a Linux computer.
@@ -28,11 +28,11 @@ Python (version 2.6 or later) are installed on your platform and that they are c
 - to have the version of Python : >python -V
 - to have the version of tcl/tk : >echo "puts [info tclversion]" | tclsh 
 
-Your PYTHONPATH must include the $dir/oasisgui/XDRpy directory 
-("dir" is the repository where is located the OASISGUI repository on your computer):
+Your PYTHONPATH must include the $dir/oasis3-mct/util/oasisgui/XDRpy directory 
+("dir" is the repository where is located oasis3-mct on your computer):
 In your .cshrc you must add :
 ----------------------------------------------------------
-setenv OASISGUIHOME $dir/oasisgui
+setenv OASISGUIHOME $dir/oasis3-mct/util/oasisgui
 if ($?PYTHONPATH) then
    setenv PYTHONPATH $OASISGUIHOME/XDRpy:$PYTHONPATH
 else
@@ -41,7 +41,7 @@ endif
 ----------------------------------------------------------
 In your .bashrc you must add :
 ----------------------------------------------------------
-export OASISGUIHOME=$dir/oasisgui
+export OASISGUIHOME=$dir/oasis3-mct/util/oasisgui
 if [ "x${PYTHONPATH}" == "x" ]
 then
 export PYTHONPATH=$OASISGUIHOME/XDRpy
@@ -65,12 +65,13 @@ alias oasisgui='wish $OASISGUIHOME/opentea/opentea.tcl -config $OASISGUIHOME/myc
 
 #####
 Once you have launch oasisgui, you must fill up the different tabs from the left
-to the right. Each window must be validated (button "process" on the bottom on the right). 
-An orange bullet in the tab means that no information was stored 
-yet in the window, a red bullet in the tab means that there is an error in the window 
-and a green bullet in the tab means that the data entered in the window has been processed and is correct. 
-Some documentation about the meaning of the variables in the different windows, is 
-available by clicking on the different blue bullets ("Learn more").
+to the right. Each window must be validated (button "process" on the bottom on the 
+right in the window). 
+An orange bullet in the tab means that no information was stored yet in the window, 
+a red bullet in the tab means that there is an error in the window and a green bullet 
+in the tab means that the data entered in the window has been processed and is correct. 
+Some documentation about the meaning of the variables is available in the different windows,
+ by clicking on the different blue bullets ("Learn more").
 Validated data are progressively stored in an xml file when filling the GUI. This file 
 must be explicitely saved when leaving the GUI (you will be automatically asked for this).
 Once you saved your xml data, you can reload your xml file using the (File/Load as new) menu at 
