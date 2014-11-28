@@ -97,6 +97,8 @@ end type FIELD_SEQUENCE
     real*8 :: r_reference = -1.E8      ! reference time
     real*8 :: r_mean                   ! tmp buffer
     real*8 :: temp_t                   ! tmp buffer
+    real*8 :: r_impossible_value= 1.E13      ! reference time
+    real*8 :: r_test_impossible= 1.E12      ! reference time
 
     real*8, dimension(:), allocatable ::  calc_time, noncalc_time   ! calculation and non calculation time per model
 
@@ -162,7 +164,7 @@ end type FIELD_SEQUENCE
     allocate(start_time(nb_models, max_nb_fields))
 
     comm_nb(:,:) = 0
-    start_time(:,:) = 1E10
+    start_time(:,:) = r_impossible_value
 !
 !   DEFAULT VALUES FOR COMMAND LINE ARGUMENTS.
 !
@@ -257,7 +259,7 @@ end type FIELD_SEQUENCE
              IF ( c_field_code(1:3) == "IT " ) cycle
 
              ! Skip if interpolation time measurement
-             IF ( c_comm_type == "rpo" ) cycle
+             IF ( INDEX ( TRIM(c_comm_type),'rpo'  ) /= 0 ) cycle
 
              ! Read model names
              IF ( c_field_code(1:3) == "MD " ) THEN
@@ -352,7 +354,7 @@ end type FIELD_SEQUENCE
 !          do k = 1, i_cpl_field(i)
 !            write(6,*) ' Field ', field_code(i, k), comm_type(i,k)
 !          ENDDO
-
+!
     ! End loop on models
     END DO
 !
@@ -363,7 +365,7 @@ end type FIELD_SEQUENCE
 !
 !    write(6,*) ' nb fields ', cpl_field_nb
 !    call flush(6)
-
+!
 !
     DO i = 1, nb_models
        ! Count total send/received fields (divide by proc number)
@@ -405,7 +407,7 @@ end type FIELD_SEQUENCE
           END DO
           j = j + 1
        END IF
-       start_time(mi,i) = 1E10
+       start_time(mi,i) = r_impossible_value
     END DO
 !
     write (6,*) ' '
@@ -420,7 +422,8 @@ end type FIELD_SEQUENCE
                 ' )      ', TRIM(model_name(cpl_fields(i)%target_model)), &
                 ' ( ', TRIM(field_name(cpl_fields(i)%target_model,cpl_fields(i)%namID)) , ' )'
     END DO
-    write (6,*) ' '
+!    write (6,*) ' '
+!    call flush(6)
 !
 !  4. CHECK COMMUNICATION NUMBER CONCORDANCE
 !
@@ -474,8 +477,8 @@ end type FIELD_SEQUENCE
     ALLOCATE ( max_clock_measure ( cpl_field_nb, max_comm_nb , 4 ) )
 
 !   initialize min/max counters
-    min_clock_measure = 1.E10 
-    max_clock_measure = -1.E10 
+    min_clock_measure = r_impossible_value
+    max_clock_measure = r_impossible_value * (-1.)
 !
 !    - to store calculation / non calculation time 
 !      for each log file of the same model
@@ -495,8 +498,8 @@ end type FIELD_SEQUENCE
 !      AND FILL ARRAYS WITH ALL CLOCK TIME MEASURES 
 !
     log_nb = 0
-    r_max_time = -1.E10 
-    r_min_time = 1.E10 
+    r_max_time = r_impossible_value * (-1.)
+    r_min_time = r_impossible_value
 
     ! Loop on model number
     DO i = 1, nb_models
@@ -555,7 +558,7 @@ end type FIELD_SEQUENCE
              r_clock = r_clock - r_reference
 
              ! Special treatment for interpolation time :cumulated
-             IF ( c_comm_type(8:14) == "interpo" ) then
+             IF ( INDEX ( TRIM(c_comm_type), 'interpo' ) /= 0 ) then
                 IF ( l_add_interp_time ) then
                    r_interp_measure(log_nb) = r_interp_measure(log_nb) + r_clock
                    l_add_interp_time=.false.
@@ -629,7 +632,7 @@ end type FIELD_SEQUENCE
 !            This excludes restart reading sequence side effect if any
 !
 !
-             IF ( l_exch_not_yet_valid ) THEN
+             IF ( l_exch_not_yet_valid .AND. cpl_fields(i_cpl)%source_comm_nb == valid_comm_nb(i) ) THEN
                 l_exch_not_yet_valid = .false.
                 ! Get the name of the first field exchanged by this model
                 c_test_name = TRIM(c_field_code)
@@ -820,13 +823,13 @@ end type FIELD_SEQUENCE
                                      ! with diff cpl time step)
              DO j = first_valid_comm(k), valid_comm_nb(k)
                 ! If a timing is available for this coupling field at this coupling time step
-                IF ( max_clock_measure (i,j,2) < 1.E9 .and. max_clock_measure (i,j,1) < 1.E9 ) &
+                IF ( max_clock_measure (i,j,2) < r_test_impossible .and. max_clock_measure (i,j,1) < r_test_impossible ) &
                    ! add sending time to the total of non calculation time
                    noncalc_time(k) = max_clock_measure (i,j,2) - max_clock_measure (i,j,1) + &
                                      noncalc_time(k)
                    ! WARNING : sending time starts when slowest mpi process check on log files is before sending
                    !            and stops when slowest mpi process check on log files is after sending
-                IF ( max_clock_measure (i,j,1) < 1.E9 .and. ABS(min_clock_measure (i,j,1)) < 1.E9 ) &
+                IF ( max_clock_measure (i,j,1) < r_test_impossible .and. ABS(min_clock_measure (i,j,1)) < r_test_impossible ) &
                    ! Measure before sending between slowest and fastest mpi process check on log files
                    r_jitter_time(k) = max_clock_measure (i,j,1) - min_clock_measure (i,j,1) + &
                                       r_jitter_time(k)
@@ -838,13 +841,13 @@ end type FIELD_SEQUENCE
                                      ! with diff cpl time step)
              DO j = first_valid_comm(k), valid_comm_nb(k)
                 ! If a timing is available for this coupling field at this coupling time step
-                IF ( max_clock_measure (i,j,4) < 1.E9 .and. max_clock_measure (i,j,3) < 1.E9 ) &
+                IF ( max_clock_measure (i,j,4) < r_test_impossible .and. max_clock_measure (i,j,3) < r_test_impossible ) &
                    ! add receiving time to the total of non calculation time
                    noncalc_time(k) = max_clock_measure (i,j,4) - max_clock_measure (i,j,3) + &
                                      noncalc_time(k)
                    ! WARNING : receiving time starts when slowest mpi process check on log files is before receiving
                    !            and stops when slowest mpi process check on log files is after receiving
-                IF ( max_clock_measure (i,j,3) < 1.E9 .and. ABS(min_clock_measure (i,j,3)) < 1.E9 ) &
+                IF ( max_clock_measure (i,j,3) < r_test_impossible .and. ABS(min_clock_measure (i,j,3)) < r_test_impossible ) &
                    ! Measure before receiving between slowest and fastest mpi process check on log files
                    r_jitter_time(k) = max_clock_measure (i,j,3) - min_clock_measure (i,j,3) + &
                                       r_jitter_time(k)
@@ -852,8 +855,8 @@ end type FIELD_SEQUENCE
           ENDIF
        ENDDO
 !
-       r_min_time = -1.E10
-       r_max_time = -1.E10
+       r_min_time = r_impossible_value * (-1.)
+       r_max_time = r_impossible_value * (-1.)
 
 !      CALCULATE TIME BOUNDS
 
@@ -866,13 +869,13 @@ end type FIELD_SEQUENCE
              ! Measure first valid time when field received (after receiving)
              temp_t = max_clock_measure(i,first_valid_comm(k)-1,4)
              ! If later than reference
-             IF ( temp_t > r_min_time .and. temp_t < 1.E9 ) &
+             IF ( temp_t > r_min_time .and. temp_t < r_test_impossible ) &
                 ! Set it as reference 
                 r_min_time = temp_t
              ! Measure last valid time when field received (after receiving)
              temp_t = max_clock_measure(i,valid_comm_nb(k),4)
              ! If later than reference
-             IF ( temp_t > r_max_time .and. temp_t < 1.E9 ) &
+             IF ( temp_t > r_max_time .and. temp_t < r_test_impossible ) &
                 ! Set it as reference 
                 r_max_time = temp_t
              l_put = .false.
@@ -888,13 +891,13 @@ end type FIELD_SEQUENCE
                 ! Measure first valid time when field received (after receiving)
                 temp_t = max_clock_measure(i,first_valid_comm(k)-1,2)
                 ! If later than reference
-                IF ( temp_t > r_min_time .and. temp_t < 1.E9 ) &
+                IF ( temp_t > r_min_time .and. temp_t < r_test_impossible ) &
                    ! Set it as reference 
                    r_min_time = temp_t
                 ! Measure last valid time when field received (after receiving)
                 temp_t = max_clock_measure(i,valid_comm_nb(k),2)
                 ! If later than reference
-                IF ( temp_t > r_max_time .and. temp_t < 1.E9 ) &
+                IF ( temp_t > r_max_time .and. temp_t < r_test_impossible ) &
                    ! Set it as reference 
                    r_max_time = temp_t
              ENDIF
