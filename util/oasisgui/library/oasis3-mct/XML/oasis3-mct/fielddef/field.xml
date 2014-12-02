@@ -11,8 +11,7 @@ must be specified as well as the associated source and target grids.
 It is also necessary to specify for each field if it is grouped or not and to which group it belongs using the names 
 already defined in the Group window. 
 Only the source and target symbolic field names and grid names will appear in the namcouple configuration text file.[] 
-A blue (?), located at the right bottom of this window, gives more information on the data to fill up, specially on the
-INPUT and OUTPUT field properties. 
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
   </desc>
  </model>
  <model name="fldname" title="Field names" layout="flat">

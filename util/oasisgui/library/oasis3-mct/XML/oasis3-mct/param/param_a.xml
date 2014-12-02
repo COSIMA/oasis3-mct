@@ -1,6 +1,6 @@
 <model name="intro" title="OASIS3-MCT coupler" layout="flat">
     <desc> 
-        [image=header_final_small.gif]
+        [image=header_formation_dec2014.gif]
         OASIS3-MCT coupler Graphical User Interface
     </desc>
     <docu>
@@ -73,8 +73,8 @@ and, as already explained, a green (v) bullet in the tab means that
 the data entered in the window is correct.
 If there is a problem in a tab (red (X) bullet), an error message giving more
 information is printed in the bottom window of the GUI.
-If the GUI is closed (File/Quit) before the proper creation of the configuration file in the last tab, it
-is possible to save only the "Green tabs". Once you saved your xml data, you can reload your xml file
+If you want to close the GUI (File/Quit) before the proper creation of the configuration file in the last tab, it
+is possible to save the information entered in an xml file. You can reload your xml file
 using the (File/Load as new) menu at the left top of the GUI (do not use the (File/Load as part) menu).
 Some documentation about the data to be provided by the user in the different windows is available by clicking on the 
 different blue bullets (?) entitled "Learn more".[]
@@ -92,14 +92,13 @@ If the first four tabs "Main", "Gen", "Model", “Grids” and "Fld Names" are n
 it will not be possible to enter information about the coupling fields in the following windows.[] 
 At some point when filling the GUI or when closing it, the data of the GUI must be saved in an xml file which name
 is chosen by the user.
-The  configuration text file is saved, WHEN ALL THE TABS ARE VALIDATED in a directory named automatically after the name of the xml file at the
-same location (see the README file).[] 
-A summary of the transformations chosen for the coupling fields will be printed when processing 
-the tab "Sum" and the configuration text file will be created and printed in the last window 
-"Config" when processing it. 
+A summary of the transformations chosen for the coupling fields will be printed when processing
+the tab "Sum".
+The  final configuration text file will be created and printed in the last window "Config" when processing it, only if
+WHEN ALL THE TABS ARE VALIDATED  (in a directory named after the name of the xml file, see the README file). [] 
 
 [section=Documentation]
-As already explained above, some documentation is available by clicking on the different blue bullets (?).
+Some documentation is available by clicking on the different blue bullets (?).
 It is also possible to get all the OASIS3-MCT documentation in an html format by using the functionality
 (File/General help) located at the left top of the GUI.
     </desc>

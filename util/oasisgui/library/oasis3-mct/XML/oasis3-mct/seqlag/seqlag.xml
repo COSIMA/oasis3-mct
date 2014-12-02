@@ -2,6 +2,7 @@
     <desc>
 Please enter the LAG and the sequence (SEQ), if any, for 
 the different coupling fields, selecting the different rows available.
+The LAG is useless for INPUT and OUTPUT fields.
 The "load" button is useless for the OASIS3-MCT application.[]
 A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
     </desc>
@@ -36,7 +37,7 @@ and write a restart file at the end of the simulation for the next run. This con
 usually used in the real coupled models.
 
 Defining LAG=dt (time step of the model) implies that there will be a shift in time between the oasis_put and the oasis_get. 
-If I call tCPL a coupling time, the oasis_put done at tCPL + LAG will match the oasis_get done at tCPL.
+If tCPL is the coupling time, the oasis_put done at tCPL + LAG will match the oasis_get done at tCPL.
 
 More information is available section 2.10.1 in the User Guide.
 

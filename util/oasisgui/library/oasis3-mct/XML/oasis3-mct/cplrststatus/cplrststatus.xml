@@ -2,11 +2,11 @@
   <desc> 
 Please enter the coupling period, the name of the restart files and the status for 
 the different coupling fields, selecting the different rows available.
-The LAG is useless for INPUT and OUTPUT fields.
 If you have many fields, it is possible to propagate the properties of one field 
 to the others using the button "copy". 
 The "load" button is useless for the OASIS3-MCT application.[]
-A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up, specially on the
+INPUT and OUTPUT field properties.
   </desc>
  </model>
 
