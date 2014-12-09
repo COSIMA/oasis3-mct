@@ -87,7 +87,7 @@ CONTAINS
 
    kinfo = OASIS_OK
 
-   call oasis_timer_start('part definition')
+   call oasis_timer_start('part_definition')
 
    prism_npart = prism_npart + 1
    if (prism_npart > mpart) then
@@ -117,7 +117,7 @@ CONTAINS
    allocate(prism_part(prism_npart)%kparal(size(kparal)))
    prism_part(prism_npart)%kparal = kparal
 
-   call oasis_timer_stop('part definition')
+   call oasis_timer_stop('part_definition')
 
    call oasis_debug_exit(subname)
 
