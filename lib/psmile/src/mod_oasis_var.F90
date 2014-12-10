@@ -162,7 +162,7 @@
    integer(kind=ip_intwp_p),pointer :: loc_inout(:),inout0(:),inout(:)
    character(len=ic_lvar)  ,pointer :: root_vname(:)
    integer(kind=ip_intwp_p),pointer :: vnum(:),rcnts(:),displ(:)
-   logical, parameter :: local_timers_on = .true.
+   logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_var_setup)'
    !--------------------------------------------------------
 

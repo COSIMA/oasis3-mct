@@ -138,7 +138,7 @@ CONTAINS
    character(len=ic_lvar2)  ,pointer :: loc_pname(:)
    character(len=ic_lvar2)  ,pointer :: pname0(:),pname(:)
    integer(kind=ip_intwp_p),pointer :: pnum(:),rcnts(:),displ(:)
-   logical, parameter :: local_timers_on = .true.
+   logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_part_setup)'
    !--------------------------------------------------------
 

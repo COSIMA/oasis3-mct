@@ -819,7 +819,7 @@ CONTAINS
     character(len=ic_med)   ,pointer :: loc_gname(:),gname0(:),gname(:)
     character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:)
     integer(kind=ip_intwp_p),pointer :: gnum(:),rcnts(:),displ(:)
-    logical, parameter :: local_timers_on = .true.
+    logical, parameter :: local_timers_on = .false.
     character(len=*),parameter :: undefined_partname = '(UnDeFiNeD_PArtnaME)'
     character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------
