@@ -73,7 +73,7 @@ CONTAINS
 
   nulprt = 6
   nulprt1 = 6
-  nullucia = 6
+  nullucia = 60
   OASIS_debug = 0
   TIMER_debug = 0
   LUCIA_debug = 0
