@@ -42,6 +42,7 @@ A blue (?), located at the right bottom of this window, gives more information o
                         <param name="nv_gauss" title="Nb of neighbours used (integer)" type="integer" />
                         <param name="var_gauss" title="Weight given to the neighbour used" type="double"/>
                         <desc> N nearest-neighbour interpolation weighted by their distance and a gaussian function.
+                               For D and U grids, the restriction bin must be one.
                         </desc>
                     </model>
                     <model name="bilinear" title="BILINEAR">

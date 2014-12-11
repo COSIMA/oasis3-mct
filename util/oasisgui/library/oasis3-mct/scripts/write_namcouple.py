@@ -453,7 +453,7 @@ for fields in getChildrenName("flddef"):
                                       if  getValue("rest_dist",fields2) == "latlon_dist":
                                            gridline+= "LATLON"
                                            gridline+= " "
-                                      elif getValue("rest_dist",fields2) == "latitutde_dist":
+                                      elif getValue("rest_dist",fields2) == "latitude_dist":
                                            gridline+= "LATITUDE"
                                            gridline+= " "
                                       gridline+= getValue("nbin_dist",fields2)
@@ -477,7 +477,7 @@ for fields in getChildrenName("flddef"):
                                       if  getValue("rest_gaus",fields2) == "latlon_gaus":
                                            gridline+= "LATLON"
                                            gridline+= " "
-                                      elif getValue("rest_gaus",fields2) == "latitutde_gaus":
+                                      elif getValue("rest_gaus",fields2) == "latitude_gaus":
                                            gridline+= "LATITUDE"
                                            gridline+= " "
                                       gridline+= getValue("nbin_gaus",fields2)
@@ -500,7 +500,7 @@ for fields in getChildrenName("flddef"):
                                       if  getValue("rest_bili",fields2) == "latlon_bili":
                                            gridline+= "LATLON"
                                            gridline+= " "
-                                      elif getValue("rest_bili",fields2) == "latitutde_bili":
+                                      elif getValue("rest_bili",fields2) == "latitude_bili":
                                            gridline+= "LATITUDE"
                                            gridline+= " "
                                       gridline+= getValue("nbin_bili",fields2)
@@ -519,7 +519,7 @@ for fields in getChildrenName("flddef"):
                                       if  getValue("rest_bicu",fields2) == "latlon_bicu":
                                            gridline+= "LATLON"
                                            gridline+= " "
-                                      elif getValue("rest_bicu",fields2) == "latitutde_bicu":
+                                      elif getValue("rest_bicu",fields2) == "latitude_bicu":
                                            gridline+= "LATITUDE"
                                            gridline+= " "
                                       gridline+= getValue("nbin_bicu",fields2)
@@ -541,7 +541,7 @@ for fields in getChildrenName("flddef"):
                                       if  getValue("rest_conserv",fields2) == "latlon_conserv":
                                            gridline+= "LATLON"
                                            gridline+= " "
-                                      elif getValue("rest_conserv",fields2) == "latitutde_conserv":
+                                      elif getValue("rest_conserv",fields2) == "latitude_conserv":
                                            gridline+= "LATITUDE"
                                            gridline+= " "
                                       gridline+= getValue("nbin_conserv",fields2)

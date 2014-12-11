@@ -15,7 +15,7 @@ A blue (?), located at the right bottom of this window, gives more information o
 	     <param name="filename" title="Remapping file (NetCDF)" type="string"/>
 	     <choice name="maploc" title="Where to do the mapping" type="string" default="src">
 	       <option value="src" title="Source processors (src)"/>
-               <option value="dst" title="Target processors (tgt)"/>
+               <option value="dst" title="Target processors (dst)"/>
 	     </choice>
 	     <choice name="mapstrategy" title="Mapping strategy" type="string" default="bfb">
 	       <option value="bfb" title="Bit-for-bit reproductibility (bfb)"/>
