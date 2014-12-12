@@ -214,8 +214,6 @@ if the associated field symbolic names and partition ID (see {\tt
   name} and {\tt il\_part\_id} arguments in section
 \ref{subsubsec_Declaration}) can then be anything.
 
-Appendix \ref{procnotinvolved} shows a coding sample of how to use
-these routines.
 
 \subsection{Separate executable not coupling at all}
 \label{subsec_nocpl}
@@ -609,6 +607,8 @@ coupling (or I/O) field.
       main process)
     \item OASIS\_ToRestOut (=9) if the field was written both to a
       restart file and to an output file.
+    \item OASIS\_Waitforallingroup (=14) if the field was not sent because it is in a group.
+    It will be sent only when the oasis\_put of the last field in the group will be called.
     \item OASIS\_Ok (=0) otherwise and no error occurred.
     \end{itemize}
   \item {\tt fld2 [REAL, IN, OPTIONAL]}: optional $2^{nd}$ coupling
@@ -725,6 +725,8 @@ coupling field.
       another model and written to an output file
     \item OASIS\_FromRestOut (=13) if the field was both read from a
       restart file and written to an output file
+    \item OASIS\_Waitforallingroup (=14) if the field was not sent because it is in a group.
+    It will be sent only when the oasis\_put of the last field in the group will be called.
     \item OASIS\_Ok (=0) otherwise and no error occurred.
     \end{itemize}
   \end{itemize}
@@ -841,6 +843,69 @@ available.
   processors of two components, the local component and the component
   associated with cdnam.  This call is collective across the tasks of
   the two components but other components are not involved.
+
+\item {\tt CALL oasis\_put\_inquire(var\_id, date, kinfo)}
+\item {\tt CALL prism\_put\_inquire\_proto(var\_id, date, kinfo)}
+  \begin{itemize}
+  \item {\tt var\_id [INTEGER; IN]}: field ID (from
+  corresponding oasis\_def\_var)
+  \item {\tt date [INTEGER; IN]}: number of seconds in the run at the
+  time of the call
+  \item {\tt kinfo [INTEGER; OUT]}: returned info code
+    \begin{itemize}
+    \item OASIS\_Sent(=4) if the field was sent to another model
+    \item OASIS\_LocTrans (=5) if the field was only used in a time
+      transformation (not sent, not output)
+    \item OASIS\_ToRest (=6) if the field was written to a restart
+      file only
+    \item OASIS\_Output (=7) if the field was written to an output
+      file only
+    \item OASIS\_SentOut (=8) if the field was both written to an
+      output file and sent to another model (directly or via OASIS3
+      main process)
+    \item OASIS\_ToRestOut (=9) if the field was written both to a
+      restart file and to an output file.
+    \item OASIS\_Waitforallingroup (=14) if the field was not sent because it is in a group.
+    It will be sent only when the oasis\_put of the last field in the group will be called.
+    \item OASIS\_Ok (=0) otherwise and no error occurred.
+    \end{itemize}
+  \end{itemize}
+
+This routine may be called at any time to
+inquire what would happen to the corresponding field (i.e. with same
+{\tt var\_id} and at same {\tt date}) below the corresponding {\tt
+  oasis\_put}.
+
+\item {\tt CALL oasis\_get\_ncpl(var\_id, ncpl, kinfo)}
+\item {\tt CALL prism\_get\_ncpl\_proto(var\_id, ncpl, kinfo)}
+  \begin{itemize}
+  \item {\tt var\_id [INTEGER; IN]}: field ID (from
+  corresponding oasis\_def\_var)
+  \item {\tt ncpl [INTEGER; OUT]}: number of couplings in which the field
+  is involved (i.e. when a field is sent to multiple targets) 
+  \item {\tt kinfo [INTEGER; OUT]}: returned info code
+  \end{itemize}
+
+This routine returns the number of coupling in which the field var\_id is
+involved. This number is needed to get the coupling frequencies with the
+routine oasis\_get\_freqs, see below.
+
+\item {\tt CALL oasis\_get\_freqs(var\_id, ncpl, cpl\_freqs, kinfo)}
+\item {\tt CALL prims\_get\_freqs\_proto(var\_id, ncpl, cpl\_freqs, kinfo)}
+  \begin{itemize}
+  \item {\tt var\_id [INTEGER; IN]}: field ID (from
+  corresponding oasis\_def\_var)
+  \item {\tt ncpl [INTEGER; IN]}: number of couplings in which the field
+  is involved (i.e. when a field is sent to multiple targets)
+   \item {\tt cpl\_freqs [INTEGER; DIMENSION(ncpl); OUT]}: periods of coupling 
+  (in number of seconds) of field var\_id. There is one coupling period for
+  each coupling in which the field is involved
+  \item {\tt kinfo [INTEGER; OUT]}: returned info code
+  \end{itemize}
+
+This routine can be used to retrieve the coupling period(s) of field with
+corresponding {\tt var\_id}, as defined in the {\it namcouple}
+
 \end{itemize}
 
 \section{Coupling algorithms - SEQ and LAG concepts}
