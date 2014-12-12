@@ -2,7 +2,7 @@
 #
 HOMEDIR=`pwd`
 #
-# Name of the grids in the initial files of each grid (4 characters)
+# Name of the grids in the initial files of each grid 
 srcgridini=bt42
 tgtgridini=lmdz
 # Name of the files containing each grid
@@ -11,6 +11,8 @@ tgtgridfile=grid_model2.nc
 # Name of the grids in the final files grids_und.nc and masks_und.nc (4 characters)
 srcgridend=bt42
 tgtgridend=lmde
+#
+# WARNING : the coordinates must be double and the masks must be integer 
 #
 RUNDIR=$HOMEDIR/wkdir_${srcgridend}_${tgtgridend}
 DATAGRIDS=$HOMEDIR/data
