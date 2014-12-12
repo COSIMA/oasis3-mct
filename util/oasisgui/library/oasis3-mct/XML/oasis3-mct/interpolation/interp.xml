@@ -38,9 +38,9 @@ A blue (?), located at the right bottom of this window, gives more information o
                             <option value="latlon_gaus" title="LATLON"/>
                             <option value="latitude_gaus" title="LATITUDE"/>
                         </choice>
-                        <param name="nbin_gauss" title="Nb of restriction bins (integer)" type="integer"/>
-                        <param name="nv_gauss" title="Nb of neighbours used (integer)" type="integer" />
-                        <param name="var_gauss" title="Weight given to the neighbour used" type="double"/>
+                        <param name="nbin_gaus" title="Nb of restriction bins (integer)" type="integer"/>
+                        <param name="nv_gaus" title="Nb of neighbours used (integer)" type="integer" />
+                        <param name="var_gaus" title="Weight given to the neighbour used" type="double"/>
                         <desc> N nearest-neighbour interpolation weighted by their distance and a gaussian function.
                                For D and U grids, the restriction bin must be one.
                         </desc>
