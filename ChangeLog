@@ -660,4 +660,12 @@ svn checkout http://oasis3mct.cerfacs.fr/svn/trunk/oasis3-mct .
 svn merge --reintegrate http://oasis3mct.cerfacs.fr/svn/branches/tc14d/oasis3-mct
 - parallel grid writing capability added
 - add namcouple checking that all variables defined in namcouple are reconciled at run time with the components and will be used
-
+==============================================================================
+Originator: coquart
+Date : 16/12/2014
+Merge trunk rev 1177 + tc14e:
+Developments to reduce memory usage at large task counts:
+"ntask" send/recv pair so each task sends it's data to the root one at a time,
+the root syncs one task at a time, then when all the sends are done, a
+broadcast is done to all the tasks.
+The performance is probably about the same, but it will use a lot less memory.
