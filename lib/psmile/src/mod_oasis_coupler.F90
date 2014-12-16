@@ -1,3 +1,6 @@
+
+!> Initialize the OASIS coupler infrastructure
+
 MODULE mod_oasis_coupler
 !     - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !
@@ -31,92 +34,95 @@ MODULE mod_oasis_coupler
 
 ! COUPLING INFO
 
+  !> Router information for rearranging data on tasks
   type prism_router_type
      !--- fixed at initialization ---
-     type(mct_router)      :: router     ! router
+     type(mct_router)      :: router     !< router
   end type prism_router_type
 
+  !> Mapper data for interpolating data between grids
   type prism_mapper_type
      !--- fixed at initialization ---
-     type(mct_sMatP),pointer :: sMatP(:)  ! mappers, size nwgts
-     integer(kind=ip_i4_p) :: nwgts       ! number of weights in weights file
-     character(len=ic_long):: file
-     character(len=ic_med) :: loc         ! location: src,dst
-     character(len=ic_med) :: opt         ! optimization: bfb,sum,opt
-     character(len=ic_med) :: optval      ! mct map option: src,dst
-     logical               :: init
-     integer(kind=ip_i4_p) :: spart ! src partition
-     integer(kind=ip_i4_p) :: dpart ! dst partition
-     logical               :: AVred ! AV_ms, AV_md data already read in
-     type(mct_aVect)       :: AV_ms ! av for CONSERV src: mask, area, etc
-     type(mct_aVect)       :: AV_md ! av for CONSERV dst: mask, area, etc
+     type(mct_sMatP),pointer :: sMatP(:)  !< stores mapping data such as weights
+     integer(kind=ip_i4_p) :: nwgts       !< number of weights in weights file
+     character(len=ic_long):: file        !< file to read/write
+     character(len=ic_med) :: loc         !< location setting, src or dst model
+     character(len=ic_med) :: opt         !< optimization setting, bfb, sum, or opt
+     character(len=ic_med) :: optval      !< mct map setting, src or dst, derived from opt
+     logical               :: init        !< flag indicating initialization complete
+     integer(kind=ip_i4_p) :: spart       !< src partition
+     integer(kind=ip_i4_p) :: dpart       !< dst partition
+     logical               :: AVred       !< flag indicating AV_ms, AV_md data has been read
+     type(mct_aVect)       :: AV_ms       !< stores data for CONSERV for src such as mask and area
+     type(mct_aVect)       :: AV_md       !< stores data for CONSERV for dst such as mask and area
   end type prism_mapper_type
 
-  integer(kind=ip_i4_p),public,parameter :: prism_coupler_avsmax=5
+  integer(kind=ip_i4_p),public,parameter :: prism_coupler_avsmax=5  !< maximum number of higher order terms in mapping
 
+  !> Coupler data for managing all aspects of coupling in OASIS
   type prism_coupler_type
      !--- fixed at initialization ---
-     type(mct_aVect)       :: aVect1   ! primary aVect
-     type(mct_aVect)       :: aVect1m  ! extra aVect needed for mapping
-     type(mct_aVect)       :: aVect2   ! aVects 2-5 handle higher order mapping
-     type(mct_aVect)       :: aVect3   ! 
-     type(mct_aVect)       :: aVect4   ! 
-     type(mct_aVect)       :: aVect5   ! 
-     logical               :: aVon(prism_coupler_avsmax)  ! flags indicating whether aVects 2-5 are active
-     character(len=ic_xl)  :: rstfile  ! restart file
-     character(len=ic_xl)  :: inpfile  ! restart file
-     character(len=ic_xl)  :: fldlist  ! field list
-     integer(kind=ip_i4_p) :: nflds    ! number of fields
-     integer(kind=ip_i4_p),pointer :: varid(:)    ! varid for each field
-     logical               :: valid    ! is this valid
-     integer(kind=ip_i4_p) :: namID    ! namcouple ID
-     integer(kind=ip_i4_p) :: partID   ! local variable partition ID
-     integer(kind=ip_i4_p) :: rpartID  ! router partition ID
-     integer(kind=ip_i4_p) :: routerID ! router ID
-     integer(kind=ip_i4_p) :: mapperID ! mapper ID
-     character(len=ic_med) :: maploc   ! map location: src,dst
-     integer(kind=ip_i4_p) :: ops      ! namcouple operation (ip_exported,...)
-     integer(kind=ip_i4_p) :: comp     ! other model compid
-     integer(kind=ip_i4_p) :: tag      ! comm tag
-     integer(kind=ip_i4_p) :: seq      ! sequence number
-     integer(kind=ip_i4_p) :: dt       ! coupling period (secs)
-     integer(kind=ip_i4_p) :: lag      ! put lag += put sooner (secs)
-     integer(kind=ip_i4_p) :: maxtime  ! max time for the coupler
-     integer(kind=ip_i4_p) :: trans    ! transformation (ip_average,...)
-     integer(kind=ip_i4_p) :: conserv  ! conserve operation (ip_cnone,ip_cglobal,...)
-     character(len=ic_med) :: consopt  ! conserve option (bfb, opt)
-     integer(kind=ip_i4_p) :: getput   ! get/put flag
-     logical               :: sndrcv   ! send recv flag
-     logical               :: output   ! output flag
-     logical               :: input    ! input flag
-     logical               :: snddiag  ! diagnose src fields as part of coupling
-     logical               :: rcvdiag  ! diagnose rcv fields as part of coupling
-     real(kind=ip_double_p):: sndmult  ! field multiplier term
-     real(kind=ip_double_p):: sndadd   ! field addition term
-     real(kind=ip_double_p):: rcvmult  ! field multiplier term
-     real(kind=ip_double_p):: rcvadd   ! field addition term
+     type(mct_aVect)       :: aVect1   !< primary aVect
+     type(mct_aVect)       :: aVect1m  !< extra aVect needed for mapping
+     type(mct_aVect)       :: aVect2   !< higher order mapping data
+     type(mct_aVect)       :: aVect3   !< higher order mapping data
+     type(mct_aVect)       :: aVect4   !< higher order mapping data
+     type(mct_aVect)       :: aVect5   !< higher order mapping data
+     logical               :: aVon(prism_coupler_avsmax)  !< flags indicating whether aVects 2-5 are active
+     character(len=ic_xl)  :: rstfile  !< restart file
+     character(len=ic_xl)  :: inpfile  !< input file if data is read
+     character(len=ic_xl)  :: fldlist  !< field list
+     integer(kind=ip_i4_p) :: nflds    !< number of fields
+     integer(kind=ip_i4_p),pointer :: varid(:)    !< varid for each field
+     logical               :: valid    !< is this coupler valid
+     integer(kind=ip_i4_p) :: namID    !< namcouple ID
+     integer(kind=ip_i4_p) :: partID   !< local variable partition ID
+     integer(kind=ip_i4_p) :: rpartID  !< router partition ID
+     integer(kind=ip_i4_p) :: routerID !< router ID
+     integer(kind=ip_i4_p) :: mapperID !< mapper ID
+     character(len=ic_med) :: maploc   !< map location setting, src or dst
+     integer(kind=ip_i4_p) :: ops      !< namcouple operation (ip_exported,...)
+     integer(kind=ip_i4_p) :: comp     !< other model compid to couple
+     integer(kind=ip_i4_p) :: tag      !< communcation tag
+     integer(kind=ip_i4_p) :: seq      !< sequence number
+     integer(kind=ip_i4_p) :: dt       !< coupling period (secs)
+     integer(kind=ip_i4_p) :: lag      !< put lag positive is put sooner (secs)
+     integer(kind=ip_i4_p) :: maxtime  !< max time for the coupler
+     integer(kind=ip_i4_p) :: trans    !< transformation (ip_average,...)
+     integer(kind=ip_i4_p) :: conserv  !< conserve operation (ip_cnone,ip_cglobal,...)
+     character(len=ic_med) :: consopt  !< conserve option (bfb, opt)
+     integer(kind=ip_i4_p) :: getput   !< get/put flag
+     logical               :: sndrcv   !< send recv flag
+     logical               :: output   !< output flag
+     logical               :: input    !< input flag
+     logical               :: snddiag  !< diagnose src fields as part of coupling
+     logical               :: rcvdiag  !< diagnose rcv fields as part of coupling
+     real(kind=ip_double_p):: sndmult  !< send field multiplier term
+     real(kind=ip_double_p):: sndadd   !< send field addition term
+     real(kind=ip_double_p):: rcvmult  !< receive field multiplier term
+     real(kind=ip_double_p):: rcvadd   !< receive field addition term
      !--- time varying info ---
-     integer(kind=ip_i4_p) :: ltime    ! time at last coupling
-     integer(kind=ip_i4_p),pointer :: avcnt(:)  ! counter for averaging
-     integer(kind=ip_i4_p),pointer :: status(:) ! status of variables in coupler
+     integer(kind=ip_i4_p) :: ltime    !< time at last coupling
+     integer(kind=ip_i4_p),pointer :: avcnt(:)  !< counter for averaging
+     integer(kind=ip_i4_p),pointer :: status(:) !< status of variables in coupler
   end type prism_coupler_type
 
-  integer(kind=ip_i4_p)           :: prism_mrouter   ! max routers
-  integer(kind=ip_i4_p)           :: prism_nrouter = 0
-  type(prism_router_type) ,public, pointer:: prism_router(:)
+  integer(kind=ip_i4_p)           :: prism_mrouter   !< max routers
+  integer(kind=ip_i4_p)           :: prism_nrouter = 0  !< router counter
+  type(prism_router_type) ,public, pointer:: prism_router(:)  !< prism_router array
 
-  integer(kind=ip_i4_p)           :: prism_mmapper   ! max mappers
-  integer(kind=ip_i4_p)           :: prism_nmapper = 0
-  type(prism_mapper_type) ,public, pointer :: prism_mapper(:)
+  integer(kind=ip_i4_p)           :: prism_mmapper   !< max mappers
+  integer(kind=ip_i4_p)           :: prism_nmapper = 0  !< mapper counter
+  type(prism_mapper_type) ,public, pointer :: prism_mapper(:)  !< prism_mapper array
 
-  integer(kind=ip_i4_p)   ,public :: prism_mcoupler   ! max couplers
-  type(prism_coupler_type),public, pointer :: prism_coupler_put(:)
-  type(prism_coupler_type),public, pointer :: prism_coupler_get(:)
+  integer(kind=ip_i4_p)   ,public :: prism_mcoupler  !< max couplers
+  type(prism_coupler_type),public, pointer :: prism_coupler_put(:)  !< prism_coupler put array
+  type(prism_coupler_type),public, pointer :: prism_coupler_get(:)  !< prism_coupler get array
 
-  integer(kind=ip_i4_p)   ,public :: lcouplerid    ! last coupler id
-  integer(kind=ip_i4_p)   ,public :: lcouplertime  ! last coupler time 
-  integer(kind=ip_i4_p)   ,public :: lastseq       ! last coupler sequence
-  integer(kind=ip_i4_p)   ,public :: lastseqtime   ! last coupler sequence time
+  integer(kind=ip_i4_p)   ,public :: lcouplerid    !< last coupler id
+  integer(kind=ip_i4_p)   ,public :: lcouplertime  !< last coupler time 
+  integer(kind=ip_i4_p)   ,public :: lastseq       !< last coupler sequence
+  integer(kind=ip_i4_p)   ,public :: lastseqtime   !< last coupler sequence time
 
 
 !#include <netcdf.inc>
@@ -124,6 +130,12 @@ MODULE mod_oasis_coupler
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
+
+!> Main routine to setup couplers
+
+!> This routine initializes all the coupler data based on the namcouple
+!> inputs and the calls into the OASIS initialization interfaces from models.
+!> It reconciles everything.  This is called from oasis_enddef.
 
   SUBROUTINE oasis_coupler_setup()
 
@@ -193,18 +205,16 @@ CONTAINS
 
   !----------------------------------------------------------
 
-  !----------------------------------------------------------
-  ! Figure out the global rank of each model's root
-  !----------------------------------------------------------
-
   call oasis_debug_enter(subname)
   call oasis_mpi_barrier(mpi_comm_global)
   call oasis_timer_start('cpl_setup')
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
 
-  ! allocate prism_router, prism_mapper, prism_coupler based on nnamcpl
+  !-----------------------------------------
+  !> * Allocate and zero prism_router, prism_mapper, prism_coupler based on nnamcpl
   ! there cannot be more than that needed
+  !-----------------------------------------
 
   call oasis_debug_note(subname//' set defaults for datatypes')
 
@@ -280,7 +290,9 @@ CONTAINS
   lastseqtime  = ispval
 
   !----------------------------------------------------------
-  ! Share model variable information across all models
+  !> * Generate model variable lists across all models based on def_var calls.
+  !> These will be reconciled with the namcouple input.  These are sorted
+  !> to improve search performance later.
   !----------------------------------------------------------
 
   call oasis_debug_note(subname//' share var info between models')
@@ -391,7 +403,7 @@ CONTAINS
   deallocate(sortkey)
 
   !----------------------------------------------------------
-  ! Setup couplers based on namcouple and model variable info
+  !> * Setup couplers based on namcouple and model variable info.
   ! These must be paired up consistently, create couplers in
   ! sorted order (nns)
   ! nn = namcpl counter, sorted
@@ -403,7 +415,7 @@ CONTAINS
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n1')
 
   !--------------------------------
-  ! preprocess namcouple strings
+  !> * Preprocess namcouple strings and sort for faster searches
   !--------------------------------
 
   ! count namcouple field names
@@ -613,23 +625,19 @@ CONTAINS
 
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n2')
 
-  !--------------------------------
-  ! for all namcoupler input
-  !--------------------------------
-
   call oasis_debug_note(subname//' compare vars and namcouple')
   call oasis_debug_note(subname//' setup couplers')
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n3')
 
   !--------------------------------
-  ! for all my variables
+  !> * Loop over all my model variables
   !--------------------------------
 
   do nv1 = 1,prism_nvar
 
      !--------------------------------
-     ! get my parition and fld
+     !>   * Get parition and field information
      !--------------------------------
 
      part1  = prism_var(nv1)%part
@@ -642,7 +650,7 @@ CONTAINS
      ENDIF
 
      !--------------------------------
-     ! check if i'm an In or Out variable and then find namcouple matches
+     !>   * Check if variable is In or Out and then find namcouple matches
      !--------------------------------
 
      if (local_timers_on) call oasis_timer_start('cpl_setup_n3a')
@@ -653,6 +661,9 @@ CONTAINS
      endif
      if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3a')
 
+     !--------------------------------
+     !>   * Loop over the namcouple matches
+     !--------------------------------
      do nf = ifind,ifind+nfind-1
         if (local_timers_on) call oasis_timer_start('cpl_setup_n3b')
 
@@ -687,7 +698,7 @@ CONTAINS
            if (local_timers_on) call oasis_timer_start('cpl_setup_n3c')
 
            !--------------------------------
-           ! migrate namcouple info into part
+           !>     * Migrate namcouple info into part
            !--------------------------------
 
            IF (OASIS_debug >= 20) THEN
@@ -711,7 +722,7 @@ CONTAINS
            endif
 
            !--------------------------------
-           ! make sure it's either an In or Out, sanity check
+           !>     * Make sure it's either an In or Out, sanity check
            !--------------------------------
 
            if (flag /= OASIS_In .and. flag /= OASIS_Out) then
@@ -726,7 +737,7 @@ CONTAINS
            endif
 
            !--------------------------------
-           ! determine matching field name
+           !>     * Determine matching field name from namcouple
            !--------------------------------
 
            if (local_timers_on) call oasis_timer_start('cpl_setup_n3c1')
@@ -745,7 +756,7 @@ CONTAINS
            ENDIF
 
            !--------------------------------
-           ! look for namcouple coupling variable in all other model variables
+           !>     * Search for list of models with other variable
            !--------------------------------
 
            if (local_timers_on) call oasis_timer_start('cpl_setup_n3c2')
@@ -753,6 +764,9 @@ CONTAINS
            if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c2')
            if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c')
 
+           !--------------------------------
+           !>     * Loop over those other matching variable names
+           !--------------------------------
            found = .false.
            do nvf = ifind, ifind+nfind-1
 
@@ -793,9 +807,8 @@ CONTAINS
               endif
 
               !--------------------------------
-              ! Do not allow src and dst to be on same model for communication
-              ! Make sure one side is In and other side is Out for communication
-              ! If input or output, field name should match
+              !>       * Check that one side is In and other side is Out for communication
+              !>       * Check if input or output, field name should match on both sides.
               !--------------------------------
 
               if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
@@ -841,7 +854,7 @@ CONTAINS
               if (flag == OASIS_In)  pcpointer => prism_coupler_get(nc)
 
               !--------------------------------
-              ! prism_coupler fields, multiple field support
+              !>       * Generate field list, multiple field support
               !--------------------------------
 
               IF (OASIS_debug >= 20) THEN
@@ -868,7 +881,7 @@ CONTAINS
               pcpointer%varid(pcpointer%nflds) = nv1
 
               !--------------------------------
-              ! add this coupler to list of prism_var couplers
+              !>       * Add this coupler to list of prism_var couplers
               !--------------------------------
 
               prism_var(nv1)%ncpl = prism_var(nv1)%ncpl + 1
@@ -881,8 +894,8 @@ CONTAINS
 
               !--------------------------------
               ! prism_coupler settings
-              ! if already initialized (valid) then check consistency
-              ! otherwise initialize pcpointer
+              !>       * Copy namcouple settings into this coupler or
+              !>       check that coupler is consistent with prior setting
               !--------------------------------
 
               if (pcpointer%valid) then
@@ -928,7 +941,7 @@ CONTAINS
                  pcpointer%rcvdiag= namchecko(nn)
 
                  !--------------------------------
-                 ! prism_coupler input and output flags
+                 !>       * Set prism_coupler input and output flags
                  ! prism_coupler comm flags, need for tags to match up on both sides
                  ! tags assume up to 1000 namcouple inputs and 100 models
                  !--------------------------------
@@ -957,7 +970,7 @@ CONTAINS
                        pcpointer%getput = OASIS3_GET
                     endif
                     !--------------------------------
-                    ! prism_coupler router
+                    !>       * Setup prism_coupler router
                     ! cannot reuse router because don't really know what's on the other side
                     ! if router is already set for the coupler, then fine, otherwise, set new router
                     !--------------------------------
@@ -973,7 +986,7 @@ CONTAINS
                  endif
 
                  !--------------------------------
-                 ! prism_coupler mapper
+                 !>       * Setup prism_coupler mapper
                  !--------------------------------
 
                  IF (OASIS_debug >= 20) THEN
@@ -998,8 +1011,8 @@ CONTAINS
                     if ((flag == OASIS_In  .and. trim(nammaploc(nn)) == 'dst') .or. &
                         (flag == OASIS_Out .and. trim(nammaploc(nn)) == 'src')) then
                        !--------------------------------
-                       ! try to reuse mapper already defined
-                       ! must match mapping file and partition
+                       !>       * Try to reuse mapper already defined,
+                       !>       must match mapping file and partition
                        !--------------------------------
                        mapID = -1
                        do n = 1,prism_nmapper
@@ -1011,7 +1024,7 @@ CONTAINS
                           endif
                        enddo
                        !--------------------------------
-                       ! or will need a new mapper
+                       !>       * Or get ready to initialize a new mapper
                        !--------------------------------
                        if (mapID < 1) then
                           prism_nmapper = prism_nmapper + 1
@@ -1095,10 +1108,14 @@ CONTAINS
   endif
 
   !----------------------------------------------------------
-  ! Initialize coupling infrastructure based on couplers above
+  !> * Initialize coupling infrastructure based on initial coupler setup above
   !----------------------------------------------------------
 
   call oasis_debug_note(subname//' initialize coupling datatypes')
+
+  !----------------------------------------------------------
+  !> * Loop over all couplers
+  !----------------------------------------------------------
 
   do nc = 1,prism_mcoupler
   do npc = 1,2
@@ -1130,7 +1147,7 @@ CONTAINS
      endif
 
      !--------------------------------
-     ! initialize avect1
+     !>   * Initialize avect1 which stores the get/put data
      !--------------------------------
 
      gsize = mct_gsmap_gsize(prism_part(part1)%gsmap)
@@ -1156,7 +1173,7 @@ CONTAINS
      endif
 
      !--------------------------------
-     ! compute nflds for this coupling and initialize avcnt and status
+     !>   * Compute nflds for this coupling and initialize avcnt and status
      !--------------------------------
 
      pcpointer%nflds = mct_aVect_nRAttr(pcpointer%avect1)
@@ -1167,7 +1184,7 @@ CONTAINS
      if (pcpointer%getput == OASIS3_GET) pcpointer%status = OASIS_COMM_READY
 
      !--------------------------------
-     ! initialize mapper
+     !>   * Initialize the mapper data
      !--------------------------------
 
      if (mapID > 0) then
@@ -1332,7 +1349,7 @@ CONTAINS
         endif  ! map init
 
         !--------------------------------
-        ! read mapper mask and area if not already done
+        !>   * Read mapper mask and area if not already done
         !--------------------------------
         if (.not.prism_mapper(mapID)%AVred .and. pcpointer%conserv /= ip_cnone) then
            ! initialize and load AV_ms and AV_md
@@ -1378,7 +1395,7 @@ CONTAINS
         endif
 
         !--------------------------------
-        ! initialize avect1m
+        !>   * Initialize avect1m, the data in avect1 mapped to another grid
         !--------------------------------
 
         lsize = mct_gsmap_lsize(prism_part(part2)%gsmap,mpi_comm_local)
@@ -1417,7 +1434,7 @@ CONTAINS
      endif  ! no mapper
 
      !--------------------------------
-     ! initialize router based on rpartID
+     !>   * Initialize router based on rpartID
      !--------------------------------
 
      if (pcpointer%sndrcv) then
@@ -1509,7 +1526,7 @@ CONTAINS
   enddo   ! prism_mcoupler
 
   !----------------------------------------------------------
-  ! Diagnostics
+  !> * Diagnostics for all couplers
   !----------------------------------------------------------
 
   if (OASIS_debug >= 2) then
@@ -1540,12 +1557,15 @@ CONTAINS
   END SUBROUTINE oasis_coupler_setup
 
 !------------------------------------------------------------
+
+!> Print routine for oasis_couplers
+
   SUBROUTINE oasis_coupler_print(cplid,pcprint)
 
   IMPLICIT NONE
 
-  integer(ip_i4_p), intent(in) :: cplid
-  type(prism_coupler_type), intent(in) :: pcprint
+  integer(ip_i4_p),         intent(in) :: cplid   !< coupler id
+  type(prism_coupler_type), intent(in) :: pcprint !< specific prism_coupler
   !----------------------------------------------------------
   integer(ip_i4_p) :: mapid, rouid, parid, namid, nflds, rpard
   integer(ip_i4_p) :: spart,dpart
@@ -1630,12 +1650,19 @@ CONTAINS
   END SUBROUTINE oasis_coupler_print
 
 !------------------------------------------------------------
+
+!> Routine to generate a mapping data via a direct SCRIP call
+
+!> This routine reads in grid data from files and passes that data
+!> to SCRIP.  Mapping weights are generated and written to a file.
+!> This entire operation is done on a single task.
+
   SUBROUTINE oasis_coupler_genmap(mapid,namid)
 
   IMPLICIT NONE
 
-  integer(ip_i4_p), intent(in) :: mapid
-  integer(ip_i4_p), intent(in) :: namid
+  integer(ip_i4_p), intent(in) :: mapid  !< map id
+  integer(ip_i4_p), intent(in) :: namid  !< namcouple id
   !----------------------------------------------------------
 
   integer(ip_i4_p)              :: src_size,src_rank, ncrn_src
@@ -1886,33 +1913,38 @@ CONTAINS
 !------------------------------------------------------------
 
 !BOP ===========================================================================
+!> Read in mapping matrix data from a SCRIP netCDF file
 !
 ! !IROUTINE:  oasis_coupler_sMatReaddnc - Do a distributed read of a NetCDF SCRIP file and
 !                                return weights in a distributed SparseMatrix
 !
 ! !DESCRIPTION: 
-!     Read in mapping matrix data from a SCRIP netCDF data file using
-!     a low memory method and then scatter to all pes.  Based on 
-!     oasis_coupler_sMatReaddnc from CESM1.0.3
-!
+!>     Read in mapping matrix data from a SCRIP netCDF data file using
+!>     a low memory method and then scatter to all pes.  Based on 
+!>     the sMatReaddnc method from CESM1.0.3.
+!>
 ! !REMARKS:
-!   This routine leverages gsmaps to determine scatter pattern
-!   The scatter is implemented as a bcast of all weights then a local
-!     computation on each pe to determine with weights to keep based
-!     on gsmap information.
-!   The algorithm to determine whether a weight belongs on a pe involves
-!     creating a couple local arrays (lsstart and lscount) which are
-!     the local values of start and length from the gsmap.  these are
-!     sorted via a bubble sort and then searched via a binary search
-!     to check whether a global index is on the local pe.
-!   The local buffer sizes are estimated up front based on ngridcell/npes
-!     plus 20% (see 1.2 below).  If the local buffer size fills up, then
-!     the buffer is reallocated 50% large (see 1.5 below) and the fill
-!     continues.  The idea is to trade off memory reallocation and copy
-!     with memory usage.  1.2 and 1.5 are arbitary, other values may
-!     result in better performance.
-!   Once all the matrix weights have been read, the sMat is initialized,
-!     the values from the buffers are copied in, and everything is deallocated.
+!>   This routine leverages gsmaps to determine scatter pattern.
+!>
+!>   The scatter is implemented as a broadcast of all weights then a local
+!>     computation on each pe to determine with weights to keep based
+!>     on gsmap information.
+!>
+!>   The algorithm to determine whether a weight belongs on a pe involves
+!>     creating a couple local arrays (lsstart and lscount) which are
+!>     the local values of start and length from the gsmap.  These are
+!>     sorted via a bubble sort and then searched via a binary search
+!>     to check whether a global index is on the local pe.
+!>
+!>   The local buffer sizes are estimated up front based on ngridcell/npes
+!>     plus 20% (search for 1.2 below).  If the local buffer size fills up, then
+!>     the buffer is reallocated 50% larger (search for 1.5 below) and the fill
+!>     continues.  The idea is to trade off memory reallocation and copy
+!>     with memory usage.  1.2 and 1.5 are arbitary, other values may
+!>     result in better performance.
+!>
+!>   Once all the matrix weights have been read, the sMat is initialized,
+!>     the values from the buffers are copied in, and everything is deallocated.
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
@@ -1928,21 +1960,21 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   type(mct_sMat)  ,intent(out),pointer   :: sMat(:) ! mapping data
-   type(mct_gsMap) ,intent(in) ,target    :: SgsMap  ! src gsmap
-   type(mct_gSMap) ,intent(in) ,target    :: DgsMap  ! dst gsmap
-   character(*)    ,intent(in)            :: newdom  ! type of sMat (src or dst)
-        ! src = rearrange and map (bfb), dst = map and rearrange (partial sums)
-   character(*)    ,intent(in)            :: filename! netCDF file to read
-   integer(IN)     ,intent(in)            :: mytask   ! processor id
-   integer(IN)     ,intent(in)            :: mpicom  ! communicator
-   integer(IN)     ,intent(out)           :: nwgts   ! number of weights 
-   type(mct_Avect) ,intent(out), optional :: areasrc ! area of src grid from mapping file
-   type(mct_Avect) ,intent(out), optional :: areadst ! area of dst grid from mapping file
-   integer(IN)     ,intent(out), optional :: ni_i    ! number of lons on input grid   
-   integer(IN)     ,intent(out), optional :: nj_i    ! number of lats on input grid   
-   integer(IN)     ,intent(out), optional :: ni_o    ! number of lons on output grid   
-   integer(IN)     ,intent(out), optional :: nj_o    ! number of lats on output grid   
+   type(mct_sMat)  ,intent(out),pointer   :: sMat(:) !< mapping data
+   type(mct_gsMap) ,intent(in) ,target    :: SgsMap  !< src gsmap
+   type(mct_gSMap) ,intent(in) ,target    :: DgsMap  !< dst gsmap
+   character(*)    ,intent(in)            :: newdom  !< type of sMat (src or dst)
+        !< src = rearrange and map (bfb), dst = map and rearrange (partial sums)
+   character(*)    ,intent(in)            :: filename!< netCDF file to read
+   integer(IN)     ,intent(in)            :: mytask  !< processor id
+   integer(IN)     ,intent(in)            :: mpicom  !< mpi communicator
+   integer(IN)     ,intent(out)           :: nwgts   !< number of weights 
+   type(mct_Avect) ,intent(out), optional :: areasrc !< area of src grid from mapping file
+   type(mct_Avect) ,intent(out), optional :: areadst !< area of dst grid from mapping file
+   integer(IN)     ,intent(out), optional :: ni_i    !< number of lons on input grid   
+   integer(IN)     ,intent(out), optional :: nj_i    !< number of lats on input grid   
+   integer(IN)     ,intent(out), optional :: ni_o    !< number of lons on output grid   
+   integer(IN)     ,intent(out), optional :: nj_o    !< number of lats on output grid   
 
 ! !EOP
 
@@ -2019,7 +2051,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (OASIS_debug >= 2) write(nulprt,*) subname," reading mapping matrix data decomposed..."
 
    !----------------------------------------------------------------------------
-   ! open & read the file
+   !> * Open and read the file SCRIP weights size on the root task
    !----------------------------------------------------------------------------
    if (OASIS_debug >=2 ) write(nulprt,*) subname," * file name                  : ",trim(fileName)
    status = nf90_open(trim(filename),NF90_NOWRITE,fid)
@@ -2066,7 +2098,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
  endif
  
-   !--- read and load area_a ---
+   !----------------------------------------------------------------------------
+   !> * Read and load area_a on root task
+   !----------------------------------------------------------------------------
    if (present(areasrc)) then
    if (mytask == 0) then
       call mct_aVect_init(areasrc0,' ',areaAV_field,na)
@@ -2097,7 +2131,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    end if
    end if
 
-   !--- read and load area_b ---
+   !----------------------------------------------------------------------------
+   !> * Read and load area_b on root task
+   !----------------------------------------------------------------------------
    if (present(areadst)) then
    if (mytask == 0) then
       call mct_aVect_init(areadst0,' ',areaAV_field,nb)
@@ -2128,6 +2164,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    endif
    endif
 
+   !----------------------------------------------------------------------------
+   !> * Broadcast ni and nj if requested
+   !----------------------------------------------------------------------------
    if (present(ni_i) .and. present(nj_i) .and. present(ni_o) .and. present(nj_o)) then
       call oasis_mpi_bcast(ni_i,mpicom,subName//" MPI in ni_i bcast")
       call oasis_mpi_bcast(nj_i,mpicom,subName//" MPI in nj_i bcast")
@@ -2135,6 +2174,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call oasis_mpi_bcast(nj_o,mpicom,subName//" MPI in nj_o bcast")
    end if
 
+   !----------------------------------------------------------------------------
+   !> * Broadcast array sizes and allocate arrays for local storage
+   !----------------------------------------------------------------------------
    call oasis_mpi_bcast(ns,mpicom,subName//" MPI in ns bcast")
    call oasis_mpi_bcast(na,mpicom,subName//" MPI in na bcast")
    call oasis_mpi_bcast(nb,mpicom,subName//" MPI in nb bcast")
@@ -2158,6 +2200,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    allocate(lsstart(lsize),lscount(lsize),stat=status)
    if (status /= 0) call mct_perr_die(subName,':: allocate Lsstart',status)
 
+   !----------------------------------------------------------------------------
+   !> * Initialize lsstart and lscount, the sorted list of local indices
+   !----------------------------------------------------------------------------
    lsize = 0
    do n = 1,size(mygsmap%start)
       if (mygsmap%pe_loc(n) == mytask) then  ! on my pe
@@ -2186,6 +2231,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       endif
    enddo
 
+   !----------------------------------------------------------------------------
+   !> * Compute the number of chunks to read, read size is rbuf_size
+   !----------------------------------------------------------------------------
    rsize = min(rbuf_size,ns)                     ! size of i/o chunks
    bsize = ((ns/commsize) + 1 ) * 1.2   ! local temporary buffer size
    if (ns == 0) then
@@ -2194,6 +2242,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       nread = (ns-1)/rsize + 1                      ! num of reads to do
    endif
 
+   !----------------------------------------------------------------------------
+   !> * Allocate arrays for local weights plus row and column indices
+   !----------------------------------------------------------------------------
    if (mytask == 0) then
       allocate(remaps(nwgts,rsize),stat=status)
       if (status /= 0) call mct_perr_die(subName,':: allocate remaps',status)
@@ -2205,6 +2256,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    allocate(Snew(nwgts,bsize),Cnew(bsize),Rnew(bsize),stat=status)
    if (status /= 0) call mct_perr_die(subName,':: allocate Snew1',status)
 
+   !----------------------------------------------------------------------------
+   !> * Loop over the chunks of weights data
+   !----------------------------------------------------------------------------
    cnt = 0
    do n = 1,nread
       start(1) = (n-1)*rsize + 1
@@ -2214,7 +2268,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       start2(2) = start(1)
       count2(2) = count(1)
 
-      !--- read data on root pe
+      !----------------------------------------------------------------------------
+      !>   * Read chunk of data on root pe
+      !----------------------------------------------------------------------------
       if (mytask== 0) then
 !        status = nf90_inq_varid      (fid,'S'  ,vid)
          status = nf90_inq_varid      (fid,'remap_matrix'  ,vid)
@@ -2245,13 +2301,18 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
              CALL oasis_flush(nulprt)
          ENDIF
       endif
+ 
+      !----------------------------------------------------------------------------
+      !>   * Broadcast S, row, col to all tasks
+      !----------------------------------------------------------------------------
 
-      !--- send S, row, col to all pes
       call oasis_mpi_bcast(Sbuf,mpicom,subName//" MPI in Sbuf bcast")
       call oasis_mpi_bcast(Rbuf,mpicom,subName//" MPI in Rbuf bcast")
       call oasis_mpi_bcast(Cbuf,mpicom,subName//" MPI in Cbuf bcast")
 
-      !--- now each pe keeps what it should
+      !----------------------------------------------------------------------------
+      !>   * Each task keeps only the data required
+      !----------------------------------------------------------------------------
       do m = 1,count(1)
          !--- should this weight be on my pe
          if (newdom == 'src') then
@@ -2264,7 +2325,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
             cntold = cnt
             cnt = cnt + 1
 
-            !--- new arrays need to be bigger
+            !----------------------------------------------------------------------------
+            !>   * Reallocate local weights arrays if they need to be bigger
+            !----------------------------------------------------------------------------
             if (cnt > bsize) then
                !--- allocate old arrays and copy new into old
                allocate(Sold(1:nwgts,cntold),Rold(cntold),Cold(cntold),stat=status)
@@ -2296,6 +2359,9 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       enddo  ! count
    enddo   ! nread
 
+   !----------------------------------------------------------------------------
+   !> * Clean up arrays
+   !----------------------------------------------------------------------------
    if (mytask == 0) then
       deallocate(remaps, stat=status)
       if (status /= 0) call mct_perr_die(subName,':: deallocate remaps',status)
@@ -2304,7 +2370,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    if (status /= 0) call mct_perr_die(subName,':: deallocate Sbuf',status)
 
    !----------------------------------------------------------------------------
-   ! init the mct sMat data type
+   !> * Initialize the mct sMat data type
    !----------------------------------------------------------------------------
    ! mct_sMat_init must be given the number of rows and columns that
    ! would be in the full matrix.  Nrows= size of output vector=nb.
@@ -2324,6 +2390,10 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       sMat(n)%data%iAttr(igcol,1:cnt) = Cnew(1:cnt)
    enddo
    endif
+
+   !----------------------------------------------------------------------------
+   !> * More clean up
+   !----------------------------------------------------------------------------
    deallocate(Snew,Rnew,Cnew, stat=status)
    deallocate(lsstart,lscount,stat=status)
    if (status /= 0) call mct_perr_die(subName,':: deallocate new',status)
@@ -2343,7 +2413,7 @@ end subroutine oasis_coupler_sMatReaddnc
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
-! !IROUTINE:  cplsort - sort a character array and associated field
+!> Sort a character array using a sort key.
 !
 ! !DESCRIPTION: 
 !     Sort a character array and the associated array(s) based on a
@@ -2362,9 +2432,9 @@ subroutine cplsort(num, fld, sortkey)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(IN),intent(in) :: num       ! size of array
-   character(len=CL),intent(inout) :: fld(:)     ! sort field
-   integer(IN)      ,intent(inout) :: sortkey(:) ! sortkey
+   integer(IN),      intent(in)    :: num        !< size of array
+   character(len=CL),intent(inout) :: fld(:)     !< sort field
+   integer(IN)      ,intent(inout) :: sortkey(:) !< sortkey
 
 ! !EOP
 
@@ -2396,7 +2466,7 @@ end subroutine cplsort
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
-! !IROUTINE:  cplsortkey - sort a character array and associated field
+!> Sort an integer array using a sort key.
 !
 ! !DESCRIPTION: 
 !     Rearrange and integer array based on an input sortkey
@@ -2414,9 +2484,9 @@ subroutine cplsortkey(num, arr, sortkey)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(IN),intent(in) :: num       ! size of array
-   integer(IN),intent(inout) :: arr(:)     ! field to sort
-   integer(IN),intent(in)    :: sortkey(:) ! sortkey
+   integer(IN),intent(in)    :: num        !< size of array
+   integer(IN),intent(inout) :: arr(:)     !< field to sort
+   integer(IN),intent(in)    :: sortkey(:) !< sortkey
 
 ! !EOP
 
@@ -2452,7 +2522,7 @@ end subroutine cplsortkey
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
-! !IROUTINE:  cplfind - sort a character array and associated field
+!> Search a character field list for a matching values 
 !
 ! !DESCRIPTION: 
 !     Sort a character array and the associated array(s) based on a
@@ -2471,11 +2541,11 @@ subroutine cplfind(num, fldlist, fld, ifind, nfind)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(IN),intent(in) :: num       ! size of array
-   character(len=CL),intent(in)  :: fldlist(:)  ! sorted field list
-   character(len=CL),intent(in)  :: fld         ! field to find
-   integer(IN)      ,intent(out) :: ifind       ! first match index
-   integer(IN)      ,intent(out) :: nfind       ! number that match
+   integer(IN),      intent(in)  :: num         !< size of array
+   character(len=CL),intent(in)  :: fldlist(:)  !< sorted field list
+   character(len=CL),intent(in)  :: fld         !< field to search for
+   integer(IN)      ,intent(out) :: ifind       !< first match index
+   integer(IN)      ,intent(out) :: nfind       !< number that match
 
 ! !EOP
 
@@ -2553,6 +2623,8 @@ end subroutine cplfind
 
 !------------------------------------------------------------
 
+!> Merge routine needed for mergesort
+
 subroutine Merge(A,X,NA,B,Y,NB,C,Z,NC)
  
    !--- local kinds ---
@@ -2597,6 +2669,8 @@ subroutine Merge(A,X,NA,B,Y,NB,C,Z,NC)
 end subroutine merge
 
 !------------------------------------------------------------
+
+!> Generic mergesort routine 
  
 recursive subroutine MergeSort(N,A,T,S,Z)
  
@@ -2648,7 +2722,11 @@ end subroutine MergeSort
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
-! !IROUTINE:  check_myindex - binary search for index in list
+!> Function that checks whether an index is part of a start and count list
+!
+!> Does a binary search on a sorted start and count list to determine
+!> whether index is a value in the list.  The list values consist of
+!> the values start(i):start(i)+count(i)-1 for all i.
 !
 ! !DESCRIPTION: 
 !     Do a binary search to see if a value is contained in a list of
@@ -2667,9 +2745,9 @@ logical function check_myindex(index,starti,counti)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(IN) :: index       ! is this index in start/count list
-   integer(IN) :: starti(:)   ! start list
-   integer(IN) :: counti(:)   ! count list
+   integer(IN) :: index       !< index to search
+   integer(IN) :: starti(:)   !< start list
+   integer(IN) :: counti(:)   !< count list
 
 ! !EOP
 

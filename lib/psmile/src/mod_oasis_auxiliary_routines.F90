@@ -1,3 +1,6 @@
+
+!> Auxiliary OASIS user interfaces
+
 MODULE mod_oasis_auxiliary_routines
 !---------------------------------------------------------------------
 
@@ -26,12 +29,16 @@ MODULE mod_oasis_auxiliary_routines
 !---------------------------------------------------------------------
   CONTAINS
 !---------------------------------------------------------------------
+
+!> Return the number of namcouple couplings for a variable
+
     SUBROUTINE oasis_get_ncpl(varid, ncpl, kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    INTEGER(kind=ip_i4_p) , INTENT(in)  :: varid
-    INTEGER(kind=ip_i4_p) , INTENT(out) :: ncpl, kinfo
+    INTEGER(kind=ip_i4_p) , INTENT(in)  :: varid   !< variable id
+    INTEGER(kind=ip_i4_p) , INTENT(out) :: ncpl    !< number of namcouple couplings
+    INTEGER(kind=ip_i4_p) , INTENT(out) :: kinfo   !< return code
     !-------------------------------------
     CHARACTER(len=ic_lvar)  :: vname
     CHARACTER(len=*),PARAMETER :: subname = 'oasis_get_ncpl'
@@ -72,13 +79,18 @@ MODULE mod_oasis_auxiliary_routines
     
   END SUBROUTINE oasis_get_ncpl
 !---------------------------------------------------------------------
+
+!> Returns the coupling periods for a given variable
+
   SUBROUTINE oasis_get_freqs(varid, mop, ncpl, cpl_freqs, kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    INTEGER(kind=ip_i4_p) , INTENT(in)  :: varid, ncpl
-    INTEGER(kind=ip_i4_p) , INTENT(in)  :: mop            ! OASIS_Out or OASIS_In
-    INTEGER(kind=ip_i4_p) , INTENT(out) :: cpl_freqs(ncpl), kinfo
+    INTEGER(kind=ip_i4_p) , INTENT(in)  :: varid          !< variable id
+    INTEGER(kind=ip_i4_p) , INTENT(in)  :: ncpl           !< number of namcouple couplings
+    INTEGER(kind=ip_i4_p) , INTENT(in)  :: mop            !< OASIS_Out or OASIS_In type
+    INTEGER(kind=ip_i4_p) , INTENT(out) :: cpl_freqs(ncpl)!< coupling period (sec)
+    INTEGER(kind=ip_i4_p) , INTENT(out) :: kinfo          !< return code
     !-------------------------------------
     CHARACTER(len=ic_lvar)  :: vname
     INTEGER(kind=ip_i4_p)   :: ncpl_calc, cplid, nc
@@ -145,12 +157,16 @@ MODULE mod_oasis_auxiliary_routines
 
   END SUBROUTINE oasis_get_freqs
 !---------------------------------------------------------------------
+
+!> Return kinfo code indicating type of action carried out for a variable at the specified time
+
   SUBROUTINE oasis_put_inquire(varid,msec,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in)  :: varid, msec
-    integer(kind=ip_i4_p) , intent(out) :: kinfo
+    integer(kind=ip_i4_p) , intent(in)  :: varid   !< variable id
+    integer(kind=ip_i4_p) , intent(in)  :: msec    !< model time in seconds
+    integer(kind=ip_i4_p) , intent(out) :: kinfo   !< return code
     !-------------------------------------
     character(len=ic_lvar)     :: vname
     INTEGER(kind=ip_i4_p)      :: ncpl, nc, cplid
@@ -334,7 +350,7 @@ MODULE mod_oasis_auxiliary_routines
       ENDIF
     ENDDO
 
-      CALL oasis_debug_exit(subname)
+    CALL oasis_debug_exit(subname)
 
     END SUBROUTINE oasis_put_inquire
 

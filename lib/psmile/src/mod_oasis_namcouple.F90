@@ -1,3 +1,12 @@
+
+!> Reads the namcouple file for use in OASIS
+
+!> This code reads in the namcouple file and sets several variables
+!> that are available to the rest of OASIS.  Some of this code
+!> is obsolete, and several input settings are deprecated.
+!> This code is based on the original Oasis3 version and
+!> will be rewritten at some point.
+
 MODULE mod_oasis_namcouple
 
 !     - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -17,56 +26,56 @@ MODULE mod_oasis_namcouple
 
 ! NAMCOUPLE PUBLIC DATA
 
-  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 ! max number of characters to be read 
-                                                         ! in each line of the file namcouple 
+  INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
+                                                         !< in each line of the file namcouple 
 
-  INTEGER(kind=ip_i4_p) ,public :: namnmodels   ! number of models
-  character(len=ic_lvar),public,pointer :: nammodnam(:)  ! model names
+  INTEGER(kind=ip_i4_p) ,public :: namnmodels   !< number of models
+  character(len=ic_lvar),public,pointer :: nammodnam(:)  !< model names
 
-  INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       ! number of namcouple inputs
-  INTEGER(kind=ip_i4_p)   ,public :: namruntim     ! namcouple runtime
-  INTEGER(kind=ip_i4_p)   ,public :: namlogprt     ! namcouple nlogprt value
-  INTEGER(kind=ip_i4_p)   ,public :: namtlogprt    ! namcouple ntlogprt value
+  INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
+  INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
+  INTEGER(kind=ip_i4_p)   ,public :: namlogprt     !< namcouple nlogprt value
+  INTEGER(kind=ip_i4_p)   ,public :: namtlogprt    !< namcouple ntlogprt value
  
-  character(len=jpeighty) ,public,pointer :: namsrcfld(:)  ! list of src fields
-  character(len=jpeighty) ,public,pointer :: namdstfld(:)  ! list of dst fields
-  character(len=ic_lvar)  ,public,pointer :: namsrcgrd(:)  ! src grid name
-  integer(kind=ip_i4_p)   ,public,pointer :: namsrc_nx(:)  ! src nx grid size
-  integer(kind=ip_i4_p)   ,public,pointer :: namsrc_ny(:)  ! src ny grid size
-  character(len=ic_lvar)  ,public,pointer :: namdstgrd(:)  ! dst grid name
-  integer(kind=ip_i4_p)   ,public,pointer :: namdst_nx(:)  ! dst nx grid size
-  integer(kind=ip_i4_p)   ,public,pointer :: namdst_ny(:)  ! dst ny grid size
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldseq(:)  ! SEQ value
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldops(:)  ! operation, ip_expout,...
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namflddti(:)  ! coupling period (secs)
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldlag(:)  ! coupling lag (secs)
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldtrn(:)  ! fields transform, ip_instant,...
-  integer(kind=ip_i4_p)   ,public,pointer :: namfldcon(:)  ! conserv fld operation
-  character(len=ic_med)   ,public,pointer :: namfldcoo(:)  ! conserv fld option (bfb, opt)
-  character(len=ic_long)  ,public,pointer :: nammapfil(:)  ! mapping file name
-  character(len=ic_med)   ,public,pointer :: nammaploc(:)  ! mapping location (src or dst pes)
-  character(len=ic_med)   ,public,pointer :: nammapopt(:)  ! mapping option (bfb, sum, or opt)
-  character(len=ic_med)   ,public,pointer :: namrstfil(:)  ! restart file name
-  character(len=ic_med)   ,public,pointer :: naminpfil(:)  ! input file name
-  logical                 ,public,pointer :: namchecki(:)  ! checkin flag
-  logical                 ,public,pointer :: namchecko(:)  ! checkout flag
-  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsmu(:)  ! src multiplier term
-  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsad(:)  ! src additive term
-  REAL (kind=ip_realwp_p) ,public,pointer :: namflddmu(:)  ! dst multipler term
-  REAL (kind=ip_realwp_p) ,public,pointer :: namflddad(:)  ! dst additive term
+  character(len=jpeighty) ,public,pointer :: namsrcfld(:)  !< list of src fields
+  character(len=jpeighty) ,public,pointer :: namdstfld(:)  !< list of dst fields
+  character(len=ic_lvar)  ,public,pointer :: namsrcgrd(:)  !< src grid name
+  integer(kind=ip_i4_p)   ,public,pointer :: namsrc_nx(:)  !< src nx grid size
+  integer(kind=ip_i4_p)   ,public,pointer :: namsrc_ny(:)  !< src ny grid size
+  character(len=ic_lvar)  ,public,pointer :: namdstgrd(:)  !< dst grid name
+  integer(kind=ip_i4_p)   ,public,pointer :: namdst_nx(:)  !< dst nx grid size
+  integer(kind=ip_i4_p)   ,public,pointer :: namdst_ny(:)  !< dst ny grid size
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldseq(:)  !< SEQ value
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldops(:)  !< operation, ip_expout,...
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namflddti(:)  !< coupling period (secs)
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldlag(:)  !< coupling lag (secs)
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namfldtrn(:)  !< fields transform, ip_instant,...
+  integer(kind=ip_i4_p)   ,public,pointer :: namfldcon(:)  !< conserv fld operation
+  character(len=ic_med)   ,public,pointer :: namfldcoo(:)  !< conserv fld option (bfb, opt)
+  character(len=ic_long)  ,public,pointer :: nammapfil(:)  !< mapping file name
+  character(len=ic_med)   ,public,pointer :: nammaploc(:)  !< mapping location (src or dst pes)
+  character(len=ic_med)   ,public,pointer :: nammapopt(:)  !< mapping option (bfb, sum, or opt)
+  character(len=ic_med)   ,public,pointer :: namrstfil(:)  !< restart file name
+  character(len=ic_med)   ,public,pointer :: naminpfil(:)  !< input file name
+  logical                 ,public,pointer :: namchecki(:)  !< checkin flag
+  logical                 ,public,pointer :: namchecko(:)  !< checkout flag
+  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsmu(:)  !< src multiplier term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namfldsad(:)  !< src additive term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namflddmu(:)  !< dst multipler term
+  REAL (kind=ip_realwp_p) ,public,pointer :: namflddad(:)  !< dst additive term
 
-  character(len=ic_med)   ,public,pointer :: namscrmet(:)  ! scrip method (CONSERV, DISTWGT, BILINEAR, BICUBIC, GAUSWGT)
-  character(len=ic_med)   ,public,pointer :: namscrnor(:)  ! scrip conserv normalization (FRACAREA, DESTAREA, FRACNNEI)
-  character(len=ic_med)   ,public,pointer :: namscrtyp(:)  ! scrip mapping type (SCALAR, VECTOR)
-  character(len=ic_med)   ,public,pointer :: namscrord(:)  ! scrip conserve order (FIRST, SECOND)
-  character(len=ic_med)   ,public,pointer :: namscrres(:)  ! scrip search restriction (LATLON, LATITUDE)
-  REAL (kind=ip_realwp_p) ,public,pointer :: namscrvam(:)  ! scrip gauss weight distance weighting for GAUSWGT
-  integer(kind=ip_i4_p)   ,public,pointer :: namscrnbr(:)  ! scrip number of neighbors for GAUSWGT and DISTWGT
-  integer(kind=ip_i4_p)   ,public,pointer :: namscrbin(:)  ! script number of search bins
+  character(len=ic_med)   ,public,pointer :: namscrmet(:)  !< scrip method (CONSERV, DISTWGT, BILINEAR, BICUBIC, GAUSWGT)
+  character(len=ic_med)   ,public,pointer :: namscrnor(:)  !< scrip conserv normalization (FRACAREA, DESTAREA, FRACNNEI)
+  character(len=ic_med)   ,public,pointer :: namscrtyp(:)  !< scrip mapping type (SCALAR, VECTOR)
+  character(len=ic_med)   ,public,pointer :: namscrord(:)  !< scrip conserve order (FIRST, SECOND)
+  character(len=ic_med)   ,public,pointer :: namscrres(:)  !< scrip search restriction (LATLON, LATITUDE)
+  REAL (kind=ip_realwp_p) ,public,pointer :: namscrvam(:)  !< scrip gauss weight distance weighting for GAUSWGT
+  integer(kind=ip_i4_p)   ,public,pointer :: namscrnbr(:)  !< scrip number of neighbors for GAUSWGT and DISTWGT
+  integer(kind=ip_i4_p)   ,public,pointer :: namscrbin(:)  !< script number of search bins
 
   !--- derived ---
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namsort2nn(:) ! sorted namcpl for sort, define nn order
-  INTEGER(kind=ip_i4_p)   ,public,pointer :: namnn2sort(:) ! sorted namcpl for nn, define sort number
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namsort2nn(:) !< sorted namcpl for sort, define nn order, computed later
+  INTEGER(kind=ip_i4_p)   ,public,pointer :: namnn2sort(:) !< sorted namcpl for nn, define sort number, computed later
 
 !----------------------------------------------------------------
 !   LOCAL ONLY BELOW HERE
@@ -248,6 +257,9 @@ MODULE mod_oasis_namcouple
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
+
+!> Reads the namcouple
+
   SUBROUTINE oasis_namcouple_init()
 
   IMPLICIT NONE

@@ -1,6 +1,7 @@
 
 SRCS1	= $(shell ls $(COUPLE)/lib/psmile/src/*.F90)
-OBJS1	= $(patsubst $(COUPLE)/lib/psmile/src/%.F90, %.o, $(SRCS1))
+OBJS0	= $(patsubst $(COUPLE)/lib/psmile/src/%.F90, %.o, $(SRCS1))
+OBJS1   = $(OBJS0) GPTLget_memusage.o
 
 VPATH 	= .:$(COUPLE)/lib/psmile/src:\
 	     $(COUPLE)/lib/psmile/include:\
@@ -31,6 +32,9 @@ INCLSC = -I$(COUPLE)/lib/psmile/include
 %.o: %.c
 	$(CC) $(CCFLAGS) $(INCLSC) -c   $<
 
+GPTLget_memusage.o: GPTLget_memusage.c
+	$(CC) $(CCFLAGS) -DHAVE_SLASHPROC -c   $<
+
 mod_psmile_io.o: mod_psmile_io.F90
 	$(F90) $(F90FLAGS) $(INCLS)  -c   $<
 
@@ -38,10 +42,12 @@ mod_psmile_io.o: mod_psmile_io.F90
 # ALL dependencies ...
 #
 
+GPTLget_memusage.o:
 mod_oasis_kinds.o: 
 mod_oasis_parameters.o: mod_oasis_kinds.o
 mod_oasis_data.o: mod_oasis_kinds.o 
 mod_oasis_sys.o: mod_oasis_kinds.o mod_oasis_data.o
+mod_oasis_mem.o: mod_oasis_kinds.o GPTLget_memusage.o mod_oasis_sys.o
 mod_oasis_mpi.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o
 mod_oasis_timer.o: mod_oasis_kinds.o mod_oasis_sys.o mod_oasis_mpi.o mod_oasis_data.o
 mod_oasis_string.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
@@ -60,14 +66,15 @@ mod_oasis_grid.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_io.o mod_oasis_part.o mod_oasis_mpi.o mod_oasis_timer.o
 mod_oasis_coupler.o: mod_oasis_kinds.o  mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_mpi.o mod_oasis_var.o mod_oasis_part.o  \
-        mod_oasis_string.o mod_oasis_namcouple.o mod_oasis_timer.o mod_oasis_io.o 
+        mod_oasis_string.o mod_oasis_namcouple.o mod_oasis_timer.o mod_oasis_io.o \
+        mod_oasis_mem.o
 mod_oasis_advance.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_var.o mod_oasis_part.o mod_oasis_mpi.o \
-        mod_oasis_coupler.o mod_oasis_timer.o mod_oasis_io.o
+        mod_oasis_coupler.o mod_oasis_timer.o mod_oasis_io.o mod_oasis_mem.o
 mod_oasis_method.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_coupler.o mod_oasis_namcouple.o \
         mod_oasis_timer.o mod_oasis_ioshr.o mod_oasis_advance.o mod_oasis_grid.o \
-        mod_oasis_mpi.o mod_oasis_part.o mod_oasis_var.o
+        mod_oasis_mpi.o mod_oasis_part.o mod_oasis_var.o mod_oasis_mem.o
 mod_oasis_getput_interface.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_var.o mod_oasis_advance.o
 mod_oasis_auxiliary_routines.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \

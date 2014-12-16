@@ -1,3 +1,6 @@
+
+!> OASIS send/receive (put/get) user interfaces
+
 MODULE mod_oasis_getput_interface
 !---------------------------------------------------------------------
 
@@ -19,6 +22,7 @@ MODULE mod_oasis_getput_interface
 
     integer(kind=ip_i4_p)     istatus(MPI_STATUS_SIZE)
 
+!> Generic overloaded interface for data put (send)
   interface oasis_put
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_put_r14
@@ -28,6 +32,7 @@ MODULE mod_oasis_getput_interface
      module procedure oasis_put_r28
   end interface
 
+!> Generic overloaded interface for data get (receive)
   interface oasis_get
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_get_r14
@@ -41,18 +46,22 @@ MODULE mod_oasis_getput_interface
 contains
 !---------------------------------------------------------------------
 #ifndef __NO_4BYTE_REALS
+
+!> Send 4 byte real 1D data
+
   SUBROUTINE oasis_put_r14(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p) :: fld1(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), optional :: fld2(:)
-    real(kind=ip_single_p), optional :: fld3(:)
-    real(kind=ip_single_p), optional :: fld4(:)
-    real(kind=ip_single_p), optional :: fld5(:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p)             :: fld1(:)     !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_single_p), optional :: fld2(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld3(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld4(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld5(:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
@@ -182,18 +191,22 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+
+!> Send 8 byte real 1D data
+
   SUBROUTINE oasis_put_r18(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p)             :: fld1(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), optional :: fld2(:)
-    real(kind=ip_double_p), optional :: fld3(:)
-    real(kind=ip_double_p), optional :: fld4(:)
-    real(kind=ip_double_p), optional :: fld5(:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p)             :: fld1(:)     !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_double_p), optional :: fld2(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld3(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld4(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld5(:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
@@ -322,18 +335,22 @@ contains
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
 #ifndef __NO_4BYTE_REALS
+
+!> Send 4 byte real 2D data
+
   SUBROUTINE oasis_put_r24(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p) :: fld1(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), optional :: fld2(:,:)
-    real(kind=ip_single_p), optional :: fld3(:,:)
-    real(kind=ip_single_p), optional :: fld4(:,:)
-    real(kind=ip_single_p), optional :: fld5(:,:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p) :: fld1(:,:)               !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_single_p), optional :: fld2(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld3(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld4(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld5(:,:)     !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
@@ -469,18 +486,22 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+
+!> Send 8 byte real 2D data
+
   SUBROUTINE oasis_put_r28(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p) :: fld1(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), optional :: fld2(:,:)
-    real(kind=ip_double_p), optional :: fld3(:,:)
-    real(kind=ip_double_p), optional :: fld4(:,:)
-    real(kind=ip_double_p), optional :: fld5(:,:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p) :: fld1(:,:)               !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_double_p), optional :: fld2(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld3(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld4(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld5(:,:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
@@ -616,13 +637,17 @@ contains
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
 #ifndef __NO_4BYTE_REALS 
+
+!> Receive 4 byte real 1D data
+
   SUBROUTINE oasis_get_r14(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: rd_field(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p), intent(inout) :: rd_field(:) !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
@@ -685,13 +710,17 @@ contains
 #endif
 
 !---------------------------------------------------------------------
+
+!> Receive 8 byte real 1D data
+
   SUBROUTINE oasis_get_r18(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: rd_field(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p), intent(inout) :: rd_field(:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
@@ -744,13 +773,17 @@ contains
 
 !---------------------------------------------------------------------
 #ifndef __NO_4BYTE_REALS
+
+!> Receive 4 byte real 2D data
+
   SUBROUTINE oasis_get_r24(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: rd_field(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p), intent(inout) :: rd_field(:,:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
@@ -815,13 +848,17 @@ contains
 #endif
 
 !---------------------------------------------------------------------
+
+!> Receive 8 byte real 2D data
+
   SUBROUTINE oasis_get_r28(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: rd_field(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p), intent(inout) :: rd_field(:,:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs

@@ -1,3 +1,11 @@
+
+!> OASIS grid data and methods
+
+!> These interfaces support both grid data specified globally on the root task
+!> as required in Oasis3 and grid data decomposed across tasks.  If grid data
+!> is decomposed across tasks, the optional partid argument must be specified
+!> when it exists in the interface.
+
 MODULE mod_oasis_grid
 !-----------------------------------------------------------------------
 ! BOP
@@ -46,7 +54,8 @@ MODULE mod_oasis_grid
   USE mod_oasis_io
   USE mod_oasis_sys
   USE mod_oasis_part
-  USE mod_oasis_mpi, only: oasis_mpi_min, oasis_mpi_max, oasis_mpi_bcast, oasis_mpi_barrier
+  USE mod_oasis_mpi, only: oasis_mpi_min, oasis_mpi_max, oasis_mpi_bcast, oasis_mpi_barrier, &
+                           oasis_mpi_chkerr
   USE mod_oasis_timer
   USE mct_mod
   
@@ -66,6 +75,7 @@ MODULE mod_oasis_grid
 
 #include "oasis_os.h"
 
+  !> Generic interface to support writing 4 or 8 byte reals
   interface oasis_write_grid
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_write_grid_r4
@@ -73,6 +83,7 @@ MODULE mod_oasis_grid
      module procedure oasis_write_grid_r8
   end interface
 
+  !> Generic interface to support writing 4 or 8 byte reals
   interface oasis_write_angle
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_write_angle_r4
@@ -80,6 +91,7 @@ MODULE mod_oasis_grid
      module procedure oasis_write_angle_r8
   end interface
 
+  !> Generic interface to support writing 4 or 8 byte reals
   interface oasis_write_corner
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_write_corner_r4
@@ -87,6 +99,7 @@ MODULE mod_oasis_grid
      module procedure oasis_write_corner_r8
   end interface
 
+  !> Generic interface to support writing 4 or 8 byte reals
   interface oasis_write_area
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_write_area_r4
@@ -95,35 +108,36 @@ MODULE mod_oasis_grid
   end interface
 
   !--- datatypes ---
-  public :: prism_grid_type
+  public :: prism_grid_type    !< Grid datatype
 
-  integer(kind=ip_intwp_p),parameter :: mgrid = 100
+  integer(kind=ip_intwp_p),parameter :: mgrid = 100  !< maximum number of grids allowed
   integer(kind=ip_intwp_p),save :: writing_grids_call=0
 
+  !> Model grid data for creating mapping data and conserving fields
   type prism_grid_type
-     character(len=ic_med)  :: gridname
-     integer(kind=ip_i4_p)  :: partid
-     integer(kind=ip_i4_p)  :: nx
-     integer(kind=ip_i4_p)  :: ny
-     integer(kind=ip_i4_p)  :: nc
-     logical                :: grid_set
-     logical                :: corner_set
-     logical                :: angle_set
-     logical                :: area_set
-     logical                :: mask_set
-     logical                :: written
-     logical                :: terminated
-     real(kind=ip_realwp_p),allocatable :: lon(:,:)     ! longitudes
-     real(kind=ip_realwp_p),allocatable :: lat(:,:)     ! latitudes
-     real(kind=ip_realwp_p),allocatable :: clon(:,:,:)  ! corner longitudes
-     real(kind=ip_realwp_p),allocatable :: clat(:,:,:)  ! corner latitudes
-     real(kind=ip_realwp_p),allocatable :: angle(:,:)   ! angle
-     real(kind=ip_realwp_p),allocatable :: area(:,:)    ! area
-     integer(kind=ip_i4_p) ,allocatable :: mask(:,:)    ! mask
+     character(len=ic_med)  :: gridname   !< grid name
+     integer(kind=ip_i4_p)  :: partid     !< partition ID
+     integer(kind=ip_i4_p)  :: nx         !< global nx size
+     integer(kind=ip_i4_p)  :: ny         !< global ny size
+     integer(kind=ip_i4_p)  :: nc         !< number of corners per gridcell
+     logical                :: grid_set   !< flag to track user calls for grid
+     logical                :: corner_set !< flag to track user calls for corner
+     logical                :: angle_set  !< flag to track user calls for angle
+     logical                :: area_set   !< flag to track user calls for area
+     logical                :: mask_set   !< flag to track user calls for mask
+     logical                :: written    !< flag to indicate grid has been written
+     logical                :: terminated !< flag to indicate user grid calls complete
+     real(kind=ip_realwp_p),allocatable :: lon(:,:)     !< user specified longitudes
+     real(kind=ip_realwp_p),allocatable :: lat(:,:)     !< user specified latitudes
+     real(kind=ip_realwp_p),allocatable :: clon(:,:,:)  !< user specified corner longitudes
+     real(kind=ip_realwp_p),allocatable :: clat(:,:,:)  !< user specified corner latitudes
+     real(kind=ip_realwp_p),allocatable :: angle(:,:)   !< user specified angle
+     real(kind=ip_realwp_p),allocatable :: area(:,:)    !< user specified area
+     integer(kind=ip_i4_p) ,allocatable :: mask(:,:)    !< user specified mask
   end type prism_grid_type
 
-  integer(kind=ip_intwp_p),public,save :: prism_ngrid = 0
-  type(prism_grid_type),public,save :: prism_grid(mgrid)
+  integer(kind=ip_intwp_p),public,save :: prism_ngrid = 0  !< counter for grids
+  type(prism_grid_type),public,save :: prism_grid(mgrid)   !< array of grid datatypes
 
 
 #ifdef use_netCDF
@@ -135,13 +149,10 @@ MODULE mod_oasis_grid
 CONTAINS
 
 !--------------------------------------------------------------------------
-    SUBROUTINE oasis_print_grid_data()
 
-    !-------------------------------------------------
-    ! Routine to start the grids writing. To syncronize access to the
-    ! grids file all component models have to wait for the starting 
-    ! message from OASIS (via MPI; see prism_init_comp_proto)
-    !-------------------------------------------------
+!> Print grid information to log file.
+
+    SUBROUTINE oasis_print_grid_data()
 
     implicit none
   
@@ -191,18 +202,15 @@ CONTAINS
   END SUBROUTINE oasis_print_grid_data
 
 !--------------------------------------------------------------------------
-    SUBROUTINE oasis_start_grids_writing(iwrite)
 
-    !-------------------------------------------------
-    ! Routine to start the grids writing. To syncronize access to the
-    ! grids file all component models have to wait for the starting 
-    ! message from OASIS (via MPI; see prism_init_comp_proto)
-    !-------------------------------------------------
+!> User interface to initialize grid writing
+
+    SUBROUTINE oasis_start_grids_writing(iwrite)
 
     implicit none
   
-    integer(kind=ip_intwp_p), intent (OUT) :: iwrite ! flag to state whether
-                                            ! grids file needs to be written
+    integer(kind=ip_intwp_p), intent (OUT) :: iwrite !< flag, obsolete
+
     !-------------------------------------------------
     character(len=*),parameter :: subname = '(oasis_start_grids_writing)'
     !-------------------------------------------------
@@ -235,6 +243,8 @@ CONTAINS
 
 !--------------------------------------------------------------------------
 
+!> User interface to set latitudes and longitudes for 8 byte reals
+
     SUBROUTINE oasis_write_grid_r8(cgrid, nx, ny, lon, lat, partid)
 
     !-------------------------------------------------
@@ -244,12 +254,12 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid      ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx         ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny         ! number of latitudes
-    real(kind=ip_double_p),   intent (in) :: lon(:,:)   ! longitudes
-    real(kind=ip_double_p),   intent (in) :: lat(:,:)   ! latitudes
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid      !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx         !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny         !< global ny size
+    real(kind=ip_double_p),   intent (in) :: lon(:,:)   !< longitudes
+    real(kind=ip_double_p),   intent (in) :: lat(:,:)   !< latitudes
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
@@ -300,6 +310,8 @@ CONTAINS
 
 !--------------------------------------------------------------------------
 
+!> User interface to set latitudes and longitudes for 4 byte reals
+
     SUBROUTINE oasis_write_grid_r4(cgrid, nx, ny, lon, lat, partid)
 
     !-------------------------------------------------
@@ -309,12 +321,12 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid      ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx         ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny         ! number of latitudes
-    real(kind=ip_single_p),   intent (in) :: lon(:,:)   ! longitudes
-    real(kind=ip_single_p),   intent (in) :: lat(:,:)   ! latitudes
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid      !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx         !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny         !< global ny size
+    real(kind=ip_single_p),   intent (in) :: lon(:,:)   !< longitudes
+    real(kind=ip_single_p),   intent (in) :: lat(:,:)   !< latitudes
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     real(kind=ip_double_p), allocatable :: lon8(:,:)
     real(kind=ip_double_p), allocatable :: lat8(:,:)
@@ -363,6 +375,9 @@ CONTAINS
   END SUBROUTINE oasis_write_grid_r4
 
 !--------------------------------------------------------------------------
+
+!> User interface to set angle for 8 byte reals
+
     SUBROUTINE oasis_write_angle_r8(cgrid, nx, ny, angle, partid)
 
     !-------------------------------------------------
@@ -371,11 +386,11 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_double_p),   intent (in) :: angle(:,:)  ! angles
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    real(kind=ip_double_p),   intent (in) :: angle(:,:)  !< angles
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
@@ -416,6 +431,9 @@ CONTAINS
   END SUBROUTINE oasis_write_angle_r8
 
 !--------------------------------------------------------------------------
+
+!> User interface to set angle for 4 byte reals
+
     SUBROUTINE oasis_write_angle_r4(cgrid, nx, ny, angle, partid)
 
     !-------------------------------------------------
@@ -424,11 +442,11 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_single_p),   intent (in) :: angle(:,:)  ! angles
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    real(kind=ip_single_p),   intent (in) :: angle(:,:)  !< angles
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     real(kind=ip_double_p),allocatable :: angle8(:,:)
     integer(kind=ip_intwp_p) :: ierror
@@ -468,6 +486,9 @@ CONTAINS
   END SUBROUTINE oasis_write_angle_r4
 
 !--------------------------------------------------------------------------
+
+!> User interface to set corner latitudes and longitudes for 8 byte reals
+
     SUBROUTINE oasis_write_corner_r8(cgrid, nx, ny, nc, clon, clat, partid)
 
     !-------------------------------------------------
@@ -477,13 +498,13 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid  ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx     ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny     ! number of latitudes
-    integer(kind=ip_intwp_p), intent (in) :: nc     ! number of corners per cell
-    real(kind=ip_double_p),   intent (in) :: clon(:,:,:) ! longitudes
-    real(kind=ip_double_p),   intent (in) :: clat(:,:,:) ! latitudes
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid  !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx     !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny     !< global ny size
+    integer(kind=ip_intwp_p), intent (in) :: nc     !< number of corners per cell
+    real(kind=ip_double_p),   intent (in) :: clon(:,:,:) !< corner longitudes
+    real(kind=ip_double_p),   intent (in) :: clat(:,:,:) !< corner latitudes
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
@@ -533,6 +554,9 @@ CONTAINS
   END SUBROUTINE oasis_write_corner_r8
 
 !--------------------------------------------------------------------------
+
+!> User interface to set corner latitudes and longitudes for 4 byte reals
+
     SUBROUTINE oasis_write_corner_r4(cgrid, nx, ny, nc, clon, clat, partid)
 
     !-------------------------------------------------
@@ -542,13 +566,13 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid  ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx     ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny     ! number of latitudes
-    integer(kind=ip_intwp_p), intent (in) :: nc     ! number of corners per cell
-    real(kind=ip_single_p),   intent (in) :: clon(:,:,:) ! longitudes
-    real(kind=ip_single_p),   intent (in) :: clat(:,:,:) ! latitudes
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid  !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx     !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny     !< global ny size
+    integer(kind=ip_intwp_p), intent (in) :: nc     !< number of corners per cell
+    real(kind=ip_single_p),   intent (in) :: clon(:,:,:) !< corner longitudes
+    real(kind=ip_single_p),   intent (in) :: clat(:,:,:) !< corner latitudes
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     real(kind=ip_double_p), allocatable :: clon8(:,:,:),clat8(:,:,:)
     integer(kind=ip_intwp_p) :: ierror
@@ -597,6 +621,9 @@ CONTAINS
   END SUBROUTINE oasis_write_corner_r4
 
 !--------------------------------------------------------------------------
+
+!> User interface to set integer mask values
+
     SUBROUTINE oasis_write_mask(cgrid, nx, ny, mask, partid)
 
     !-------------------------------------------------
@@ -606,11 +633,11 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    integer(kind=ip_intwp_p), intent (in) :: mask(:,:)   ! mask
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    integer(kind=ip_intwp_p), intent (in) :: mask(:,:)   !< mask
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
@@ -651,6 +678,9 @@ CONTAINS
   END SUBROUTINE oasis_write_mask
 
 !--------------------------------------------------------------------------
+
+!> User interface to set area values for 8 byte reals
+
     SUBROUTINE oasis_write_area_r8(cgrid, nx, ny, area, partid)
 
     !-------------------------------------------------
@@ -660,11 +690,11 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_double_p),   intent (in) :: area(:,:)   ! areas
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    real(kind=ip_double_p),   intent (in) :: area(:,:)   !< areas
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID
     integer(kind=ip_intwp_p) :: ierror
@@ -705,6 +735,9 @@ CONTAINS
   END SUBROUTINE oasis_write_area_r8
 
 !--------------------------------------------------------------------------
+
+!> User interface to set area values for 4 byte reals
+
     SUBROUTINE oasis_write_area_r4(cgrid, nx, ny, area, partid)
 
     !-------------------------------------------------
@@ -714,11 +747,11 @@ CONTAINS
 
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    real(kind=ip_single_p),   intent (in) :: area(:,:)   ! areas
-    integer(kind=ip_intwp_p), intent (in),optional :: partid  ! partid if nonglobal
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    real(kind=ip_single_p),   intent (in) :: area(:,:)   !< areas
+    integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     real(kind=ip_double_p), allocatable :: area8(:,:)
     integer(kind=ip_intwp_p) :: ierror
@@ -758,6 +791,9 @@ CONTAINS
   END SUBROUTINE oasis_write_area_r4
 
 !--------------------------------------------------------------------------
+
+!> User interface to indicate user defined grids are done
+
     SUBROUTINE oasis_terminate_grids_writing()
     !-------------------------------------------------
     ! Routine to terminate the grids writing.
@@ -786,13 +822,16 @@ CONTAINS
   END SUBROUTINE oasis_terminate_grids_writing
 
 !--------------------------------------------------------------------------
+
+!> Interface that actually writes fields to grid files
+
     SUBROUTINE oasis_write2files()
 
     !-------------------------------------------------
-    ! Write fields to grid files.
-    ! Only write fields that have been buffered and
-    ! if prism_grid_terminate_grids_writing has been called.
-    ! this is called by all tasks
+    !> Write fields to grid files.
+    !> Only write fields that have been buffered and
+    !> if prism_grid_terminate_grids_writing has been called.
+    !> This is called by all tasks from oasis_enddef.
     !-------------------------------------------------
 
     implicit none
@@ -802,7 +841,7 @@ CONTAINS
     character(len=ic_med) :: fldname   ! full field name
     character(len=ic_med) :: cgrid     ! grid name
     logical :: exists                  ! check if file exists
-    integer(kind=ip_i4_p) :: n,n1,g,p  ! counter
+    integer(kind=ip_i4_p) :: m,n,n1,g,p  ! counter
     integer(kind=ip_i4_p) :: partid    ! part id
     integer(kind=ip_i4_p) :: taskid    ! task id for writing
     integer(kind=ip_i4_p) :: nx,ny,nc  ! grid size
@@ -816,15 +855,18 @@ CONTAINS
     integer(kind=ip_i4_p) ,allocatable :: iglo(:,:) ! global array
     integer(kind=ip_intwp_p) :: gcnt, tot_gnum, ierr
     logical                  :: found
-    character(len=ic_med)   ,pointer :: loc_gname(:),gname0(:),gname(:)
-    character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:)
+    integer(kind=ip_intwp_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
+    character(len=ic_med)   ,pointer :: loc_gname(:),gname0(:),gname(:), loc_gname0(:), gname1(:)
+    character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:), loc_pname0(:), pname1(:)
     integer(kind=ip_intwp_p),pointer :: gnum(:),rcnts(:),displ(:)
     logical, parameter :: local_timers_on = .false.
+    logical, parameter :: gatherall_on = .false.
     character(len=*),parameter :: undefined_partname = '(UnDeFiNeD_PArtnaME)'
     character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    call oasis_timer_start('grid_write')
 
     call oasis_mpi_bcast(writing_grids_call,mpi_comm_local,subname//'writing_grids_call')
     if (writing_grids_call .eq. 1) then
@@ -833,19 +875,30 @@ CONTAINS
     allocate(gnum(mpi_size_local))
     gnum = 0
     call MPI_GATHER(prism_ngrid, 1, MPI_INTEGER, gnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
+    if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
 
-    !--- gname
+    !-------------------------------------
+    !> * Gather and sync grid information across tasks.
+    !-------------------------------------
+
+ if (gatherall_on) then
+
+    !-------------------------------------
+    !>   * if gatherall, Gather grid names.
+    !-------------------------------------
+
+    if (local_timers_on) call oasis_timer_start('grid_write_gather')
 
     if (mpi_rank_local == 0) then
        tot_gnum = sum(gnum)
        allocate(gname0(tot_gnum))
        allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-       do n = 1,mpi_size_local
-          rcnts(n) = gnum(n) * ic_med
-          if (n == 1) then
-             displ(n) = 0
+       do m = 1,mpi_size_local
+          rcnts(m) = gnum(m) * ic_med
+          if (m == 1) then
+             displ(m) = 0
           else
-             displ(n) = displ(n-1) + rcnts(n-1)
+             displ(m) = displ(m-1) + rcnts(m-1)
           endif
        enddo
     else
@@ -860,7 +913,9 @@ CONTAINS
     deallocate(loc_gname)
     deallocate(rcnts, displ)
 
-    !--- pname
+    !-------------------------------------
+    !>   * if gatherall, Gather partition names
+    !-------------------------------------
 
     if (mpi_rank_local == 0) then
        tot_gnum = sum(gnum)
@@ -891,8 +946,10 @@ CONTAINS
     call MPI_GATHERV(loc_pname, prism_ngrid*ic_lvar2, MPI_CHARACTER, pname0, rcnts, displ, MPI_CHARACTER, 0, mpi_comm_local, ierr) 
     deallocate(loc_pname)
     if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
- 
-    !--- determine unique var names on root
+
+    !-------------------------------------
+    !>   * if gatherall, Determine unique grid names on root.
+    !-------------------------------------
 
     if (local_timers_on) call oasis_timer_start('grid_write_rootsrch')
     if (mpi_rank_local == 0) then
@@ -925,8 +982,143 @@ CONTAINS
     endif
     if (local_timers_on) call oasis_timer_stop ('grid_write_rootsrch')
 
+ else   ! gatherall_on
+
+    allocate(loc_gname(prism_ngrid))
+    allocate(loc_pname(prism_ngrid))
+    do n = 1,prism_ngrid
+       loc_gname(n) = prism_grid(n)%gridname
+       if (prism_grid(n)%partid > 0 .and. prism_grid(n)%partid <= prism_npart) then
+          loc_pname(n) = prism_part(prism_grid(n)%partid)%partname
+       elseif (prism_grid(n)%partid == -1) then
+          loc_pname(n) = undefined_partname
+       else
+          write(nulprt,*) subname,estr,'illegal partition id for grid ',trim(prism_grid(n)%gridname),prism_grid(n)%partid
+       endif
+    enddo
+
+    if (mpi_rank_local == 0) then
+       gcnt = 0
+       allocate(pname0(max(prism_ngrid,20)))  ! 20 is arbitrary starting number
+       allocate(gname0(max(prism_ngrid,20)))  ! 20 is arbitrary starting number
+    else
+       allocate(pname0(1))
+       allocate(gname0(1))
+    endif
+
+    !-------------------------------------
+    !>   * if not gatherall, Loop over tasks
+    !-------------------------------------
+
+    do m = 1,mpi_size_local
+       taskid = m - 1
+
+       !-------------------------------------
+       !>     * if not gatherall, Send grid and partition to root
+       !-------------------------------------
+
+       if (mpi_rank_local == taskid .and. prism_ngrid > 0) then
+          if (local_timers_on) call oasis_timer_start('grid_write_gather')
+          if (mpi_rank_local /= 0) then
+             if (OASIS_Debug >= 15) then
+                write(nulprt,*) subname,' send prism_ngrid ',mpi_rank_local,m,prism_ngrid,ic_lvar2
+                call oasis_flush(nulprt)
+             endif
+             call MPI_SEND(loc_gname, prism_ngrid*ic_med  , MPI_CHARACTER, 0, 10000+m, mpi_comm_local, ierr)
+             call oasis_mpi_chkerr(ierr,subname//':send gname')
+             call MPI_SEND(loc_pname, prism_ngrid*ic_lvar2, MPI_CHARACTER, 0, 50000+m, mpi_comm_local, ierr)
+             call oasis_mpi_chkerr(ierr,subname//':send pname')
+          endif
+          if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
+       endif
+
+       !-------------------------------------
+       !>     * if not gatherall, Recv grid and partition on root
+       !>     * if not gatherall, Determine unique grid names on root.
+       !-------------------------------------
+
+       if (mpi_rank_local == 0 .and. gnum(m) > 0) then
+          if (local_timers_on) call oasis_timer_start ('grid_write_gather')
+          if (OASIS_Debug >= 15) then
+             write(nulprt,*) subname,' recv prism_ngrid ',mpi_rank_local,m,gnum(m),ic_lvar2
+             call oasis_flush(nulprt)
+          endif
+          allocate(loc_gname0(gnum(m)))
+          allocate(loc_pname0(gnum(m)))
+          if (taskid == 0) then
+             loc_gname0 = loc_gname   ! copy local values
+             loc_pname0 = loc_pname   ! copy local values
+          else
+             call MPI_RECV(loc_gname0, gnum(m)*ic_med  , MPI_CHARACTER, taskid, 10000+m, mpi_comm_local, status, ierr)
+             call oasis_mpi_chkerr(ierr,subname//':recv')
+             call MPI_RECV(loc_pname0, gnum(m)*ic_lvar2, MPI_CHARACTER, taskid, 50000+m, mpi_comm_local, status, ierr)
+             call oasis_mpi_chkerr(ierr,subname//':recv')
+          endif
+          if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
+
+          if (local_timers_on) call oasis_timer_start('grid_write_rootsrch')
+          do n = 1,gnum(m)
+             if (OASIS_Debug >= 15) write(nulprt,*) subname,' check loc_gname0 ',m,n,trim(loc_gname0(n))
+
+             g = 0
+             found = .false.
+             do while (g < gcnt .and. .not.found)
+                g = g + 1
+                if (loc_gname0(n) == gname0(g)) then
+                   found = .true.
+                   !--- use something other than undefined_partname if it exists
+                   if (pname0(g) == undefined_partname) then
+                      pname0(g) = loc_pname0(n)
+                   elseif (loc_pname0(n) /= undefined_partname .and. pname0(g) /= loc_pname0(n)) then
+                      write(nulprt,*) subname,estr,'inconsistent grid and part name: ', &
+                                      trim(loc_gname0(n)),' ',trim(loc_pname0(n)),' ',trim(pname0(g))
+                      call oasis_abort()
+                   endif
+                endif
+             enddo
+             if (.not.found) then
+                gcnt = gcnt + 1
+                if (gcnt > size(gname0)) then
+                   allocate(gname1(size(gname0)))
+                   allocate(pname1(size(pname0)))
+                   gname1 = gname0
+                   pname1 = pname0
+                   deallocate(gname0,pname0)
+                   if (OASIS_Debug >= 15) then
+                      write(nulprt,*) subname,' resize gname0 ',size(gname1),gcnt+gnum(m)
+                      call oasis_flush(nulprt)
+                   endif
+                   allocate(gname0(gcnt+gnum(m)))
+                   allocate(pname0(gcnt+gnum(m)))
+                   gname0(1:size(gname1)) = gname1(1:size(gname1))
+                   pname0(1:size(pname1)) = pname1(1:size(pname1))
+                   deallocate(gname1,pname1)
+                endif
+                gname0(gcnt) = loc_gname0(n)
+                pname0(gcnt) = loc_pname0(n)
+             endif
+           enddo  ! gnum
+          deallocate(loc_gname0)
+          deallocate(loc_pname0)
+          if (local_timers_on) call oasis_timer_stop('grid_write_rootsrch')
+
+       endif  ! rank == 0 and gnum > 0
+
+    enddo  ! mpi_size_local
+
+    deallocate(loc_gname)
+    deallocate(loc_pname)
+
+ endif  ! gatherall_on
+
+   deallocate(gnum)
+
+    !-------------------------------------
+    !>   * Broadcast grid and partition names
+    !-------------------------------------
+
     if (local_timers_on) call oasis_timer_start('grid_write_bcast')
-    call oasis_mpi_bcast(gcnt,mpi_comm_local,subname//' pcnt')
+    call oasis_mpi_bcast(gcnt,mpi_comm_local,subname//' gcnt')
     allocate(gname(gcnt))
     allocate(pname(gcnt))
     if (mpi_rank_local == 0) then
@@ -944,7 +1136,9 @@ CONTAINS
     call oasis_mpi_bcast(gname,mpi_comm_local,subname//' gname')
     call oasis_mpi_bcast(pname,mpi_comm_local,subname//' pname')
 
-    !--- document
+    !-------------------------------------
+    !> * Document
+    !-------------------------------------
 
     if (OASIS_debug >= 15) then
        do n = 1,gcnt
@@ -954,7 +1148,9 @@ CONTAINS
     endif
     if (local_timers_on) call oasis_timer_stop ('grid_write_bcast')
 
-    !--- check grid defined on a partitition is defined on all tasks on that partition
+    !-------------------------------------
+    !> * Check that a grid defined on a partitition is defined on all tasks on that partition.
+    !-------------------------------------
 
     do n = 1,gcnt
        if (pname(n) /= undefined_partname) then
@@ -975,6 +1171,10 @@ CONTAINS
 
     if (local_timers_on) call oasis_timer_start('grid_write_writefiles')
 
+    !-------------------------------------
+    !> * Write grid information
+    !-------------------------------------
+
     do g = 1,gcnt
     do n = 1,prism_ngrid
     if (prism_grid(n)%terminated) then
@@ -985,6 +1185,10 @@ CONTAINS
        prism_grid(n)%written = .true.
        tnx = -1
        tny = -1
+
+       !-------------------------------------
+       !>   * Determine which tasks are associated with the grid information
+       !-------------------------------------
 
        active_task = .false.
        write_task = .false.
@@ -1011,7 +1215,6 @@ CONTAINS
           write(nulprt,*) subname,' ',trim(gname(g)),':',trim(pname(g)),': partid_grid=', &
                           partid_grid,'active_task=',active_task,'write_task=',write_task
        endif
-       !--------------
 
        if (active_task) then
 
@@ -1020,6 +1223,10 @@ CONTAINS
          nc = prism_grid(n)%nc
 
          allocate(rglo(nx,ny))
+
+         !-------------------------------------
+         !>   * Check that array sizes match for all fields
+         !-------------------------------------
 
          if (prism_grid(n)%grid_set) then
            if (tnx <= 0 .or. tny <= 0) then
@@ -1036,6 +1243,10 @@ CONTAINS
              call oasis_abort()
            endif
 
+           !-------------------------------------
+           !>   * Gather longitudes if needed and write from root
+           !-------------------------------------
+
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.lon'
            if (partid_grid) then
@@ -1044,6 +1255,10 @@ CONTAINS
              rglo = prism_grid(n)%lon
            endif
            if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
+
+           !-------------------------------------
+           !>   * Gather latitudes if needed and write from root
+           !-------------------------------------
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.lat'
@@ -1070,6 +1285,10 @@ CONTAINS
              call oasis_abort()
            endif
 
+           !-------------------------------------
+           !>   * Gather corner longitudes if needed and write from root
+           !-------------------------------------
+
            allocate(r3glo(nx,ny,nc))
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.clo'
@@ -1085,6 +1304,10 @@ CONTAINS
              r3glo = prism_grid(n)%clon
            endif
            if (write_task) call oasis_io_write_3dgridfld_fromroot(filename,fldname,r3glo,nx,ny,nc)
+
+           !-------------------------------------
+           !>   * Gather corner latitudes if needed and write from root
+           !-------------------------------------
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.cla'
@@ -1115,6 +1338,10 @@ CONTAINS
              call oasis_abort()
            endif
 
+           !-------------------------------------
+           !>   * Gather areas if needed and write from root
+           !-------------------------------------
+
            filename = 'areas.nc'
            fldname  = trim(cgrid)//'.srf'
            if (partid_grid) then
@@ -1137,6 +1364,10 @@ CONTAINS
              call oasis_abort()
            endif
 
+           !-------------------------------------
+           !>   * Gather angles if needed and write from root
+           !-------------------------------------
+
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.ang'
            if (partid_grid) then
@@ -1158,6 +1389,10 @@ CONTAINS
                 size(prism_grid(n)%mask,dim=1),size(prism_grid(n)%mask,dim=2)
              call oasis_abort()
            endif
+
+           !-------------------------------------
+           !>   * Gather masks if needed and write from root
+           !-------------------------------------
 
            allocate(iglo(nx,ny))
            filename = 'masks.nc'
@@ -1186,10 +1421,13 @@ CONTAINS
 
     if (local_timers_on) call oasis_timer_stop('grid_write_writefiles')
     endif ! writing_grids_call
+    call oasis_timer_stop('grid_write')
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write2files
 !--------------------------------------------------------------------------
+
+!> Local interface to find gridID for a specified grid name
 
     SUBROUTINE oasis_findgrid(cgrid,nx,ny,gridID)
     !-------------------------------------------------
@@ -1198,10 +1436,10 @@ CONTAINS
     !-------------------------------------------------
     implicit none
 
-    character(len=*),         intent (in) :: cgrid       ! grid acronym
-    integer(kind=ip_intwp_p), intent (in) :: nx          ! number of longitudes
-    integer(kind=ip_intwp_p), intent (in) :: ny          ! number of latitudes
-    integer(kind=ip_intwp_p), intent(out) :: gridID      ! gridID matching cgrid
+    character(len=*),         intent (in) :: cgrid       !< grid name
+    integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
+    integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
+    integer(kind=ip_intwp_p), intent(out) :: gridID      !< gridID matching cgrid
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: n
     character(len=*),parameter :: subname = '(oasis_findgrid)'
@@ -1237,16 +1475,15 @@ CONTAINS
 
 !--------------------------------------------------------------------------
 
+!> Local routine that gathers the local array using partition information
+
   SUBROUTINE oasis_grid_loc2glo(aloc,aglo,partid,taskid)
-    !-------------------------------------------------
-    ! Routine that gathers local array using partition
-    !-------------------------------------------------
     implicit none
 
-    real(kind=ip_realwp_p),intent(in)    :: aloc(:,:)
-    real(kind=ip_realwp_p),intent(inout) :: aglo(:,:)
-    integer(kind=ip_i4_p) ,intent(in)    :: partid
-    integer(kind=ip_i4_p) ,intent(in)    :: taskid
+    real(kind=ip_realwp_p),intent(in)    :: aloc(:,:)  !< local array
+    real(kind=ip_realwp_p),intent(inout) :: aglo(:,:)  !< global array
+    integer(kind=ip_i4_p) ,intent(in)    :: partid     !< partition id for local data
+    integer(kind=ip_i4_p) ,intent(in)    :: taskid     !< task id to gather data to
     !-------------------------------------------------
     type(mct_aVect) :: avloc,avglo
     integer(kind=ip_i4_p) :: i,j,n

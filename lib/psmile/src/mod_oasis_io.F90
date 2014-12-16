@@ -1,3 +1,6 @@
+
+!> Provides reusable IO routines for OASIS
+
 MODULE mod_oasis_io
 
    USE mod_oasis_kinds
@@ -32,21 +35,19 @@ CONTAINS
 
 !===============================================================================
 
-subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
+!> Reads single field from a file into an attribute Vector
 
-   ! ---------------------------------------
-   ! Reads single field from file to av
-   ! ---------------------------------------
+subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
 
    implicit none
 
-   character(len=*), intent(in) :: filename   ! filename
-   type(mct_aVect) , intent(inout) :: av      ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom
-   character(len=*), intent(in) :: avfld      ! av field name
-   character(len=*), intent(in) :: filefld    ! file field name
-   character(len=*), intent(in),optional :: fldtype       ! int or real
+   character(len=*), intent(in) :: filename   !< filename
+   type(mct_aVect) , intent(inout) :: av      !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   character(len=*), intent(in) :: avfld      !< av field name
+   character(len=*), intent(in) :: filefld    !< file field name
+   character(len=*), intent(in),optional :: fldtype       !< kind
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -182,21 +183,19 @@ end subroutine oasis_io_read_avfld
 
 !===============================================================================
 
-subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
+!> Writes all fields from an attribute vector to a file
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   type(mct_aVect) , intent(in) :: av         ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom 
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
-   character(len=*), intent(in),optional :: nampre  ! name prepend string
+   character(len=*), intent(in) :: rstfile    !< filename
+   type(mct_aVect) , intent(in) :: av         !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
+   character(len=*), intent(in),optional :: nampre  !< field name prepend string on file
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -360,21 +359,19 @@ end subroutine oasis_io_write_avfile
 
 !===============================================================================
 
-subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
+!> Reads all fields for an attribute vector from a file
 
-   ! ---------------------------------------
-   ! Reads all fields for av from file
-   ! ---------------------------------------
+subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   type(mct_aVect) , intent(inout) :: av      ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom 
-   logical         , intent(in) ,optional :: abort   ! abort on fail flag
-   character(len=*), intent(in) ,optional :: nampre  ! name prepend string
-   logical         , intent(out),optional :: didread ! was something read
+   character(len=*), intent(in) :: rstfile    !< filename
+   type(mct_aVect) , intent(inout) :: av      !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   logical         , intent(in) ,optional :: abort   !< abort on error flag, default is true
+   character(len=*), intent(in) ,optional :: nampre  !< name prepend string for fields on file
+   logical         , intent(out),optional :: didread !< flag indicating that read was successful
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -517,21 +514,19 @@ end subroutine oasis_io_read_avfile
 
 !===============================================================================
 
-subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,abort)
+!> Reads an integer or real field from a file into an array
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,abort)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom
-   integer(ip_i4_p), intent(inout),optional :: iarray(:) ! data on root
-   character(len=*), intent(in),optional :: ivarname     ! variable name on file
-   real(ip_double_p),intent(inout),optional :: rarray(:) ! data on root
-   character(len=*), intent(in),optional :: rvarname     ! variable name on file
-   logical         , intent(in),optional :: abort        ! abort flag
+   character(len=*), intent(in) :: rstfile    !< filename
+   integer(ip_i4_p), intent(in) :: mpicom     !<  mpicom
+   integer(ip_i4_p), intent(inout),optional :: iarray(:) !< integer data on root
+   character(len=*), intent(in),optional :: ivarname     !< integer variable name on file
+   real(ip_double_p),intent(inout),optional :: rarray(:) !< real data on root
+   character(len=*), intent(in),optional :: rvarname     !< real variable name on file
+   logical         , intent(in),optional :: abort        !< abort on error flag, default is true
 
    !--- local ---
    integer(ip_i4_p)    :: ncnt
@@ -684,20 +679,18 @@ end subroutine oasis_io_read_array
 
 !===============================================================================
 
-subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
+!> Writes a real or integer array to a file
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom
-   integer(ip_i4_p), intent(in),optional :: iarray(:)   ! data on root
-   character(len=*), intent(in),optional :: ivarname    ! variable name on file
-   real(ip_double_p),intent(in),optional :: rarray(:)   ! data on root
-   character(len=*), intent(in),optional :: rvarname    ! variable name on file
+   character(len=*), intent(in) :: rstfile    !< filename
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   integer(ip_i4_p), intent(in),optional :: iarray(:)   !< integer data on root
+   character(len=*), intent(in),optional :: ivarname    !< integer  variable name on file
+   real(ip_double_p),intent(in),optional :: rarray(:)   !< real data on root
+   character(len=*), intent(in),optional :: rvarname    !< real variable name on file
 
    !--- local ---
    integer(ip_i4_p)    :: ncnt
@@ -833,24 +826,25 @@ end subroutine oasis_io_write_array
 
 !===============================================================================
 
+!> Write each field in an attribute vector to an individual files
+
 subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
 
    ! ---------------------------------------
-   ! Write all fields from av to individual field files
    ! This works only for a single av to a file
    ! Optionally can specify time info, and filename info
    ! ---------------------------------------
 
    implicit none
 
-   type(mct_aVect) , intent(in) :: av         ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     ! mpicom
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
-   integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
-   character(len=*), intent(in),optional :: filename   ! optional output filename
+   type(mct_aVect) , intent(in) :: av         !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
+   integer(ip_i4_p), intent(in),optional :: msec      !< optional time info in seconds
+   character(len=*), intent(in),optional :: f_string  !< optional f_string to append to filename
+   character(len=*), intent(in),optional :: filename  !< optional output filename
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -1023,22 +1017,23 @@ end subroutine oasis_io_write_avfbf
 
 !===============================================================================
 
+!> Read each field in an attribute vector from individual files
+
 subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
 
    ! ---------------------------------------
-   ! Read all fields to av from individual field files
    ! This works only for a single av from a file
    ! Optionally can specify time info, and filename info
    ! ---------------------------------------
 
    implicit none
 
-   type(mct_aVect) , intent(inout) :: av     ! avect
-   type(mct_gsmap) , intent(in) :: gsmap     ! gsmap
-   integer(ip_i4_p), intent(in) :: mpicom    ! mpicom
-   integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
-   character(len=*), intent(in),optional :: filename   ! optional input filename
+   type(mct_aVect) , intent(inout) :: av     !< avect
+   type(mct_gsmap) , intent(in) :: gsmap     !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom    !< mpicom
+   integer(ip_i4_p), intent(in),optional :: msec     !< optional time info in seconds
+   character(len=*), intent(in),optional :: f_string !< optional f_string to append to filename
+   character(len=*), intent(in),optional :: filename !< optional input filename
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -1184,23 +1179,24 @@ end subroutine oasis_io_read_avfbf
 
 !===============================================================================
 
+!> Read a field on the root task from a file into an array.
+
 subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,nz)
 
    ! ---------------------------------------
-   ! Write real fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Supports 2d integer or real and 3d real arrays.
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*) , intent(in) :: filename
-   character(len=*) , intent(in) :: fldname
-   integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)
-   real(ip_realwp_p), intent(inout),optional :: fld2(:,:)
-   real(ip_realwp_p), intent(inout),optional :: fld3(:,:,:)
-   integer(ip_i4_p) , intent(inout),optional :: nx         ! global size nx
-   integer(ip_i4_p) , intent(inout),optional :: ny         ! global size ny
-   integer(ip_i4_p) , intent(inout),optional :: nz         ! global size nz
+   character(len=*) , intent(in) :: filename   !< filename
+   character(len=*) , intent(in) :: fldname    !< field name
+   integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)  !< 2d integer array
+   real(ip_realwp_p), intent(inout),optional :: fld2(:,:)   !< 2d real array
+   real(ip_realwp_p), intent(inout),optional :: fld3(:,:,:) !< 3d real array
+   integer(ip_i4_p) , intent(inout),optional :: nx          !< global nx size
+   integer(ip_i4_p) , intent(inout),optional :: ny          !< global ny size
+   integer(ip_i4_p) , intent(inout),optional :: nz          !< global nz size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,varid  ! cdf info
@@ -1302,20 +1298,21 @@ end subroutine oasis_io_read_field_fromroot
 
 !===============================================================================
 
+!> Write a real array named field from the root task to a file.
+
 subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
-   ! Write real fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Designed to work with oasis3 write_grid .
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   real(ip_realwp_p), intent(in) :: fld(:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   real(ip_realwp_p),intent(in) :: fld(:,:)   !< 2d real field
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid  ! cdf info
@@ -1404,20 +1401,21 @@ end subroutine oasis_io_write_2dgridfld_fromroot
 
 !===============================================================================
 
+!> Write an integer array named field from the root task to a file.
+
 subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
-   ! Write int fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Designed to work with oasis3 write_grid .
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   integer(ip_i4_p), intent(in) :: fld(:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   integer(ip_i4_p), intent(in) :: fld(:,:)   !< integer field
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid  ! cdf info
@@ -1506,21 +1504,22 @@ end subroutine oasis_io_write_2dgridint_fromroot
 
 !===============================================================================
 
+!> Write a 3d real array named field from the root task to a file.
+
 subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
  
    ! ---------------------------------------
-   ! Write real 3d fld on rootpe to file
-   ! Designed to work with oasis3 write_grid (corners)
+   ! Designed to work with oasis3 write_grid.
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   real(ip_realwp_p), intent(in) :: fld(:,:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 3d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 3d global size ny
-   integer(ip_i4_p), intent(in) :: nc         ! 3d global size nc ncorners
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   real(ip_realwp_p), intent(in) :: fld(:,:,:)!< 3d real array
+   integer(ip_i4_p), intent(in) :: nx         !< 3d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 3d global ny size
+   integer(ip_i4_p), intent(in) :: nc         !< 3d global nz size or nc size for corners
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid3(3),varid  ! cdf info

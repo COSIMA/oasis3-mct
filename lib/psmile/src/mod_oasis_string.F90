@@ -1,3 +1,12 @@
+
+!> Character string manipulation methods
+
+!> These methods work generally on character strings, but also, more particularly
+!> on lists.  A list is a character string that contains substrings separated by
+!> a delimeter.  That delimeter can be set by the user but the default is ":".
+!> Colon delimeted lists are used in OASIS and MCT mainly to instantiate a list
+!> of fields, such as "temperature:humidity:zonal_velocity:meridiona_velocity".
+
 #define NEW_LGI_METHOD2a
 !!#define NEW_LGI_METHOD2b
 !===============================================================================
@@ -83,7 +92,7 @@ contains
 ! !IROUTINE: oasis_string_countChar -- Count number of occurances of a character
 !
 ! !DESCRIPTION:
-!  count number of occurances of a single character in a string
+!>  Count number of occurances of a single character in a string
 !     \newline
 !     n = shr\_string\_countChar(string,character)
 !
@@ -97,9 +106,9 @@ integer function oasis_string_countChar(str,char,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(in)           :: str   ! string to search
-   character(1)        ,intent(in)           :: char  ! char to search for
-   integer(ip_i4_p),intent(out),optional :: rc    ! return code
+   character(*)    ,intent(in)           :: str   !< string to search
+   character(1)    ,intent(in)           :: char  !< char to search for
+   integer(ip_i4_p),intent(out),optional :: rc    !< return code
 
 !EOP
 
@@ -133,7 +142,7 @@ end function oasis_string_countChar
 ! !IROUTINE: oasis_string_toUpper -- Convert string to upper case
 !
 ! !DESCRIPTION:
-!     Convert the input string to upper-case.
+!>    Convert the input string to upper-case.
 !     Use achar and iachar intrinsics to ensure use of ascii collating sequence.
 !
 !
@@ -144,14 +153,14 @@ function oasis_string_toUpper(str)
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   character(len=*), intent(in) :: str      ! String to convert to upper case
-   character(len=len(str))      :: oasis_string_toUpper
+   character(len=*), intent(in) :: str      !< input string to convert to upper case
+   character(len=len(str))      :: oasis_string_toUpper  !< output converted string
 
    !----- local -----
    integer(ip_i4_p) :: i             ! Index
    integer(ip_i4_p) :: aseq          ! ascii collating sequence
    integer(ip_i4_p) :: LowerToUpper  ! integer to convert case
-   character(len=1)     :: ctmp          ! Character temporary
+   character(len=1) :: ctmp          ! Character temporary
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_toUpper) "
@@ -181,7 +190,7 @@ end function oasis_string_toUpper
 ! !IROUTINE: oasis_string_toLower -- Convert string to lower case
 !
 ! !DESCRIPTION:
-!     Convert the input string to lower-case.
+!>    Convert the input string to lower-case.
 !     Use achar and iachar intrinsics to ensure use of ascii collating sequence.
 !
 !
@@ -191,14 +200,14 @@ function oasis_string_toLower(str)
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   character(len=*), intent(in) :: str      ! String to convert to lower case
-   character(len=len(str))      :: oasis_string_toLower
+   character(len=*), intent(in) :: str      !< input string to convert to lower case
+   character(len=len(str))      :: oasis_string_toLower  !< output converted string
 
    !----- local -----
    integer(ip_i4_p) :: i            ! Index
    integer(ip_i4_p) :: aseq         ! ascii collating sequence
    integer(ip_i4_p) :: UpperToLower ! integer to convert case
-   character(len=1)     :: ctmp         ! Character temporary
+   character(len=1) :: ctmp         ! Character temporary
 
    !----- formats -----
    character(*),parameter :: subName =   "(oasis_string_toLower) "
@@ -228,7 +237,7 @@ end function oasis_string_toLower
 ! !IROUTINE: oasis_string_getParentDir -- For pathname get the parent directory name
 !
 ! !DESCRIPTION:
-!     Get the parent directory name for a pathname.
+!>   Get the parent directory pathname.
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
@@ -238,8 +247,8 @@ function oasis_string_getParentDir(str)
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   character(len=*), intent(in) :: str      ! String to convert to lower case
-   character(len=len(str))      :: oasis_string_getParentDir
+   character(len=*), intent(in) :: str      !< input string
+   character(len=len(str))      :: oasis_string_getParentDir !< return directory path
 
    !----- local -----
    integer(ip_i4_p) :: i       ! Index
@@ -274,7 +283,7 @@ end function oasis_string_getParentDir
 ! !IROUTINE: oasis_string_lastIndex -- Get index of last substr within string
 !
 ! !DESCRIPTION:
-!  Get index of last substr within string
+!> Get the index of the last occurance of a substring within a string
 !     \newline
 !     n = shr\_string\_lastIndex(string,substring)
 !
@@ -287,9 +296,9 @@ integer function oasis_string_lastIndex(string,substr,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(in)           :: string ! string to search
-   character(*)        ,intent(in)           :: substr ! sub-string to search for
-   integer(ip_i4_p),intent(out),optional :: rc     ! return code
+   character(*)    ,intent(in)           :: string !< input string to search
+   character(*)    ,intent(in)           :: substr !< sub-string to search for
+   integer(ip_i4_p),intent(out),optional :: rc     !< return code
 
 !EOP
 
@@ -319,7 +328,7 @@ end function oasis_string_lastIndex
 ! !IROUTINE: oasis_string_endIndex -- Get the ending index of substr within string
 !
 ! !DESCRIPTION:
-!  Get the ending index of substr within string
+!>  Get the ending index of the first occurance of a substring within string
 !     \newline
 !     n = shr\_string\_endIndex(string,substring)
 !
@@ -332,9 +341,9 @@ integer function oasis_string_endIndex(string,substr,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(in)           :: string ! string to search
-   character(*)        ,intent(in)           :: substr ! sub-string to search for
-   integer(ip_i4_p),intent(out),optional :: rc     ! return code
+   character(*)    ,intent(in)           :: string !< string to search
+   character(*)    ,intent(in)           :: substr !< sub-string to search for
+   integer(ip_i4_p),intent(out),optional :: rc     !< return code
 
 !EOP
 
@@ -378,7 +387,7 @@ end function oasis_string_endIndex
 ! !IROUTINE: oasis_string_leftAlign -- remove leading white space
 !
 ! !DESCRIPTION:
-!    Remove leading white space
+!>    Remove leading white space
 !     \newline
 !     call shr\_string\_leftAlign(string)
 !
@@ -391,8 +400,8 @@ subroutine oasis_string_leftAlign(str,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(inout)          :: str
-   integer(ip_i4_p),intent(out)  ,optional :: rc   ! return code
+   character(*)    ,intent(inout)          :: str  !< input and returned string
+   integer(ip_i4_p),intent(out)  ,optional :: rc   !< return code
 
 !EOP
 
@@ -432,7 +441,7 @@ end subroutine oasis_string_leftAlign
 ! !IROUTINE: oasis_string_alphanum -- remove non alpha numeric characters
 !
 ! !DESCRIPTION:
-!    Remove all non alpha numeric characters from string
+!>   Remove all non alpha numeric characters from string
 !     \newline
 !     call shr\_string\_alphanum(string)
 !
@@ -445,8 +454,8 @@ subroutine oasis_string_alphanum(str,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(inout)          :: str
-   integer(ip_i4_p),intent(out)  ,optional :: rc   ! return code
+   character(*)    ,intent(inout)          :: str  !< input and output string
+   integer(ip_i4_p),intent(out)  ,optional :: rc   !< return code
 
 !EOP
 
@@ -488,7 +497,7 @@ end subroutine oasis_string_alphanum
 ! !IROUTINE: oasis_string_betweenTags -- Get the substring between the two tags.
 !
 ! !DESCRIPTION:
-!    Get the substring found between the start and end tags.
+!>   Get the substring found between the start and end strings.
 !    \newline
 !    call shr\_string\_betweenTags(string,startTag,endTag,substring,rc)
 !
@@ -501,11 +510,11 @@ subroutine oasis_string_betweenTags(string,startTag,endTag,substr,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(in)  :: string      ! string to search
-   character(*)        ,intent(in)  :: startTag    ! start tag
-   character(*)        ,intent(in)  :: endTag      ! end tag
-   character(*)        ,intent(out) :: substr      ! sub-string between tags
-   integer(ip_i4_p),intent(out),optional :: rc ! return code
+   character(*)        ,intent(in)  :: string      !< input string to search
+   character(*)        ,intent(in)  :: startTag    !< start string
+   character(*)        ,intent(in)  :: endTag      !< end string
+   character(*)        ,intent(out) :: substr      !< output sub-string between tags
+   integer(ip_i4_p),intent(out),optional :: rc !< return code
 
 !EOP
 
@@ -578,7 +587,7 @@ end subroutine oasis_string_betweenTags
 ! !IROUTINE: oasis_string_parseCFtunit -- Parse CF time unit
 !
 ! !DESCRIPTION:
-!  Parse CF time unit into a delta string name and a base time in yyyymmdd
+!>  Parse CF time unit into a delta string name and a base time in yyyymmdd
 !  and seconds (nearest integer actually).
 !     \newline
 !     call shr\_string\_parseCFtunit(string,substring)
@@ -598,11 +607,11 @@ subroutine oasis_string_parseCFtunit(string,unit,bdate,bsec,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)    ,intent(in)           :: string ! string to search
-   character(*)    ,intent(out)          :: unit   ! delta time unit
-   integer(ip_i4_p),intent(out)          :: bdate  ! base date yyyymmdd
-   real(ip_r8_p)   ,intent(out)          :: bsec   ! base seconds
-   integer(ip_i4_p),intent(out),optional :: rc     ! return code
+   character(*)    ,intent(in)           :: string !< string to search
+   character(*)    ,intent(out)          :: unit   !< delta time unit
+   integer(ip_i4_p),intent(out)          :: bdate  !< base date yyyymmdd
+   real(ip_r8_p)   ,intent(out)          :: bsec   !< base seconds
+   integer(ip_i4_p),intent(out),optional :: rc     !< return code
 
 !EOP
 
@@ -730,7 +739,7 @@ end subroutine oasis_string_parseCFtunit
 ! !IROUTINE: oasis_string_clean -- Clean a string, set it to "blank"
 !
 ! !DESCRIPTION:
-!     Clean a string, set it to blank
+!>    Clean a string, set it to blank
 !     \newline
 !     call shr\_string\_clean(string,rc)
 !
@@ -743,8 +752,8 @@ subroutine oasis_string_clean(string,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)                 ,intent(inout) :: string  ! list/string
-   integer(ip_i4_p),optional,intent(out)   :: rc      ! return code
+   character(*)             ,intent(inout) :: string  !< string
+   integer(ip_i4_p),optional,intent(out)   :: rc      !< return code
 
 !EOP
 
@@ -775,7 +784,7 @@ end subroutine oasis_string_clean
 ! !IROUTINE: oasis_string_listIsValid -- determine whether string is a valid list
 !
 ! !DESCRIPTION:
-!     Determine whether string is a valid list
+!>    Determine whether string is a valid list
 !     \newline
 !     logical_var = shr\_string\_listIsValid(list,rc)
 !
@@ -788,8 +797,8 @@ logical function oasis_string_listIsValid(list,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)                 ,intent(in)  :: list    ! list/string
-   integer(ip_i4_p),optional,intent(out) :: rc      ! return code
+   character(*)             ,intent(in)  :: list    !< list/string
+   integer(ip_i4_p),optional,intent(out) :: rc      !< return code
 
 !EOP
 
@@ -841,7 +850,7 @@ end function oasis_string_listIsValid
 ! !IROUTINE: oasis_string_listGetName -- Get name of k-th field in list
 !
 ! !DESCRIPTION:
-!     Get name of k-th field in list
+!>    Get name of k-th field in list
 !     \newline
 !     call shr\_string\_listGetName(list,k,name,rc)
 !
@@ -854,10 +863,10 @@ subroutine oasis_string_listGetName(list,k,name,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)                 ,intent(in)  :: list    ! list/string
-   integer(ip_i4_p)         ,intent(in)  :: k       ! index of field
-   character(*)                 ,intent(out) :: name    ! k-th name in list
-   integer(ip_i4_p),optional,intent(out) :: rc      ! return code
+   character(*)             ,intent(in)  :: list    !< input list
+   integer(ip_i4_p)         ,intent(in)  :: k       !< index of field
+   character(*)             ,intent(out) :: name    !< k-th name in list
+   integer(ip_i4_p),optional,intent(out) :: rc      !< return code
 
 !EOP
 
@@ -927,7 +936,7 @@ end subroutine oasis_string_listGetName
 ! !IROUTINE: oasis_string_listIntersect -- Get intersection of two field lists
 !
 ! !DESCRIPTION:
-!     Get intersection of two fields lists, write into third list
+!>    Get intersection of two fields lists, write into third list
 !     \newline
 !     call shr\_string\_listIntersect(list1,list2,listout)
 !
@@ -940,10 +949,10 @@ subroutine oasis_string_listIntersect(list1,list2,listout,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(in)  :: list1   ! list/string
-   character(*)             ,intent(in)  :: list2   ! list/string
-   character(*)             ,intent(out) :: listout ! list/string
-   integer(ip_i4_p),optional,intent(out) :: rc      ! return code
+   character(*)             ,intent(in)  :: list1   !< input list 1
+   character(*)             ,intent(in)  :: list2   !< input list 2
+   character(*)             ,intent(out) :: listout !< output list
+   integer(ip_i4_p),optional,intent(out) :: rc      !< return code
 
 !EOP
 
@@ -985,7 +994,7 @@ end subroutine oasis_string_listIntersect
 ! !IROUTINE: oasis_string_listUnion -- Get union of two field lists
 !
 ! !DESCRIPTION:
-!     Get union of two fields lists, write into third list
+!>    Get union of two fields lists, write into third list
 !     \newline
 !     call shr\_string\_listUnion(list1,list2,listout)
 !
@@ -998,10 +1007,10 @@ subroutine oasis_string_listUnion(list1,list2,listout,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(in)  :: list1   ! list/string
-   character(*)             ,intent(in)  :: list2   ! list/string
-   character(*)             ,intent(out) :: listout ! list/string
-   integer(ip_i4_p),optional,intent(out) :: rc      ! return code
+   character(*)             ,intent(in)  :: list1   !< input list 1
+   character(*)             ,intent(in)  :: list2   !< input list 2
+   character(*)             ,intent(out) :: listout !< output list 3
+   integer(ip_i4_p),optional,intent(out) :: rc      !< return code
 
 !EOP
 
@@ -1053,7 +1062,7 @@ end subroutine oasis_string_listUnion
 ! !IROUTINE: oasis_string_listMerge -- Merge lists two list to third
 !
 ! !DESCRIPTION:
-!     Merge two list to third
+!>    Merge two lists into a third list
 !     \newline
 !     call shr\_string\_listMerge(list1,list2,listout)
 !     call shr\_string\_listMerge(list1,list2,list1)
@@ -1066,10 +1075,10 @@ subroutine oasis_string_listMerge(list1,list2,listout,rc)
    implicit none
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(in)  :: list1   ! list/string
-   character(*)             ,intent(in)  :: list2   ! list/string
-   character(*)             ,intent(out) :: listout ! list/string
-   integer(ip_i4_p),optional,intent(out) :: rc      ! return code
+   character(*)             ,intent(in)  :: list1   !< input list 1
+   character(*)             ,intent(in)  :: list2   !< input list 2
+   character(*)             ,intent(out) :: listout !< output list
+   integer(ip_i4_p),optional,intent(out) :: rc      !< return code
 
 !EOP
 
@@ -1121,7 +1130,7 @@ end subroutine oasis_string_listMerge
 ! !IROUTINE: oasis_string_listAppend -- Append one list to another
 !
 ! !DESCRIPTION:
-!     Append one list to another
+!>    Append one list to another
 !     \newline
 !     call shr\_string\_listAppend(list,listadd)
 !
@@ -1134,9 +1143,9 @@ subroutine oasis_string_listAppend(list,listadd,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(inout) :: list   ! list/string
-   character(*)             ,intent(in)    :: listadd ! list/string
-   integer(ip_i4_p),optional,intent(out)   :: rc      ! return code
+   character(*)             ,intent(inout) :: list    !< input and output list
+   character(*)             ,intent(in)    :: listadd !< list to append
+   integer(ip_i4_p),optional,intent(out)   :: rc      !< return code
 
 !EOP
 
@@ -1184,7 +1193,7 @@ end subroutine oasis_string_listAppend
 ! !IROUTINE: oasis_string_listPrepend -- Prepend one list to another
 !
 ! !DESCRIPTION:
-!     Prepend one list to another
+!>    Prepend one list to another
 !     \newline
 !     call shr\_string\_listPrepend(listadd,list)
 !     \newline
@@ -1199,8 +1208,8 @@ subroutine oasis_string_listPrepend(listadd,list,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(in)    :: listadd ! list/string
-   character(*)             ,intent(inout) :: list   ! list/string
+   character(*)             ,intent(in)    :: listadd ! input and output list
+   character(*)             ,intent(inout) :: list    ! list to prepend
    integer(ip_i4_p),optional,intent(out)   :: rc      ! return code
 
 !EOP
@@ -1250,7 +1259,7 @@ end subroutine oasis_string_listPrepend
 ! !IROUTINE: oasis_string_listGetIndexF -- Get index of field in string
 !
 ! !DESCRIPTION:
-!     Get index of field in string
+!>    Get the index of a field in a list
 !     \newline
 !     k = shr\_string\_listGetIndex(str,"taux")
 !
@@ -1263,8 +1272,8 @@ integer function oasis_string_listGetIndexF(string,fldStr)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*),intent(in) :: string   ! string
-   character(*),intent(in) :: fldStr   ! name of field
+   character(*),intent(in) :: string   !< input string
+   character(*),intent(in) :: fldStr   !< name of field
 
 !EOP
 
@@ -1293,7 +1302,7 @@ end function oasis_string_listGetIndexF
 ! !IROUTINE: oasis_string_listGetIndex -- Get index of field in string
 !
 ! !DESCRIPTION:
-!     Get index of field in string
+!>    Get the index of a field in a string
 !     \newline
 !     call shr\_string\_listGetIndex(str,"taux",k,rc)
 !
@@ -1306,11 +1315,11 @@ subroutine oasis_string_listGetIndex(string,fldStr,kFld,print,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)        ,intent(in)           :: string  ! string
-   character(*)        ,intent(in)           :: fldStr  ! name of field
-   integer(ip_i4_p),intent(out)          :: kFld    ! index of field
-   logical             ,intent(in) ,optional :: print   ! print switch
-   integer(ip_i4_p),intent(out),optional :: rc      ! return code
+   character(*)    ,intent(in)           :: string  !< input list
+   character(*)    ,intent(in)           :: fldStr  !< name of field
+   integer(ip_i4_p),intent(out)          :: kFld    !< index of field in list
+   logical         ,intent(in) ,optional :: print   !< print switch
+   integer(ip_i4_p),intent(out),optional :: rc      !< return code
 
 !EOP
 
@@ -1457,7 +1466,7 @@ end subroutine oasis_string_listGetIndex
 ! !IROUTINE: oasis_string_listGetNum -- get number of fields in a string list
 !
 ! !DESCRIPTION:
-!  return number of fields in string list
+!> return number of fields in string list
 !
 !
 ! !INTERFACE: ------------------------------------------------------------------
@@ -1468,7 +1477,7 @@ integer function oasis_string_listGetNum(str)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*),intent(in) :: str   ! string to search
+   character(*),intent(in) :: str   !< input list
 
 !EOP
 
@@ -1501,7 +1510,7 @@ end function oasis_string_listGetNum
 ! !IROUTINE: oasis_string_listSetDel -- Set list delimeter character
 !
 ! !DESCRIPTION:
-!     Set field delimeter character in lists
+!>    Set field delimeter character in lists
 !     \newline
 !     call shr\_string\_listSetDel(":")
 !
@@ -1514,7 +1523,7 @@ subroutine oasis_string_listSetDel(cflag)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(len=1),intent(in) :: cflag
+   character(len=1),intent(in) :: cflag  !< field delimeter
 
 !EOP
 
@@ -1543,7 +1552,7 @@ end subroutine oasis_string_listSetDel
 ! !IROUTINE: oasis_string_listGetDel -- Get list delimeter character
 !
 ! !DESCRIPTION:
-!     Get field delimeter character in lists
+!>    Get field delimeter character in lists
 !     \newline
 !     call shr\_string\_listGetDel(del)
 !
@@ -1556,7 +1565,7 @@ subroutine oasis_string_listGetDel(del)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*),intent(out) :: del
+  character(*),intent(out) :: del  !< field delimeter
 
 !EOP
 
@@ -1579,7 +1588,7 @@ end subroutine oasis_string_listGetDel
 ! !IROUTINE: oasis_string_setAbort -- Set local oasis_string abort flag
 !
 ! !DESCRIPTION:
-!     Set local oasis_string abort flag, true = abort, false = print and continue
+!>    Set local oasis_string abort flag, true = abort, false = print and continue
 !     \newline
 !     call shr\_string\_setAbort(.false.)
 !
@@ -1592,7 +1601,7 @@ subroutine oasis_string_setAbort(flag)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  logical,intent(in) :: flag
+  logical,intent(in) :: flag   !< abort flag
 
 !EOP
 
@@ -1627,7 +1636,7 @@ end subroutine oasis_string_setAbort
 ! !IROUTINE: oasis_string_setDebug -- Set local oasis_string debug level
 !
 ! !DESCRIPTION:
-!     Set local oasis_string debug level, 0 = production
+!>    Set local oasis_string debug level, 0 = production
 !     \newline
 !     call shr\_string\_setDebug(2)
 !
@@ -1640,7 +1649,7 @@ subroutine oasis_string_setDebug(iFlag)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(ip_i4_p),intent(in) :: iFlag ! requested debug level
+   integer(ip_i4_p),intent(in) :: iFlag !< requested debug level
 
 !EOP
 
@@ -1665,13 +1674,15 @@ end subroutine oasis_string_setDebug
 !===============================================================================
 !===============================================================================
 
+!> Supports aborts in the string module
+
 subroutine oasis_string_abort(string)
 
    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*),optional,intent(in) :: string
+   character(*),optional,intent(in) :: string  !< error string
 
 !EOP
 

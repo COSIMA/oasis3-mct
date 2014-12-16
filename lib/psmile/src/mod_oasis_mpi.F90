@@ -1,3 +1,5 @@
+!> Provides a generic and simpler interface into MPI calls for OASIS.
+
 MODULE mod_oasis_mpi
 
 !-------------------------------------------------------------------------------
@@ -32,6 +34,7 @@ MODULE mod_oasis_mpi
    public :: oasis_mpi_init
    public :: oasis_mpi_finalize
 
+   !> Generic overloaded interface into MPI send
    interface oasis_mpi_send ; module procedure &
      oasis_mpi_sendi0, &
      oasis_mpi_sendi1, &
@@ -39,6 +42,8 @@ MODULE mod_oasis_mpi
      oasis_mpi_sendr1, &
      oasis_mpi_sendr3
    end interface
+
+   !> Generic overloaded interface into MPI receive
    interface oasis_mpi_recv ; module procedure &
      oasis_mpi_recvi0, &
      oasis_mpi_recvi1, &
@@ -46,6 +51,8 @@ MODULE mod_oasis_mpi
      oasis_mpi_recvr1, &
      oasis_mpi_recvr3
    end interface
+
+   !> Generic overloaded interface into MPI broadcast
    interface oasis_mpi_bcast ; module procedure &
      oasis_mpi_bcastc0, &
      oasis_mpi_bcastc1, &
@@ -59,15 +66,23 @@ MODULE mod_oasis_mpi
      oasis_mpi_bcastr2, &
      oasis_mpi_bcastr3
    end interface
+
+   !> Generic interface to oasis_mpi_gathScatVInit
    interface oasis_mpi_gathScatVInit ; module procedure &
      oasis_mpi_gathScatVInitr1
    end interface
+
+   !> Generic interfaces into an MPI vector gather
    interface oasis_mpi_gatherv ; module procedure &
      oasis_mpi_gatherVr1
    end interface
+
+   !> Generic interfaces into an MPI vector scatter
    interface oasis_mpi_scatterv ; module procedure &
      oasis_mpi_scatterVr1
    end interface
+
+   !> Generic overloaded interface into MPI sum reduction
    interface oasis_mpi_sum ; module procedure &
      oasis_mpi_sumi0, &
      oasis_mpi_sumi1, &
@@ -78,12 +93,16 @@ MODULE mod_oasis_mpi
      oasis_mpi_sumr2, &
      oasis_mpi_sumr3
    end interface
+
+   !> Generic overloaded interface into MPI min reduction
    interface oasis_mpi_min ; module procedure &
      oasis_mpi_mini0, &
      oasis_mpi_mini1, &
      oasis_mpi_minr0, &
      oasis_mpi_minr1
    end interface
+
+   !> Generic overloaded interface into MPI max reduction
    interface oasis_mpi_max ; module procedure &
      oasis_mpi_maxi0, &
      oasis_mpi_maxi1, &
@@ -98,16 +117,22 @@ MODULE mod_oasis_mpi
 CONTAINS
 !===============================================================================
 
+!> Checks MPI error codes and aborts
+
+!> This method compares rcode to MPI_SUCCESS.  If rcode is an error,
+!> it queries MPI_ERROR_STRING for the error string associated with rcode, writes
+!> it out, and aborts with the string passed through the interface.
+
 SUBROUTINE oasis_mpi_chkerr(rcode,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: rcode  ! input MPI error code
-   character(*),         intent(in) :: string ! message
+   integer(ip_i4_p), intent(in) :: rcode   !< MPI error code 
+   character(*),     intent(in) :: string  !< abort message
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_chkerr)'
+   character(*),parameter       :: subname = '(oasis_mpi_chkerr)'
    character(MPI_MAX_ERROR_STRING)  :: lstring
    integer(ip_i4_p)             :: len
    integer(ip_i4_p)             :: ierr
@@ -134,19 +159,21 @@ END SUBROUTINE oasis_mpi_chkerr
 !===============================================================================
 !===============================================================================
 
+!> Send a scalar integer
+
 SUBROUTINE oasis_mpi_sendi0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec     ! send value
-   integer(ip_i4_p), intent(in) :: pid      ! pid to send to
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   integer(ip_i4_p), intent(in) :: lvec     !< send value
+   integer(ip_i4_p), intent(in) :: pid      !< pid to send to
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sendi0)'
+   character(*),parameter       :: subname = '(oasis_mpi_sendi0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -172,19 +199,21 @@ END SUBROUTINE oasis_mpi_sendi0
 !===============================================================================
 !===============================================================================
 
+!> Send an array of 1D integers
+
 SUBROUTINE oasis_mpi_sendi1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to send to
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   integer(ip_i4_p), intent(in) :: lvec(:)  !< send values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to send to
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sendi1)'
+   character(*),parameter       :: subname = '(oasis_mpi_sendi1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -210,19 +239,21 @@ END SUBROUTINE oasis_mpi_sendi1
 !===============================================================================
 !===============================================================================
 
+!> Send a scalar double
+
 SUBROUTINE oasis_mpi_sendr0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec     ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to send to
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   real(ip_double_p),intent(in) :: lvec     !< send values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to send to
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sendr0)'
+   character(*),parameter       :: subname = '(oasis_mpi_sendr0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -248,19 +279,21 @@ END SUBROUTINE oasis_mpi_sendr0
 !===============================================================================
 !===============================================================================
 
+!> Send an array of 1D doubles
+
 SUBROUTINE oasis_mpi_sendr1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to send to
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   real(ip_double_p),intent(in) :: lvec(:)  !< send values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to send to
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sendr1)'
+   character(*),parameter       :: subname = '(oasis_mpi_sendr1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -286,19 +319,21 @@ END SUBROUTINE oasis_mpi_sendr1
 !===============================================================================
 !===============================================================================
 
+!> Send an array of 3D doubles
+
 SUBROUTINE oasis_mpi_sendr3(array,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real   (ip_double_p), intent(in) :: array(:,:,:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid           ! pid to send to
-   integer(ip_i4_p), intent(in) :: tag           ! tag
-   integer(ip_i4_p), intent(in) :: comm          ! mpi communicator
-   character(*),optional,intent(in) :: string        ! message
+   real(ip_double_p),intent(in) :: array(:,:,:)  !< send values
+   integer(ip_i4_p), intent(in) :: pid           !< pid to send to
+   integer(ip_i4_p), intent(in) :: tag           !< tag
+   integer(ip_i4_p), intent(in) :: comm          !< mpi communicator
+   character(*),optional,intent(in) :: string        !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sendr3)'
+   character(*),parameter       :: subname = '(oasis_mpi_sendr3)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: ierr
 
@@ -324,19 +359,21 @@ END SUBROUTINE oasis_mpi_sendr3
 !===============================================================================
 !===============================================================================
 
+!> Receive a scalar integer
+
 SUBROUTINE oasis_mpi_recvi0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(out):: lvec     ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   integer(ip_i4_p), intent(out):: lvec     !< receive values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_recvi0)'
+   character(*),parameter       :: subname = '(oasis_mpi_recvi0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -363,19 +400,21 @@ END SUBROUTINE oasis_mpi_recvi0
 !===============================================================================
 !===============================================================================
 
+!> Receive an array of 1D integers
+
 SUBROUTINE oasis_mpi_recvi1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(out):: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   integer(ip_i4_p), intent(out):: lvec(:)  !< receive values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_recvi1)'
+   character(*),parameter       :: subname = '(oasis_mpi_recvi1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -402,19 +441,21 @@ END SUBROUTINE oasis_mpi_recvi1
 !===============================================================================
 !===============================================================================
 
+!> Receive a scalar double
+
 SUBROUTINE oasis_mpi_recvr0(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(out):: lvec     ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   real(ip_double_p),intent(out):: lvec     !< receive values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_recvr0)'
+   character(*),parameter       :: subname = '(oasis_mpi_recvr0)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -441,19 +482,21 @@ END SUBROUTINE oasis_mpi_recvr0
 !===============================================================================
 !===============================================================================
 
+!> Receive an array of 1D doubles
+
 SUBROUTINE oasis_mpi_recvr1(lvec,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(out):: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid      ! pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      ! tag
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
+   real(ip_double_p),intent(out):: lvec(:)  !< receive values
+   integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
+   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_recvr1)'
+   character(*),parameter       :: subname = '(oasis_mpi_recvr1)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -480,19 +523,21 @@ END SUBROUTINE oasis_mpi_recvr1
 !===============================================================================
 !===============================================================================
 
+!> Receive an array of 3D doubles
+
 SUBROUTINE oasis_mpi_recvr3(array,pid,tag,comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   real   (ip_double_p), intent(out):: array(:,:,:)  ! in/out local values
-   integer(ip_i4_p), intent(in) :: pid           ! pid to recv from
-   integer(ip_i4_p), intent(in) :: tag           ! tag
-   integer(ip_i4_p), intent(in) :: comm          ! mpi communicator
-   character(*),optional,intent(in) :: string        ! message
+   real(ip_double_p),intent(out):: array(:,:,:)  !< receive values
+   integer(ip_i4_p), intent(in) :: pid           !< pid to recv from
+   integer(ip_i4_p), intent(in) :: tag           !< tag
+   integer(ip_i4_p), intent(in) :: comm          !< mpi communicator
+   character(*),optional,intent(in) :: string        !< to identify caller
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_recvr3)'
+   character(*),parameter       :: subname = '(oasis_mpi_recvr3)'
    integer(ip_i4_p)             :: lsize
    integer(ip_i4_p)             :: status(MPI_STATUS_SIZE)  ! mpi status info
    integer(ip_i4_p)             :: ierr
@@ -519,18 +564,20 @@ END SUBROUTINE oasis_mpi_recvr3
 !===============================================================================
 !===============================================================================
 
+!> Broadcast a scalar integer
+
 SUBROUTINE oasis_mpi_bcasti0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(inout):: vec      ! vector of 1
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   integer(ip_i4_p),     intent(inout):: vec      !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcasti0)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcasti0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -559,18 +606,20 @@ END SUBROUTINE oasis_mpi_bcasti0
 !===============================================================================
 !===============================================================================
 
+!> Broadcast a scalar logical
+
 SUBROUTINE oasis_mpi_bcastl0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   logical, intent(inout):: vec      ! vector of 1
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   logical,              intent(inout):: vec      !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastl0)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastl0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -599,18 +648,20 @@ END SUBROUTINE oasis_mpi_bcastl0
 !===============================================================================
 !===============================================================================
 
+!> Broadcast a character string
+
 SUBROUTINE oasis_mpi_bcastc0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   character(len=*), intent(inout)    :: vec      ! vector of 1
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   character(len=*),     intent(inout):: vec      !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastc0)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastc0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -639,18 +690,20 @@ END SUBROUTINE oasis_mpi_bcastc0
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 1D character strings
+
 SUBROUTINE oasis_mpi_bcastc1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   character(len=*), intent(inout)    :: vec(:)   ! 1D vector
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   character(len=*),     intent(inout):: vec(:)   !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastc1)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastc1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -679,18 +732,20 @@ END SUBROUTINE oasis_mpi_bcastc1
 !===============================================================================
 !===============================================================================
 
+!> Broadcast a scalar double
+
 SUBROUTINE oasis_mpi_bcastr0(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(inout):: vec      ! vector of 1
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   real(ip_double_p),    intent(inout):: vec      !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastr0)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastr0)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -719,18 +774,20 @@ END SUBROUTINE oasis_mpi_bcastr0
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 1D integers
+
 SUBROUTINE oasis_mpi_bcasti1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(inout):: vec(:)   ! vector 
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   integer(ip_i4_p),     intent(inout):: vec(:)   !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcasti1)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcasti1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -759,18 +816,20 @@ END SUBROUTINE oasis_mpi_bcasti1
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 1D logicals
+
 SUBROUTINE oasis_mpi_bcastl1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   logical, intent(inout):: vec(:)      ! vector of 1
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   logical,              intent(inout):: vec(:)   !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastl1)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastl1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -799,18 +858,20 @@ END SUBROUTINE oasis_mpi_bcastl1
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 1D doubles
+
 SUBROUTINE oasis_mpi_bcastr1(vec,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(inout):: vec(:)   ! vector 
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   real(ip_double_p),    intent(inout):: vec(:)   !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_bcastr1)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastr1)'
    integer(ip_i4_p)               :: ierr
    integer(ip_i4_p)               :: lsize
    integer(ip_i4_p)               :: lpebcast
@@ -839,15 +900,17 @@ END SUBROUTINE oasis_mpi_bcastr1
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 2D doubles
+
 SUBROUTINE oasis_mpi_bcastr2(arr,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments -----
-   real(ip_double_p),    intent(inout):: arr(:,:) ! array, 2d 
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   real(ip_double_p),    intent(inout):: arr(:,:) !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local -----
    integer(ip_i4_p)               :: ierr
@@ -855,7 +918,7 @@ SUBROUTINE oasis_mpi_bcastr2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_bcastr2)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastr2)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of reals
@@ -881,15 +944,17 @@ END SUBROUTINE oasis_mpi_bcastr2
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 2D integers
+
 SUBROUTINE oasis_mpi_bcasti2(arr,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments -----
-   integer,              intent(inout):: arr(:,:) ! array, 2d 
-   integer(ip_i4_p), intent(in)   :: comm     ! mpi communicator
-   character(*),optional,intent(in)   :: string   ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   integer,              intent(inout):: arr(:,:) !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local -----
    integer(ip_i4_p)               :: ierr
@@ -897,7 +962,7 @@ SUBROUTINE oasis_mpi_bcasti2(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_bcasti2)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcasti2)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 2d array of integers
@@ -923,15 +988,17 @@ END SUBROUTINE oasis_mpi_bcasti2
 !===============================================================================
 !===============================================================================
 
+!> Broadcast an array of 3D doubles
+
 SUBROUTINE oasis_mpi_bcastr3(arr,comm,string,pebcast)
 
    IMPLICIT none
 
    !----- arguments -----
-   real(ip_double_p),    intent(inout):: arr(:,:,:) ! array, 3d 
-   integer(ip_i4_p), intent(in)   :: comm       ! mpi communicator
-   character(*),optional,intent(in)   :: string     ! message
-   integer(ip_i4_p), optional, intent(in)   :: pebcast  ! bcast pe (otherwise zero)
+   real(ip_double_p),    intent(inout):: arr(:,:,:) !< values to broadcast
+   integer(ip_i4_p),     intent(in)   :: comm       !< mpi communicator
+   character(*),optional,intent(in)   :: string     !< to identify caller
+   integer(ip_i4_p), optional, intent(in) :: pebcast  !< bcast pe, default is task 0
 
    !----- local -----
    integer(ip_i4_p)               :: ierr
@@ -939,7 +1006,7 @@ SUBROUTINE oasis_mpi_bcastr3(arr,comm,string,pebcast)
    integer(ip_i4_p)               :: lpebcast
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_bcastr3)'
+   character(*),parameter         :: subname = '(oasis_mpi_bcastr3)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Broadcast a 3d array of reals
@@ -965,19 +1032,25 @@ END SUBROUTINE oasis_mpi_bcastr3
 !===============================================================================
 !===============================================================================
 
+!> Initialize variables for oasis_mpi_gatherv and oasis_mpi_scatterv
+
+!> This method initializes glob1DArr, globSize, and displs for use
+!> in the oasis_mpi_gatherv and oasis_mpi_scatterv routines.  locArr is the
+!> distributed array to gather from or scatter to.
+
 SUBROUTINE oasis_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, &
                                    displs, string )
 
    IMPLICIT none
 
    !----- arguments -----
-   integer(ip_i4_p), intent(in)   :: comm          ! mpi communicator
-   integer(ip_i4_p), intent(in)   :: rootid        ! MPI task to gather/scatter on
-   real(ip_double_p),    intent(in)   :: locArr(:)     ! Local array of distributed data
-   real(ip_double_p),    pointer      :: glob1DArr(:)  ! Global 1D array of gathered data
-   integer(ip_i4_p), pointer      :: globSize(:)   ! Size of each distributed piece
-   integer(ip_i4_p), pointer      :: displs(:)     ! Displacements for receive
-   character(*),optional,intent(in)   :: string        ! message
+   integer(ip_i4_p), intent(in)    :: comm          !< mpi communicator
+   integer(ip_i4_p), intent(in)    :: rootid        !< MPI task to gather/scatter on
+   real(ip_double_p),intent(in)    :: locArr(:)     !< Local array of distributed data
+   real(ip_double_p),pointer       :: glob1DArr(:)  !< Global 1D array of gathered data
+   integer(ip_i4_p), pointer       :: globSize(:)   !< Size of each distributed piece
+   integer(ip_i4_p), pointer       :: displs(:)     !< Displacements for receive
+   character(*),optional,intent(in):: string        !< to identify caller
 
    !----- local -----
    integer(ip_i4_p)               :: npes          ! Number of MPI tasks
@@ -991,7 +1064,7 @@ SUBROUTINE oasis_mpi_gathScatvInitr1(comm, rootid, locArr, glob1DArr, globSize, 
    integer(ip_i4_p)               :: maxSize       ! Maximum size
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_gathScatvInitr1)'
+   character(*),parameter         :: subname = '(oasis_mpi_gathScatvInitr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Setup arrays for a gatherv/scatterv operation
@@ -1052,26 +1125,33 @@ END SUBROUTINE oasis_mpi_gathScatvInitr1
 !===============================================================================
 !===============================================================================
 
+!> Gather a vector of distributed data to a rootid
+
+!> This method passes in glob1DArr, globSize, and displs computed
+!> in the oasis_mpi_gathscatvinit routine and uses that information to 
+!> gather the locArr into the glob1Darr on processor rootid in communicator
+!> comm.
+
 SUBROUTINE oasis_mpi_gathervr1(locarr, locSize, glob1DArr, globSize, displs, rootid, &
                              comm, string )
 
    IMPLICIT none
 
    !----- arguments -----
-   real(ip_double_p),    intent(in)   :: locArr(:)     ! Local array
-   real(ip_double_p),    intent(inout):: glob1DArr(:)  ! Global 1D array to receive in on
-   integer(ip_i4_p), intent(in)   :: locSize       ! Number to send this PE
-   integer(ip_i4_p), intent(in)   :: globSize(:)   ! Number to receive each PE
-   integer(ip_i4_p), intent(in)   :: displs(:)     ! Displacements for receive
-   integer(ip_i4_p), intent(in)   :: rootid        ! MPI task to gather on
-   integer(ip_i4_p), intent(in)   :: comm          ! mpi communicator
-   character(*),optional,intent(in)   :: string        ! message
+   real(ip_double_p),intent(in)    :: locArr(:)     !< Local array
+   real(ip_double_p),intent(inout) :: glob1DArr(:)  !< Global 1D array to receive in on
+   integer(ip_i4_p), intent(in)    :: locSize       !< Number to send from this PE
+   integer(ip_i4_p), intent(in)    :: globSize(:)   !< Number to receive from each PE
+   integer(ip_i4_p), intent(in)    :: displs(:)     !< Displacements for receives
+   integer(ip_i4_p), intent(in)    :: rootid        !< MPI task to gather on
+   integer(ip_i4_p), intent(in)    :: comm          !< mpi communicator
+   character(*),optional,intent(in):: string        !< to identify caller
 
    !----- local -----
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_gathervr1)'
+   character(*),parameter         :: subname = '(oasis_mpi_gathervr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Gather a 1D array of reals
@@ -1094,26 +1174,33 @@ END SUBROUTINE oasis_mpi_gathervr1
 !===============================================================================
 !===============================================================================
 
+!> Scatter a vector of global data from a rootid
+
+!> This method passes in glob1DArr, globSize, and displs computed
+!> in the oasis_mpi_gathscatvinit routine and uses that information to 
+!> scatter glob1Darr on processor rootid in communicator comm to locarr
+!> on other processors.
+
 SUBROUTINE oasis_mpi_scattervr1(locarr, locSize, glob1Darr, globSize, displs, rootid, &
                               comm, string )
 
    IMPLICIT none
 
    !----- arguments -----
-   real(ip_double_p),    intent(out)  :: locarr(:)     ! Local array
-   real(ip_double_p),    intent(in)   :: glob1Darr(:)  ! Global 1D array to send from
-   integer(ip_i4_p), intent(in)   :: locSize       ! Number to receive this PE
-   integer(ip_i4_p), intent(in)   :: globSize(:)   ! Number to send to each PE
-   integer(ip_i4_p), intent(in)   :: displs(:)     ! Displacements for send
-   integer(ip_i4_p), intent(in)   :: rootid        ! MPI task to scatter on
-   integer(ip_i4_p), intent(in)   :: comm          ! mpi communicator
-   character(*),optional,intent(in)   :: string        ! message
+   real(ip_double_p),intent(out)   :: locarr(:)     !< Local array
+   real(ip_double_p),intent(in)    :: glob1Darr(:)  !< Global 1D array to send from
+   integer(ip_i4_p), intent(in)    :: locSize       !< Number to receive this PE
+   integer(ip_i4_p), intent(in)    :: globSize(:)   !< Number to send to each PE
+   integer(ip_i4_p), intent(in)    :: displs(:)     !< Displacements for send
+   integer(ip_i4_p), intent(in)    :: rootid        !< MPI task to scatter on
+   integer(ip_i4_p), intent(in)    :: comm          !< mpi communicator
+   character(*),optional,intent(in):: string        !< to identify caller
 
    !----- local -----
    integer(ip_i4_p)               :: ierr          ! Error code
 
    !----- formats -----
-   character(*),parameter             :: subName = '(oasis_mpi_scattervr1)'
+   character(*),parameter         :: subname = '(oasis_mpi_scattervr1)'
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: Scatter a 1D array of reals
@@ -1137,20 +1224,22 @@ END SUBROUTINE oasis_mpi_scattervr1
 !===============================================================================
 !===============================================================================
 
+!> Compute a global Sum for a scalar integer
+
 SUBROUTINE oasis_mpi_sumi0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec     ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p), intent(in) :: lvec     !< local values
+   integer(ip_i4_p), intent(out):: gvec     !< global values
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumi0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumi0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1198,20 +1287,25 @@ END SUBROUTINE oasis_mpi_sumi0
 !===============================================================================
 !===============================================================================
 
+!> Compute a 1D array of global sums for an array of 1D integers
+
+!> This sums an array of local integers to an array of summed integers.
+!> This does not reduce the array to a scalar.
+
 SUBROUTINE oasis_mpi_sumi1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p), intent(in) :: lvec(:)  !< local values
+   integer(ip_i4_p), intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumi1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumi1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1259,20 +1353,22 @@ END SUBROUTINE oasis_mpi_sumi1
 !===============================================================================
 !===============================================================================
 
+!> Compute a global sum for a scalar 8 byte integer
+
 SUBROUTINE oasis_mpi_sumb0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i8_p), intent(in) :: lvec     ! in/out local values
-   integer(ip_i8_p), intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i8_p), intent(in) :: lvec     !< local values
+   integer(ip_i8_p), intent(out):: gvec     !< global values
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumb0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumb0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1320,20 +1416,25 @@ END SUBROUTINE oasis_mpi_sumb0
 !===============================================================================
 !===============================================================================
 
+!> Compute a 1D array of global sums for an array of 1D 8 byte integers
+
+!> This sums an array of local integers to an array of summed integers.
+!> This does not reduce the array to a scalar.
+
 SUBROUTINE oasis_mpi_sumb1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i8_p), intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i8_p), intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i8_p), intent(in) :: lvec(:)  !< local values
+   integer(ip_i8_p), intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumb1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumb1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1381,20 +1482,22 @@ END SUBROUTINE oasis_mpi_sumb1
 !===============================================================================
 !===============================================================================
 
+!> Compute a global sum for a scalar double
+
 SUBROUTINE oasis_mpi_sumr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec     ! in/out local values
-   real(ip_double_p),    intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec     !< local values
+   real(ip_double_p),    intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumr0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumr0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1442,20 +1545,25 @@ END SUBROUTINE oasis_mpi_sumr0
 !===============================================================================
 !===============================================================================
 
+!> Compute a 1D array of global sums for an array of 1D doubles
+
+!> This sums an array of local doubles to an array of summed doubles.
+!> This does not reduce the array to a scalar.
+
 SUBROUTINE oasis_mpi_sumr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:)  ! in/out local values
-   real(ip_double_p),    intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec(:)  !< local values
+   real(ip_double_p),    intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumr1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumr1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1503,20 +1611,25 @@ END SUBROUTINE oasis_mpi_sumr1
 !===============================================================================
 !===============================================================================
 
+!> Compute a 2D array of global sums for an array of 2D doubles
+
+!> This sums an array of local doubles to an array of summed doubles.
+!> This does not reduce the array to a scalar.
+
 SUBROUTINE oasis_mpi_sumr2(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:,:)! in/out local values
-   real(ip_double_p),    intent(out):: gvec(:,:)! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec(:,:)!< local values
+   real(ip_double_p),    intent(out):: gvec(:,:)!< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumr2)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumr2)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1564,20 +1677,25 @@ END SUBROUTINE oasis_mpi_sumr2
 !===============================================================================
 !===============================================================================
 
+!> Compute a 3D array of global sums for an array of 3D doubles
+
+!> This sums an array of local doubles to an array of summed doubles.
+!> This does not reduce the array to a scalar.
+
 SUBROUTINE oasis_mpi_sumr3(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:,:,:) ! in/out local values
-   real(ip_double_p),    intent(out):: gvec(:,:,:) ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec(:,:,:) !< local values
+   real(ip_double_p),    intent(out):: gvec(:,:,:) !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_sumr3)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_sumr3)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1625,20 +1743,22 @@ END SUBROUTINE oasis_mpi_sumr3
 !===============================================================================
 !===============================================================================
 
+!> Compute a global minimum for a scalar integer
+
 SUBROUTINE oasis_mpi_mini0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec     ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p),     intent(in) :: lvec     !< local values
+   integer(ip_i4_p),     intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_mini0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_mini0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1686,20 +1806,22 @@ END SUBROUTINE oasis_mpi_mini0
 !===============================================================================
 !===============================================================================
 
+!> Compute an array of global minimums for an array of 1D integers
+
 SUBROUTINE oasis_mpi_mini1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p),     intent(in) :: lvec(:)  !< local values
+   integer(ip_i4_p),     intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_mini1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_mini1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1747,20 +1869,22 @@ END SUBROUTINE oasis_mpi_mini1
 !===============================================================================
 !===============================================================================
 
+!> Compute an global minimum for a scalar double
+
 SUBROUTINE oasis_mpi_minr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec     ! in/out local values
-   real(ip_double_p),    intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec     !< local values
+   real(ip_double_p),    intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_minr0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_minr0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1808,20 +1932,22 @@ END SUBROUTINE oasis_mpi_minr0
 !===============================================================================
 !===============================================================================
 
+!> Compute an array of global minimums for an array of 1D doubles
+
 SUBROUTINE oasis_mpi_minr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:)  ! in/out local values
-   real(ip_double_p),    intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec(:)  !< local values
+   real(ip_double_p),    intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_minr1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_minr1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1869,20 +1995,22 @@ END SUBROUTINE oasis_mpi_minr1
 !===============================================================================
 !===============================================================================
 
+!> Compute a global maximum for a scalar integer
+
 SUBROUTINE oasis_mpi_maxi0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec     ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p),     intent(in) :: lvec     !< local values
+   integer(ip_i4_p),     intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_maxi0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_maxi0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1930,20 +2058,22 @@ END SUBROUTINE oasis_mpi_maxi0
 !===============================================================================
 !===============================================================================
 
+!> Compute an array of global maximums for an array of 1D integers
+
 SUBROUTINE oasis_mpi_maxi1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer(ip_i4_p), intent(in) :: lvec(:)  ! in/out local values
-   integer(ip_i4_p), intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   integer(ip_i4_p),     intent(in) :: lvec(:)  !< local values
+   integer(ip_i4_p),     intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_maxi1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_maxi1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -1991,20 +2121,22 @@ END SUBROUTINE oasis_mpi_maxi1
 !===============================================================================
 !===============================================================================
 
+!> Compute a global maximum for a scalar double
+
 SUBROUTINE oasis_mpi_maxr0(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec     ! in/out local values
-   real(ip_double_p),    intent(out):: gvec     ! in/out global values
-   integer(ip_i4_p), intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec     !< local values
+   real(ip_double_p),    intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_maxr0)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_maxr0)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -2052,20 +2184,22 @@ END SUBROUTINE oasis_mpi_maxr0
 !===============================================================================
 !===============================================================================
 
+!> Compute an array of global maximums for an array of 1D doubles
+
 SUBROUTINE oasis_mpi_maxr1(lvec,gvec,comm,string,all)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_double_p),    intent(in) :: lvec(:)  ! in/out local values
-   real(ip_double_p),    intent(out):: gvec(:)  ! in/out global values
-   integer(ip_i4_p) ,    intent(in) :: comm     ! mpi communicator
-   character(*),optional,intent(in) :: string   ! message
-   logical,     optional,intent(in) :: all      ! allreduce if true
+   real(ip_double_p),    intent(in) :: lvec(:)  !< local values
+   real(ip_double_p),    intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p) ,    intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
 
    !----- local ---
-   character(*),parameter           :: subName = '(oasis_mpi_maxr1)'
-   logical                          :: lall
+   character(*),parameter       :: subname = '(oasis_mpi_maxr1)'
+   logical                      :: lall
    character(len=256)           :: lstring
    integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
    integer(ip_i4_p)             :: lsize
@@ -2113,18 +2247,20 @@ END SUBROUTINE oasis_mpi_maxr1
 !===============================================================================
 !===============================================================================
 
+!> Get the total number of tasks associated with a communicator
+
 SUBROUTINE oasis_mpi_commsize(comm,size,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer,intent(in)                 :: comm
-   integer,intent(out)                :: size
-   character(*),optional,intent(in)   :: string   ! message
+   integer,intent(in)                 :: comm   !< mpi communicator
+   integer,intent(out)                :: size   !< output comm size
+   character(*),optional,intent(in)   :: string !< to identify caller
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_commsize)'
-   integer(ip_i4_p)               :: ierr
+   character(*),parameter             :: subname = '(oasis_mpi_commsize)'
+   integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
 ! PURPOSE: MPI commsize
@@ -2146,17 +2282,19 @@ END SUBROUTINE oasis_mpi_commsize
 !===============================================================================
 !===============================================================================
 
+!> Get the rank (task ID) for a task in a communicator
+
 SUBROUTINE oasis_mpi_commrank(comm,rank,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer,intent(in)                 :: comm
-   integer,intent(out)                :: rank
-   character(*),optional,intent(in)   :: string   ! message
+   integer,intent(in)                 :: comm    !< mpi communicator
+   integer,intent(out)                :: rank    !< output task ID
+   character(*),optional,intent(in)   :: string  !< to identify caller
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_commrank)'
+   character(*),parameter             :: subname = '(oasis_mpi_commrank)'
    integer(ip_i4_p)                   :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2179,13 +2317,15 @@ END SUBROUTINE oasis_mpi_commrank
 !===============================================================================
 !===============================================================================
 
+!> Check whether MPI has been initialized
+
 SUBROUTINE oasis_mpi_initialized(flag,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   logical,intent(out)                :: flag
-   character(*),optional,intent(in)   :: string   ! message
+   logical,intent(out)                :: flag     !< true if MPI_INITIALIZED has been called
+   character(*),optional,intent(in)   :: string   !< to identify caller
 
    !----- local ---
    character(*),parameter             :: subName = '(oasis_mpi_initialized)'
@@ -2211,12 +2351,14 @@ END SUBROUTINE oasis_mpi_initialized
 !===============================================================================
 !===============================================================================
 
+!> Return a timestamp from MPI_WTIME
+
 SUBROUTINE oasis_mpi_wtime(wtime)
 
    IMPLICIT none
 
    !----- arguments ---
-   real(ip_r8_p), intent(out) :: wtime  ! time
+   real(ip_r8_p), intent(out) :: wtime  !< time in MPI_WTIME units
 
    !----- local ---
    character(*),parameter             :: subName = '(oasis_mpi_wtime)'
@@ -2236,13 +2378,15 @@ END SUBROUTINE oasis_mpi_wtime
 !===============================================================================
 !===============================================================================
 
+!> Write error messages and Call MPI_ABORT
+
 SUBROUTINE oasis_mpi_abort(string,rcode)
 
    IMPLICIT none
 
    !----- arguments ---
-   character(*),optional,intent(in)   :: string   ! message
-   integer,optional,intent(in)        :: rcode    ! optional code
+   character(*),optional,intent(in)   :: string   !< to identify caller
+   integer,optional,intent(in)        :: rcode    !< optional code
 
    !----- local ---
    character(*),parameter             :: subName = '(oasis_mpi_abort)'
@@ -2274,16 +2418,18 @@ END SUBROUTINE oasis_mpi_abort
 !===============================================================================
 !===============================================================================
 
+!> Call MPI_BARRIER for a particular communicator
+
 SUBROUTINE oasis_mpi_barrier(comm,string)
 
    IMPLICIT none
 
    !----- arguments ---
-   integer,intent(in)                 :: comm
-   character(*),optional,intent(in)   :: string   ! message
+   integer,intent(in)                 :: comm     !< mpi communicator
+   character(*),optional,intent(in)   :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_barrier)'
+   character(*),parameter         :: subname = '(oasis_mpi_barrier)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2306,15 +2452,17 @@ END SUBROUTINE oasis_mpi_barrier
 !===============================================================================
 !===============================================================================
 
+!> Call MPI_INIT
+
 SUBROUTINE oasis_mpi_init(string)
 
    IMPLICIT none
 
    !----- arguments ---
-   character(*),optional,intent(in)   :: string   ! message
+   character(*),optional,intent(in)   :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_init)'
+   character(*),parameter         :: subname = '(oasis_mpi_init)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------
@@ -2337,15 +2485,17 @@ END SUBROUTINE oasis_mpi_init
 !===============================================================================
 !===============================================================================
 
+!> Call MPI_FINALZE
+
 SUBROUTINE oasis_mpi_finalize(string)
 
    IMPLICIT none
 
    !----- arguments ---
-   character(*),optional,intent(in)   :: string   ! message
+   character(*),optional,intent(in)   :: string   !< to identify caller
 
    !----- local ---
-   character(*),parameter             :: subName = '(oasis_mpi_finalize)'
+   character(*),parameter         :: subname = '(oasis_mpi_finalize)'
    integer(ip_i4_p)               :: ierr
 
 !-------------------------------------------------------------------------------

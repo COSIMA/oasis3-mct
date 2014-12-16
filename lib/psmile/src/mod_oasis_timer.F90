@@ -6,8 +6,10 @@
 !
 ! !DESCRIPTION:
 !
-! Module oasis_timer contains functionallity, which can be used to
-! measure the time consumed in specific parts of the code.
+!> Performance timer methods
+!
+!>  This is used to measure the time consumed in specific parts of the code.
+!>  Timers are defined by character strings that are stored in an internal datatype.
 !
 ! Available routines:
 !  oasis_timer_init         allocates timers
@@ -56,6 +58,7 @@ module mod_oasis_timer
    character (len=ic_med) :: file_name
    character (len=ic_med) :: file_hold
 
+   !> Storage for timer data
    type timer_details
       ! label of timer
       character (len=ic_med) :: label
@@ -84,13 +87,15 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Initializes the timer methods, called once in an application
+
       subroutine oasis_timer_init (app, file, nt)
 
          implicit none
 
-         character (len=*), intent (in)   :: app
-         character (len=*), intent (in)   :: file
-         integer          , intent (in)   :: nt
+         character (len=*), intent (in)   :: app  !< name of application
+         character (len=*), intent (in)   :: file !< output filename
+         integer          , intent (in)   :: nt   !< number of timers
 
          integer :: ierror,n
          character(len=*),parameter :: subname = '(oasis_timer_init)'
@@ -124,12 +129,14 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Start a timer
+
       subroutine oasis_timer_start (timer_label, barrier)
 
          implicit none
 
-         character(len=*), intent (in) :: timer_label
-         logical, intent (in), optional :: barrier
+         character(len=*),  intent (in) :: timer_label !< timer name
+         logical, intent (in), optional :: barrier     !< flag to barrier this timer
 
          integer :: ierr
          integer :: timer_id
@@ -166,9 +173,12 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Stop a timer
+
       subroutine oasis_timer_stop (timer_label)
 
-         character(len=*), intent (in) :: timer_label
+         character(len=*), intent (in) :: timer_label  !< timer name
+
          real :: cpu_time_arg
          integer :: timer_id
          character(len=*),parameter :: subname = '(oasis_timer_stop)'
@@ -207,11 +217,13 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Print timers
+
       subroutine oasis_timer_print(timer_label)
 
          implicit none
 
-         character(len=*), optional, intent(in) :: timer_label
+         character(len=*), optional, intent(in) :: timer_label !< if unset, print all timers
 
          integer :: timer_id
          real, allocatable             :: sum_ctime_global_tmp(:,:)
@@ -643,10 +655,13 @@ module mod_oasis_timer
       end subroutine oasis_timer_print
 
 ! --------------------------------------------------------------------------------
+
+!> Convert a timer name to the timer id number
+
       subroutine oasis_timer_c2i(tname,tid)
 
-         character(len=*),intent(in)  :: tname
-         integer         ,intent(out) :: tid
+         character(len=*),intent(in)  :: tname  !< timer name
+         integer         ,intent(out) :: tid    !< timer id
 
          integer :: n
 

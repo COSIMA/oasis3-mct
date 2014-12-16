@@ -1,3 +1,6 @@
+
+!> OASIS variable data and methods
+
   MODULE mod_oasis_var
 
   USE mod_oasis_kinds
@@ -18,35 +21,42 @@
 
   !--- datatypes ---
 
-  integer(ip_intwp_p),public   :: maxvar         ! derived based on namcouple
-  integer(kind=ip_i4_p),parameter,public :: mvarcpl = 10   ! max namcouples per variable
+  integer(ip_intwp_p),public   :: maxvar  !< number of potential variables, derived from namcouple input
+  integer(kind=ip_i4_p),parameter,public :: mvarcpl = 10   !< max namcouples per variable
 
+  !> Model variable data for model coupling
   type prism_var_type
-     character(len=ic_lvar):: name
-     integer(kind=ip_i4_p) :: part
-     integer(kind=ip_i4_p) :: ndim
-     integer(kind=ip_i4_p) :: num
-     integer(kind=ip_i4_p) :: ops
-     integer(kind=ip_i4_p) :: type
-     integer(kind=ip_i4_p) :: size
-     integer(kind=ip_i4_p) :: ncpl
-     integer(kind=ip_i4_p) :: cpl(mvarcpl)
+     character(len=ic_lvar):: name  !< variable name
+     integer(kind=ip_i4_p) :: part  !< variable partition
+     integer(kind=ip_i4_p) :: ndim  !< rank of variable
+     integer(kind=ip_i4_p) :: num   !< size of variable
+     integer(kind=ip_i4_p) :: ops   !< input or output
+     integer(kind=ip_i4_p) :: type  !< type kind of variable
+     integer(kind=ip_i4_p) :: size  !< total size of field
+     integer(kind=ip_i4_p) :: ncpl  !< number of namcouple couplers
+     integer(kind=ip_i4_p) :: cpl(mvarcpl)  !< list of namcouple couplers
   end type prism_var_type
 
-  integer(kind=ip_intwp_p),public :: prism_nvar = 0
-  TYPE(prism_var_type),POINTER,public :: prism_var(:)
+  integer(kind=ip_intwp_p),public :: prism_nvar = 0    !< number of variables defined
+  TYPE(prism_var_type),POINTER,public :: prism_var(:)  !< list of defined variables
 
   CONTAINS
 
 !---------------------------------------------------------------
 
+!> The OASIS user interface to define variables
+
   SUBROUTINE oasis_def_var(id_nports, cdport, id_part, &
          id_var_nodims, kinout, id_var_shape, ktype, kinfo)
      !---------------------------------------------------------------
-     INTEGER(kind=ip_i4_p) :: kinout, ktype, id_nports,id_part
-     INTEGER(kind=ip_i4_p) :: id_var_nodims(2),id_var_shape(2*id_var_nodims(1))
-     CHARACTER(len=*)         :: cdport
-     INTEGER(kind=ip_i4_p),optional :: kinfo
+     INTEGER(kind=ip_i4_p),intent(out) :: id_nports    !< coupling field ID
+     CHARACTER(len=*)     ,intent(in)  :: cdport       !< field name as in namcouple
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_part      !< partition ID
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_nodims(2)  !< rank and number of bundles
+     INTEGER(kind=ip_i4_p),intent(in)  :: kinout       !< input or output flag
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(2*id_var_nodims(1)) !< size of field
+     INTEGER(kind=ip_i4_p),intent(in)  :: ktype        !< type of coupling field
+     INTEGER(kind=ip_i4_p),intent(out),optional :: kinfo    !< return code
      !---------------------------------------------------------------
      INTEGER(kind=ip_i4_p)  :: n
      CHARACTER(len=ic_lvar) :: trimmed_cdport   ! Trimmed version of cdport
@@ -60,9 +70,12 @@
         return
      endif
 
-     ! Check len of incoming variable name and
+     !-------------------------------------------------     
+     !> * Check len of incoming variable name
      ! Trim incoming name once to avoid multiple trim operations
      ! in subsequent loops
+     !-------------------------------------------------     
+
      if (len_trim(cdport) > ic_lvar) then
         WRITE(nulprt,*) subname,estr,'variable too long = ',trim(cdport)
         WRITE(nulprt,*) subname,estr,'max variable length (ic_lvar) = ',ic_lvar
@@ -74,7 +87,11 @@
 
      l_field_in_namcouple = .FALSE.
      n = 0
-     
+
+     !-------------------------------------------------     
+     !> * Search for field in namcouple field lists
+     !-------------------------------------------------     
+
      ! If either condition ceases to be true then bail out of the loop
      DO WHILE (n < size_namfld .AND. (.NOT.l_field_in_namcouple))
         n = n+1
@@ -83,6 +100,10 @@
               l_field_in_namcouple = .TRUE.
         ENDIF       
      enddo
+
+     !-------------------------------------------------     
+     !> * Return if field not found in namcouple
+     !-------------------------------------------------     
 
      if (.not. l_field_in_namcouple) then
         id_nports = OASIS_Var_Uncpl
@@ -94,6 +115,10 @@
         return
      endif
 
+     !-------------------------------------------------     
+     !> * Abort if field already defined
+     !-------------------------------------------------     
+
      do n = 1,prism_nvar
         if (trimmed_cdport == prism_var(n)%name) then
            write(nulprt,*) subname,estr,'variable already defined with def_var = ',trimmed_cdport
@@ -101,6 +126,10 @@
            call oasis_abort()
         endif
      enddo
+
+     !-------------------------------------------------     
+     !> * Increment the variable and store the values
+     !-------------------------------------------------     
 
      prism_nvar = prism_nvar + 1
      id_nports = prism_nvar
@@ -126,9 +155,10 @@
      prism_var(prism_nvar)%ncpl = 0
      prism_var(prism_nvar)%cpl  = 0
 
-    !----------------------------------
-    !--- some diagnostics
-    !----------------------------------
+     !----------------------------------
+     !> * Write some diagnostics
+     !----------------------------------
+
      if (OASIS_debug >= 2) then
         write(nulprt,*) ' '
         write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
@@ -149,20 +179,24 @@
 
 !---------------------------------------------------------------
 
+!> Synchronize variables across all tasks, called at oasis enddef.
+
   SUBROUTINE oasis_var_setup()
    IMPLICIT NONE
 
    !--------------------------------------------------------
-   integer(kind=ip_intwp_p) :: n,p,v
-   INTEGER(kind=ip_intwp_p) :: ierr
+   integer(kind=ip_intwp_p) :: m,n,p,v
+   INTEGER(kind=ip_intwp_p) :: ierr, taskid
    integer(kind=ip_intwp_p) :: vcnt, tot_vnum, nvarroot, varcheck, varcheckall
+   integer(kind=ip_intwp_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
    logical                  :: found
-   character(len=ic_lvar)  ,pointer :: loc_vname(:),vname0(:),vname(:)
-   character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:)
-   integer(kind=ip_intwp_p),pointer :: loc_inout(:),inout0(:),inout(:)
+   character(len=ic_lvar)  ,pointer :: loc_vname(:),vname0(:),vname(:), loc_vname0(:), vname1(:)
+   character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:), loc_pname0(:), pname1(:)
+   integer(kind=ip_intwp_p),pointer :: loc_inout(:),inout0(:),inout(:), loc_inout0(:), inout1(:)
    character(len=ic_lvar)  ,pointer :: root_vname(:)
    integer(kind=ip_intwp_p),pointer :: vnum(:),rcnts(:),displ(:)
    logical, parameter :: local_timers_on = .false.
+   logical, parameter :: gatherall_on = .false.
    character(len=*),parameter :: subname = '(oasis_var_setup)'
    !--------------------------------------------------------
 
@@ -170,8 +204,10 @@
 
    call oasis_timer_start('var_setup')
 
-   !--- first check whether all tasks have same vars defined
-   !--- if so, then skip a bunch of the work to sort it out
+   !-------------------------------------------------     
+   !> * Check whether all tasks have same vars defined.
+   !>   If so, then skip a bunch of the work to sort it out.
+   !-------------------------------------------------     
 
    if (local_timers_on) call oasis_timer_start('var_setup_check1')
 
@@ -210,7 +246,9 @@
    endif
    if (local_timers_on) call oasis_timer_stop ('var_setup_check1')
 
-   !--- all vars same on all tasks, just return
+   !-------------------------------------------------     
+   ! all vars same on all tasks, just return
+   !-------------------------------------------------     
 
    if (varcheckall == 1) then
       call oasis_timer_stop('var_setup')
@@ -220,26 +258,39 @@
 
    !-----------------------------------------------------------------
 
-   !--- gather var information
+   !-------------------------------------------------     
+   !> * Gather variable information across all tasks
+   !-------------------------------------------------     
+
    if (local_timers_on) call oasis_timer_start('var_setup_gather')
 
    allocate(vnum(mpi_size_local))
    vnum = 0
 
+   !-------------------------------------------------     
+   !>   * Gather number of variables
+   !-------------------------------------------------     
+
    call MPI_GATHER(prism_nvar, 1, MPI_INTEGER, vnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
+   if (local_timers_on) call oasis_timer_stop('var_setup_gather')
 
-   !--- vname
+ if (gatherall_on) then
 
+   !-------------------------------------------------     
+   !>   * If gatherall, Gather variable names
+   !-------------------------------------------------     
+
+   if (local_timers_on) call oasis_timer_start('var_setup_gather')
    if (mpi_rank_local == 0) then
       tot_vnum = sum(vnum)
       allocate(vname0(tot_vnum))
       allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-      do n = 1,mpi_size_local
-         rcnts(n) = vnum(n) * ic_lvar
-         if (n == 1) then
-            displ(n) = 0
+      do m = 1,mpi_size_local
+         rcnts(m) = vnum(m) * ic_lvar
+         if (m == 1) then
+            displ(m) = 0
          else
-            displ(n) = displ(n-1) + rcnts(n-1)
+            displ(m) = displ(m-1) + rcnts(m-1)
          endif
       enddo
    else
@@ -254,7 +305,9 @@
    deallocate(loc_vname)
    deallocate(rcnts, displ)
 
-   !--- pname
+   !-------------------------------------------------     
+   !>   * If gatherall, Gather partition names
+   !-------------------------------------------------     
 
    if (mpi_rank_local == 0) then
       tot_vnum = sum(vnum)
@@ -279,7 +332,9 @@
    call MPI_GATHERV(loc_pname, prism_nvar*ic_lvar2, MPI_CHARACTER, pname0, rcnts, displ, MPI_CHARACTER, 0, mpi_comm_local, ierr) 
    deallocate(loc_pname)
 
-   !--- inout
+   !-------------------------------------------------     
+   !>   * If gatherall, Gather in/out variable setting
+   !-------------------------------------------------     
 
    if (mpi_rank_local == 0) then
       tot_vnum = sum(vnum)
@@ -297,8 +352,6 @@
       allocate(inout0(1),rcnts(1),displ(1))
    endif
 
-   deallocate(vnum)
-
    allocate(loc_inout(prism_nvar))
    do n = 1,prism_nvar
       loc_inout(n) = prism_var(n)%ops
@@ -307,7 +360,9 @@
    deallocate(loc_inout)
    if (local_timers_on) call oasis_timer_stop ('var_setup_gather')
 
-   !--- determine unique var names on root
+   !-------------------------------------------------     
+   !> * If gatherall, Determine the unique variable names on the root
+   !-------------------------------------------------     
 
    if (local_timers_on) call oasis_timer_start('var_setup_rootsrch')
    if (mpi_rank_local == 0) then
@@ -341,7 +396,150 @@
    endif
    if (local_timers_on) call oasis_timer_stop ('var_setup_rootsrch')
 
-   !--- broadcast var name list
+ else   ! gatherall_on
+
+   allocate(loc_vname(prism_nvar))
+   allocate(loc_pname(prism_nvar))
+   allocate(loc_inout(prism_nvar))
+   do n = 1,prism_nvar
+      loc_vname(n) = prism_var(n)%name
+      loc_inout(n) = prism_var(n)%ops
+      loc_pname(n) = prism_part(prism_var(n)%part)%partname
+   enddo
+
+   if (mpi_rank_local == 0) then
+      vcnt = 0
+      allocate(pname0(max(prism_nvar,20)))  ! 20 is arbitrary starting number
+      allocate(vname0(max(prism_nvar,20)))  ! 20 is arbitrary starting number
+      allocate(inout0(max(prism_nvar,20)))  ! 20 is arbitrary starting number
+   else
+      allocate(pname0(1))
+      allocate(vname0(1))
+      allocate(inout0(1))
+   endif
+
+   !-------------------------------------------------     
+   !> * If not gatherall, Loop over each task
+   !-------------------------------------------------     
+
+   do m = 1,mpi_size_local
+      taskid = m - 1
+
+      !-------------------------------------------------     
+      !>   * If not gatherall, Send variable, partition, inout to root
+      !-------------------------------------------------     
+
+      if (mpi_rank_local == taskid .and. prism_nvar > 0) then
+         if (local_timers_on) call oasis_timer_start('var_setup_gather')
+         if (mpi_rank_local /= 0) then
+            if (OASIS_Debug >= 15) then
+               write(nulprt,*) subname,' send prism_nvar ',mpi_rank_local,m,prism_nvar,ic_lvar2
+               call oasis_flush(nulprt)
+            endif
+            call MPI_SEND(loc_vname, prism_nvar*ic_lvar , MPI_CHARACTER, 0, 10000+m, mpi_comm_local, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':send vname')
+            call MPI_SEND(loc_pname, prism_nvar*ic_lvar2, MPI_CHARACTER, 0, 50000+m, mpi_comm_local, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':send pname')
+            call MPI_SEND(loc_inout, prism_nvar         , MPI_INTEGER  , 0, 90000+m, mpi_comm_local, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':send pname')
+         endif
+         if (local_timers_on) call oasis_timer_stop ('var_setup_gather')
+      endif
+
+      !-------------------------------------------------     
+      !>   * If not gatherall, Recv variable, partition, inout on root
+      !>   * If not gatherall, Determine the unique variable names on the root
+      !-------------------------------------------------     
+
+      if (mpi_rank_local == 0 .and. vnum(m) > 0) then
+         if (local_timers_on) call oasis_timer_start ('var_setup_gather')
+         if (OASIS_Debug >= 15) then
+            write(nulprt,*) subname,' recv prism_nvar ',mpi_rank_local,m,vnum(m),ic_lvar2
+            call oasis_flush(nulprt)
+         endif
+         allocate(loc_vname0(vnum(m)))
+         allocate(loc_pname0(vnum(m)))
+         allocate(loc_inout0(vnum(m)))
+         if (taskid == 0) then
+            loc_vname0 = loc_vname   ! copy local values
+            loc_pname0 = loc_pname   ! copy local values
+            loc_inout0 = loc_inout   ! copy local values
+         else
+            call MPI_RECV(loc_vname0, vnum(m)*ic_lvar , MPI_CHARACTER, taskid, 10000+m, mpi_comm_local, status, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':recv')
+            call MPI_RECV(loc_pname0, vnum(m)*ic_lvar2, MPI_CHARACTER, taskid, 50000+m, mpi_comm_local, status, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':recv')
+            call MPI_RECV(loc_inout0, vnum(m)         , MPI_INTEGER  , taskid, 90000+m, mpi_comm_local, status, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':recv')
+         endif
+         if (local_timers_on) call oasis_timer_stop ('var_setup_gather')
+
+         if (local_timers_on) call oasis_timer_start('var_setup_rootsrch')
+         do n = 1,vnum(m)
+            if (OASIS_Debug >= 15) write(nulprt,*) subname,' check loc_vname0 ',m,n,trim(loc_vname0(n))
+
+            v = 0
+            found = .false.
+            do while (v < vcnt .and. .not.found)
+               v = v + 1
+               if (loc_vname0(n) == vname0(v)) then
+                  found = .true.
+                  !--- check that var, part, and inout consistent on all tasks
+                  if (loc_pname0(n) /= pname0(v) .or. loc_inout0(n) /= inout0(v)) then
+                     write(nulprt,*) subname,estr,'inconsistent var and part name: ',&
+                                     trim(loc_vname0(n)),' ',trim(loc_pname0(n)),' ',trim(pname0(v))
+                     write(nulprt,*) subname,estr,'inconsistent var and inout opt: ',&
+                                     trim(loc_vname0(n)),' ',loc_inout0(n),' ',inout0(v)
+                     call oasis_abort()
+                  endif
+               endif
+            enddo
+            if (.not.found) then
+               vcnt = vcnt + 1
+               if (vcnt > size(vname0)) then
+                  allocate(vname1(size(vname0)))
+                  allocate(pname1(size(pname0)))
+                  allocate(inout1(size(inout0)))
+                  vname1 = vname0
+                  pname1 = pname0
+                  inout1 = inout0
+                  deallocate(vname0,pname0,inout0)
+                  if (OASIS_Debug >= 15) then
+                     write(nulprt,*) subname,' resize vname0 ',size(vname1),vcnt+vnum(m)
+                     call oasis_flush(nulprt)
+                  endif
+                  allocate(vname0(vcnt+vnum(m)))
+                  allocate(pname0(vcnt+vnum(m)))
+                  allocate(inout0(vcnt+vnum(m)))
+                  vname0(1:size(vname1)) = vname1(1:size(vname1))
+                  pname0(1:size(pname1)) = pname1(1:size(pname1))
+                  inout0(1:size(inout1)) = inout1(1:size(inout1))
+                  deallocate(vname1,pname1,inout1)
+               endif
+               vname0(vcnt) = loc_vname0(n)
+               pname0(vcnt) = loc_pname0(n)
+               inout0(vcnt) = loc_inout0(n)
+            endif
+          enddo  ! vnum
+         deallocate(loc_vname0)
+         deallocate(loc_pname0)
+         deallocate(loc_inout0)
+         if (local_timers_on) call oasis_timer_stop('var_setup_rootsrch')
+
+      endif  ! rank == 0 and vnum > 0
+   enddo  ! mpi_size_local
+
+   deallocate(loc_vname)
+   deallocate(loc_pname)
+   deallocate(loc_inout)
+
+ endif  ! gatherall_on
+
+   deallocate(vnum)
+
+   !-------------------------------------------------     
+   !> * Broadcast the variable information to all tasks
+   !-------------------------------------------------     
 
    if (local_timers_on) call oasis_timer_start('var_setup_bcast')
    call oasis_mpi_bcast(vcnt,mpi_comm_local,subname//' vcnt')
@@ -369,7 +567,9 @@
    endif
    if (local_timers_on) call oasis_timer_stop ('var_setup_bcast')
 
-   !--- Initialize variables on tasks where not defined
+   !-------------------------------------------------     
+   !> * Initialize variables on tasks where they are not previously defined.
+   !-------------------------------------------------     
 
    if (local_timers_on) call oasis_timer_start('var_setup_initvar')
    do v = 1,vcnt
@@ -430,6 +630,8 @@
    END SUBROUTINE oasis_var_setup
 
 !---------------------------------------------------------------
+
+!> Zero variable information
 
   SUBROUTINE oasis_var_zero(prism_var)
    IMPLICIT NONE

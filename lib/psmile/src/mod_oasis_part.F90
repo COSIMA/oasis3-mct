@@ -1,3 +1,6 @@
+
+!> OASIS partition data and methods
+
 MODULE mod_oasis_part
 
    USE mod_oasis_kinds
@@ -20,34 +23,37 @@ MODULE mod_oasis_part
    !--- datatypes ---
    public :: prism_part_type
 
-   integer(kind=ip_intwp_p),parameter :: mpart = 100
+   integer(kind=ip_intwp_p),parameter :: mpart = 100  !< maximum number of partitions allowed
 
+   !> Partition (decomposition) data for variables
    type prism_part_type
-      character(len=ic_lvar2):: partname
-      type(mct_gsmap)        :: gsmap    ! gsmap on mpi_comm_local
-      integer(kind=ip_i4_p)  :: gsize
-      integer(kind=ip_i4_p)  :: nx
-      integer(kind=ip_i4_p)  :: ny
-      character(len=ic_lvar) :: gridname
-      integer(kind=ip_i4_p)  :: mpicom   ! mpicom for part pes only
-      integer(kind=ip_i4_p)  :: npes
-      integer(kind=ip_i4_p)  :: rank
-      type(mct_gsmap)        :: pgsmap   ! same gsmap but on mpicom
+      character(len=ic_lvar2):: partname !< partition name
+      type(mct_gsmap)        :: gsmap    !< gsmap on mpi_comm_local
+      integer(kind=ip_i4_p)  :: gsize    !< global size of grid
+      integer(kind=ip_i4_p)  :: nx       !< global nx size
+      integer(kind=ip_i4_p)  :: ny       !< global ny size
+      character(len=ic_lvar) :: gridname !< grid name
+      integer(kind=ip_i4_p)  :: mpicom   !< mpicom for partition tasks only
+      integer(kind=ip_i4_p)  :: npes     !< tasks count associated with partition
+      integer(kind=ip_i4_p)  :: rank     !< rank of each task
+      type(mct_gsmap)        :: pgsmap   !< same gsmap but on partition mpicom
       !--- temporary storage from def_part inputs ---
-      integer(kind=ip_i4_p)  :: ig_size
-      integer(kind=ip_i4_p),pointer  :: kparal(:)
+      integer(kind=ip_i4_p)  :: ig_size  !< def_part setting
+      integer(kind=ip_i4_p),pointer  :: kparal(:)  !< def_part setting
    end type prism_part_type
 
-   integer(kind=ip_intwp_p),public :: prism_npart = 0
-   type(prism_part_type)   ,public :: prism_part(mpart)
+   integer(kind=ip_intwp_p),public :: prism_npart = 0  !< number of partitions defined
+   type(prism_part_type)   ,public :: prism_part(mpart)  !< list of defined partitions
 
    !--- for automatic naming of partname
    !--- better than prism_npart, counts only unnamed parts
-   integer(kind=ip_intwp_p)        :: part_name_cnt = 0
+   integer(kind=ip_intwp_p)        :: part_name_cnt = 0  !< used to define partition names internally
 
 CONTAINS
 
 !--------------------------------------------------------------------
+
+!> The OASIS user interface to define partitions
 
   SUBROUTINE oasis_def_partition (id_part, kparal, kinfo, ig_size, name)
 
@@ -68,11 +74,11 @@ CONTAINS
 !        Arnaud Caubel - FECIT
 !
 !  ----------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p)              ,intent(out) :: id_part
-   INTEGER(kind=ip_intwp_p), DIMENSION(:),intent(in)  :: kparal
-   INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo
-   INTEGER(kind=ip_intwp_p), optional    ,intent(in)  :: ig_size
-   character(len=*)        , optional    ,intent(in)  :: name
+   INTEGER(kind=ip_intwp_p)              ,intent(out) :: id_part  !< partition id
+   INTEGER(kind=ip_intwp_p), DIMENSION(:),intent(in)  :: kparal   !< decomposition information
+   INTEGER(kind=ip_intwp_p), optional    ,intent(out) :: kinfo    !< return code
+   INTEGER(kind=ip_intwp_p), optional    ,intent(in)  :: ig_size  !< total size of partition
+   character(len=*)        , optional    ,intent(in)  :: name     !< name of partition
 !  ----------------------------------------------------------------
    integer(kind=ip_intwp_p) :: n
    character(len=*),parameter :: subname = '(oasis_def_partition)'
@@ -86,6 +92,10 @@ CONTAINS
    endif
 
    kinfo = OASIS_OK
+
+   !-----------------------------------------------
+   !> * Increment partition number and store user values
+   !-----------------------------------------------
 
    call oasis_timer_start('part_definition')
 
@@ -124,21 +134,26 @@ CONTAINS
  END SUBROUTINE oasis_def_partition
 
 !------------------------------------------------------------
+
+!> Synchronize partitions across all tasks, called at oasis enddef.
+
   SUBROUTINE oasis_part_setup()
    IMPLICIT NONE
 
    !--------------------------------------------------------
-   integer(kind=ip_intwp_p) :: m,n,k,p,nsegs,numel
+   integer(kind=ip_intwp_p) :: m,n,k,p,nsegs,numel,taskid
    INTEGER(kind=ip_intwp_p) :: icpl,ierr,ilen
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
    integer(kind=ip_intwp_p),pointer :: kparal(:)
    integer(kind=ip_intwp_p) :: ig_size
    integer(kind=ip_intwp_p) :: pcnt, tot_pnum
    logical                  :: found
-   character(len=ic_lvar2)  ,pointer :: loc_pname(:)
-   character(len=ic_lvar2)  ,pointer :: pname0(:),pname(:)
-   integer(kind=ip_intwp_p),pointer :: pnum(:),rcnts(:),displ(:)
+   integer(kind=ip_intwp_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
+   character(len=ic_lvar2)  ,pointer :: loc_pname(:), loc_pname0(:)
+   character(len=ic_lvar2)  ,pointer :: pname0(:),pname(:),pname1(:)
+   integer(kind=ip_intwp_p) ,pointer :: pnum(:),rcnts(:),displ(:)
    logical, parameter :: local_timers_on = .false.
+   logical, parameter :: gatherall_on = .false.
    character(len=*),parameter :: subname = '(oasis_part_setup)'
    !--------------------------------------------------------
 
@@ -146,26 +161,36 @@ CONTAINS
 
    call oasis_timer_start('part_setup')
 
-   !--- gather part information
+   !-----------------------------------------------
+   !> * Gather partition information
+   !-----------------------------------------------
 
    if (local_timers_on) call oasis_timer_start('part_setup_gather')
    allocate(pnum(mpi_size_local))
    pnum = 0
 
-   call MPI_GATHER(prism_npart, 1, MPI_INTEGER, pnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
+   !-----------------------------------------------
+   !>   * Gather number of partitions
+   !-----------------------------------------------
 
+   call MPI_GATHER(prism_npart, 1, MPI_INTEGER, pnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
+   if (local_timers_on) call oasis_timer_stop('part_setup_gather')
+
+ if (gatherall_on) then
+
+   if (local_timers_on) call oasis_timer_start('part_setup_gather')
    if (mpi_rank_local == 0) then
       tot_pnum = sum(pnum)
       if (OASIS_Debug >= 15) &
          write(nulprt,*) subname,' part num = ',tot_pnum,pnum
       allocate(pname0(tot_pnum))
       allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-      do n = 1,mpi_size_local
-         rcnts(n) = pnum(n) * ic_lvar2
-         if (n == 1) then
-            displ(n) = 0
+      do m = 1,mpi_size_local
+         rcnts(m) = pnum(m) * ic_lvar2
+         if (m == 1) then
+            displ(m) = 0
          else
-            displ(n) = displ(n-1) + rcnts(n-1)
+            displ(m) = displ(m-1) + rcnts(m-1)
          endif
       enddo
       if (OASIS_Debug >= 15) then
@@ -178,7 +203,9 @@ CONTAINS
       allocate(pname0(1),rcnts(1),displ(1))
    endif
 
-   deallocate(pnum)
+   !-----------------------------------------------
+   !>   * if gatherall, Gather partition names
+   !-----------------------------------------------
 
    allocate(loc_pname(prism_npart))
    do n = 1,prism_npart
@@ -189,7 +216,9 @@ CONTAINS
    deallocate(loc_pname)
    if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
 
-   !--- determine unique part names on root
+   !-----------------------------------------------
+   !>   * if gatherall, Determine the unique partitions on the root
+   !-----------------------------------------------
 
    if (local_timers_on) call oasis_timer_start('part_setup_rootsrch')
    deallocate(rcnts, displ)
@@ -212,7 +241,106 @@ CONTAINS
    endif
    if (local_timers_on) call oasis_timer_stop ('part_setup_rootsrch')
 
-   !--- broadcast part name list
+ else   ! gatherall_on
+
+   allocate(loc_pname(prism_npart))
+   do n = 1,prism_npart
+      loc_pname(n) = prism_part(n)%partname
+   enddo
+   if (mpi_rank_local == 0) then
+      pcnt = 0
+      allocate(pname0(max(prism_npart,20)))  ! 20 is arbitrary starting number
+   else
+      allocate(pname0(1))
+   endif
+
+   !-----------------------------------------------
+   !>   * if not gatherall, Loop over tasks
+   !-----------------------------------------------
+
+   do m = 1,mpi_size_local
+      taskid = m - 1
+
+      !-----------------------------------------------
+      !>     * if not gatherall, Send partitions to root
+      !-----------------------------------------------
+
+      if (mpi_rank_local == taskid .and. prism_npart > 0) then
+         if (local_timers_on) call oasis_timer_start('part_setup_gather')
+         if (mpi_rank_local /= 0) then
+            if (OASIS_Debug >= 15) then
+               write(nulprt,*) subname,' send prism_npart ',mpi_rank_local,m,prism_npart,ic_lvar2
+               call oasis_flush(nulprt)
+            endif
+            call MPI_SEND(loc_pname, prism_npart*ic_lvar2, MPI_CHARACTER, 0, 900+m, mpi_comm_local, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':send')
+         endif
+         if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
+      endif
+
+      !-----------------------------------------------
+      !>     * if not gatherall, Recv partitions on root
+      !>     * if not gatherall, Determine the unique partitions on the root
+      !-----------------------------------------------
+
+      if (mpi_rank_local == 0 .and. pnum(m) > 0) then
+         if (local_timers_on) call oasis_timer_start ('part_setup_gather')
+         if (OASIS_Debug >= 15) then
+            write(nulprt,*) subname,' recv prism_npart ',mpi_rank_local,m,pnum(m),ic_lvar2
+            call oasis_flush(nulprt)
+         endif
+         allocate(loc_pname0(pnum(m)))
+         if (taskid == 0) then
+            loc_pname0 = loc_pname   ! copy local values
+         else
+            call MPI_RECV(loc_pname0, pnum(m)*ic_lvar2, MPI_CHARACTER, taskid, 900+m, mpi_comm_local, status, ierr)
+            call oasis_mpi_chkerr(ierr,subname//':recv')
+         endif
+         if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
+
+         if (local_timers_on) call oasis_timer_start('part_setup_rootsrch')
+         do n = 1,pnum(m)
+            if (OASIS_Debug >= 15) write(nulprt,*) subname,' check loc_pname0 ',m,n,trim(loc_pname0(n))
+
+            p = 0
+            found = .false.
+            do while (p < pcnt .and. .not.found)
+               p = p + 1
+               if (loc_pname0(n) == pname0(p)) found = .true.
+            enddo
+            if (.not.found) then
+               pcnt = pcnt + 1
+               if (pcnt > size(pname0)) then
+                  allocate(pname1(size(pname0)))
+                  pname1 = pname0
+                  deallocate(pname0)
+                  if (OASIS_Debug >= 15) then
+                     write(nulprt,*) subname,' resize pname0 ',size(pname1),pcnt+pnum(m)
+                     call oasis_flush(nulprt)
+                  endif
+                  allocate(pname0(pcnt+pnum(m)))
+                  pname0(1:size(pname1)) = pname1(1:size(pname1))
+                  deallocate(pname1)
+               endif
+               pname0(pcnt) = loc_pname0(n)
+            endif
+         enddo  ! pnum
+         deallocate(loc_pname0)
+         if (local_timers_on) call oasis_timer_stop('part_setup_rootsrch')
+
+      endif  ! rank == 0 and pnum > 0
+
+   enddo  ! mpi_size_local
+
+   deallocate(loc_pname)
+
+ endif  ! gatherall_on
+
+   deallocate(pnum)
+
+   !-------------------------------------------------     
+   !> * Broadcast the partition information to all tasks
+   !-------------------------------------------------     
 
    if (local_timers_on) call oasis_timer_start('part_setup_bcast')
    call oasis_mpi_bcast(pcnt,mpi_comm_local,subname//' pcnt')
@@ -233,7 +361,10 @@ CONTAINS
    endif
    if (local_timers_on) call oasis_timer_stop ('part_setup_bcast')
 
-   !--- Initialize gsmaps for all partitions on all tasks
+   !-------------------------------------------------     
+   !> * Define all partitions on all tasks
+   !-------------------------------------------------     
+
    if (local_timers_on) call oasis_timer_start('part_setup_initgsm')
    do p = 1,pcnt
 
@@ -258,6 +389,10 @@ CONTAINS
          allocate(prism_part(prism_npart)%kparal(3))
          prism_part(prism_npart)%kparal = 0
       endif
+
+      !-------------------------------------------------     
+      !> * Convert kparal information to data for the gsmap
+      !-------------------------------------------------     
 
       allocate(kparal(size(prism_part(m)%kparal)))
       kparal = prism_part(m)%kparal
@@ -325,6 +460,10 @@ CONTAINS
          call oasis_abort()
       endif
    
+      !-------------------------------------------------     
+      !> * Initialize the local gsmap and partition gsmap
+      !-------------------------------------------------     
+
       if (mpi_comm_local /= MPI_COMM_NULL) then
          if (ig_size > 0) then
             call mct_gsmap_init(prism_part(m)%gsmap,start,length,mpi_root_local,&
@@ -374,6 +513,9 @@ CONTAINS
 
  END SUBROUTINE oasis_part_setup
 !------------------------------------------------------------
+
+!> Zero partition information
+
   SUBROUTINE oasis_part_zero(s_prism_part)
 
   IMPLICIT NONE
@@ -399,6 +541,9 @@ CONTAINS
 
  END SUBROUTINE oasis_part_zero
 !------------------------------------------------------------
+
+!> Print parition information
+
   SUBROUTINE oasis_part_write(s_prism_part,npart)
 
   IMPLICIT NONE
@@ -437,18 +582,21 @@ CONTAINS
 
  END SUBROUTINE oasis_part_write
 !------------------------------------------------------------
+
+!> Create a new partition internally, needed for mapping
+
   SUBROUTINE oasis_part_create(id_part,TYPE,gsize,nx,ny,gridname,gscomm,mpicom)
 
   IMPLICIT NONE
 
-  integer(ip_i4_p),intent(out) :: id_part
-  character(len=*),intent(in)  :: type
-  integer(ip_i4_p),intent(in)  :: gsize
-  integer(ip_i4_p),intent(in)  :: nx
-  integer(ip_i4_p),intent(in)  :: ny
-  character(len=*),intent(in)  :: gridname
-  integer(ip_i4_p),intent(in)  :: gscomm
-  integer(ip_i4_p),intent(in)  :: mpicom
+  integer(ip_i4_p),intent(out) :: id_part  !< partition id
+  character(len=*),intent(in)  :: type     !< type of decomposition specified
+  integer(ip_i4_p),intent(in)  :: gsize    !< global size of grid
+  integer(ip_i4_p),intent(in)  :: nx       !< global nx size
+  integer(ip_i4_p),intent(in)  :: ny       !< global ny size
+  character(len=*),intent(in)  :: gridname !< grid name
+  integer(ip_i4_p),intent(in)  :: gscomm   !< global seg map communicator
+  integer(ip_i4_p),intent(in)  :: mpicom   !< local mpi comm
   !--------------------------------------------------------
   integer(ip_i4_p) :: gsrank
   integer(ip_i4_p) :: gssize
@@ -476,7 +624,10 @@ CONTAINS
      write(nulprt,*) subname,' local ',gsrank,gssize
   endif
 
-  !--- before initializing another gsmap, check if one exists that will work
+  !-----------------------------------------------
+  !> * Check if an existing gsmap can be reused
+  !-----------------------------------------------
+
   id_part = -1
   found = 0
   n = 0
@@ -492,7 +643,10 @@ CONTAINS
      endif
   enddo
 
-  !--- all tasks must agree that one exists for this to work
+  !-----------------------------------------------
+  !> * Check that all tasks agree and if so, return with that partition id
+  !-----------------------------------------------
+
   foundall = -1
   call oasis_mpi_min(found,foundall,mpicom,string=subname//' found',all=.true.)
   if (foundall == 1) then
@@ -503,11 +657,16 @@ CONTAINS
      return
   endif
 
+  !-----------------------------------------------
+  !> * Instantiate a decomposition based on gsize and type
+  !-----------------------------------------------
+
   if (trim(type) == '1d') then
      allocate(start(1),length(1))
      start = 1
      length = 0
      numel = 0
+     pts = 0
      if (gsrank >= 0) then
         numel = 1
         length(1) = gsize/gssize
@@ -520,6 +679,11 @@ CONTAINS
         write(nulprt,*) subname,' start ',numel,start,length,pts
      endif
      call oasis_part_zero(prism_part(prism_npart))
+
+     !-----------------------------------------------
+     !>   * Create a new partition and set values
+     !-----------------------------------------------
+
      part_name_cnt = part_name_cnt + 1
      write(prism_part(prism_npart)%partname,'(a,i6.6)') trim(compnm)//'_part',part_name_cnt
      prism_part(prism_npart)%gsize = gsize
@@ -528,6 +692,11 @@ CONTAINS
      prism_part(prism_npart)%mpicom = gscomm
      prism_part(prism_npart)%npes = gssize
      prism_part(prism_npart)%rank = gsrank
+
+     !-----------------------------------------------
+     !>   * Initialize the partition gsmap and pgsmap
+     !-----------------------------------------------
+
      call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,0,mpicom,compid,numel=numel)
      if (numel > 0) then
         call mct_gsmap_init(prism_part(prism_npart)%pgsmap,start,length,0, &

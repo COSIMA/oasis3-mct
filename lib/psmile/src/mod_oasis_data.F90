@@ -1,3 +1,6 @@
+
+!> Provides a common location for several OASIS variables
+
 MODULE mod_oasis_data
 !     - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !
@@ -14,7 +17,7 @@ MODULE mod_oasis_data
 
 ! GENERAL
 
-  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1, nullucia
+  INTEGER(kind=ip_intwp_p)  :: nulprt, nulprt1, nullucia  ! unit numbers for log files
   INTEGER(kind=ip_i4_p)	    :: OASIS_debug
   INTEGER(kind=ip_i4_p)     :: TIMER_debug
   INTEGER(kind=ip_i4_p)     :: LUCIA_debug
@@ -64,6 +67,8 @@ MODULE mod_oasis_data
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
+
+!< Initialize the module data
 
   SUBROUTINE oasis_data_zero()
 

@@ -1,6 +1,10 @@
+
+!> High level OASIS user interfaces
+
 MODULE mod_oasis_method
 
    USE mod_oasis_kinds
+   USE mod_oasis_mem
    USE mod_oasis_sys
    USE mod_oasis_data
    USE mod_oasis_parameters
@@ -41,16 +45,19 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
+
+!> OASIS user init method
+
    SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled)
 
-   ! This is COLLECTIVE, all pes must call
+   !> * This is COLLECTIVE, all pes must call
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(out)   :: mynummod     
-   CHARACTER(len=*)         ,intent(in)    :: cdnam   
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
-   logical                  ,intent(in)   ,optional :: coupled  ! is this component coupled in oasis
+   INTEGER (kind=ip_intwp_p),intent(out)   :: mynummod     !< component model ID
+   CHARACTER(len=*)         ,intent(in)    :: cdnam        !< model name
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
+   logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -87,7 +94,7 @@ CONTAINS
    endif
 
    !------------------------
-   !--- Initialize MPI
+   !> * Initialize MPI
    !------------------------
 
    lg_mpiflag = .FALSE.
@@ -111,7 +118,7 @@ CONTAINS
    mpi_rank_global = mpi_rank_world
 
    !------------------------
-   !--- nout file, need mpi_rank_world
+   !> * Set initial output file, need mpi_rank_world
    !------------------------
 
    iu=-1
@@ -125,9 +132,10 @@ CONTAINS
    ENDIF
 
    !------------------------
-   !--- Initialize namcouple
-   !--- first on rank 0 to write error messages
-   !--- then on all other ranks
+   !> * Initialize namcouple.
+   !>   First on rank 0 to write error messages
+   !>   then on all other ranks.  All tasks will
+   !>   read the namcouple file independently.
    !------------------------
 
    IF (mpi_rank_world == 0) THEN
@@ -143,9 +151,11 @@ CONTAINS
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
 
-   ! If NFIELDS=0 there is no coupling
+   !------------------------
+   !> * Check if NFIELDS=0, there is no coupling.
    ! No information must be written in the debug files as
    ! the different structures are not allocated
+   !------------------------
 
    IF ( nnamcpl == 0 ) THEN
        IF (mpi_rank_world == 0) THEN
@@ -158,8 +168,12 @@ CONTAINS
        ENDIF
    ENDIF
 
-   ! Determines the total number of fields to avoid a parameter in oasis_def_var
-   ! and mod_oasis_coupler
+   !------------------------
+   !> * Determine the total number of coupling fields from namcouple.
+   !>   Set maxvar parameter and allocate prism_var.
+   ! to avoid a parameter in oasis_def_var and mod_oasis_coupler
+   !------------------------
+
    size_namfld=0
    DO n = 1,nnamcpl
      size_namfld = size_namfld + oasis_string_listGetNum(namsrcfld(n))
@@ -172,9 +186,11 @@ CONTAINS
 
    ALLOCATE(prism_var(maxvar))
 
-   ! Store all the names of the fields exchanged in the namcouple
+   !------------------------
+   !> * Store all the names of the fields exchanged in the namcouple
    ! which can be different of namsrcfld(:) and namdstfld(:) if multiple 
    ! fields are exchanged together
+   !------------------------
 
    ALLOCATE(total_namsrcfld(size_namfld))
    ALLOCATE(total_namdstfld(size_namfld))
@@ -213,7 +229,7 @@ CONTAINS
    ENDIF
 
    !------------------------
-   !--- Set compid (need namcouple model names)
+   ! check (not needed anymore)
    !------------------------
 
    if (len_trim(cdnam) > ic_lvar) then
@@ -223,7 +239,7 @@ CONTAINS
    endif
 
    !------------------------
-   !--- Gather model names from all tasks to generate active model list
+   !> * Gather model names from all tasks to generate active model list on all tasks.
    !--- Check that the coupled flag from all tasks is consistent for a given model or abort
    !--- Size of compnm is ic_lvar
    !------------------------
@@ -310,13 +326,17 @@ CONTAINS
    deallocate(compnmlist)
    deallocate(coupledlist)
 
-   !--- Broadcast the model list to all MPI tasks
+   !------------------------
+   !> * Broadcast the model list to all MPI tasks
+   !------------------------
    call oasis_mpi_bcast(prism_nmodels,MPI_COMM_WORLD,subname//' prism_nmodels')
    call oasis_mpi_bcast(prism_amodels,MPI_COMM_WORLD,subname//' prism_amodels')
    call oasis_mpi_bcast(prism_modnam ,MPI_COMM_WORLD,subname//' prism_modnam')
    call oasis_mpi_bcast(prism_modcpl ,MPI_COMM_WORLD,subname//' prism_modcpl')
 
-   !--- Finally compute compid ---
+   !------------------------
+   !> * Compute compid
+   !------------------------
 
    compid = -1
    do n = 1,prism_nmodels
@@ -335,18 +355,25 @@ CONTAINS
    endif
 
    !------------------------
-   !--- Re-Set MPI info (need compid for MPI1 COMM_SPLIT)
+   !> * Re-Set MPI info based on active model tasks
+   !  (need compid for MPI1 COMM_SPLIT)
    !------------------------
 
    mpi_rank_global = -1
 #ifdef use_comm_MPI1
 
-   ! Set mpi_comm_local based on compid
+   !------------------------
+   !>   * Set mpi_comm_local based on compid
+   !------------------------
+
    ikey = 0
    icolor = compid
    call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_local,ierr)
 
-   ! Set mpi_comm_global based on oasis_coupled flag
+   !------------------------
+   !>   * Set mpi_comm_global based on oasis_coupled flag
+   !------------------------
+
    ikey = 0
    icolor = 1
    if (.not.oasis_coupled) icolor = 0
@@ -360,7 +387,11 @@ CONTAINS
 
 #endif
 
-   ! We change debug level (verbose level disabled if load balance analysis)
+   !------------------------
+   !> * Reset debug levels
+   !  verbose level disabled if load balance analysis
+   !------------------------
+
    IF ( LUCIA_debug > 0 .AND. OASIS_debug > 0 ) THEN
       WRITE (UNIT = nulprt1,FMT = *) subname,wstr, &
        ' With LUCIA load balance analysis '
@@ -384,7 +415,7 @@ CONTAINS
    mpi_root_local = 0
 
    !------------------------
-   !--- debug file
+   !> * Open log files
    !------------------------
 
    iu=-1
@@ -447,7 +478,8 @@ CONTAINS
    call oasis_debug_enter(subname)
 
    !------------------------
-   !--- mpi_root_global (after nulprt set)
+   !> * Set mpi_root_global 
+   ! (after nulprt set)
    !------------------------
 
    call mod_oasis_setrootglobal()
@@ -465,7 +497,14 @@ CONTAINS
 #endif
 
    !------------------------
-   !--- Timer Initialization
+   !> * Memory Initialization
+   !------------------------
+
+   call oasis_mem_init(nulprt)
+   call oasis_mem_print(nulprt,subname)
+
+   !------------------------
+   !> * Timer Initialization
    !------------------------
 
    ! Allocate timer memory based on maxvar
@@ -475,7 +514,7 @@ CONTAINS
    call oasis_timer_start('init_thru_enddef')
 
    !------------------------
-   !--- Diagnostics
+   !> * Diagnostics
    !------------------------
 
    if (OASIS_debug >= 15)  then
@@ -515,11 +554,14 @@ CONTAINS
  END SUBROUTINE oasis_init_comp
 
 !----------------------------------------------------------------------
+
+!> OASIS user finalize method
+
    SUBROUTINE oasis_terminate(kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    character(len=*),parameter :: subname = '(oasis_terminate)'
@@ -535,8 +577,16 @@ CONTAINS
       kinfo = OASIS_OK
    endif
 
+   !------------------------
+   !> * Print timer information
+   !------------------------
+
    call oasis_timer_stop('total')
    call oasis_timer_print()
+
+   !------------------------
+   !> * Call MPI finalize
+   !------------------------
 
    IF ( .NOT. lg_mpiflag ) THEN
        IF (OASIS_debug >= 2)  THEN
@@ -551,6 +601,12 @@ CONTAINS
        ENDIF
    ENDIF
 
+   !------------------------
+   !> * Write SUCCESSFUL RUN
+   !------------------------
+
+   call oasis_mem_print(nulprt,subname)
+
    IF (mpi_rank_local == 0)  THEN
        WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
        CALL oasis_flush(nulprt)
@@ -561,12 +617,15 @@ CONTAINS
  END SUBROUTINE oasis_terminate
 
 !----------------------------------------------------------------------
+
+!> OASIS user query for the local MPI communicator
+
    SUBROUTINE oasis_get_localcomm(localcomm,kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(out)   :: localcomm
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(out)   :: localcomm  !< MPI communicator
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_get_localcomm)'
 !  ---------------------------------------------------------
@@ -587,12 +646,15 @@ CONTAINS
 
  END SUBROUTINE oasis_get_localcomm
 !----------------------------------------------------------------------
+
+!> OASIS user call to specify a local communicator
+
    SUBROUTINE oasis_set_couplcomm(localcomm,kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(in)   :: localcomm  !< MPI communicator
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    character(len=*),parameter :: subname = '(oasis_set_couplcomm)'
@@ -625,14 +687,17 @@ CONTAINS
 
  END SUBROUTINE oasis_set_couplcomm
 !----------------------------------------------------------------------
+
+!> OASIS user call to create a new communicator
+
    SUBROUTINE oasis_create_couplcomm(icpl,allcomm,cplcomm,kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(in)   :: icpl
-   INTEGER (kind=ip_intwp_p),intent(in)   :: allcomm
-   INTEGER (kind=ip_intwp_p),intent(out)  :: cplcomm
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(in)   :: icpl  !< coupling process flag 
+   INTEGER (kind=ip_intwp_p),intent(in)   :: allcomm  !< input MPI communicator 
+   INTEGER (kind=ip_intwp_p),intent(out)  :: cplcomm  !< reduced MPI communicator
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    character(len=*),parameter :: subname = '(oasis_create_couplcomm)'
@@ -668,12 +733,15 @@ CONTAINS
 
  END SUBROUTINE oasis_create_couplcomm
 !----------------------------------------------------------------------
+
+!> OASIS user interface to query debug level
+
    SUBROUTINE oasis_get_debug(debug,kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(out)   :: debug
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(out)   :: debug  !< debug level
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_get_debug)'
 !  ---------------------------------------------------------
@@ -689,12 +757,15 @@ CONTAINS
 
  END SUBROUTINE oasis_get_debug
 !----------------------------------------------------------------------
+
+!> OASIS user interface to set debug level
+
    SUBROUTINE oasis_set_debug(debug,kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(in)   :: debug
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(in)   :: debug  !< debug level
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_set_debug)'
 !  ---------------------------------------------------------
@@ -714,13 +785,16 @@ CONTAINS
 
  END SUBROUTINE oasis_set_debug
 !----------------------------------------------------------------------
+
+!> OASIS user interface to establish an intercomm communicator between the root of two models
+
    SUBROUTINE oasis_get_intercomm(new_comm, cdnam, kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm
-   CHARACTER(len=*),intent(in) :: cdnam
-   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm  !< out MPI communicator
+   CHARACTER(len=*),intent(in) :: cdnam               !< other model name to link with
+   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo  !< return code
 
    INTEGER (kind=ip_intwp_p)	:: n, il, ierr, tag
    LOGICAL :: found
@@ -765,13 +839,16 @@ CONTAINS
 
  END SUBROUTINE oasis_get_intercomm
 !----------------------------------------------------------------------
+
+!> OASIS user interface to establish an intracomm communicator between the root of two models
+
    SUBROUTINE oasis_get_intracomm(new_comm, cdnam, kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm
-   CHARACTER(len=*),intent(in) :: cdnam
-   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(out) :: new_comm  !< output MPI communicator
+   CHARACTER(len=*),intent(in) :: cdnam               !< other model name
+   INTEGER (kind=ip_intwp_p),intent(out),optional :: kinfo  !< return code
 
    INTEGER (kind=ip_intwp_p)	:: tmp_intercomm
    INTEGER (kind=ip_intwp_p)	:: ierr
@@ -792,11 +869,14 @@ CONTAINS
 
  END SUBROUTINE oasis_get_intracomm
 !----------------------------------------------------------------------
+
+!> OASIS user interface specifying the OASIS definition phase is complete
+
    SUBROUTINE oasis_enddef(kinfo)
 
    IMPLICIT NONE
 
-   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -806,6 +886,10 @@ CONTAINS
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
+
+   !------------------------
+   !> * Check enddef called only once per task
+   !------------------------
 
    if (enddef_called) then
        write(nulprt,*) subname,estr,'enddef called already'
@@ -820,8 +904,10 @@ CONTAINS
 
    lkinfo = OASIS_OK
 
+   call oasis_mem_print(nulprt,subname//':start')
+
    !------------------------
-   !--- reset mpi_comm_global
+   !> * Reset mpi_comm_global because active tasks might have been excluded
    !--- for changes to mpi_comm_local since init
    !------------------------
 
@@ -831,26 +917,26 @@ CONTAINS
    mpi_comm_global = newcomm
 
    !------------------------
-   !--- for active tasks only
+   !> * For active tasks only
    !------------------------
 
    if (mpi_comm_global /= MPI_COMM_NULL) then
 
       !------------------------
-      !--- Update mpi_comm_global
+      !>   * Update mpi_comm_global
       !------------------------
 
       CALL MPI_Comm_Size(mpi_comm_global,mpi_size_global,ierr)
       CALL MPI_Comm_Rank(mpi_comm_global,mpi_rank_global,ierr)
 
       !------------------------
-      !--- update mpi_root_global
+      !>   * Update mpi_root_global
       !------------------------
 
       call mod_oasis_setrootglobal()
 
       !------------------------
-      !--- document
+      !>   * Document
       !------------------------
 
       if (OASIS_debug >= 2)  then
@@ -873,20 +959,22 @@ CONTAINS
       endif
 
       !------------------------
-      !--- reconcile partitions
+      !>   * Reconcile partitions, call part_setup
       !--- generate gsmaps from partitions
       !------------------------
 
       call oasis_part_setup()
+      call oasis_mem_print(nulprt,subname//':part_setup')
 
       !------------------------
-      !--- reconcile variables
+      !>   * Reconcile variables, call var_setup
       !------------------------
 
       call oasis_var_setup()
+      call oasis_mem_print(nulprt,subname//':var_setup')
 
       !------------------------
-      !--- write grid info to files one model at a time
+      !>   * Write grid info to files one model at a time
       !------------------------
 
       call oasis_mpi_barrier(mpi_comm_global)
@@ -896,9 +984,10 @@ CONTAINS
          endif
          call oasis_mpi_barrier(mpi_comm_global)
       enddo
+      call oasis_mem_print(nulprt,subname//':write2files')
 
       !------------------------
-      !--- MCT Initialization
+      !>   * MCT Initialization
       !------------------------
 
       call mct_world_init(prism_amodels,mpi_comm_global,mpi_comm_local,compid)
@@ -907,17 +996,27 @@ CONTAINS
          CALL oasis_flush(nulprt)
       ENDIF
 
+      !------------------------
+      !>   * Initialize coupling via call to coupler_setup
+      !------------------------
+
       call oasis_coupler_setup()
       IF (OASIS_debug >= 2)  THEN
          WRITE(nulprt,*) subname, ' done prism_coupler_setup '
          CALL oasis_flush(nulprt)
       ENDIF
+      call oasis_mem_print(nulprt,subname//':coupler_setup')
+
+      !------------------------
+      !>   * Call advance_init to initialize coupling fields from restarts
+      !------------------------
 
       call oasis_advance_init(lkinfo)
       IF (OASIS_debug >= 2)  THEN
          WRITE(nulprt,*) subname, ' done prism_advance_init '
          CALL oasis_flush(nulprt)
       ENDIF
+      call oasis_mem_print(nulprt,subname//':advance_init')
 
    endif   !  (mpi_comm_local /= MPI_COMM_NULL)
 
@@ -929,10 +1028,15 @@ CONTAINS
 
    call oasis_timer_stop('init_thru_enddef')
 
+   call oasis_mem_print(nulprt,subname//':end')
+
    call oasis_debug_exit(subname)
 
  END SUBROUTINE oasis_enddef
 !----------------------------------------------------------------------
+
+!> Local method to compute each models' global task ids, exists for reuse in enddef
+
  SUBROUTINE mod_oasis_setrootglobal()
 
    INTEGER(kind=ip_intwp_p) :: n, ierr

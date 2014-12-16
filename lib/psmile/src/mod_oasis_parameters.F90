@@ -1,3 +1,6 @@
+
+!> Defines parameters for OASIS
+
 MODULE mod_oasis_parameters
 !
 ! -- clim.h   18-08-95   Version 2.0   Author: Laurent Terray

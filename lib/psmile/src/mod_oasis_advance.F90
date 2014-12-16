@@ -1,3 +1,6 @@
+
+!> Advances the OASIS coupling
+
 MODULE mod_oasis_advance
 
     USE mod_oasis_kinds
@@ -23,6 +26,9 @@ MODULE mod_oasis_advance
 contains
 
 !---------------------------------------------------------------------
+
+!> Initializes the OASIS fields
+
   SUBROUTINE oasis_advance_init(kinfo)
 
 !   ----------------------------------------------------------------
@@ -32,7 +38,7 @@ contains
 
     IMPLICIT none
 !   ----------------------------------------------------------------
-    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
+    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    !< status, not used
 !   ----------------------------------------------------------------
     integer(kind=ip_i4_p) :: cplid,partid,varid
     INTEGER(kind=ip_i4_p) :: nf,lsize,nflds,npc
@@ -52,6 +58,11 @@ contains
 
     call oasis_debug_enter(subname)
 
+    !----------------------------------------------------------------
+    !> oasis_advance_init does the following
+    !> * Aborts if it's called from non-active tasks
+    !----------------------------------------------------------------
+
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,estr,'called on non coupling task'
        call oasis_abort()
@@ -65,6 +76,12 @@ contains
        write(nulprt,*) '   subname         at         time    time+lag   act: field '
        write(nulprt,*) '   diags :     fldname    min      max      sum '
     endif
+
+    !----------------------------------------------------------------
+    !> * Loop over all coupler connections, 
+    !>   Loop over get and put connections,
+    !>   For valid connections
+    !----------------------------------------------------------------
 
     call oasis_debug_note(subname//' loop over cplid')
     DO cplid = 1,prism_mcoupler
@@ -91,7 +108,7 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! check that lag is reasonable
+       !>   * Checks that lag is reasonable
        !------------------------------------------------
 
        IF (lag > dt .OR. lag <= -dt) THEN
@@ -100,7 +117,9 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! read restart and call advance for the current fields
+       !>   * For put fields that need to read a restart file because of a lag, 
+       !>     call oasis_advance_run and read in the restart file.
+       !>     Set readrest to true in oasis_advance_run to indicate it's called from init.
        ! right now, do not know whether any hot map terms are there
        ! assume they are if something is read, otherwise not
        !------------------------------------------------
@@ -136,6 +155,12 @@ contains
     enddo ! npc
     ENDDO ! cplid
 
+    !----------------------------------------------------------------
+    !> * Loop over all coupler connections, 
+    !>   Loop over get and put connections,
+    !>   For valid connections
+    !----------------------------------------------------------------
+
     DO cplid=1, prism_mcoupler
     DO npc = 1,2
     if (npc == 1) pcpointer => prism_coupler_put(cplid)
@@ -159,9 +184,9 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! read restart for LOCTRANS fields
-       ! do after restart and advance above because prism_advance_run
-       ! fills in the avect with the array info
+       !>   * Read restart for LOCTRANS fields.
+       !>     Do after restart and advance above because prism_advance_run
+       !>     fills in the avect with the array info
        !------------------------------------------------
 
        call oasis_debug_note(subname//' check for loctrans restart')
@@ -246,33 +271,40 @@ contains
 
   end SUBROUTINE oasis_advance_init
 !---------------------------------------------------------------------
+
+!> Advances the OASIS coupling
+
+!> Only one from array1din, array1dout, or array2dout can be passed in.
+!> readrest is set to true when called by the oasis_advance_init method.
+!> Arrays 2 to 5 are for the higher order terms (hot)
+
   SUBROUTINE oasis_advance_run(mop,varid,msec,kinfo,nff,namid,&
              array1din,array1dout,array2dout,readrest,&
              a2on,array2,a3on,array3,a4on,array4,a5on,array5)
 
     IMPLICIT none
 !   ----------------------------------------------------------------
-    integer(kind=ip_i4_p), intent(in)    :: mop      ! OASIS_Out or OASIS_In
-    INTEGER(kind=ip_i4_p), intent(in)    :: varid    ! prism_var id
-    INTEGER(kind=ip_i4_p), intent(in)    :: msec     ! model time
-    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    ! status
+    integer(kind=ip_i4_p), intent(in)    :: mop      !< OASIS_Out or OASIS_In
+    INTEGER(kind=ip_i4_p), intent(in)    :: varid    !< prism_var id
+    INTEGER(kind=ip_i4_p), intent(in)    :: msec     !< model time
+    INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    !< status
 
-    INTEGER(kind=ip_i4_p), OPTIONAL :: nff
-    INTEGER(kind=ip_i4_p), OPTIONAL :: namid         ! only do this namcouple
-                                                     ! method for restart
-    REAL   (kind=ip_r8_p), optional :: array1din(:)  ! data
-    REAL   (kind=ip_r8_p), OPTIONAL :: array1dout(:) ! data
-    REAL   (kind=ip_r8_p), OPTIONAL :: array2dout(:,:) ! data
-    logical              , optional :: readrest      ! special flag to indicate this 
-                                                     ! is called from the advance_init
-    logical              , optional :: a2on      ! logical for array2
-    REAL   (kind=ip_r8_p), optional :: array2(:) ! data
-    logical              , optional :: a3on      ! logical for array3
-    REAL   (kind=ip_r8_p), optional :: array3(:) ! data
-    logical              , optional :: a4on      ! logical for array4
-    REAL   (kind=ip_r8_p), optional :: array4(:) ! data
-    logical              , optional :: a5on      ! logical for array5
-    REAL   (kind=ip_r8_p), optional :: array5(:) ! data
+    INTEGER(kind=ip_i4_p), optional :: nff           !< specify particular field for restart
+    INTEGER(kind=ip_i4_p), optional :: namid         !< only do this namcouple
+                                                     !< method for restart
+    REAL   (kind=ip_r8_p), optional :: array1din(:)  !< 1D put data
+    REAL   (kind=ip_r8_p), optional :: array1dout(:) !< 1D get data
+    REAL   (kind=ip_r8_p), optional :: array2dout(:,:) !< 2D get data
+    logical              , optional :: readrest      !< special flag to indicate this 
+                                                     !< is called from the advance_init
+    logical              , optional :: a2on      !< logical for array2
+    REAL   (kind=ip_r8_p), optional :: array2(:) !< hot put data
+    logical              , optional :: a3on      !< logical for array3
+    REAL   (kind=ip_r8_p), optional :: array3(:) !< hot put data
+    logical              , optional :: a4on      !< logical for array4
+    REAL   (kind=ip_r8_p), optional :: array4(:) !< hot put data
+    logical              , optional :: a5on      !< logical for array5
+    REAL   (kind=ip_r8_p), optional :: array5(:) !< hot put data
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     INTEGER(kind=ip_i4_p) :: cplid,rouid,mapid,partid
@@ -319,6 +351,11 @@ contains
 
     call oasis_debug_enter(subname)
 
+    !----------------------------------------------------------------
+    !> oasis_advance_run does the following
+    !> * Aborts if it's called from non-active tasks
+    !----------------------------------------------------------------
+
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,estr,'called on non coupling task'
        call oasis_abort()
@@ -334,7 +371,7 @@ contains
     if (lreadrest) kinfo = OASIS_fromrest
 
     !------------------------------------------------
-    ! validate mop
+    !> * Verify field (var) is either In or Out
     !------------------------------------------------
 
     if (mop /= OASIS_Out .and. mop /= OASIS_In) then
@@ -343,12 +380,11 @@ contains
        call oasis_abort()
     endif
 
-    !------------------------------------------------
-    ! for all the couplers associated with this var
-    ! or if nam is present, just for nc == nam
-    !------------------------------------------------
-
     call oasis_debug_note(subname//' loop over var ncpl')
+
+    !------------------------------------------------
+    ! Check namid
+    !------------------------------------------------
 
     if (present(namid)) then
        IF (OASIS_debug >= 20) THEN
@@ -367,6 +403,11 @@ contains
        endif
     endif
 
+    !------------------------------------------------
+    !> * Loop over all the couplers associated with this var
+    !  or if nam is present, just for nc == nam
+    !------------------------------------------------
+
     DO nc = 1,prism_var(varid)%ncpl
      cplid   = prism_var(varid)%cpl(nc)
      runit = .true.
@@ -380,7 +421,7 @@ contains
        if (mop == OASIS_In ) pcpointer => prism_coupler_get(cplid)
 
        !------------------------------------------------
-       ! check this prism_coupler is valid
+       !>   * check this prism_coupler is valid
        !------------------------------------------------
        if (.not.pcpointer%valid) then
           WRITE(nulprt,*) subname,estr,'invalid prism_coupler for var = ',trim(vname)
@@ -388,7 +429,7 @@ contains
        endif
 
        !------------------------------------------------
-       ! check again that model op matches coupler op
+       !>   *  check again that model op matches coupler op
        !------------------------------------------------
        getput  = pcpointer%getput
        if ((mop == OASIS_Out .and. getput == OASIS3_PUT) .or. &
@@ -399,6 +440,9 @@ contains
           call oasis_abort()
        endif
 
+       !------------------------------------------------
+       !>   *  set a bunch of local variables
+       !------------------------------------------------
        rouid   = pcpointer%routerid
        mapid   = pcpointer%mapperid
        tag     = pcpointer%tag
@@ -439,7 +483,7 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! check that lag is reasonable
+       !>   * check that lag is reasonable
        !------------------------------------------------
 
        IF (ABS(lag) > dt) THEN
@@ -448,7 +492,7 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! read restart and call advance for the current fields
+       !>   *  read restart for call from init phase
        ! right now, do not know whether any hot map terms are there
        ! assume they are if something is read, otherwise not
        !------------------------------------------------
@@ -510,8 +554,8 @@ contains
        ENDIF
 
        !------------------------------------------------
-       ! compute lag time, only on put side
-       ! set time now, is it a coupling period?
+       !>   * compute lag time, only on put side
+       !>   * set time_now, is it a coupling period?
        !------------------------------------------------
 
        call oasis_debug_note(subname//' set mseclag')
@@ -530,7 +574,7 @@ contains
        if (mod(mseclag,dt) == 0) time_now = .true.
 
        !------------------------------------------------
-       ! check that model hasn't gone past maxtime
+       !>   * check that model hasn't gone past maxtime
        !------------------------------------------------
 
        if (msec >= maxtime) then
@@ -540,7 +584,7 @@ contains
        endif
 
        !------------------------------------------------
-       ! check that model isn't going backwards
+       !>   * check that model isn't going backwards
        ! msec >= 0 does the check only in run mode, not in initialization
        !------------------------------------------------
 
@@ -551,7 +595,7 @@ contains
        endif
 
        !------------------------------------------------
-       ! check that varible didn't miss a coupling period 
+       !>   * check that variable didn't miss a coupling period 
        ! check only for send recv operations where deadlock 
        ! is possible
        !------------------------------------------------
@@ -580,8 +624,8 @@ contains
        enddo  ! prism_mcoupler
 
        !------------------------------------------------
-       ! check that prior sequences weren't missed at this 
-       ! step for get (recv) operation.
+       !>   * check that prior sequences weren't missed at this 
+       !>     step for get (recv) operation.
        ! attempts to trap deadlocks before they happen
        !------------------------------------------------
 
@@ -605,7 +649,7 @@ contains
        endif
 
        !------------------------------------------------
-       ! compute field index and check sizes
+       !>   * compute field index and check sizes
        !------------------------------------------------
 
        call oasis_debug_note(subname//' compute field index and sizes')
@@ -627,8 +671,8 @@ contains
        endif
 
        !------------------------------------------------
-       ! check for higher order coupling fields
-       ! and get everything ready
+       !>   * check for higher order coupling fields
+       !>     and get everything ready
        ! arrayon is what's passed this time
        ! optional args only on put side
        !------------------------------------------------
@@ -707,8 +751,8 @@ contains
        endif  ! .not. lreadrest
 
        !------------------------------------------------
-       ! update avect1-5 on put side, apply appropriate transform
-       ! if its coupling time, set status of this var to ready
+       !>   * update avect1-5 on put side and apply appropriate transform
+       !>   * if its coupling time, set status of this var to ready
        ! on restart, treat as instant value
        !------------------------------------------------
 
@@ -882,8 +926,8 @@ contains
        endif
 
        !------------------------------------------------
-       ! decide if it's time to communicate based on 
-       ! time.  also, on the put side, status of all vars
+       !>   * decide if it's time to communicate based on time
+       ! also, on the put side, status of all vars
        ! must be ready which means all vars have called put.
        ! on get side, all ready means all vars have unpacked
        ! from last get.
@@ -907,11 +951,16 @@ contains
           enddo
        endif
 
+       !------------------------------------------------
+       !>   * If it's time to communicate
+       !------------------------------------------------
+
        if (comm_now) then
 
           call oasis_debug_note(subname//' comm_now')
 
           !------------------------------------------------
+          !>     * check again that time is correct
           ! this is the time critical bit, we need to make sure the
           ! model is truly advancing in time when comms are called.
           ! must ignore the initial call, ltime = 0
@@ -924,7 +973,8 @@ contains
           endif
 
           !------------------------------------------------
-          ! average as needed (not cache friendly yet)
+          !>     * average as needed for some transforms
+          ! (not cache friendly yet)
           !------------------------------------------------
 
           IF (getput == OASIS3_PUT) THEN
@@ -984,6 +1034,8 @@ contains
          ENDIF
 
           !------------------------------------------------
+          !>     * write to restart file if put and at the end of the run, 
+          !>       turn off communication
           ! past namcouple runtime (maxtime) no communication
           ! do restart if time+lag = maxtime, this assumes coupling
           ! period and lag and maxtime are all nicely consistent
@@ -1022,7 +1074,7 @@ contains
           endif
 
           !------------------------------------------------
-          ! map and communicate operations
+          !>     * map and communicate operations
           !------------------------------------------------
 
           if (sndrcv) then
@@ -1196,6 +1248,10 @@ contains
           endif  ! getput
           endif  ! sndrcv
 
+          !------------------------------------------------
+          !>     * write to output files if output is turned on
+          !------------------------------------------------
+
           if (output) then
              if (kinfo == OASIS_sent) then
                 kinfo = OASIS_sentout
@@ -1232,7 +1288,7 @@ contains
           endif
 
           !------------------------------------------------
-          ! set avcnt, avect1, ltime, and status
+          !>     * set avcnt, avect1, ltime, and status
           !------------------------------------------------
 
           call oasis_debug_note(subname//' reset status')
@@ -1280,8 +1336,8 @@ contains
        endif   ! comm_now
 
           !------------------------------------------------
-          ! sav non-instant loctrans operations for future restart
-          !   at the end of the run only
+          !>   * at the end of the run only,  save fields associated
+          !>     with non-instant loctrans operations to restart files
           !------------------------------------------------
 
           IF (mseclag + dt >= maxtime .AND. &
@@ -1331,7 +1387,7 @@ contains
          ENDIF
 
        !------------------------------------------------
-       ! GET only, unpack avect1 if its coupling time
+       !>   * GET only, unpack avect1 if it's newly received
        !------------------------------------------------
 
        if (getput == OASIS3_GET) then
@@ -1385,7 +1441,7 @@ contains
        endif
 
        !------------------------------------------------
-       ! always remember last id and last coupler time
+       !>   * always remember last id and last coupler time
        !------------------------------------------------
 
        lcouplerid = cplid
@@ -1405,22 +1461,27 @@ contains
 
 !-------------------------------------------------------------------
 
+!> Provides interpolation functionality
+
+!> Maps (regrids, interpolates) data from av1 to avd.
+!> av2-av5 are for higher order mapping (hot).
+
   SUBROUTINE oasis_advance_map(av1,avd,mapper,conserv,consbfb,&
                                avon,av2,av3,av4,av5)
 
     ! NOTE: mask = 0 is active point according to oasis3 conserv.f
 
     implicit none
-    type(mct_aVect)        ,intent(in)    :: av1  ! source av
-    type(mct_aVect)        ,intent(inout) :: avd    ! dst av
-    type(prism_mapper_type),intent(inout) :: mapper ! prism_mapper
-    integer(kind=ip_i4_p)  ,intent(in),optional :: conserv  ! conserv flag
-    logical                ,intent(in),optional :: consbfb  ! conserv bfb option
-    logical                ,intent(in),optional :: avon(:) ! which source avs are on
-    type(mct_aVect)        ,intent(in),optional :: av2  ! source av2
-    type(mct_aVect)        ,intent(in),optional :: av3  ! source av2
-    type(mct_aVect)        ,intent(in),optional :: av4  ! source av2
-    type(mct_aVect)        ,intent(in),optional :: av5  ! source av2
+    type(mct_aVect)        ,intent(in)    :: av1  !< source av
+    type(mct_aVect)        ,intent(inout) :: avd    !< dst av
+    type(prism_mapper_type),intent(inout) :: mapper !< prism_mapper
+    integer(kind=ip_i4_p)  ,intent(in),optional :: conserv  !< conserv flag
+    logical                ,intent(in),optional :: consbfb  !< conserv bfb option
+    logical                ,intent(in),optional :: avon(:) !< which source hot are on
+    type(mct_aVect)        ,intent(in),optional :: av2  !< source av2 hot
+    type(mct_aVect)        ,intent(in),optional :: av3  !< source av3 hot
+    type(mct_aVect)        ,intent(in),optional :: av4  !< source av4 hot
+    type(mct_aVect)        ,intent(in),optional :: av5  !< source av5 hot
 
     integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m
     real(kind=ip_r8_p)     :: sumtmp, wts_sums, wts_sumd, zradi, zlagr
@@ -1438,11 +1499,15 @@ contains
 
     call oasis_debug_enter(subname)
 
+    !> oasis_advance_map does the following
+    !> * check for conservation flags
+
     lconsbfb = .true.
     if (present(consbfb)) then
        lconsbfb = consbfb
     endif
 
+    !> * check for higher order terms
     !--- assume avon and av2-5 are not passed but av1 always is ---
     avonsize = 1
     nterm = 1
@@ -1462,7 +1527,7 @@ contains
        endif
     endif
 
-    ! check consistency between weights and coupling terms
+    !> * check consistency between weights and coupling terms
     do n = 1,nterm
        if (locavon(n) .and. n > mapper%nwgts) then
           WRITE(nulprt,*) subname,estr,'in nwgts and coupling terms',mapper%nwgts,n
@@ -1470,6 +1535,7 @@ contains
        endif
     enddo
 
+    !> * run mct sparse matrix mapper on data and separately on hot as needed
 
     if (locavon(1)) then
        if (mct_avect_nRattr(av1) /= mct_avect_nRattr(avd)) then
@@ -1524,6 +1590,8 @@ contains
 
 
     call oasis_debug_note(subname//' map')
+
+    !> * enforce conservation
 
     IF (PRESENT(conserv)) THEN
     call oasis_debug_note(subname//' conserv')
@@ -1697,10 +1765,12 @@ contains
 
 !-------------------------------------------------------------------
 
+!> A generic method for summing fields in an attribute vector
+
   SUBROUTINE oasis_advance_avsum(av,sum,gsmap,mpicom,mask,wts,consbfb)
 
     implicit none
-    type(mct_aVect)      ,intent(in)    :: av      ! av
+    type(mct_aVect)      ,intent(in)    :: av      ! input av
     real(kind=ip_r8_p)   ,intent(inout) :: sum(:)  ! sum of av fields
     type(mct_gsMap)      ,intent(in)    :: gsmap   ! gsmap associate with av
     integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpicom
@@ -1797,11 +1867,13 @@ contains
 
 !-------------------------------------------------------------------
 
+!> A generic method for writing the global sums of fields in an attribute vector
+
   SUBROUTINE oasis_advance_avdiag(av,mpicom,mask,wts)
 
     implicit none
-    type(mct_aVect)      ,intent(in)    :: av    ! av
-    integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpicom
+    type(mct_aVect)      ,intent(in)    :: av    ! input av
+    integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpi communicator
     integer(kind=ip_i4_p),intent(in),optional :: mask(:) ! mask to apply to av
     real(kind=ip_r8_p)   ,intent(in),optional :: wts(:)  ! wts to apply to av
 

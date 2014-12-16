@@ -1,3 +1,6 @@
+!> Provides top level OASIS interfaces to the user community using prism names
+!> for backwards compatibility.
+
 module mod_prism
 
 ! !USES:

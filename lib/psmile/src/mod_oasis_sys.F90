@@ -1,3 +1,6 @@
+
+!> System type methods
+
 MODULE mod_oasis_sys
 
    USE mod_oasis_kinds
@@ -32,13 +35,15 @@ CONTAINS
 
 !--------------------------------------------------------------------
 
+!> OASIS abort method, publically available to users
+
    SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message)
 
    IMPLICIT NONE
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(in),optional :: id_compid
-   CHARACTER(len=*), INTENT(in),optional :: cd_routine
-   CHARACTER(len=*), INTENT(in),optional :: cd_message
+   INTEGER(kind=ip_intwp_p),INTENT(in),optional :: id_compid  !< component id
+   CHARACTER(len=*), INTENT(in),optional :: cd_routine   !< string defining calling routine
+   CHARACTER(len=*), INTENT(in),optional :: cd_message   !< error message string
 !--------------------------------------------------------------------
    INTEGER                      :: ierror
    character(len=*),parameter   :: subname = '(oasis_abort)'
@@ -66,12 +71,15 @@ CONTAINS
  END SUBROUTINE oasis_abort
 
 !==========================================================================
+
+!> Flushes output to file
+
    SUBROUTINE oasis_flush(nu)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(in) :: nu
+   INTEGER(kind=ip_intwp_p),INTENT(in) :: nu  !< unit number of file
 !--------------------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_flush)'
 !--------------------------------------------------------------------
@@ -81,12 +89,15 @@ CONTAINS
  END SUBROUTINE oasis_flush
 
 !==========================================================================
+
+!> Get a free unit number
+
    SUBROUTINE oasis_unitget(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(out) :: uio
+   INTEGER(kind=ip_intwp_p),INTENT(out) :: uio  !< unit number
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p) :: n1
    logical :: found
@@ -113,12 +124,15 @@ CONTAINS
  END SUBROUTINE oasis_unitget
 
 !==========================================================================
+
+!> Set the minimum unit number allowed
+
    SUBROUTINE oasis_unitsetmin(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(in) :: uio
+   INTEGER(kind=ip_intwp_p),INTENT(in) :: uio  !< unit number
 !--------------------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_unitsetmin)'
 !--------------------------------------------------------------------
@@ -129,12 +143,15 @@ CONTAINS
  END SUBROUTINE oasis_unitsetmin
 
 !==========================================================================
+
+!> Release a unit number for reuse
+
    SUBROUTINE oasis_unitfree(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p),INTENT(in) :: uio
+   INTEGER(kind=ip_intwp_p),INTENT(in) :: uio  !< unit number
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p) :: n1
    character(len=*),parameter :: subname = '(oasis_unitfree)'
@@ -151,12 +168,16 @@ CONTAINS
 
 !=========================================================================
 !==========================================================================
+
+!> Used when a subroutine is entered, write info to log file at some debug level
+
 SUBROUTINE oasis_debug_enter(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   CHARACTER(len=*), INTENT(in) :: string
+   CHARACTER(len=*), INTENT(in) :: string !< name of the subroutine
+
    character(len=*),parameter :: subname = '(oasis_debug_enter)'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_enter
@@ -174,12 +195,16 @@ SUBROUTINE oasis_debug_enter(string)
  END SUBROUTINE oasis_debug_enter
 
 !==========================================================================
+
+!> Used when a subroutine is exited, write info to log file at some debug level
+
 SUBROUTINE oasis_debug_exit(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   CHARACTER(len=*), INTENT(in) :: string
+   CHARACTER(len=*), INTENT(in) :: string  !< name of subroutine
+
    character(len=*),parameter :: subname = '(oasis_debug_exit)'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500)        :: tree_exit
@@ -197,12 +222,16 @@ SUBROUTINE oasis_debug_exit(string)
  END SUBROUTINE oasis_debug_exit
 
 !==========================================================================
+
+!> Used to write information from a subroutine, write info to log file at some debug level
+
 SUBROUTINE oasis_debug_note(string)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
-   CHARACTER(len=*), INTENT(in) :: string
+   CHARACTER(len=*), INTENT(in) :: string  !< string to write
+
    character(len=*),parameter :: subname = '(oasis_debug_note)'
    CHARACTER(len=1), pointer :: ch_blank(:)
    CHARACTER(len=500) :: tree_note

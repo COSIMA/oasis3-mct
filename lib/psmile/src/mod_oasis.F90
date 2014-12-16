@@ -1,3 +1,9 @@
+!> @mainpage Oasis3-MCT Version 3.0: October, 2014
+!> This provides documentation of the Oasis3-MCT implementation for developers.
+!> A separate Oasis3-MCT User Guide is available for Oasis users.
+
+!> Provides top level OASIS interfaces to the user community.
+
 MODULE mod_oasis
 
 ! !USES:
