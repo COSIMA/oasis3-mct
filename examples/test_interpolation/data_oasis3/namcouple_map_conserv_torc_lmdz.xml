@@ -6,6 +6,48 @@
                 <generaldesc value="" />
                 <guidesc value="" />
             </param>
+            <printruns value="">
+                <descprint value="" />
+                <runtime value="">
+                    <duration value="21600" />
+                </runtime>
+                <debug value="">
+                    <nlogprt value="ptr_1">
+                        <ptr_1 value="" />
+                    </nlogprt>
+                </debug>
+                <timestat value="">
+                    <opttime value="none">
+                        <none value="" />
+                    </opttime>
+                </timestat>
+                <generalgroup value="">
+                    <groups_onoff value="0" />
+                    <mult_fields_name value="single" />
+                </generalgroup>
+            </printruns>
+            <modeldef value="">
+                <mainmodelparam value="" />
+                <modelparam value="">
+                    <models value="">
+                        <item_1368819 value="model1">
+                            <maxunits value="units_on">
+                                <units_on value="">
+                                    <nunit value="200" />
+                                </units_on>
+                            </maxunits>
+                        </item_1368819>
+                        <item_1379378 value="model2">
+                            <maxunits value="units_on">
+                                <units_on value="">
+                                    <nunit value="200" />
+                                </units_on>
+                            </maxunits>
+                        </item_1379378>
+                    </models>
+                    <model_names_list value="model1;model2" />
+                </modelparam>
+            </modeldef>
             <grids value="">
                 <modelgrids value="" />
                 <defgrids value="">
@@ -34,39 +76,17 @@
                     <grid_names_list value="torc;lmdz" />
                 </defgrids>
             </grids>
-            <modeldef value="">
-                <mainmodelparam value="" />
-                <modelparam value="">
-                    <models value="">
-                        <item_1368819 value="model1">
-                            <maxunits value="units_on">
-                                <units_on value="">
-                                    <nunit value="200" />
-                                </units_on>
-                            </maxunits>
-                        </item_1368819>
-                        <item_1379378 value="model2">
-                            <maxunits value="units_on">
-                                <units_on value="">
-                                    <nunit value="200" />
-                                </units_on>
-                            </maxunits>
-                        </item_1379378>
-                    </models>
-                    <model_names_list value="model1;model2" />
-                </modelparam>
-            </modeldef>
             <fielddef value="">
                 <flddesc value="" />
                 <fldname value="">
                     <flddef value="">
                         <item_2020415 value="FS-ANA">
+                            <namefldgui value="FS-ANA" />
                             <fldnamebef value="FSENDANA" />
                             <srcgrid value="torc" />
                             <fldnameaft value="FRECVANA" />
                             <tgtgrid value="lmdz" />
                             <fldmult value="single" />
-                            <namefldgui value="FS-ANA" />
                         </item_2020415>
                     </flddef>
                     <field_names_list value="FS-ANA" />
@@ -141,26 +161,6 @@
                     </multaddoldnew>
                 </transfblon>
             </blastransfo>
-            <printruns value="">
-                <descprint value="" />
-                <runtime value="">
-                    <duration value="21600" />
-                </runtime>
-                <debug value="">
-                    <nlogprt value="ptr_1">
-                        <ptr_1 value="" />
-                    </nlogprt>
-                </debug>
-                <timestat value="">
-                    <opttime value="none">
-                        <none value="" />
-                    </opttime>
-                </timestat>
-                <generalgroup value="">
-                    <groups_onoff value="0" />
-                    <mult_fields_name value="single" />
-                </generalgroup>
-            </printruns>
             <interpolation value="">
                 <scriptransfo value="" />
                 <transfinterp value="">
