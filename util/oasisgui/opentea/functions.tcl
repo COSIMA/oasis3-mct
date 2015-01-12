@@ -40,11 +40,7 @@ proc font_create {} {
 }
 
 proc log_create {} {
-    global engine_version waypoint workingDir log_channel
-    
-    
-    
-                     
+    global engine_version waypoint workingDir log_channel banner
     
     
     
@@ -58,8 +54,10 @@ proc log_create {} {
     
     
     set coltxt [ThemeColor 1.05]
-    text .log.text_log -height $log_lines -yscrollcommand {.log.ybar_log set} -wrap word -font log_font -background $coltxt -highlightcolor $coltxt -highlightbackground $coltxt -selectbackground skyblue1
-
+    text .log.text_log -height $log_lines -yscrollcommand {.log.ybar_log set} -wrap word -font log_font  -background [ThemeColor 1.05] -highlightbackground [ThemeColor 1.05]  -selectbackground skyblue1
+    
+    bind . <<ThemeUpdate>> +[subst {.log.text_log  configure -background \[ThemeColor 1.05\] -highlightbackground \[ThemeColor 1.05\]}]
+    
     bind .log.text_log <Enter> [subst { set tabscroll 0 }]
     bind .log.text_log <Leave> [subst { set tabscroll 1 }]
     
@@ -131,17 +129,14 @@ proc log_create {} {
     
     
     
-    log {.____   ____   ___   _  _   _____  ___     _   
-/ __ \ )  _)\ ) __( ) \/ ( )__ __() __(   )_\  
-))__(( | '__/ | _)  |  \ |   | |  | _)   /( )\ 
-\____/ )_(    )___( )_()_(   )_(  )___( )_/ \_(}
+    log $banner
     log "Version : $engine_version"
      
 
     .log.text_log tag configure none -foreground black
     .log.text_log tag configure debug -foreground blue
     .log.text_log tag configure ok -foreground green4
-    .log.text_log tag configure warning -foreground red
+    .log.text_log tag configure warning -foreground orange
     .log.text_log tag configure xdrerror -foreground red4
     .log.text_log tag configure xdrexecute -foreground grey50
     .log.text_log tag configure plugin -foreground violet

@@ -137,7 +137,6 @@ proc action_refreshStatus {win address} {
         }
         "-2" {$win.action.status configure -image icon_void -foreground black
             set widgetInfo($address-progress) 100
-            
             set widgetInfo($address-status_txt) "Waiting for launch"
             set widgetInfo($address-variable) 1
             set widgetInfo($address.scriptNode-status) -2            

@@ -293,7 +293,7 @@ proc Save_XML_File {mode {typesave "all"} } {
 # This proc is a brutal kill and load instruction
 # This avoid the reminiscence of old data in the newly loaded project.
 proc loadProject_as_new { } {
-    global relaunchCmd  configPath loadApplication
+    global relaunchCmd  configPath loadApplication workingDir
     
     set msgOpen "Choose the project to load as a new window"
     set browsemode [getConfig "config gui paths"]
@@ -379,7 +379,8 @@ proc Save_CSV_File { } {
 
 # Preference window
 proc Window_preferences {} {
- set win .preferences
+    set win .preferences
+    global theme focusCorrection widgetInfo
     
     if {[winfo exists $win]} {
         wm deiconify $win
@@ -388,25 +389,35 @@ proc Window_preferences {} {
         toplevel $win
         wm title $win "Preferences"
         wm attributes $win 
-        ttk::labelframe $win.f -text "Display"
-        pack $win.f -expand 1
         
         
+        
+        set win .preferences.bg
+        
+        ttk::frame $win
+        pack $win -fill both
+        
+        # theme
+        ttk::labelframe $win.f -text "Display theme" -width $widgetInfo(guiSmallWidgetWidth)
+        pack $win.f -fill x -padx 10 -pady 10
+        set theme [ getConfig "config gui appearance theme"] 
         set theme_list [ttk::style theme names]
-        set theme [lindex $theme_list 0]
+        if {$theme ni $theme_list} {
+             set theme [lindex $theme_list 0]
+        }
         
+        foreach th $theme_list {
+            ttk::radiobutton $win.f.theme_rb_$th -variable theme -value $th -text $th -compound left -command [subst {
+                set theme $th
+                ThemeUpdate
+            }] 
+            pack  $win.f.theme_rb_$th -anchor w
+        }
         
-        # theme 
-        ttk::label $win.f.theme_lbl -text "Theme test" 
-        ttk::combobox $win.f.theme_cbbox -values  [ttk::style theme names]
-        $win.f.theme_cbbox set $theme 
-        bind $win.f.theme_cbbox <<ComboboxSelected>> [ subst {
-            set theme \[ $win.f.theme_cbbox get\]
-            ThemeUpdate \$theme
-        }]
-        grid $win.f.theme_lbl -column 0 -row 0 -padx 10 -pady 10
-        grid $win.f.theme_cbbox -column 1 -row 0  -padx 10 -pady 10
-         
+        ttk::labelframe $win.focus -text "Focus handling" -width $widgetInfo(guiSmallWidgetWidth)
+        pack $win.focus -fill x  -padx 10 -pady 10
+        ttk::checkbutton $win.focus.cb -variable focusCorrection -command [subst {smartpacker_focus_correction}] -text "Focus correction"
+        pack $win.focus.cb
     }
 }
 

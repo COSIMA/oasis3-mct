@@ -234,6 +234,12 @@ proc gui_addpart { args } {
         "viewer" {
             set part_winactive [viewer_create -path_father $path_father -address $address]
         }
+        "view3d" {
+            set part_winactive [viewer3d_create -path_father $path_father -address $address]
+        }
+        "view3d_source" {
+            set part_winactive [viewer3d_add_source -path_father $path_father -address $address]
+        }
         default {
             if {$part_class in $additionalWidgets} {
                 set part_winactive [$part_class\_create -path_father $path_father -address $address]

@@ -236,7 +236,7 @@ proc analyseModelNode {itree node} {
     if {[catch {set nodeType [dTree_getAttribute $tree "$node" nodeType]} ]} {
         popup_error "no nodeType detected for the node $node. Please check your XML file system"
     }
-    set possibleNodeTypes "docu status solver tab comment comparator graph glance timeline viewer model xor action info param choice option multiple item" 
+    set possibleNodeTypes "docu status solver tab comment comparator graph glance timeline viewer view3d view3d_source model xor action info param choice option multiple item" 
     
     foreach widget $additionalWidgets {
         lappend possibleNodeTypes  $widget

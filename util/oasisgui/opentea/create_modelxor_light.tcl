@@ -218,12 +218,16 @@ proc modelxor_refreshStatus {win address} {
     
     
     # create new memory and gui
-    if {   $refreshxor == 1} {
+    if { $refreshxor == 1} {
         #debug ">>>> creating $address.$child "
         set winchild $win.xor.$child
         ttk::frame $winchild
         pack $winchild -side top -expand 1 -fill both
-        set child_nodeType [dTree_getAttribute_fast $XMLtree "$full_address_XML_clean $child" "nodeType"]
+        set child_nodeType [dTree_tryGetAttribute_fast $XMLtree "$full_address_XML_clean $child" "nodeType" "exception_XOR"]
+        
+        if {$child_nodeType ==  "exception_XOR"} {
+            popup_error "[subst {"The option $child is no longer available in the XOR $full_address_XML_clean. Please remove this item from the XML"}]" strict 
+        }
         set newpart [gui_addpart -address $address.$child  -path_father $winchild -class $child_nodeType -style "flat"]    
         CheckFamily  $address.$child
     }

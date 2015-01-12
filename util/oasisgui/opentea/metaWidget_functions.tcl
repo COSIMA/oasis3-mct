@@ -87,22 +87,14 @@ proc initWidget { } {
 	set docu_prefered_place $win
      
         set widgetInfo($address-name) $name
-        switch $widgetInfo(guimode) {
-	    "treeview" {
-                set widgetInfo(packme-$win) [subst {
-                    pack $win  -anchor nw -side top -pady 10
-                }]
-	    }
-	    "multicolumn" {
-                set widgetInfo(packme-$win) [subst {
-                    set widgetInfo(fixedview) 1
-                    pack $win  -expand 1 -fill x
-                    event generate . <<SetView>>
-                    set widgetInfo(fixedview) 0
-                }]
-	    }
-        }
-       
+        
+	set widgetInfo(packme-$win) [subst {
+	    set widgetInfo(fixedview) 1
+	    pack $win  -expand 1 -fill x
+	    event generate . <<SetView>>
+	    set widgetInfo(fixedview) 0
+	}]
+
         # unpackme method
         set widgetInfo(unpackme-$win) [subst {
             pack forget $win

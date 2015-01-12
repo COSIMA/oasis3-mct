@@ -13,7 +13,7 @@ proc graph_create { args } {
     
     set widgetInfo($address-status) 1
     set widgetInfo($address-message) ""
-    set widgetInfo($address-accepted_keys) {"name" "xtitle" "ytitle" "color" "type"}
+    set widgetInfo($address-accepted_keys) {"name" "xtitle" "ytitle" "color" "type" "size"}
     
     ttk::frame $win 
     eval $widgetInfo(packme-$win)
@@ -230,13 +230,14 @@ proc graph_refresh {win address} {
         set ds_type [graph_parsecontent $address $dataset type]
         set dsraw [graph_parsecontent $address $dataset raw]
         set ds_length  [graph_parsecontent $address $dataset length]
-        
+        set size  [graph_parsecontent $address $dataset size]
+       
        
         
         set ds_rawpix ""
         
         set tags "xscalable yscalable $ds_tag"
-            
+        set h [expr {$size*5}]    
         for {set i 1} {$i <= $ds_length} {incr i} {
             set shade [expr {1.0*($ds_length-$i)/($ds_length-1)}]
             set x [lindex $dsraw [expr {2*$i-2}]]
@@ -247,29 +248,21 @@ proc graph_refresh {win address} {
             
             # Symbols
             if {"circle" in $ds_type} {
-                set h 5
                 $win.t.can create oval [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix+$h}] -fill [shadeColor $ds_color $shade]   -width 0 -tags $tags -activewidth 3
-                set h 5
                 $win.t.can create oval [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix+$h}] -outline  $ds_color -tags $tags -activewidth 3
             }
             if {"square" in $ds_type} {
-                set h 5
                 $win.t.can create rectangle [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix+$h}] -fill [shadeColor $ds_color $shade] -width 0 -tags $tags -activewidth 3
-                set h 5
                 $win.t.can create rectangle [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix+$h}]  -outline  $ds_color -tags $tags -activewidth 3
                 
             }
             if {"triangle" in $ds_type} {
-                set h 5
                 $win.t.can create polygon [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix-$h}] [expr {$xpix}] [expr {$ypix+$h}] -fill [shadeColor $ds_color $shade] -width 0  -tags $tags -activewidth 3
-                set h 5
                 $win.t.can create line [expr {$xpix-$h}] [expr {$ypix-$h}] [expr {$xpix+$h}] [expr {$ypix-$h}] [expr {$xpix}] [expr {$ypix+$h}] [expr {$xpix-$h}] [expr {$ypix-$h}] -fill $ds_color -tags $tags -activewidth 3
                 
             }
             if {"diamond" in $ds_type} {
-                set h 5
                 $win.t.can create polygon $xpix [expr {$ypix-$h}] [expr {$xpix+$h}] $ypix $xpix [expr {$ypix+$h}] [expr {$xpix-$h}] $ypix  -fill [shadeColor $ds_color $shade] -width 0  -tags $tags -activewidth 3
-                set h 5
                 $win.t.can create line $xpix [expr {$ypix-$h}] [expr {$xpix+$h}] $ypix $xpix [expr {$ypix+$h}] [expr {$xpix-$h}] $ypix  $xpix [expr {$ypix-$h}]  -fill $ds_color -tags $tags -activewidth 3
                 
             }           
@@ -328,6 +321,8 @@ proc graph_parsecontent {address curve_data arg} {
     set dsi(ytitle) "no ytitle"
     set dsi(color) "black"
     set dsi(type) "circle_line"
+    set dsi(size) "1"
+    
     set dsi(raw) ""
     foreach item $ds {
         if {[string match "*=*" $item] == 1} {

@@ -14,6 +14,8 @@ proc switchform_create { win } {
     ttk::frame $win.blank
     label $win.blank.logo -image bg_200 -text "Nothing selected..." -compound top -font "helvetica 30" -bg [ThemeColor 1.0] -fg [ThemeColor 0.9]
     
+    bind . <<ThemeUpdate>> +[subst {$win.blank.logo configure -bg \[ThemeColor 1.0\] -fg \[ThemeColor 0.9\]}]
+    
     pack $win.blank.logo -side left -padx 200 -pady 20
     
     pack $win -side top -expand 1 -fill both

@@ -8,53 +8,54 @@
 
 # creation of the scrollform
 proc scrollform_create {win } {
-	global ScrollInfo widgetInfo
-	
-	
-	set ScrollInfo($win-y0) 0
-	
-	set ScrollInfo(count) 0
-	
-	# main frame
-	ttk::frame $win
-	pack $win -side top -expand 1 -fill both 
-	
-	ttk::scrollbar $win.sbary -orient vertical -command [list $win.vport yview]
-	ttk::scrollbar $win.sbarx -orient horizontal -command [list $win.vport xview]
-	
-	
-	#bind $win.sbary <ButtonPress> [subst { puts "sby $win" }]
-	
-	canvas $win.vport  -xscrollcommand  [list $win.sbarx set] -yscrollcommand  [list $win.sbary set]  -borderwidth 0 -highlightthickness 0 -insertborderwidth 0 -background [ThemeColor 0.9]
-	
-   grid $win.vport -sticky news -column 0 -row 0
-   grid columnconfigure $win 0 -weight 1
-   grid rowconfigure $win 0 -weight 1
-
-   #### TEST ####
-   grid $win.sbary -sticky news -column 1 -row 0
-	grid $win.sbarx -sticky news -column 0 -row 1
-	
-   #### TEST ####
+    global ScrollInfo widgetInfo
+    
+    
+    set ScrollInfo($win-y0) 0
+    
+    set ScrollInfo(count) 0
+    
+    # main frame
+    ttk::frame $win
+    pack $win -side top -expand 1 -fill both 
+    
+    ttk::scrollbar $win.sbary -orient vertical -command [list $win.vport yview]
+    ttk::scrollbar $win.sbarx -orient horizontal -command [list $win.vport xview]
+    
+    
+    #bind $win.sbary <ButtonPress> [subst { puts "sby $win" }]
+    
+    canvas $win.vport  -xscrollcommand  [list $win.sbarx set] -yscrollcommand  [list $win.sbary set]  -borderwidth 0 -highlightthickness 0 -insertborderwidth 0 -background [ThemeColor 0.9]
    
-   #$win.vport configure -background [ThemeColor 1.0]
-   #bind . <<ThemeUpdate>> +[subst {$win.vport configure -background \[ThemeColor 1.0\]}]
+    set guiWidth $widgetInfo(guiwidth)
+    set guiHeight $widgetInfo(guiheight)
    
-   # form to be scrolled
-     ttk::frame $win.vport.form
+    #$win.vport create oval 0 0 $widgetInfo(guiwidth) $widgetInfo(guiheight) -outline white -width 4 
+    
+    grid $win.vport -sticky news -column 0 -row 0
+    grid columnconfigure $win 0 -weight 1
+    grid rowconfigure $win 0 -weight 1
 
-   set guiMode $widgetInfo(guimode)
-   set guiWidth $widgetInfo(guiwidth)
-   set guiHeight $widgetInfo(guiheight)
+    grid $win.sbary -sticky news -column 1 -row 0
+    grid $win.sbarx -sticky news -column 0 -row 1
+    
+    
+    $win.vport configure -background [ThemeColor 1.0]
+    bind . <<ThemeUpdate>> +[subst {$win.vport configure -background \[ThemeColor 1.0\]}]
+    
+    # form to be scrolled
+    ttk::frame $win.vport.form
+ 
+   
     
    
-    $win.vport create window 1 1 -window $win.vport.form  
+    $win.vport create window 0 0 -window $win.vport.form  
     #-width 2000 -height 2000
-		
+        
     #bind $win.vport.form <Visibility>  [subst { scrollform_upperleft $win}]
-	
-	bind $win.vport.form <Visibility>  [subst { scrollform_resize $win}]
-	
+    
+    bind $win.vport.form <Visibility>  [subst { scrollform_resize $win}]
+    
     
     bind . <<InitializeGUI>>  +[subst { scrollform_upperleft $win}]
     
@@ -65,45 +66,45 @@ proc scrollform_create {win } {
 # procedure for scrolling using the drag and drop binding
 proc scrollform_scroll {win x y} {
     global ScrollInfo
-	
-	set gap [expr ($y - $ScrollInfo($win-fy))]
-	
-	if { $gap > 0} {
-		$win.vport yview scroll 1 units
-	}
-	if { $gap < 0} {
-		$win.vport yview scroll -1 units
-	}
-	set ScrollInfo($win-fy) $y
+    
+    set gap [expr ($y - $ScrollInfo($win-fy))]
+    
+    if { $gap > 0} {
+        $win.vport yview scroll 1 units
+    }
+    if { $gap < 0} {
+        $win.vport yview scroll -1 units
+    }
+    set ScrollInfo($win-fy) $y
 }
 
 # procedure for scrolling using the MouseWheel binding
 # warning, delta is negative with respect to canvas corrdinate
 proc scrollform_scrollwheel {win delta} {
-	global tabscroll
-	
-	if {$tabscroll} {	
-		set scrollamount [expr int(-$delta)]
-		$win.vport yview scroll $scrollamount units
-		#if {[expr abs($scrollamount) > 3]} {
-		#	set delta [expr int($delta*0.3)]
-		#	 scrollform_scrollwheel $win $delta 
-		#}
-	}
+    global tabscroll
+    
+    if {$tabscroll} {    
+        set scrollamount [expr int(-$delta)]
+        $win.vport yview scroll $scrollamount units
+        #if {[expr abs($scrollamount) > 3]} {
+        #    set delta [expr int($delta*0.3)]
+        #     scrollform_scrollwheel $win $delta 
+        #}
+    }
 }
 
 # procedure for scrolling using the MouseWheel binding
 # warning, delta is negative with respect to canvas corrdinate
 proc scrollform_lateralscroll {win delta} {
-	global tabscroll
-	if {$tabscroll} {	
-		set scrollamount [expr int(-$delta)]
-		$win.vport xview scroll $scrollamount units
-		#if {[expr abs($scrollamount) > 3]} {
-		#	set delta [expr int($delta*0.33)]
-		#	 scrollform_lateralscroll $win $delta 
-		#}
-	}
+    global tabscroll
+    if {$tabscroll} {    
+        set scrollamount [expr int(-$delta)]
+        $win.vport xview scroll $scrollamount units
+        #if {[expr abs($scrollamount) > 3]} {
+        #    set delta [expr int($delta*0.33)]
+        #     scrollform_lateralscroll $win $delta 
+        #}
+    }
 }
 
 
@@ -112,66 +113,66 @@ proc scrollform_lateralscroll {win delta} {
 # propagate mousewheel binding
 
 proc scrollform_resize {win} {
-	global ScrollInfo
-	set  frac_x [lindex [$win.sbarx  get] 0 ]
-	set  frac_y [lindex [$win.sbary  get] 0 ]
-	set bbox [$win.vport bbox all]
-	
-	$win.vport configure -scrollregion $bbox
-	
-	bind . <MouseWheel>  [subst {scrollform_scrollwheel $win %D}]
-	bind . <Shift-MouseWheel>  [subst {scrollform_lateralscroll $win %D}]
-	
-	$win.vport yview moveto $frac_y
-	$win.vport xview moveto $frac_x
-	
-	
-	## get geometry of form
-	#set height [winfo height $win.vport.form]
-	#set width [winfo width $win.vport.form]
-	#
-	## get the bbox of canvas
-	#set bbox [$win.vport bbox all]
-	#
-	## toggle y scrollbar
-	#set win_height [winfo height $win.vport]
-	#if {$height > $win_height && [winfo viewable $win.vport.form ] } {
-	#	grid  $win.sbary -sticky news -column 1 -row 0
-	#	$win.vport configure -scrollregion $bbox 
-	#	bind .  <MouseWheel> [subst {scrollform_scrollwheel $win %D}]
-	#} else {
-	#	$win.vport yview moveto 0.0
-	#	grid forget $win.sbary
-	#	bind . <MouseWheel> ""
-	#}
-	## toggle x scrollbar
-	#set win_width [winfo width $win.vport]
-	#if {$width > $win_width} {
-	#	grid $win.sbarx -sticky news -column 0 -row 1
-	#	$win.vport configure -scrollregion $bbox
-	#	bind .  <Shift-MouseWheel> [subst {scrollform_lateralscroll $win %D}]
-	#} else {
-	#	$win.vport xview moveto 0.0
-	#	grid forget $win.sbarx
-	#	bind . <Shift-MouseWheel> ""
-	#}
+    global ScrollInfo
+    set frac_x [lindex [$win.sbarx  get] 0 ]
+    set frac_y [lindex [$win.sbary  get] 0 ]
+    set bbox [$win.vport bbox all]
+    
+    $win.vport configure -scrollregion $bbox
+    
+    bind . <MouseWheel>  [subst {scrollform_scrollwheel $win %D}]
+    bind . <Shift-MouseWheel>  [subst {scrollform_lateralscroll $win %D}]
+    
+    $win.vport yview moveto $frac_y
+    $win.vport xview moveto $frac_x
+    
+    
+    # get geometry of form
+    set height [winfo height $win.vport.form]
+    set width [winfo width $win.vport.form]
+    
+    # get the bbox of canvas
+    set bbox [$win.vport bbox all]
+    
+    # toggle y scrollbar
+    set win_height [winfo height $win.vport]
+    if {$height > $win_height && [winfo viewable $win.vport.form ] } {
+        grid  $win.sbary -sticky news -column 1 -row 0
+        $win.vport configure -scrollregion $bbox 
+        bind .  <MouseWheel> [subst {scrollform_scrollwheel $win %D}]
+    } else {
+        $win.vport yview moveto 0.0
+        grid forget $win.sbary
+        bind . <MouseWheel> ""
+    }
+    # toggle x scrollbar
+    set win_width [winfo width $win.vport]
+    if {$width > $win_width} {
+        grid $win.sbarx -sticky news -column 0 -row 1
+        $win.vport configure -scrollregion $bbox
+        bind .  <Shift-MouseWheel> [subst {scrollform_lateralscroll $win %D}]
+    } else {
+        $win.vport xview moveto 0.0
+        grid forget $win.sbarx
+        bind . <Shift-MouseWheel> ""
+    }
 
-	return $win
+    return $win
 }
 
 # Only return where child widget must be packed
 proc scrollform_interior { win } {
-	return $win.vport.form
+    return $win.vport.form
 
 }
 
 # Only return where child widget must be packed
 proc scrollform_upperleft { win } {
-	global widgetInfo
-	scrollform_resize $win
-	
-	$win.vport xview moveto 0.0
-	$win.vport yview moveto 0.0
+    global widgetInfo
+    scrollform_resize $win
+    
+    $win.vport xview moveto 0.0
+    $win.vport yview moveto 0.0
 }
 
 

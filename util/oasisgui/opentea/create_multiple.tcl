@@ -15,6 +15,8 @@ proc multiple_create { args } {
     set widgetInfo($address-status_txt) ""
     set widgetInfo($address-copy) "none"
     set widgetInfo($address-copied) ""
+    set widgetInfo($address-sorting) "none"
+    
     set widgetInfo($address-lastclick) [clock milliseconds]
     
     set widgetInfo($address-full_address_XML_clean) $full_address_XML_clean
@@ -30,7 +32,7 @@ proc multiple_create { args } {
     set size_v 10
     set size_h 1.
     set size [split [dTree_tryGetAttribute $XMLtree $full_address_XML_clean "size" "1;1" ] ";"]
-    set size_h [expr {[lindex $size 1]*1.*$size_h}]
+    set size_h [expr {[lindex $size 0]*1.*$size_h}]
     set size_v [expr {int([lindex $size 1]*1.*$size_v)}]
 
     set subcolumns  [dTree_tryGetAttribute $XMLtree $full_address_XML_clean "subcolumns" "1"]  
@@ -55,14 +57,8 @@ proc multiple_create { args } {
     pack $win.forceps -side top
     help_add_desc_docu_to_widget
     
-    switch $widgetInfo(guimode) {
-        "treeview" {
-           pack $win.ftv -fill both -side top -expand 1 
-        }
-        "multicolumn" {
-          pack $win.ftv -fill both -side left -expand 1 
-        }
-    }
+   
+    pack $win.ftv -fill both -side left -expand 1 
     pack $win.children -in $win -fill both -side top -expand 1 
     pack $win.children.forceps -side top
     
@@ -99,7 +95,7 @@ proc multiple_create { args } {
     set widgetInfo($address-colwidth) [expr {int([expr {$size_h*1.* $widgetInfo(guiSmallWidgetWidth)/$visible_cols}])}]
     $win.ftv.tv configure -columns $columns_labels
     $win.ftv.tv column #1 -width $widgetInfo($address-colwidth) 
-    $win.ftv.tv heading lbl -text $label_name -command [subst {multiple_sortrows $win $address #0}]
+    $win.ftv.tv heading lbl -text $label_name -command [subst {multiple_newsorting $win $address #0}]
     set colid 1
     
     foreach child $widgetInfo($address-listChildren) {
@@ -113,7 +109,7 @@ proc multiple_create { args } {
             $win.ftv.tv heading $child -text "" 
         } else {
             $win.ftv.tv column #$colid -width $widgetInfo($address-colwidth) 
-            $win.ftv.tv heading $child -text "$child_title" -command [subst {multiple_sortrows $win $address #$colid}]
+            $win.ftv.tv heading $child -text "$child_title" -command [subst {multiple_newsorting $win $address #$colid}]
         }
         
     }        
@@ -159,12 +155,6 @@ proc multiple_create { args } {
     }]
     balloon $win.ftv.controls.rm  "Remove the selected  row."
     
-    ttk::button $win.ftv.controls.copy -text "copy selection" -command [subst {
-        multiple_ctrl_copychild $win $address
-        #eval \$widgetInfo($address-check)   
-    }]
-    balloon $win.ftv.controls.copy  "First, select a row. Hit this \"Copy\" button. Select all rows where you want to paste."
-    
     
     ttk::button $win.ftv.controls.load -text "load" -command [subst {
         multiple_ctrl_loadfromproject $win $address
@@ -176,7 +166,6 @@ proc multiple_create { args } {
        pack $win.ftv.controls.add $win.ftv.controls.rm -side left -anchor nw -padx 0 -pady 0      
     }
     
-    pack   $win.ftv.controls.copy -side left -anchor nw -padx 0 -pady 0      
     pack   $win.ftv.controls.load -side left -anchor nw -padx 0 -pady 0      
     
    
@@ -195,12 +184,16 @@ proc multiple_create { args } {
     
     bind $win.ftv.tv <<TreeviewSelect>> +[subst { multiple_sync $win $address "current_selection"}]
   
+  
+    bind $win.ftv.tv <ButtonPress-2> [subst { multiple_context_menu $win $address %x %y %X %Y}] 
     
-    bind $win.ftv.tv <ButtonPress> [subst {
-                                    multiple_simple_trigger $win $address %x %y
-                                    multiple_trytocopy $win $address %x %y
-                                    }]
-    bind $win.ftv.tv <B1-Motion> [subst { multiple_trytocopy $win $address %x %y}]
+    #bind $win.ftv.tv <Double-Button-1> [subst {multiple_double_trigger $win $address %x %y}] 
+    
+    bind $win.ftv.tv <ButtonPress-1> [subst { multiple_click $win $address %x %y }]
+    bind $win.ftv.tv <Control-ButtonPress-1> [subst { multiple_trytocopy $win $address %x %y }]
+    bind $win.ftv.tv <Control-B1-Motion> [subst { multiple_trytocopy $win $address %x %y}]
+    
+    
     bind $win.ftv.tv <ButtonRelease> [subst { set widgetInfo($address-copied) "" }]
     
     bind $win.ftv <Enter> [subst { set tabscroll 0 }]
@@ -208,9 +201,6 @@ proc multiple_create { args } {
         set tabscroll 1
         destroy $win.ftv.tv.rename
         set widgetInfo($address-renaming) 0
-        $win.ftv.controls.copy configure -text "copy" -default normal
-        set widgetInfo($address-copy) "none"
-        . config -cursor left_ptr
     }]
     
     
@@ -223,65 +213,119 @@ proc multiple_create { args } {
 }
 
 
+#
+
+
+
+
+
+proc multiple_click { win address x y} {
+    global widgetInfo
+    set t [clock milliseconds]
+    set dt [expr {$t-$widgetInfo($address-lastclick)}]    
+    if { $dt < 500} {
+        multiple_double_trigger $win $address $x $y
+    } else {
+        multiple_simple_trigger $win $address $x $y
+    }
+    set widgetInfo($address-lastclick) $t
+}
+
+
+
+proc multiple_context_menu {win address x y globalX globalY} {
+    global widgetInfo
+    set row [$win.ftv.tv identify row $x $y]
+    set col [$win.ftv.tv identify column $x $y]
+    #debug "B2 simple , -$row-$col- "
+    if {$row!= ""} {
+        $win.ftv.tv selection set $row
+        multiple_sync $win $address "current_selection"
+        
+        
+        update
+        catch {destroy $win.ftv.tv.cmenu }
+        set popMenu [menu  $win.ftv.tv.cmenu ]
+    
+        $popMenu add command -label "Copy" -command [ subst {multiple_ctrl_copychild $win $address}]
+        $popMenu add command -label "Paste (or Ctrl-B1)" -command [ subst {multiple_trytocopy $win $address $x $y}] 
+       
+        tk_popup $popMenu $globalX $globalY
+    }
+    
+}
+
 # Simple Click : raise the form relative to the child
 proc multiple_simple_trigger {win address x y} {
     global widgetInfo
     set row [$win.ftv.tv identify row $x $y]
     set col [$win.ftv.tv identify column $x $y]
+    #debug "B1 simple , -$row-$col- "
     
-    set double_click 0
-    set current_time_ms [clock milliseconds]
-    set delay [expr {$current_time_ms - $widgetInfo($address-lastclick)}]
-    set widgetInfo($address-lastclick) $current_time_ms
-    if {$delay <300 } {
-        set double_click 1
-    }
-    
-    
+}
+
+
+
+# Double Click : raise the form relative to the child
+proc multiple_double_trigger {win address x y} {
+    global widgetInfo
+    set row [$win.ftv.tv identify row $x $y]
+    set col [$win.ftv.tv identify column $x $y]
+    #debug "B1 double , -$row-$col- "
+     
+     
     if {$row!= ""} {
-        
-        if {$double_click} {
-            switch $col {
-                "#0" {
+        switch $col {
+            "#0" {
+            
+            }
+            "#1" {
+                if {$widgetInfo($address-multiplemode) !="require"} {
+                    multiple_rename $win $address $row $col
+                }
+            }
+            default {
+                set child [  $win.ftv.tv column $col -id]
                 
+                # case of a menubutton
+                if {[winfo exists $win.children.flipbook.$row.$child.mb]} {
+                    set winmb $win.children.flipbook.$row.$child.mb
+                    set xmb [winfo rootx $winmb]
+                    set ymb [expr [winfo rooty $winmb] + [winfo height $winmb]]
+                    $win.children.flipbook.$row.$child.mb.xor post $xmb $ymb
                 }
-                "#1" {
-                    if {$widgetInfo($address-multiplemode) !="require"} {
-                        multiple_rename $win $address $row $col
-                    }
+                
+                # case of a checkbutton
+                if {[winfo exists $win.children.flipbook.$row.$child.cb]} {
+                    focus $win.children.flipbook.$row.$child.cb
+                    $win.children.flipbook.$row.$child.cb invoke
                 }
-                default {
-                    set child [  $win.ftv.tv column $col -id]
-                    
-                    # case of a menubutton
-                    if {[winfo exists $win.children.flipbook.$row.$child.mb]} {
-                        set winmb $win.children.flipbook.$row.$child.mb
-                        set xmb [winfo rootx $winmb]
-                        set ymb [expr [winfo rooty $winmb] + [winfo height $winmb]]
-                        $win.children.flipbook.$row.$child.mb.xor post $xmb $ymb
-                    }
-                    
-                    # case of a checkbutton
-                    if {[winfo exists $win.children.flipbook.$row.$child.cb]} {
-                        focus $win.children.flipbook.$row.$child.cb
-                        $win.children.flipbook.$row.$child.cb invoke
-                    }
-                    # case of an entry
-                    if {[winfo exists $win.children.flipbook.$row.$child.entry]} {
-                        $win.children.flipbook.$row.$child.entry selection range 0 end
-                        focus $win.children.flipbook.$row.$child.entry 
-                    }               
-                }
+                # case of an entry
+                if {[winfo exists $win.children.flipbook.$row.$child.entry]} {
+                    $win.children.flipbook.$row.$child.entry selection range 0 end
+                    focus $win.children.flipbook.$row.$child.entry 
+                }               
             }
         }
     }
 }
 
-
-
-proc multiple_sortrows {win address col} {
+proc multiple_newsorting {win address col} {
     global widgetInfo 
-    set child  [$win.ftv.tv column $col -id] 
+    set widgetInfo($address-sorting) $col
+    multiple_sortrows $win $address 
+}
+
+
+proc multiple_sortrows {win address} {
+    global widgetInfo
+    
+    if {$widgetInfo($address-sorting) =="none" } {return}
+    
+    set col $widgetInfo($address-sorting)
+    set child  [$win.ftv.tv column $col -id]
+    
+    
     set sortlist ""
     foreach couple $widgetInfo($address-content) {
         set child_node [lindex $couple 0]
@@ -312,6 +356,8 @@ proc multiple_sortrows {win address col} {
 
 proc multiple_trytocopy {win address x y} {
     global widgetInfo tmpTree
+    
+    #debug "TryToCopy $widgetInfo($address-copy)"
     # exclude if no copy 
     if {$widgetInfo($address-copy) == "none" } {return}
     
@@ -453,7 +499,7 @@ proc multiple_setname { address win row col } {
 proc multiple_ctrl_addchild {win address} {
     global widgetInfo tmpTree
     
-    set widgetInfo($address-copy)  "off"
+    set widgetInfo($address-copy)  "none"
     multiple_ctrl_copychild $win $address
     
     set row [$win.ftv.tv selection ]
@@ -478,7 +524,7 @@ proc multiple_ctrl_addchild {win address} {
 proc multiple_ctrl_rmchild {win address } {
     global widgetInfo
     
-    set widgetInfo($address-copy)  "off"
+    set widgetInfo($address-copy)  "none"
     multiple_ctrl_copychild $win $address    
     
     set row [$win.ftv.tv selection ]
@@ -506,24 +552,15 @@ proc multiple_ctrl_rmchild {win address } {
 proc multiple_ctrl_copychild {win address } {
     global widgetInfo
     
+    set source_child [$win.ftv.tv selection ]
+    #debug "multiple_ctrl_copychild -$source_child-"
+    if {$source_child ==""} {return}
+    set widgetInfo($address-copy) $source_child
     
-    switch $widgetInfo($address-copy) {
-        "none" {
-            set source_child [$win.ftv.tv selection ]
-            if {$source_child ==""} {return}
-            set widgetInfo($address-copy) $source_child
-            set source_name $widgetInfo($address.$source_child-variable)
-            $win.ftv.controls.copy configure -text "copying $source_name" -default active
-            . config -cursor spraycan
-            
-        }
-        default {
-            $win.ftv.controls.copy configure -text "copy" -default normal
-            set widgetInfo($address-copy) "none"
-            . config -cursor left_ptr
-            
-        }
-    }
+    #debug "multiple_ctrl_copychild ### - $widgetInfo($address-copy)-"
+   
+    set source_name $widgetInfo($address.$source_child-variable)
+    
 }
 
 proc multiple_ctrl_loadfromproject {win address } {
@@ -696,6 +733,7 @@ proc multiple_refreshStatus {win address} {
     
     # catched because if the item is deleted, this selection cannot be done
     catch {$win.ftv.tv selection set $tvselection} err
+    multiple_sortrows $win $address 
     multiple_sync $win $address "current_selection"
     
 }

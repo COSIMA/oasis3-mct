@@ -48,11 +48,13 @@ proc test_vartype {value type} {
             if { [string length $value] != 8 } {
                 set test_result "\"$value\" is not in jj/mm/aa format"
             } else {
-                set jj [string range $value 0 1]
+                set jj [string trimleft [string range $value 0 1] "0"]
                 set sep [string index $value 2]
-                set mm [string range $value 3 4]
+                set mm [string trimleft [string range $value 3 4] "0"]
                 set sep2 [string index $value 5]
                 set aa [string range $value 6 7]
+                
+                
                 
                 
                 if {$sep != "/" || $sep2 != "/" } {

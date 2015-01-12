@@ -6,7 +6,8 @@
 # still need a fix on the smartpaker
 #################################################
 
-proc ThemeUpdate { theme } {
+proc ThemeUpdate {  } {
+    global theme focusColor
     set themelist [ttk::style theme names]
     
     if {[lsearch $themelist $theme] ==-1} {
@@ -17,6 +18,8 @@ proc ThemeUpdate { theme } {
 	ttk::style theme use $theme
     }
     
+    
+#  
     
     # label des modeles
     ttk::style configure Model.TLabelframe.Label -foreground [ThemeColor 0.30]
@@ -44,8 +47,11 @@ proc ThemeUpdate { theme } {
 # factor beyond 1 gives a lighter color
 #################################################
 proc ThemeColor { factor {item background}  } {
-    if {[getConfig "config gui appearance theme" ]== "aqua"} {
-	set rgb "60909 60909 60909"
+    global theme
+    if {$theme== "aqua"} {
+	#set rgb "60909 60909 60909"
+	set rgb "59898 59898 59898"
+	
     } else {
         set rgb [winfo rgb . [ttk::style lookup .activefield -$item]]
     }
@@ -61,6 +67,25 @@ proc ThemeColor { factor {item background}  } {
     
 }
 
+
+proc FocusColor {  } {
+    global theme
+     switch $theme {
+	"aqua" {
+	    set focusColor "#77acdc"
+	}
+	"clam" {
+	    set focusColor "#77acdc"
+	}
+	default {
+	    set focusColor "black"
+	}
+    }
+
+    return $focusColor
+    
+    
+}
 
 proc getcharsize { sizeinpx {fontname courier} } {
     set width0 [font measure $fontname "0"]

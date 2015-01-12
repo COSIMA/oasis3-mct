@@ -109,6 +109,7 @@ proc readPipe {win address} {
             set tagid "none"
             if {[string match "Ok*" $line]} { set tagid "ok"}
             if {[string match "Error*" $line]} { set tagid "warning"}
+            if {[string match "Warning*" $line]} { set tagid "warning"}
             if {[string match "Note*" $line]} { set tagid "debug"}
             if {[string match "XDRExecute*" $line]} {
                 set tagid "xdrexecute"

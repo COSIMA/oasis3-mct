@@ -11,20 +11,10 @@ proc solverframe_create { args } {
     
     read_arguments
     
-    switch $widgetInfo(guimode) {
-        "treeview" {
-            ttk::treeview  $path_father.tv -selectmode browse -show {tree}
-            set widgetInfo(globaltv.path) $path_father.tv
-            place $path_father.tv -relx 0 -rely 0 -relwidth 0.2 -relheight 1
-            ttk::notebook $path_father.s -style "NoTabs.TNotebook"
-            place $path_father.s -relx 0.2 -rely 0  -relwidth 0.8 -relheight 1
-        }
-        "multicolumn" {
-            ttk::notebook $path_father.s
-            place $path_father.s -relx 0.0 -rely 0 -relwidth 1 -relheight 1
-        }
-    }
-    
+   
+    ttk::notebook $path_father.s
+    place $path_father.s -relx 0.0 -rely 0 -relwidth 1 -relheight 1
+
     return $path_father.s
 }
 
@@ -46,11 +36,7 @@ proc solverframe_add { args } {
     lappend widgetInfo($path_father-solvernames) $name
     lappend widgetInfo($path_father-solver-$name-valid) 1
     
-    # insert object in tree
-    if {$widgetInfo(guimode)=="treeview"} {
-        $widgetInfo(globaltv.path) insert "" end -id $name -text [dTree_getAttribute $XMLtree $full_address_XML "title"] -open 1 -tag $name
-        $widgetInfo(globaltv.path)  tag bind $name <ButtonPress> [subst {$path_father select $path_father.$name}]
-    }
+    
     
     if {[dTree_attrExists $XMLtree $full_address_XML "image"]} {
         set logofile [dTree_getAttribute $XMLtree $full_address_XML "image"]
@@ -92,42 +78,19 @@ proc solverframe_refreshStatus {win address name} {
     set status $widgetInfo($address-status)
     # update the graphical state
     
-    switch $widgetInfo(guimode) {
-        "treeview" {
-            switch $status {
-                "-2" {
-                       #  $win configure -text " "
-                         $widgetInfo(globaltv.path) item $name -image icon_void
-                }
-                "-1" {
-                       # $win configure  -text "Error(s) in the set up"
-                        $widgetInfo(globaltv.path) item $name -image icon_error
-                }
-                "0" {
-                        #$win configure -text "Waiting..."
-                        $widgetInfo(globaltv.path) item $name -image icon_question
-                }
-                "1" {
-                       #$win configure -text "Set up is ready for this solver"
-                        $widgetInfo(globaltv.path) item $name -image icon_ok 
-                }
-            }
+   
+    switch $status {
+        "-2" {
+                 #$win configure -text " "
         }
-        "multicolumn" {
-            switch $status {
-                "-2" {
-                         #$win configure -text " "
-                }
-                "-1" {
-                        #$win configure  -text "Error(s) in the set up"
-                }
-                "0" {
-                       # $win configure -text "Waiting..."
-                }
-                "1" {
-                        #$win configure -text "Set up is ready for this solver"
-                }
-            }
+        "-1" {
+                #$win configure  -text "Error(s) in the set up"
+        }
+        "0" {
+               # $win configure -text "Waiting..."
+        }
+        "1" {
+                #$win configure -text "Set up is ready for this solver"
         }
     }
 }

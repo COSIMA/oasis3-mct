@@ -695,7 +695,7 @@ proc grapher_setup_XML {arrayname dsaddress} {
             set modelPath [file join  $widgetInfo(libraryPath) $appli XML]
             set dataPath [file join $widgetInfo(libraryPath)]
             set tmpXMLtree ""
-            OpenTeaXMLML2tree tmpXMLtree $modelPath $dataPath
+            OpenTeaXML2tree tmpXMLtree $modelPath $dataPath
         }
     }
 

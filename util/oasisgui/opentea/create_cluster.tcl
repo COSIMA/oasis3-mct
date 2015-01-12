@@ -34,7 +34,13 @@ proc cluster_create { args } {
     
     
     
-    ttk::frame $win.ftv 
+    ttk::frame $win.ftv
+    
+    frame $win.ftv.border  -bd 0 -highlightthickness 2 -background [ThemeColor 1.0] -highlightbackground [ThemeColor 1.0] -highlightcolor [FocusColor]
+    bind . <<ThemeUpdate>> +[subst {$win.ftv.border configure -background \[ThemeColor 1.0\] -highlightbackground \[ThemeColor 1.0\] -highlightcolor \[FocusColor\] }]
+    #pack $win.ftv.border
+    
+    
     ttk::frame $win.ftv.forceps -width $widgetInfo(guiSmallWidgetWidth) -height 0 
     pack $win.ftv -fill both -side left -expand 1 
     ############
@@ -52,9 +58,9 @@ proc cluster_create { args } {
     
     set widgetInfo($address-labelstype) [dTree_tryGetAttribute $XMLtree $full_address_XML_clean "labels" "ascii"]
     
-    ttk::treeview $win.ftv.tv -selectmode none -show {}
+    ttk::treeview $win.ftv.border.tv -selectmode none -show {}
     if {$widgetInfo($address-clustermode) == "independant"} {
-        $win.ftv.tv configure -selectmode browse
+        $win.ftv.border.tv configure -selectmode browse
     }
     #yscrollcommand [list $win.ftv.sby set]  
     # create the columns of the treeview    
@@ -64,23 +70,24 @@ proc cluster_create { args } {
     set colwidth [expr {int([expr {0.5* $widgetInfo(guiSmallWidgetWidth)}])}]
     
     
-    $win.ftv.tv configure -columns "lbl var"
-    $win.ftv.tv column #1 -width $colwidth -anchor e
-    $win.ftv.tv column #2 -width $colwidth -anchor w
+    $win.ftv.border.tv configure -columns "lbl var"
+    $win.ftv.border.tv column #1 -width $colwidth -anchor e
+    $win.ftv.border.tv column #2 -width $colwidth -anchor w
     
-    #ttk::scrollbar $win.ftv.sby -orient vertical -command [list $win.ftv.tv yview]
+    #ttk::scrollbar $win.ftv.sby -orient vertical -command [list $win.ftv.border.tv yview]
     
     # avoid tab scrolling for mousewheel
-    bind $win.ftv.tv <MouseWheel> {+set tabscroll 0}
-    bind $win.ftv.tv  <Leave> {+set tabscroll 1}
-    #bind $win.ftv.tv  <FocusOut> [subst {$win.ftv.tv selection set  {} }]
+    bind $win.ftv.border.tv <MouseWheel> {+set tabscroll 0}
+    bind $win.ftv.border.tv  <Leave> {+set tabscroll 1}
+    #bind $win.ftv.border.tv  <FocusOut> [subst {$win.ftv.border.tv selection set  {} }]
     # ce binding est inutilisable ca il bloque la deletion d'un item
     
     
     grid $win.ftv.lb -sticky ne -column 0 -row 0 
     grid columnconfigure  $win.ftv  $win.ftv.lb  -weight 1
     grid rowconfigure  $win.ftv  $win.ftv.lb  -weight 1
-    grid $win.ftv.tv -sticky e -column 1 -row 0 -rowspan 2
+    grid $win.ftv.border -sticky e -column 1 -row 0 -rowspan 2
+    pack $win.ftv.border.tv
     grid $win.ftv.forceps -sticky news -column 0 -row 3 -columnspan 2
     grid $win.ftv.status -sticky news -column 0 -row 4 -columnspan 2
     
@@ -128,55 +135,169 @@ proc cluster_create { args } {
    
     
     # reaction to cells
-    bind $win.ftv.tv <ButtonPress> [subst {+cluster_simple_trigger $win $address %x %y}]
+    #bind $win.ftv.border.tv <ButtonPress> [subst {+cluster_simple_trigger $win $address %x %y}]
     
+    #bind $win.ftv.border.tv <Double-Button-1> [subst {
+    #    cluster_focus $win $address "on"
+    #    cluster_double_trigger $win $address %x %y
+    #    }] 
+    #
+    bind $win.ftv.border.tv <ButtonPress-1> [subst {cluster_click $win $address %x %y}]
+        
+    bind $win.ftv.border.tv <ButtonPress-2> [subst {
+        cluster_focus $win $address "on"
+        cluster_context_menu $win $address %x %y %X %Y
+    }] 
+   
     # clean the widget callBack on dstruction
     bind $win <Destroy> [ subst {widget_destroy $win $address}]
     
     return $win
 }
 
+proc cluster_focus {win address onoff} {
+    global widgetInfo
+    switch $onoff {
+        "on" {
+            focus $win.ftv
+            update
+        }
+        default {
+            
+            
+        }
+    }
+    
+}
+
+
+
+
+proc cluster_click { win address x y} {
+    global widgetInfo
+    set t [clock milliseconds]
+    cluster_focus $win $address "on"
+    set dt [expr {$t-$widgetInfo($address-lastclick)}]    
+    if { $dt < 500} {
+        cluster_double_trigger $win $address $x $y
+    } else {
+        cluster_simple_trigger $win $address $x $y
+    }
+    set widgetInfo($address-lastclick) $t
+}
+
 
 # Simple Click : raise the form relative to the component
 proc cluster_simple_trigger {win address x y} {
     global widgetInfo
-    set row [$win.ftv.tv identify row $x $y]
-    set col [$win.ftv.tv identify column $x $y]
-    
-    set double_click "0"
-    set current_time_ms [clock milliseconds]
-    set delay [expr {$current_time_ms - $widgetInfo($address-lastclick)}]
-    set widgetInfo($address-lastclick) $current_time_ms
-    if {$delay <300 } {
-        set double_click 1
+    set row [$win.ftv.border.tv identify row $x $y]
+    set col [$win.ftv.border.tv identify column $x $y]
+    if {$col=="#1" && $widgetInfo($address-clustermode)!="independant"} { return 0}    
+    if {$row!= ""} {
+        if { $widgetInfo($address-renaming) != 0 } {
+            cluster_setname $address $win $widgetInfo($address-renaming) $widgetInfo($address-renamingCol)
+            set widgetInfo($address-renaming) 0
+            destroy $win.ftv.border.tv.rename  
+        }
     }
+}
+
+# Simple Click : raise the form relative to the component
+proc cluster_double_trigger {win address x y} {
+    global widgetInfo
+    set row [$win.ftv.border.tv identify row $x $y]
+    set col [$win.ftv.border.tv identify column $x $y]
+    
     
     
     if {$col=="#1" && $widgetInfo($address-clustermode)!="independant"} { return 0}    
     if {$row!= ""} {
-        
-        if { $widgetInfo($address-renaming) != 0 } {
-            cluster_setname $address $win $widgetInfo($address-renaming) $widgetInfo($address-renamingCol)
-            set widgetInfo($address-renaming) 0
-            destroy $win.ftv.tv.rename  
-        }
-        
-        if {$double_click} {
-            cluster_rename $win $address $row $col
-            
-        }
-        
+        cluster_rename $win $address $row $col
     }
 }
 
 
 
 
+proc cluster_context_menu {win address x y globalX globalY} {
+    global widgetInfo
+    
+    
+    
+    $win.ftv.border configure -background [FocusColor] -highlightbackground [FocusColor] -highlightthickness 0 -bd  2
+    update
+    
+    
+    catch {destroy $win.ftv.border.tv.cmenu }
+    set popMenu [menu  $win.ftv.border.tv.cmenu ]
+
+    $popMenu add command -label "Copy to clipbooard" -command [ subst {cluster_save_to_clipboard $win $address
+       
+    }]
+    $popMenu add command -label "Paste from clipboard" -command [ subst {cluster_paste_from_clipboard $win $address}] 
+   
+    tk_popup $popMenu $globalX $globalY
+    
+    $win.ftv.border configure -background  [ThemeColor 1.0] -highlightbackground [ThemeColor 1.0] -highlightthickness 2 -bd  0
+
+}
+
+proc cluster_save_to_clipboard {win address } {
+    global widgetInfo
+    clipboard clear
+    clipboard append $widgetInfo($address-variable)
+    log  "Data  stored in clipboard : \n $widgetInfo($address-variable) "
+    
+}
+
+proc cluster_paste_from_clipboard {win address } {
+    global widgetInfo
+    
+    if {[catch {clipboard get} contents]} {
+        warning "Clipboard is empty"
+        return
+    }
+    
+    if {[llength [split $contents  ";" ]] <2} {
+        warning "Clipboard data  -$contents- is not compatible with this widget"
+        return
+    }
+    
+    
+    if {$widgetInfo($address-clustermode) =="require"} {
+        set component_list [cluster_component_list $address]
+        
+        set content_component_list ""
+        set couple ""
+        foreach item [split $contents  ";" ] {
+            lappend couple $item
+            if {[llength $couple] == 1 } {
+                lappend content_component_list $item
+                
+            }
+            if {[llength $couple] == 2 } {
+                set couple ""
+            }
+        }
+        
+        foreach component $content_component_list {
+            if {$component ni $component_list} {
+                warning "Clipboard data  -$contents- is not compatible with this widget\n clipboard : -$content_component_list-\n  widget : -$component_list-"    
+                return
+            }
+        }
+    }
+    set widgetInfo($address-variable) $contents
+    eval $widgetInfo($address-check)
+    #cluster_refreshStatus $win $address
+}
+
+
 # called by the "+" button is invoked
 proc cluster_ctrl_addcomponent {win address} {
     global widgetInfo tmpTree
     
-    set row [$win.ftv.tv selection ]
+    set row [$win.ftv.border.tv selection ]
     if { $row != "" } {
         set rank [lsearch [cluster_component_list $address] $row]
         incr rank
@@ -191,7 +312,7 @@ proc cluster_ctrl_rmcomponent {win address } {
     global widgetInfo
      
     
-    set row [$win.ftv.tv selection ]
+    set row [$win.ftv.border.tv selection ]
     if { $row != "" } {
         set rank [lsearch [cluster_component_list $address] $row]
     } else {
@@ -247,7 +368,7 @@ proc cluster_rename {win address row col } {
     
     global widgetInfo
     if { $widgetInfo($address-renaming) != 0 } {
-        focus $win.ftv.tv.rename.entry
+        focus $win.ftv.border.tv.rename.entry
         return    
     }                    
     
@@ -257,68 +378,47 @@ proc cluster_rename {win address row col } {
 
     
     
-    frame $win.ftv.tv.rename -background red  -bd 2
-    set bbox [$win.ftv.tv bbox $row $col]
+    frame $win.ftv.border.tv.rename -background red  -bd 2
+    set bbox [$win.ftv.border.tv bbox $row $col]
     
-    place $win.ftv.tv.rename -x [lindex $bbox 0] -y [lindex $bbox 1] -width [lindex $bbox 2] -height [lindex $bbox 3]
+    place $win.ftv.border.tv.rename -x [lindex $bbox 0] -y [lindex $bbox 1] -width [lindex $bbox 2] -height [lindex $bbox 3]
     
-    focus $win.ftv.tv.rename
+    focus $win.ftv.border.tv.rename
     
-    set widgetInfo($address-entry) [$win.ftv.tv set $row $col]
-    ttk::entry $win.ftv.tv.rename.entry -textvariable widgetInfo($address-entry) 
-    pack $win.ftv.tv.rename.entry -expand 1
-    $win.ftv.tv.rename.entry selection range 0 end
-    $win.ftv.tv.rename.entry icursor end
-    focus $win.ftv.tv.rename.entry
+    set widgetInfo($address-entry) [$win.ftv.border.tv set $row $col]
+    ttk::entry $win.ftv.border.tv.rename.entry -textvariable widgetInfo($address-entry) 
+    pack $win.ftv.border.tv.rename.entry -expand 1
+    $win.ftv.border.tv.rename.entry selection range 0 end
+    $win.ftv.border.tv.rename.entry icursor end
+    focus $win.ftv.border.tv.rename.entry
 
 
-    bind $win.ftv.tv.rename.entry <Return>  [ subst {
+    bind $win.ftv.border.tv.rename.entry <Return>  [ subst {
         # change value
         cluster_setname $address $win $row $col
         # kill dialog
-        destroy $win.ftv.tv.rename
+        destroy $win.ftv.border.tv.rename
         set widgetInfo($address-renaming) 0
     }]
     
-    bind $win.ftv.tv.rename.entry <FocusOut>  [ subst {
+    bind $win.ftv.border.tv.rename.entry <FocusOut>  [ subst {
          # change value
         cluster_setname $address $win $row $col
         # kill dialog
-        destroy $win.ftv.tv.rename
+        destroy $win.ftv.border.tv.rename
         set widgetInfo($address-renaming) 0
     }]
     
     
-    bind $win.ftv.tv.rename.entry <Escape>  [ subst {
+    bind $win.ftv.border.tv.rename.entry <Escape>  [ subst {
         # kill dialog
-        destroy $win.ftv.tv.rename
+        destroy $win.ftv.border.tv.rename
         set widgetInfo($address-renaming) 0
     }]
     
     
-    #bind $win.ftv.tv.rename.entry <Tab>  [ subst {
-    #    
-    #    #change value
-    #    cluster_setname $address $win $row $col
-    #    # kill dialog
-    #    destroy $win.ftv.tv.rename
-    #    set widgetInfo($address-renaming) 0
-    #    
-    #    # find nex row
-    #    set list_row \[cluster_component_list $address\]
-    #    set rank \[lsearch \$list_row $row\]
-    #    incr rank
-    #    if {\$rank == \[llength \$list_row\]} {
-    #        set rank 0
-    #    }
-    #    set newrow \[lindex \$list_row \$rank\]
-    #    # restart dialog
-    #    cluster_rename $win $address \$newrow $col
-    #    puts "test"
-    #}]
+   
 }
-
-
 
 # change the label assigned 
 proc cluster_setname { address win row col } {
@@ -379,7 +479,7 @@ proc cluster_refreshStatus {win address} {
   
     
     
-    $win.ftv.tv delete [$win.ftv.tv children {}]
+    $win.ftv.border.tv delete [$win.ftv.border.tv children {}]
     
     set compolenght 0
     # create the lines of the treeview
@@ -402,7 +502,7 @@ proc cluster_refreshStatus {win address} {
         set test_label [test_vartype $component $widgetInfo($address-labelstype) ]       
         set test_cluster [test_vartype $var $type ]
         if { $test_cluster == 1 && $test_label == 1} {
-            $win.ftv.tv insert {} end -id $component -text "$component" -image "" -tags "true"
+            $win.ftv.border.tv insert {} end -id $component -text "$component" -image "" -tags "true"
         } else {
             
             if { $test_cluster != 1} {
@@ -414,7 +514,7 @@ proc cluster_refreshStatus {win address} {
             }
             
             set widgetInfo($address-status) -1
-            $win.ftv.tv insert {} end -id $component -text "$component" -image "" -tags "false"
+            $win.ftv.border.tv insert {} end -id $component -text "$component" -image "" -tags "false"
         }
         
         if {$type == "fraction" && [string is double $var]} {
@@ -422,32 +522,32 @@ proc cluster_refreshStatus {win address} {
         }
     
         
-        $win.ftv.tv set $component #1 "$component"
-        $win.ftv.tv set $component #2 $var
+        $win.ftv.border.tv set $component #1 "$component"
+        $win.ftv.border.tv set $component #2 $var
     }
     
     if {$type == "fraction"} {
         if {$sum != 1.0 } {
-            set test_cluster "sum fractions not one"
+            set test_cluster "sum fractions not one : $sum"
             set widgetInfo($address-status_txt) $test_cluster
             set widgetInfo($address-status) -1
         }
     }
     
     
-    $win.ftv.tv tag configure false -background #ff5050
-    $win.ftv.tv tag configure unknown -background #ffcd7c
-    $win.ftv.tv tag configure true -background ""
+    $win.ftv.border.tv tag configure false -background #ff5050
+    $win.ftv.border.tv tag configure unknown -background #ffcd7c
+    $win.ftv.border.tv tag configure true -background ""
     
     set colwidth1 [expr {int([expr {0.5* $widgetInfo(guiSmallWidgetWidth)  *$widgetInfo($address-ratio)  }])}]
     set colwidth2 [expr {int([expr {0.5* $widgetInfo(guiSmallWidgetWidth)}]) - $colwidth1}]
-    $win.ftv.tv column #1 -width $colwidth1 -anchor w
-    $win.ftv.tv column #2 -width $colwidth2 -anchor w
+    $win.ftv.border.tv column #1 -width $colwidth1 -anchor w
+    $win.ftv.border.tv column #2 -width $colwidth2 -anchor w
     
     
     set nrows  [llength [cluster_variable_to_content $address] ]
     
-    $win.ftv.tv configure -height $nrows
+    $win.ftv.border.tv configure -height $nrows
     
     if { $widgetInfo($address-status) == -1 } { 
        $win.ftv.status configure -image icon_flag
@@ -522,6 +622,9 @@ proc cluster_require { win address } {
     if {$default==""} {set default 0 }
     set old_content [cluster_variable_to_content $address]
     set new_content ""       
+    
+    
+    
     # get the present values of the components if they belong to reQvar   
     foreach actual_component $reqVar {
         set component_found 0

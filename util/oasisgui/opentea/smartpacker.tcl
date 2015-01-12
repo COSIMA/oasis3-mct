@@ -3,10 +3,6 @@
 
 proc smartpacker_getconfig {} {
     global widgetInfo
-    set guiMode [getConfig "config gui appearance mode"]
-    if {$guiMode == ""} {
-        set guiMode "treeview"
-    }
     set guiWidth [getConfig "config gui appearance width"]
     if {$guiWidth == ""} {
         set guiWidth "700"
@@ -16,21 +12,13 @@ proc smartpacker_getconfig {} {
         set guiHeight "700"
     }
     
-    set widgetInfo(guimode) $guiMode
     set widgetInfo(guiheight) $guiHeight
     set widgetInfo(guiwidth) $guiWidth
-    switch $widgetInfo(guimode) {
-	"multicolumn" {
-	    set widgetInfo(guiSmallWidgetWidth)  [expr { int ([expr { 0.37*$widgetInfo(guiwidth)}])}]
-	    set widgetInfo(guiBigWidgetWidth) [expr { int ([expr { 0.74*$widgetInfo(guiwidth)}])}]
-	    set widgetInfo(guiEntryRelWidth)  0.5
-	}
-	"treeview" {
-	    set widgetInfo(guiSmallWidgetWidth)  [expr { int ([expr { 0.6*$widgetInfo(guiwidth)}])}]
-	    set widgetInfo(guiBigWidgetWidth) [expr { int ([expr { 0.6*$widgetInfo(guiwidth)}])}]
-	    set widgetInfo(guiEntryRelWidth)  0.33
-	}
-    }
+    
+    set widgetInfo(guiSmallWidgetWidth)  [expr { int ([expr { 0.37*$widgetInfo(guiwidth)}])}]
+    set widgetInfo(guiBigWidgetWidth) [expr { int ([expr { 0.74*$widgetInfo(guiwidth)}])}]
+    set widgetInfo(guiEntryRelWidth)  0.5
+
 }
 
 
@@ -39,43 +27,38 @@ proc smartpacker_getconfig {} {
 proc smartpacker_initialize_gui { loadedProject } {
     global widgetInfo
     global workingDir
-    switch $widgetInfo(guimode) {
-	"multicolumn" {
-	    # bind the main window to the resizing action
-	    
+    
+    # bind the main window to the resizing action
+    
+    set widgetInfo(SetViewMode) "large"
+    event generate . <<SetView>> 
+    
+    
+    bind . <Configure> {
+	set ActualWidth [winfo width .]
+	#puts "AW $ActualWidth"
+	#puts "VM $widgetInfo(SetViewMode)"
+	
+	if {$ActualWidth >[expr { (2.2)*$widgetInfo(guiSmallWidgetWidth)}] && $widgetInfo(SetViewMode)=="small"} {
 	    set widgetInfo(SetViewMode) "large"
 	    event generate . <<SetView>> 
-	    
-	    
-	    bind . <Configure> {
-		set ActualWidth [winfo width .]
-		#puts "AW $ActualWidth"
-		#puts "VM $widgetInfo(SetViewMode)"
-		
-		if {$ActualWidth >[expr { (2.2)*$widgetInfo(guiSmallWidgetWidth)}] && $widgetInfo(SetViewMode)=="small"} {
-		    set widgetInfo(SetViewMode) "large"
-		    event generate . <<SetView>> 
-		}
-		if {$ActualWidth >[expr { (3.3)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="large"} {
-		    set widgetInfo(SetViewMode) "huge"
-		    event generate . <<SetView>> 
-		}
-		if {$ActualWidth <[expr { (2.2)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="large"} {
-		    set widgetInfo(SetViewMode) "small"
-		    event generate . <<SetView>> 
-		}
-		if {$ActualWidth <[expr { (3.3)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="huge"} {
-		    set widgetInfo(SetViewMode) "large"
-		    event generate . <<SetView>> 
-		}
-		
-		    
-	    }
 	}
-	"treeview" {
-	    
+	if {$ActualWidth >[expr { (3.3)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="large"} {
+	    set widgetInfo(SetViewMode) "huge"
+	    event generate . <<SetView>> 
 	}
+	if {$ActualWidth <[expr { (2.2)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="large"} {
+	    set widgetInfo(SetViewMode) "small"
+	    event generate . <<SetView>> 
+	}
+	if {$ActualWidth <[expr { (3.3)*$widgetInfo(guiSmallWidgetWidth)}]  && $widgetInfo(SetViewMode)=="huge"} {
+	    set widgetInfo(SetViewMode) "large"
+	    event generate . <<SetView>> 
+	}
+	
+	    
     }
+	
     wm geometry . ${widgetInfo(guiwidth)}x${widgetInfo(guiheight)}
     raise .
     
@@ -85,9 +68,10 @@ proc smartpacker_initialize_gui { loadedProject } {
     update    
 }
 
-# correction of focus on mac OSX
+# correction of focus
 proc smartpacker_focus_correction {} {
-    if {[getConfig "config gui appearance focusCorrection"] == 1} {
+    global focusCorrection
+    if {$focusCorrection == 1} {
 	bind . <ButtonPress-1> {
 	    if {[focus] == ""} {
 		focus -force [focus -lastfor .]
@@ -111,168 +95,154 @@ proc smartpacker_regrid {   } {
     if {$widgetInfo(tabfocus) == ""} {return} 
     set win "$widgetInfo(tabfocus).sf.vport.form"
     
-    switch $widgetInfo(guimode) {
-	"multicolumn" {
-	    #incr widgetInfo(nregrid)
-	    #puts "Regridding... $widgetInfo(nregrid) \n mode $viewmode"
-		
-	    set ColumnSize [expr { 1.1*$widgetInfo(guiSmallWidgetWidth)}]
-	    set VerticalPad 15
-	    set HorizontalPad [expr { 0.001*$widgetInfo(guiSmallWidgetWidth)}]
-	    set VerticalStart 5    
-	    set HorizontalStart 5
+    #incr widgetInfo(nregrid)
+    #puts "Regridding... $widgetInfo(nregrid) \n mode $viewmode"
 	
-	    # get the number of columns
-	    switch $viewmode {
-		"small" {
-		    set colmax 1
-		}
-		"large" {
-		    set colmax 2
-		}
-		"huge" {
-		    set colmax 3
-		}
-		default {
-		    set colmax 1
-		}
-	    }
-	    
-	    update idletasks
-	    
-	    #list of widget to repack
-	    set widgetlist ""
-	    foreach wc [winfo children $win] {
-		if {[ winfo manager $wc ] != ""} {
-		    lappend widgetlist $wc
-		}
-	    }
-	    
-	    #  1st loop on widgets to fill info and depack widgets
-	    set wp(narrow-height) 0
-	    set wp(narrow-list) ""
-	    set wp(wide-list) ""
-	    foreach widget $widgetlist {
-	        eval $widgetInfo(unpackme-$widget)
-		
-		pack $widget 
-		
-		set wp($widget-height) [winfo reqheight $widget]
-		if {$wp($widget-height) == 0 }  {set wp($widget-height) [winfo height $widget]}
-		set wp($widget-width) [winfo reqwidth $widget]
-		if {$wp($widget-width) == 0 }  {set wp($widget-width) [winfo width $widget]}
-		
-		pack forget $widget
-			
-			
-			
-		if {$wp($widget-width)  < $ColumnSize} {
-		    incr wp(narrow-height)  $wp($widget-height)
-		    lappend wp(narrow-list) $widget
-		} else {
-		    lappend wp(wide-list) $widget
-		}
-		
-	    }
-	    
-		
-	    set vmax 0
-	    set hmax 0
-	    # balance the columns
-	    # if the middle of the widget is below the maximum average,
-	    # then the widget must jump one col
-	    set max [expr {int($wp(narrow-height)/$colmax*1.0)}]
-	    set position 0
-	    set mid_position 0
-	    set jumpwidget 0
-	    set sparecolumns $colmax 
-	    
-	    foreach widget $wp(narrow-list) { 
-		set  mid_position [ expr {int($position+ int(0.5*$wp($widget-height)))}]
-		if { $mid_position > $max &&  $sparecolumns > 1 } {
-		    set position 0
-		    set wp($widget-jump) 1
-		    incr sparecolumns -1
-		} else {
-		    set wp($widget-jump) 0
-		}
-		incr position $wp($widget-height)
-	    }
-	  
-	    
-	    # loop on narrow widgets
-	    set wp(x1) $HorizontalStart
-	    set wp(y1) $VerticalStart
-	    set wp(narrowtotalheight) 0
-	    foreach widget $wp(narrow-list) {
-		if {$wp($widget-jump)} {
-		    set wp(x1) [expr {int($wp(x1) + $HorizontalPad + $ColumnSize)}]
-		    set wp(y1) $VerticalStart
-		}
-                place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)		
-		set widgetInfo(packme-$widget) [subst {
-		    set widgetInfo(fixedview) 1
-                    place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)		
-		    event generate . <<SetView>>
-                    set widgetInfo(fixedview) 0
-                }]
-		set widgetInfo(unpackme-$widget) [subst {
-		    place forget $widget
-		}]
-		
-		
-		
-		incr wp(y1) $wp($widget-height)
-		incr wp(y1) $VerticalPad
-		if { $wp(narrowtotalheight) < $wp(y1) } { set wp(narrowtotalheight) $wp(y1)}        
-	    }
-	    set hmax [expr {int($wp(x1) + $HorizontalPad + $ColumnSize)}]
-	    
-	  
-	    #loop on wide widgets
-	    set wp(x1) $HorizontalStart
-	    set wp(y1) $wp(narrowtotalheight)
-	    foreach widget $wp(wide-list) {
-		place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)
-		set widgetInfo(packme-$widget) [subst {
-                    set widgetInfo(fixedview) 1
-                    place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)
-		    event generate . <<SetView>>
-                    set widgetInfo(fixedview) 0
-                }]
-		set widgetInfo(unpackme-$widget) [subst {
-		    place forget $widget
-		}]
-		
-		incr wp(y1) $wp($widget-height)
-		incr wp(y1) 5
-		set widthwide [expr {int($wp($widget-width) +$HorizontalStart+2*$HorizontalPad)}]
-		if { $widthwide > $hmax} {set hmax $widthwide}
-		
-	    }
-	    set vmax $wp(y1)
-	    
-	    
-	    # clean all variables used
-	    array unset wp
-	    
-	    # adjust the form
-	    $win configure -width $hmax -height $vmax
-	    set widgetInfo(ReGrid) "no"
-	    
-	    scrollform_resize [crop_address $win 2]
-	    
-	    
-	    
-	    
+    set ColumnSize [expr { 1.1*$widgetInfo(guiSmallWidgetWidth)}]
+    set VerticalPad 15
+    set HorizontalPad [expr { 0.001*$widgetInfo(guiSmallWidgetWidth)}]
+    set VerticalStart 5    
+    set HorizontalStart 5
+
+    # get the number of columns
+    switch $viewmode {
+	"small" {
+	    set colmax 1
 	}
-	"treeview" {
+	"large" {
+	    set colmax 2
+	}
+	"huge" {
+	    set colmax 3
+	}
+	default {
+	    set colmax 1
+	}
+    }
+    
+    update idletasks
+    
+    #list of widget to repack
+    set widgetlist ""
+    foreach wc [winfo children $win] {
+	if {[ winfo manager $wc ] != ""} {
+	    lappend widgetlist $wc
+	}
+    }
+    
+    #  1st loop on widgets to fill info and depack widgets
+    set wp(narrow-height) 0
+    set wp(narrow-list) ""
+    set wp(wide-list) ""
+    foreach widget $widgetlist {
+	eval $widgetInfo(unpackme-$widget)
+	
+	pack $widget 
+	
+	set wp($widget-height) [winfo reqheight $widget]
+	if {$wp($widget-height) == 0 }  {set wp($widget-height) [winfo height $widget]}
+	set wp($widget-width) [winfo reqwidth $widget]
+	if {$wp($widget-width) == 0 }  {set wp($widget-width) [winfo width $widget]}
+	
+	pack forget $widget
 		
+		
+		
+	if {$wp($widget-width)  < $ColumnSize} {
+	    incr wp(narrow-height)  $wp($widget-height)
+	    lappend wp(narrow-list) $widget
+	} else {
+	    lappend wp(wide-list) $widget
 	}
 	
     }
     
+	
+    set vmax 0
+    set hmax 0
+    # balance the columns
+    # if the middle of the widget is below the maximum average,
+    # then the widget must jump one col
+    set max [expr {int($wp(narrow-height)/$colmax*1.0)}]
+    set position 0
+    set mid_position 0
+    set jumpwidget 0
+    set sparecolumns $colmax 
     
+    foreach widget $wp(narrow-list) { 
+	set  mid_position [ expr {int($position+ int(0.5*$wp($widget-height)))}]
+	if { $mid_position > $max &&  $sparecolumns > 1 } {
+	    set position 0
+	    set wp($widget-jump) 1
+	    incr sparecolumns -1
+	} else {
+	    set wp($widget-jump) 0
+	}
+	incr position $wp($widget-height)
+    }
+  
+    
+    # loop on narrow widgets
+    set wp(x1) $HorizontalStart
+    set wp(y1) $VerticalStart
+    set wp(narrowtotalheight) 0
+    foreach widget $wp(narrow-list) {
+	if {$wp($widget-jump)} {
+	    set wp(x1) [expr {int($wp(x1) + $HorizontalPad + $ColumnSize)}]
+	    set wp(y1) $VerticalStart
+	}
+	place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)		
+	set widgetInfo(packme-$widget) [subst {
+	    set widgetInfo(fixedview) 1
+	    place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)		
+	    event generate . <<SetView>>
+	    set widgetInfo(fixedview) 0
+	}]
+	set widgetInfo(unpackme-$widget) [subst {
+	    place forget $widget
+	}]
+	
+	
+	
+	incr wp(y1) $wp($widget-height)
+	incr wp(y1) $VerticalPad
+	if { $wp(narrowtotalheight) < $wp(y1) } { set wp(narrowtotalheight) $wp(y1)}        
+    }
+    set hmax [expr {int($wp(x1) + $HorizontalPad + $ColumnSize)}]
+    
+  
+    #loop on wide widgets
+    set wp(x1) $HorizontalStart
+    set wp(y1) $wp(narrowtotalheight)
+    foreach widget $wp(wide-list) {
+	place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)
+	set widgetInfo(packme-$widget) [subst {
+	    set widgetInfo(fixedview) 1
+	    place $widget -x $wp(x1) -y $wp(y1) -width $wp($widget-width) -height $wp($widget-height)
+	    event generate . <<SetView>>
+	    set widgetInfo(fixedview) 0
+	}]
+	set widgetInfo(unpackme-$widget) [subst {
+	    place forget $widget
+	}]
+	
+	incr wp(y1) $wp($widget-height)
+	incr wp(y1) 5
+	set widthwide [expr {int($wp($widget-width) +$HorizontalStart+2*$HorizontalPad)}]
+	if { $widthwide > $hmax} {set hmax $widthwide}
+	
+    }
+    set vmax $wp(y1)
+    
+    
+    # clean all variables used
+    array unset wp
+    
+    # adjust the form
+    $win configure -width $hmax -height $vmax
+    set widgetInfo(ReGrid) "no"
+    
+    scrollform_resize [crop_address $win 2]
     
 }
 
@@ -369,9 +339,7 @@ proc smartpacker_setup_label { win address } {
 	set title "[dTree_getAttribute $XMLtree $full_address_XML "title"]:"
 	ttk::label $win.lbl -text $title -justify right
     
-	if { $widgetInfo(guimode) == "multicolumn"} {
-	    $win.lbl configure -wraplength [expr { int(0.5*$widgetInfo(guiSmallWidgetWidth))}]
-	}    
+	$win.lbl configure -wraplength [expr { int(0.5*$widgetInfo(guiSmallWidgetWidth))}]
 	
 	place $win.lbl -relx 0.5 -rely 0. -anchor ne
     }

@@ -486,12 +486,139 @@
             </conservtransof>
             <summary value="">
                 <scriptsummary value="">
-                    <summaryscript value="******************************************************************BREAKLINE*** Summary of the coupling fields and their transformations: BREAKLINE******************************************************************BREAKLINE******************************************************************BREAKLINEFSENDOCN-FRECVATM:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : lmdzBREAKLINEDimensions : 96x72BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: rsto.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:AVERAGEBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDATM-FRECVOCN:BREAKLINESource grid : lmdzBREAKLINEDimensions : 96x72BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: rsta.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:ACCUMULBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDOC2-FSENDOC2:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : lmdzBREAKLINEDimensions : 96x72BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av.ncBREAKLINEField status: OUTPUTBREAKLINEBREAKLINEMin and max of the received field calculatedBREAKLINEMultiply by 1. the field sentBREAKLINEAdd 3 to the field sentBREAKLINEMultiply by 10 the received fieldBREAKLINEAdd 1. to the received fieldBREAKLINESCRIPR is used: BREAKLINEBILINEAR interpolationBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3-INPUTAT1:INPUTAT2:INPUTAT3BREAKLINESource grid : lmdzBREAKLINEDimensions : 96x72BREAKLINETarget grid : lmdzBREAKLINEDimensions : 96x72BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: av2.ncBREAKLINEField status: INPUTBREAKLINEBREAKLINEMin and max of the field sent calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTOCN-INPUTOCN:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av3.ncBREAKLINEField status: INPUTBREAKLINEBREAKLINE********************************************************BREAKLINE********************************************************" />
+                    <summaryscript value="******************************************************************
+*** Summary of the coupling fields and their transformations: 
+******************************************************************
+******************************************************************
+FSENDOCN-FRECVATM:
+Source grid : torc
+Dimensions : 182x149
+Target grid : lmdz
+Dimensions : 96x72
+Source grid periodical with  2 overlapping points
+Target grid periodical with  0 overlapping points 
+Coupling period=7200
+Restart file: rsto.nc
+Field status: EXPORTED
+ LAG=3600
+Time transformation:AVERAGE
+Min and max of the field sent calculated
+Min and max of the received field calculated
+MAPPING is used with options: src and bfb
+********************************************************
+********************************************************
+FSENDATM-FRECVOCN:
+Source grid : lmdz
+Dimensions : 96x72
+Target grid : torc
+Dimensions : 182x149
+Source grid periodical with  0 overlapping points
+Target grid periodical with  2 overlapping points 
+Coupling period=3600
+Restart file: rsta.nc
+Field status: EXPORTED
+ LAG=3600
+Time transformation:ACCUMUL
+Min and max of the field sent calculated
+Min and max of the received field calculated
+MAPPING is used with options: src and bfb
+********************************************************
+********************************************************
+FSENDOC2-FSENDOC2:
+Source grid : torc
+Dimensions : 182x149
+Target grid : lmdz
+Dimensions : 96x72
+Source grid periodical with  2 overlapping points
+Target grid periodical with  0 overlapping points 
+Coupling period=3600
+Restart file: av.nc
+Field status: OUTPUT
+
+Min and max of the received field calculated
+Multiply by 1. the field sent
+Add 3 to the field sent
+Multiply by 10 the received field
+Add 1. to the received field
+SCRIPR is used: 
+BILINEAR interpolation
+********************************************************
+********************************************************
+INPUTAT1:INPUTAT2:INPUTAT3-INPUTAT1:INPUTAT2:INPUTAT3
+Source grid : lmdz
+Dimensions : 96x72
+Target grid : lmdz
+Dimensions : 96x72
+Source grid periodical with  0 overlapping points
+Target grid periodical with  0 overlapping points 
+Coupling period=7200
+Restart file: av2.nc
+Field status: INPUT
+
+Min and max of the field sent calculated
+MAPPING is used with options: src and bfb
+********************************************************
+********************************************************
+INPUTOCN-INPUTOCN:
+Source grid : torc
+Dimensions : 182x149
+Target grid : torc
+Dimensions : 182x149
+Source grid periodical with  2 overlapping points
+Target grid periodical with  2 overlapping points 
+Coupling period=3600
+Restart file: av3.nc
+Field status: INPUT
+
+********************************************************
+********************************************************" />
                 </scriptsummary>
             </summary>
             <write value="">
                 <scriptnamcouple value="">
-                    <namcouplescript value="$NFIELDS BREAKLINE7BREAKLINE$END BREAKLINE####BREAKLINE$NBMODEL BREAKLINE2 model1 model2BREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE21600BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE0 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEFSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTEDBREAKLINE182 149 96 72 torc lmdz LAG=3600BREAKLINEP 2 P 0 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEAVERAGE BREAKLINEINT=1BREAKLINEmap1.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTEDBREAKLINE96 72 182 149 lmdz torc LAG=3600BREAKLINEP 0 P 2 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEACCUMUL BREAKLINEINT=1BREAKLINEmap2.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDOC2 FSENDOC2 1 3600 0 av.nc OUTPUTBREAKLINEtorc torcBREAKLINE####BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3 RECVAT1:RECVAT2:RECVAT3 1 7200 0 av2.nc INPUTBREAKLINE####BREAKLINEINPUTOCN INPUTOCN 1 3600 0 av3.nc INPUTBREAKLINE####BREAKLINE $END" />
+                    <namcouplescript value="$NFIELDS 
+7
+$END 
+####
+$NBMODEL 
+2 model1 model2
+$END 
+####
+$RUNTIME 
+21600
+$END 
+####
+$NLOGPRT 
+0 0
+$END 
+####
+$STRINGS 
+FSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTED
+182 149 96 72 torc lmdz LAG=3600
+P 2 P 0 
+LOCTRANS CHECKIN MAPPING CHECKOUT 
+AVERAGE 
+INT=1
+map1.nc src bfb 
+INT=1
+####
+FSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTED
+96 72 182 149 lmdz torc LAG=3600
+P 0 P 2 
+LOCTRANS CHECKIN MAPPING CHECKOUT 
+ACCUMUL 
+INT=1
+map2.nc src bfb 
+INT=1
+####
+FSENDOC2 FSENDOC2 1 3600 0 av.nc OUTPUT
+torc torc
+####
+INPUTAT1:INPUTAT2:INPUTAT3 RECVAT1:RECVAT2:RECVAT3 1 7200 0 av2.nc INPUT
+####
+INPUTOCN INPUTOCN 1 3600 0 av3.nc INPUT
+####
+ $END" />
                 </scriptnamcouple>
             </write>
         </oasis3-mct>
@@ -501,7 +628,7 @@
             </solver>
             <project>
                 <name value="test2" />
-                <address value="/home/evian/coquart/OASIS/OASISGUI/examples_xml_namcouple/test2.xml" />
+                <address value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test2.xml" />
                 <username value="myName" />
                 <company value="myCompany" />
             </project>
@@ -512,10 +639,10 @@
             <scriptSuccess value="1" />
             <engine>
                 <name value="OpenTEA" />
-                <launchCommand value="/usr/bin/wish /home/evian/coquart/OASIS/OASISGUI/opentea/opentea.tcl  -config /home/evian/coquart/OASIS/OASISGUI/myconfig.xml -config /home/evian/coquart/OASIS/OASISGUI/myconfig.xml -library /home/evian/coquart/OASIS/OASISGUI/library -config /home/evian/coquart/OASIS/OASISGUI/myconfig.xml -plugins /home/evian/coquart/OASIS/OASISGUI/library/DATA/pluginscripts" />
-                <pluginsPath value="/home/evian/coquart/OASIS/OASISGUI/library/DATA/pluginscripts" />
-                <libraryPath value="/home/evian/coquart/OASIS/OASISGUI/library" />
-                <configPath value="/home/evian/coquart/OASIS/OASISGUI/myconfig.xml" />
+                <launchCommand value="/usr/bin/wish /space/coquart/oasis3-mct_buildbot/util/oasisgui/opentea/opentea.tcl  -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -library /space/coquart/oasis3-mct_buildbot/util/oasisgui/library -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -plugins /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <pluginsPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <libraryPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library" />
+                <configPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml" />
             </engine>
         </meta>
     </dataset>

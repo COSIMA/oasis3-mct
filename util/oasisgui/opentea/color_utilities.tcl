@@ -6,14 +6,20 @@ proc shadeColor { colorname shade} {
    set G [lindex $color 1]
    set B [lindex $color 2]
    
-   set DR [expr {65535 - $R}]
-   set DG [expr {65535 - $G}]
-   set DB [expr {65535 - $B}]
    
-   set newR [expr { int($R+ $DR*$shade)}]
-   set newG [expr { int($G+ $DG*$shade)}]
-   set newB [expr { int($B+ $DB*$shade)}]
-   
+   if {$shade > 0 } {
+      set DR [expr {65535 - $R}]
+      set DG [expr {65535 - $G}]
+      set DB [expr {65535 - $B}]
+      
+      set newR [expr { int($R+ $DR*$shade)}]
+      set newG [expr { int($G+ $DG*$shade)}]
+      set newB [expr { int($B+ $DB*$shade)}]
+   } else {
+      set newR [expr { int($R*(1.+$shade))}]
+      set newG [expr { int($G*(1.+$shade))}]
+      set newB [expr { int($B*(1.+$shade))}]  
+   }
    
    set color [format "#%04x%04x%04x" $newR $newG $newB]
    return $color
@@ -48,6 +54,32 @@ proc mix_color {mix_color} {
    set result [list $red $green $blue]
     return $result
 }
+
+
+proc mix_color2 { colorname colorname2 shade} {
+   set color [winfo rgb . $colorname]
+   set R1 [lindex $color 0]
+   set G1 [lindex $color 1]
+   set B1 [lindex $color 2]
+   
+   set color [winfo rgb . $colorname2]
+   set R2 [lindex $color 0]
+   set G2 [lindex $color 1]
+   set B2 [lindex $color 2]
+   
+   
+   if {$shade >= 0 } {
+     
+      set newR [expr { int($R2*$shade+(1.-$shade)*$R1)}]
+      set newG [expr { int($G2*$shade+(1.-$shade)*$G1)}]
+      set newB [expr { int($B2*$shade+(1.-$shade)*$B1)}]
+   } 
+   
+   set color [format "#%04x%04x%04x" $newR $newG $newB]
+   return $color
+}
+
+
 
 proc max_color { col } {
    set x [lindex $col 0]

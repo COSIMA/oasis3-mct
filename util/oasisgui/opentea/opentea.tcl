@@ -4,7 +4,13 @@
 set load_start_time [clock milliseconds]
 
 
-
+if {[info exists banner] == 0} {
+    set banner {.____   ____   ___   _  _   _____  ___     _   
+/ __ \ )  _)\ ) __( ) \/ ( )__ __() __(   )_\  
+))__(( | '__/ | _)  |  \ |   | |  | _)   /( )\ 
+\____/ )_(    )___( )_()_(   )_(  )___( )_/ \_(}
+					       
+}
 
 ##############################################################
 # Handle  errors in thecode with a message                   #
@@ -88,7 +94,7 @@ foreach { keyword argument } $argv {
 
 global debug loading FunctionUsed solverList loadApplication configTree widgetInfo configPath pluginsPath starpack relaunchCmd
 global logHistory loadedProject metaTree requiredValue additionalWidgets
-global workingDir
+global workingDir focusCorrection theme banner
 
 
 set workingDir [pwd]
@@ -272,6 +278,7 @@ source [file join $pathEngine "create_status.tcl"]
 source [file join $pathEngine "create_timeline.tcl"]
 source [file join $pathEngine "create_window.tcl"]
 source [file join $pathEngine "create_viewer.tcl"]
+source [file join $pathEngine "create_viewer3d.tcl"]
 source [file join $pathEngine "color_utilities.tcl"]
 source [file join $pathEngine "metaWidget_functions.tcl"]
 source [file join $pathEngine "config.tcl"]
@@ -337,7 +344,8 @@ if {[info exists key_file]} {
 
 # declare fonts (see function.tcl)
 font_create
-ThemeUpdate [ getConfig "config gui appearance theme"]
+set theme [ getConfig "config gui appearance theme"]
+ThemeUpdate 
 
 
 
@@ -454,7 +462,7 @@ if {$loadApplication == "none"} {
     bind . <Control-h> {Window_help_generator}
     bind . <Control-q> {quit_gui}
     
-    
+    set focusCorrection [getConfig "config gui appearance focusCorrection"]
     smartpacker_focus_correction
     
     

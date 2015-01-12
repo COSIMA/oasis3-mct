@@ -8,16 +8,10 @@ proc tabs_create { args } {
     read_arguments
     
     
-    switch $widgetInfo(guimode) {
-        "treeview" {
-            ttk::notebook $path_father.nb -style "NoTabs.TNotebook"
-        }
-        "multicolumn" {
-            ttk::notebook $path_father.nb 
-            ttk::notebook::enableTraversal $path_father.nb
-        }
-    }
-    
+   
+    ttk::notebook $path_father.nb 
+    ttk::notebook::enableTraversal $path_father.nb
+
     bind $path_father.nb  <<NotebookTabChanged>> [subst {
         # get the tab under focus , finishing by .vport.form
         set widgetInfo(tabfocus)  \[$path_father.nb select\]
@@ -55,12 +49,7 @@ proc tabs_add { args } {
     set widgetInfo($address-starttime) "0"
     set widgetInfo($address-endtime) "0"
     
-    
-    # insert object in tree
-    if {$widgetInfo(guimode)=="treeview"} {
-        $widgetInfo(globaltv.path) insert $solver end -id $name -text [dTree_getAttribute $XMLtree $full_address_XML "title"] -tag "$solver $solver.$name"
-        $widgetInfo(globaltv.path)  tag bind $solver.$name <ButtonPress> [subst {$path_father select $path_father.$name}]
-    }    
+
     
     set widgetInfo($address-refreshStatus) [subst {
         tab_refreshStatus $path_father $solver $name $address 
@@ -88,11 +77,9 @@ proc tabs_add { args } {
     
     set widgetInfo($address-order) [$path_father index  $path_father.$name]
     
-    if {$widgetInfo(guimode)=="multicolumn"} { 
-        ttk::separator $path_father.$name.sep1 -orient horizontal
-        pack $path_father.$name.sep1 -side top -fill x 
-    }
-    
+    ttk::separator $path_father.$name.sep1 -orient horizontal
+    pack $path_father.$name.sep1 -side top -fill x 
+
     scrollform_create $path_father.$name.sf
     
     set winreturn [scrollform_interior $path_father.$name.sf]
@@ -219,62 +206,28 @@ proc tab_refreshStatus {path_father solver name tab_address} {
     
     if {$widgetInfo($tab_address-visible)} {
         $path_father add $path_father.$name
-        if {$widgetInfo(guimode)=="treeview"} {
-            $widgetInfo(globaltv.path) move $name $solver $widgetInfo($tab_address-order)
-        }
     } else {
         $path_father hide $path_father.$name
-        if {$widgetInfo(guimode)=="treeview"} {
-            $widgetInfo(globaltv.path) detach $name
-        }
     }
     
     switch $widgetInfo($tab_address-status) {
         "-2" {
-            switch $widgetInfo(guimode) {
-                "treeview" {
-                    $widgetInfo(globaltv.path) item $name -image icon_void
-                }
-                "multicolumn" {
-                    $path_father tab $path_father.$name -image icon_void -compound left        
-                }
-            }
+            $path_father tab $path_father.$name -image icon_void -compound left        
         }
         "-1" {
             $path_father.$name.buttT2W configure -state normal
             $path_father.$name.buttW2T configure -state normal
-            switch $widgetInfo(guimode) {
-                "treeview" {
-                    $widgetInfo(globaltv.path) item $name -image icon_error
-                }
-                "multicolumn" {
-                    $path_father tab $path_father.$name -image icon_error -compound left        
-                }
-            }            
+            $path_father tab $path_father.$name -image icon_error -compound left        
         }
         "0"  {
             $path_father.$name.buttT2W configure -state normal
             $path_father.$name.buttW2T configure -state normal
-            switch $widgetInfo(guimode) {
-                "treeview" {
-                    $widgetInfo(globaltv.path) item $name -image icon_question
-                }
-                "multicolumn" {
-                    $path_father tab $path_father.$name -image icon_question -compound left        
-                }
-            }        
+            $path_father tab $path_father.$name -image icon_question -compound left        
         }
         "1"  {
             #$path_father.$name.buttT2W configure -state disabled
             #$path_father.$name.buttW2T configure -state disabled
-            switch $widgetInfo(guimode) {
-                "treeview" {
-                    $widgetInfo(globaltv.path) item $name -image icon_ok
-                }
-                "multicolumn" {
-                    $path_father tab $path_father.$name -image icon_ok -compound left        
-                }
-            }        
+            $path_father tab $path_father.$name -image icon_ok -compound left        
         }
     }
 }
