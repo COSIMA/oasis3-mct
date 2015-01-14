@@ -26,7 +26,7 @@ all: oasis3_psmile ocnice
 #
 # Compile and link libaries
 oasis3_psmile:
-	(cd $(O3DIR)/util/make_dir ; $(MAKE) oasis3_psmile -f TopMakefileOasis3)
+	(cd ../../util/make_dir ; $(MAKE) oasis3_psmile -f TopMakefileOasis3)
 #
 #
 #-------------------------------------------------------------------------------
