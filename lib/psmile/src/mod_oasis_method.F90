@@ -271,7 +271,9 @@ CONTAINS
             if (compnmlist(n) == prism_modnam(m)) then
                found = .true.
                if (coupledlist(n) .neqv. prism_modcpl(m)) then
-                  WRITE(nulprt1,*) subname,estr,'inconsistent coupled flag in oasis_init_comp'
+                  WRITE(nulprt1,*) subname,estr,'inconsistent coupled flag in oasis_init_comp.'
+                  WRITE(nulprt1,*) subname,estr,'the optional argument, coupled, in oasis_init_comp '
+                  WRITE(nulprt1,*) subname,estr,'must be identical on all tasks of a component.'
                   call oasis_abort()
                endif
             endif

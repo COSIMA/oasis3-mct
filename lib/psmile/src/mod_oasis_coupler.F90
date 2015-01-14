@@ -9,7 +9,6 @@ MODULE mod_oasis_coupler
   USE mod_oasis_parameters
   USE mod_oasis_namcouple
   USE mod_oasis_sys
-  USE mod_oasis_var, only : prism_nvar
   USE mod_oasis_part
   USE mod_oasis_var
   USE mod_oasis_mpi
@@ -813,11 +812,11 @@ CONTAINS
 
               if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
 ! tcraig allow this now
- !                if (nm == compid) then
- !                   write(nulprt,*) subname,estr,'send recv pair on same model = ', &
- !                      trim(myfld),' ',trim(otfld)
- !                   call oasis_abort()
- !                endif
+!                if (nm == compid) then
+!                   write(nulprt,*) subname,estr,'send recv pair on same model = ', &
+!                      trim(myfld),' ',trim(otfld)
+!                   call oasis_abort()
+!                endif
                  if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
                     write(nulprt,*) subname,estr,'send recv pair both Out = ', &
                        trim(myfld),' ',trim(otfld)
