@@ -162,7 +162,9 @@ CONTAINS
   character(len=ic_med) :: cstring
   character(len=ic_lvar):: myfld
   integer(kind=ip_i4_p) :: myfldi
+  character(len=ic_xl)  :: myfldlist  ! field list
   character(len=ic_lvar):: otfld
+  character(len=ic_xl)  :: otfldlist  ! field list
   integer(kind=ip_i4_p) :: nx,ny
   character(len=ic_lvar):: gridname
   character(len=ic_long):: tmp_mapfile
@@ -671,10 +673,14 @@ CONTAINS
         if (prism_var(nv1)%ops == OASIS_Out) then
            nn = sortnsrc%namnum(nf)
            myfldi = sortnsrc%fldnum(nf)
+           myfldlist = namsrcfld(nn)
+           otfldlist = namdstfld(nn)
            flag = OASIS_Out
         elseif (prism_var(nv1)%ops == OASIS_In) then
            nn = sortndst%namnum(nf)
            myfldi = sortndst%fldnum(nf)
+           myfldlist = namdstfld(nn)
+           otfldlist = namsrcfld(nn)
            flag = OASIS_In
         endif
 
@@ -741,12 +747,7 @@ CONTAINS
 
            if (local_timers_on) call oasis_timer_start('cpl_setup_n3c1')
            otfld = 'NOmatchNOyesNOyesNO'
-           if (flag == OASIS_Out) then
-              call oasis_string_listGetName(namdstfld(nn),myfldi,otfld)
-           endif
-           if (flag == OASIS_In) then
-              call oasis_string_listGetName(namsrcfld(nn),myfldi,otfld)
-           endif
+           call oasis_string_listGetName(otfldlist,myfldi,otfld)
            if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3c1')
 
            IF (OASIS_debug >= 20) THEN
@@ -861,23 +862,49 @@ CONTAINS
                   CALL oasis_flush(nulprt)
               ENDIF
 
+              ! tcraig, changed this to make sure order of fields in list matches on all tasks
+              ! Use the field lists in the namcouple
+              ! Assumes all namcoupler variables are coupled
+              ! The nflds counter doesn't do much anymore here
+              ! The varid size should be size(myfldlist)
+              ! Will need to change IF all namcoupler variables don't need to be coupled
+
               pcpointer%nflds = pcpointer%nflds + 1
+
+!tcx
+! this used to add fields to list one at a time
+!              svarid = size(pcpointer%varid)
+!              if (pcpointer%nflds > svarid) then
+!                  allocate(varidtmp(svarid))
+!                  varidtmp(1:svarid) = pcpointer%varid(1:svarid)
+!                  deallocate(pcpointer%varid)
+!                  allocate(pcpointer%varid(pcpointer%nflds+10))
+!                  pcpointer%varid(1:svarid) = varidtmp(1:svarid)
+!                  deallocate(varidtmp)
+!              endif
+!
+!              if (pcpointer%nflds == 1) then
+!                 pcpointer%fldlist = trim(myfld)
+!              else
+!                 pcpointer%fldlist = trim(pcpointer%fldlist)//':'//trim(myfld)
+!              endif
+!              pcpointer%varid(pcpointer%nflds) = nv1
+!tcx
+
               if (pcpointer%nflds == 1) then
-                 pcpointer%fldlist = trim(myfld)
-              else
-                 pcpointer%fldlist = trim(pcpointer%fldlist)//':'//trim(myfld)
+                 pcpointer%fldlist = trim(myfldlist)
+                 deallocate(pcpointer%varid)
+                 allocate(pcpointer%varid(oasis_string_listGetNum(myfldlist)))
+                 pcpointer%varid(:) = ispval
               endif
 
               svarid = size(pcpointer%varid)
-              if (pcpointer%nflds > svarid) then
-                  allocate(varidtmp(svarid))
-                  varidtmp(1:svarid) = pcpointer%varid(1:svarid)
-                  deallocate(pcpointer%varid)
-                  allocate(pcpointer%varid(pcpointer%nflds+10))
-                  pcpointer%varid(1:svarid) = varidtmp(1:svarid)
-                  deallocate(varidtmp)
+              if (myfldi > svarid .or. pcpointer%nflds > svarid) then
+                 WRITE(nulprt,*) subname,estr,'multiple field coupling setup error',svarid,myfldi,pcpointer%nflds
+                 call oasis_abort()
               endif
-              pcpointer%varid(pcpointer%nflds) = nv1
+
+              pcpointer%varid(myfldi) = nv1
 
               !--------------------------------
               !>       * Add this coupler to list of prism_var couplers

@@ -362,6 +362,10 @@ contains
     endif
 
     kinfo = OASIS_OK
+    if (varid < 1 .or. varid > prism_nvar) then
+       write(nulprt,*) subname,estr,'invalid varid',varid
+       call oasis_abort()
+    endif
     vname = prism_var(varid)%name
 
     lreadrest = .false.
