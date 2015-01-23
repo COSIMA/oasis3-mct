@@ -452,9 +452,9 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
                   CALL oasis_abort()
-               ELSE
-                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
-                  CALL oasis_flush(nulprt)
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
 
             else
@@ -591,9 +591,9 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
                   CALL oasis_abort()
-               ELSE
-                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
-                  CALL oasis_flush(nulprt)
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
@@ -631,9 +631,9 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
                   CALL oasis_abort()
-               ELSE
-                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
-                  CALL oasis_flush(nulprt)
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
