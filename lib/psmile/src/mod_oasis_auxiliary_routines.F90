@@ -47,35 +47,30 @@ MODULE mod_oasis_auxiliary_routines
     CALL oasis_debug_enter(subname)
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
-        WRITE(nulprt,*) subname,' ERROR called on non coupling task'
-        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'called on non coupling task'
+        CALL oasis_abort()
     ENDIF
 
     kinfo = OASIS_OK
     vname = prism_var(varid)%name
     
     IF (varid == OASIS_Var_Uncpl) THEN
-        WRITE(nulprt,*) subname, &
-           ' Routine is called for a variable not in namcouple: it will not be sent'
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
-        RETURN
+        WRITE(nulprt,*) subname,estr, &
+           'Routine is called for a variable not in namcouple: it will not be sent'
+        CALL oasis_abort()
     ENDIF
     
     ncpl  = prism_var(varid)%ncpl
     
     IF (ncpl <= 0) THEN
-        IF (OASIS_debug >= 2) WRITE(nulprt,*) subname,' variable not coupled ',&
+        IF (OASIS_debug >= 2) WRITE(nulprt,*) subname,' Variable not coupled ',&
                                TRIM(vname)
-        CALL oasis_debug_exit(subname)
-        RETURN
     ELSE 
         IF (OASIS_debug >= 2)  WRITE(nulprt,*) subname,' Variable: ',TRIM(vname),&
                                ' used in ',ncpl,' couplings' 
-        CALL oasis_flush(nulprt)
     ENDIF
+
+    CALL oasis_debug_exit(subname)
     
   END SUBROUTINE oasis_get_ncpl
 !---------------------------------------------------------------------
@@ -87,8 +82,8 @@ MODULE mod_oasis_auxiliary_routines
     IMPLICIT none
     !-------------------------------------
     INTEGER(kind=ip_i4_p) , INTENT(in)  :: varid          !< variable id
-    INTEGER(kind=ip_i4_p) , INTENT(in)  :: ncpl           !< number of namcouple couplings
     INTEGER(kind=ip_i4_p) , INTENT(in)  :: mop            !< OASIS_Out or OASIS_In type
+    INTEGER(kind=ip_i4_p) , INTENT(in)  :: ncpl           !< number of namcouple couplings
     INTEGER(kind=ip_i4_p) , INTENT(out) :: cpl_freqs(ncpl)!< coupling period (sec)
     INTEGER(kind=ip_i4_p) , INTENT(out) :: kinfo          !< return code
     !-------------------------------------
@@ -100,41 +95,33 @@ MODULE mod_oasis_auxiliary_routines
     CALL oasis_debug_enter(subname)
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
-        WRITE(nulprt,*) subname,' ERROR called on non coupling task'
-        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'called on non coupling task'
+        CALL oasis_abort()
     ENDIF
 
     kinfo = OASIS_OK
     vname = prism_var(varid)%name
     
     IF (varid == OASIS_Var_Uncpl) THEN
-        WRITE(nulprt,*) subname, &
-           ' Routine is called for a variable not in namcouple: it will not be sent'
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
-        RETURN
+        WRITE(nulprt,*) subname,estr, &
+           'Routine is called for a variable not in namcouple: it will not be sent'
+        CALL oasis_abort()
     ENDIF
     
     ncpl_calc  = prism_var(varid)%ncpl
 
     IF (ncpl_calc /= ncpl) THEN
-        WRITE(nulprt,*) subname,' Wrong number of couplings for variable: ',TRIM(vname), &
+        WRITE(nulprt,*) subname,estr,' Wrong number of couplings for variable: ',TRIM(vname), &
                         ncpl_calc, ncpl
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+        CALL oasis_abort()
     ENDIF
     
     IF (ncpl <= 0) THEN
         IF (OASIS_debug >= 2) WRITE(nulprt,*) subname,' variable not coupled ',&
                                TRIM(vname)
-        CALL oasis_flush(nulprt)
-        CALL oasis_debug_exit(subname)
-        RETURN
     ENDIF
 
-    DO nc = 1,prism_var(varid)%ncpl
+    DO nc = 1,ncpl
       cplid           = prism_var(varid)%cpl(nc)
       IF (mop == OASIS_Out) THEN
           cpl_freqs(nc)   = prism_coupler_put(cplid)%dt
@@ -149,11 +136,12 @@ MODULE mod_oasis_auxiliary_routines
       ENDIF
 
       IF (cpl_freqs(nc) .le. 0) THEN
-          WRITE(nulprt,*) subname,' The coupling frequency is < or equal to 0'
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          WRITE(nulprt,*) subname,estr,' The coupling frequency is < or equal to 0'
+          CALL oasis_abort()
       ENDIF
     ENDDO
+
+    CALL oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_freqs
 !---------------------------------------------------------------------
@@ -178,21 +166,17 @@ MODULE mod_oasis_auxiliary_routines
     CALL oasis_debug_enter(subname)
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
-        WRITE(nulprt,*) subname,' ERROR called on non coupling task'
-        WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'called on non coupling task'
+        CALL oasis_abort()
     ENDIF
 
     kinfo = OASIS_OK
     vname = prism_var(varid)%name
     
     IF (varid == OASIS_Var_Uncpl) THEN
-        WRITE(nulprt,*) subname, &
-           ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-        CALL oasis_flush(nulprt)
-        CALL oasis_abort_noarg()
-        RETURN
+        WRITE(nulprt,*) subname,estr, &
+           'Routine oasis_put is called for a variable not in namcouple: it will not be sent'
+        CALL oasis_abort()
     ENDIF
     
     ncpl  = prism_var(varid)%ncpl
@@ -200,11 +184,9 @@ MODULE mod_oasis_auxiliary_routines
     IF (ncpl <= 0) THEN
         IF (OASIS_debug >= 2) WRITE(nulprt,*) subname,' variable not coupled ',&
                                TRIM(vname)
-        CALL oasis_debug_exit(subname)
-        RETURN
     ENDIF
 
-    DO nc = 1,prism_var(varid)%ncpl
+    DO nc = 1,ncpl
 
       cplid   = prism_var(varid)%cpl(nc)
       dt      = prism_coupler_put(cplid)%dt
@@ -220,10 +202,8 @@ MODULE mod_oasis_auxiliary_routines
       !------------------------------------------------
 
       IF (ABS(lag) > dt) THEN
-          WRITE(nulprt,*) subname,' ERROR lag gt dt for cplid',cplid
-          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          WRITE(nulprt,*) subname,estr,' ERROR lag gt dt for cplid',cplid
+          CALL oasis_abort()
       ENDIF
 
       !------------------------------------------------
@@ -231,10 +211,8 @@ MODULE mod_oasis_auxiliary_routines
       !------------------------------------------------
 
       IF (getput == OASIS3_GET) THEN
-          WRITE(nulprt,*) subname,' ERROR : routine can only be called for OASIS_PUT variable'
-          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          WRITE(nulprt,*) subname,estr,'routine can only be called for OASIS_PUT variable'
+          CALL oasis_abort()
       ENDIF
 
       CALL oasis_debug_note(subname//' set mseclag')
@@ -248,11 +226,9 @@ MODULE mod_oasis_auxiliary_routines
 
        if (msec >= maxtime) then
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
-          write(nulprt,*) subname,' ERROR model time beyond namcouple maxtime',&
+          write(nulprt,*) subname,estr,'model time beyond namcouple maxtime',&
                           msec,maxtime
-          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-          call oasis_abort_noarg()
+          call oasis_abort()
        endif
 
       time_now = .FALSE.
@@ -348,7 +324,7 @@ MODULE mod_oasis_auxiliary_routines
           WRITE(nulprt,*) subname,' kinfo: ',kinfo
           CALL oasis_flush(nulprt)
       ENDIF
-    ENDDO
+    ENDDO  ! nc
 
     CALL oasis_debug_exit(subname)
 

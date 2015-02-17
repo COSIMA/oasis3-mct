@@ -45,6 +45,10 @@ MODULE mod_oasis
   USE mod_oasis_grid   ,ONLY: oasis_write_mask          
   USE mod_oasis_grid   ,ONLY: oasis_write_area          
   USE mod_oasis_grid   ,ONLY: oasis_terminate_grids_writing 
+
+  USE mod_oasis_auxiliary_routines, ONLY: oasis_get_ncpl
+  USE mod_oasis_auxiliary_routines, ONLY: oasis_get_freqs
+  USE mod_oasis_auxiliary_routines, ONLY: oasis_put_inquire
   
   USE mod_oasis_sys    ,ONLY: oasis_abort       
 

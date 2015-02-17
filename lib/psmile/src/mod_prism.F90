@@ -37,11 +37,15 @@ module mod_prism
 
    use mod_oasis_grid   ,only: prism_start_grids_writing => oasis_start_grids_writing
    use mod_oasis_grid   ,only: prism_write_grid          => oasis_write_grid 
-   USE mod_oasis_grid   ,ONLY: prism_write_angle         => oasis_write_angle
+   USE mod_oasis_grid   ,only: prism_write_angle         => oasis_write_angle
    use mod_oasis_grid   ,only: prism_write_corner        => oasis_write_corner 
    use mod_oasis_grid   ,only: prism_write_mask          => oasis_write_mask
    use mod_oasis_grid   ,only: prism_write_area          => oasis_write_area
    use mod_oasis_grid   ,only: prism_terminate_grids_writing => oasis_terminate_grids_writing
+
+   use mod_oasis_auxiliary_routines, only: prism_get_ncpl    => oasis_get_ncpl
+   use mod_oasis_auxiliary_routines, only: prism_get_freqs   => oasis_get_freqs
+   use mod_oasis_auxiliary_routines, only: prism_put_inquire => oasis_put_inquire
 
    use mod_oasis_sys    ,only: prism_abort_proto         => oasis_abort
 
