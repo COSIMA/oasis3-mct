@@ -1,0 +1,451 @@
+\hypertarget{classmod__oasis__io}{\section{mod\+\_\+oasis\+\_\+io Module Reference}
+\label{classmod__oasis__io}\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+}
+
+
+Provides reusable I\+O routines for O\+A\+S\+I\+S.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__io_a6c14bebb7b216218e25f599e3469ae0c}{oasis\+\_\+io\+\_\+read\+\_\+avfld} (filename, av, gsmap, mpicom, avfld, filefld, fldtype)
+\begin{DoxyCompactList}\small\item\em Reads single field from a file into an attribute Vector. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_ad8a48d6c36e3fac637a8191c20e514f2}{oasis\+\_\+io\+\_\+write\+\_\+avfile} (rstfile, av, gsmap, mpicom, nx, ny, nampre)
+\begin{DoxyCompactList}\small\item\em Writes all fields from an attribute vector to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a65e17e4a065e8e4dea33754fb9c1d32c}{oasis\+\_\+io\+\_\+read\+\_\+avfile} (rstfile, av, gsmap, mpicom, abort, nampre, didread)
+\begin{DoxyCompactList}\small\item\em Reads all fields for an attribute vector from a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a8b604f89345d74c74c6bc3b4760b2e29}{oasis\+\_\+io\+\_\+read\+\_\+array} (rstfile, mpicom, iarray, ivarname, rarray, rvarname, abort)
+\begin{DoxyCompactList}\small\item\em Reads an integer or real field from a file into an array. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a9ac8ce0ba3223fb59f7f003b50b229cf}{oasis\+\_\+io\+\_\+write\+\_\+array} (rstfile, mpicom, iarray, ivarname, rarray, rvarname)
+\begin{DoxyCompactList}\small\item\em Writes a real or integer array to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a42b325557a774b08d4cba24f387f8b01}{oasis\+\_\+io\+\_\+write\+\_\+avfbf} (av, gsmap, mpicom, nx, ny, msec, f\+\_\+string, filename)
+\begin{DoxyCompactList}\small\item\em Write each field in an attribute vector to an individual files. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_ac4a465a698824fb473074bfbd3d92f79}{oasis\+\_\+io\+\_\+read\+\_\+avfbf} (av, gsmap, mpicom, msec, f\+\_\+string, filename)
+\begin{DoxyCompactList}\small\item\em Read each field in an attribute vector from individual files. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_af080505b4678a5c68916a700f54ac6e6}{oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot} (filename, fldname, ifld2, fld2, fld3, nx, ny, nz)
+\begin{DoxyCompactList}\small\item\em Read a field on the root task from a file into an array. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a18912324646473cf8fedd7138cc59a79}{oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot} (filename, fldname, fld, nx, ny)
+\begin{DoxyCompactList}\small\item\em Write a real array named field from the root task to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_a432ecb26e0e2d8387c1601ea6cc68668}{oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot} (filename, fldname, fld, nx, ny)
+\begin{DoxyCompactList}\small\item\em Write an integer array named field from the root task to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__io_aa967e930e5d6199bbc6ec9a4f3c7069e}{oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot} (filename, fldname, fld, nx, ny, nc)
+\begin{DoxyCompactList}\small\item\em Write a 3d real array named field from the root task to a file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Provides reusable I\+O routines for O\+A\+S\+I\+S. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__io_a8b604f89345d74c74c6bc3b4760b2e29}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+read\+\_\+array@{oasis\+\_\+io\+\_\+read\+\_\+array}}
+\index{oasis\+\_\+io\+\_\+read\+\_\+array@{oasis\+\_\+io\+\_\+read\+\_\+array}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+read\+\_\+array}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+array (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{rstfile, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(inout), optional}]{iarray, }
+\item[{character(len=$\ast$), intent(in), optional}]{ivarname, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(inout), optional}]{rarray, }
+\item[{character(len=$\ast$), intent(in), optional}]{rvarname, }
+\item[{logical, intent(in), optional}]{abort}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a8b604f89345d74c74c6bc3b4760b2e29}
+
+
+Reads an integer or real field from a file into an array. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rstfile} & filename\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in,out}  & {\em iarray} & integer data on root\\
+\hline
+\mbox{\tt in}  & {\em ivarname} & integer variable name on file\\
+\hline
+\mbox{\tt in,out}  & {\em rarray} & real data on root\\
+\hline
+\mbox{\tt in}  & {\em rvarname} & real variable name on file\\
+\hline
+\mbox{\tt in}  & {\em abort} & abort on error flag, default is true \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 519 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_ac4a465a698824fb473074bfbd3d92f79}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+read\+\_\+avfbf@{oasis\+\_\+io\+\_\+read\+\_\+avfbf}}
+\index{oasis\+\_\+io\+\_\+read\+\_\+avfbf@{oasis\+\_\+io\+\_\+read\+\_\+avfbf}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+read\+\_\+avfbf}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfbf (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+avect), intent(inout)}]{av, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{msec, }
+\item[{character(len=$\ast$), intent(in), optional}]{f\+\_\+string, }
+\item[{character(len=$\ast$), intent(in), optional}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_ac4a465a698824fb473074bfbd3d92f79}
+
+
+Read each field in an attribute vector from individual files. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em av} & avect\\
+\hline
+\mbox{\tt in}  & {\em gsmap} & gsmap\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em msec} & optional time info in seconds\\
+\hline
+\mbox{\tt in}  & {\em f\+\_\+string} & optional f\+\_\+string to append to filename\\
+\hline
+\mbox{\tt in}  & {\em filename} & optional input filename \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1022 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a65e17e4a065e8e4dea33754fb9c1d32c}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+read\+\_\+avfile@{oasis\+\_\+io\+\_\+read\+\_\+avfile}}
+\index{oasis\+\_\+io\+\_\+read\+\_\+avfile@{oasis\+\_\+io\+\_\+read\+\_\+avfile}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+read\+\_\+avfile}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfile (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{rstfile, }
+\item[{type(mct\+\_\+avect), intent(inout)}]{av, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{logical, intent(in), optional}]{abort, }
+\item[{character(len=$\ast$), intent(in), optional}]{nampre, }
+\item[{logical, intent(out), optional}]{didread}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a65e17e4a065e8e4dea33754fb9c1d32c}
+
+
+Reads all fields for an attribute vector from a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rstfile} & filename\\
+\hline
+\mbox{\tt in,out}  & {\em av} & avect\\
+\hline
+\mbox{\tt in}  & {\em gsmap} & gsmap\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em abort} & abort on error flag, default is true\\
+\hline
+\mbox{\tt in}  & {\em nampre} & name prepend string for fields on file\\
+\hline
+\mbox{\tt out}  & {\em didread} & flag indicating that read was successful \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 364 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a6c14bebb7b216218e25f599e3469ae0c}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+read\+\_\+avfld@{oasis\+\_\+io\+\_\+read\+\_\+avfld}}
+\index{oasis\+\_\+io\+\_\+read\+\_\+avfld@{oasis\+\_\+io\+\_\+read\+\_\+avfld}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+read\+\_\+avfld}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfld (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{filename, }
+\item[{type(mct\+\_\+avect), intent(inout)}]{av, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{character(len=$\ast$), intent(in)}]{avfld, }
+\item[{character(len=$\ast$), intent(in)}]{filefld, }
+\item[{character(len=$\ast$), intent(in), optional}]{fldtype}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a6c14bebb7b216218e25f599e3469ae0c}
+
+
+Reads single field from a file into an attribute Vector. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & filename\\
+\hline
+\mbox{\tt in,out}  & {\em av} & avect\\
+\hline
+\mbox{\tt in}  & {\em gsmap} & gsmap\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em avfld} & av field name\\
+\hline
+\mbox{\tt in}  & {\em filefld} & file field name\\
+\hline
+\mbox{\tt in}  & {\em fldtype} & kind \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 40 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_af080505b4678a5c68916a700f54ac6e6}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot@{oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot}}
+\index{oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot@{oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{filename, }
+\item[{character(len=$\ast$), intent(in)}]{fldname, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:,\+:), intent(inout), optional}]{ifld2, }
+\item[{real(ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), intent(inout), optional}]{fld2, }
+\item[{real(ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:,\+:), intent(inout), optional}]{fld3, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(inout), optional}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(inout), optional}]{ny, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(inout), optional}]{nz}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_af080505b4678a5c68916a700f54ac6e6}
+
+
+Read a field on the root task from a file into an array. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & filename\\
+\hline
+\mbox{\tt in}  & {\em fldname} & field name\\
+\hline
+\mbox{\tt in,out}  & {\em ifld2} & 2d integer array\\
+\hline
+\mbox{\tt in,out}  & {\em fld2} & 2d real array\\
+\hline
+\mbox{\tt in,out}  & {\em fld3} & 3d real array\\
+\hline
+\mbox{\tt in,out}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in,out}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in,out}  & {\em nz} & global nz size \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1184 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a18912324646473cf8fedd7138cc59a79}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{filename, }
+\item[{character(len=$\ast$), intent(in)}]{fldname, }
+\item[{real(ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), intent(in)}]{fld, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a18912324646473cf8fedd7138cc59a79}
+
+
+Write a real array named field from the root task to a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & file name\\
+\hline
+\mbox{\tt in}  & {\em fldname} & field name\\
+\hline
+\mbox{\tt in}  & {\em fld} & 2d real field\\
+\hline
+\mbox{\tt in}  & {\em nx} & 2d global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & 2d global ny size \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1303 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a432ecb26e0e2d8387c1601ea6cc68668}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{filename, }
+\item[{character(len=$\ast$), intent(in)}]{fldname, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:,\+:), intent(in)}]{fld, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a432ecb26e0e2d8387c1601ea6cc68668}
+
+
+Write an integer array named field from the root task to a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & file name\\
+\hline
+\mbox{\tt in}  & {\em fldname} & field name\\
+\hline
+\mbox{\tt in}  & {\em fld} & integer field\\
+\hline
+\mbox{\tt in}  & {\em nx} & 2d global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & 2d global ny size \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1406 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_aa967e930e5d6199bbc6ec9a4f3c7069e}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot@{oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{filename, }
+\item[{character(len=$\ast$), intent(in)}]{fldname, }
+\item[{real(ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{fld, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_aa967e930e5d6199bbc6ec9a4f3c7069e}
+
+
+Write a 3d real array named field from the root task to a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & file name\\
+\hline
+\mbox{\tt in}  & {\em fldname} & field name\\
+\hline
+\mbox{\tt in}  & {\em fld} & 3d real array\\
+\hline
+\mbox{\tt in}  & {\em nx} & 3d global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & 3d global ny size\\
+\hline
+\mbox{\tt in}  & {\em nc} & 3d global nz size or nc size for corners \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1509 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a9ac8ce0ba3223fb59f7f003b50b229cf}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+array@{oasis\+\_\+io\+\_\+write\+\_\+array}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+array@{oasis\+\_\+io\+\_\+write\+\_\+array}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+array}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+array (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{rstfile, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in), optional}]{iarray, }
+\item[{character(len=$\ast$), intent(in), optional}]{ivarname, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in), optional}]{rarray, }
+\item[{character(len=$\ast$), intent(in), optional}]{rvarname}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a9ac8ce0ba3223fb59f7f003b50b229cf}
+
+
+Writes a real or integer array to a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rstfile} & filename\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em iarray} & integer data on root\\
+\hline
+\mbox{\tt in}  & {\em ivarname} & integer variable name on file\\
+\hline
+\mbox{\tt in}  & {\em rarray} & real data on root\\
+\hline
+\mbox{\tt in}  & {\em rvarname} & real variable name on file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 684 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_a42b325557a774b08d4cba24f387f8b01}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+avfbf@{oasis\+\_\+io\+\_\+write\+\_\+avfbf}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+avfbf@{oasis\+\_\+io\+\_\+write\+\_\+avfbf}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+avfbf}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+avfbf (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+avect), intent(in)}]{av, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{msec, }
+\item[{character(len=$\ast$), intent(in), optional}]{f\+\_\+string, }
+\item[{character(len=$\ast$), intent(in), optional}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_a42b325557a774b08d4cba24f387f8b01}
+
+
+Write each field in an attribute vector to an individual files. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em av} & avect\\
+\hline
+\mbox{\tt in}  & {\em gsmap} & gsmap\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em nx} & 2d global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & 2d global ny size\\
+\hline
+\mbox{\tt in}  & {\em msec} & optional time info in seconds\\
+\hline
+\mbox{\tt in}  & {\em f\+\_\+string} & optional f\+\_\+string to append to filename\\
+\hline
+\mbox{\tt in}  & {\em filename} & optional output filename \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 831 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+\hypertarget{classmod__oasis__io_ad8a48d6c36e3fac637a8191c20e514f2}{\index{mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}!oasis\+\_\+io\+\_\+write\+\_\+avfile@{oasis\+\_\+io\+\_\+write\+\_\+avfile}}
+\index{oasis\+\_\+io\+\_\+write\+\_\+avfile@{oasis\+\_\+io\+\_\+write\+\_\+avfile}!mod\+\_\+oasis\+\_\+io@{mod\+\_\+oasis\+\_\+io}}
+\subsubsection[{oasis\+\_\+io\+\_\+write\+\_\+avfile}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+avfile (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{rstfile, }
+\item[{type(mct\+\_\+avect), intent(in)}]{av, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny, }
+\item[{character(len=$\ast$), intent(in), optional}]{nampre}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__io_ad8a48d6c36e3fac637a8191c20e514f2}
+
+
+Writes all fields from an attribute vector to a file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rstfile} & filename\\
+\hline
+\mbox{\tt in}  & {\em av} & avect\\
+\hline
+\mbox{\tt in}  & {\em gsmap} & gsmap\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpicom\\
+\hline
+\mbox{\tt in}  & {\em nx} & 2d global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & 2d global ny size\\
+\hline
+\mbox{\tt in}  & {\em nampre} & field name prepend string on file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 188 of file mod\+\_\+oasis\+\_\+io.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__io_8_f90}{mod\+\_\+oasis\+\_\+io.\+F90}\end{DoxyCompactItemize}

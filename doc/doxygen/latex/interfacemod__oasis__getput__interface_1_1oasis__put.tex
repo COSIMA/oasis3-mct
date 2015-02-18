@@ -1,0 +1,198 @@
+\hypertarget{interfacemod__oasis__getput__interface_1_1oasis__put}{\section{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+:\+:oasis\+\_\+put Interface Reference}
+\label{interfacemod__oasis__getput__interface_1_1oasis__put}\index{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}}
+}
+
+
+Generic overloaded interface for data put (send)  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__getput__interface_1_1oasis__put_afc4fc88f802a8ba3a0651fa8ea4b6044}{oasis\+\_\+put\+\_\+r14} (id\+\_\+port\+\_\+id, kstep, fld1, kinfo, fld2, fld3, fld4, fld5)
+\begin{DoxyCompactList}\small\item\em Send 4 byte real 1\+D data. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__getput__interface_1_1oasis__put_ab4506683590789def360b7393b98928f}{oasis\+\_\+put\+\_\+r24} (id\+\_\+port\+\_\+id, kstep, fld1, kinfo, fld2, fld3, fld4, fld5)
+\begin{DoxyCompactList}\small\item\em Send 4 byte real 2\+D data. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__getput__interface_1_1oasis__put_adc07bb0095b399942dcdde5491039b5a}{oasis\+\_\+put\+\_\+r18} (id\+\_\+port\+\_\+id, kstep, fld1, kinfo, fld2, fld3, fld4, fld5)
+\begin{DoxyCompactList}\small\item\em Send 8 byte real 1\+D data. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__getput__interface_1_1oasis__put_a47d572f62e2d428ee9088650adeea84b}{oasis\+\_\+put\+\_\+r28} (id\+\_\+port\+\_\+id, kstep, fld1, kinfo, fld2, fld3, fld4, fld5)
+\begin{DoxyCompactList}\small\item\em Send 8 byte real 2\+D data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic overloaded interface for data put (send) 
+
+Definition at line 26 of file mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__getput__interface_1_1oasis__put_afc4fc88f802a8ba3a0651fa8ea4b6044}{\index{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}!oasis\+\_\+put\+\_\+r14@{oasis\+\_\+put\+\_\+r14}}
+\index{oasis\+\_\+put\+\_\+r14@{oasis\+\_\+put\+\_\+r14}!mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}}
+\subsubsection[{oasis\+\_\+put\+\_\+r14}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put\+::oasis\+\_\+put\+\_\+r14 (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{id\+\_\+port\+\_\+id, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{kstep, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:)}]{fld1, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out), optional}]{kinfo, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:), optional}]{fld2, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:), optional}]{fld3, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:), optional}]{fld4, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:), optional}]{fld5}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__getput__interface_1_1oasis__put_afc4fc88f802a8ba3a0651fa8ea4b6044}
+
+
+Send 4 byte real 1\+D data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+port\+\_\+id} & variable id\\
+\hline
+\mbox{\tt in}  & {\em kstep} & model time in seconds\\
+\hline
+ & {\em fld1} & field data\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code\\
+\hline
+ & {\em fld2} & higher order field data\\
+\hline
+ & {\em fld3} & higher order field data\\
+\hline
+ & {\em fld4} & higher order field data\\
+\hline
+ & {\em fld5} & higher order field data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 52 of file mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90.
+
+\hypertarget{interfacemod__oasis__getput__interface_1_1oasis__put_adc07bb0095b399942dcdde5491039b5a}{\index{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}!oasis\+\_\+put\+\_\+r18@{oasis\+\_\+put\+\_\+r18}}
+\index{oasis\+\_\+put\+\_\+r18@{oasis\+\_\+put\+\_\+r18}!mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}}
+\subsubsection[{oasis\+\_\+put\+\_\+r18}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put\+::oasis\+\_\+put\+\_\+r18 (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{id\+\_\+port\+\_\+id, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{kstep, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:)}]{fld1, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out), optional}]{kinfo, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:), optional}]{fld2, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:), optional}]{fld3, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:), optional}]{fld4, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:), optional}]{fld5}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__getput__interface_1_1oasis__put_adc07bb0095b399942dcdde5491039b5a}
+
+
+Send 8 byte real 1\+D data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+port\+\_\+id} & variable id\\
+\hline
+\mbox{\tt in}  & {\em kstep} & model time in seconds\\
+\hline
+ & {\em fld1} & field data\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code\\
+\hline
+ & {\em fld2} & higher order field data\\
+\hline
+ & {\em fld3} & higher order field data\\
+\hline
+ & {\em fld4} & higher order field data\\
+\hline
+ & {\em fld5} & higher order field data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 197 of file mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90.
+
+\hypertarget{interfacemod__oasis__getput__interface_1_1oasis__put_ab4506683590789def360b7393b98928f}{\index{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}!oasis\+\_\+put\+\_\+r24@{oasis\+\_\+put\+\_\+r24}}
+\index{oasis\+\_\+put\+\_\+r24@{oasis\+\_\+put\+\_\+r24}!mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}}
+\subsubsection[{oasis\+\_\+put\+\_\+r24}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put\+::oasis\+\_\+put\+\_\+r24 (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{id\+\_\+port\+\_\+id, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{kstep, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:)}]{fld1, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out), optional}]{kinfo, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), optional}]{fld2, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), optional}]{fld3, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), optional}]{fld4, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), optional}]{fld5}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__getput__interface_1_1oasis__put_ab4506683590789def360b7393b98928f}
+
+
+Send 4 byte real 2\+D data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+port\+\_\+id} & variable id\\
+\hline
+\mbox{\tt in}  & {\em kstep} & model time in seconds\\
+\hline
+ & {\em fld1} & field data\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code\\
+\hline
+ & {\em fld2} & higher order field data\\
+\hline
+ & {\em fld3} & higher order field data\\
+\hline
+ & {\em fld4} & higher order field data\\
+\hline
+ & {\em fld5} & higher order field data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 341 of file mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90.
+
+\hypertarget{interfacemod__oasis__getput__interface_1_1oasis__put_a47d572f62e2d428ee9088650adeea84b}{\index{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}!oasis\+\_\+put\+\_\+r28@{oasis\+\_\+put\+\_\+r28}}
+\index{oasis\+\_\+put\+\_\+r28@{oasis\+\_\+put\+\_\+r28}!mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put@{mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put}}
+\subsubsection[{oasis\+\_\+put\+\_\+r28}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+getput\+\_\+interface\+::oasis\+\_\+put\+::oasis\+\_\+put\+\_\+r28 (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{id\+\_\+port\+\_\+id, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{kstep, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:)}]{fld1, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out), optional}]{kinfo, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), optional}]{fld2, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), optional}]{fld3, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), optional}]{fld4, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), optional}]{fld5}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__getput__interface_1_1oasis__put_a47d572f62e2d428ee9088650adeea84b}
+
+
+Send 8 byte real 2\+D data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+port\+\_\+id} & variable id\\
+\hline
+\mbox{\tt in}  & {\em kstep} & model time in seconds\\
+\hline
+ & {\em fld1} & field data\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code\\
+\hline
+ & {\em fld2} & higher order field data\\
+\hline
+ & {\em fld3} & higher order field data\\
+\hline
+ & {\em fld4} & higher order field data\\
+\hline
+ & {\em fld5} & higher order field data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 492 of file mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__getput__interface_8_f90}{mod\+\_\+oasis\+\_\+getput\+\_\+interface.\+F90}\end{DoxyCompactItemize}

@@ -1,0 +1,100 @@
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__grid}{\section{mod\+\_\+oasis\+\_\+grid\+:\+:oasis\+\_\+write\+\_\+grid Interface Reference}
+\label{interfacemod__oasis__grid_1_1oasis__write__grid}\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid}}
+}
+
+
+Generic interface to support writing 4 or 8 byte reals.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__grid_a7eede475150c0fa6692193c940d4268b}{oasis\+\_\+write\+\_\+grid\+\_\+r4} (cgrid, nx, ny, lon, lat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set latitudes and longitudes for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__grid_a31dbc6c9b5268a261b61a005762ffb28}{oasis\+\_\+write\+\_\+grid\+\_\+r8} (cgrid, nx, ny, lon, lat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set latitudes and longitudes for 8 byte reals. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic interface to support writing 4 or 8 byte reals. 
+
+Definition at line 79 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__grid_a7eede475150c0fa6692193c940d4268b}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid}!oasis\+\_\+write\+\_\+grid\+\_\+r4@{oasis\+\_\+write\+\_\+grid\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+grid\+\_\+r4@{oasis\+\_\+write\+\_\+grid\+\_\+r4}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+grid\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{lon, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{lat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__grid_a7eede475150c0fa6692193c940d4268b}
+
+
+User interface to set latitudes and longitudes for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em lon} & longitudes\\
+\hline
+\mbox{\tt in}  & {\em lat} & latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 315 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__grid_a31dbc6c9b5268a261b61a005762ffb28}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid}!oasis\+\_\+write\+\_\+grid\+\_\+r8@{oasis\+\_\+write\+\_\+grid\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+grid\+\_\+r8@{oasis\+\_\+write\+\_\+grid\+\_\+r8}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+grid\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lon, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__grid_a31dbc6c9b5268a261b61a005762ffb28}
+
+
+User interface to set latitudes and longitudes for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em lon} & longitudes\\
+\hline
+\mbox{\tt in}  & {\em lat} & latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 248 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

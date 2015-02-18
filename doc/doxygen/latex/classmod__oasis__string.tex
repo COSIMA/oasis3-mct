@@ -1,0 +1,756 @@
+\hypertarget{classmod__oasis__string}{\section{mod\+\_\+oasis\+\_\+string Module Reference}
+\label{classmod__oasis__string}\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+}
+
+
+Character string manipulation methods.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+integer function, public \hyperlink{classmod__oasis__string_a54c5d197eba9bcb7fa7f71b200f8e5e6}{oasis\+\_\+string\+\_\+countchar} (str, char, rc)
+\begin{DoxyCompactList}\small\item\em Count number of occurances of a single character in a string. \end{DoxyCompactList}\item 
+character(len=len(str)) \\*
+function, public \hyperlink{classmod__oasis__string_a832ff1d26d766bee361ef9669efacda6}{oasis\+\_\+string\+\_\+toupper} (str)
+\begin{DoxyCompactList}\small\item\em Convert the input string to upper-\/case. \end{DoxyCompactList}\item 
+character(len=len(str)) \\*
+function, public \hyperlink{classmod__oasis__string_af339c54c982092a80960a5241ccae1fa}{oasis\+\_\+string\+\_\+tolower} (str)
+\begin{DoxyCompactList}\small\item\em Convert the input string to lower-\/case. \end{DoxyCompactList}\item 
+character(len=len(str)) \\*
+function, public \hyperlink{classmod__oasis__string_a8f2289f6a9d1e9940204bbeb82b89f33}{oasis\+\_\+string\+\_\+getparentdir} (str)
+\begin{DoxyCompactList}\small\item\em Get the parent directory pathname. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{classmod__oasis__string_afae0db32f2cf0b6beb00829f8f016e48}{oasis\+\_\+string\+\_\+lastindex} (string, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the index of the last occurance of a substring within a string. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{classmod__oasis__string_a600ed4bd6221a0195d242076217377b4}{oasis\+\_\+string\+\_\+endindex} (string, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the ending index of the first occurance of a substring within string. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a1d525e36684a0a574b74a2aace51324a}{oasis\+\_\+string\+\_\+leftalign} (str, rc)
+\begin{DoxyCompactList}\small\item\em Remove leading white space. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_af123aee419f09309d1ded79ae41243bd}{oasis\+\_\+string\+\_\+alphanum} (str, rc)
+\begin{DoxyCompactList}\small\item\em Remove all non alpha numeric characters from string. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a465ffaf8d7c5462f3de8595934d58c8d}{oasis\+\_\+string\+\_\+betweentags} (string, start\+Tag, end\+Tag, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the substring found between the start and end strings. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a2f7bae9ccc5d2c48c14f3a1525a6c234}{oasis\+\_\+string\+\_\+parsecftunit} (string, unit, bdate, bsec, rc)
+\begin{DoxyCompactList}\small\item\em Parse C\+F time unit into a delta string name and a base time in yyyymmdd. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_aaf462e055c2c6136ef5d142d03355673}{oasis\+\_\+string\+\_\+clean} (string, rc)
+\begin{DoxyCompactList}\small\item\em Clean a string, set it to blank. \end{DoxyCompactList}\item 
+logical function, public \hyperlink{classmod__oasis__string_ae8c50e9742e1f24cc0d7bfa9d476cd95}{oasis\+\_\+string\+\_\+listisvalid} (list, rc)
+\begin{DoxyCompactList}\small\item\em Determine whether string is a valid list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a4d3a28944ce786f4d8d8a9555c63f8cd}{oasis\+\_\+string\+\_\+listgetname} (list, k, name, rc)
+\begin{DoxyCompactList}\small\item\em Get name of k-\/th field in list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a8b9648bf4eb3a2373f1fac49e572436f}{oasis\+\_\+string\+\_\+listintersect} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Get intersection of two fields lists, write into third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a3482d80f258c8062e8dd0d4eff8135b7}{oasis\+\_\+string\+\_\+listunion} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Get union of two fields lists, write into third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_adb1544a078e3abd743749f857fca5aee}{oasis\+\_\+string\+\_\+listmerge} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Merge two lists into a third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a47bd1c6d7ee6ea7dcec169fa140481aa}{oasis\+\_\+string\+\_\+listappend} (list, listadd, rc)
+\begin{DoxyCompactList}\small\item\em Append one list to another. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a7df42cce90ae7fa5eceb0b9f2e4bf169}{oasis\+\_\+string\+\_\+listprepend} (listadd, list, rc)
+\begin{DoxyCompactList}\small\item\em Prepend one list to another. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{classmod__oasis__string_a66bedb9c90f129c44087bf3f3c26bdb7}{oasis\+\_\+string\+\_\+listgetindexf} (string, fld\+Str)
+\begin{DoxyCompactList}\small\item\em Get the index of a field in a list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a6e2bf29a9030f16e3a58d0302ab793f2}{oasis\+\_\+string\+\_\+listgetindex} (string, fld\+Str, k\+Fld, print, rc)
+\begin{DoxyCompactList}\small\item\em Get the index of a field in a string. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{classmod__oasis__string_a15a49e6a71df520424402a753be10bb1}{oasis\+\_\+string\+\_\+listgetnum} (str)
+\begin{DoxyCompactList}\small\item\em return number of fields in string list \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a4229e0726d97fc10f17027caea332daf}{oasis\+\_\+string\+\_\+listsetdel} (cflag)
+\begin{DoxyCompactList}\small\item\em Set field delimeter character in lists. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a0ed07993c2e7d09baffe933c6075f154}{oasis\+\_\+string\+\_\+listgetdel} (del)
+\begin{DoxyCompactList}\small\item\em Get field delimeter character in lists. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_a10977c4902f912074ef3effd86630a24}{oasis\+\_\+string\+\_\+setabort} (flag)
+\begin{DoxyCompactList}\small\item\em Set local oasis\+\_\+string abort flag, true = abort, false = print and continue. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__string_af5c49843654a2bc9ccedf2934571329d}{oasis\+\_\+string\+\_\+setdebug} (i\+Flag)
+\begin{DoxyCompactList}\small\item\em Set local oasis\+\_\+string debug level, 0 = production. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__string_a86c2c26b793c41219bc833beb992d0e3}{oasis\+\_\+string\+\_\+abort} (string)
+\begin{DoxyCompactList}\small\item\em Supports aborts in the string module. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=1), save \hyperlink{classmod__oasis__string_aa6f905efb4869a52d8bb2414e82bb0a7}{listdel} = \char`\"{}\+:\char`\"{}
+\item 
+character(len=2), save \hyperlink{classmod__oasis__string_a9b40ad6f4785bd4765a24b6337185513}{listdel2} = \char`\"{}\+::\char`\"{}
+\item 
+logical, save \hyperlink{classmod__oasis__string_a59e9b1145c7c14506941e6495b237395}{doabort} = .true.
+\item 
+integer(ip\+\_\+i4\+\_\+p), save \hyperlink{classmod__oasis__string_a84408befb8bedabf75507eb4d690cea9}{debug} = 0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Character string manipulation methods. 
+
+These methods work generally on character strings, but also, more particularly on lists. A list is a character string that contains substrings separated by a delimeter. That delimeter can be set by the user but the default is \char`\"{}\+:\char`\"{}. Colon delimeted lists are used in O\+A\+S\+I\+S and M\+C\+T mainly to instantiate a list of fields, such as \char`\"{}temperature\+:humidity\+:zonal\+\_\+velocity\+:meridiona\+\_\+velocity\char`\"{}. 
+
+Definition at line 27 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__string_a86c2c26b793c41219bc833beb992d0e3}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+abort@{oasis\+\_\+string\+\_\+abort}}
+\index{oasis\+\_\+string\+\_\+abort@{oasis\+\_\+string\+\_\+abort}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+abort}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+abort (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__string_a86c2c26b793c41219bc833beb992d0e3}
+
+
+Supports aborts in the string module. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & error string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1679 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_af123aee419f09309d1ded79ae41243bd}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+alphanum@{oasis\+\_\+string\+\_\+alphanum}}
+\index{oasis\+\_\+string\+\_\+alphanum@{oasis\+\_\+string\+\_\+alphanum}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+alphanum}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+alphanum (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(inout)}]{str, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_af123aee419f09309d1ded79ae41243bd}
+
+
+Remove all non alpha numeric characters from string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em str} & input and output string\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 451 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a465ffaf8d7c5462f3de8595934d58c8d}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+betweentags@{oasis\+\_\+string\+\_\+betweentags}}
+\index{oasis\+\_\+string\+\_\+betweentags@{oasis\+\_\+string\+\_\+betweentags}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+betweentags}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+betweentags (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(in)}]{start\+Tag, }
+\item[{character($\ast$), intent(in)}]{end\+Tag, }
+\item[{character($\ast$), intent(out)}]{substr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a465ffaf8d7c5462f3de8595934d58c8d}
+
+
+Get the substring found between the start and end strings. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & input string to search\\
+\hline
+\mbox{\tt in}  & {\em starttag} & start string\\
+\hline
+\mbox{\tt in}  & {\em endtag} & end string\\
+\hline
+\mbox{\tt out}  & {\em substr} & output sub-\/string between tags\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 507 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_aaf462e055c2c6136ef5d142d03355673}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+clean@{oasis\+\_\+string\+\_\+clean}}
+\index{oasis\+\_\+string\+\_\+clean@{oasis\+\_\+string\+\_\+clean}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+clean}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+clean (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(inout)}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_aaf462e055c2c6136ef5d142d03355673}
+
+
+Clean a string, set it to blank. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em string} & string\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 749 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a54c5d197eba9bcb7fa7f71b200f8e5e6}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+countchar@{oasis\+\_\+string\+\_\+countchar}}
+\index{oasis\+\_\+string\+\_\+countchar@{oasis\+\_\+string\+\_\+countchar}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+countchar}]{\setlength{\rightskip}{0pt plus 5cm}integer function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+countchar (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{str, }
+\item[{character(1), intent(in)}]{char, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a54c5d197eba9bcb7fa7f71b200f8e5e6}
+
+
+Count number of occurances of a single character in a string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em str} & string to search\\
+\hline
+\mbox{\tt in}  & {\em char} & char to search for\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 102 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a600ed4bd6221a0195d242076217377b4}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+endindex@{oasis\+\_\+string\+\_\+endindex}}
+\index{oasis\+\_\+string\+\_\+endindex@{oasis\+\_\+string\+\_\+endindex}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+endindex}]{\setlength{\rightskip}{0pt plus 5cm}integer function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+endindex (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(in)}]{substr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a600ed4bd6221a0195d242076217377b4}
+
+
+Get the ending index of the first occurance of a substring within string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & string to search\\
+\hline
+\mbox{\tt in}  & {\em substr} & sub-\/string to search for\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 338 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a8f2289f6a9d1e9940204bbeb82b89f33}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+getparentdir@{oasis\+\_\+string\+\_\+getparentdir}}
+\index{oasis\+\_\+string\+\_\+getparentdir@{oasis\+\_\+string\+\_\+getparentdir}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+getparentdir}]{\setlength{\rightskip}{0pt plus 5cm}character(len=len(str)) function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+getparentdir (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{str}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a8f2289f6a9d1e9940204bbeb82b89f33}
+
+
+Get the parent directory pathname. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em str} & input string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 245 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_afae0db32f2cf0b6beb00829f8f016e48}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+lastindex@{oasis\+\_\+string\+\_\+lastindex}}
+\index{oasis\+\_\+string\+\_\+lastindex@{oasis\+\_\+string\+\_\+lastindex}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+lastindex}]{\setlength{\rightskip}{0pt plus 5cm}integer function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+lastindex (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(in)}]{substr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_afae0db32f2cf0b6beb00829f8f016e48}
+
+
+Get the index of the last occurance of a substring within a string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & input string to search\\
+\hline
+\mbox{\tt in}  & {\em substr} & sub-\/string to search for\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 293 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a1d525e36684a0a574b74a2aace51324a}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+leftalign@{oasis\+\_\+string\+\_\+leftalign}}
+\index{oasis\+\_\+string\+\_\+leftalign@{oasis\+\_\+string\+\_\+leftalign}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+leftalign}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+leftalign (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(inout)}]{str, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a1d525e36684a0a574b74a2aace51324a}
+
+
+Remove leading white space. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em str} & input and returned string\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 397 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a47bd1c6d7ee6ea7dcec169fa140481aa}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listappend@{oasis\+\_\+string\+\_\+listappend}}
+\index{oasis\+\_\+string\+\_\+listappend@{oasis\+\_\+string\+\_\+listappend}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listappend}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listappend (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(inout)}]{list, }
+\item[{character($\ast$), intent(in)}]{listadd, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a47bd1c6d7ee6ea7dcec169fa140481aa}
+
+
+Append one list to another. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em list} & input and output list\\
+\hline
+\mbox{\tt in}  & {\em listadd} & list to append\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1140 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a0ed07993c2e7d09baffe933c6075f154}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listgetdel@{oasis\+\_\+string\+\_\+listgetdel}}
+\index{oasis\+\_\+string\+\_\+listgetdel@{oasis\+\_\+string\+\_\+listgetdel}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listgetdel}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetdel (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(out)}]{del}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a0ed07993c2e7d09baffe933c6075f154}
+
+
+Get field delimeter character in lists. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em del} & field delimeter \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1562 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a6e2bf29a9030f16e3a58d0302ab793f2}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listgetindex@{oasis\+\_\+string\+\_\+listgetindex}}
+\index{oasis\+\_\+string\+\_\+listgetindex@{oasis\+\_\+string\+\_\+listgetindex}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listgetindex}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetindex (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(in)}]{fld\+Str, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{k\+Fld, }
+\item[{logical, intent(in), optional}]{print, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a6e2bf29a9030f16e3a58d0302ab793f2}
+
+
+Get the index of a field in a string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & input list\\
+\hline
+\mbox{\tt in}  & {\em fldstr} & name of field\\
+\hline
+\mbox{\tt out}  & {\em kfld} & index of field in list\\
+\hline
+\mbox{\tt in}  & {\em print} & print switch\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1312 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a66bedb9c90f129c44087bf3f3c26bdb7}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listgetindexf@{oasis\+\_\+string\+\_\+listgetindexf}}
+\index{oasis\+\_\+string\+\_\+listgetindexf@{oasis\+\_\+string\+\_\+listgetindexf}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listgetindexf}]{\setlength{\rightskip}{0pt plus 5cm}integer function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetindexf (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(in)}]{fld\+Str}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a66bedb9c90f129c44087bf3f3c26bdb7}
+
+
+Get the index of a field in a list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & input string\\
+\hline
+\mbox{\tt in}  & {\em fldstr} & name of field \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1269 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a4d3a28944ce786f4d8d8a9555c63f8cd}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listgetname@{oasis\+\_\+string\+\_\+listgetname}}
+\index{oasis\+\_\+string\+\_\+listgetname@{oasis\+\_\+string\+\_\+listgetname}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listgetname}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetname (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{list, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{k, }
+\item[{character($\ast$), intent(out)}]{name, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a4d3a28944ce786f4d8d8a9555c63f8cd}
+
+
+Get name of k-\/th field in list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em list} & input list\\
+\hline
+\mbox{\tt in}  & {\em k} & index of field\\
+\hline
+\mbox{\tt out}  & {\em name} & k-\/th name in list\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 860 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a15a49e6a71df520424402a753be10bb1}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listgetnum@{oasis\+\_\+string\+\_\+listgetnum}}
+\index{oasis\+\_\+string\+\_\+listgetnum@{oasis\+\_\+string\+\_\+listgetnum}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listgetnum}]{\setlength{\rightskip}{0pt plus 5cm}integer function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetnum (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{str}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a15a49e6a71df520424402a753be10bb1}
+
+
+return number of fields in string list 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em str} & input list \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1474 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a8b9648bf4eb3a2373f1fac49e572436f}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listintersect@{oasis\+\_\+string\+\_\+listintersect}}
+\index{oasis\+\_\+string\+\_\+listintersect@{oasis\+\_\+string\+\_\+listintersect}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listintersect}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listintersect (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{list1, }
+\item[{character($\ast$), intent(in)}]{list2, }
+\item[{character($\ast$), intent(out)}]{listout, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a8b9648bf4eb3a2373f1fac49e572436f}
+
+
+Get intersection of two fields lists, write into third list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em list1} & input list 1\\
+\hline
+\mbox{\tt in}  & {\em list2} & input list 2\\
+\hline
+\mbox{\tt out}  & {\em listout} & output list\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 946 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_ae8c50e9742e1f24cc0d7bfa9d476cd95}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listisvalid@{oasis\+\_\+string\+\_\+listisvalid}}
+\index{oasis\+\_\+string\+\_\+listisvalid@{oasis\+\_\+string\+\_\+listisvalid}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listisvalid}]{\setlength{\rightskip}{0pt plus 5cm}logical function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listisvalid (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{list, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_ae8c50e9742e1f24cc0d7bfa9d476cd95}
+
+
+Determine whether string is a valid list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em list} & list/string\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 794 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_adb1544a078e3abd743749f857fca5aee}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listmerge@{oasis\+\_\+string\+\_\+listmerge}}
+\index{oasis\+\_\+string\+\_\+listmerge@{oasis\+\_\+string\+\_\+listmerge}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listmerge}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listmerge (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{list1, }
+\item[{character($\ast$), intent(in)}]{list2, }
+\item[{character($\ast$), intent(out)}]{listout, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_adb1544a078e3abd743749f857fca5aee}
+
+
+Merge two lists into a third list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em list1} & input list 1\\
+\hline
+\mbox{\tt in}  & {\em list2} & input list 2\\
+\hline
+\mbox{\tt out}  & {\em listout} & output list\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1073 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a7df42cce90ae7fa5eceb0b9f2e4bf169}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listprepend@{oasis\+\_\+string\+\_\+listprepend}}
+\index{oasis\+\_\+string\+\_\+listprepend@{oasis\+\_\+string\+\_\+listprepend}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listprepend}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listprepend (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{listadd, }
+\item[{character($\ast$), intent(inout)}]{list, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a7df42cce90ae7fa5eceb0b9f2e4bf169}
+
+
+Prepend one list to another. 
+
+
+
+Definition at line 1205 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a4229e0726d97fc10f17027caea332daf}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listsetdel@{oasis\+\_\+string\+\_\+listsetdel}}
+\index{oasis\+\_\+string\+\_\+listsetdel@{oasis\+\_\+string\+\_\+listsetdel}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listsetdel}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listsetdel (
+\begin{DoxyParamCaption}
+\item[{character(len=1), intent(in)}]{cflag}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a4229e0726d97fc10f17027caea332daf}
+
+
+Set field delimeter character in lists. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cflag} & field delimeter \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1520 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a3482d80f258c8062e8dd0d4eff8135b7}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+listunion@{oasis\+\_\+string\+\_\+listunion}}
+\index{oasis\+\_\+string\+\_\+listunion@{oasis\+\_\+string\+\_\+listunion}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+listunion}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listunion (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{list1, }
+\item[{character($\ast$), intent(in)}]{list2, }
+\item[{character($\ast$), intent(out)}]{listout, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a3482d80f258c8062e8dd0d4eff8135b7}
+
+
+Get union of two fields lists, write into third list. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em list1} & input list 1\\
+\hline
+\mbox{\tt in}  & {\em list2} & input list 2\\
+\hline
+\mbox{\tt out}  & {\em listout} & output list 3\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1004 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a2f7bae9ccc5d2c48c14f3a1525a6c234}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+parsecftunit@{oasis\+\_\+string\+\_\+parsecftunit}}
+\index{oasis\+\_\+string\+\_\+parsecftunit@{oasis\+\_\+string\+\_\+parsecftunit}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+parsecftunit}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+parsecftunit (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in)}]{string, }
+\item[{character($\ast$), intent(out)}]{unit, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{bdate, }
+\item[{real(ip\+\_\+r8\+\_\+p), intent(out)}]{bsec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out), optional}]{rc}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a2f7bae9ccc5d2c48c14f3a1525a6c234}
+
+
+Parse C\+F time unit into a delta string name and a base time in yyyymmdd. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & string to search\\
+\hline
+\mbox{\tt out}  & {\em unit} & delta time unit\\
+\hline
+\mbox{\tt out}  & {\em bdate} & base date yyyymmdd\\
+\hline
+\mbox{\tt out}  & {\em bsec} & base seconds\\
+\hline
+\mbox{\tt out}  & {\em rc} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 604 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a10977c4902f912074ef3effd86630a24}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+setabort@{oasis\+\_\+string\+\_\+setabort}}
+\index{oasis\+\_\+string\+\_\+setabort@{oasis\+\_\+string\+\_\+setabort}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+setabort}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+setabort (
+\begin{DoxyParamCaption}
+\item[{logical, intent(in)}]{flag}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a10977c4902f912074ef3effd86630a24}
+
+
+Set local oasis\+\_\+string abort flag, true = abort, false = print and continue. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em flag} & abort flag \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1598 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_af5c49843654a2bc9ccedf2934571329d}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+setdebug@{oasis\+\_\+string\+\_\+setdebug}}
+\index{oasis\+\_\+string\+\_\+setdebug@{oasis\+\_\+string\+\_\+setdebug}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+setdebug}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+setdebug (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{i\+Flag}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_af5c49843654a2bc9ccedf2934571329d}
+
+
+Set local oasis\+\_\+string debug level, 0 = production. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em iflag} & requested debug level \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1646 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_af339c54c982092a80960a5241ccae1fa}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+tolower@{oasis\+\_\+string\+\_\+tolower}}
+\index{oasis\+\_\+string\+\_\+tolower@{oasis\+\_\+string\+\_\+tolower}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+tolower}]{\setlength{\rightskip}{0pt plus 5cm}character(len=len(str)) function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+tolower (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{str}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_af339c54c982092a80960a5241ccae1fa}
+
+
+Convert the input string to lower-\/case. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em str} & input string to convert to lower case \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 198 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a832ff1d26d766bee361ef9669efacda6}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!oasis\+\_\+string\+\_\+toupper@{oasis\+\_\+string\+\_\+toupper}}
+\index{oasis\+\_\+string\+\_\+toupper@{oasis\+\_\+string\+\_\+toupper}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{oasis\+\_\+string\+\_\+toupper}]{\setlength{\rightskip}{0pt plus 5cm}character(len=len(str)) function, public mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+toupper (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{str}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__string_a832ff1d26d766bee361ef9669efacda6}
+
+
+Convert the input string to upper-\/case. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em str} & input string to convert to upper case \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 151 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__string_a84408befb8bedabf75507eb4d690cea9}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!debug@{debug}}
+\index{debug@{debug}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{debug}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+i4\+\_\+p), save mod\+\_\+oasis\+\_\+string\+::debug = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__string_a84408befb8bedabf75507eb4d690cea9}
+
+
+Definition at line 83 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a59e9b1145c7c14506941e6495b237395}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!doabort@{doabort}}
+\index{doabort@{doabort}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{doabort}]{\setlength{\rightskip}{0pt plus 5cm}logical, save mod\+\_\+oasis\+\_\+string\+::doabort = .true.\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__string_a59e9b1145c7c14506941e6495b237395}
+
+
+Definition at line 82 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_aa6f905efb4869a52d8bb2414e82bb0a7}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!listdel@{listdel}}
+\index{listdel@{listdel}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{listdel}]{\setlength{\rightskip}{0pt plus 5cm}character(len=1), save mod\+\_\+oasis\+\_\+string\+::listdel = \char`\"{}\+:\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__string_aa6f905efb4869a52d8bb2414e82bb0a7}
+
+
+Definition at line 80 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+\hypertarget{classmod__oasis__string_a9b40ad6f4785bd4765a24b6337185513}{\index{mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}!listdel2@{listdel2}}
+\index{listdel2@{listdel2}!mod\+\_\+oasis\+\_\+string@{mod\+\_\+oasis\+\_\+string}}
+\subsubsection[{listdel2}]{\setlength{\rightskip}{0pt plus 5cm}character(len=2), save mod\+\_\+oasis\+\_\+string\+::listdel2 = \char`\"{}\+::\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__string_a9b40ad6f4785bd4765a24b6337185513}
+
+
+Definition at line 81 of file mod\+\_\+oasis\+\_\+string.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__string_8_f90}{mod\+\_\+oasis\+\_\+string.\+F90}\end{DoxyCompactItemize}

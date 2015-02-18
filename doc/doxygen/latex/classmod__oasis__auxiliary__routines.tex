@@ -1,0 +1,132 @@
+\hypertarget{classmod__oasis__auxiliary__routines}{\section{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines Module Reference}
+\label{classmod__oasis__auxiliary__routines}\index{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}}
+}
+
+
+Auxiliary O\+A\+S\+I\+S user interfaces.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__auxiliary__routines_a154d3345ef9691e378afdc871086f7eb}{oasis\+\_\+get\+\_\+ncpl} (varid, ncpl, kinfo)
+\begin{DoxyCompactList}\small\item\em Return the number of namcouple couplings for a variable. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__auxiliary__routines_a62d1c98c05bcc4bd5e8796866bcce2db}{oasis\+\_\+get\+\_\+freqs} (varid, mop, ncpl, cpl\+\_\+freqs, kinfo)
+\begin{DoxyCompactList}\small\item\em Returns the coupling periods for a given variable. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__auxiliary__routines_a7a95eb579171b6c2f06ff532c7823e2e}{oasis\+\_\+put\+\_\+inquire} (varid, msec, kinfo)
+\begin{DoxyCompactList}\small\item\em Return kinfo code indicating type of action carried out for a variable at the specified time. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(mpi\+\_\+status\+\_\+size) \hyperlink{classmod__oasis__auxiliary__routines_a284fcb0384dbbf081a6930256fc12b27}{istatus}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Auxiliary O\+A\+S\+I\+S user interfaces. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__auxiliary__routines_a62d1c98c05bcc4bd5e8796866bcce2db}{\index{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}!oasis\+\_\+get\+\_\+freqs@{oasis\+\_\+get\+\_\+freqs}}
+\index{oasis\+\_\+get\+\_\+freqs@{oasis\+\_\+get\+\_\+freqs}!mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}}
+\subsubsection[{oasis\+\_\+get\+\_\+freqs}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+freqs (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{varid, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{mop, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{ncpl, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), dimension(ncpl), intent(out)}]{cpl\+\_\+freqs, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out)}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__auxiliary__routines_a62d1c98c05bcc4bd5e8796866bcce2db}
+
+
+Returns the coupling periods for a given variable. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em varid} & variable id\\
+\hline
+\mbox{\tt in}  & {\em mop} & O\+A\+S\+I\+S\+\_\+\+Out or O\+A\+S\+I\+S\+\_\+\+In type\\
+\hline
+\mbox{\tt in}  & {\em ncpl} & number of namcouple couplings\\
+\hline
+\mbox{\tt out}  & {\em cpl\+\_\+freqs} & coupling period (sec)\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 80 of file mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90.
+
+\hypertarget{classmod__oasis__auxiliary__routines_a154d3345ef9691e378afdc871086f7eb}{\index{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}!oasis\+\_\+get\+\_\+ncpl@{oasis\+\_\+get\+\_\+ncpl}}
+\index{oasis\+\_\+get\+\_\+ncpl@{oasis\+\_\+get\+\_\+ncpl}!mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}}
+\subsubsection[{oasis\+\_\+get\+\_\+ncpl}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+ncpl (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{varid, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out)}]{ncpl, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out)}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__auxiliary__routines_a154d3345ef9691e378afdc871086f7eb}
+
+
+Return the number of namcouple couplings for a variable. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em varid} & variable id\\
+\hline
+\mbox{\tt out}  & {\em ncpl} & number of namcouple couplings\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90.
+
+\hypertarget{classmod__oasis__auxiliary__routines_a7a95eb579171b6c2f06ff532c7823e2e}{\index{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}!oasis\+\_\+put\+\_\+inquire@{oasis\+\_\+put\+\_\+inquire}}
+\index{oasis\+\_\+put\+\_\+inquire@{oasis\+\_\+put\+\_\+inquire}!mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}}
+\subsubsection[{oasis\+\_\+put\+\_\+inquire}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+put\+\_\+inquire (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{varid, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{msec, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out)}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__auxiliary__routines_a7a95eb579171b6c2f06ff532c7823e2e}
+
+
+Return kinfo code indicating type of action carried out for a variable at the specified time. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em varid} & variable id\\
+\hline
+\mbox{\tt in}  & {\em msec} & model time in seconds\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 151 of file mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__auxiliary__routines_a284fcb0384dbbf081a6930256fc12b27}{\index{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}!istatus@{istatus}}
+\index{istatus@{istatus}!mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines@{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}}
+\subsubsection[{istatus}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(mpi\+\_\+status\+\_\+size) mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::istatus\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__auxiliary__routines_a284fcb0384dbbf081a6930256fc12b27}
+
+
+Definition at line 27 of file mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__auxiliary__routines_8_f90}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90}\end{DoxyCompactItemize}

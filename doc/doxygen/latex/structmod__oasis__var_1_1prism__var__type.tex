@@ -1,0 +1,144 @@
+\hypertarget{structmod__oasis__var_1_1prism__var__type}{\section{mod\+\_\+oasis\+\_\+var\+:\+:prism\+\_\+var\+\_\+type Type Reference}
+\label{structmod__oasis__var_1_1prism__var__type}\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+}
+
+
+Model variable data for model coupling.  
+
+
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=ic\+\_\+lvar) \hyperlink{structmod__oasis__var_1_1prism__var__type_a90fb2c4252337f674bd4e3dc29c02f6b}{name}
+\begin{DoxyCompactList}\small\item\em variable name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a370ca8fd795e1d832bdcce52705e8f0c}{part}
+\begin{DoxyCompactList}\small\item\em variable partition \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a21345a842b0dfd5dcf4a00c2356035da}{ndim}
+\begin{DoxyCompactList}\small\item\em rank of variable \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a717aa9d5848cee514dcaf036936c8f1b}{num}
+\begin{DoxyCompactList}\small\item\em size of variable \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a9235132dc1d3cf0b89211c09dcc62fa2}{ops}
+\begin{DoxyCompactList}\small\item\em input or output \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a944549d5fb1aebecc59ca5dbff9b3222}{type}
+\begin{DoxyCompactList}\small\item\em type kind of variable \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a13dac48e592591a9e06999aadaf1e6b7}{size}
+\begin{DoxyCompactList}\small\item\em total size of field \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__var_1_1prism__var__type_a5e74e0f54df6c10c13569250bd616c94}{ncpl}
+\begin{DoxyCompactList}\small\item\em number of namcouple couplers \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\hyperlink{classmod__oasis__var_a687d6dce16699f36ae3a67accfdba3a9}{mvarcpl}) \hyperlink{structmod__oasis__var_1_1prism__var__type_aca0fbd288bee74de5e08e77ad869039b}{cpl}
+\begin{DoxyCompactList}\small\item\em list of namcouple couplers \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Model variable data for model coupling. 
+
+Definition at line 28 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structmod__oasis__var_1_1prism__var__type_aca0fbd288bee74de5e08e77ad869039b}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!cpl@{cpl}}
+\index{cpl@{cpl}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{cpl}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension({\bf mvarcpl}) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::cpl\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_aca0fbd288bee74de5e08e77ad869039b}
+
+
+list of namcouple couplers 
+
+
+
+Definition at line 37 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a90fb2c4252337f674bd4e3dc29c02f6b}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!name@{name}}
+\index{name@{name}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{name}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+lvar) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::name\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a90fb2c4252337f674bd4e3dc29c02f6b}
+
+
+variable name 
+
+
+
+Definition at line 29 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a5e74e0f54df6c10c13569250bd616c94}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!ncpl@{ncpl}}
+\index{ncpl@{ncpl}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{ncpl}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::ncpl\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a5e74e0f54df6c10c13569250bd616c94}
+
+
+number of namcouple couplers 
+
+
+
+Definition at line 36 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a21345a842b0dfd5dcf4a00c2356035da}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!ndim@{ndim}}
+\index{ndim@{ndim}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{ndim}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::ndim\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a21345a842b0dfd5dcf4a00c2356035da}
+
+
+rank of variable 
+
+
+
+Definition at line 31 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a717aa9d5848cee514dcaf036936c8f1b}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!num@{num}}
+\index{num@{num}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{num}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::num\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a717aa9d5848cee514dcaf036936c8f1b}
+
+
+size of variable 
+
+
+
+Definition at line 32 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a9235132dc1d3cf0b89211c09dcc62fa2}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!ops@{ops}}
+\index{ops@{ops}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{ops}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::ops\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a9235132dc1d3cf0b89211c09dcc62fa2}
+
+
+input or output 
+
+
+
+Definition at line 33 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a370ca8fd795e1d832bdcce52705e8f0c}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!part@{part}}
+\index{part@{part}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{part}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::part\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a370ca8fd795e1d832bdcce52705e8f0c}
+
+
+variable partition 
+
+
+
+Definition at line 30 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a13dac48e592591a9e06999aadaf1e6b7}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!size@{size}}
+\index{size@{size}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::size\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a13dac48e592591a9e06999aadaf1e6b7}
+
+
+total size of field 
+
+
+
+Definition at line 35 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{structmod__oasis__var_1_1prism__var__type_a944549d5fb1aebecc59ca5dbff9b3222}{\index{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}!type@{type}}
+\index{type@{type}!mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type@{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}}
+\subsubsection[{type}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type\+::type\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__var_1_1prism__var__type_a944549d5fb1aebecc59ca5dbff9b3222}
+
+
+type kind of variable 
+
+
+
+Definition at line 34 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+
+
+The documentation for this type was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__var_8_f90}{mod\+\_\+oasis\+\_\+var.\+F90}\end{DoxyCompactItemize}
