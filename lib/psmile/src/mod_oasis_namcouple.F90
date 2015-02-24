@@ -29,9 +29,6 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
                                                          !< in each line of the file namcouple 
 
-  INTEGER(kind=ip_i4_p) ,public :: namnmodels   !< number of models
-  character(len=ic_lvar),public,pointer :: nammodnam(:)  !< model names
-
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
   INTEGER(kind=ip_i4_p)   ,public :: namlogprt     !< namcouple nlogprt value
@@ -113,7 +110,6 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p) :: nitfn
   INTEGER (kind=ip_intwp_p) :: nstep
 ! --- mod_parameter
-  INTEGER (kind=ip_intwp_p) :: ig_nmodel   ! number of models (not including oasis)
   INTEGER (kind=ip_intwp_p) :: ig_nfield   ! number of oasis coupled fields
   INTEGER (kind=ip_intwp_p) :: ig_direct_nfield   ! number of direct coupled fields
   INTEGER (kind=ip_intwp_p) :: ig_total_nfield    ! estimate of total fields
@@ -299,13 +295,9 @@ CONTAINS
   CALL oasis_unitfree(nulin)
 
   IF (mpi_rank_global == 0) THEN
-      WRITE(nulprt1,*) subname,' allocating ig_nmodel+1',ig_nmodel+1
       WRITE(nulprt1,*) subname,' allocating ig_final_nfield',ig_final_nfield
       CALL oasis_flush(nulprt1)
   ENDIF
-
-  allocate(nammodnam(ig_nmodel+1), stat=il_err)
-  IF (il_err.NE.0) CALL prtout('Error in "nammodnam" allocation of experiment module',il_err,1)
 
   allocate(namsrcfld(ig_final_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namsrcfld" allocation of experiment module',il_err,1)
@@ -415,7 +407,6 @@ CONTAINS
   allocate(namscrbin(ig_final_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "namscrbin" allocation of experiment module',il_err,1)
 
-  nammodnam(:) = trim(cspval)
   namsrcfld(:) = trim(cspval)
   namdstfld(:) = trim(cspval)
   namsrcgrd(:) = trim(cspval)
@@ -459,20 +450,6 @@ CONTAINS
   ENDIF
 
   call oasis_unitsetmin(maxunit)
-
-  namnmodels = ig_nmodel
-
-  do n = 1,ig_nmodel
-    nammodnam(n) = trim(cmodnam(n))
-  enddo
-
-  IF (mpi_rank_global == 0) THEN
-      WRITE(nulprt1,*) subname,' total number of models = ',namnmodels
-      DO n = 1,namnmodels
-        WRITE(nulprt1,*) subname,n,TRIM(nammodnam(n))
-      ENDDO
-      CALL oasis_flush(nulprt1)
-  ENDIF
 
   nnamcpl = ig_final_nfield
   namruntim = ntime
@@ -790,32 +767,17 @@ SUBROUTINE inipar_alloc()
 
   REWIND nulin
 100 CONTINUE
-  READ (UNIT = nulin,FMT = 1001,END = 110) clword
+  READ (UNIT = nulin,FMT = 1001,END = 140) clword
   IF (clword .NE. clmod) GO TO 100
-  READ (UNIT = nulin,FMT = 1002) clline
-  CALL parse (clline, clvari, 1, jpeighty, ilen)
-  IF (ilen .LE. 0 .or.ilen .GT. 1 ) THEN
-      GOTO 110
-  ELSE
-      READ (clvari,FMT = 1003) ig_nmodel
+  IF (mpi_rank_global == 0) THEN
+      WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+      WRITE (UNIT = nulprt1,FMT = *) 'Information below $NBMODEL'
+      WRITE (UNIT = nulprt1,FMT = *) 'is obsolete in OASIS3-MCT'
+      WRITE (UNIT = nulprt1,FMT = *) 'It will not be read and will not be used'
+      CALL oasis_flush(nulprt1)
   ENDIF
 
-  !* Print out the number of models
-
-  CALL prtout &
-     ('The number of models set for this run (but ignored) is nmodel =', ig_nmodel, &
-     1)
-  !tcx inline
-  !      CALL alloc_experiment
-
-  ALLOCATE (cmodnam(ig_nmodel), stat=il_err)
-  IF (il_err.NE.0) CALL prtout & 
-     ('Error in "cmodnam"allocation of experiment module',il_err,1)
-  cmodnam(:)=' '
-  ALLOCATE (iga_unitmod(ig_nmodel), stat=il_err)
-  IF (il_err.NE.0) CALL prtout & 
-     ('Error in iga_unitmod allocation of experiment module',il_err,1)
-  iga_unitmod(:)=0
+140 CONTINUE
 
   ! --> Get the message passing technique we are using
 
@@ -837,7 +799,6 @@ SUBROUTINE inipar_alloc()
 
 1001 FORMAT(A9)
 1002 FORMAT(A5000)
-1003 FORMAT(I1)
 
 
   !*    2. Get field information
@@ -1738,60 +1699,17 @@ SUBROUTINE inipar_alloc()
   
   REWIND nulin
 120 CONTINUE
-  READ (UNIT = nulin,FMT = 1001,END = 130) clword
+  READ (UNIT = nulin,FMT = 1001,END = 140) clword
   IF (clword .NE. clmod) GO TO 120
-  READ (UNIT = nulin,FMT = 1002) clline
-
-  !* Get model names
-
-  DO 140 jm = 1, ig_nmodel
-    imodel = jm + 1
-    CALL parse (clline, clvari, imodel, jpeighty, ilen)
-    cmodnam(jm) = trim(clvari)
-
-    !* Print out model names
-
-    IF (mpi_rank_global == 0) THEN
-        WRITE (UNIT = nulprt1,FMT =' &
-           &        (''   Name for model '',I1,'' is '',A6,/)')  &
-           jm, trim(cmodnam(jm))
-        CALL oasis_flush(nulprt1)
-    ENDIF
+  IF (mpi_rank_global == 0) THEN
+      WRITE (UNIT = nulprt1,FMT = *) '        ***WARNING***'
+      WRITE (UNIT = nulprt1,FMT = *) 'Information below $NBMODEL'
+      WRITE (UNIT = nulprt1,FMT = *) 'is obsolete in OASIS3-MCT'
+      WRITE (UNIT = nulprt1,FMT = *) 'It will not be read and will not be used'
+      CALL oasis_flush(nulprt1)
+  ENDIF
 
 140 CONTINUE
-
-  !* Get model maximum unit number used if they appear on the line
-
-  DO 142 jm = 1, ig_nmodel
-    imodel = jm + 1 + ig_nmodel
-    CALL parse (clline, clvari, imodel, jpeighty, ILEN)
-    IF (ILEN .GT. 0) THEN
-        READ (clvari,FMT = 1004) iga_unitmod(jm)
-        
-        !* Print out model minimum logfile unit number
-        IF (mpi_rank_global == 0) THEN
-            WRITE (UNIT = nulprt1,FMT = *) ' '
-            WRITE (UNIT=nulprt1,FMT=*) &
-                'The maximum Fortran unit number used in model is', &
-                 jm, iga_unitmod(jm)
-            WRITE (UNIT = nulprt1,FMT = *) ' '
-            CALL oasis_flush(nulprt1)
-        ENDIF
-
-        !* Verify that maximum unit number is larger than 1024; 
-        !* if not, use 1024.
-        IF (iga_unitmod(jm) .lt. 1024) iga_unitmod(jm)=1024
-    ELSE
-        IF (mpi_rank_global == 0) THEN
-            WRITE (UNIT = nulprt1, FMT = *) &
-               ' WARNING: You did not give in the namcouple the maximum', &
-               ' Fortran unit numbers used in your models.', &
-               ' Oasis will suppose that units above 1024 are free !'
-            CALL oasis_flush(nulprt1)
-        ENDIF
-        iga_unitmod(jm)=1024
-    ENDIF
-142 CONTINUE
 
   !* Get hardware info for this OASIS simulation
 
