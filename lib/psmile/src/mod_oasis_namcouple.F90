@@ -122,9 +122,6 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_intwp_p) :: nlogprt
 !---- Time statistics level printing
   INTEGER(kind=ip_intwp_p) :: ntlogprt
-! --- mod_experiment
-  INTEGER (kind=ip_intwp_p), DIMENSION(:), ALLOCATABLE :: iga_unitmod
-  CHARACTER(len=16) , DIMENSION(:), ALLOCATABLE :: cmodnam
 ! --- mod_string
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: numlab
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: ig_numlab
@@ -443,7 +440,8 @@ CONTAINS
   namscrnbr(:) = -1
   namscrbin(:) = -1
 
-  maxunit = max(maxval(iga_unitmod),1024)
+!  maxunit = max(maxval(iga_unitmod),1024)
+  maxunit = 1024
   IF (mpi_rank_global == 0) THEN
       WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
       CALL oasis_flush(nulprt1)
