@@ -203,7 +203,7 @@ CONTAINS
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
 !  character(len=*),parameter :: smatread_method = 'orig'
   character(len=*),parameter :: smatread_method = 'ceg'
-  logical, parameter :: local_timers_on = .true.
+  logical, parameter :: local_timers_on = .false.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
 
