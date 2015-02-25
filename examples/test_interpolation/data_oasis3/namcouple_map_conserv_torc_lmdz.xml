@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <dataset>
+        <oasis3-mct value="">
+            <modeldef value="">
+                <mainmodelparam value="" />
+                <modelparam value="">
+                    <models value="">
+                        <item_1368819 value="model1">
+                            <maxunits value="units_on">
+                                <units_on value="">
+                                    <nunit value="200" />
+                                </units_on>
+                            </maxunits>
+                        </item_1368819>
+                        <item_1379378 value="model2">
+                            <maxunits value="units_on">
+                                <units_on value="">
+                                    <nunit value="200" />
+                                </units_on>
+                            </maxunits>
+                        </item_1379378>
+                    </models>
+                    <model_names_list value="model1;model2" />
+                </modelparam>
+            </modeldef>
+            <param value="">
+                <intro value="" />
+                <generaldesc value="" />
+                <guidesc value="" />
+            </param>
+            <printruns value="">
+                <descprint value="" />
+                <runtime value="">
+                    <duration value="21600" />
+                </runtime>
+                <debug value="">
+                    <nlogprt value="ptr_1">
+                        <ptr_1 value="" />
+                    </nlogprt>
+                </debug>
+                <timestat value="">
+                    <opttime value="none">
+                        <none value="" />
+                    </opttime>
+                </timestat>
+                <generalgroup value="">
+                    <groups_onoff value="0" />
+                    <mult_fields_name value="single" />
+                </generalgroup>
+            </printruns>
+            <grids value="">
+                <modelgrids value="" />
+                <defgrids value="">
+                    <gridsline value="">
+                        <item_1389830 value="torc">
+                            <gridstatus value="periodical_grid" />
+                            <grid_overlap value="2" />
+                            <dimsgrid value="dims_on">
+                                <dims_on value="">
+                                    <ni_grid value="182" />
+                                    <nj_grid value="149" />
+                                </dims_on>
+                            </dimsgrid>
+                        </item_1389830>
+                        <item_1508732 value="lmdz">
+                            <gridstatus value="periodical_grid" />
+                            <grid_overlap value="0" />
+                            <dimsgrid value="dims_on">
+                                <dims_on value="">
+                                    <ni_grid value="96" />
+                                    <nj_grid value="72" />
+                                </dims_on>
+                            </dimsgrid>
+                        </item_1508732>
+                    </gridsline>
+                    <grid_names_list value="torc;lmdz" />
+                </defgrids>
+            </grids>
+            <fielddef value="">
+                <flddesc value="" />
+                <fldname value="">
+                    <flddef value="">
+                        <item_2020415 value="FS-ANA">
+                            <namefldgui value="FS-ANA" />
+                            <fldnamebef value="FSENDANA" />
+                            <srcgrid value="torc" />
+                            <fldnameaft value="FRECVANA" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="single" />
+                        </item_2020415>
+                    </flddef>
+                    <field_names_list value="FS-ANA" />
+                </fldname>
+            </fielddef>
+            <cplrststatus value="">
+                <fldproper value="" />
+                <cplrststatus value="">
+                    <crs value="">
+                        <item_2276733 value="FS-ANA">
+                            <cpl value="7200" />
+                            <restart value="rst.nc" />
+                            <status value="expout" />
+                        </item_2276733>
+                    </crs>
+                </cplrststatus>
+            </cplrststatus>
+            <seqlag value="">
+                <defineseqlag value="" />
+                <defseqlag value="">
+                    <seqlag value="">
+                        <item_2280157 value="FS-ANA">
+                            <lag value="lag_off">
+                                <lag_off value="" />
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_2280157>
+                    </seqlag>
+                </defseqlag>
+            </seqlag>
+            <timetransfo value="">
+                <timetransfo value="" />
+                <transftime value="">
+                    <time value="">
+                        <item_2287573 value="FS-ANA">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_2287573>
+                    </time>
+                </transftime>
+            </timetransfo>
+            <checktransfo value="">
+                <cicotransfo value="" />
+                <transfcico value="">
+                    <checkinoutminmax value="">
+                        <item_2292081 value="FS-ANA">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_2292081>
+                    </checkinoutminmax>
+                </transfcico>
+            </checktransfo>
+            <blastransfo value="">
+                <transfblas value="" />
+                <transfblon value="">
+                    <multaddoldnew value="">
+                        <item_2297574 value="FS-ANA">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_2297574>
+                    </multaddoldnew>
+                </transfblon>
+            </blastransfo>
+            <interpolation value="">
+                <scriptransfo value="" />
+                <transfinterp value="">
+                    <interp value="">
+                        <item_2306181 value="FS-ANA">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_2306181>
+                    </interp>
+                </transfinterp>
+            </interpolation>
+            <mapping value="">
+                <mappingtransfo value="" />
+                <transfmap value="">
+                    <map value="">
+                        <item_2337259 value="FS-ANA">
+                            <mapremapping value="mapping_on">
+                                <mapping_on value="">
+                                    <filename value="myfile_torc_to_lmdz_CONSERV_FRACNNEI.nc" />
+                                    <maploc value="src" />
+                                    <mapstrategy value="bfb" />
+                                </mapping_on>
+                            </mapremapping>
+                        </item_2337259>
+                    </map>
+                </transfmap>
+            </mapping>
+            <conservtransof value="">
+                <conservtransfo value="" />
+                <transfconserv value="">
+                    <conservation value="">
+                        <item_2343507 value="FS-ANA">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_2343507>
+                    </conservation>
+                </transfconserv>
+            </conservtransof>
+            <summary value="">
+                <scriptsummary value="">
+                    <summaryscript value="******************************************************************
+*** Summary of the coupling fields and their transformations: 
+******************************************************************
+******************************************************************
+FSENDANA-FRECVANA:
+Source grid : torc
+Dimensions : 182x149
+Target grid : lmdz
+Dimensions : 96x72
+Source grid periodical with  2 overlapping points
+Target grid periodical with  0 overlapping points 
+Coupling period=7200
+Restart file: rst.nc
+Field status: EXPOUT
+
+Min and max of the field sent calculated
+Min and max of the received field calculated
+MAPPING is used with options: src and bfb
+********************************************************
+********************************************************" />
+                </scriptsummary>
+            </summary>
+            <write value="">
+                <scriptnamcouple value="">
+                    <namcouplescript value="$NFIELDS 
+1
+$END 
+####
+$RUNTIME 
+21600
+$END 
+####
+$NLOGPRT 
+1 0
+$END 
+####
+$STRINGS 
+FSENDANA FRECVANA 1 7200 3 rst.nc EXPOUT
+182 149 96 72 torc lmdz
+P 2 P 0 
+CHECKIN MAPPING CHECKOUT 
+INT=1
+myfile_torc_to_lmdz_CONSERV_FRACNNEI.nc src bfb 
+INT=1
+####
+ $END" />
+                </scriptnamcouple>
+            </write>
+        </oasis3-mct>
+        <meta>
+            <solver>
+                <name value="oasis3-mct" />
+            </solver>
+            <project>
+                <name value="namcouple_map_conserv_torc_lmdz_new" />
+                <address value="/space/coquart/oasis3-mct_buildbot/examples/test_interpolation/data_oasis3/namcouple_map_conserv_torc_lmdz_new.xml" />
+                <username value="myName" />
+                <company value="myCompany" />
+            </project>
+            <action>
+                <callingAddress value="root.oasis3-mct.write" />
+            </action>
+            <temporary />
+            <scriptSuccess value="1" />
+            <engine>
+                <name value="OpenTEA" />
+                <launchCommand value="/usr/bin/wish /space/coquart/oasis3-mct_buildbot/util/oasisgui/opentea/opentea.tcl  -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -library /space/coquart/oasis3-mct_buildbot/util/oasisgui/library -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -plugins /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <pluginsPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <libraryPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library" />
+                <configPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml" />
+            </engine>
+        </meta>
+    </dataset>
