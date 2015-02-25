@@ -11,12 +11,6 @@
 #
              3
  $END
-#########################################################################
- $NBMODEL
-# The number of models in this experiment + their names (6 characters)
-#
-   2  model1   model2
- $END
 ###########################################################################
  $RUNTIME
 # The total simulated time for this run in seconds

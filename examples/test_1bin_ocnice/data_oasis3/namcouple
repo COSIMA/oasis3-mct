@@ -14,14 +14,6 @@
 #
              20
  $END
-##########################################################################
- $NBMODEL
-# This gives you the number of models running in this experiment +
-# their names (6 characters) + , in option, the maximum Fortran unit
-# number used by each model; 1024 will be used if none are given.
-#
-   0  xxx 99
- $END
 ###########################################################################
  $RUNTIME
 # This gives you the total simulated time for this run in seconds (here 6 days)
