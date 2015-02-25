@@ -64,8 +64,11 @@ mod_oasis_io.o:  mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_ioshr.o mod_oasis_mpi.o
 mod_oasis_grid.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_io.o mod_oasis_part.o mod_oasis_mpi.o mod_oasis_timer.o
-mod_oasis_coupler.o: mod_oasis_kinds.o  mod_oasis_data.o mod_oasis_sys.o \
+ceg_oasis_coupler.o: mod_oasis_kinds.o  mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_mpi.o mod_oasis_var.o mod_oasis_part.o  \
+        mod_oasis_string.o mod_oasis_namcouple.o mod_oasis_timer.o mod_oasis_io.o 
+mod_oasis_coupler.o: mod_oasis_kinds.o  mod_oasis_data.o mod_oasis_sys.o \
+        ceg_oasis_coupler.o mod_oasis_parameters.o mod_oasis_mpi.o mod_oasis_var.o mod_oasis_part.o  \
         mod_oasis_string.o mod_oasis_namcouple.o mod_oasis_timer.o mod_oasis_io.o \
         mod_oasis_mem.o
 mod_oasis_advance.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \

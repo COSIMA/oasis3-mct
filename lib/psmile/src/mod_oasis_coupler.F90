@@ -1,4 +1,4 @@
-
+#define SPLIT
 !> Initialize the OASIS coupler infrastructure
 
 MODULE mod_oasis_coupler
@@ -9,6 +9,7 @@ MODULE mod_oasis_coupler
   USE mod_oasis_parameters
   USE mod_oasis_namcouple
   USE mod_oasis_sys
+  USE ceg_oasis_coupler
   USE mod_oasis_part
   USE mod_oasis_var
   USE mod_oasis_mpi
@@ -200,17 +201,21 @@ CONTAINS
   type(sortvarfld_type) :: sortvars
   type(sortvarfld_type) :: sorttest
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
-  logical, parameter :: local_timers_on = .false.
+!  character(len=*),parameter :: smatread_method = 'orig'
+  character(len=*),parameter :: smatread_method = 'ceg'
+  logical, parameter :: local_timers_on = .true.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
 
   !----------------------------------------------------------
 
   call oasis_debug_enter(subname)
-  call oasis_mpi_barrier(mpi_comm_global)
+!  call oasis_mpi_barrier(mpi_comm_global)
   call oasis_timer_start('cpl_setup')
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
+
+  write(nulprt,*) subname,' smatread_method = ',trim(smatread_method)
 
   !-----------------------------------------
   !> * Allocate and zero prism_router, prism_mapper, prism_coupler based on nnamcpl
@@ -307,6 +312,7 @@ CONTAINS
   allvar = " "
   nallvar = 0
   allops = -1
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n1_bcast')
   do n = 1,prism_amodels
      if (n == compid) then
         myvar = " "
@@ -347,6 +353,7 @@ CONTAINS
      endif
      allops(:,n) = myops(:)
   enddo
+  if (local_timers_on) call oasis_timer_stop('cpl_setup_n1_bcast')
 
   deallocate(myvar,myops)
 
@@ -1089,6 +1096,7 @@ CONTAINS
   enddo  ! nv1
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3')
   if (local_timers_on) call oasis_timer_start('cpl_setup_n4')
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n4a')
 
   ! aggregate checkused info across all pes and then check on each component root
   allocate(namsrc_checkused_g(sortnsrc%num))
@@ -1100,7 +1108,7 @@ CONTAINS
         found = .true.
      endif
   enddo
-  call oasis_mpi_barrier(mpi_comm_global)
+!  call oasis_mpi_barrier(mpi_comm_global)
   if (found) call oasis_abort()
   deallocate(namsrc_checkused_g)
 
@@ -1122,6 +1130,7 @@ CONTAINS
      write(nulprt,*) subname,' couplers setup'
      do nc = 1,prism_mcoupler
 !tcx can't write here, something uninitialized???
+!-> CEG it was dpart so added extra if into the print routine
 !        if (prism_coupler_put(nc)%valid) call prism_coupler_print(nc,prism_coupler_put(nc))
 !        if (prism_coupler_get(nc)%valid) call prism_coupler_print(nc,prism_coupler_get(nc))
      enddo
@@ -1143,6 +1152,8 @@ CONTAINS
   !> * Loop over all couplers
   !----------------------------------------------------------
 
+  if (local_timers_on) call oasis_timer_stop('cpl_setup_n4a')
+
   do nc = 1,prism_mcoupler
   do npc = 1,2
   if (npc == 1) then
@@ -1157,7 +1168,9 @@ CONTAINS
      write(nulprt,*) subname,' DEBUG cb:initialize coupler ',nc,npc,pcpointer%valid
      call oasis_flush(nulprt)
   endif
+
   if (pcpointer%valid) then
+     if (local_timers_on) call oasis_timer_start('cpl_setup_n4b')
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc,npc
         call oasis_flush(nulprt)
@@ -1208,6 +1221,7 @@ CONTAINS
      pcpointer%avcnt(:) = 0
      if (pcpointer%getput == OASIS3_PUT) pcpointer%status = OASIS_COMM_WAIT
      if (pcpointer%getput == OASIS3_GET) pcpointer%status = OASIS_COMM_READY
+     if (local_timers_on) call oasis_timer_stop('cpl_setup_n4b')
 
      !--------------------------------
      !>   * Initialize the mapper data
@@ -1216,6 +1230,7 @@ CONTAINS
      if (mapID > 0) then
 
         if (prism_mapper(mapID)%init) then
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4c')
            !--------------------------------
            ! mapper already initialized
            !--------------------------------
@@ -1225,6 +1240,7 @@ CONTAINS
               part2 = prism_mapper(mapID)%spart
            endif
            gsize = mct_gsmap_gsize(prism_part(part2)%gsmap)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4c')
         else
            !--------------------------------
            ! instantiate mapper
@@ -1233,12 +1249,16 @@ CONTAINS
            ! get gsmap for non local grid
            ! read mapping weights and initialize sMatP
            !--------------------------------
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4d')
            if (OASIS_debug >= 15) then
               write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapID)%file)
               call oasis_flush(nulprt)
            endif
            if (mpi_rank_local == 0) then
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da')
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da1')
               inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da1')
               if (OASIS_debug >= 15) then
                  write(nulprt,*) subname,' DEBUG ci: inquire mapfile ',&
                                  trim(prism_mapper(mapID)%file),exists
@@ -1250,7 +1270,9 @@ CONTAINS
                     ! generate mapping file on root pe
                     ! taken from oasis3 scriprmp
                     !--------------------------------
+                    call oasis_timer_start('cpl_setup_genmap')
                     call oasis_coupler_genmap(mapID,namID)
+                    call oasis_timer_stop('cpl_setup_genmap')
                  else
                     write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
                                     trim(prism_mapper(mapID)%file)
@@ -1261,6 +1283,7 @@ CONTAINS
               !--------------------------------
               ! open mapping file
               !--------------------------------
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da3')
               status = nf90_open(trim(prism_mapper(mapID)%file),nf90_nowrite,ncid)
               if (OASIS_debug >= 15) then
                  status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
@@ -1275,9 +1298,14 @@ CONTAINS
               if (pcpointer%getput == OASIS3_GET) &
                  status = nf90_inq_dimid(ncid,'src_grid_size',dimid)
               status = nf90_inquire_dimension(ncid,dimid,len=gsize)
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da3')
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da')
            endif  ! rank = 0
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4db')
            call oasis_mpi_bcast(gsize,mpi_comm_local,subname//' gsize')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4db')
 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4dc')
            if (pcpointer%getput == OASIS3_PUT) then
               nx = namdst_nx(namID)
               ny = namdst_ny(namID)
@@ -1287,9 +1315,12 @@ CONTAINS
               ny = namsrc_ny(namID)
               gridname = trim(namsrcgrd(namID))
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dc')
 
            !tcx improve match here with nx,ny,gridname 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4dd')
            call oasis_part_create(part2,'1d',gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dd')
 
            if (OASIS_Debug >= 15) then
               write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
@@ -1306,6 +1337,7 @@ CONTAINS
               enddo
            endif
 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4de')
            if (prism_part(part2)%nx < 1) then
               prism_part(part2)%nx = nx
               prism_part(part2)%ny = ny
@@ -1345,16 +1377,26 @@ CONTAINS
               call oasis_abort()
            endif
            prism_mapper(mapID)%optval = trim(cstring)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4de')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4d')
 
            !-------------------------------
            ! smatreaddnc allocates sMati to nwgts
            ! then instantiate an sMatP for each set of wgts
            ! to support higher order mapping
            !-------------------------------
-           ! call oasis_timer_start('cpl_smatrd')
-           call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-              trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local, &
-              nwgts)
+           if (smatread_method == "ceg") then
+              call oasis_timer_start('cpl_setup_smatrd_ceg')
+              call ceg_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
+                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+              call oasis_timer_stop('cpl_setup_smatrd_ceg')
+           else
+              call oasis_timer_start('cpl_setup_smatrd_orig')
+              call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
+                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+              call oasis_timer_stop('cpl_setup_smatrd_orig')
+           endif
+           call oasis_timer_start('cpl_setup_sminit')
            prism_mapper(mapID)%nwgts = nwgts
            allocate(prism_mapper(mapID)%sMatP(nwgts))
            do n = 1,nwgts
@@ -1363,7 +1405,8 @@ CONTAINS
               call mct_sMat_Clean(sMati(n))
            enddo
            deallocate(sMati)
-           ! call oasis_timer_stop('cpl_smatrd')
+           call oasis_timer_stop('cpl_setup_sminit')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4e')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
@@ -1372,8 +1415,10 @@ CONTAINS
                               " nElements = ",lsize," nwgts = ",nwgts
               call oasis_flush(nulprt)
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4e')
         endif  ! map init
 
+        if (local_timers_on) call oasis_timer_start('cpl_setup_n4f')
         !--------------------------------
         !>   * Read mapper mask and area if not already done
         !--------------------------------
@@ -1447,7 +1492,7 @@ CONTAINS
         !--------------------------------
 
         pcpointer%rpartID = part2
-
+        if (local_timers_on) call oasis_timer_stop('cpl_setup_n4f')
      else
 
         !--------------------------------
@@ -1459,10 +1504,47 @@ CONTAINS
 
      endif  ! no mapper
 
+#ifdef SPLIT
+!-------------------------------------------------
+! CEG split 1 loop into 2
+   endif ! endif of pcpointer%valid
+   
+!   print'(I3,A,X,L,X,8(I8,X))',mpi_rank_global, 'would have done sndrcv here', pcpointer%sndrcv,pcpointer%comp,compid, &
+!           pcpointer%valid, mapID, pcpointer%rPartID, pcpointer%routerID
+
+  enddo   ! npc
+enddo   ! nc
+do nc = 1, prism_mcoupler  ! nc
+  do npc=1,2
+
+     if (npc == 1) then
+        pcpointer => prism_coupler_put(nc)
+        pcpntpair => prism_coupler_get(nc)
+     endif
+     if (npc == 2) then
+        pcpointer => prism_coupler_get(nc)
+        pcpntpair => prism_coupler_put(nc)
+     endif
+
+     namID = pcpointer%namID
+     part1 = pcpointer%partID
+     mapID = pcpointer%mapperID
+
+
+!   print'(I3,A,X,L,X,8(I8,X))',mpi_rank_global, '..finally doing sndrcv here', pcpointer%sndrcv, pcpointer%comp, compid, &
+!           pcpointer%valid, mapID, pcpointer%rPartID, pcpointer%routerID
+!     if (mapID > 0) then
+#else
+!   print'(I3,A,X,L,X,8(I8,X))',mpi_rank_global, 'doing sndrcv as in original', pcpointer%sndrcv, pcpointer%comp, compid, &
+!           pcpointer%valid, mapID, pcpointer%rPartID, pcpointer%routerID
+#endif
+
+
      !--------------------------------
      !>   * Initialize router based on rpartID
      !--------------------------------
 
+     if (local_timers_on) call oasis_timer_start('cpl_setup_n4_sr')
      if (pcpointer%sndrcv) then
 
         if (OASIS_debug >= 15) then
@@ -1472,9 +1554,11 @@ CONTAINS
         endif
 
         if (compid == pcpointer%comp) then
+!CEG NOTE test case not using this bit -- jump to 'else'
            ! routers for sending to self
            ! setup router on second pass so rpartID is defined on both sides
            ! setup both routers at the same time
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4_sra')
            if (npc == 2) then
               if (OASIS_debug >= 15) then
                  write(nulprt,*) subname,' DEBUG self router between part ',pcpointer%rpartID,' and part ',pcpntpair%rpartID, &
@@ -1526,7 +1610,9 @@ CONTAINS
               endif
            endif
 
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_sra')
         else
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4_srb')
 
            call mct_router_init(pcpointer%comp,prism_part(pcpointer%rpartID)%gsmap, &
               mpi_comm_local,prism_router(pcpointer%routerID)%router)
@@ -1542,15 +1628,22 @@ CONTAINS
               endif
               call oasis_flush(nulprt)
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_srb')
 
         endif
 
      endif
+     if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_sr')
 
+#ifdef SPLIT
+!  endif   ! mapID
+#else
   endif   ! valid
+#endif
   enddo   ! npc
   enddo   ! prism_mcoupler
 
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n4g')
   !----------------------------------------------------------
   !> * Diagnostics for all couplers
   !----------------------------------------------------------
@@ -1575,6 +1668,7 @@ CONTAINS
      ENDDO
   ENDIF
 
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4g')
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4')
   call oasis_timer_stop('cpl_setup')
 
@@ -2064,7 +2158,6 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    !--- formats ---
    character(*),parameter :: subName = '(oasis_coupler_sMatReaddnc)'
-   character(*),parameter :: F01 = '("oasis_coupler_sMatReaddnc",1x,2(a,i10))'
 
 !-------------------------------------------------------------------------------
 !
@@ -2119,8 +2212,8 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       nj_o = dims(2)
    end if
 
-   if (OASIS_debug >= 2) write(nulprt,F01) "* matrix dims src x dst      : ",na,' x',nb
-   if (OASIS_debug >= 2) write(nulprt,F01) "* number of non-zero elements: ",ns
+   if (OASIS_debug >= 2) write(nulprt,*) subname," * matrix dims src x dst      : ",na,' x',nb
+   if (OASIS_debug >= 2) write(nulprt,*) subname," * number of non-zero elements: ",ns
 
  endif
  
@@ -2366,7 +2459,7 @@ subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
                deallocate(Snew,Rnew,Cnew,stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate new',status)
                bsize = 1.5 * bsize
-               if (OASIS_debug > 15) write(nulprt,F01) ' reallocate bsize to ',bsize
+               if (OASIS_debug > 15) write(nulprt,*) subname,' reallocate bsize to ',bsize
                allocate(Snew(nwgts,bsize),Rnew(bsize),Cnew(bsize),stat=status)
                if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
 
