@@ -1,0 +1,45 @@
+# This is a typical input file for OASIS3-MCT, using NetCDF 
+# format for restart input files. OASIS3-MCT reads in this file 
+# at run time. Don't hesitate to ask precisions or make 
+# suggestions (oasishelp@cerfacs.fr)
+#
+# Any line beginning with # is ignored. Blank lines are not allowed
+####################################################################
+ $NFIELDS 
+3
+ $END
+############################################
+ $RUNTIME 
+21600
+ $END
+############################################
+ $NLOGPRT 
+1 0
+ $END
+############################################
+ $STRINGS 
+FSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTED
+182 149 96 72 torc lmdz LAG=3600
+P 2 P 0 
+LOCTRANS CHECKIN MAPPING CHECKOUT 
+AVERAGE 
+INT=1
+map1.nc src bfb 
+INT=1
+####
+FSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTED
+96 72 182 149 lmdz torc LAG=3600
+P 0 P 2 
+LOCTRANS CHECKIN MAPPING CHECKOUT 
+ACCUMUL 
+INT=1
+map2.nc src bfb 
+INT=1
+####
+FSENDOC2 FSENDOC2 1 3600 1 av.nc OUTPUT
+torc torc
+LOCTRANS
+ACCUMUL 
+####
+ $END
+############################################

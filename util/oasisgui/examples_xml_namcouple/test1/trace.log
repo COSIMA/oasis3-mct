@@ -1,0 +1,85 @@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Application oasis3-mct
+Project  /space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test1.xml
+Date   Wed Feb 25 14:08:02 CET 2015
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Loading time : 0.437 s.
+Startup time :  1.777 s.
+
+@@@@@@@@ Process Tab 'Sum' @@@@@@@
+Local  use of XDRpy for project  test1 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+Only LOCTRANS transformation is possible for INPUT and OUTPUT coupling fields
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/process_summary.py is completed. 
+
+
+@@@@@@@@ Process Tab 'Config' @@@@@@@
+Local  use of XDRpy for project  test1 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+Only LOCTRANS transformation is possible for INPUT and OUTPUT coupling fields
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/write_namcouple.py is completed. 
+
+error copying "/space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test1" to "/space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test1/test1": "/space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/test1/trace.log": file name too long
+Saving Project As file /space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test1.xml 
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Application oasis3-mct
+Project  /space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test3.xml
+Date   Wed Feb 25 14:08:51 CET 2015
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@ Process Tab 'Main' @@@@@@@
+
+@@@@@@@@ Process Tab 'Gen' @@@@@@@
+
+@@@@@@@@ Process Tab 'Grids' @@@@@@@
+Local  use of XDRpy for project  test3 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/process_grids.py is completed. 
+
+
+@@@@@@@@ Process Tab 'Fld Name' @@@@@@@
+Local  use of XDRpy for project  test3 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+(['FSENDOCN', 'FSENDATM', 'FSENDOC2'], 'field_names_list')
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/process_fielddef.py is completed. 
+
+
+@@@@@@@@ Process Tab 'Fld status' @@@@@@@
+
+@@@@@@@@ Process Tab 'LAG' @@@@@@@
+
+@@@@@@@@ Process Tab 'Time' @@@@@@@
+
+@@@@@@@@ Process Tab 'Min/Max' @@@@@@@
+
+@@@@@@@@ Process Tab 'Blasold/new' @@@@@@@
+
+@@@@@@@@ Process Tab 'SCRIP' @@@@@@@
+
+@@@@@@@@ Process Tab 'MAP' @@@@@@@
+
+@@@@@@@@ Process Tab 'Cons' @@@@@@@
+
+@@@@@@@@ Process Tab 'Sum' @@@@@@@
+Local  use of XDRpy for project  test3 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+Only LOCTRANS transformation is possible for INPUT and OUTPUT coupling fields
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/process_summary.py is completed. 
+
+
+@@@@@@@@ Process Tab 'Config' @@@@@@@
+Local  use of XDRpy for project  test3 ( oasis3-mct )
+/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts
+XDRpy running for application :  oasis3-mct
+Only LOCTRANS transformation is possible for INPUT and OUTPUT coupling fields
+Script /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/oasis3-mct/scripts/write_namcouple.py is completed. 
+
+Saving Project in file /space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test3.xml 
+Quitting  - green only -

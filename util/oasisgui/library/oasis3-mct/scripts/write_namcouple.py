@@ -32,30 +32,6 @@ nam.writeLine( fieldsline )
 nam.writeLine( """ $END
 ############################################""")
 
-
-###########################
-# MODELS
-model_names_list=[]
-nam.writeLine( """ $NBMODEL """)
-model_list = getChildrenName("models")
-model_names_list=getListValue("model_names_list")
-
-modelline = str(len(model_list))
-
-for model in model_names_list:
-    modelline+=" "
-    modelline+=model
-    
-for model in getChildrenName("models"):
-    if getValue("maxunits",model) == "units_on" :
-         modelline+=" "
-         modelline+=getValue("nunit",model)
-
-nam.writeLine( modelline )
-nam.writeLine( """ $END
-############################################""")
-
-
 ###########################
 # RUNTIME
 nam.writeLine( """ $RUNTIME """)
@@ -256,6 +232,7 @@ for fields in getChildrenName("flddef"):
                            gridline+=tgt_name
 
 # Get the SEG and LAG values for the second line of STRING
+# If the field id INPUT or OUTPUT no LAG and no SEG
     if (field_label != "nothing"):
          for fields2 in getChildrenName("crs"):
              field_label2 = getValue(fields2,"crs")
@@ -642,7 +619,7 @@ nam.close()
 # Write the namcouple in a window of the interface
 totaltime=getValue("duration","runtime")
 gridline2=gridline
-namcoupleline="$NFIELDS \n"+fieldsline+"\n"+"$END \n"+"####"+"\n"+"$NBMODEL \n"+modelline+"\n"+"$END \n"+"####"+"\n"+"$RUNTIME \n"+totaltime+"\n"+"$END \n"+"####"+"\n"+"$NLOGPRT \n"+debugline+"\n"+"$END \n"+"####"+"\n"+"$STRINGS \n"+gridline2
+namcoupleline="$NFIELDS \n"+fieldsline+"\n"+"$END \n"+"####"+"\n"+"$RUNTIME \n"+totaltime+"\n"+"$END \n"+"####"+"\n"+"$NLOGPRT \n"+debugline+"\n"+"$END \n"+"####"+"\n"+"$STRINGS \n"+gridline2
 setValue(namcoupleline,"namcouplescript")
 
 #########################

@@ -107,32 +107,56 @@ for fields in getChildrenName("flddef"):
     if (field_label != "nothing"):
          src_name=getValue("srcgrid",fields)
          tgt_name=getValue("tgtgrid",fields)
-         if grid_array[src_name,"grddims"] == "dims_on":
-             gridline+="Source grid :"
-             gridline+=" "
-             gridline+=src_name
-             gridline+="\n"
-             gridline+="Dimensions :"
-             gridline+=" "
-             gridline+=grid_array[src_name,"ni"]+"x"+grid_array[src_name,"nj"]
-             gridline+="\n"
-             gridline+="Target grid :"
-             gridline+=" "
-             gridline+=tgt_name
-             gridline+="\n"
-             gridline+="Dimensions :"
-             gridline+=" "
-             gridline+=grid_array[tgt_name,"ni"]+"x"+grid_array[tgt_name,"nj"]
-             gridline+="\n"
-         else :
-             gridline+="Source grid :"
-             gridline+=" "
-             gridline+=src_name
-             gridline+="\n"
-             gridline+="Target grid :"
-             gridline+=" "
-             gridline+=tgt_name
-             gridline+="\n"
+         for fields2 in getChildrenName("crs"):
+             field_label2 = getValue(fields2,"crs")
+             if field_label == field_label2 :
+                  if (getValue("status",fields2) == "input"):
+                      gridline+=""
+                  if (getValue("status",fields2) == "output"):
+                      if grid_array[src_name,"grddims"] == "dims_on":
+                          gridline+="Source grid :"
+                          gridline+=" "
+                          gridline+=src_name
+                          gridline+="\n"
+                          gridline+="Dimensions :"
+                          gridline+=" "
+                          gridline+=grid_array[src_name,"ni"]+"x"+grid_array[src_name,"nj"]
+                          gridline+="\n"
+                          gridline+="Target grid :"
+                          gridline+=" "
+                          gridline+=src_name
+                          gridline+="\n"
+                          gridline+="Dimensions :"
+                          gridline+=" "
+                          gridline+=grid_array[src_name,"ni"]+"x"+grid_array[src_name,"nj"]
+                          gridline+="\n"
+                  if ((getValue("status",fields2) == "exported" or getValue("status",fields2) == "expout")):
+                      if (grid_array[src_name,"grddims"] == "dims_on"):
+                          gridline+="Source grid :"
+                          gridline+=" "
+                          gridline+=src_name
+                          gridline+="\n"
+                          gridline+="Dimensions :"
+                          gridline+=" "
+                          gridline+=grid_array[src_name,"ni"]+"x"+grid_array[src_name,"nj"]
+                          gridline+="\n"
+                          gridline+="Target grid :"
+                          gridline+=" "
+                          gridline+=tgt_name
+                          gridline+="\n"
+                          gridline+="Dimensions :"
+                          gridline+=" "
+                          gridline+=grid_array[tgt_name,"ni"]+"x"+grid_array[tgt_name,"nj"]
+                          gridline+="\n"
+                      else :
+                         gridline+="Source grid :"
+                         gridline+=" "
+                         gridline+=src_name
+                         gridline+="\n"
+                         gridline+="Target grid :"
+                         gridline+=" "
+                         gridline+=tgt_name
+                         gridline+="\n"
 
          for fields2 in getChildrenName("crs"):
              field_label2 = getValue(fields2,"crs")
@@ -172,124 +196,151 @@ for fields in getChildrenName("flddef"):
             gridline+="Field status: "+getValue("status",fields2).upper()
             gridline+="\n" 
 
-    for fields3 in getChildrenName("seqlag","defseqlag"):
-        field_label3 = getValue(fields3,"seqlag")
-        if field_label == field_label3 : 
-            if getValue("seq",fields3) == "seq_on" :
-                 gridline+=" " 
-                 gridline+="SEQ="+getValue("seq_fld",fields3)
-            if getValue("lag",fields3) == "lag_on" :
-                 gridline+=" " 
-                 gridline+="LAG="+getValue("lag_fld",fields3)
-            gridline+="\n"
+# Get the SEG and LAG values for the second line of STRING
+# If the field id INPUT or OUTPUT no LAG and no SEG
+    for fields2 in getChildrenName("crs"):
+        field_label2 = getValue(fields2,"crs")
+        if field_label == field_label2 :
+             if (getValue("status",fields2) == "exported" or getValue("status",fields2) == "expout"):
+                 for fields3 in getChildrenName("seqlag","defseqlag"):
+                     field_label3 = getValue(fields3,"seqlag")
+                     if field_label == field_label3 : 
+                         if getValue("seq",fields3) == "seq_on" :
+                             gridline+=" " 
+                             gridline+="SEQ="+getValue("seq_fld",fields3)
+                         if getValue("lag",fields3) == "lag_on" :
+                             gridline+=" " 
+                             gridline+="LAG="+getValue("lag_fld",fields3)
+                         gridline+="\n"
+             if (getValue("status",fields2) == "input"):
+                 gridline+=""
+             if (getValue("status",fields2) == "output") :
+                 gridline+="\n"  
     
 
 # Transformations done on the coupling fields
-    for fields2 in getChildrenName("time"):
-        field_label2 = getValue(fields2,"time")
-        if field_label == field_label2 :
-            if getValue("loctrans",fields2) == "loctrans_on" :
-                gridline+="Time transformation:"+getValue("loctransdef",fields2).upper()
-                gridline+="\n"
+    for fields100 in getChildrenName("crs"):
+        field_label100 = getValue(fields100,"crs")
+        if field_label == field_label100 :
+             if (getValue("status",fields100) == "exported" or getValue("status",fields100) == "expout"):
+                 for fields2 in getChildrenName("time"):
+                     field_label2 = getValue(fields2,"time")
+                     if field_label == field_label2 :
+                         if getValue("loctrans",fields2) == "loctrans_on" :
+                             gridline+="Time transformation:"+getValue("loctransdef",fields2).upper()
+                             gridline+="\n"
 
-    for fields2 in getChildrenName("checkinoutminmax"):
-        field_label2 = getValue(fields2,"checkinoutminmax")
-        if field_label == field_label2 :
-            if getValue("checkin",fields2) == "checkin_on" :
-                gridline+="Min and max of the field sent calculated"
-                gridline+="\n"
+                 for fields2 in getChildrenName("checkinoutminmax"):
+                     field_label2 = getValue(fields2,"checkinoutminmax")
+                     if field_label == field_label2 :
+                         if getValue("checkin",fields2) == "checkin_on" :
+                             gridline+="Min and max of the field sent calculated"
+                             gridline+="\n"
 
-    for fields2 in getChildrenName("checkinoutminmax"):
-        field_label2 = getValue(fields2,"checkinoutminmax")
-        if field_label == field_label2 :
-            if getValue("checkout",fields2) == "checkout_on" :
-                gridline+="Min and max of the received field calculated"
-                gridline+="\n"
+                 for fields2 in getChildrenName("checkinoutminmax"):
+                     field_label2 = getValue(fields2,"checkinoutminmax")
+                     if field_label == field_label2 :
+                         if getValue("checkout",fields2) == "checkout_on" :
+                             gridline+="Min and max of the received field calculated"
+                             gridline+="\n"
 
-    for fields2 in getChildrenName("multaddoldnew"):
-        field_label2 = getValue(fields2,"multaddoldnew")
-        if field_label == field_label2 :
-            if getValue("blasold",fields2) == "blasold_on" :
-                gridline+="Multiply by "+getValue("xmult_blso","blasold_on",fields2)+" the field sent"
-                gridline+="\n"
-                if getValue("xadd_blso","blasold_on",fields2) == "0." :
-                    gridline+=" "
-                else:
-                    gridline+="Add "+getValue("xadd_blso","blasold_on",fields2)+" to the field sent"
-                    gridline+="\n"
+                 for fields2 in getChildrenName("multaddoldnew"):
+                     field_label2 = getValue(fields2,"multaddoldnew")
+                     if field_label == field_label2 :
+                         if getValue("blasold",fields2) == "blasold_on" :
+                             gridline+="Multiply by "+getValue("xmult_blso","blasold_on",fields2)+" the field sent"
+                             gridline+="\n"
+                             if getValue("xadd_blso","blasold_on",fields2) == "0." :
+                                 gridline+=" "
+                             else:
+                                 gridline+="Add "+getValue("xadd_blso","blasold_on",fields2)+" to the field sent"
+                                 gridline+="\n"
 
-    for fields2 in getChildrenName("multaddoldnew"):
-        field_label2 = getValue(fields2,"multaddoldnew")
-        if field_label == field_label2 :
-            if getValue("blasnew",fields2) == "blasnew_on" :
-                gridline+="Multiply by "+getValue("xmult_blsn","blasnew_on",fields2)+" the received field"
-                gridline+="\n"
-                if getValue("xadd_blsn","blasnew_on",fields2) == "0." :
-                    gridline+=" "
-                else:
-                    gridline+="Add "+getValue("xadd_blsn","blasnew_on",fields2)+" to the received field"
-                    gridline+="\n"
-
-
-    for fields2 in getChildrenName("map"):
-        field_label2 = getValue(fields2,"map")
-        if field_label == field_label2 :
-            if getValue("mapremapping",fields2) == "mapping_on" :
-                gridline+="MAPPING is used with options: "+getValue("maploc",fields2)+" and "+getValue("mapstrategy",fields2)
-                gridline+="\n"
-
-    for fields2 in getChildrenName("interp"):
-        field_label2 = getValue(fields2,"interp")
-        if field_label == field_label2 :
-            if getValue("scrip",fields2) == "scrip_on" :
-                gridline+="SCRIPR is used: "
-                gridline+="\n"
-                if getValue("scriprinterp",fields2) == "distwgt" :
-                    gridline+="DISTWGT interpolation with "+getValue("nv_dist",fields2)+" neighbours"
-                    gridline+="\n"
-                if getValue("scriprinterp",fields2) == "gauswgt" :
-                    gridline+="GAUSWGT interpolation with "+getValue("nv_gaus",fields2)+" neighbours"
-                    gridline+="\n"
-                if getValue("scriprinterp",fields2) == "bilinear" :
-                    gridline+="BILINEAR interpolation"
-                    gridline+="\n"
-                if getValue("scriprinterp",fields2) == "bicubic" :
-                    gridline+="BICUBIC interpolation"
-                    gridline+="\n"
-                if getValue("scriprinterp",fields2) == "conserv_interp" :
-                    gridline+="CONSERVATIVE interpolation of: "
-                    gridline+="\n"
-                    if getValue("order_conserv",fields2) == "first_conserv" :
-                        gridline+= "FIRST ORDER"
-                        gridline+= "\n"
-                    elif getValue("order_conserv",fields2) == "second_conserv" :
-                        gridline+= "SECOND ORDER"
-                        gridline+= "\n"
-                    if getValue("norm_conserv",fields2) == "fracnnei_conserv" :
-                        gridline+= "using FRACNNEI option"
-                        gridline+= " "
-                    elif getValue("norm_conserv",fields2) == "fracarea_conserv" :
-                        gridline+= "FRACAREA"
-                        gridline+= " "
-                    elif getValue("norm_conserv",fields2) == "destarea_conserv" :
-                        gridline+= "DESTAREA"
-                        gridline+= " "
+                 for fields2 in getChildrenName("multaddoldnew"):
+                     field_label2 = getValue(fields2,"multaddoldnew")
+                     if field_label == field_label2 :
+                         if getValue("blasnew",fields2) == "blasnew_on" :
+                             gridline+="Multiply by "+getValue("xmult_blsn","blasnew_on",fields2)+" the received field"
+                             gridline+="\n"
+                             if getValue("xadd_blsn","blasnew_on",fields2) == "0." :
+                                 gridline+=" "
+                             else:
+                                 gridline+="Add "+getValue("xadd_blsn","blasnew_on",fields2)+" to the received field"
+                                 gridline+="\n"
 
 
-    for fields2 in getChildrenName("conservation"):
-        field_label2 = getValue(fields2,"conservation")
-        if field_label == field_label2 :
-            if getValue("conservopt",fields2) == "conserv_on" :
-                gridline+="Redistribution after interpolation (CONSERV)"
-                gridline+="\n"
-                gridline+= "with conserv option: "+getValue("conservstrategy",fields2).upper()
-                gridline+="\n"
-                if getValue("conservalgo",fields2) == "bfb_conserv_on" :
-                    gridline+="and bit-for-bit reproductibility option"
-                    gridline+="\n"
-                elif getValue("conservalgo",fields2) == "opt_conserv_on" :
-                    gridline+="and optimize option"
-                    gridline+="\n"
+                 for fields2 in getChildrenName("map"):
+                     field_label2 = getValue(fields2,"map")
+                     if field_label == field_label2 :
+                         if getValue("mapremapping",fields2) == "mapping_on" :
+                             gridline+="MAPPING is used with options: "+getValue("maploc",fields2)+" and "+getValue("mapstrategy",fields2)
+                             gridline+="\n"
+
+                 for fields2 in getChildrenName("interp"):
+                     field_label2 = getValue(fields2,"interp")
+                     if field_label == field_label2 :
+                         if getValue("scrip",fields2) == "scrip_on" :
+                             gridline+="SCRIPR is used: "
+                             gridline+="\n"
+                             if getValue("scriprinterp",fields2) == "distwgt" :
+                                 gridline+="DISTWGT interpolation with "+getValue("nv_dist",fields2)+" neighbours"
+                                 gridline+="\n"
+                             if getValue("scriprinterp",fields2) == "gauswgt" :
+                                 gridline+="GAUSWGT interpolation with "+getValue("nv_gaus",fields2)+" neighbours"
+                                 gridline+="\n"
+                             if getValue("scriprinterp",fields2) == "bilinear" :
+                                 gridline+="BILINEAR interpolation"
+                                 gridline+="\n"
+                             if getValue("scriprinterp",fields2) == "bicubic" :
+                                 gridline+="BICUBIC interpolation"
+                                 gridline+="\n"
+                             if getValue("scriprinterp",fields2) == "conserv_interp" :
+                                 gridline+="CONSERVATIVE interpolation of: "
+                                 gridline+="\n"
+                                 if getValue("order_conserv",fields2) == "first_conserv" :
+                                     gridline+= "FIRST ORDER"
+                                     gridline+= "\n"
+                                 elif getValue("order_conserv",fields2) == "second_conserv" :
+                                     gridline+= "SECOND ORDER"
+                                     gridline+= "\n"
+                                 if getValue("norm_conserv",fields2) == "fracnnei_conserv" :
+                                     gridline+= "using FRACNNEI option"
+                                     gridline+= " "
+                                 elif getValue("norm_conserv",fields2) == "fracarea_conserv" :
+                                     gridline+= "FRACAREA"
+                                     gridline+= " "
+                                 elif getValue("norm_conserv",fields2) == "destarea_conserv" :
+                                     gridline+= "DESTAREA"
+                                     gridline+= " "
+
+
+                 for fields2 in getChildrenName("conservation"):
+                     field_label2 = getValue(fields2,"conservation")
+                     if field_label == field_label2 :
+                         if getValue("conservopt",fields2) == "conserv_on" :
+                             gridline+="Redistribution after interpolation (CONSERV)"
+                             gridline+="\n"
+                             gridline+= "with conserv option: "+getValue("conservstrategy",fields2).upper()
+                             gridline+="\n"
+                             if getValue("conservalgo",fields2) == "bfb_conserv_on" :
+                                 gridline+="and bit-for-bit reproductibility option"
+                                 gridline+="\n"
+                             elif getValue("conservalgo",fields2) == "opt_conserv_on" :
+                                 gridline+="and optimize option"
+                                 gridline+="\n"
+             else : 
+                 print("Only LOCTRANS transformation is possible for INPUT and OUTPUT coupling fields") 
+                 for fields2 in getChildrenName("time"):
+                     field_label2 = getValue(fields2,"time")
+                     if field_label == field_label2 :
+                          if getValue("loctrans",fields2) == "loctrans_on" :
+                              gridline+="Time transformation"
+                              gridline+="\n"
+                              myvalue=""
+                              myvalue+= getValue("loctransdef",fields2)
+                              gridline+= myvalue.upper()
+                              gridline+=" "
+                              gridline+="\n" 
 
     if (field_label == "nothing" ):
         gridline+=""

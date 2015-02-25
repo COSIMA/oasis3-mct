@@ -48,8 +48,7 @@ More information can be found on the OASIS web site: https://oasis.enes.org
 This GUI was developed to create the configuration file (namcouple) of OASIS3-MCT.
 The configuration file contains all user defined information necessary to configure a
 particular coupled run. The first part of the file is devoted to general parameters
-such as the number
-of models involved in the simulation or the level of debugging.
+such as the runtime or the level of debugging.
 The second part gathers specific information
 on each coupling (or I/O) field, e.g. their coupling period, the list of transformations
 or interpolations to be performed by OASIS3-MCT.
@@ -83,12 +82,12 @@ level and the timing information printed by OASIS3-MCT.
 If grouped fields have to be defined (i.e. fields using the same configuration settings sent in a single communication) 
 the "Enable grouped field" must be activated.
 In this case a new tab "Group" will appear to define the different groups.
-Then the model components must be defined in the tab "Model", the grid characteristics of the coupling fields in
+Then the grid characteristics of the coupling fields in
 the "Grids" window, and the different names of the coupling fields (before and after transformations), grouped or not,
 in the tab "Fld Name".[] 
 Finally all characteristics and transformations associated to each coupling field (or grouped fields) have to be defined step 
 by step in the following windows. 
-If the first four tabs "Main", "Gen", "Model", “Grids” and "Fld Names" are not filled up and processed before the others, 
+If the first four tabs "Main", "Gen", “Grids” and "Fld Names" are not filled up and processed before the others, 
 it will not be possible to enter information about the coupling fields in the following windows.[] 
 At some point when filling the GUI or when closing it, the data of the GUI must be saved in an xml file which name
 is chosen by the user.
