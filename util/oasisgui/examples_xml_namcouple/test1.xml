@@ -18,8 +18,8 @@
                     <duration value="21600" />
                 </runtime>
                 <debug value="">
-                    <nlogprt value="none">
-                        <none value="" />
+                    <nlogprt value="ptr_1">
+                        <ptr_1 value="" />
                     </nlogprt>
                 </debug>
                 <timestat value="">
@@ -32,24 +32,6 @@
                     <mult_fields_name value="single" />
                 </generalgroup>
             </printruns>
-            <modeldef value="">
-                <mainmodelparam value="" />
-                <modelparam value="">
-                    <models value="">
-                        <item_1376581 value="model1">
-                            <maxunits value="units_off">
-                                <units_off value="" />
-                            </maxunits>
-                        </item_1376581>
-                        <item_1383366 value="model2">
-                            <maxunits value="units_off">
-                                <units_off value="" />
-                            </maxunits>
-                        </item_1383366>
-                    </models>
-                    <model_names_list value="model1;model2" />
-                </modelparam>
-            </modeldef>
             <grids value="">
                 <modelgrids value="" />
                 <defgrids value="">
@@ -388,22 +370,16 @@ MAPPING is used with options: src and bfb
 FSENDOC2-FSENDOC2:
 Source grid : torc
 Dimensions : 182x149
-Target grid : lmdz
-Dimensions : 96x72
+Target grid : torc
+Dimensions : 182x149
 Source grid periodical with  2 overlapping points
 Target grid periodical with  0 overlapping points 
 Coupling period=3600
 Restart file: av.nc
 Field status: OUTPUT
 
-Time transformation:ACCUMUL
-Min and max of the received field calculated
-Multiply by 1. the field sent
-Add 3 to the field sent
-Multiply by 10 the received field
-Add 1. to the received field
-SCRIPR is used: 
-BILINEAR interpolation
+Time transformation
+ACCUMUL 
 ********************************************************
 ********************************************************" />
                 </scriptsummary>
@@ -414,16 +390,12 @@ BILINEAR interpolation
 3
 $END 
 ####
-$NBMODEL 
-2 model1 model2
-$END 
-####
 $RUNTIME 
 21600
 $END 
 ####
 $NLOGPRT 
-0 0
+1 0
 $END 
 ####
 $STRINGS 

@@ -12,8 +12,8 @@
                     <duration value="21600" />
                 </runtime>
                 <debug value="">
-                    <nlogprt value="none">
-                        <none value="" />
+                    <nlogprt value="ptr_1">
+                        <ptr_1 value="" />
                     </nlogprt>
                 </debug>
                 <timestat value="">
@@ -26,24 +26,6 @@
                     <mult_fields_name value="single;INPUTGROUP;INPUTG2" />
                 </generalgroup>
             </printruns>
-            <modeldef value="">
-                <mainmodelparam value="" />
-                <modelparam value="">
-                    <models value="">
-                        <item_1376581 value="model1">
-                            <maxunits value="units_off">
-                                <units_off value="" />
-                            </maxunits>
-                        </item_1376581>
-                        <item_1383366 value="model2">
-                            <maxunits value="units_off">
-                                <units_off value="" />
-                            </maxunits>
-                        </item_1383366>
-                    </models>
-                    <model_names_list value="model1;model2" />
-                </modelparam>
-            </modeldef>
             <grids value="">
                 <modelgrids value="" />
                 <defgrids value="">
@@ -486,139 +468,12 @@
             </conservtransof>
             <summary value="">
                 <scriptsummary value="">
-                    <summaryscript value="******************************************************************
-*** Summary of the coupling fields and their transformations: 
-******************************************************************
-******************************************************************
-FSENDOCN-FRECVATM:
-Source grid : torc
-Dimensions : 182x149
-Target grid : lmdz
-Dimensions : 96x72
-Source grid periodical with  2 overlapping points
-Target grid periodical with  0 overlapping points 
-Coupling period=7200
-Restart file: rsto.nc
-Field status: EXPORTED
- LAG=3600
-Time transformation:AVERAGE
-Min and max of the field sent calculated
-Min and max of the received field calculated
-MAPPING is used with options: src and bfb
-********************************************************
-********************************************************
-FSENDATM-FRECVOCN:
-Source grid : lmdz
-Dimensions : 96x72
-Target grid : torc
-Dimensions : 182x149
-Source grid periodical with  0 overlapping points
-Target grid periodical with  2 overlapping points 
-Coupling period=3600
-Restart file: rsta.nc
-Field status: EXPORTED
- LAG=3600
-Time transformation:ACCUMUL
-Min and max of the field sent calculated
-Min and max of the received field calculated
-MAPPING is used with options: src and bfb
-********************************************************
-********************************************************
-FSENDOC2-FSENDOC2:
-Source grid : torc
-Dimensions : 182x149
-Target grid : lmdz
-Dimensions : 96x72
-Source grid periodical with  2 overlapping points
-Target grid periodical with  0 overlapping points 
-Coupling period=3600
-Restart file: av.nc
-Field status: OUTPUT
-
-Min and max of the received field calculated
-Multiply by 1. the field sent
-Add 3 to the field sent
-Multiply by 10 the received field
-Add 1. to the received field
-SCRIPR is used: 
-BILINEAR interpolation
-********************************************************
-********************************************************
-INPUTAT1:INPUTAT2:INPUTAT3-INPUTAT1:INPUTAT2:INPUTAT3
-Source grid : lmdz
-Dimensions : 96x72
-Target grid : lmdz
-Dimensions : 96x72
-Source grid periodical with  0 overlapping points
-Target grid periodical with  0 overlapping points 
-Coupling period=7200
-Restart file: av2.nc
-Field status: INPUT
-
-Min and max of the field sent calculated
-MAPPING is used with options: src and bfb
-********************************************************
-********************************************************
-INPUTOCN-INPUTOCN:
-Source grid : torc
-Dimensions : 182x149
-Target grid : torc
-Dimensions : 182x149
-Source grid periodical with  2 overlapping points
-Target grid periodical with  2 overlapping points 
-Coupling period=3600
-Restart file: av3.nc
-Field status: INPUT
-
-********************************************************
-********************************************************" />
+                    <summaryscript value="******************************************************************BREAKLINE*** Summary of the coupling fields and their transformations: BREAKLINE******************************************************************BREAKLINE******************************************************************BREAKLINEFSENDOCN-FRECVATM:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : lmdzBREAKLINEDimensions : 96x72BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: rsto.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:AVERAGEBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDATM-FRECVOCN:BREAKLINESource grid : lmdzBREAKLINEDimensions : 96x72BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: rsta.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:ACCUMULBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDOC2-FSENDOC2:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av.ncBREAKLINEField status: OUTPUTBREAKLINEBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3-INPUTAT1:INPUTAT2:INPUTAT3BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: av2.ncBREAKLINEField status: INPUTBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTOCN-INPUTOCN:BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av3.ncBREAKLINEField status: INPUTBREAKLINE********************************************************BREAKLINE********************************************************" />
                 </scriptsummary>
             </summary>
             <write value="">
                 <scriptnamcouple value="">
-                    <namcouplescript value="$NFIELDS 
-7
-$END 
-####
-$NBMODEL 
-2 model1 model2
-$END 
-####
-$RUNTIME 
-21600
-$END 
-####
-$NLOGPRT 
-0 0
-$END 
-####
-$STRINGS 
-FSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTED
-182 149 96 72 torc lmdz LAG=3600
-P 2 P 0 
-LOCTRANS CHECKIN MAPPING CHECKOUT 
-AVERAGE 
-INT=1
-map1.nc src bfb 
-INT=1
-####
-FSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTED
-96 72 182 149 lmdz torc LAG=3600
-P 0 P 2 
-LOCTRANS CHECKIN MAPPING CHECKOUT 
-ACCUMUL 
-INT=1
-map2.nc src bfb 
-INT=1
-####
-FSENDOC2 FSENDOC2 1 3600 0 av.nc OUTPUT
-torc torc
-####
-INPUTAT1:INPUTAT2:INPUTAT3 RECVAT1:RECVAT2:RECVAT3 1 7200 0 av2.nc INPUT
-####
-INPUTOCN INPUTOCN 1 3600 0 av3.nc INPUT
-####
- $END" />
+                    <namcouplescript value="$NFIELDS BREAKLINE7BREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE21600BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE1 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEFSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTEDBREAKLINE182 149 96 72 torc lmdz LAG=3600BREAKLINEP 2 P 0 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEAVERAGE BREAKLINEINT=1BREAKLINEmap1.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTEDBREAKLINE96 72 182 149 lmdz torc LAG=3600BREAKLINEP 0 P 2 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEACCUMUL BREAKLINEINT=1BREAKLINEmap2.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDOC2 FSENDOC2 1 3600 0 av.nc OUTPUTBREAKLINEtorc torcBREAKLINE####BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3 RECVAT1:RECVAT2:RECVAT3 1 7200 0 av2.nc INPUTBREAKLINE####BREAKLINEINPUTOCN INPUTOCN 1 3600 0 av3.nc INPUTBREAKLINE####BREAKLINE $END" />
                 </scriptnamcouple>
             </write>
         </oasis3-mct>
