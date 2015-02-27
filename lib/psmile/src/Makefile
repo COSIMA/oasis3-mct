@@ -87,6 +87,6 @@ mod_prism.o: mod_oasis_kinds.o mod_oasis_part.o mod_oasis_sys.o \
 	mod_oasis_getput_interface.o mod_oasis_parameters.o \
 	mod_oasis_grid.o mod_oasis_method.o mod_oasis_var.o
 mod_oasis.o: mod_oasis_kinds.o mod_oasis_part.o mod_oasis_sys.o \
-	mod_oasis_getput_interface.o mod_oasis_parameters.o \
+	mod_oasis_getput_interface.o mod_oasis_parameters.o mod_oasis_auxiliary_routines.o \
 	mod_oasis_grid.o mod_oasis_method.o mod_oasis_var.o
 
