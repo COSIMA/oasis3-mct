@@ -128,7 +128,9 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    !--- variables associated with local computation of global indices
    integer             :: commsize  ! size of local communicator
    type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
-   integer             :: l1,l2     ! generice indices for sort
+   integer             :: l1,l2,lsize ! generice indices for sort
+   integer,allocatable :: lsstart(:) ! local seg map info
+   integer,allocatable :: lscount(:) ! local seg map info
    logical             :: found     ! for sort
    integer             :: pe          ! Process ID of owning process
    integer             :: reclen      ! Length of Rbuf/Cbuf to be received
@@ -316,6 +318,47 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call oasis_abort()
    endif
 
+   lsize = 0
+   do n = 1,size(mygsmap%start)
+      if (mygsmap%pe_loc(n) == mytask) then
+         lsize=lsize+1
+      endif
+   enddo
+   allocate(lsstart(lsize),lscount(lsize),stat=status)
+   if (status /= 0) call mct_perr_die(subName,':: allocate Lsstart',status)
+
+   !----------------------------------------------------------------------------
+   !> * Initialize lsstart and lscount, the sorted list of local indices
+   !----------------------------------------------------------------------------
+   lsize = 0
+   do n = 1,size(mygsmap%start)
+      if (mygsmap%pe_loc(n) == mytask) then  ! on my pe
+         lsize=lsize+1
+         found = .false.
+         l1 = 1
+         do while (.not.found .and. l1 < lsize)         ! bubble sort copy
+            if (mygsmap%start(n) < lsstart(l1)) then
+               do l2 = lsize, l1+1, -1
+                  lsstart(l2) = lsstart(l2-1)
+                  lscount(l2) = lscount(l2-1)
+               enddo
+               found = .true.
+            else
+               l1 = l1 + 1
+            endif
+         enddo
+         lsstart(l1) = mygsmap%start(n)
+         lscount(l1) = mygsmap%length(n)
+      endif
+   enddo
+   do n = 1,lsize-1
+      if (lsstart(n) > lsstart(n+1)) then
+         write(nulprt,*) subname,estr,'lsstart not properly sorted'
+         call oasis_abort()
+      endif
+   enddo
+
+
    rsize = min(rbuf_size,ns)                     ! size of i/o chunks
    bsize = ((ns/commsize) + 1 ) * 1.2   ! local temporary buffer size
    if (ns == 0) then
@@ -402,9 +445,9 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          do m = 1,count(1)
             !--- which process owns this point?
             if (newdom == 'src') then
-               pe = get_cegindex(RReadData(m),mygsmap)
+               pe = get_cegindex(RReadData(m),mygsmap,lsstart,lscount)
             else if (newdom == 'dst') then
-               pe = get_cegindex(CReadData(m),mygsmap)
+               pe = get_cegindex(CReadData(m),mygsmap,lsstart,lscount)
             endif
             pesave(m) = pe
             
@@ -422,14 +465,15 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          do pe = 1, mpi_size_local
             cntrs(pe) = cntrs(pe-1) + cntrs(pe)
          end do
+         
 
          !--- decide which pe keeps each point
          do m = 1,count(1)
             !--- which process owns this point?
             if (newdom == 'src') then
-               pe = get_cegindex(RReadData(m),mygsmap)
+               pe = get_cegindex(RReadData(m),mygsmap,lsstart,lscount)
             else if (newdom == 'dst') then
-               pe = get_cegindex(CReadData(m),mygsmap)
+               pe = get_cegindex(CReadData(m),mygsmap,lsstart,lscount)
             endif
 
             pe = pesave(m)
@@ -635,7 +679,7 @@ end subroutine augment_arrays
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-integer function get_cegindex(index,mygsmap)
+integer function get_cegindex(index,mygsmap,starti,counti)
 
 ! !USES:
 
@@ -646,15 +690,18 @@ integer function get_cegindex(index,mygsmap)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
+   integer(IN) :: index       !< index to search
+   integer(IN) :: starti(:)   !< start list
+   integer(IN) :: counti(:)   !< count list
    type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
-   integer(IN) :: index       ! is this index in start/count list
 
 ! !EOP
 
+
    !--- local ---
-   integer(IN)    :: nl,nc,nr,ncprev 
+   integer(IN)    :: nl,nc,nr,ncprev
+   integer(IN)    :: lsize
    logical        :: stopnow
-   integer, save  :: prevnc = 1  ! Store previous found segment -- guess at 0 for forst call
 
    !--- formats ---
    character(*),parameter :: subName = '(get_cegindex) '
@@ -662,58 +709,35 @@ integer function get_cegindex(index,mygsmap)
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+!   call oasis_debug_enter(subname)
 
-! Need to search my version of GlobalSegMap to find which process owns this point
+   lsize = size(starti)
+   if (lsize < 1) then
+!     call oasis_debug_exit(subname)
+      return
+   endif
 
-  if (prevnc .gt. size(mygsmap%start)) then
-      prevnc=1
-  endif
-
-  ! First test if last time was correct
-  if (index .ge.mygsmap%start(prevnc) .and. index.le.mygsmap%start(prevnc) + mygsmap%length(prevnc)-1) then
-     get_cegindex = mygsmap%pe_loc(prevnc)
-     if ( OASIS_debug >= 40 ) then
-        write(nulprt,*) subname,'prevnc=',index,prevnc,mygsmap%start(prevnc),mygsmap%start(prevnc) + mygsmap%length(prevnc)-1
-        call oasis_flush(nulprt)
-     endif
-     return
-  endif
-
-
-! Can still use binary search
-
-   nl = 0                   ! Note use 0 and +1 in these two lines to save test of division by 2 later on
-   nr = mygsmap%ngseg+1     !
+   nl = 0
+   nr = lsize + 1
    nc = (nl+nr)/2
    stopnow = .false.
-!   write(nulprt,*) subname,mpi_rank_local, mygsmap%start(:)
-!   write(nulprt,*) subname,mpi_rank_local, mygsmap%length(:)
-   get_cegindex = -1
    do while (.not.stopnow)
-      if ( OASIS_debug >= 40 ) then
-         write(nulprt,'(a,7i7)') subname,mpi_rank_local, nl,nc,nr,index,mygsmap%start(nc), mygsmap%length(nc)
-      endif
-      if (index < mygsmap%start(nc)) then
+      if (index < starti(nc)) then
          nr = nc
-      elseif (index > (mygsmap%start(nc) + mygsmap%length(nc) - 1)) then
+      elseif (index > (starti(nc) + counti(nc) - 1)) then
          nl = nc
       else
          get_cegindex = mygsmap%pe_loc(nc)
 !        call oasis_debug_exit(subname)
-!      write(nulprt,*) subname,mpi_rank_local, 'Found'
-         prevnc = nc
          return
       endif
       ncprev = nc
       nc = (nl + nr)/2
-!      write(nulprt,*) subname,mpi_rank_local, 'loop',nc,ncprev, mygsmap%ngseg
-      if (nc == ncprev .or. nc < 1 .or. nc > mygsmap%ngseg) stopnow = .true.
+      if (nc == ncprev .or. nc < 1 .or. nc > lsize) stopnow = .true.
    enddo
 
-   if ( OASIS_debug >= 40 ) then
-      write(nulprt,'(2a,6i7)') subname,'cegindex=',get_cegindex,mpi_rank_local, nl,nc,nr,index
-   endif
 
+!   call oasis_debug_exit(subname)
 
 
 end function get_cegindex
