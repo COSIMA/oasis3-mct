@@ -129,9 +129,10 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
    integer             :: commsize  ! size of local communicator
    type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
    integer             :: l1,l2,lsize ! generice indices for sort
-   integer,allocatable :: lsstart(:) ! local seg map info
-   integer,allocatable :: lscount(:) ! local seg map info
-   logical             :: found     ! for sort
+   integer,allocatable :: lsstart(:)  ! local seg map info
+   integer,allocatable :: lscount(:)  ! local seg map info
+   integer,allocatable :: lspeloc(:)  ! local seg map info
+   logical             :: found       ! for sort
    integer             :: pe          ! Process ID of owning process
    integer             :: reclen      ! Length of Rbuf/Cbuf to be received
    integer             :: ierr        ! MPI error check
@@ -318,47 +319,6 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       call oasis_abort()
    endif
 
-   lsize = 0
-   do n = 1,size(mygsmap%start)
-      if (mygsmap%pe_loc(n) == mytask) then
-         lsize=lsize+1
-      endif
-   enddo
-   allocate(lsstart(lsize),lscount(lsize),stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: allocate Lsstart',status)
-
-   !----------------------------------------------------------------------------
-   !> * Initialize lsstart and lscount, the sorted list of local indices
-   !----------------------------------------------------------------------------
-   lsize = 0
-   do n = 1,size(mygsmap%start)
-      if (mygsmap%pe_loc(n) == mytask) then  ! on my pe
-         lsize=lsize+1
-         found = .false.
-         l1 = 1
-         do while (.not.found .and. l1 < lsize)         ! bubble sort copy
-            if (mygsmap%start(n) < lsstart(l1)) then
-               do l2 = lsize, l1+1, -1
-                  lsstart(l2) = lsstart(l2-1)
-                  lscount(l2) = lscount(l2-1)
-               enddo
-               found = .true.
-            else
-               l1 = l1 + 1
-            endif
-         enddo
-         lsstart(l1) = mygsmap%start(n)
-         lscount(l1) = mygsmap%length(n)
-      endif
-   enddo
-   do n = 1,lsize-1
-      if (lsstart(n) > lsstart(n+1)) then
-         write(nulprt,*) subname,estr,'lsstart not properly sorted'
-         call oasis_abort()
-      endif
-   enddo
-
-
    rsize = min(rbuf_size,ns)                     ! size of i/o chunks
    bsize = ((ns/commsize) + 1 ) * 1.2   ! local temporary buffer size
    if (ns == 0) then
@@ -377,7 +337,42 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
 
    cnt = 1
 
-   if (mytask== 0) then
+   if (mytask == 0) then
+
+      !----------------------------------------------------------------------------
+      !> * Sort gsmap; Initialize lsstart, lscount, and lspeloc
+      !----------------------------------------------------------------------------
+
+      lsize = size(mygsmap%start)
+      allocate(lsstart(lsize),lscount(lsize),lspeloc(lsize),stat=status)
+      if (status /= 0) call mct_perr_die(subName,':: allocate Lsstart',status)
+
+      do n = 1,size(mygsmap%start)
+         found = .false.
+         l1 = 1
+         do while (.not.found .and. l1 < n)         ! bubble sort copy
+            if (mygsmap%start(n) < lsstart(l1)) then
+               do l2 = n, l1+1, -1
+                  lsstart(l2) = lsstart(l2-1)
+                  lscount(l2) = lscount(l2-1)
+                  lspeloc(l2) = lspeloc(l2-1)
+               enddo
+               found = .true.
+            else
+               l1 = l1 + 1
+            endif
+         enddo
+         lsstart(l1) = mygsmap%start(n)
+         lscount(l1) = mygsmap%length(n)
+         lspeloc(l1) = mygsmap%pe_loc(n)
+      enddo
+      do n = 1,size(mygsmap%start)-1
+         if (lsstart(n) > lsstart(n+1)) then
+            write(nulprt,*) subname,estr,'lsstart not properly sorted'
+            call oasis_abort()
+         endif
+      enddo
+
       ! Allocate memory for reading and distributing data
       allocate(remaps(nwgts,rsize),stat=status)
       if (status /= 0) call mct_perr_die(subName,':: allocate remaps',status)
@@ -445,9 +440,9 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          do m = 1,count(1)
             !--- which process owns this point?
             if (newdom == 'src') then
-               pe = get_cegindex(RReadData(m),mygsmap,lsstart,lscount)
+               pe = get_cegindex(RReadData(m),lsstart,lscount,lspeloc)
             else if (newdom == 'dst') then
-               pe = get_cegindex(CReadData(m),mygsmap,lsstart,lscount)
+               pe = get_cegindex(CReadData(m),lsstart,lscount,lspeloc)
             endif
             pesave(m) = pe
             
@@ -471,9 +466,9 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          do m = 1,count(1)
             !--- which process owns this point?
             if (newdom == 'src') then
-               pe = get_cegindex(RReadData(m),mygsmap,lsstart,lscount)
+               pe = get_cegindex(RReadData(m),lsstart,lscount,lspeloc)
             else if (newdom == 'dst') then
-               pe = get_cegindex(CReadData(m),mygsmap,lsstart,lscount)
+               pe = get_cegindex(CReadData(m),lsstart,lscount,lspeloc)
             endif
 
             pe = pesave(m)
@@ -528,6 +523,8 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       end do
 
       ! Free memory used during the distribution
+      deallocate(lsstart,lscount,lspeloc, stat=status)
+      if (status /= 0) call mct_perr_die(subName,':: deallocate lsstart',status)
       deallocate(pesave, stat=status)
       if (status /= 0) call mct_perr_die(subName,':: deallocate pesave',status)
       deallocate(SReadData,RReadData,CReadData, stat=status)
@@ -539,7 +536,7 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
       deallocate(remaps, stat=status)
       if (status /= 0) call mct_perr_die(subName,':: deallocate remaps',status)
 
-   else
+   else   ! mytask == 0
    
       call oasis_mpi_recv(reclen, 0, 4000, mpicom, subName//" MPI in reclen recv")
       ! Check we haven't now had the last data
@@ -562,7 +559,7 @@ subroutine ceg_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
          call oasis_mpi_recv(reclen, 0, 4000, mpicom, subName//" MPI in reclen recv")
       end do
 
-   endif
+   endif   ! mytask == 0
 
    ! Fix cnt to be the length of the array
    cnt = cnt-1
@@ -679,7 +676,7 @@ end subroutine augment_arrays
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-integer function get_cegindex(index,mygsmap,starti,counti)
+integer function get_cegindex(index,starti,counti,peloci)
 
 ! !USES:
 
@@ -693,7 +690,7 @@ integer function get_cegindex(index,mygsmap,starti,counti)
    integer(IN) :: index       !< index to search
    integer(IN) :: starti(:)   !< start list
    integer(IN) :: counti(:)   !< count list
-   type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
+   integer(IN) :: peloci(:)   !< pe list
 
 ! !EOP
 
@@ -727,7 +724,7 @@ integer function get_cegindex(index,mygsmap,starti,counti)
       elseif (index > (starti(nc) + counti(nc) - 1)) then
          nl = nc
       else
-         get_cegindex = mygsmap%pe_loc(nc)
+         get_cegindex = peloci(nc)
 !        call oasis_debug_exit(subname)
          return
       endif
