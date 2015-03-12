@@ -1386,17 +1386,17 @@ CONTAINS
            ! to support higher order mapping
            !-------------------------------
            if (smatread_method == "ceg") then
-              call oasis_timer_start('cpl_setup_smatrd_ceg')
+              call oasis_timer_start('smatrd_ceg')
               call ceg_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
                  trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
-              call oasis_timer_stop('cpl_setup_smatrd_ceg')
+              call oasis_timer_stop('smatrd_ceg')
            else
-              call oasis_timer_start('cpl_setup_smatrd_orig')
+              call oasis_timer_start('smatrd_orig')
               call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
                  trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
-              call oasis_timer_stop('cpl_setup_smatrd_orig')
+              call oasis_timer_stop('smatrd_orig')
            endif
-           call oasis_timer_start('cpl_setup_sminit')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_sminit')
            prism_mapper(mapID)%nwgts = nwgts
            allocate(prism_mapper(mapID)%sMatP(nwgts))
            do n = 1,nwgts
@@ -1405,7 +1405,7 @@ CONTAINS
               call mct_sMat_Clean(sMati(n))
            enddo
            deallocate(sMati)
-           call oasis_timer_stop('cpl_setup_sminit')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_sminit')
            if (local_timers_on) call oasis_timer_start('cpl_setup_n4e')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
