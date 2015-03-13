@@ -7,6 +7,7 @@ MODULE mod_oasis_advance
     USE mod_oasis_data
     USE mod_oasis_parameters
     USE mod_oasis_coupler
+    USE mod_oasis_map
     USE mod_oasis_part
     USE mod_oasis_timer
     USE mod_oasis_var
