@@ -289,7 +289,7 @@ MODULE mod_oasis_auxiliary_routines
   END SUBROUTINE oasis_get_intracomm
 !----------------------------------------------------------------------
 
-!> Return the number of namcouple couplings for a variable
+!> OASIS user query for the number of unique couplings associated with a variable
 
   SUBROUTINE oasis_get_ncpl(varid, ncpl, kinfo)
 
@@ -334,7 +334,7 @@ MODULE mod_oasis_auxiliary_routines
   END SUBROUTINE oasis_get_ncpl
 !---------------------------------------------------------------------
 
-!> Returns the coupling periods for a given variable
+!> OASIS user query for the coupling periods for a given variable
 
   SUBROUTINE oasis_get_freqs(varid, mop, ncpl, cpl_freqs, kinfo)
 
@@ -405,7 +405,7 @@ MODULE mod_oasis_auxiliary_routines
   END SUBROUTINE oasis_get_freqs
 !---------------------------------------------------------------------
 
-!> Return kinfo code indicating type of action carried out for a variable at the specified time
+!> OASIS user query to indicate put return code expected at a specified time for a given variable
 
   SUBROUTINE oasis_put_inquire(varid,msec,kinfo)
 

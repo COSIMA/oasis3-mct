@@ -69,7 +69,7 @@ CONTAINS
 
 !------------------------------------------------------------
 
-!> Routine to generate a mapping data via a direct SCRIP call
+!> Routine to generate mapping weights data via a direct SCRIP call
 
 !> This routine reads in grid data from files and passes that data
 !> to SCRIP.  Mapping weights are generated and written to a file.
@@ -916,24 +916,23 @@ end function check_myindex
 !>     a low memory method and then scatter to all pes using a smart method
 !>     where only select data is sent to tasks.  Based on the sMatReaddnc method 
 !>    from CESM1.0.3
-!
 ! !REMARKS:
 !>   This routine leverages gsmaps to determine scatter pattern
-!
+!>
 !>   The scatter is implemented via the root task reading the data and
 !>     then determining which task gets which weights from the gsmap.
 !>     The root the sends specific data to each task.
-!
+!>
 !>   The algorithm to determine which task a weigth belongs to involves
-!>     checking the task ownershop for a given global index.
-!
+!>     checking the task ownership for a given global index.
+!>
 !>   The local buffer sizes are estimated up front based on ngridcell/npes
 !>     plus 20% (see 1.2 below).  If the local buffer size fills up, then
-!>     the buffer is reallocated 50% large (see 1.5 below) and the fill
+!>     the buffer is reallocated 50% larger (see 1.5 below) and the fill
 !>     continues.  The idea is to trade off memory reallocation and copy
 !>     with memory usage.  1.2 and 1.5 are arbitary, other values may
 !>     result in better performance.
-!
+!>
 !>   Once all the matrix weights have been read, the sMat is initialized,
 !>     the values from the buffers are copied in, and everything is deallocated.
 !
