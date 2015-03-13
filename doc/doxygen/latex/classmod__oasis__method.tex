@@ -13,20 +13,6 @@ subroutine, public \hyperlink{classmod__oasis__method_a9d642dd3ca229a1b957bc3c92
 \begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user init method. \end{DoxyCompactList}\item 
 subroutine, public \hyperlink{classmod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{oasis\+\_\+terminate} (kinfo)
 \begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user finalize method. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_ae5f78b3c9b89a40c3a9e20063ccd69fd}{oasis\+\_\+get\+\_\+localcomm} (localcomm, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user query for the local M\+P\+I communicator. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a3edf1cd01a0765eba643d0cecd71814e}{oasis\+\_\+set\+\_\+couplcomm} (localcomm, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user call to specify a local communicator. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a50dc6d05005689e3b4e3831e92a63e30}{oasis\+\_\+create\+\_\+couplcomm} (icpl, allcomm, cplcomm, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user call to create a new communicator. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a8f11010f5ff62cbb10468b8a5df2685c}{oasis\+\_\+get\+\_\+debug} (\hyperlink{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{debug}, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface to query debug level. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a92d2b8f49bb31c638f59fc45ec5d1f4c}{oasis\+\_\+set\+\_\+debug} (\hyperlink{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{debug}, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface to set debug level. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a3fd0bd0dd8d7274faea9b12eacd1e7a8}{oasis\+\_\+get\+\_\+intercomm} (new\+\_\+comm, cdnam, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface to establish an intercomm communicator between the root of two models. \end{DoxyCompactList}\item 
-subroutine, public \hyperlink{classmod__oasis__method_a691517fc5a11d701664061a7dc5bcb83}{oasis\+\_\+get\+\_\+intracomm} (new\+\_\+comm, cdnam, kinfo)
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface to establish an intracomm communicator between the root of two models. \end{DoxyCompactList}\item 
 subroutine, public \hyperlink{classmod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{oasis\+\_\+enddef} (kinfo)
 \begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface specifying the O\+A\+S\+I\+S definition phase is complete. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Private Member Functions}
@@ -64,36 +50,7 @@ Local method to compute each models' global task ids, exists for reuse in enddef
 
 
 
-Definition at line 1042 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a50dc6d05005689e3b4e3831e92a63e30}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+create\+\_\+couplcomm@{oasis\+\_\+create\+\_\+couplcomm}}
-\index{oasis\+\_\+create\+\_\+couplcomm@{oasis\+\_\+create\+\_\+couplcomm}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+create\+\_\+couplcomm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+create\+\_\+couplcomm (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{icpl, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{allcomm, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{cplcomm, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a50dc6d05005689e3b4e3831e92a63e30}
-
-
-O\+A\+S\+I\+S user call to create a new communicator. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em icpl} & coupling process flag\\
-\hline
-\mbox{\tt in}  & {\em allcomm} & input M\+P\+I communicator\\
-\hline
-\mbox{\tt out}  & {\em cplcomm} & reduced M\+P\+I communicator\\
-\hline
-\mbox{\tt in,out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 695 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 783 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 \hypertarget{classmod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+enddef@{oasis\+\_\+enddef}}
 \index{oasis\+\_\+enddef@{oasis\+\_\+enddef}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
@@ -129,105 +86,7 @@ O\+A\+S\+I\+S user interface specifying the O\+A\+S\+I\+S definition phase is co
 \end{DoxyItemize}
 \end{DoxyItemize}
 
-Definition at line 877 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a8f11010f5ff62cbb10468b8a5df2685c}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+get\+\_\+debug@{oasis\+\_\+get\+\_\+debug}}
-\index{oasis\+\_\+get\+\_\+debug@{oasis\+\_\+get\+\_\+debug}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+get\+\_\+debug}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+get\+\_\+debug (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{debug, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a8f11010f5ff62cbb10468b8a5df2685c}
-
-
-O\+A\+S\+I\+S user interface to query debug level. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt out}  & {\em debug} & debug level\\
-\hline
-\mbox{\tt in,out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 741 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a3fd0bd0dd8d7274faea9b12eacd1e7a8}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+get\+\_\+intercomm@{oasis\+\_\+get\+\_\+intercomm}}
-\index{oasis\+\_\+get\+\_\+intercomm@{oasis\+\_\+get\+\_\+intercomm}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+get\+\_\+intercomm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+get\+\_\+intercomm (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{new\+\_\+comm, }
-\item[{character(len=$\ast$), intent(in)}]{cdnam, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a3fd0bd0dd8d7274faea9b12eacd1e7a8}
-
-
-O\+A\+S\+I\+S user interface to establish an intercomm communicator between the root of two models. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt out}  & {\em new\+\_\+comm} & out M\+P\+I communicator\\
-\hline
-\mbox{\tt in}  & {\em cdnam} & other model name to link with\\
-\hline
-\mbox{\tt out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 793 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a691517fc5a11d701664061a7dc5bcb83}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+get\+\_\+intracomm@{oasis\+\_\+get\+\_\+intracomm}}
-\index{oasis\+\_\+get\+\_\+intracomm@{oasis\+\_\+get\+\_\+intracomm}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+get\+\_\+intracomm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+get\+\_\+intracomm (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{new\+\_\+comm, }
-\item[{character(len=$\ast$), intent(in)}]{cdnam, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a691517fc5a11d701664061a7dc5bcb83}
-
-
-O\+A\+S\+I\+S user interface to establish an intracomm communicator between the root of two models. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt out}  & {\em new\+\_\+comm} & output M\+P\+I communicator\\
-\hline
-\mbox{\tt in}  & {\em cdnam} & other model name\\
-\hline
-\mbox{\tt out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 847 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_ae5f78b3c9b89a40c3a9e20063ccd69fd}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+get\+\_\+localcomm@{oasis\+\_\+get\+\_\+localcomm}}
-\index{oasis\+\_\+get\+\_\+localcomm@{oasis\+\_\+get\+\_\+localcomm}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+get\+\_\+localcomm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+get\+\_\+localcomm (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{localcomm, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_ae5f78b3c9b89a40c3a9e20063ccd69fd}
-
-
-O\+A\+S\+I\+S user query for the local M\+P\+I communicator. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt out}  & {\em localcomm} & M\+P\+I communicator\\
-\hline
-\mbox{\tt in,out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 625 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 618 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 \hypertarget{classmod__oasis__method_a9d642dd3ca229a1b957bc3c92b33c356}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}}
 \index{oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
@@ -276,53 +135,7 @@ O\+A\+S\+I\+S user init method.
 \item Diagnostics 
 \end{DoxyItemize}
 
-Definition at line 51 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a3edf1cd01a0765eba643d0cecd71814e}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+set\+\_\+couplcomm@{oasis\+\_\+set\+\_\+couplcomm}}
-\index{oasis\+\_\+set\+\_\+couplcomm@{oasis\+\_\+set\+\_\+couplcomm}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+set\+\_\+couplcomm}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+set\+\_\+couplcomm (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{localcomm, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a3edf1cd01a0765eba643d0cecd71814e}
-
-
-O\+A\+S\+I\+S user call to specify a local communicator. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em localcomm} & M\+P\+I communicator\\
-\hline
-\mbox{\tt in,out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 654 of file mod\+\_\+oasis\+\_\+method.\+F90.
-
-\hypertarget{classmod__oasis__method_a92d2b8f49bb31c638f59fc45ec5d1f4c}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+set\+\_\+debug@{oasis\+\_\+set\+\_\+debug}}
-\index{oasis\+\_\+set\+\_\+debug@{oasis\+\_\+set\+\_\+debug}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
-\subsubsection[{oasis\+\_\+set\+\_\+debug}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+set\+\_\+debug (
-\begin{DoxyParamCaption}
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{debug, }
-\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
-\end{DoxyParamCaption}
-)}}\label{classmod__oasis__method_a92d2b8f49bb31c638f59fc45ec5d1f4c}
-
-
-O\+A\+S\+I\+S user interface to set debug level. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em debug} & debug level\\
-\hline
-\mbox{\tt in,out}  & {\em kinfo} & return code \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 765 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 44 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 \hypertarget{classmod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+terminate@{oasis\+\_\+terminate}}
 \index{oasis\+\_\+terminate@{oasis\+\_\+terminate}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
@@ -347,7 +160,7 @@ O\+A\+S\+I\+S user finalize method.
 \item Write S\+U\+C\+C\+E\+S\+S\+F\+U\+L R\+U\+N 
 \end{DoxyItemize}
 
-Definition at line 562 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 555 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 
 
@@ -357,17 +170,17 @@ Definition at line 562 of file mod\+\_\+oasis\+\_\+method.\+F90.
 \subsubsection[{debug}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+method\+::debug =1\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}
 
 
-Definition at line 41 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 34 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 \hypertarget{classmod__oasis__method_a2d387aae5e884be0aa69d640a7d3b49f}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!lg\+\_\+mpiflag@{lg\+\_\+mpiflag}}
 \index{lg\+\_\+mpiflag@{lg\+\_\+mpiflag}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
 \subsubsection[{lg\+\_\+mpiflag}]{\setlength{\rightskip}{0pt plus 5cm}logical, save mod\+\_\+oasis\+\_\+method\+::lg\+\_\+mpiflag\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__method_a2d387aae5e884be0aa69d640a7d3b49f}
 
 
-Definition at line 43 of file mod\+\_\+oasis\+\_\+method.\+F90.
+Definition at line 36 of file mod\+\_\+oasis\+\_\+method.\+F90.
 
 
 
 The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__method_8_f90}{mod\+\_\+oasis\+\_\+method.\+F90}\end{DoxyCompactItemize}
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+ceg15a/lib/psmile/src/\hyperlink{mod__oasis__method_8_f90}{mod\+\_\+oasis\+\_\+method.\+F90}\end{DoxyCompactItemize}

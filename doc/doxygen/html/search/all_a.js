@@ -31,6 +31,8 @@ var searchData=
   ['mod_5foasis_5fioshr_2ef90',['mod_oasis_ioshr.F90',['../mod__oasis__ioshr_8_f90.html',1,'']]],
   ['mod_5foasis_5fkinds',['mod_oasis_kinds',['../classmod__oasis__kinds.html',1,'']]],
   ['mod_5foasis_5fkinds_2ef90',['mod_oasis_kinds.F90',['../mod__oasis__kinds_8_f90.html',1,'']]],
+  ['mod_5foasis_5fmap',['mod_oasis_map',['../classmod__oasis__map.html',1,'']]],
+  ['mod_5foasis_5fmap_2ef90',['mod_oasis_map.F90',['../mod__oasis__map_8_f90.html',1,'']]],
   ['mod_5foasis_5fmem',['mod_oasis_mem',['../classmod__oasis__mem.html',1,'']]],
   ['mod_5foasis_5fmem_2ef90',['mod_oasis_mem.F90',['../mod__oasis__mem_8_f90.html',1,'']]],
   ['mod_5foasis_5fmethod',['mod_oasis_method',['../classmod__oasis__method.html',1,'']]],

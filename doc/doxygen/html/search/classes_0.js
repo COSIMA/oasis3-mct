@@ -10,6 +10,7 @@ var searchData=
   ['mod_5foasis_5fio',['mod_oasis_io',['../classmod__oasis__io.html',1,'']]],
   ['mod_5foasis_5fioshr',['mod_oasis_ioshr',['../classmod__oasis__ioshr.html',1,'']]],
   ['mod_5foasis_5fkinds',['mod_oasis_kinds',['../classmod__oasis__kinds.html',1,'']]],
+  ['mod_5foasis_5fmap',['mod_oasis_map',['../classmod__oasis__map.html',1,'']]],
   ['mod_5foasis_5fmem',['mod_oasis_mem',['../classmod__oasis__mem.html',1,'']]],
   ['mod_5foasis_5fmethod',['mod_oasis_method',['../classmod__oasis__method.html',1,'']]],
   ['mod_5foasis_5fmpi',['mod_oasis_mpi',['../classmod__oasis__mpi.html',1,'']]],
