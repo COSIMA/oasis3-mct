@@ -948,6 +948,7 @@ contains
                 if (OASIS_debug >= 15) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' NOT READY'
                 endif
+                 kinfo=OASIS_Waitgroup
              else
                 if (OASIS_debug >= 15) then
                    write(nulprt,*) subname,' at ',msec,mseclag,' STAT: ',nf,' READY'
