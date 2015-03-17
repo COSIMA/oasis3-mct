@@ -17,6 +17,7 @@ MODULE mod_oasis
   USE mod_oasis_kinds  ,ONLY: ip_intwp_p
 
   USE mod_oasis_parameters
+  USE mod_oasis_namcouple
 
   USE mod_oasis_method ,ONLY: oasis_init_comp    
   USE mod_oasis_method ,ONLY: oasis_terminate

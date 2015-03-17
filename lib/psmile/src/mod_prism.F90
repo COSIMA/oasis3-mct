@@ -14,6 +14,7 @@ module mod_prism
    use mod_oasis_kinds  ,only: ip_intwp_p
 
    use mod_oasis_parameters
+   USE mod_oasis_namcouple
 
    use mod_oasis_method ,only: prism_init_comp_proto     => oasis_init_comp
    use mod_oasis_method ,only: prism_terminate_proto     => oasis_terminate
