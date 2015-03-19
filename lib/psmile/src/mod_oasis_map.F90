@@ -1614,6 +1614,7 @@ integer function get_cegindex(index,starti,counti,peloci)
 !-------------------------------------------------------------------------------
 !   call oasis_debug_enter(subname)
 
+   get_cegindex = -99
    lsize = size(starti)
    if (lsize < 1) then
 !     call oasis_debug_exit(subname)
