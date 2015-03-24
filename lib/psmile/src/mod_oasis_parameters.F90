@@ -25,9 +25,9 @@ MODULE mod_oasis_parameters
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_NotDef      = -2 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_NotDef      = PRISM_NotDef
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Var_Uncpl   = -1
-  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Out         = 14 
+  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Out         = 20
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Out         = PRISM_Out
-  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_In          = 15
+  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_In          = 21
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_In          = PRISM_In
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_InOut       = 2 
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_InOut       = PRISM_InOut
@@ -53,6 +53,8 @@ MODULE mod_oasis_parameters
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_RecvOut     = PRISM_RecvOut
   INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_FromRestOut = 13
   INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_FromRestOut = PRISM_FromRestOut
+  INTEGER (kind=ip_intwp_p), PARAMETER :: PRISM_Waitgroup   = 14
+  INTEGER (kind=ip_intwp_p), PARAMETER :: OASIS_Waitgroup   = PRISM_Waitgroup
 
 !-----Coupler Comm Status
 

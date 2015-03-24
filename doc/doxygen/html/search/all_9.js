@@ -19,7 +19,7 @@ var searchData=
   ['lmapp',['lmapp',['../classmod__oasis__namcouple.html#a8eca7c715a39c523e00ed2be0612950d',1,'mod_oasis_namcouple']]],
   ['lncdfgrd',['lncdfgrd',['../classmod__oasis__namcouple.html#a5d6add8b958acc8b865b898d9e54ac73',1,'mod_oasis_namcouple']]],
   ['lncdfrst',['lncdfrst',['../classmod__oasis__namcouple.html#a645168dae20a0c24786c3e6dcea9f2ab',1,'mod_oasis_namcouple']]],
-  ['loc',['loc',['../structmod__oasis__coupler_1_1prism__mapper__type.html#a23c2df7387be68804d75095c47e59b69',1,'mod_oasis_coupler::prism_mapper_type']]],
+  ['loc',['loc',['../structmod__oasis__map_1_1prism__mapper__type.html#a37a969cc8b9d9234e6e99c6d3ef144ad',1,'mod_oasis_map::prism_mapper_type']]],
   ['lon',['lon',['../structmod__oasis__grid_1_1prism__grid__type.html#a4f7fb8a71335506209709cfbe939ef7b',1,'mod_oasis_grid::prism_grid_type']]],
   ['lsubg',['lsubg',['../classmod__oasis__namcouple.html#acda1605129987d656360e1ed81e8d199',1,'mod_oasis_namcouple']]],
   ['lsurf',['lsurf',['../classmod__oasis__namcouple.html#a902fe007f6c2505858bf72dbc64e43a2',1,'mod_oasis_namcouple']]],

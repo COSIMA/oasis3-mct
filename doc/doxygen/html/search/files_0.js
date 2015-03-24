@@ -10,6 +10,7 @@ var searchData=
   ['mod_5foasis_5fio_2ef90',['mod_oasis_io.F90',['../mod__oasis__io_8_f90.html',1,'']]],
   ['mod_5foasis_5fioshr_2ef90',['mod_oasis_ioshr.F90',['../mod__oasis__ioshr_8_f90.html',1,'']]],
   ['mod_5foasis_5fkinds_2ef90',['mod_oasis_kinds.F90',['../mod__oasis__kinds_8_f90.html',1,'']]],
+  ['mod_5foasis_5fmap_2ef90',['mod_oasis_map.F90',['../mod__oasis__map_8_f90.html',1,'']]],
   ['mod_5foasis_5fmem_2ef90',['mod_oasis_mem.F90',['../mod__oasis__mem_8_f90.html',1,'']]],
   ['mod_5foasis_5fmethod_2ef90',['mod_oasis_method.F90',['../mod__oasis__method_8_f90.html',1,'']]],
   ['mod_5foasis_5fmpi_2ef90',['mod_oasis_mpi.F90',['../mod__oasis__mpi_8_f90.html',1,'']]],

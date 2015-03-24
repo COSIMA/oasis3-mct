@@ -1,4 +1,4 @@
-!> @mainpage Oasis3-MCT Version 3.0: October, 2014
+!> @mainpage Oasis3-MCT Version 3.0: March, 2015
 !> This provides documentation of the Oasis3-MCT implementation for developers.
 !> A separate Oasis3-MCT User Guide is available for Oasis users.
 
@@ -17,18 +17,10 @@ MODULE mod_oasis
   USE mod_oasis_kinds  ,ONLY: ip_intwp_p
 
   USE mod_oasis_parameters
-
-  USE mod_oasis_namcouple ,ONLY: namflddti
+  USE mod_oasis_namcouple
 
   USE mod_oasis_method ,ONLY: oasis_init_comp    
   USE mod_oasis_method ,ONLY: oasis_terminate
-  USE mod_oasis_method ,ONLY: oasis_get_localcomm
-  USE mod_oasis_method ,ONLY: oasis_set_couplcomm
-  USE mod_oasis_method ,ONLY: oasis_create_couplcomm
-  USE mod_oasis_method ,ONLY: oasis_get_intracomm
-  USE mod_oasis_method ,ONLY: oasis_get_intercomm 
-  USE mod_oasis_method ,ONLY: oasis_set_debug     
-  USE mod_oasis_method ,ONLY: oasis_get_debug     
   USE mod_oasis_method ,ONLY: oasis_enddef        
 
   USE mod_oasis_part   ,ONLY: oasis_def_partition 
@@ -46,6 +38,13 @@ MODULE mod_oasis
   USE mod_oasis_grid   ,ONLY: oasis_write_area          
   USE mod_oasis_grid   ,ONLY: oasis_terminate_grids_writing 
 
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_get_localcomm
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_set_couplcomm
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_create_couplcomm
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_get_intracomm
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_get_intercomm 
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_set_debug     
+  USE mod_oasis_auxiliary_routines ,ONLY: oasis_get_debug     
   USE mod_oasis_auxiliary_routines, ONLY: oasis_get_ncpl
   USE mod_oasis_auxiliary_routines, ONLY: oasis_get_freqs
   USE mod_oasis_auxiliary_routines, ONLY: oasis_put_inquire

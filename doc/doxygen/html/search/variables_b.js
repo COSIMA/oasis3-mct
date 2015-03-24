@@ -28,8 +28,6 @@ var searchData=
   ['nammapfil',['nammapfil',['../classmod__oasis__namcouple.html#a9fc6ac674a8cfa68d9d15ad13213e21d',1,'mod_oasis_namcouple']]],
   ['nammaploc',['nammaploc',['../classmod__oasis__namcouple.html#a7316d7d322da7cf10f315e38c145ebbb',1,'mod_oasis_namcouple']]],
   ['nammapopt',['nammapopt',['../classmod__oasis__namcouple.html#ad2554b4881fa63780dd5e6fe78d705ef',1,'mod_oasis_namcouple']]],
-  ['nammodnam',['nammodnam',['../classmod__oasis__namcouple.html#a4b17296f706edcb9695f25babe240f23',1,'mod_oasis_namcouple']]],
-  ['namnmodels',['namnmodels',['../classmod__oasis__namcouple.html#ab94a99d4801cf5a16beaa5ca3bb41046',1,'mod_oasis_namcouple']]],
   ['namnn2sort',['namnn2sort',['../classmod__oasis__namcouple.html#a0ace7c451d8658759b9c8d871926a76e',1,'mod_oasis_namcouple']]],
   ['namrstfil',['namrstfil',['../classmod__oasis__namcouple.html#a54f4b8262f809a20928092782bc78345',1,'mod_oasis_namcouple']]],
   ['namruntim',['namruntim',['../classmod__oasis__namcouple.html#a14505eaa91b2c8ba308c63ff78652206',1,'mod_oasis_namcouple']]],
@@ -101,7 +99,7 @@ var searchData=
   ['nulprt1',['nulprt1',['../classmod__oasis__data.html#a2b9f5c72f10178df0bda39000b151d24',1,'mod_oasis_data']]],
   ['num',['num',['../structmod__oasis__var_1_1prism__var__type.html#a717aa9d5848cee514dcaf036936c8f1b',1,'mod_oasis_var::prism_var_type']]],
   ['numlab',['numlab',['../classmod__oasis__namcouple.html#a12e1621f5697a0cdbde11d3e25f43b54',1,'mod_oasis_namcouple']]],
-  ['nwgts',['nwgts',['../structmod__oasis__coupler_1_1prism__mapper__type.html#a8ea719b8aa4ce4bfed630471b4d3687a',1,'mod_oasis_coupler::prism_mapper_type']]],
+  ['nwgts',['nwgts',['../structmod__oasis__map_1_1prism__mapper__type.html#a90bcd6831549c027de72dbba1daa0939',1,'mod_oasis_map::prism_mapper_type']]],
   ['nx',['nx',['../structmod__oasis__grid_1_1prism__grid__type.html#ad27a1fc4d01d2b69f95d7cf9bcdbe571',1,'mod_oasis_grid::prism_grid_type::nx()'],['../structmod__oasis__part_1_1prism__part__type.html#a7640ce8e1943f2fc70c8b072795502b2',1,'mod_oasis_part::prism_part_type::nx()']]],
   ['ny',['ny',['../structmod__oasis__grid_1_1prism__grid__type.html#ad12673fd6c928ed6441e5584c16d0a3e',1,'mod_oasis_grid::prism_grid_type::ny()'],['../structmod__oasis__part_1_1prism__part__type.html#a4169783dee96aa9c60d43826daf6000c',1,'mod_oasis_part::prism_part_type::ny()']]]
 ];

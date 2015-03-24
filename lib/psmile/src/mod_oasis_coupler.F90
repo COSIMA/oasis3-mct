@@ -9,6 +9,7 @@ MODULE mod_oasis_coupler
   USE mod_oasis_parameters
   USE mod_oasis_namcouple
   USE mod_oasis_sys
+  USE mod_oasis_map
   USE mod_oasis_part
   USE mod_oasis_var
   USE mod_oasis_mpi
@@ -28,7 +29,6 @@ MODULE mod_oasis_coupler
 ! Type of data
 
   public prism_router_type
-  public prism_mapper_type
   public prism_coupler_type
 
 ! COUPLING INFO
@@ -38,23 +38,6 @@ MODULE mod_oasis_coupler
      !--- fixed at initialization ---
      type(mct_router)      :: router     !< router
   end type prism_router_type
-
-  !> Mapper data for interpolating data between grids
-  type prism_mapper_type
-     !--- fixed at initialization ---
-     type(mct_sMatP),pointer :: sMatP(:)  !< stores mapping data such as weights
-     integer(kind=ip_i4_p) :: nwgts       !< number of weights in weights file
-     character(len=ic_long):: file        !< file to read/write
-     character(len=ic_med) :: loc         !< location setting, src or dst model
-     character(len=ic_med) :: opt         !< optimization setting, bfb, sum, or opt
-     character(len=ic_med) :: optval      !< mct map setting, src or dst, derived from opt
-     logical               :: init        !< flag indicating initialization complete
-     integer(kind=ip_i4_p) :: spart       !< src partition
-     integer(kind=ip_i4_p) :: dpart       !< dst partition
-     logical               :: AVred       !< flag indicating AV_ms, AV_md data has been read
-     type(mct_aVect)       :: AV_ms       !< stores data for CONSERV for src such as mask and area
-     type(mct_aVect)       :: AV_md       !< stores data for CONSERV for dst such as mask and area
-  end type prism_mapper_type
 
   integer(kind=ip_i4_p),public,parameter :: prism_coupler_avsmax=5  !< maximum number of higher order terms in mapping
 
@@ -109,10 +92,6 @@ MODULE mod_oasis_coupler
   integer(kind=ip_i4_p)           :: prism_mrouter   !< max routers
   integer(kind=ip_i4_p)           :: prism_nrouter = 0  !< router counter
   type(prism_router_type) ,public, pointer:: prism_router(:)  !< prism_router array
-
-  integer(kind=ip_i4_p)           :: prism_mmapper   !< max mappers
-  integer(kind=ip_i4_p)           :: prism_nmapper = 0  !< mapper counter
-  type(prism_mapper_type) ,public, pointer :: prism_mapper(:)  !< prism_mapper array
 
   integer(kind=ip_i4_p)   ,public :: prism_mcoupler  !< max couplers
   type(prism_coupler_type),public, pointer :: prism_coupler_put(:)  !< prism_coupler put array
@@ -200,6 +179,8 @@ CONTAINS
   type(sortvarfld_type) :: sortvars
   type(sortvarfld_type) :: sorttest
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
+!  character(len=*),parameter :: smatread_method = 'orig'
+  character(len=*),parameter :: smatread_method = 'ceg'
   logical, parameter :: local_timers_on = .false.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
@@ -207,10 +188,12 @@ CONTAINS
   !----------------------------------------------------------
 
   call oasis_debug_enter(subname)
-  call oasis_mpi_barrier(mpi_comm_global)
+!  call oasis_mpi_barrier(mpi_comm_global)
   call oasis_timer_start('cpl_setup')
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
+
+  write(nulprt,*) subname,' smatread_method = ',trim(smatread_method)
 
   !-----------------------------------------
   !> * Allocate and zero prism_router, prism_mapper, prism_coupler based on nnamcpl
@@ -307,6 +290,7 @@ CONTAINS
   allvar = " "
   nallvar = 0
   allops = -1
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n1_bcast')
   do n = 1,prism_amodels
      if (n == compid) then
         myvar = " "
@@ -347,6 +331,7 @@ CONTAINS
      endif
      allops(:,n) = myops(:)
   enddo
+  if (local_timers_on) call oasis_timer_stop('cpl_setup_n1_bcast')
 
   deallocate(myvar,myops)
 
@@ -1089,6 +1074,7 @@ CONTAINS
   enddo  ! nv1
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n3')
   if (local_timers_on) call oasis_timer_start('cpl_setup_n4')
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n4a')
 
   ! aggregate checkused info across all pes and then check on each component root
   allocate(namsrc_checkused_g(sortnsrc%num))
@@ -1100,7 +1086,7 @@ CONTAINS
         found = .true.
      endif
   enddo
-  call oasis_mpi_barrier(mpi_comm_global)
+!  call oasis_mpi_barrier(mpi_comm_global)
   if (found) call oasis_abort()
   deallocate(namsrc_checkused_g)
 
@@ -1122,6 +1108,7 @@ CONTAINS
      write(nulprt,*) subname,' couplers setup'
      do nc = 1,prism_mcoupler
 !tcx can't write here, something uninitialized???
+!-> CEG it was dpart so added extra if into the print routine
 !        if (prism_coupler_put(nc)%valid) call prism_coupler_print(nc,prism_coupler_put(nc))
 !        if (prism_coupler_get(nc)%valid) call prism_coupler_print(nc,prism_coupler_get(nc))
      enddo
@@ -1143,6 +1130,8 @@ CONTAINS
   !> * Loop over all couplers
   !----------------------------------------------------------
 
+  if (local_timers_on) call oasis_timer_stop('cpl_setup_n4a')
+
   do nc = 1,prism_mcoupler
   do npc = 1,2
   if (npc == 1) then
@@ -1157,7 +1146,9 @@ CONTAINS
      write(nulprt,*) subname,' DEBUG cb:initialize coupler ',nc,npc,pcpointer%valid
      call oasis_flush(nulprt)
   endif
+
   if (pcpointer%valid) then
+     if (local_timers_on) call oasis_timer_start('cpl_setup_n4b')
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc,npc
         call oasis_flush(nulprt)
@@ -1208,6 +1199,7 @@ CONTAINS
      pcpointer%avcnt(:) = 0
      if (pcpointer%getput == OASIS3_PUT) pcpointer%status = OASIS_COMM_WAIT
      if (pcpointer%getput == OASIS3_GET) pcpointer%status = OASIS_COMM_READY
+     if (local_timers_on) call oasis_timer_stop('cpl_setup_n4b')
 
      !--------------------------------
      !>   * Initialize the mapper data
@@ -1216,6 +1208,7 @@ CONTAINS
      if (mapID > 0) then
 
         if (prism_mapper(mapID)%init) then
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4c')
            !--------------------------------
            ! mapper already initialized
            !--------------------------------
@@ -1225,6 +1218,7 @@ CONTAINS
               part2 = prism_mapper(mapID)%spart
            endif
            gsize = mct_gsmap_gsize(prism_part(part2)%gsmap)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4c')
         else
            !--------------------------------
            ! instantiate mapper
@@ -1233,12 +1227,16 @@ CONTAINS
            ! get gsmap for non local grid
            ! read mapping weights and initialize sMatP
            !--------------------------------
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4d')
            if (OASIS_debug >= 15) then
               write(nulprt,*) subname,' DEBUG ci:read mapfile ',trim(prism_mapper(mapID)%file)
               call oasis_flush(nulprt)
            endif
            if (mpi_rank_local == 0) then
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da')
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da1')
               inquire(file=trim(prism_mapper(mapID)%file),exist=exists)
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da1')
               if (OASIS_debug >= 15) then
                  write(nulprt,*) subname,' DEBUG ci: inquire mapfile ',&
                                  trim(prism_mapper(mapID)%file),exists
@@ -1250,7 +1248,9 @@ CONTAINS
                     ! generate mapping file on root pe
                     ! taken from oasis3 scriprmp
                     !--------------------------------
-                    call oasis_coupler_genmap(mapID,namID)
+                    call oasis_timer_start('cpl_setup_genmap')
+                    call oasis_map_genmap(mapID,namID)
+                    call oasis_timer_stop('cpl_setup_genmap')
                  else
                     write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
                                     trim(prism_mapper(mapID)%file)
@@ -1261,6 +1261,7 @@ CONTAINS
               !--------------------------------
               ! open mapping file
               !--------------------------------
+              if (local_timers_on) call oasis_timer_start('cpl_setup_n4da3')
               status = nf90_open(trim(prism_mapper(mapID)%file),nf90_nowrite,ncid)
               if (OASIS_debug >= 15) then
                  status = nf90_inq_dimid(ncid,'dst_grid_size',dimid)
@@ -1275,9 +1276,14 @@ CONTAINS
               if (pcpointer%getput == OASIS3_GET) &
                  status = nf90_inq_dimid(ncid,'src_grid_size',dimid)
               status = nf90_inquire_dimension(ncid,dimid,len=gsize)
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da3')
+              if (local_timers_on) call oasis_timer_stop('cpl_setup_n4da')
            endif  ! rank = 0
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4db')
            call oasis_mpi_bcast(gsize,mpi_comm_local,subname//' gsize')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4db')
 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4dc')
            if (pcpointer%getput == OASIS3_PUT) then
               nx = namdst_nx(namID)
               ny = namdst_ny(namID)
@@ -1287,9 +1293,12 @@ CONTAINS
               ny = namsrc_ny(namID)
               gridname = trim(namsrcgrd(namID))
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dc')
 
            !tcx improve match here with nx,ny,gridname 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4dd')
            call oasis_part_create(part2,'1d',gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dd')
 
            if (OASIS_Debug >= 15) then
               write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
@@ -1306,6 +1315,7 @@ CONTAINS
               enddo
            endif
 
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4de')
            if (prism_part(part2)%nx < 1) then
               prism_part(part2)%nx = nx
               prism_part(part2)%ny = ny
@@ -1345,16 +1355,26 @@ CONTAINS
               call oasis_abort()
            endif
            prism_mapper(mapID)%optval = trim(cstring)
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4de')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4d')
 
            !-------------------------------
            ! smatreaddnc allocates sMati to nwgts
            ! then instantiate an sMatP for each set of wgts
            ! to support higher order mapping
            !-------------------------------
-           ! call oasis_timer_start('cpl_smatrd')
-           call oasis_coupler_smatreaddnc(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-              trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local, &
-              nwgts)
+           if (smatread_method == "ceg") then
+              call oasis_timer_start('smatrd_ceg')
+              call oasis_map_smatreaddnc_ceg(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
+                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+              call oasis_timer_stop('smatrd_ceg')
+           else
+              call oasis_timer_start('smatrd_orig')
+              call oasis_map_smatreaddnc_orig(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
+                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+              call oasis_timer_stop('smatrd_orig')
+           endif
+           if (local_timers_on) call oasis_timer_start('cpl_setup_sminit')
            prism_mapper(mapID)%nwgts = nwgts
            allocate(prism_mapper(mapID)%sMatP(nwgts))
            do n = 1,nwgts
@@ -1363,7 +1383,8 @@ CONTAINS
               call mct_sMat_Clean(sMati(n))
            enddo
            deallocate(sMati)
-           ! call oasis_timer_stop('cpl_smatrd')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_sminit')
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4e')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
            prism_mapper(mapID)%init = .true.
@@ -1372,8 +1393,10 @@ CONTAINS
                               " nElements = ",lsize," nwgts = ",nwgts
               call oasis_flush(nulprt)
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4e')
         endif  ! map init
 
+        if (local_timers_on) call oasis_timer_start('cpl_setup_n4f')
         !--------------------------------
         !>   * Read mapper mask and area if not already done
         !--------------------------------
@@ -1447,7 +1470,7 @@ CONTAINS
         !--------------------------------
 
         pcpointer%rpartID = part2
-
+        if (local_timers_on) call oasis_timer_stop('cpl_setup_n4f')
      else
 
         !--------------------------------
@@ -1459,10 +1482,43 @@ CONTAINS
 
      endif  ! no mapper
 
+   endif ! endif of pcpointer%valid
+   
+!   print'(I3,A,X,L,X,8(I8,X))',mpi_rank_global, 'would have done sndrcv here', pcpointer%sndrcv,pcpointer%comp,compid, &
+!           pcpointer%valid, mapID, pcpointer%rPartID, pcpointer%routerID
+
+  enddo   ! npc
+  enddo   ! nc
+
+!-------------------------------------------------
+! CEG split 1 loop into 2 to allow map reading on different models in parallel.
+!-------------------------------------------------
+
+  do nc = 1, prism_mcoupler  ! nc
+  do npc=1,2
+
+     if (npc == 1) then
+        pcpointer => prism_coupler_put(nc)
+        pcpntpair => prism_coupler_get(nc)
+     endif
+     if (npc == 2) then
+        pcpointer => prism_coupler_get(nc)
+        pcpntpair => prism_coupler_put(nc)
+     endif
+
+     namID = pcpointer%namID
+     part1 = pcpointer%partID
+     mapID = pcpointer%mapperID
+
+!   print'(I3,A,X,L,X,8(I8,X))',mpi_rank_global, '..finally doing sndrcv here', pcpointer%sndrcv, pcpointer%comp, compid, &
+!           pcpointer%valid, mapID, pcpointer%rPartID, pcpointer%routerID
+!     if (mapID > 0) then
+
      !--------------------------------
      !>   * Initialize router based on rpartID
      !--------------------------------
 
+     if (local_timers_on) call oasis_timer_start('cpl_setup_n4_sr')
      if (pcpointer%sndrcv) then
 
         if (OASIS_debug >= 15) then
@@ -1475,6 +1531,7 @@ CONTAINS
            ! routers for sending to self
            ! setup router on second pass so rpartID is defined on both sides
            ! setup both routers at the same time
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4_sra')
            if (npc == 2) then
               if (OASIS_debug >= 15) then
                  write(nulprt,*) subname,' DEBUG self router between part ',pcpointer%rpartID,' and part ',pcpntpair%rpartID, &
@@ -1526,7 +1583,9 @@ CONTAINS
               endif
            endif
 
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_sra')
         else
+           if (local_timers_on) call oasis_timer_start('cpl_setup_n4_srb')
 
            call mct_router_init(pcpointer%comp,prism_part(pcpointer%rpartID)%gsmap, &
               mpi_comm_local,prism_router(pcpointer%routerID)%router)
@@ -1542,15 +1601,17 @@ CONTAINS
               endif
               call oasis_flush(nulprt)
            endif
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_srb')
 
         endif
 
      endif
+     if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_sr')
 
-  endif   ! valid
   enddo   ! npc
   enddo   ! prism_mcoupler
 
+  if (local_timers_on) call oasis_timer_start('cpl_setup_n4g')
   !----------------------------------------------------------
   !> * Diagnostics for all couplers
   !----------------------------------------------------------
@@ -1575,6 +1636,7 @@ CONTAINS
      ENDDO
   ENDIF
 
+  if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4g')
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4')
   call oasis_timer_stop('cpl_setup')
 
@@ -1674,767 +1736,6 @@ CONTAINS
   call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_coupler_print
-
-!------------------------------------------------------------
-
-!> Routine to generate a mapping data via a direct SCRIP call
-
-!> This routine reads in grid data from files and passes that data
-!> to SCRIP.  Mapping weights are generated and written to a file.
-!> This entire operation is done on a single task.
-
-  SUBROUTINE oasis_coupler_genmap(mapid,namid)
-
-  IMPLICIT NONE
-
-  integer(ip_i4_p), intent(in) :: mapid  !< map id
-  integer(ip_i4_p), intent(in) :: namid  !< namcouple id
-  !----------------------------------------------------------
-
-  integer(ip_i4_p)              :: src_size,src_rank, ncrn_src
-  integer(ip_i4_p) ,allocatable :: src_dims(:),src_mask(:)
-  real(ip_double_p),allocatable :: src_lon(:),src_lat(:)
-  real(ip_double_p),allocatable :: src_corner_lon(:,:),src_corner_lat(:,:)
-  integer(ip_i4_p)              :: dst_size,dst_rank, ncrn_dst
-  integer(ip_i4_p) ,allocatable :: dst_dims(:),dst_mask(:)
-  real(ip_double_p),allocatable :: dst_lon(:),dst_lat(:)
-  real(ip_double_p),allocatable :: dst_corner_lon(:,:),dst_corner_lat(:,:)
-  integer(ip_i4_p) ,allocatable :: ifld2(:,:)
-  real(ip_double_p),allocatable :: fld2(:,:),fld3(:,:,:)
-  integer(ip_i4_p) :: i,j,k,icnt,nx,ny,nc
-  logical :: lextrapdone
-  logical :: do_corners
-  character(len=ic_med) :: filename
-  character(len=ic_med) :: fldname
-  character(len=*),parameter :: subname = '(oasis_coupler_genmap)'
-
-  call oasis_debug_enter(subname)
-
-  lextrapdone = .false.
-  nx = -1  ! must be read
-  ny = -1  ! must be read
-  nc =  1  ! might not be read, set to something reasonable
-
-  !--- checks first ---
-
-  if (trim(namscrtyp(namID)) /= 'SCALAR') then
-     write(nulprt,*) subname,estr,'only scrip type SCALAR mapping supported'
-     CALL oasis_abort()
-  endif
-
-  
-  do_corners = .false.
-  if (trim(namscrmet(namID)) == 'CONSERV') then
-     do_corners = .true.
-  endif
-
-  !--- src data ---
-
-  filename = 'grids.nc'
-  if (do_corners) then
-     fldname = trim(namsrcgrd(namID))//'.clo'
-     call oasis_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny,nz=nc)
-  else
-     fldname = trim(namsrcgrd(namID))//'.lon'
-     call oasis_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
-  endif
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',&
-                                         trim(fldname),nx,ny,nc,do_corners
-  src_rank = 2
-  src_size = nx*ny
-  allocate(src_dims(src_rank))
-  src_dims(1) = nx
-  src_dims(2) = ny
-  ncrn_src = nc
-  allocate(src_mask(src_size))
-  allocate(src_lon (src_size))
-  allocate(src_lat (src_size))
-  allocate(src_corner_lon(ncrn_src,src_size))
-  allocate(src_corner_lat(ncrn_src,src_size))
-
-  allocate(ifld2(nx,ny))
-  filename = 'masks.nc'
-  fldname = trim(namsrcgrd(namID))//'.msk'
-  call oasis_io_read_field_fromroot(filename,fldname,ifld2=ifld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     src_mask(icnt) = ifld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(src_mask),maxval(src_mask)
-  deallocate(ifld2)
-
-  allocate(fld2(nx,ny))
-  filename = 'grids.nc'
-  fldname = trim(namsrcgrd(namID))//'.lon'
-  call oasis_io_read_field_fromroot(filename,fldname,fld2=fld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     src_lon(icnt) = fld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(src_lon),maxval(src_lon)
-  fldname = trim(namsrcgrd(namID))//'.lat'
-  call oasis_io_read_field_fromroot(filename,fldname,fld2=fld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     src_lat(icnt) = fld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(src_lat),maxval(src_lat)
-  deallocate(fld2)
-
-  if (do_corners) then
-     allocate(fld3(nx,ny,nc))
-     filename = 'grids.nc'
-     fldname = trim(namsrcgrd(namID))//'.clo'
-     call oasis_io_read_field_fromroot(filename,fldname,fld3=fld3)
-     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-        do k = 1,nc
-           src_corner_lon(k,icnt) = fld3(i,j,k)
-        enddo
-     enddo; enddo
-     if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-        minval(src_corner_lon),maxval(src_corner_lon)
-     fldname = trim(namsrcgrd(namID))//'.cla'
-     call oasis_io_read_field_fromroot(filename,fldname,fld3=fld3)
-     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-        do k = 1,nc
-           src_corner_lat(k,icnt) = fld3(i,j,k)
-        enddo
-     enddo; enddo
-     if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-        minval(src_corner_lat),maxval(src_corner_lat)
-     deallocate(fld3)
-  else
-     src_corner_lon = -9999.
-     src_corner_lat = -9999.
-  endif
-
-  !--- dst data ---
-
-  filename = 'grids.nc'
-  if (do_corners) then
-     fldname = trim(namdstgrd(namID))//'.clo'
-     call oasis_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny,nz=nc)
-  else
-     fldname = trim(namdstgrd(namID))//'.lon'
-     call oasis_io_read_field_fromroot(filename,fldname,nx=nx,ny=ny)
-  endif
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname),nx,ny,nc
-  dst_rank = 2
-  dst_size = nx*ny
-  allocate(dst_dims(dst_rank))
-  dst_dims(1) = nx
-  dst_dims(2) = ny
-  ncrn_dst = nc
-  allocate(dst_mask(dst_size))
-  allocate(dst_lon (dst_size))
-  allocate(dst_lat (dst_size))
-  allocate(dst_corner_lon(ncrn_dst,dst_size))
-  allocate(dst_corner_lat(ncrn_dst,dst_size))
-
-  allocate(ifld2(nx,ny))
-  filename = 'masks.nc'
-  fldname = trim(namdstgrd(namID))//'.msk'
-  call oasis_io_read_field_fromroot(filename,fldname,ifld2=ifld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     dst_mask(icnt) = ifld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(dst_mask),maxval(dst_mask)
-  deallocate(ifld2)
-
-  allocate(fld2(nx,ny))
-  filename = 'grids.nc'
-  fldname = trim(namdstgrd(namID))//'.lon'
-  call oasis_io_read_field_fromroot(filename,fldname,fld2=fld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     dst_lon(icnt) = fld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(dst_lon),maxval(dst_lon)
-  fldname = trim(namdstgrd(namID))//'.lat'
-  call oasis_io_read_field_fromroot(filename,fldname,fld2=fld2)
-  icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-     dst_lat(icnt) = fld2(i,j)
-  enddo; enddo
-  if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-     minval(dst_lat),maxval(dst_lat)
-  deallocate(fld2)
-
-  if (do_corners) then
-     allocate(fld3(nx,ny,nc))
-     filename = 'grids.nc'
-     fldname = trim(namdstgrd(namID))//'.clo'
-     call oasis_io_read_field_fromroot(filename,fldname,fld3=fld3)
-     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-        do k = 1,nc
-           dst_corner_lon(k,icnt) = fld3(i,j,k)
-        enddo
-     enddo; enddo
-     if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-        minval(dst_corner_lon),maxval(dst_corner_lon)
-     fldname = trim(namdstgrd(namID))//'.cla'
-     call oasis_io_read_field_fromroot(filename,fldname,fld3=fld3)
-     icnt = 0; do j = 1,ny; do i = 1,nx; icnt = icnt + 1
-        do k = 1,nc
-           dst_corner_lat(k,icnt) = fld3(i,j,k)
-        enddo
-     enddo; enddo
-     if (OASIS_debug >= 15) write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname), &
-        minval(dst_corner_lat),maxval(dst_corner_lat)
-     deallocate(fld3)
-  else
-     dst_corner_lon = -9999.
-     dst_corner_lat = -9999.
-  endif
-
-  IF (OASIS_debug >= 15) THEN
-      WRITE(nulprt,*) subname,' call grid_init '
-      CALL oasis_flush(nulprt)
-  ENDIF
-
-  !--- 0/1 mask convention opposite in scrip vs oasis
-  src_mask = 1 - src_mask
-  dst_mask = 1 - dst_mask
-  call grid_init(namscrmet(namID),namscrres(namID),namscrbin(namID),  &
-       src_size, dst_size, src_dims, dst_dims, &
-       src_rank, dst_rank, ncrn_src, ncrn_dst, &
-       src_mask, dst_mask, namsrcgrd(namID), namdstgrd(namID), &
-       src_lat,  src_lon,  dst_lat,  dst_lon, &
-       src_corner_lat, src_corner_lon, &
-       dst_corner_lat, dst_corner_lon, &
-       logunit=nulprt)
-  if (OASIS_debug >= 15) then
-      WRITE(nulprt,*) subname,' done grid_init '
-      CALL oasis_flush(nulprt)
-  ENDIF
-
-  IF (OASIS_debug >= 15) THEN
-      WRITE(nulprt,*) subname,' call scrip '
-      CALL oasis_flush(nulprt)
-  ENDIF
-  call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
-             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
-  IF (OASIS_debug >= 15) THEN
-      WRITE(nulprt,*) subname,' done scrip '
-      CALL oasis_flush(nulprt)
-  ENDIF
-
-  deallocate(src_dims, dst_dims)
-  deallocate(src_mask)
-  deallocate(src_lon)
-  deallocate(src_lat)
-  deallocate(src_corner_lon)
-  deallocate(src_corner_lat)
-  deallocate(dst_mask)
-  deallocate(dst_lon)
-  deallocate(dst_lat)
-  deallocate(dst_corner_lon)
-  deallocate(dst_corner_lat)
-
-
-  call oasis_debug_exit(subname)
-
-  END SUBROUTINE oasis_coupler_genmap
-
-!------------------------------------------------------------
-
-!BOP ===========================================================================
-!> Read in mapping matrix data from a SCRIP netCDF file
-!
-! !IROUTINE:  oasis_coupler_sMatReaddnc - Do a distributed read of a NetCDF SCRIP file and
-!                                return weights in a distributed SparseMatrix
-!
-! !DESCRIPTION: 
-!>     Read in mapping matrix data from a SCRIP netCDF data file using
-!>     a low memory method and then scatter to all pes.  Based on 
-!>     the sMatReaddnc method from CESM1.0.3.
-!>
-! !REMARKS:
-!>   This routine leverages gsmaps to determine scatter pattern.
-!>
-!>   The scatter is implemented as a broadcast of all weights then a local
-!>     computation on each pe to determine with weights to keep based
-!>     on gsmap information.
-!>
-!>   The algorithm to determine whether a weight belongs on a pe involves
-!>     creating a couple local arrays (lsstart and lscount) which are
-!>     the local values of start and length from the gsmap.  These are
-!>     sorted via a bubble sort and then searched via a binary search
-!>     to check whether a global index is on the local pe.
-!>
-!>   The local buffer sizes are estimated up front based on ngridcell/npes
-!>     plus 20% (search for 1.2 below).  If the local buffer size fills up, then
-!>     the buffer is reallocated 50% larger (search for 1.5 below) and the fill
-!>     continues.  The idea is to trade off memory reallocation and copy
-!>     with memory usage.  1.2 and 1.5 are arbitary, other values may
-!>     result in better performance.
-!>
-!>   Once all the matrix weights have been read, the sMat is initialized,
-!>     the values from the buffers are copied in, and everything is deallocated.
-!
-! !INTERFACE:  -----------------------------------------------------------------
-
-subroutine oasis_coupler_sMatReaddnc(sMat,SgsMap,DgsMap,newdom, &
-                            fileName,mytask,mpicom,nwgts, &
-                            areasrc,areadst,ni_i,nj_i,ni_o,nj_o )
-
-! !USES:
-
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-
-! !INPUT/OUTPUT PARAMETERS:
-
-   type(mct_sMat)  ,intent(out),pointer   :: sMat(:) !< mapping data
-   type(mct_gsMap) ,intent(in) ,target    :: SgsMap  !< src gsmap
-   type(mct_gSMap) ,intent(in) ,target    :: DgsMap  !< dst gsmap
-   character(*)    ,intent(in)            :: newdom  !< type of sMat (src or dst)
-        !< src = rearrange and map (bfb), dst = map and rearrange (partial sums)
-   character(*)    ,intent(in)            :: filename!< netCDF file to read
-   integer(IN)     ,intent(in)            :: mytask  !< processor id
-   integer(IN)     ,intent(in)            :: mpicom  !< mpi communicator
-   integer(IN)     ,intent(out)           :: nwgts   !< number of weights 
-   type(mct_Avect) ,intent(out), optional :: areasrc !< area of src grid from mapping file
-   type(mct_Avect) ,intent(out), optional :: areadst !< area of dst grid from mapping file
-   integer(IN)     ,intent(out), optional :: ni_i    !< number of lons on input grid   
-   integer(IN)     ,intent(out), optional :: nj_i    !< number of lats on input grid   
-   integer(IN)     ,intent(out), optional :: ni_o    !< number of lons on output grid   
-   integer(IN)     ,intent(out), optional :: nj_o    !< number of lats on output grid   
-
-! !EOP
-
-   !--- local ---
-   integer           :: n,m     ! generic loop indicies
-   integer           :: na      ! size of source domain
-   integer           :: nb      ! size of destination domain
-   integer           :: ns      ! number of non-zero elements in matrix
-   integer           :: ni,nj   ! number of row and col in the matrix
-   integer           :: igrow   ! aVect index for matrix row
-   integer           :: igcol   ! aVect index for matrix column
-   integer           :: iwgt    ! aVect index for matrix element
-   integer           :: iarea   ! aVect index for area
-   integer           :: rsize   ! size of read buffer
-   integer           :: cnt     ! local num of wgts
-   integer           :: cntold  ! local num of wgts, previous read
-   integer           :: start(1)! netcdf read
-   integer           :: count(1)! netcdf read
-   integer           :: start2(2)! netcdf read
-   integer           :: count2(2)! netcdf read
-   integer           :: bsize   ! buffer size
-   integer           :: nread   ! number of reads 
-   logical           :: mywt    ! does this weight belong on my pe
-   integer           :: dims(2) 
-
-   !--- buffers for i/o ---
-   real(R8)   ,allocatable :: rtemp(:) ! real temporary
-   real(R8)   ,allocatable :: Sbuf(:,:)  ! real weights
-   real(R8)   ,allocatable :: remaps(:,:)  ! real weights with num_wgts dim
-   integer,allocatable :: Rbuf(:)  ! ints rows
-   integer,allocatable :: Cbuf(:)  ! ints cols
-
-   !--- variables associated with local computation of global indices
-   integer             :: lsize     ! size of local seg map
-   integer             :: commsize  ! size of local communicator
-   integer,allocatable :: lsstart(:) ! local seg map info
-   integer,allocatable :: lscount(:) ! local seg map info
-   type(mct_gsMap),pointer :: mygsmap ! pointer to one of the gsmaps
-   integer             :: l1,l2     ! generice indices for sort
-   logical             :: found     ! for sort
-
-   !--- variable assocaited with local data buffers and reallocation
-   real(R8)   ,allocatable :: Snew(:,:),Sold(:,:)  ! reals
-   integer,allocatable :: Rnew(:),Rold(:)  ! ints
-   integer,allocatable :: Cnew(:),Cold(:)  ! ints
-
-   character,allocatable :: str(:)  ! variable length char string
-   character(len=ic_long):: attstr  ! netCDF attribute name string
-   integer           :: status   ! netCDF routine return code
-   integer           :: fid     ! netCDF file      ID
-   integer           :: vid     ! netCDF variable  ID
-   integer           :: did     ! netCDF dimension ID
-   !--- arbitrary size of read buffer, this is the chunk size weights reading
-   integer,parameter :: rbuf_size = 100000
-
-   !--- global source and destination areas ---
-   type(mct_Avect) :: areasrc0   ! area of src grid from mapping file
-   type(mct_Avect) :: areadst0   ! area of src grid from mapping file
-
-   character(*),parameter :: areaAV_field = 'aream'
-
-   !--- formats ---
-   character(*),parameter :: subName = '(oasis_coupler_sMatReaddnc)'
-   character(*),parameter :: F01 = '("oasis_coupler_sMatReaddnc",1x,2(a,i10))'
-
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
-
- call oasis_debug_enter(subname)
- call oasis_mpi_commsize(mpicom,commsize)
- nwgts = -1
- if (mytask == 0) then
-   if (OASIS_debug >= 2) write(nulprt,*) subname," reading mapping matrix data decomposed..."
-
-   !----------------------------------------------------------------------------
-   !> * Open and read the file SCRIP weights size on the root task
-   !----------------------------------------------------------------------------
-   if (OASIS_debug >=2 ) write(nulprt,*) subname," * file name                  : ",trim(fileName)
-   status = nf90_open(trim(filename),NF90_NOWRITE,fid)
-   if (status /= NF90_NOERR) then
-      write(nulprt,*) subname,' nf90_strerror = ',trim(nf90_strerror(status))
-      WRITE(nulprt,*) subname,estr,'mapping file not found = ',trim(filename)
-      call oasis_abort()
-   endif
-
-   !--- get matrix dimensions ----------
-!  status = nf90_inq_dimid (fid, 'n_s', did)  ! size of sparse matrix
-   status = nf90_inq_dimid (fid, 'num_links', did)  ! size of sparse matrix
-   status = nf90_inquire_dimension(fid, did  , len = ns)
-!  status = nf90_inq_dimid (fid, 'n_a', did)  ! size of  input vector
-   status = nf90_inq_dimid (fid, 'src_grid_size', did)  ! size of  input vector
-   status = nf90_inquire_dimension(fid, did  , len = na)
-!  status = nf90_inq_dimid (fid, 'n_b', did)  ! size of output vector
-   status = nf90_inq_dimid (fid, 'dst_grid_size', did)  ! size of output vector
-   status = nf90_inquire_dimension(fid, did  , len = nb)
-   status = nf90_inq_dimid (fid, 'num_wgts', did)  ! size of output vector
-   status = nf90_inquire_dimension(fid, did  , len = nwgts)
-   
-   if (present(ni_i) .and. present(nj_i) .and. present(ni_o) .and. present(nj_o)) then
-!     status = nf90_inq_dimid (fid, 'ni_a', did)  ! number of lons in input grid
-!     status = nf90_inquire_dimension(fid, did  , len = ni_i)
-!     status = nf90_inq_dimid (fid, 'nj_a', did)  ! number of lats in input grid
-!     status = nf90_inquire_dimension(fid, did  , len = nj_i)
-!     status = nf90_inq_dimid (fid, 'ni_b', did)  ! number of lons in output grid
-!     status = nf90_inquire_dimension(fid, did  , len = ni_o)
-!     status = nf90_inq_dimid (fid, 'nj_b', did)  ! number of lats in output grid
-!     status = nf90_inquire_dimension(fid, did  , len = nj_o)
-      status = nf90_inq_varid(fid, 'src_grid_dims', vid)
-      status = nf90_get_var(fid, vid, dims)
-      ni_i = dims(1)
-      nj_i = dims(2)
-      status = nf90_inq_varid(fid, 'dst_grid_dims', vid)
-      status = nf90_get_var(fid, vid, dims)
-      ni_o = dims(1)
-      nj_o = dims(2)
-   end if
-
-   if (OASIS_debug >= 2) write(nulprt,F01) "* matrix dims src x dst      : ",na,' x',nb
-   if (OASIS_debug >= 2) write(nulprt,F01) "* number of non-zero elements: ",ns
-
- endif
- 
-   !----------------------------------------------------------------------------
-   !> * Read and load area_a on root task
-   !----------------------------------------------------------------------------
-   if (present(areasrc)) then
-   if (mytask == 0) then
-      call mct_aVect_init(areasrc0,' ',areaAV_field,na)
-!     status = nf90_inq_varid     (fid,'area_a',vid)
-      status = nf90_inq_varid     (fid,'src_grid_area',vid)
-      IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,*) subname,' nf90_strerrr = ',TRIM(nf90_strerror(status))
-          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-      ENDIF
-      status = nf90_get_var(fid, vid, areasrc0%rAttr)
-      IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-      ENDIF
-   endif
-   call mct_aVect_scatter(areasrc0, areasrc, SgsMap, 0, mpicom, status)
-   if (status /= 0) call mct_die(subname,"Error on scatter of areasrc0")
-   if (mytask == 0) then
-!      if (present(dbug)) then
-!         if (dbug > 2) then
-!            write(nulprt,*) subName,'Size of src ',mct_aVect_lSize(areasrc0)
-!            write(nulprt,*) subName,'min/max src ',minval(areasrc0%rAttr(1,:)),maxval(areasrc0%rAttr(1,:))
-!         endif
-!      end if
-      call mct_aVect_clean(areasrc0)
-   end if
-   end if
-
-   !----------------------------------------------------------------------------
-   !> * Read and load area_b on root task
-   !----------------------------------------------------------------------------
-   if (present(areadst)) then
-   if (mytask == 0) then
-      call mct_aVect_init(areadst0,' ',areaAV_field,nb)
-!     status = nf90_inq_varid     (fid,'area_b',vid)
-      status = nf90_inq_varid     (fid,'dst_grid_area',vid)
-      IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-      ENDIF
-      status = nf90_get_var(fid, vid, areadst0%rAttr)
-      IF (status /= NF90_NOERR) THEN
-          WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-          WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-      ENDIF
-   endif
-   call mct_aVect_scatter(areadst0, areadst, DgsMap, 0, mpicom, status)
-   if (status /= 0) call mct_die(subname,"Error on scatter of areadst0")
-   if (mytask == 0) then
-!      if (present(dbug)) then
-!         if (dbug > 2) then
-!            write(nulprt,*) subName,'Size of dst ',mct_aVect_lSize(areadst0)
-!            write(nulprt,*) subName,'min/max dst ',minval(areadst0%rAttr(1,:)),maxval(areadst0%rAttr(1,:))
-!         endif
-!      end if
-      call mct_aVect_clean(areadst0)
-   endif
-   endif
-
-   !----------------------------------------------------------------------------
-   !> * Broadcast ni and nj if requested
-   !----------------------------------------------------------------------------
-   if (present(ni_i) .and. present(nj_i) .and. present(ni_o) .and. present(nj_o)) then
-      call oasis_mpi_bcast(ni_i,mpicom,subName//" MPI in ni_i bcast")
-      call oasis_mpi_bcast(nj_i,mpicom,subName//" MPI in nj_i bcast")
-      call oasis_mpi_bcast(ni_o,mpicom,subName//" MPI in ni_o bcast")
-      call oasis_mpi_bcast(nj_o,mpicom,subName//" MPI in nj_o bcast")
-   end if
-
-   !----------------------------------------------------------------------------
-   !> * Broadcast array sizes and allocate arrays for local storage
-   !----------------------------------------------------------------------------
-   call oasis_mpi_bcast(ns,mpicom,subName//" MPI in ns bcast")
-   call oasis_mpi_bcast(na,mpicom,subName//" MPI in na bcast")
-   call oasis_mpi_bcast(nb,mpicom,subName//" MPI in nb bcast")
-   call oasis_mpi_bcast(nwgts,mpicom,subName//" MPI in nwgts bcast")
-
-   !--- setup local seg map, sorted
-   if (newdom == 'src') then
-      mygsmap => DgsMap
-   elseif (newdom == 'dst') then
-      mygsmap => SgsMap
-   else
-      write(nulprt,*) subname,estr,'invalid newdom value, expect src or dst = ',newdom
-      call oasis_abort()
-   endif
-   lsize = 0
-   do n = 1,size(mygsmap%start)
-      if (mygsmap%pe_loc(n) == mytask) then
-         lsize=lsize+1
-      endif
-   enddo
-   allocate(lsstart(lsize),lscount(lsize),stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: allocate Lsstart',status)
-
-   !----------------------------------------------------------------------------
-   !> * Initialize lsstart and lscount, the sorted list of local indices
-   !----------------------------------------------------------------------------
-   lsize = 0
-   do n = 1,size(mygsmap%start)
-      if (mygsmap%pe_loc(n) == mytask) then  ! on my pe
-         lsize=lsize+1
-         found = .false.
-         l1 = 1
-         do while (.not.found .and. l1 < lsize)         ! bubble sort copy
-            if (mygsmap%start(n) < lsstart(l1)) then
-               do l2 = lsize, l1+1, -1
-                  lsstart(l2) = lsstart(l2-1)
-                  lscount(l2) = lscount(l2-1)
-               enddo
-               found = .true.
-            else
-               l1 = l1 + 1
-            endif
-         enddo
-         lsstart(l1) = mygsmap%start(n)
-         lscount(l1) = mygsmap%length(n)
-      endif
-   enddo
-   do n = 1,lsize-1
-      if (lsstart(n) > lsstart(n+1)) then
-         write(nulprt,*) subname,estr,'lsstart not properly sorted'
-         call oasis_abort()
-      endif
-   enddo
-
-   !----------------------------------------------------------------------------
-   !> * Compute the number of chunks to read, read size is rbuf_size
-   !----------------------------------------------------------------------------
-   rsize = min(rbuf_size,ns)                     ! size of i/o chunks
-   bsize = ((ns/commsize) + 1 ) * 1.2   ! local temporary buffer size
-   if (ns == 0) then
-      nread = 0
-   else
-      nread = (ns-1)/rsize + 1                      ! num of reads to do
-   endif
-
-   !----------------------------------------------------------------------------
-   !> * Allocate arrays for local weights plus row and column indices
-   !----------------------------------------------------------------------------
-   if (mytask == 0) then
-      allocate(remaps(nwgts,rsize),stat=status)
-      if (status /= 0) call mct_perr_die(subName,':: allocate remaps',status)
-   endif
-   allocate(Smat(nwgts),stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: allocate Smat',status)
-   allocate(Sbuf(nwgts,rsize),Rbuf(rsize),Cbuf(rsize),stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: allocate Sbuf',status)
-   allocate(Snew(nwgts,bsize),Cnew(bsize),Rnew(bsize),stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: allocate Snew1',status)
-
-   !----------------------------------------------------------------------------
-   !> * Loop over the chunks of weights data
-   !----------------------------------------------------------------------------
-   cnt = 0
-   do n = 1,nread
-      start(1) = (n-1)*rsize + 1
-      count(1) = min(rsize,ns-start(1)+1)
-      start2(1) = 1
-      count2(1) = nwgts
-      start2(2) = start(1)
-      count2(2) = count(1)
-
-      !----------------------------------------------------------------------------
-      !>   * Read chunk of data on root pe
-      !----------------------------------------------------------------------------
-      if (mytask== 0) then
-!        status = nf90_inq_varid      (fid,'S'  ,vid)
-         status = nf90_inq_varid      (fid,'remap_matrix'  ,vid)
-!        status = nf90_get_var(fid,vid,start,count,Sbuf)
-         status = nf90_get_var(fid,vid,remaps,start2,count2)
-         Sbuf(:,:) = remaps(:,:)
-         IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-         ENDIF
-
-!        status = nf90_inq_varid      (fid,'row',vid)
-         status = nf90_inq_varid      (fid,'dst_address',vid)
-         status = nf90_get_var   (fid,vid,Rbuf,start,count)
-         IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-         ENDIF
-
-!        status = nf90_inq_varid      (fid,'col',vid)
-         status = nf90_inq_varid      (fid,'src_address',vid)
-         status = nf90_get_var   (fid,vid,Cbuf,start,count)
-         IF (status /= NF90_NOERR) THEN
-             WRITE(nulprt,*) subname,' nf90_strerror = ',TRIM(nf90_strerror(status))
-             WRITE(nulprt,*) subname,'model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-         ENDIF
-      endif
- 
-      !----------------------------------------------------------------------------
-      !>   * Broadcast S, row, col to all tasks
-      !----------------------------------------------------------------------------
-
-      call oasis_mpi_bcast(Sbuf,mpicom,subName//" MPI in Sbuf bcast")
-      call oasis_mpi_bcast(Rbuf,mpicom,subName//" MPI in Rbuf bcast")
-      call oasis_mpi_bcast(Cbuf,mpicom,subName//" MPI in Cbuf bcast")
-
-      !----------------------------------------------------------------------------
-      !>   * Each task keeps only the data required
-      !----------------------------------------------------------------------------
-      do m = 1,count(1)
-         !--- should this weight be on my pe
-         if (newdom == 'src') then
-            mywt = check_myindex(Rbuf(m),lsstart,lscount)
-         elseif (newdom == 'dst') then
-            mywt = check_myindex(Cbuf(m),lsstart,lscount)
-         endif
-
-         if (mywt) then
-            cntold = cnt
-            cnt = cnt + 1
-
-            !----------------------------------------------------------------------------
-            !>   * Reallocate local weights arrays if they need to be bigger
-            !----------------------------------------------------------------------------
-            if (cnt > bsize) then
-               !--- allocate old arrays and copy new into old
-               allocate(Sold(1:nwgts,cntold),Rold(cntold),Cold(cntold),stat=status)
-               if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
-               Sold(1:nwgts,1:cntold) = Snew(1:nwgts,1:cntold)
-               Rold(1:cntold) = Rnew(1:cntold)
-               Cold(1:cntold) = Cnew(1:cntold)
-
-               !--- reallocate new to bigger size, increase buffer by 50% (arbitrary)
-               deallocate(Snew,Rnew,Cnew,stat=status)
-               if (status /= 0) call mct_perr_die(subName,':: allocate new',status)
-               bsize = 1.5 * bsize
-               if (OASIS_debug > 15) write(nulprt,F01) ' reallocate bsize to ',bsize
-               allocate(Snew(nwgts,bsize),Rnew(bsize),Cnew(bsize),stat=status)
-               if (status /= 0) call mct_perr_die(subName,':: allocate old',status)
-
-               !--- copy data back into new
-               Snew(1:nwgts,1:cntold) = Sold(1:nwgts,1:cntold)
-               Rnew(1:cntold) = Rold(1:cntold)
-               Cnew(1:cntold) = Cold(1:cntold)
-               deallocate(Sold,Rold,Cold,stat=status)
-               if (status /= 0) call mct_perr_die(subName,':: deallocate old',status)
-            endif
-
-            Snew(1:nwgts,cnt) = Sbuf(1:nwgts,m)
-            Rnew(cnt) = Rbuf(m)
-            Cnew(cnt) = Cbuf(m)
-         endif
-      enddo  ! count
-   enddo   ! nread
-
-   !----------------------------------------------------------------------------
-   !> * Clean up arrays
-   !----------------------------------------------------------------------------
-   if (mytask == 0) then
-      deallocate(remaps, stat=status)
-      if (status /= 0) call mct_perr_die(subName,':: deallocate remaps',status)
-   endif
-   deallocate(Sbuf,Rbuf,Cbuf, stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: deallocate Sbuf',status)
-
-   !----------------------------------------------------------------------------
-   !> * Initialize the mct sMat data type
-   !----------------------------------------------------------------------------
-   ! mct_sMat_init must be given the number of rows and columns that
-   ! would be in the full matrix.  Nrows= size of output vector=nb.
-   ! Ncols = size of input vector = na.
-   do n = 1,nwgts
-      call mct_sMat_init(sMat(n), nb, na, cnt)
-   enddo
-
-   igrow = mct_sMat_indexIA(sMat(1),'grow')
-   igcol = mct_sMat_indexIA(sMat(1),'gcol')
-   iwgt  = mct_sMat_indexRA(sMat(1),'weight')
-
-   if (cnt /= 0) then
-   do n = 1,nwgts
-      sMat(n)%data%rAttr(iwgt ,1:cnt) = Snew(n,1:cnt)
-      sMat(n)%data%iAttr(igrow,1:cnt) = Rnew(1:cnt)
-      sMat(n)%data%iAttr(igcol,1:cnt) = Cnew(1:cnt)
-   enddo
-   endif
-
-   !----------------------------------------------------------------------------
-   !> * More clean up
-   !----------------------------------------------------------------------------
-   deallocate(Snew,Rnew,Cnew, stat=status)
-   deallocate(lsstart,lscount,stat=status)
-   if (status /= 0) call mct_perr_die(subName,':: deallocate new',status)
-
-   if (mytask == 0) then
-      status = nf90_close(fid)
-      IF (OASIS_debug >= 2) THEN
-          WRITE(nulprt,*) subname," ... done reading file"
-          CALL oasis_flush(nulprt)
-      ENDIF
-   endif
-
-  call oasis_debug_exit(subname)
-
-end subroutine oasis_coupler_sMatReaddnc
 
 !------------------------------------------------------------
 ! !BOP ===========================================================================
@@ -2744,86 +2045,9 @@ recursive subroutine MergeSort(N,A,T,S,Z)
    return
  
 end subroutine MergeSort
- 
-!------------------------------------------------------------
-! !BOP ===========================================================================
-!
-!> Function that checks whether an index is part of a start and count list
-!
-!> Does a binary search on a sorted start and count list to determine
-!> whether index is a value in the list.  The list values consist of
-!> the values start(i):start(i)+count(i)-1 for all i.
-!
-! !DESCRIPTION: 
-!     Do a binary search to see if a value is contained in a list of
-!     values.  return true or false.  starti must be monotonically
-!     increasing, function does NOT check this.
-!
-! !INTERFACE:  -----------------------------------------------------------------
-
-logical function check_myindex(index,starti,counti)
-
-! !USES:
-
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-
-! !INPUT/OUTPUT PARAMETERS:
-
-   integer(IN) :: index       !< index to search
-   integer(IN) :: starti(:)   !< start list
-   integer(IN) :: counti(:)   !< count list
-
-! !EOP
-
-   !--- local ---
-   integer(IN)    :: nl,nc,nr,ncprev 
-   integer(IN)    :: lsize
-   logical        :: stopnow
-
-   !--- formats ---
-   character(*),parameter :: subName = '(check_myindex) '
-
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
-
-!   call oasis_debug_enter(subname)
-   check_myindex = .false.
-
-   lsize = size(starti)
-   if (lsize < 1) then
-!     call oasis_debug_exit(subname)
-      return
-   endif
-
-   nl = 0
-   nr = lsize + 1
-   nc = (nl+nr)/2
-   stopnow = .false.
-   do while (.not.stopnow)
-      if (index < starti(nc)) then
-         nr = nc
-      elseif (index > (starti(nc) + counti(nc) - 1)) then
-         nl = nc
-      else
-         check_myindex = .true.
-!        call oasis_debug_exit(subname)
-         return
-      endif
-      ncprev = nc
-      nc = (nl + nr)/2
-      if (nc == ncprev .or. nc < 1 .or. nc > lsize) stopnow = .true.
-   enddo
-
-   check_myindex = .false.
-
-!   call oasis_debug_exit(subname)
-
-end function check_myindex
 
 !===============================================================================
+
 END MODULE mod_oasis_coupler
 
 
