@@ -55,7 +55,7 @@ MODULE mod_oasis_grid
   USE mod_oasis_sys
   USE mod_oasis_part
   USE mod_oasis_mpi, only: oasis_mpi_min, oasis_mpi_max, oasis_mpi_bcast, oasis_mpi_barrier, &
-                           oasis_mpi_chkerr
+                           oasis_mpi_chkerr, oasis_mpi_reducelists
   USE mod_oasis_timer
   USE mct_mod
   
@@ -853,14 +853,11 @@ CONTAINS
     real(kind=ip_realwp_p),allocatable :: rglo(:,:) ! global array
     real(kind=ip_realwp_p),allocatable :: r3glo(:,:,:) ! global array
     integer(kind=ip_i4_p) ,allocatable :: iglo(:,:) ! global array
-    integer(kind=ip_intwp_p) :: gcnt, tot_gnum, ierr
+    integer(kind=ip_intwp_p) :: gcnt
     logical                  :: found
-    integer(kind=ip_intwp_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
-    character(len=ic_med)   ,pointer :: loc_gname(:),gname0(:),gname(:), loc_gname0(:), gname1(:)
-    character(len=ic_lvar2) ,pointer :: loc_pname(:),pname0(:),pname(:), loc_pname0(:), pname1(:)
-    integer(kind=ip_intwp_p),pointer :: gnum(:),rcnts(:),displ(:)
+    character(len=ic_med)   ,pointer :: gname0(:),gname(:)
+    character(len=ic_lvar2) ,pointer :: pname0(:),pname(:)
     logical, parameter :: local_timers_on = .false.
-    logical, parameter :: gatherall_on = .false.
     character(len=*),parameter :: undefined_partname = '(UnDeFiNeD_PArtnaME)'
     character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------
@@ -871,282 +868,25 @@ CONTAINS
     call oasis_mpi_bcast(writing_grids_call,mpi_comm_local,subname//'writing_grids_call')
     if (writing_grids_call .eq. 1) then
 
-    if (local_timers_on) call oasis_timer_start('grid_write_gather')
-    allocate(gnum(mpi_size_local))
-    gnum = 0
-    call MPI_GATHER(prism_ngrid, 1, MPI_INTEGER, gnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
-    if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
-
-    !-------------------------------------
-    !> * Gather and sync grid information across tasks.
-    !-------------------------------------
-
- if (gatherall_on) then
-
-    !-------------------------------------
-    !>   * if gatherall, Gather grid names.
-    !-------------------------------------
-
-    if (local_timers_on) call oasis_timer_start('grid_write_gather')
-
-    if (mpi_rank_local == 0) then
-       tot_gnum = sum(gnum)
-       allocate(gname0(tot_gnum))
-       allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-       do m = 1,mpi_size_local
-          rcnts(m) = gnum(m) * ic_med
-          if (m == 1) then
-             displ(m) = 0
-          else
-             displ(m) = displ(m-1) + rcnts(m-1)
-          endif
-       enddo
-    else
-       allocate(gname0(1),rcnts(1),displ(1))
-    endif
-
-    allocate(loc_gname(prism_ngrid))
+    call oasis_timer_start('grid_write_reducelists')
+    allocate(gname0(prism_ngrid))
+    allocate(pname0(prism_ngrid))
     do n = 1,prism_ngrid
-       loc_gname(n) = prism_grid(n)%gridname
-    enddo
-    call MPI_GATHERV(loc_gname, prism_ngrid*ic_med, MPI_CHARACTER, gname0, rcnts, displ, MPI_CHARACTER, 0, mpi_comm_local, ierr) 
-    deallocate(loc_gname)
-    deallocate(rcnts, displ)
-
-    !-------------------------------------
-    !>   * if gatherall, Gather partition names
-    !-------------------------------------
-
-    if (mpi_rank_local == 0) then
-       tot_gnum = sum(gnum)
-       allocate(pname0(tot_gnum))
-       allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-       do n = 1,mpi_size_local
-          rcnts(n) = gnum(n) * ic_lvar2
-          if (n == 1) then
-             displ(n) = 0
-          else
-             displ(n) = displ(n-1) + rcnts(n-1)
-          endif
-       enddo
-    else
-       allocate(pname0(1),rcnts(1),displ(1))
-    endif
-
-    allocate(loc_pname(prism_ngrid))
-    do n = 1,prism_ngrid
+       gname0(n) = prism_grid(n)%gridname
        if (prism_grid(n)%partid > 0 .and. prism_grid(n)%partid <= prism_npart) then
-          loc_pname(n) = prism_part(prism_grid(n)%partid)%partname
+          pname0(n) = prism_part(prism_grid(n)%partid)%partname
        elseif (prism_grid(n)%partid == -1) then
-          loc_pname(n) = undefined_partname
-       else
-          write(nulprt,*) subname,estr,'illegal partition id for grid ',trim(prism_grid(n)%gridname),prism_grid(n)%partid
-       endif
-    enddo
-    call MPI_GATHERV(loc_pname, prism_ngrid*ic_lvar2, MPI_CHARACTER, pname0, rcnts, displ, MPI_CHARACTER, 0, mpi_comm_local, ierr) 
-    deallocate(loc_pname)
-    if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
-
-    !-------------------------------------
-    !>   * if gatherall, Determine unique grid names on root.
-    !-------------------------------------
-
-    if (local_timers_on) call oasis_timer_start('grid_write_rootsrch')
-    if (mpi_rank_local == 0) then
-       gcnt = 0
-       do n = 1,tot_gnum
-          if (OASIS_Debug >= 15) &
-             write(nulprt,*) subname,' check gname0 ',n,trim(gname0(n))
-          g = 0
-          found = .false.
-          do while (g < gcnt .and. .not.found)
-             g = g + 1
-             if (gname0(n) == gname0(g)) then
-                found = .true.
-                !--- use something other than undefined_partname if it exists
-                if (pname0(g) == undefined_partname) then
-                   pname0(g) = pname0(n)
-                elseif (pname0(n) /= undefined_partname .and. pname0(g) /= pname0(n)) then
-                   write(nulprt,*) subname,estr,'inconsistent grid and part name: ', &
-                                   trim(gname0(n)),' ',trim(pname0(n)),' ',trim(pname0(g))
-                   call oasis_abort()
-                endif
-             endif
-          enddo
-          if (.not.found) then
-             gcnt = gcnt + 1
-             gname0(gcnt) = gname0(n)
-             pname0(gcnt) = pname0(n)
-          endif
-       enddo
-    endif
-    if (local_timers_on) call oasis_timer_stop ('grid_write_rootsrch')
-
- else   ! gatherall_on
-
-    allocate(loc_gname(prism_ngrid))
-    allocate(loc_pname(prism_ngrid))
-    do n = 1,prism_ngrid
-       loc_gname(n) = prism_grid(n)%gridname
-       if (prism_grid(n)%partid > 0 .and. prism_grid(n)%partid <= prism_npart) then
-          loc_pname(n) = prism_part(prism_grid(n)%partid)%partname
-       elseif (prism_grid(n)%partid == -1) then
-          loc_pname(n) = undefined_partname
+          pname0(n) = undefined_partname
        else
           write(nulprt,*) subname,estr,'illegal partition id for grid ',trim(prism_grid(n)%gridname),prism_grid(n)%partid
        endif
     enddo
 
-    if (mpi_rank_local == 0) then
-       gcnt = 0
-       allocate(pname0(max(prism_ngrid,20)))  ! 20 is arbitrary starting number
-       allocate(gname0(max(prism_ngrid,20)))  ! 20 is arbitrary starting number
-    else
-       allocate(pname0(1))
-       allocate(gname0(1))
-    endif
-
-    !-------------------------------------
-    !>   * if not gatherall, Loop over tasks
-    !-------------------------------------
-
-    do m = 1,mpi_size_local
-       taskid = m - 1
-
-       !-------------------------------------
-       !>     * if not gatherall, Send grid and partition to root
-       !-------------------------------------
-
-       if (mpi_rank_local == taskid .and. prism_ngrid > 0) then
-          if (local_timers_on) call oasis_timer_start('grid_write_gather')
-          if (mpi_rank_local /= 0) then
-             if (OASIS_Debug >= 15) then
-                write(nulprt,*) subname,' send prism_ngrid ',mpi_rank_local,m,prism_ngrid,ic_lvar2
-                call oasis_flush(nulprt)
-             endif
-             call MPI_SEND(loc_gname, prism_ngrid*ic_med  , MPI_CHARACTER, 0, 10000+m, mpi_comm_local, ierr)
-             call oasis_mpi_chkerr(ierr,subname//':send gname')
-             call MPI_SEND(loc_pname, prism_ngrid*ic_lvar2, MPI_CHARACTER, 0, 50000+m, mpi_comm_local, ierr)
-             call oasis_mpi_chkerr(ierr,subname//':send pname')
-          endif
-          if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
-       endif
-
-       !-------------------------------------
-       !>     * if not gatherall, Recv grid and partition on root
-       !>     * if not gatherall, Determine unique grid names on root.
-       !-------------------------------------
-
-       if (mpi_rank_local == 0 .and. gnum(m) > 0) then
-          if (local_timers_on) call oasis_timer_start ('grid_write_gather')
-          if (OASIS_Debug >= 15) then
-             write(nulprt,*) subname,' recv prism_ngrid ',mpi_rank_local,m,gnum(m),ic_lvar2
-             call oasis_flush(nulprt)
-          endif
-          allocate(loc_gname0(gnum(m)))
-          allocate(loc_pname0(gnum(m)))
-          if (taskid == 0) then
-             loc_gname0 = loc_gname   ! copy local values
-             loc_pname0 = loc_pname   ! copy local values
-          else
-             call MPI_RECV(loc_gname0, gnum(m)*ic_med  , MPI_CHARACTER, taskid, 10000+m, mpi_comm_local, status, ierr)
-             call oasis_mpi_chkerr(ierr,subname//':recv')
-             call MPI_RECV(loc_pname0, gnum(m)*ic_lvar2, MPI_CHARACTER, taskid, 50000+m, mpi_comm_local, status, ierr)
-             call oasis_mpi_chkerr(ierr,subname//':recv')
-          endif
-          if (local_timers_on) call oasis_timer_stop ('grid_write_gather')
-
-          if (local_timers_on) call oasis_timer_start('grid_write_rootsrch')
-          do n = 1,gnum(m)
-             if (OASIS_Debug >= 15) write(nulprt,*) subname,' check loc_gname0 ',m,n,trim(loc_gname0(n))
-
-             g = 0
-             found = .false.
-             do while (g < gcnt .and. .not.found)
-                g = g + 1
-                if (loc_gname0(n) == gname0(g)) then
-                   found = .true.
-                   !--- use something other than undefined_partname if it exists
-                   if (pname0(g) == undefined_partname) then
-                      pname0(g) = loc_pname0(n)
-                   elseif (loc_pname0(n) /= undefined_partname .and. pname0(g) /= loc_pname0(n)) then
-                      write(nulprt,*) subname,estr,'inconsistent grid and part name: ', &
-                                      trim(loc_gname0(n)),' ',trim(loc_pname0(n)),' ',trim(pname0(g))
-                      call oasis_abort()
-                   endif
-                endif
-             enddo
-             if (.not.found) then
-                gcnt = gcnt + 1
-                if (gcnt > size(gname0)) then
-                   allocate(gname1(size(gname0)))
-                   allocate(pname1(size(pname0)))
-                   gname1 = gname0
-                   pname1 = pname0
-                   deallocate(gname0,pname0)
-                   if (OASIS_Debug >= 15) then
-                      write(nulprt,*) subname,' resize gname0 ',size(gname1),gcnt+gnum(m)
-                      call oasis_flush(nulprt)
-                   endif
-                   allocate(gname0(gcnt+gnum(m)))
-                   allocate(pname0(gcnt+gnum(m)))
-                   gname0(1:size(gname1)) = gname1(1:size(gname1))
-                   pname0(1:size(pname1)) = pname1(1:size(pname1))
-                   deallocate(gname1,pname1)
-                endif
-                gname0(gcnt) = loc_gname0(n)
-                pname0(gcnt) = loc_pname0(n)
-             endif
-           enddo  ! gnum
-          deallocate(loc_gname0)
-          deallocate(loc_pname0)
-          if (local_timers_on) call oasis_timer_stop('grid_write_rootsrch')
-
-       endif  ! rank == 0 and gnum > 0
-
-    enddo  ! mpi_size_local
-
-    deallocate(loc_gname)
-    deallocate(loc_pname)
-
- endif  ! gatherall_on
-
-   deallocate(gnum)
-
-    !-------------------------------------
-    !>   * Broadcast grid and partition names
-    !-------------------------------------
-
-    if (local_timers_on) call oasis_timer_start('grid_write_bcast')
-    call oasis_mpi_bcast(gcnt,mpi_comm_local,subname//' gcnt')
-    allocate(gname(gcnt))
-    allocate(pname(gcnt))
-    if (mpi_rank_local == 0) then
-       gname(1:gcnt) = gname0(1:gcnt)
-       pname(1:gcnt) = pname0(1:gcnt)
-    if (OASIS_debug >= 15) then
-       do n = 1,gcnt
-          write(nulprt,*) subname,' grid writing, n,grid:partition = ',n,trim(gname(n)),':',trim(pname(n))
-       enddo
-       call oasis_flush(nulprt)
-    endif
-    endif
+    call oasis_mpi_reducelists(gname0,mpi_comm_local,gcnt,gname,'write2files',fastcheck=.true., &
+         linp2=pname0,lout2=pname,spval2=undefined_partname)
     deallocate(gname0)
     deallocate(pname0)
-    call oasis_mpi_bcast(gname,mpi_comm_local,subname//' gname')
-    call oasis_mpi_bcast(pname,mpi_comm_local,subname//' pname')
-
-    !-------------------------------------
-    !> * Document
-    !-------------------------------------
-
-    if (OASIS_debug >= 15) then
-       do n = 1,gcnt
-          write(nulprt,*) subname,' grid writing, n,grid:partition = ',n,trim(gname(n)),':',trim(pname(n))
-       enddo
-       call oasis_flush(nulprt)
-    endif
-    if (local_timers_on) call oasis_timer_stop ('grid_write_bcast')
+    call oasis_timer_stop('grid_write_reducelists')
 
     !-------------------------------------
     !> * Check that a grid defined on a partitition is defined on all tasks on that partition.
@@ -1418,6 +1158,8 @@ CONTAINS
     endif  ! terminated
     enddo  ! n = 1,prism_ngrid
     enddo  ! g = 1,gcnt
+
+    deallocate(gname,pname)
 
     if (local_timers_on) call oasis_timer_stop('grid_write_writefiles')
     endif ! writing_grids_call

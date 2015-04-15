@@ -56,8 +56,8 @@ mod_oasis_parameters.o: mod_oasis_kinds.o
 mod_oasis_data.o: mod_oasis_kinds.o 
 mod_oasis_sys.o: mod_oasis_kinds.o mod_oasis_data.o
 mod_oasis_mem.o: mod_oasis_kinds.o GPTLget_memusage.o mod_oasis_sys.o
-mod_oasis_mpi.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o
-mod_oasis_timer.o: mod_oasis_kinds.o mod_oasis_sys.o mod_oasis_mpi.o mod_oasis_data.o
+mod_oasis_timer.o: mod_oasis_kinds.o mod_oasis_sys.o mod_oasis_data.o
+mod_oasis_mpi.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o mod_oasis_timer.o
 mod_oasis_string.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o
 mod_oasis_namcouple.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \

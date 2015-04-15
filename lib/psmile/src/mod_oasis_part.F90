@@ -146,228 +146,50 @@ CONTAINS
    integer(kind=ip_intwp_p),pointer :: start(:),length(:)
    integer(kind=ip_intwp_p),pointer :: kparal(:)
    integer(kind=ip_intwp_p) :: ig_size
-   integer(kind=ip_intwp_p) :: pcnt, tot_pnum
+   integer(kind=ip_intwp_p) :: pcnt
    logical                  :: found
-   integer(kind=ip_intwp_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
-   character(len=ic_lvar2)  ,pointer :: loc_pname(:), loc_pname0(:)
-   character(len=ic_lvar2)  ,pointer :: pname0(:),pname(:),pname1(:)
-   integer(kind=ip_intwp_p) ,pointer :: pnum(:),rcnts(:),displ(:)
+   character(len=ic_lvar2), pointer :: pname0(:),pname(:)
    logical, parameter :: local_timers_on = .false.
-   logical, parameter :: gatherall_on = .false.
    character(len=*),parameter :: subname = '(oasis_part_setup)'
    !--------------------------------------------------------
 
    call oasis_debug_enter(subname)
 
+   if (local_timers_on) then
+      call oasis_timer_start('part_setup_barrier')
+      if (mpi_comm_local /= MPI_COMM_NULL) &
+               call MPI_BARRIER(mpi_comm_local, ierr)
+      call oasis_timer_stop('part_setup_barrier')
+   endif
    call oasis_timer_start('part_setup')
 
    !-----------------------------------------------
-   !> * Gather partition information
+   !> * Generate reduced partname list
    !-----------------------------------------------
 
-   if (local_timers_on) call oasis_timer_start('part_setup_gather')
-   allocate(pnum(mpi_size_local))
-   pnum = 0
-
-   !-----------------------------------------------
-   !>   * Gather number of partitions
-   !-----------------------------------------------
-
-   call MPI_GATHER(prism_npart, 1, MPI_INTEGER, pnum, 1, MPI_INTEGER, 0, mpi_comm_local, ierr)
-   if (local_timers_on) call oasis_timer_stop('part_setup_gather')
-
- if (gatherall_on) then
-
-   if (local_timers_on) call oasis_timer_start('part_setup_gather')
-   if (mpi_rank_local == 0) then
-      tot_pnum = sum(pnum)
-      if (OASIS_Debug >= 15) &
-         write(nulprt,*) subname,' part num = ',tot_pnum,pnum
-      allocate(pname0(tot_pnum))
-      allocate(rcnts(mpi_size_local),displ(mpi_size_local))
-      do m = 1,mpi_size_local
-         rcnts(m) = pnum(m) * ic_lvar2
-         if (m == 1) then
-            displ(m) = 0
-         else
-            displ(m) = displ(m-1) + rcnts(m-1)
-         endif
-      enddo
-      if (OASIS_Debug >= 15) then
-         write(nulprt,*) subname,' gatherv prism_npart ',prism_npart,ic_lvar2,prism_npart*ic_lvar2
-         write(nulprt,*) subname,' gatherv rcnts ',rcnts
-         write(nulprt,*) subname,' gatherv displ ',displ
-         call oasis_flush(nulprt)
-      endif
-   else
-      allocate(pname0(1),rcnts(1),displ(1))
-   endif
-
-   !-----------------------------------------------
-   !>   * if gatherall, Gather partition names
-   !-----------------------------------------------
-
-   allocate(loc_pname(prism_npart))
+   call oasis_timer_start('part_setup_reducelists')
+   allocate(pname0(prism_npart))
    do n = 1,prism_npart
-      loc_pname(n) = prism_part(n)%partname
+      pname0(n) = prism_part(n)%partname
    enddo
-   
-   call MPI_GATHERV(loc_pname, prism_npart*ic_lvar2, MPI_CHARACTER, pname0, rcnts, displ, MPI_CHARACTER, 0, mpi_comm_local, ierr) 
-   deallocate(loc_pname)
-   if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
-
-   !-----------------------------------------------
-   !>   * if gatherall, Determine the unique partitions on the root
-   !-----------------------------------------------
-
-   if (local_timers_on) call oasis_timer_start('part_setup_rootsrch')
-   deallocate(rcnts, displ)
-   if (mpi_rank_local == 0) then
-      pcnt = 0
-      do n = 1,tot_pnum
-         if (OASIS_Debug >= 15) &
-            write(nulprt,*) subname,' check pname0 ',n,trim(pname0(n))
-         p = 0
-         found = .false.
-         do while (p < pcnt .and. .not.found)
-            p = p + 1
-            if (pname0(n) == pname0(p)) found = .true.
-         enddo
-         if (.not.found) then
-            pcnt = pcnt + 1
-            pname0(pcnt) = pname0(n)
-         endif
-      enddo
-   endif
-   if (local_timers_on) call oasis_timer_stop ('part_setup_rootsrch')
-
- else   ! gatherall_on
-
-   allocate(loc_pname(prism_npart))
-   do n = 1,prism_npart
-      loc_pname(n) = prism_part(n)%partname
-   enddo
-   if (mpi_rank_local == 0) then
-      pcnt = 0
-      allocate(pname0(max(prism_npart,20)))  ! 20 is arbitrary starting number
-   else
-      allocate(pname0(1))
-   endif
-
-   !-----------------------------------------------
-   !>   * if not gatherall, Loop over tasks
-   !-----------------------------------------------
-
-   do m = 1,mpi_size_local
-      taskid = m - 1
-
-      !-----------------------------------------------
-      !>     * if not gatherall, Send partitions to root
-      !-----------------------------------------------
-
-      if (mpi_rank_local == taskid .and. prism_npart > 0) then
-         if (local_timers_on) call oasis_timer_start('part_setup_gather')
-         if (mpi_rank_local /= 0) then
-            if (OASIS_Debug >= 15) then
-               write(nulprt,*) subname,' send prism_npart ',mpi_rank_local,m,prism_npart,ic_lvar2
-               call oasis_flush(nulprt)
-            endif
-            call MPI_SEND(loc_pname, prism_npart*ic_lvar2, MPI_CHARACTER, 0, 900+m, mpi_comm_local, ierr)
-            call oasis_mpi_chkerr(ierr,subname//':send')
-         endif
-         if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
-      endif
-
-      !-----------------------------------------------
-      !>     * if not gatherall, Recv partitions on root
-      !>     * if not gatherall, Determine the unique partitions on the root
-      !-----------------------------------------------
-
-      if (mpi_rank_local == 0 .and. pnum(m) > 0) then
-         if (local_timers_on) call oasis_timer_start ('part_setup_gather')
-         if (OASIS_Debug >= 15) then
-            write(nulprt,*) subname,' recv prism_npart ',mpi_rank_local,m,pnum(m),ic_lvar2
-            call oasis_flush(nulprt)
-         endif
-         allocate(loc_pname0(pnum(m)))
-         if (taskid == 0) then
-            loc_pname0 = loc_pname   ! copy local values
-         else
-            call MPI_RECV(loc_pname0, pnum(m)*ic_lvar2, MPI_CHARACTER, taskid, 900+m, mpi_comm_local, status, ierr)
-            call oasis_mpi_chkerr(ierr,subname//':recv')
-         endif
-         if (local_timers_on) call oasis_timer_stop ('part_setup_gather')
-
-         if (local_timers_on) call oasis_timer_start('part_setup_rootsrch')
-         do n = 1,pnum(m)
-            if (OASIS_Debug >= 15) write(nulprt,*) subname,' check loc_pname0 ',m,n,trim(loc_pname0(n))
-
-            p = 0
-            found = .false.
-            do while (p < pcnt .and. .not.found)
-               p = p + 1
-               if (loc_pname0(n) == pname0(p)) found = .true.
-            enddo
-            if (.not.found) then
-               pcnt = pcnt + 1
-               if (pcnt > size(pname0)) then
-                  allocate(pname1(size(pname0)))
-                  pname1 = pname0
-                  deallocate(pname0)
-                  if (OASIS_Debug >= 15) then
-                     write(nulprt,*) subname,' resize pname0 ',size(pname1),pcnt+pnum(m)
-                     call oasis_flush(nulprt)
-                  endif
-                  allocate(pname0(pcnt+pnum(m)))
-                  pname0(1:size(pname1)) = pname1(1:size(pname1))
-                  deallocate(pname1)
-               endif
-               pname0(pcnt) = loc_pname0(n)
-            endif
-         enddo  ! pnum
-         deallocate(loc_pname0)
-         if (local_timers_on) call oasis_timer_stop('part_setup_rootsrch')
-
-      endif  ! rank == 0 and pnum > 0
-
-   enddo  ! mpi_size_local
-
-   deallocate(loc_pname)
-
- endif  ! gatherall_on
-
-   deallocate(pnum)
-
-   !-------------------------------------------------     
-   !> * Broadcast the partition information to all tasks
-   !-------------------------------------------------     
-
-   if (local_timers_on) call oasis_timer_start('part_setup_bcast')
-   call oasis_mpi_bcast(pcnt,mpi_comm_local,subname//' pcnt')
-   allocate(pname(pcnt))
-   if (mpi_rank_local == 0) then
-      pname(1:pcnt) = pname0(1:pcnt)
-   endif
+   call oasis_mpi_reducelists(pname0,mpi_comm_local,pcnt,pname,'part_setup',fastcheck=.true.)
    deallocate(pname0)
-   call oasis_mpi_bcast(pname,mpi_comm_local,subname//' pname')
-
-   !--- document
-
-   if (OASIS_debug >= 15) then
-      do n = 1,pcnt
-         write(nulprt,*) subname,' partitions: ',n,trim(pname(n))
-      enddo
-      call oasis_flush(nulprt)
-   endif
-   if (local_timers_on) call oasis_timer_stop ('part_setup_bcast')
+   call oasis_timer_stop('part_setup_reducelists')
 
    !-------------------------------------------------     
    !> * Define all partitions on all tasks
    !-------------------------------------------------     
 
-   if (local_timers_on) call oasis_timer_start('part_setup_initgsm')
+   if (local_timers_on) then
+      call oasis_timer_start('part_setup_initgsm_barrier')
+      if (mpi_comm_local /= MPI_COMM_NULL) &
+               call MPI_BARRIER(mpi_comm_local, ierr)
+      call oasis_timer_stop('part_setup_initgsm_barrier')
+   endif
+   call oasis_timer_start('part_setup_initgsm')
    do p = 1,pcnt
 
+      if (local_timers_on) call oasis_timer_start('part_setup_initgsm_A')
       !--- set m, either a prism_part that already exists
       found = .false.
       n = 0
@@ -378,7 +200,9 @@ CONTAINS
             found = .true.
          endif
       enddo
+      if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_A')
 
+      if (local_timers_on) call oasis_timer_start('part_setup_initgsm_B')
       !--- or m is a new prism_part that must be instantiated
       !--- and set to have no data
       if (.not.found) then
@@ -389,11 +213,13 @@ CONTAINS
          allocate(prism_part(prism_npart)%kparal(3))
          prism_part(prism_npart)%kparal = 0
       endif
+      if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_B')
 
       !-------------------------------------------------     
       !> * Convert kparal information to data for the gsmap
       !-------------------------------------------------     
 
+      if (local_timers_on) call oasis_timer_start('part_setup_initgsm_C')
       allocate(kparal(size(prism_part(m)%kparal)))
       kparal = prism_part(m)%kparal
       ig_size = prism_part(m)%ig_size
@@ -459,11 +285,13 @@ CONTAINS
          write(nulprt,*) subname,estr,'strategy set in kparal array index ',CLIM_Strategy
          call oasis_abort()
       endif
+      if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_C')
    
       !-------------------------------------------------     
       !> * Initialize the local gsmap and partition gsmap
       !-------------------------------------------------     
 
+      if (local_timers_on) call oasis_timer_start('part_setup_initgsm_D')
       if (mpi_comm_local /= MPI_COMM_NULL) then
          if (ig_size > 0) then
             call mct_gsmap_init(prism_part(m)%gsmap,start,length,mpi_root_local,&
@@ -495,7 +323,9 @@ CONTAINS
       !   prism_part(m)%gsize = -1
       !   prism_part(m)%mpicom = MPI_COMM_NULL
       endif
+      if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_D')
    
+      if (local_timers_on) call oasis_timer_start('part_setup_initgsm_E')
       deallocate(start,length)
       deallocate(kparal)
       deallocate(prism_part(m)%kparal)
@@ -503,10 +333,13 @@ CONTAINS
       if (OASIS_debug >= 2) then
          call oasis_part_write(prism_part(m),m)
       endif
+      if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_E')
 
    enddo   ! p = 1,pcnt
 
-   if (local_timers_on) call oasis_timer_stop ('part_setup_initgsm')
+   deallocate(pname)
+
+   call oasis_timer_stop ('part_setup_initgsm')
    call oasis_timer_stop('part_setup')
       
    call oasis_debug_exit(subname)

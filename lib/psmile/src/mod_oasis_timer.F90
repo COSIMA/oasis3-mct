@@ -41,7 +41,6 @@ module mod_oasis_timer
    use mod_oasis_kinds
    use mod_oasis_data
    use mod_oasis_sys
-   use mod_oasis_mpi
 
    implicit none
    private
@@ -341,7 +340,7 @@ module mod_oasis_timer
 !-----------------------------------------------------
          if (mpi_size_local > 0) then
 
-            call oasis_mpi_max(ntimer,ntimermax,mpi_comm_local,string='ntimer',all=.true.)
+            call MPI_ALLREDUCE(ntimer,ntimermax,1,MPI_INTEGER,MPI_MAX,mpi_comm_local,ierror)
 
             allocate (sum_ctime_global_tmp(ntimermax, mpi_size_local), &
                       sum_wtime_global_tmp(ntimermax, mpi_size_local), stat=ierror)
