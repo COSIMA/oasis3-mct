@@ -8,6 +8,10 @@ MODULE mod_oasis_sys
 
    IMPLICIT NONE
 
+   character(len=*),parameter,public :: astr = ' ABORT: '   ! abort string
+   character(len=*),parameter,public :: estr = ' ERROR: '   ! error string
+   character(len=*),parameter,public :: wstr = ' WARNING: ' ! warning string
+
    private
 
    public oasis_abort
@@ -24,10 +28,6 @@ MODULE mod_oasis_sys
    integer(ip_intwp_p),save :: maxion
    integer(ip_intwp_p),parameter :: tree_delta = 2
    integer(ip_intwp_p),save :: tree_indent = 0
-
-   character(len=*),parameter,public :: astr = ' ABORT: '   ! abort string
-   character(len=*),parameter,public :: estr = ' ERROR: '   ! error string
-   character(len=*),parameter,public :: wstr = ' WARNING: ' ! warning string
 
 !--------------------------------------------------------------------
 CONTAINS
