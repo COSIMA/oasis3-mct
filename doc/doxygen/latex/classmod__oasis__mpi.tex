@@ -47,7 +47,9 @@ subroutine, public \hyperlink{classmod__oasis__mpi_aaf477847380fbbbc1341520b0b3e
 subroutine, public \hyperlink{classmod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}{oasis\+\_\+mpi\+\_\+init} (string)
 \begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+I\+N\+I\+T. \end{DoxyCompactList}\item 
 subroutine, public \hyperlink{classmod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}{oasis\+\_\+mpi\+\_\+finalize} (string)
-\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+Z\+E. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+Z\+E. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}{oasis\+\_\+mpi\+\_\+reducelists} (linp1, comm, cntout, lout1, callstr, fastcheck, fastcheckout, linp2, lout2, spval2, linp3, lout3, spval3)
+\begin{DoxyCompactList}\small\item\em Custom method for reducing M\+P\+I lists across pes for O\+A\+S\+I\+S. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Private Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -162,7 +164,7 @@ Write error messages and Call M\+P\+I\+\_\+\+A\+B\+O\+R\+T.
 \end{DoxyParams}
 
 
-Definition at line 2383 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2382 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aaf477847380fbbbc1341520b0b3e66da}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+barrier@{oasis\+\_\+mpi\+\_\+barrier}}
 \index{oasis\+\_\+mpi\+\_\+barrier@{oasis\+\_\+mpi\+\_\+barrier}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -185,7 +187,7 @@ Call M\+P\+I\+\_\+\+B\+A\+R\+R\+I\+E\+R for a particular communicator.
 \end{DoxyParams}
 
 
-Definition at line 2423 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2421 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a6d10e1673748a91dc7ec955ef16d771a}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastc0@{oasis\+\_\+mpi\+\_\+bcastc0}}
 \index{oasis\+\_\+mpi\+\_\+bcastc0@{oasis\+\_\+mpi\+\_\+bcastc0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -214,7 +216,7 @@ Broadcast a character string.
 \end{DoxyParams}
 
 
-Definition at line 653 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 652 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a99b3a1ab4c7617b5bc83d3c6360aaef3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastc1@{oasis\+\_\+mpi\+\_\+bcastc1}}
 \index{oasis\+\_\+mpi\+\_\+bcastc1@{oasis\+\_\+mpi\+\_\+bcastc1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -243,7 +245,7 @@ Broadcast an array of 1\+D character strings.
 \end{DoxyParams}
 
 
-Definition at line 695 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 694 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_af8bc029a22d59f1188b7f8a1a2645c40}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti0@{oasis\+\_\+mpi\+\_\+bcasti0}}
 \index{oasis\+\_\+mpi\+\_\+bcasti0@{oasis\+\_\+mpi\+\_\+bcasti0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -272,7 +274,7 @@ Broadcast a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 569 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 568 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a6f9140637f29d3939dc9c53930101e2e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti1@{oasis\+\_\+mpi\+\_\+bcasti1}}
 \index{oasis\+\_\+mpi\+\_\+bcasti1@{oasis\+\_\+mpi\+\_\+bcasti1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -301,7 +303,7 @@ Broadcast an array of 1\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 779 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 778 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ad6918adccdd62a278066f41b0b8edf57}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti2@{oasis\+\_\+mpi\+\_\+bcasti2}}
 \index{oasis\+\_\+mpi\+\_\+bcasti2@{oasis\+\_\+mpi\+\_\+bcasti2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -330,7 +332,7 @@ Broadcast an array of 2\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 949 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 948 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a1426590a36b24f1770381b9c35563cff}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastl0@{oasis\+\_\+mpi\+\_\+bcastl0}}
 \index{oasis\+\_\+mpi\+\_\+bcastl0@{oasis\+\_\+mpi\+\_\+bcastl0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -359,7 +361,7 @@ Broadcast a scalar logical.
 \end{DoxyParams}
 
 
-Definition at line 611 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 610 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a8b03787549fba5faff499c946d521db0}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastl1@{oasis\+\_\+mpi\+\_\+bcastl1}}
 \index{oasis\+\_\+mpi\+\_\+bcastl1@{oasis\+\_\+mpi\+\_\+bcastl1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -388,7 +390,7 @@ Broadcast an array of 1\+D logicals.
 \end{DoxyParams}
 
 
-Definition at line 821 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 820 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a3b21bebef1b56b31bd6d07e83d7a59a6}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr0@{oasis\+\_\+mpi\+\_\+bcastr0}}
 \index{oasis\+\_\+mpi\+\_\+bcastr0@{oasis\+\_\+mpi\+\_\+bcastr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -417,7 +419,7 @@ Broadcast a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 737 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 736 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a6f12178b027ff30cb87f9f8313b459d5}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr1@{oasis\+\_\+mpi\+\_\+bcastr1}}
 \index{oasis\+\_\+mpi\+\_\+bcastr1@{oasis\+\_\+mpi\+\_\+bcastr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -446,7 +448,7 @@ Broadcast an array of 1\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 863 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 862 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ab14018fe59cd737067e4f4202a3eeb39}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr2@{oasis\+\_\+mpi\+\_\+bcastr2}}
 \index{oasis\+\_\+mpi\+\_\+bcastr2@{oasis\+\_\+mpi\+\_\+bcastr2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -475,7 +477,7 @@ Broadcast an array of 2\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 905 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 904 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ac01edbda3e33b1feff9b797f83f82e8c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr3@{oasis\+\_\+mpi\+\_\+bcastr3}}
 \index{oasis\+\_\+mpi\+\_\+bcastr3@{oasis\+\_\+mpi\+\_\+bcastr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -504,7 +506,7 @@ Broadcast an array of 3\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 993 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 992 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a15ba68764a1f4dd07d403e46afae824c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+chkerr@{oasis\+\_\+mpi\+\_\+chkerr}}
 \index{oasis\+\_\+mpi\+\_\+chkerr@{oasis\+\_\+mpi\+\_\+chkerr}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -529,7 +531,7 @@ This method compares rcode to M\+P\+I\+\_\+\+S\+U\+C\+C\+E\+S\+S. If rcode is an
 \end{DoxyParams}
 
 
-Definition at line 126 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 128 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2690a841a331f4398cc4b5a244bbc52e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+commrank@{oasis\+\_\+mpi\+\_\+commrank}}
 \index{oasis\+\_\+mpi\+\_\+commrank@{oasis\+\_\+mpi\+\_\+commrank}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -555,7 +557,7 @@ Get the rank (task I\+D) for a task in a communicator.
 \end{DoxyParams}
 
 
-Definition at line 2287 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2286 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_adac784196d7af85611752214137dd4db}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+commsize@{oasis\+\_\+mpi\+\_\+commsize}}
 \index{oasis\+\_\+mpi\+\_\+commsize@{oasis\+\_\+mpi\+\_\+commsize}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -581,7 +583,7 @@ Get the total number of tasks associated with a communicator.
 \end{DoxyParams}
 
 
-Definition at line 2252 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2251 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+finalize@{oasis\+\_\+mpi\+\_\+finalize}}
 \index{oasis\+\_\+mpi\+\_\+finalize@{oasis\+\_\+mpi\+\_\+finalize}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -601,7 +603,7 @@ Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+Z\+E.
 \end{DoxyParams}
 
 
-Definition at line 2490 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2488 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a88a13ea3b4f96074669fdc872fe41728}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}}
 \index{oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -644,7 +646,7 @@ This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyp
 \end{DoxyParams}
 
 
-Definition at line 1135 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1134 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a68afb4ab4136545faeaa2c37a1eb294a}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}}
 \index{oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -684,7 +686,7 @@ This method initializes glob1\+D\+Arr, glob\+Size, and displs for use in the \hy
 \end{DoxyParams}
 
 
-Definition at line 1041 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1040 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+init@{oasis\+\_\+mpi\+\_\+init}}
 \index{oasis\+\_\+mpi\+\_\+init@{oasis\+\_\+mpi\+\_\+init}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -704,7 +706,7 @@ Call M\+P\+I\+\_\+\+I\+N\+I\+T.
 \end{DoxyParams}
 
 
-Definition at line 2457 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2455 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a384f170e63ac03f25d3bd549245b43f3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+initialized@{oasis\+\_\+mpi\+\_\+initialized}}
 \index{oasis\+\_\+mpi\+\_\+initialized@{oasis\+\_\+mpi\+\_\+initialized}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -727,7 +729,7 @@ Check whether M\+P\+I has been initialized.
 \end{DoxyParams}
 
 
-Definition at line 2322 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2321 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a0b469347d40c78c317042fa069d9baa5}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxi0@{oasis\+\_\+mpi\+\_\+maxi0}}
 \index{oasis\+\_\+mpi\+\_\+maxi0@{oasis\+\_\+mpi\+\_\+maxi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -759,7 +761,7 @@ Compute a global maximum for a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 2000 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1999 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2ba8d76b016ddde4013aecc2ca0b1d9f}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxi1@{oasis\+\_\+mpi\+\_\+maxi1}}
 \index{oasis\+\_\+mpi\+\_\+maxi1@{oasis\+\_\+mpi\+\_\+maxi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -791,7 +793,7 @@ Compute an array of global maximums for an array of 1\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 2063 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2062 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a7f46e23956ff948e039c5c1cdde0f6f3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxr0@{oasis\+\_\+mpi\+\_\+maxr0}}
 \index{oasis\+\_\+mpi\+\_\+maxr0@{oasis\+\_\+mpi\+\_\+maxr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -823,7 +825,7 @@ Compute a global maximum for a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 2126 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2125 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ae57151fc4714e33d7e0e1cf0aa65ae64}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxr1@{oasis\+\_\+mpi\+\_\+maxr1}}
 \index{oasis\+\_\+mpi\+\_\+maxr1@{oasis\+\_\+mpi\+\_\+maxr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -855,7 +857,7 @@ Compute an array of global maximums for an array of 1\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 2189 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2188 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2832568cd4d34db40cdcc39ffa876474}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}}
 \index{oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -887,7 +889,7 @@ Compute a global minimum for a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 1748 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1747 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aed0c20d56fdab764f0ad8e48e3a7209f}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}}
 \index{oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -919,7 +921,7 @@ Compute an array of global minimums for an array of 1\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 1811 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1810 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_af3628ad005b1a21e8f33e3dc2be38635}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}}
 \index{oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -951,7 +953,7 @@ Compute an global minimum for a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 1874 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1873 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a29c460b836ae9ad77ee1ac21f684d188}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}}
 \index{oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -983,7 +985,7 @@ Compute an array of global minimums for an array of 1\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 1937 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1936 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ad89796f10a2225d4930cdec65546cf98}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvi0@{oasis\+\_\+mpi\+\_\+recvi0}}
 \index{oasis\+\_\+mpi\+\_\+recvi0@{oasis\+\_\+mpi\+\_\+recvi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1015,7 +1017,7 @@ Receive a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 364 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 363 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_acf13ea626ed09fe98123f23d0990879d}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvi1@{oasis\+\_\+mpi\+\_\+recvi1}}
 \index{oasis\+\_\+mpi\+\_\+recvi1@{oasis\+\_\+mpi\+\_\+recvi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1047,7 +1049,7 @@ Receive an array of 1\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 405 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 404 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2578d560c80d608340b5a49b327642ba}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr0@{oasis\+\_\+mpi\+\_\+recvr0}}
 \index{oasis\+\_\+mpi\+\_\+recvr0@{oasis\+\_\+mpi\+\_\+recvr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1079,7 +1081,7 @@ Receive a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 446 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 445 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2bbd8de453167b4c73aa09c3c44c0ca8}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr1@{oasis\+\_\+mpi\+\_\+recvr1}}
 \index{oasis\+\_\+mpi\+\_\+recvr1@{oasis\+\_\+mpi\+\_\+recvr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1111,7 +1113,7 @@ Receive an array of 1\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 487 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 486 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a2c3b82d2346a69cd20be3d35c5e70be6}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr3@{oasis\+\_\+mpi\+\_\+recvr3}}
 \index{oasis\+\_\+mpi\+\_\+recvr3@{oasis\+\_\+mpi\+\_\+recvr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1143,7 +1145,75 @@ Receive an array of 3\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 528 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 527 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+reducelists@{oasis\+\_\+mpi\+\_\+reducelists}}
+\index{oasis\+\_\+mpi\+\_\+reducelists@{oasis\+\_\+mpi\+\_\+reducelists}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+reducelists}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+reducelists (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), dimension(\+:), intent(in), pointer}]{linp1, }
+\item[{integer, intent(in)}]{comm, }
+\item[{integer, intent(out)}]{cntout, }
+\item[{character($\ast$), dimension(\+:), intent(inout), pointer}]{lout1, }
+\item[{character($\ast$), intent(in)}]{callstr, }
+\item[{logical, intent(in), optional}]{fastcheck, }
+\item[{logical, intent(out), optional}]{fastcheckout, }
+\item[{character($\ast$), dimension(\+:), intent(in), optional, pointer}]{linp2, }
+\item[{character($\ast$), dimension(\+:), intent(inout), optional, pointer}]{lout2, }
+\item[{character($\ast$), intent(in), optional}]{spval2, }
+\item[{integer, dimension(\+:), intent(in), optional, pointer}]{linp3, }
+\item[{integer, dimension(\+:), intent(inout), optional, pointer}]{lout3, }
+\item[{integer, intent(in), optional}]{spval3}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}
+
+
+Custom method for reducing M\+P\+I lists across pes for O\+A\+S\+I\+S. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em linp1} & input list on each task\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em cntout} & size of lout1 list\\
+\hline
+\mbox{\tt in,out}  & {\em lout1} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em callstr} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em fastcheck} & run a fastcheck first\\
+\hline
+\mbox{\tt out}  & {\em fastcheckout} & true if fastcheck worked\\
+\hline
+\mbox{\tt in}  & {\em linp2} & input list on each task\\
+\hline
+\mbox{\tt in,out}  & {\em lout2} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em spval2} & unset value for linp2\\
+\hline
+\mbox{\tt in}  & {\em linp3} & input list on each task\\
+\hline
+\mbox{\tt in,out}  & {\em lout3} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em spval3} & unset value for linp3 \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check argument consistency
+\item Fast compare on all tasks
+\item Generate initial unique local name list
+\item Log2 reduction of linp over tasks to root
+\begin{DoxyItemize}
+\item Send list
+\item Recv list
+\item Determine the unique list
+\end{DoxyItemize}
+\item Broadcast the list information to all tasks from root 
+\end{DoxyItemize}
+
+Definition at line 2521 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a9d0d807b92d39c9789eea4744d331612}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}}
 \index{oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1186,7 +1256,7 @@ This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyp
 \end{DoxyParams}
 
 
-Definition at line 1184 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1183 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aa5078962eee157f52878f711c0a29afb}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendi0@{oasis\+\_\+mpi\+\_\+sendi0}}
 \index{oasis\+\_\+mpi\+\_\+sendi0@{oasis\+\_\+mpi\+\_\+sendi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1218,7 +1288,7 @@ Send a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 164 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 163 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aab4cc0d2b50e8e73697e6d88d23b03cd}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendi1@{oasis\+\_\+mpi\+\_\+sendi1}}
 \index{oasis\+\_\+mpi\+\_\+sendi1@{oasis\+\_\+mpi\+\_\+sendi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1250,7 +1320,7 @@ Send an array of 1\+D integers.
 \end{DoxyParams}
 
 
-Definition at line 204 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 203 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ab38f15fbce57555ea66ccbc1aa477dd1}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr0@{oasis\+\_\+mpi\+\_\+sendr0}}
 \index{oasis\+\_\+mpi\+\_\+sendr0@{oasis\+\_\+mpi\+\_\+sendr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1282,7 +1352,7 @@ Send a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 244 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 243 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a948cd001c0955ae19f4b410d4cca9f9b}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr1@{oasis\+\_\+mpi\+\_\+sendr1}}
 \index{oasis\+\_\+mpi\+\_\+sendr1@{oasis\+\_\+mpi\+\_\+sendr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1314,7 +1384,7 @@ Send an array of 1\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 284 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 283 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ac8809a8b29b3ffa246612b9c25cd05eb}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr3@{oasis\+\_\+mpi\+\_\+sendr3}}
 \index{oasis\+\_\+mpi\+\_\+sendr3@{oasis\+\_\+mpi\+\_\+sendr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1346,7 +1416,7 @@ Send an array of 3\+D doubles.
 \end{DoxyParams}
 
 
-Definition at line 324 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 323 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_ae4d2818f21f445e594aad97598f49d8e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}}
 \index{oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1378,7 +1448,7 @@ Compute a global sum for a scalar 8 byte integer.
 \end{DoxyParams}
 
 
-Definition at line 1358 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1357 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a3f32594b15b9ae3629969839ab952012}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}}
 \index{oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1412,7 +1482,7 @@ This sums an array of local integers to an array of summed integers. This does n
 \end{DoxyParams}
 
 
-Definition at line 1424 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1423 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_adbb3963310e45ac012e5e28f13d5781e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}}
 \index{oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1444,7 +1514,7 @@ Compute a global Sum for a scalar integer.
 \end{DoxyParams}
 
 
-Definition at line 1229 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1228 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a507bb5e0ae088d68bb68c566e8965bef}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}}
 \index{oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1478,7 +1548,7 @@ This sums an array of local integers to an array of summed integers. This does n
 \end{DoxyParams}
 
 
-Definition at line 1295 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1294 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a02b0555479a3d54e1c3d42219af9b991}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}}
 \index{oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1510,7 +1580,7 @@ Compute a global sum for a scalar double.
 \end{DoxyParams}
 
 
-Definition at line 1487 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1486 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aac62148bc912b158aff769572f27b8d3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}}
 \index{oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1544,7 +1614,7 @@ This sums an array of local doubles to an array of summed doubles. This does not
 \end{DoxyParams}
 
 
-Definition at line 1553 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1552 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_afbc665ae71c97d0b0467323cd86a5973}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}}
 \index{oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1578,7 +1648,7 @@ This sums an array of local doubles to an array of summed doubles. This does not
 \end{DoxyParams}
 
 
-Definition at line 1619 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1618 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_a41836fe23aeb81e65b4d24f6f0c90953}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}}
 \index{oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1612,7 +1682,7 @@ This sums an array of local doubles to an array of summed doubles. This does not
 \end{DoxyParams}
 
 
-Definition at line 1685 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1684 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 \hypertarget{classmod__oasis__mpi_aa3786c2cab131c3834583e7943ba28c8}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+wtime@{oasis\+\_\+mpi\+\_\+wtime}}
 \index{oasis\+\_\+mpi\+\_\+wtime@{oasis\+\_\+mpi\+\_\+wtime}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
@@ -1632,10 +1702,10 @@ Return a timestamp from M\+P\+I\+\_\+\+W\+T\+I\+M\+E.
 \end{DoxyParams}
 
 
-Definition at line 2356 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 2355 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 
 
 The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+ceg15a/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

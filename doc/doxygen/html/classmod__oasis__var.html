@@ -239,22 +239,6 @@ Private Member Functions</h2></td></tr>
 
 <p>Synchronize variables across all tasks, called at oasis enddef. </p>
 <ul>
-<li>Check whether all tasks have same vars defined. If so, then skip a bunch of the work to sort it out.</li>
-<li>Gather variable information across all tasks<ul>
-<li>Gather number of variables</li>
-<li>If gatherall, Gather variable names</li>
-<li>If gatherall, Gather partition names</li>
-<li>If gatherall, Gather in/out variable setting</li>
-</ul>
-</li>
-<li>If gatherall, Determine the unique variable names on the root</li>
-<li>If not gatherall, Loop over each task<ul>
-<li>If not gatherall, Send variable, partition, inout to root</li>
-<li>If not gatherall, Recv variable, partition, inout on root</li>
-<li>If not gatherall, Determine the unique variable names on the root</li>
-</ul>
-</li>
-<li>Broadcast the variable information to all tasks</li>
 <li>Initialize variables on tasks where they are not previously defined. </li>
 </ul>
 
@@ -286,7 +270,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Zero variable information. </p>
 
-<p>Definition at line <a class="el" href="mod__oasis__var_8_f90_source.html#l00636">636</a> of file <a class="el" href="mod__oasis__var_8_f90_source.html">mod_oasis_var.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__var_8_f90_source.html#l00295">295</a> of file <a class="el" href="mod__oasis__var_8_f90_source.html">mod_oasis_var.F90</a>.</p>
 
 </div>
 </div>
@@ -356,12 +340,12 @@ Private Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this module was generated from the following file:<ul>
-<li>/Users/tcraig/Desktop/oasis/oasis3-mct.ceg15a/lib/psmile/src/<a class="el" href="mod__oasis__var_8_f90_source.html">mod_oasis_var.F90</a></li>
+<li>/Users/tcraig/Desktop/oasis/oasis3-mct.trunk/lib/psmile/src/<a class="el" href="mod__oasis__var_8_f90_source.html">mod_oasis_var.F90</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 13 2015 15:04:25 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 17 2015 17:57:38 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

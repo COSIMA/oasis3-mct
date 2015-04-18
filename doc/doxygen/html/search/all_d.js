@@ -59,5 +59,6 @@ var searchData=
   ['prism_5ftorestout',['prism_torestout',['../classmod__oasis__parameters.html#a9ed7a0f0a9392248de5b4b15849843df',1,'mod_oasis_parameters']]],
   ['prism_5fvar',['prism_var',['../classmod__oasis__var.html#ae66c490437c2960d795fbd3d2c773a0a',1,'mod_oasis_var']]],
   ['prism_5fvar_5ftype',['prism_var_type',['../structmod__oasis__var_1_1prism__var__type.html',1,'mod_oasis_var']]],
+  ['prism_5fwaitgroup',['prism_waitgroup',['../classmod__oasis__parameters.html#ae5cbdfb558e82bfb8695a8cf425780cb',1,'mod_oasis_parameters']]],
   ['prtout',['prtout',['../classmod__oasis__namcouple.html#aee06276b65463fb85340dcc2ab9d67dc',1,'mod_oasis_namcouple']]]
 ];

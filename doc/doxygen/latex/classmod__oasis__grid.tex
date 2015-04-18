@@ -110,7 +110,7 @@ Local interface to find grid\+I\+D for a specified grid name.
 \end{DoxyParams}
 
 
-Definition at line 1432 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+Definition at line 1174 of file mod\+\_\+oasis\+\_\+grid.\+F90.
 
 \hypertarget{classmod__oasis__grid_a5aba1fce549be5f9db2fda5374d588e1}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+grid\+\_\+loc2glo@{oasis\+\_\+grid\+\_\+loc2glo}}
 \index{oasis\+\_\+grid\+\_\+loc2glo@{oasis\+\_\+grid\+\_\+loc2glo}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
@@ -139,7 +139,7 @@ Local routine that gathers the local array using partition information.
 \end{DoxyParams}
 
 
-Definition at line 1480 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+Definition at line 1222 of file mod\+\_\+oasis\+\_\+grid.\+F90.
 
 \hypertarget{classmod__oasis__grid_a4bc230ba4aa317f666bdab2416b4f6da}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+print\+\_\+grid\+\_\+data@{oasis\+\_\+print\+\_\+grid\+\_\+data}}
 \index{oasis\+\_\+print\+\_\+grid\+\_\+data@{oasis\+\_\+print\+\_\+grid\+\_\+data}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
@@ -206,20 +206,6 @@ Write fields to grid files. Only write fields that have been buffered and if pri
 
 
 \begin{DoxyItemize}
-\item Gather and sync grid information across tasks.
-\begin{DoxyItemize}
-\item if gatherall, Gather grid names.
-\item if gatherall, Gather partition names
-\item if gatherall, Determine unique grid names on root.
-\item if not gatherall, Loop over tasks
-\begin{DoxyItemize}
-\item if not gatherall, Send grid and partition to root
-\item if not gatherall, Recv grid and partition on root
-\item if not gatherall, Determine unique grid names on root.
-\end{DoxyItemize}
-\item Broadcast grid and partition names
-\end{DoxyItemize}
-\item Document
 \item Check that a grid defined on a partitition is defined on all tasks on that partition.
 \item Write grid information
 \begin{DoxyItemize}
@@ -590,4 +576,4 @@ Definition at line 114 of file mod\+\_\+oasis\+\_\+grid.\+F90.
 
 The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+ceg15a/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

@@ -135,7 +135,7 @@ Create a new partition internally, needed for mapping.
 \end{DoxyItemize}
 \end{DoxyItemize}
 
-Definition at line 588 of file mod\+\_\+oasis\+\_\+part.\+F90.
+Definition at line 421 of file mod\+\_\+oasis\+\_\+part.\+F90.
 
 \hypertarget{classmod__oasis__part_a80f66cc0ce5857aa53d070861f05b521}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+setup@{oasis\+\_\+part\+\_\+setup}}
 \index{oasis\+\_\+part\+\_\+setup@{oasis\+\_\+part\+\_\+setup}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
@@ -150,19 +150,7 @@ Synchronize partitions across all tasks, called at oasis enddef.
 
 
 \begin{DoxyItemize}
-\item Gather partition information
-\begin{DoxyItemize}
-\item Gather number of partitions
-\item if gatherall, Gather partition names
-\item if gatherall, Determine the unique partitions on the root
-\item if not gatherall, Loop over tasks
-\begin{DoxyItemize}
-\item if not gatherall, Send partitions to root
-\item if not gatherall, Recv partitions on root
-\item if not gatherall, Determine the unique partitions on the root
-\end{DoxyItemize}
-\end{DoxyItemize}
-\item Broadcast the partition information to all tasks
+\item Generate reduced partname list
 \item Define all partitions on all tasks
 \item Convert kparal information to data for the gsmap
 \item Initialize the local gsmap and partition gsmap 
@@ -184,7 +172,7 @@ Print parition information.
 
 
 
-Definition at line 547 of file mod\+\_\+oasis\+\_\+part.\+F90.
+Definition at line 380 of file mod\+\_\+oasis\+\_\+part.\+F90.
 
 \hypertarget{classmod__oasis__part_a17c747bc29d25b558df42524bd63ac90}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+zero@{oasis\+\_\+part\+\_\+zero}}
 \index{oasis\+\_\+part\+\_\+zero@{oasis\+\_\+part\+\_\+zero}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
@@ -199,7 +187,7 @@ Zero partition information.
 
 
 
-Definition at line 519 of file mod\+\_\+oasis\+\_\+part.\+F90.
+Definition at line 352 of file mod\+\_\+oasis\+\_\+part.\+F90.
 
 
 
@@ -252,4 +240,4 @@ Definition at line 46 of file mod\+\_\+oasis\+\_\+part.\+F90.
 
 The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+ceg15a/lib/psmile/src/\hyperlink{mod__oasis__part_8_f90}{mod\+\_\+oasis\+\_\+part.\+F90}\end{DoxyCompactItemize}
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__part_8_f90}{mod\+\_\+oasis\+\_\+part.\+F90}\end{DoxyCompactItemize}

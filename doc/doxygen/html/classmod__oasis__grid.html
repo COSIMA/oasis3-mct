@@ -244,7 +244,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mod__oasis__grid_8_f90_source.html#l01432">1432</a> of file <a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__grid_8_f90_source.html#l01174">1174</a> of file <a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a>.</p>
 
 </div>
 </div>
@@ -303,7 +303,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mod__oasis__grid_8_f90_source.html#l01480">1480</a> of file <a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__grid_8_f90_source.html#l01222">1222</a> of file <a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a>.</p>
 
 </div>
 </div>
@@ -387,20 +387,6 @@ Private Attributes</h2></td></tr>
 <p>Interface that actually writes fields to grid files. </p>
 <p>Write fields to grid files. Only write fields that have been buffered and if prism_grid_terminate_grids_writing has been called. This is called by all tasks from oasis_enddef.</p>
 <ul>
-<li>Gather and sync grid information across tasks.<ul>
-<li>if gatherall, Gather grid names.</li>
-<li>if gatherall, Gather partition names</li>
-<li>if gatherall, Determine unique grid names on root.</li>
-<li>if not gatherall, Loop over tasks<ul>
-<li>if not gatherall, Send grid and partition to root</li>
-<li>if not gatherall, Recv grid and partition on root</li>
-<li>if not gatherall, Determine unique grid names on root.</li>
-</ul>
-</li>
-<li>Broadcast grid and partition names</li>
-</ul>
-</li>
-<li>Document</li>
 <li>Check that a grid defined on a partitition is defined on all tasks on that partition.</li>
 <li>Write grid information<ul>
 <li>Determine which tasks are associated with the grid information</li>
@@ -1128,12 +1114,12 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this module was generated from the following file:<ul>
-<li>/Users/tcraig/Desktop/oasis/oasis3-mct.ceg15a/lib/psmile/src/<a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a></li>
+<li>/Users/tcraig/Desktop/oasis/oasis3-mct.trunk/lib/psmile/src/<a class="el" href="mod__oasis__grid_8_f90_source.html">mod_oasis_grid.F90</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 13 2015 15:04:25 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 17 2015 17:57:38 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

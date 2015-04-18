@@ -291,7 +291,7 @@ Private Attributes</h2></td></tr>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00588">588</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00421">421</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
 
 </div>
 </div>
@@ -310,19 +310,7 @@ Private Attributes</h2></td></tr>
 
 <p>Synchronize partitions across all tasks, called at oasis enddef. </p>
 <ul>
-<li>Gather partition information<ul>
-<li>Gather number of partitions</li>
-<li>if gatherall, Gather partition names</li>
-<li>if gatherall, Determine the unique partitions on the root</li>
-<li>if not gatherall, Loop over tasks<ul>
-<li>if not gatherall, Send partitions to root</li>
-<li>if not gatherall, Recv partitions on root</li>
-<li>if not gatherall, Determine the unique partitions on the root</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Broadcast the partition information to all tasks</li>
+<li>Generate reduced partname list</li>
 <li>Define all partitions on all tasks</li>
 <li>Convert kparal information to data for the gsmap</li>
 <li>Initialize the local gsmap and partition gsmap </li>
@@ -366,7 +354,7 @@ Private Attributes</h2></td></tr>
 
 <p>Print parition information. </p>
 
-<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00547">547</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00380">380</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
 
 </div>
 </div>
@@ -394,7 +382,7 @@ Private Attributes</h2></td></tr>
 
 <p>Zero partition information. </p>
 
-<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00519">519</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
+<p>Definition at line <a class="el" href="mod__oasis__part_8_f90_source.html#l00352">352</a> of file <a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a>.</p>
 
 </div>
 </div>
@@ -480,12 +468,12 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this module was generated from the following file:<ul>
-<li>/Users/tcraig/Desktop/oasis/oasis3-mct.ceg15a/lib/psmile/src/<a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a></li>
+<li>/Users/tcraig/Desktop/oasis/oasis3-mct.trunk/lib/psmile/src/<a class="el" href="mod__oasis__part_8_f90_source.html">mod_oasis_part.F90</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 13 2015 15:04:25 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 17 2015 17:57:38 for Oasis3-MCT by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

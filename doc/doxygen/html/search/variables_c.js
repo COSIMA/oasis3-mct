@@ -26,6 +26,7 @@ var searchData=
   ['oasis_5ftorest',['oasis_torest',['../classmod__oasis__parameters.html#a875abcc1cc679cb72f20d42d3dbfac97',1,'mod_oasis_parameters']]],
   ['oasis_5ftorestout',['oasis_torestout',['../classmod__oasis__parameters.html#a390018877602efede436bd0721add299',1,'mod_oasis_parameters']]],
   ['oasis_5fvar_5funcpl',['oasis_var_uncpl',['../classmod__oasis__parameters.html#ac906e1466e6cdc300a0b582af6619ca5',1,'mod_oasis_parameters']]],
+  ['oasis_5fwaitgroup',['oasis_waitgroup',['../classmod__oasis__parameters.html#a2cc23572d33c536d49a53587359b68f0',1,'mod_oasis_parameters']]],
   ['ops',['ops',['../structmod__oasis__coupler_1_1prism__coupler__type.html#ac041ba5de191fa34468f61a674dd5bac',1,'mod_oasis_coupler::prism_coupler_type::ops()'],['../structmod__oasis__var_1_1prism__var__type.html#a9235132dc1d3cf0b89211c09dcc62fa2',1,'mod_oasis_var::prism_var_type::ops()']]],
   ['opt',['opt',['../structmod__oasis__map_1_1prism__mapper__type.html#a3b10832f360b8f2061807dfdec6be493',1,'mod_oasis_map::prism_mapper_type']]],
   ['optval',['optval',['../structmod__oasis__map_1_1prism__mapper__type.html#ad1516b48d26a0cf57a3c61c58298aa09',1,'mod_oasis_map::prism_mapper_type']]],

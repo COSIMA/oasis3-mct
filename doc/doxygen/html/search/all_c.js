@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['oasis3_2dmct_20version_203_2e0_3a_20march_2c_202015',['Oasis3-MCT Version 3.0: March, 2015',['../index.html',1,'']]],
+  ['oasis3_2dmct_20version_203_2e0_3a_20april_2c_202015',['Oasis3-MCT Version 3.0: April, 2015',['../index.html',1,'']]],
   ['oasis3_5fget',['oasis3_get',['../classmod__oasis__parameters.html#aa2ac99363b8f1aa7ff950fda3e3f5fff',1,'mod_oasis_parameters']]],
   ['oasis3_5fput',['oasis3_put',['../classmod__oasis__parameters.html#a325334a5e2f9d0c7846c1ef964f9f7e3',1,'mod_oasis_parameters']]],
   ['oasis_5fabort',['oasis_abort',['../classmod__oasis__sys.html#ae6bc2703e627d5a9491338c9569f8f4e',1,'mod_oasis_sys']]],
@@ -102,6 +102,7 @@ var searchData=
   ['oasis_5fmpi_5frecvr0',['oasis_mpi_recvr0',['../interfacemod__oasis__mpi_1_1oasis__mpi__recv.html#a6c501c168ddca69b50972959025044ff',1,'mod_oasis_mpi::oasis_mpi_recv::oasis_mpi_recvr0()'],['../classmod__oasis__mpi.html#a2578d560c80d608340b5a49b327642ba',1,'mod_oasis_mpi::oasis_mpi_recvr0()']]],
   ['oasis_5fmpi_5frecvr1',['oasis_mpi_recvr1',['../interfacemod__oasis__mpi_1_1oasis__mpi__recv.html#a6706db7315d932b5ff3a1fff5c917ea8',1,'mod_oasis_mpi::oasis_mpi_recv::oasis_mpi_recvr1()'],['../classmod__oasis__mpi.html#a2bbd8de453167b4c73aa09c3c44c0ca8',1,'mod_oasis_mpi::oasis_mpi_recvr1()']]],
   ['oasis_5fmpi_5frecvr3',['oasis_mpi_recvr3',['../interfacemod__oasis__mpi_1_1oasis__mpi__recv.html#a8a3e3cd1cd642121fb4cd943a744af68',1,'mod_oasis_mpi::oasis_mpi_recv::oasis_mpi_recvr3()'],['../classmod__oasis__mpi.html#a2c3b82d2346a69cd20be3d35c5e70be6',1,'mod_oasis_mpi::oasis_mpi_recvr3()']]],
+  ['oasis_5fmpi_5freducelists',['oasis_mpi_reducelists',['../classmod__oasis__mpi.html#a52ceb1f5d86efec2d94dcc7a18e90216',1,'mod_oasis_mpi']]],
   ['oasis_5fmpi_5fscatterv',['oasis_mpi_scatterv',['../interfacemod__oasis__mpi_1_1oasis__mpi__scatterv.html',1,'mod_oasis_mpi']]],
   ['oasis_5fmpi_5fscattervr1',['oasis_mpi_scattervr1',['../interfacemod__oasis__mpi_1_1oasis__mpi__scatterv.html#a3fcba01cf7b4de3c6c05fa8999f5c00d',1,'mod_oasis_mpi::oasis_mpi_scatterv::oasis_mpi_scattervr1()'],['../classmod__oasis__mpi.html#a9d0d807b92d39c9789eea4744d331612',1,'mod_oasis_mpi::oasis_mpi_scattervr1()']]],
   ['oasis_5fmpi_5fsend',['oasis_mpi_send',['../interfacemod__oasis__mpi_1_1oasis__mpi__send.html',1,'mod_oasis_mpi']]],
@@ -187,6 +188,7 @@ var searchData=
   ['oasis_5fvar_5fsetup',['oasis_var_setup',['../classmod__oasis__var.html#ab33b7fbec62bcfd15e9cd7f912f71035',1,'mod_oasis_var']]],
   ['oasis_5fvar_5funcpl',['oasis_var_uncpl',['../classmod__oasis__parameters.html#ac906e1466e6cdc300a0b582af6619ca5',1,'mod_oasis_parameters']]],
   ['oasis_5fvar_5fzero',['oasis_var_zero',['../classmod__oasis__var.html#aa780f62e9eded0a55d0077a990bf2443',1,'mod_oasis_var']]],
+  ['oasis_5fwaitgroup',['oasis_waitgroup',['../classmod__oasis__parameters.html#a2cc23572d33c536d49a53587359b68f0',1,'mod_oasis_parameters']]],
   ['oasis_5fwrite2files',['oasis_write2files',['../classmod__oasis__grid.html#a275791c512cefae9799e188d92b6f9d4',1,'mod_oasis_grid']]],
   ['oasis_5fwrite_5fangle',['oasis_write_angle',['../interfacemod__oasis__grid_1_1oasis__write__angle.html',1,'mod_oasis_grid']]],
   ['oasis_5fwrite_5fangle_5fr4',['oasis_write_angle_r4',['../interfacemod__oasis__grid_1_1oasis__write__angle.html#ad29c223ca87f1f54d042bce0a9b9e90d',1,'mod_oasis_grid::oasis_write_angle::oasis_write_angle_r4()'],['../classmod__oasis__grid.html#aa4f44626552980d5418d77447e1ce058',1,'mod_oasis_grid::oasis_write_angle_r4()']]],

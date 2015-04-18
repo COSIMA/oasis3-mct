@@ -108,22 +108,6 @@ Synchronize variables across all tasks, called at oasis enddef.
 
 
 \begin{DoxyItemize}
-\item Check whether all tasks have same vars defined. If so, then skip a bunch of the work to sort it out.
-\item Gather variable information across all tasks
-\begin{DoxyItemize}
-\item Gather number of variables
-\item If gatherall, Gather variable names
-\item If gatherall, Gather partition names
-\item If gatherall, Gather in/out variable setting
-\end{DoxyItemize}
-\item If gatherall, Determine the unique variable names on the root
-\item If not gatherall, Loop over each task
-\begin{DoxyItemize}
-\item If not gatherall, Send variable, partition, inout to root
-\item If not gatherall, Recv variable, partition, inout on root
-\item If not gatherall, Determine the unique variable names on the root
-\end{DoxyItemize}
-\item Broadcast the variable information to all tasks
 \item Initialize variables on tasks where they are not previously defined. 
 \end{DoxyItemize}
 
@@ -142,7 +126,7 @@ Zero variable information.
 
 
 
-Definition at line 636 of file mod\+\_\+oasis\+\_\+var.\+F90.
+Definition at line 295 of file mod\+\_\+oasis\+\_\+var.\+F90.
 
 
 
@@ -195,4 +179,4 @@ Definition at line 41 of file mod\+\_\+oasis\+\_\+var.\+F90.
 
 The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+ceg15a/lib/psmile/src/\hyperlink{mod__oasis__var_8_f90}{mod\+\_\+oasis\+\_\+var.\+F90}\end{DoxyCompactItemize}
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__var_8_f90}{mod\+\_\+oasis\+\_\+var.\+F90}\end{DoxyCompactItemize}
