@@ -81,7 +81,7 @@ PROGRAM ocnice
   ! Other stuff
   INTEGER             :: ierror, w_unit, icpl
   CHARACTER(len=32)   :: filename
-  INTEGER             :: FILE_Debug=2 ! to manage writing in the debug file w_unit
+  INTEGER             :: FILE_Debug=1 ! to manage writing in the debug file w_unit
   REAL*8, parameter :: spval = -1.0e36
   CHARACTER(len=*),PARAMETER :: subname = '(ocnice) '
 
@@ -111,10 +111,18 @@ PROGRAM ocnice
 
      ocnpe_start = 0
      ocnpe_end   = npes/2
-     icepe_start = npes/4
+     icepe_start = min(npes-1,npes/2+1)
      icepe_end   = max(npes-2,icepe_start)
      iope_start  = npes - 1
      iope_end    = npes - 1
+
+     WRITE(w_unit,*) subname,'ocnpe_start :',ocnpe_start
+     WRITE(w_unit,*) subname,'ocnpe_end :',ocnpe_end
+     WRITE(w_unit,*) subname,'icepe_start :',icepe_start
+     WRITE(w_unit,*) subname,'icepe_end :',icepe_end
+     WRITE(w_unit,*) subname,'iope_start :',iope_start
+     WRITE(w_unit,*) subname,'iope_end :',iope_end
+
 
      submodel = ' '
      if (mype >= ocnpe_start .and. mype <= ocnpe_end) then
@@ -317,11 +325,11 @@ PROGRAM ocnice
      write(w_unit,*) subname,' fld_i2p local  = ',minval(fld_i2p),maxval(fld_i2p),sum(fld_i2p)
      write(w_unit,*) subname,' fld_i2p global = ',fmin,fmax,fsum
 
-     fld_p1 = 1.0
-     fld_p2 = 2.0
-     fld_p3 = 3.0
-     fld_p4 = 4.0
-     fld_p5 = 5.0
+     fld_p1 = mype * 100. + 1.0 + float(time)/1.0e6
+     fld_p2 = mype * 100. + 2.0 + float(time)/1.0e6
+     fld_p3 = mype * 100. + 3.0 + float(time)/1.0e6
+     fld_p4 = mype * 100. + 4.0 + float(time)/1.0e6
+     fld_p5 = mype * 100. + 5.0 + float(time)/1.0e6
 
      call flddiag(fld_p1 , fmin, fmax, fsum, mpiocn)
      write(w_unit,*) subname,' fld_p1  local  = ',minval(fld_p1 ),maxval(fld_p1 ),sum(fld_p1 )
@@ -369,11 +377,11 @@ PROGRAM ocnice
      write(w_unit,*) subname,' fld_p3d local  = ',minval(fld_p3d),maxval(fld_p3d),sum(fld_p3d)
      write(w_unit,*) subname,' fld_p3d global = ',fmin,fmax,fsum
 
-     fld_d1 = 1.0
-     fld_d2 = 2.0
-     fld_d3 = 3.0
-     fld_d4 = 4.0
-     fld_d5 = 5.0
+     fld_d1 = mype * 200. + 1.0 + float(time)/1.0e6
+     fld_d2 = mype * 200. + 2.0 + float(time)/1.0e6
+     fld_d3 = mype * 200. + 3.0 + float(time)/1.0e6
+     fld_d4 = mype * 200. + 4.0 + float(time)/1.0e6
+     fld_d5 = mype * 200. + 5.0 + float(time)/1.0e6
 
      call flddiag(fld_d1 , fmin, fmax, fsum, mpiocn)
      write(w_unit,*) subname,' fld_d1  local  = ',minval(fld_d1 ),maxval(fld_d1 ),sum(fld_d1 )
@@ -503,10 +511,10 @@ PROGRAM ocnice
      write(w_unit,*) subname,' fld_d4i local  = ',minval(fld_d4i),maxval(fld_d4i),sum(fld_d4i)
      write(w_unit,*) subname,' fld_d4i global = ',fmin,fmax,fsum
 
-     fld_i1 = 1.0
-     fld_i2 = 2.0
-     fld_i3 = 3.0
-     fld_i4 = 4.0
+     fld_i1 = mype * 300. + 1.0 + float(time)/1.0e6
+     fld_i2 = mype * 300. + 2.0 + float(time)/1.0e6
+     fld_i3 = mype * 300. + 3.0 + float(time)/1.0e6
+     fld_i4 = mype * 300. + 4.0 + float(time)/1.0e6
 
      call flddiag(fld_i1 , fmin, fmax, fsum, mpiice)
      write(w_unit,*) subname,' fld_i1  local  = ',minval(fld_i1 ),maxval(fld_i1 ),sum(fld_i1 )
