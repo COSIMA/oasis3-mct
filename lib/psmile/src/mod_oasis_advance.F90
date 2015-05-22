@@ -56,6 +56,7 @@ contains
     character(len=ic_med) :: vstring   ! temporary string
     type(prism_coupler_type),pointer :: pcpointer
     character(len=*),parameter :: subname = '(oasis_advance_init)'
+    logical, parameter :: local_timers_on = .false.
 
     call oasis_debug_enter(subname)
 
@@ -71,7 +72,7 @@ contains
 
     kinfo = OASIS_OK
 
-    call oasis_timer_start ('advance_init')
+    IF (local_timers_on) call oasis_timer_start ('advance_init')
 
     if (OASIS_debug >= 2) then
        write(nulprt,*) '   subname         at         time    time+lag   act: field '
@@ -266,7 +267,7 @@ contains
     ENDIF  ! valid
     enddo  ! npc
     ENDDO  ! cplid
-    call oasis_timer_stop ('advance_init')
+    IF (local_timers_on) call oasis_timer_stop ('advance_init')
 
     call oasis_debug_exit(subname)
 

@@ -161,20 +161,19 @@ CONTAINS
                call MPI_BARRIER(mpi_comm_local, ierr)
       call oasis_timer_stop('part_setup_barrier')
    endif
-   call oasis_timer_start('part_setup')
+   if (local_timers_on) call oasis_timer_start('part_setup')
 
    !-----------------------------------------------
    !> * Generate reduced partname list
    !-----------------------------------------------
-
-   call oasis_timer_start('part_setup_reducelists')
+   IF (local_timers_on) CALL oasis_timer_start('part_setup_reducelists')
    allocate(pname0(prism_npart))
    do n = 1,prism_npart
       pname0(n) = prism_part(n)%partname
    enddo
    call oasis_mpi_reducelists(pname0,mpi_comm_local,pcnt,pname,'part_setup',fastcheck=.true.)
    deallocate(pname0)
-   call oasis_timer_stop('part_setup_reducelists')
+   IF (local_timers_on) CALL oasis_timer_stop('part_setup_reducelists')
 
    !-------------------------------------------------     
    !> * Define all partitions on all tasks
@@ -186,7 +185,7 @@ CONTAINS
                call MPI_BARRIER(mpi_comm_local, ierr)
       call oasis_timer_stop('part_setup_initgsm_barrier')
    endif
-   call oasis_timer_start('part_setup_initgsm')
+   IF (local_timers_on) CALL oasis_timer_start('part_setup_initgsm')
    do p = 1,pcnt
 
       if (local_timers_on) call oasis_timer_start('part_setup_initgsm_A')
@@ -339,8 +338,8 @@ CONTAINS
 
    deallocate(pname)
 
-   call oasis_timer_stop ('part_setup_initgsm')
-   call oasis_timer_stop('part_setup')
+   if (local_timers_on) call oasis_timer_stop ('part_setup_initgsm')
+   if (local_timers_on) call oasis_timer_stop('part_setup')
       
    call oasis_debug_exit(subname)
 

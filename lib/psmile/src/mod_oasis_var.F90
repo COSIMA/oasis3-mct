@@ -198,9 +198,9 @@
 
    call oasis_debug_enter(subname)
 
-   call oasis_timer_start('var_setup')
+   IF (local_timers_on) call oasis_timer_start('var_setup')
 
-   call oasis_timer_start('var_setup_reducelists')
+   IF (local_timers_on) call oasis_timer_start('var_setup_reducelists')
    allocate(vname0(prism_nvar))
    allocate(pname0(prism_nvar))
    allocate(inout0(prism_nvar))
@@ -217,7 +217,7 @@
    deallocate(vname0)
    deallocate(pname0)
    deallocate(inout0)
-   call oasis_timer_stop('var_setup_reducelists')
+   IF (local_timers_on) call oasis_timer_stop('var_setup_reducelists')
 
    !-------------------------------------------------     
    !> * Initialize variables on tasks where they are not previously defined.
@@ -282,7 +282,7 @@
 
    deallocate(vname,pname,inout)
 
-   call oasis_timer_stop('var_setup')
+   IF (local_timers_on) call oasis_timer_stop('var_setup')
       
    call oasis_debug_exit(subname)
 

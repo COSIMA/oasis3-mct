@@ -863,12 +863,12 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
-    call oasis_timer_start('grid_write')
+    IF (local_timers_on) call oasis_timer_start('grid_write')
 
     call oasis_mpi_bcast(writing_grids_call,mpi_comm_local,subname//'writing_grids_call')
     if (writing_grids_call .eq. 1) then
 
-    call oasis_timer_start('grid_write_reducelists')
+    IF (local_timers_on) call oasis_timer_start('grid_write_reducelists')
     allocate(gname0(prism_ngrid))
     allocate(pname0(prism_ngrid))
     do n = 1,prism_ngrid
@@ -886,7 +886,7 @@ CONTAINS
          linp2=pname0,lout2=pname,spval2=undefined_partname)
     deallocate(gname0)
     deallocate(pname0)
-    call oasis_timer_stop('grid_write_reducelists')
+    IF (local_timers_on) call oasis_timer_stop('grid_write_reducelists')
 
     !-------------------------------------
     !> * Check that a grid defined on a partitition is defined on all tasks on that partition.
@@ -1163,7 +1163,7 @@ CONTAINS
 
     if (local_timers_on) call oasis_timer_stop('grid_write_writefiles')
     endif ! writing_grids_call
-    call oasis_timer_stop('grid_write')
+    IF (local_timers_on) call oasis_timer_stop('grid_write')
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write2files

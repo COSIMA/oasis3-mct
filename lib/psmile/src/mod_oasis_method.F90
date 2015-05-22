@@ -627,9 +627,10 @@ CONTAINS
    integer (kind=ip_intwp_p) :: newcomm
    character(len=*),parameter :: subname = '(oasis_enddef)'
 !  ---------------------------------------------------------
+   CALL oasis_timer_start ('oasis_enddef')
 
    call oasis_debug_enter(subname)
-
+   
    !------------------------
    !> * Check enddef called only once per task
    !------------------------
@@ -768,7 +769,7 @@ CONTAINS
    if (present(kinfo)) then
       kinfo = OASIS_OK
    endif
-
+   CALL oasis_timer_stop ('oasis_enddef')
    call oasis_timer_stop('init_thru_enddef')
 
    call oasis_mem_print(nulprt,subname//':end')

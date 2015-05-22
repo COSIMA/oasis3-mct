@@ -189,7 +189,7 @@ CONTAINS
 
   call oasis_debug_enter(subname)
 !  call oasis_mpi_barrier(mpi_comm_global)
-  call oasis_timer_start('cpl_setup')
+  IF (local_timers_on) call oasis_timer_start('cpl_setup')
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
 
@@ -1364,15 +1364,15 @@ CONTAINS
            ! to support higher order mapping
            !-------------------------------
            if (smatread_method == "ceg") then
-              call oasis_timer_start('smatrd_ceg')
+              if (local_timers_on) call oasis_timer_start('smatrd_ceg')
               call oasis_map_smatreaddnc_ceg(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
                  trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
-              call oasis_timer_stop('smatrd_ceg')
+              if (local_timers_on) call oasis_timer_stop('smatrd_ceg')
            else
-              call oasis_timer_start('smatrd_orig')
+              if (local_timers_on) call oasis_timer_start('smatrd_orig')
               call oasis_map_smatreaddnc_orig(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
                  trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
-              call oasis_timer_stop('smatrd_orig')
+              if (local_timers_on) call oasis_timer_stop('smatrd_orig')
            endif
            if (local_timers_on) call oasis_timer_start('cpl_setup_sminit')
            prism_mapper(mapID)%nwgts = nwgts
@@ -1638,7 +1638,7 @@ CONTAINS
 
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4g')
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n4')
-  call oasis_timer_stop('cpl_setup')
+  IF (local_timers_on) call oasis_timer_stop('cpl_setup')
 
   call oasis_debug_exit(subname)
 
