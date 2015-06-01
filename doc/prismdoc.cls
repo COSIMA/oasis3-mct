@@ -360,7 +360,7 @@
              \begin{center}
                \vspace*{-\topsep}
                 \centering
-                 \includegraphics[width=4cm,angle=-90]{figures/logo_oasis3_guide}
+                 \includegraphics[width=8cm]{figures/logo_cerfacs_cnrs}
                \vspace*{-\topsep}
              \end{center}
                  }}}
