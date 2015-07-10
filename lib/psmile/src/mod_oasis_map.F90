@@ -43,6 +43,8 @@ MODULE mod_oasis_map
      logical               :: init        !< flag indicating initialization complete
      integer(kind=ip_i4_p) :: spart       !< src partition
      integer(kind=ip_i4_p) :: dpart       !< dst partition
+     character(len=ic_med) :: srcgrid     !< source grid name
+     character(len=ic_med) :: dstgrid     !< target grid name
      logical               :: AVred       !< flag indicating AV_ms, AV_md data has been read
      type(mct_aVect)       :: AV_ms       !< stores data for CONSERV for src such as mask and area
      type(mct_aVect)       :: AV_md       !< stores data for CONSERV for dst such as mask and area

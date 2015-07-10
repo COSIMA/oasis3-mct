@@ -711,6 +711,14 @@ CONTAINS
               endif
            endif
 
+           IF (OASIS_debug >= 20) THEN
+               WRITE(nulprt,*) subname,' Field : ',trim(prism_var(nn)%name)
+               WRITE(nulprt,*) subname,' Grid dst : ',trim(namdstgrd(nn))
+               WRITE(nulprt,*) subname,' Grid src : ',trim(namsrcgrd(nn))
+!               WRITE(nulprt,*) subname,' prism_part : ',prism_part(part1)%gridname
+               CALL oasis_flush(nulprt)
+           ENDIF
+
            !--------------------------------
            !>     * Make sure it's either an In or Out, sanity check
            !--------------------------------
@@ -1048,6 +1056,8 @@ CONTAINS
                           prism_mapper(mapID)%file = trim(tmp_mapfile)
                           prism_mapper(mapID)%loc  = trim(nammaploc(nn))
                           prism_mapper(mapID)%opt  = trim(nammapopt(nn))
+                          prism_mapper(mapID)%srcgrid = trim(namsrcgrd(nn))
+                          prism_mapper(mapID)%dstgrid = trim(namdstgrd(nn))
                           if (flag == OASIS_In ) prism_mapper(mapID)%dpart = part1
                           if (flag == OASIS_Out) prism_mapper(mapID)%spart = part1
                           if (OASIS_debug > 15) then
@@ -1409,7 +1419,8 @@ CONTAINS
            lsize = mct_gsmap_lsize(prism_part(spart)%gsmap,mpi_comm_local)
            call mct_avect_init(prism_mapper(mapID)%av_ms,iList='mask',rList='area',lsize=lsize)
            call mct_avect_zero(prism_mapper(mapID)%av_ms)
-           gridname = prism_part(spart)%gridname
+!           gridname = prism_part(spart)%gridname
+           gridname=prism_mapper(mapID)%srcgrid
            call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_ms, &
               prism_part(spart)%gsmap,mpi_comm_local,'mask',trim(gridname)//'.msk',fldtype='int')
            call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_ms, &
@@ -1418,7 +1429,8 @@ CONTAINS
            lsize = mct_gsmap_lsize(prism_part(dpart)%gsmap,mpi_comm_local)
            call mct_avect_init(prism_mapper(mapID)%av_md,iList='mask',rList='area',lsize=lsize)
            call mct_avect_zero(prism_mapper(mapID)%av_md)
-           gridname = prism_part(dpart)%gridname
+!           gridname = prism_part(dpart)%gridname
+           gridname=prism_mapper(mapID)%dstgrid
            call oasis_io_read_avfld('masks.nc',prism_mapper(mapID)%av_md, &
               prism_part(dpart)%gsmap,mpi_comm_local,'mask',trim(gridname)//'.msk',fldtype='int')
            call oasis_io_read_avfld('areas.nc',prism_mapper(mapID)%av_md, &
@@ -1671,64 +1683,68 @@ CONTAINS
      write(nulprt,*) ' '
      write(nulprt,*) subname,' model and cplid',compid,cplid
   if (pcprint%getput == OASIS3_PUT) then
-     write(nulprt,*) subname,'   send fields  ',trim(pcprint%fldlist)
-     write(nulprt,*) subname,'   from model   ',compid
-     write(nulprt,*) subname,'   to model     ',pcprint%comp
-     write(nulprt,*) subname,'   using router ',rouid
-     write(nulprt,*) subname,'   transform    ',pcprint%trans
-     write(nulprt,*) subname,'   snd diagnose ',pcprint%snddiag
-     write(nulprt,*) subname,'   snd fld mult ',pcprint%sndmult
-     write(nulprt,*) subname,'   snd fld add  ',pcprint%sndadd
+     write(nulprt,*) subname,'   send fields      ',trim(pcprint%fldlist)
+     write(nulprt,*) subname,'   from model       ',compid
+     write(nulprt,*) subname,'   to model         ',pcprint%comp
+     write(nulprt,*) subname,'   using router     ',rouid
+     write(nulprt,*) subname,'   transform        ',pcprint%trans
+     write(nulprt,*) subname,'   snd diagnose     ',pcprint%snddiag
+     write(nulprt,*) subname,'   snd fld mult     ',pcprint%sndmult
+     write(nulprt,*) subname,'   snd fld add      ',pcprint%sndadd
   endif
   if (pcprint%getput == OASIS3_GET) then
-     write(nulprt,*) subname,'   recv fields  ',trim(pcprint%fldlist)
-     write(nulprt,*) subname,'   from model   ',pcprint%comp
-     write(nulprt,*) subname,'   to model     ',compid
-     write(nulprt,*) subname,'   using router ',rouid
-     write(nulprt,*) subname,'   rcv diagnose ',pcprint%rcvdiag
-     write(nulprt,*) subname,'   rcv fld mult ',pcprint%rcvmult
-     write(nulprt,*) subname,'   rcv fld add  ',pcprint%rcvadd
+     write(nulprt,*) subname,'   recv fields      ',trim(pcprint%fldlist)
+     write(nulprt,*) subname,'   from model       ',pcprint%comp
+     write(nulprt,*) subname,'   to model         ',compid
+     write(nulprt,*) subname,'   using router     ',rouid
+     write(nulprt,*) subname,'   rcv diagnose     ',pcprint%rcvdiag
+     write(nulprt,*) subname,'   rcv fld mult     ',pcprint%rcvmult
+     write(nulprt,*) subname,'   rcv fld add      ',pcprint%rcvadd
   endif
-     write(nulprt,*) subname,'   namcouple op ',pcprint%ops
-     write(nulprt,*) subname,'   valid        ',pcprint%valid
-     write(nulprt,*) subname,'   namcouple id ',namid
-     write(nulprt,*) subname,'   variable ids ',pcprint%varid(1:nflds)
-     write(nulprt,*) subname,'   sndrcv flag  ',pcprint%sndrcv
-     write(nulprt,*) subname,'   output flag  ',pcprint%output
-     write(nulprt,*) subname,'   input flag   ',pcprint%input
-     write(nulprt,*) subname,'   input file   ',trim(pcprint%inpfile)
-     write(nulprt,*) subname,'   restart file ',trim(pcprint%rstfile)
-     write(nulprt,*) subname,'   tag          ',pcprint%tag
-     write(nulprt,*) subname,'   seq          ',pcprint%seq
-     write(nulprt,*) subname,'   maxtime      ',pcprint%maxtime
-     write(nulprt,*) subname,'   dt, lag      ',pcprint%dt,pcprint%lag
-     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
-                                                prism_part(parid)%gsize
-     write(nulprt,*) subname,'   partid, nx,ny',prism_part(parid)%nx,prism_part(parid)%ny
-     write(nulprt,*) subname,'   rpartid,size ',rpard,trim(prism_part(rpard)%gridname),&
-                                                prism_part(rpard)%gsize
-     write(nulprt,*) subname,'   rpartid,nx,ny',prism_part(rpard)%nx,prism_part(rpard)%ny
-     write(nulprt,*) subname,'   maploc       ',trim(pcprint%maploc)
+     write(nulprt,*) subname,'   namcouple op     ',pcprint%ops
+     write(nulprt,*) subname,'   valid            ',pcprint%valid
+     write(nulprt,*) subname,'   namcouple id     ',namid
+     write(nulprt,*) subname,'   variable ids     ',pcprint%varid(1:nflds)
+     write(nulprt,*) subname,'   sndrcv flag      ',pcprint%sndrcv
+     write(nulprt,*) subname,'   output flag      ',pcprint%output
+     write(nulprt,*) subname,'   input flag       ',pcprint%input
+     write(nulprt,*) subname,'   input file       ',trim(pcprint%inpfile)
+     write(nulprt,*) subname,'   restart file     ',trim(pcprint%rstfile)
+     write(nulprt,*) subname,'   tag              ',pcprint%tag
+     write(nulprt,*) subname,'   seq              ',pcprint%seq
+     write(nulprt,*) subname,'   maxtime          ',pcprint%maxtime
+     write(nulprt,*) subname,'   dt, lag          ',pcprint%dt,pcprint%lag
+!     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
+!                                               prism_part(parid)%gsize
+     write(nulprt,*) subname,'   partid, size     ',parid,prism_part(parid)%gsize                                                
+     write(nulprt,*) subname,'   partid, nx,ny    ',prism_part(parid)%nx,prism_part(parid)%ny
+!     write(nulprt,*) subname,'   rpartid,size ',rpard,trim(prism_part(rpard)%gridname),&
+!                                                prism_part(rpard)%gsize
+     write(nulprt,*) subname,'   rpartid,size     ',rpard,prism_part(rpard)%gsize
+     write(nulprt,*) subname,'   rpartid,nx,ny    ',prism_part(rpard)%nx,prism_part(rpard)%ny
+     write(nulprt,*) subname,'   maploc           ',trim(pcprint%maploc)
 
   if (mapid > 0) then
-     write(nulprt,*) subname,'   use map      ',mapid,trim(prism_mapper(mapid)%file)
-     write(nulprt,*) subname,'   nwgts        ',mapid,prism_mapper(mapid)%nwgts
+     WRITE(nulprt,*) subname,'   src mask on grid ',trim(prism_mapper(mapid)%srcgrid)
+     WRITE(nulprt,*) subname,'   dst mask on grid ',trim(prism_mapper(mapid)%dstgrid)
+     write(nulprt,*) subname,'   use map          ',mapid,trim(prism_mapper(mapid)%file)
+     write(nulprt,*) subname,'   nwgts            ',mapid,prism_mapper(mapid)%nwgts
      spart = prism_mapper(mapid)%spart
      dpart = prism_mapper(mapid)%dpart
-     write(nulprt,*) subname,'   conserve     ',pcprint%conserv
-     write(nulprt,*) subname,'   conserve opt ',pcprint%consopt
-     write(nulprt,*) subname,'   location     ',trim(prism_mapper(mapid)%loc)
-     write(nulprt,*) subname,'   opt,optval   ',trim(prism_mapper(mapid)%opt),' ',&
-                                                trim(prism_mapper(mapid)%optval)
-     write(nulprt,*) subname,'   s/d partids  ',spart,dpart
+     write(nulprt,*) subname,'   conserve         ',pcprint%conserv
+     write(nulprt,*) subname,'   conserve opt     ',pcprint%consopt
+     write(nulprt,*) subname,'   location         ',trim(prism_mapper(mapid)%loc)
+     write(nulprt,*) subname,'   opt,optval       ',trim(prism_mapper(mapid)%opt),' ',&
+                                                    trim(prism_mapper(mapid)%optval)
+     write(nulprt,*) subname,'   s/d partids      ',spart,dpart
      if (spart > 0) &
-     write(nulprt,*) subname,'   from/to      ',trim(prism_part(spart)%gridname),' ',&
-                                                trim(prism_part(dpart)%gridname)
-     write(nulprt,*) subname,'   from nx,ny   ',prism_part(spart)%gsize,prism_part(spart)%nx,&
-                                                prism_part(spart)%ny
+     write(nulprt,*) subname,'   from/to partition',trim(prism_part(spart)%gridname),' ',&
+                                                    trim(prism_part(dpart)%gridname)
+     write(nulprt,*) subname,'   from nx,ny       ',prism_part(spart)%gsize,prism_part(spart)%nx,&
+                                                    prism_part(spart)%ny
      if (dpart > 0) &
-     write(nulprt,*) subname,'   to nx,ny     ',prism_part(dpart)%gsize, prism_part(dpart)%nx,&
-                                                prism_part(dpart)%ny
+     write(nulprt,*) subname,'   to nx,ny         ',prism_part(dpart)%gsize, prism_part(dpart)%nx,&
+                                                    prism_part(dpart)%ny
   endif  ! mapid > 0
 
   call oasis_flush(nulprt)
