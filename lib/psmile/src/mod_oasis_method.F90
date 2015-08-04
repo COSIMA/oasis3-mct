@@ -504,6 +504,10 @@ CONTAINS
 
    ! Allocate timer memory based on maxvar
    nt = 7*maxvar+30
+   if (OASIS_debug >= 15)  then
+      write(nulprt,*) subname,' Total number of time stamps = ',nt
+      call oasis_flush(nulprt)
+   endif
    call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers',nt)
    call oasis_timer_start('total')
    call oasis_timer_start('init_thru_enddef')
@@ -627,7 +631,6 @@ CONTAINS
    integer (kind=ip_intwp_p) :: newcomm
    character(len=*),parameter :: subname = '(oasis_enddef)'
 !  ---------------------------------------------------------
-   CALL oasis_timer_start ('oasis_enddef')
 
    call oasis_debug_enter(subname)
    
@@ -648,6 +651,7 @@ CONTAINS
 
    lkinfo = OASIS_OK
 
+   CALL oasis_timer_start ('oasis_enddef')
    call oasis_mem_print(nulprt,subname//':start')
 
    !------------------------
