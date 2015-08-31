@@ -41,7 +41,7 @@ ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY -DTMG_PERF
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY 
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 

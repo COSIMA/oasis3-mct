@@ -39,7 +39,7 @@ ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 #  
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # 
 F90FLAGS_1  = -g -ffree-line-length-0 -fbounds-check

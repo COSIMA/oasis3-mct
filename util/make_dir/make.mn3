@@ -39,8 +39,7 @@ ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-#CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTMG_PERF
-CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DTMG_PERF 
+CPPDEF    = -Duse_libMPI -Duse_comm_$(CHAN)  
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
