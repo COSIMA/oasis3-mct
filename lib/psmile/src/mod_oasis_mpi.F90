@@ -2407,7 +2407,11 @@ SUBROUTINE oasis_mpi_abort(string,rcode)
       lstr = ' '
    endif
 
-   call oasis_abort(cd_routine=subName,cd_message=trim(string))
+   IF ( PRESENT(rcode)) THEN
+       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string),rcode=rcode)
+   ELSE
+       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string))
+   ENDIF
 
    call oasis_debug_exit(subname)
 

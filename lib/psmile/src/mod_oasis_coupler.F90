@@ -1725,8 +1725,8 @@ CONTAINS
      write(nulprt,*) subname,'   maploc           ',trim(pcprint%maploc)
 
   if (mapid > 0) then
-     WRITE(nulprt,*) subname,'   src mask on grid ',trim(prism_mapper(mapid)%srcgrid)
-     WRITE(nulprt,*) subname,'   dst mask on grid ',trim(prism_mapper(mapid)%dstgrid)
+     WRITE(nulprt,*) subname,'   src grid        :',trim(prism_mapper(mapid)%srcgrid)
+     WRITE(nulprt,*) subname,'   dst grid        :',trim(prism_mapper(mapid)%dstgrid)
      write(nulprt,*) subname,'   use map          ',mapid,trim(prism_mapper(mapid)%file)
      write(nulprt,*) subname,'   nwgts            ',mapid,prism_mapper(mapid)%nwgts
      spart = prism_mapper(mapid)%spart

@@ -37,15 +37,16 @@ CONTAINS
 
 !> OASIS abort method, publically available to users
 
-   SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message)
+   SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, rcode)
 
    IMPLICIT NONE
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(in),optional :: id_compid  !< component id
    CHARACTER(len=*), INTENT(in),optional :: cd_routine   !< string defining calling routine
    CHARACTER(len=*), INTENT(in),optional :: cd_message   !< error message string
+   INTEGER,INTENT(in),optional           :: rcode        !< optional code to return to invoking environment 
 !--------------------------------------------------------------------
-   INTEGER                      :: ierror
+   INTEGER                      :: ierror, errcode
    character(len=*),parameter   :: subname = '(oasis_abort)'
 !--------------------------------------------------------------------
 
@@ -55,6 +56,12 @@ CONTAINS
    WRITE (nulprt,*) subname,astr,'called by = ',trim(cd_routine)
    if (present(cd_message))  &
    WRITE (nulprt,*) subname,astr,'message   = ',trim(cd_message)
+   IF (PRESENT(rcode))  THEN
+       errcode=rcode
+       WRITE (nulprt,*) subname,astr,'errcode   = ',errcode
+   ELSE
+       errcode=0
+   ENDIF
 
    WRITE (nulprt,*) subname,astr,'on model  = ',trim(compnm)
    WRITE (nulprt,*) subname,astr,'on global rank = ',mpi_rank_global
@@ -63,7 +70,7 @@ CONTAINS
    CALL oasis_flush(nulprt)
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
-   CALL MPI_ABORT (mpi_comm_global, 0, ierror)
+   CALL MPI_ABORT (mpi_comm_global, errcode, ierror)
 #endif
 
    STOP
