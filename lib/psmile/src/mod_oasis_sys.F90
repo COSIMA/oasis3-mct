@@ -60,7 +60,7 @@ CONTAINS
        errcode=rcode
        WRITE (nulprt,*) subname,astr,'errcode   = ',errcode
    ELSE
-       errcode=0
+       errcode=1
    ENDIF
 
    WRITE (nulprt,*) subname,astr,'on model  = ',trim(compnm)
