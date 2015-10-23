@@ -429,9 +429,8 @@ These routines can be called only by one component process to write the whole gr
 \item {\tt CALL oasis\_start\_grids\_writing (flag)} or
 \item {\tt CALL prism\_start\_grids\_writing (flag)}
   \begin{itemize}
-  \item {\tt flag [INTEGER; OUT]}: not used 
+  \item {\tt flag [INTEGER; OUT]}: not used ; obsolete in OASIS3-MCT; can be called for upward compatibility. 
   \end{itemize}
-Obsolete in OASIS3-MCT; can be called for upward compatibility.
   
   \vspace{0.2cm}
 \item {\tt CALL oasis\_write\_grid (cgrid, nx\_global, ny\_global, lon, lat, il\_part\_id)}

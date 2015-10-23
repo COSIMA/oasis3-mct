@@ -79,6 +79,8 @@ restart file is not needed at all). This is
   prints them to the OASIS3-MCT debug file (for the master process of
   the source component model only under the 
   attribute ``diags''). This operation does not transform the field.
+  CHECKIN operation can significantly slow down the simulation. It should
+  not be used in production mode.
 
   The generic input line is as follows:
  \begin{verbatim}
@@ -697,8 +699,9 @@ restart file is not needed at all). This is
   of the target component model only). These informations are found in 
   the debug file of the master process of the target model under the 
   attribute ``diags''. This operation does not
-  transform the field.  The generic input line is as for {\tt CHECKIN}
-  (see above).
+  transform the field. CHECKOUT operation can significantly slow down the simulation.
+  It should not be used in production mode.
+  The generic input line is as for {\tt CHECKIN} (see above).
 
 \item {\bf GLORED}: UNUSED
 
