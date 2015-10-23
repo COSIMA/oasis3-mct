@@ -1457,7 +1457,7 @@ SUBROUTINE inipar_alloc()
                     ! For IGNORED, IGNOUT and OUTPUT, only one line for LOCTRANS
                     READ (UNIT = nulin,FMT = 2002) clline
                     IF (mpi_rank_global == 0) THEN
-                        WRITE(nulprt1,*)'OUTPUT clline=', clline
+                        WRITE(nulprt1,*)'OUTPUT clline=', trim(clline)
                         CALL oasis_flush(nulprt1)
                     ENDIF
                     CALL skip(clline, jpeighty)
@@ -1794,8 +1794,8 @@ SUBROUTINE inipar_alloc()
 
    !* Print out the information mode
 
-   CALL prcout &
-      ('The information mode is activated ? ==>', clinfo, 1)
+!   CALL prcout &
+!      ('The information mode is activated ? ==>', clinfo, 1)
 
    !* Get the printing level for this simulation
 
