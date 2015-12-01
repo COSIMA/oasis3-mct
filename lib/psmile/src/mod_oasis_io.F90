@@ -128,7 +128,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,estr,'av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
+         WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                       TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
          call oasis_abort()
       endif
 
@@ -241,8 +242,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
 
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,estr,'av gsize nx ny mismatch ',&
-                         size(av_g%rAttr,dim=2),nx,ny
+         write(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                         TRIM(lstring),SIZE(av_g%rAttr,dim=2),nx,ny
          call oasis_abort()
       endif
 
@@ -473,7 +474,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
-                  write(nulprt,*) subname,estr,'av gsize nx ny mismatch = ',size(av_g%rAttr,dim=2),nx,ny
+                  WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file = ',&
+                                               TRIM(rstfile),SIZE(av_g%rAttr,dim=2),nx,ny
                   call oasis_abort()
                endif
 
@@ -921,7 +923,8 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,estr,'av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
+         WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                      TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
          call oasis_abort()
       endif
 
@@ -1137,7 +1140,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
-             write(nulprt,*) subname,estr,'av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
+             WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                           TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
              call oasis_abort()
          endif
 
