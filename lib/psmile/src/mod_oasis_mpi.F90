@@ -2912,7 +2912,9 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    cntout = cnt
    allocate(lout1(cntout))
    if (commrank == 0) then
-      lout1(1:cntout) = varf1a(1:cntout)
+      do n = 1,cntout
+         lout1(n) = trim(varf1a(n))
+      enddo
    endif
    deallocate(varf1a)
    call oasis_mpi_bcast(lout1,comm,subname//trim(string)//' lout1')
@@ -2920,7 +2922,9 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    if (present2) then
       allocate(lout2(cntout))
       if (commrank == 0) then
-         lout2(1:cntout) = varf2a(1:cntout)
+         do n = 1,cntout
+            lout2(n) = trim(varf2a(n))
+         enddo
       endif
       deallocate(varf2a)
       call oasis_mpi_bcast(lout2,comm,subname//trim(string)//' lout2')
@@ -2929,7 +2933,9 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    if (present3) then
       allocate(lout3(cntout))
       if (commrank == 0) then
-         lout3(1:cntout) = varf3a(1:cntout)
+         do n = 1,cntout
+            lout3(n) = varf3a(n)
+         enddo
       endif
       deallocate(varf3a)
       call oasis_mpi_bcast(lout3,comm,subname//trim(string)//' lout3')
