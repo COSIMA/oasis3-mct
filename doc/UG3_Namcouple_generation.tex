@@ -169,15 +169,17 @@ must be in the second column. Only 4 keywords are really used by OASIS3-MCT\_3.0
     oasis\_set\_debug} routine, see section
   \ref{subsubsec_auxroutines}) may be:
   \begin{itemize}
-  \item 0 : one file debug.root.xx is open by the master process of
+  \item 0 : production mode. One file debug.root.xx is open by the master process of
     each component and one file debug\_notroot.xx is open for all the
     other processes of each component to write only error information.
   \item 1 : one file debug.root.xx is open by the master process of
     each component to write information equivalent to level 10 (see
-    below); one file debug\_notroot.xx is open for all the other
+    below) and also to write memory usage information; 
+    one file debug\_notroot.xx is open for all the other
     processes of each component to write error information.
   \item 2 : one file debug.yy.xxxxxx is open by each process of each
-    component (with ``yy” being the component number and ``xxxxxx” the process number) to write normal production diagnostics
+    component (with ``yy” being the component number and ``xxxxxx” the process number) 
+    to write normal production diagnostics and memory usage information
   \item 5 : as for 2 with in addition some initial debug info
   \item 10: as for 5 with in addition the routine calling tree
   \item 12: as for 10 with in addition some routine calling notes

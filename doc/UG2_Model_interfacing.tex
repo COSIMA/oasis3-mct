@@ -799,7 +799,7 @@ All processes of components at least partly involved in the coupling (e.g. {\tt 
 The following auxiliary routines are currently available.
 
 \begin{itemize}
-\item {\tt CALL oasis\_abort (compid, routine\_name, abort\_message)}
+\item {\tt CALL oasis\_abort (compid, routine\_name, abort\_message, rcode)}
 \item {\tt CALL prism\_abort\_proto(compid, routine\_name,
     abort\_message)}
   \begin{itemize}
@@ -808,6 +808,8 @@ The following auxiliary routines are currently available.
   \item {\tt routine\_name[CHARACTER*; IN]}: name of calling routine
   \item {\tt abort\_message[CHARACTER*; IN]}: message to be written
     out.
+  \item {\tt rcode [INTEGER, OPTIONAL; IN]}: Optional argument. When OASIS 
+    aborts, it returns rcode if it is present, else it returns 1
   \end{itemize}
 
   If a process needs to abort voluntarily, it should do so by calling

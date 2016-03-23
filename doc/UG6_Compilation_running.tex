@@ -130,20 +130,21 @@ increasing the {\tt \$NLOGPRT} value in your {\it namcouple} (see also section
 
 Different outputs are written depending on {\tt \$NLOGPRT} value:
 \begin{itemize}
-\item {0} : one file debug.root.xx is opened by the master process of
+\item {0} : production mode. One file debug.root.xx is opened by the master process of
   each model and one file debug\_notroot.xx is opened for all the other
   processes of each model to write only error information if an error
   occurs.
 \item {1} : one file debug.root.xx is opened by the master process of
-  each model to write information equivalent to level 10 (see below);
+  each model to write information equivalent to level 10 (see below)
+  and also to write memory usage information;
   one file debug\_notroot.xx is opened for all the other processes of
   each model to write only error information if an error occurs.
 \item {2} : one file debug.xx.xxxxxx is opened by each process of each
-  model to write normal production diagnostics.
+  model to write normal production diagnostics .
 \item {5} : as for 2 with in addition some initial debug info.
 \item {10} : as for 5 with in addition the routine calling tree.
 \item {12} : as for 10 with in addition some routine calling notes.
-\item {15} : as for 12 with even more debug diagnostics.
+\item {15} : as for 12 with even more debug diagnostics and memory usage information.
 \item {20} : as for 15 with in addition some extra runtime analysis.
 \item {30} : full debug information.
 \end{itemize}
