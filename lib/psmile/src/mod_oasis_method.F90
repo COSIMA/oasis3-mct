@@ -495,8 +495,10 @@ CONTAINS
    !> * Memory Initialization
    !------------------------
 
-   call oasis_mem_init(nulprt)
-   call oasis_mem_print(nulprt,subname)
+   IF (OASIS_debug >= 2)  THEN
+       CALL oasis_mem_init(nulprt)
+       CALL oasis_mem_print(nulprt,subname)
+   ENDIF
 
    !------------------------
    !> * Timer Initialization
@@ -599,8 +601,9 @@ CONTAINS
    !------------------------
    !> * Write SUCCESSFUL RUN
    !------------------------
-
-   call oasis_mem_print(nulprt,subname)
+   IF (OASIS_debug >= 2)  THEN
+       CALL oasis_mem_print(nulprt,subname)
+   ENDIF
 
    IF (mpi_rank_local == 0)  THEN
        WRITE(nulprt,*) subname,' SUCCESSFUL RUN'
@@ -648,7 +651,9 @@ CONTAINS
    lkinfo = OASIS_OK
 
    CALL oasis_timer_start ('oasis_enddef')
-   call oasis_mem_print(nulprt,subname//':start')
+   IF (OASIS_debug >= 2)  THEN
+       CALL oasis_mem_print(nulprt,subname//':start')
+   ENDIF
 
    !------------------------
    !> * Reset mpi_comm_global because active tasks might have been excluded
@@ -708,14 +713,18 @@ CONTAINS
       !------------------------
 
       call oasis_part_setup()
-      call oasis_mem_print(nulprt,subname//':part_setup')
+      IF (OASIS_debug >= 2)  THEN
+          CALL oasis_mem_print(nulprt,subname//':part_setup')
+      ENDIF
 
       !------------------------
       !>   * Reconcile variables, call var_setup
       !------------------------
 
       call oasis_var_setup()
-      call oasis_mem_print(nulprt,subname//':var_setup')
+      IF (OASIS_debug >= 2)  THEN
+          CALL oasis_mem_print(nulprt,subname//':var_setup')
+      ENDIF
 
       !------------------------
       !>   * Write grid info to files one model at a time
@@ -728,7 +737,9 @@ CONTAINS
          endif
          call oasis_mpi_barrier(mpi_comm_global)
       enddo
-      call oasis_mem_print(nulprt,subname//':write2files')
+      IF (OASIS_debug >= 2)  THEN
+          CALL oasis_mem_print(nulprt,subname//':write2files')
+      ENDIF
 
       !------------------------
       !>   * MCT Initialization
@@ -749,8 +760,9 @@ CONTAINS
          WRITE(nulprt,*) subname, ' done prism_coupler_setup '
          CALL oasis_flush(nulprt)
       ENDIF
-      call oasis_mem_print(nulprt,subname//':coupler_setup')
-
+      IF (OASIS_debug >= 2)  THEN
+          CALL oasis_mem_print(nulprt,subname//':coupler_setup')
+      ENDIF
       !------------------------
       !>   * Call advance_init to initialize coupling fields from restarts
       !------------------------
@@ -760,7 +772,9 @@ CONTAINS
          WRITE(nulprt,*) subname, ' done prism_advance_init '
          CALL oasis_flush(nulprt)
       ENDIF
-      call oasis_mem_print(nulprt,subname//':advance_init')
+      IF (OASIS_debug >= 2)  THEN
+          CALL oasis_mem_print(nulprt,subname//':advance_init')
+      ENDIF
 
    endif   !  (mpi_comm_local /= MPI_COMM_NULL)
 
@@ -772,7 +786,9 @@ CONTAINS
    CALL oasis_timer_stop ('oasis_enddef')
    call oasis_timer_stop('init_thru_enddef')
 
-   call oasis_mem_print(nulprt,subname//':end')
+   IF (OASIS_debug >= 2)  THEN
+       CALL oasis_mem_print(nulprt,subname//':end')
+   ENDIF
 
    call oasis_debug_exit(subname)
 

@@ -31,16 +31,16 @@
       public :: MCTWorld        ! The MCTWorld  class data structure
 
     type MCTWorld
-      integer :: MCT_comm                          ! MCT communicator
-      integer :: ncomps	                           ! Total number of components
-      integer :: mygrank                           ! Rank of this processor in 
-                                                   ! global communicator.
-      integer,dimension(:),pointer :: nprocspid	   ! Number of processes 
-                                                   ! each component is on (e.g. rank of its
-						   ! local communicator.
-      integer,dimension(:,:),pointer :: idGprocid  ! Translate between local component rank
-                                                   ! rank in global communicator.
-						   ! idGprocid(modelid,localrank)=globalrank
+      integer :: MCT_comm                                   ! MCT communicator
+      integer :: ncomps	                                    ! Total number of components
+      integer :: mygrank                                    ! Rank of this processor in 
+                                                            ! global communicator.
+      integer,dimension(:),pointer :: nprocspid             ! Number of processes 
+                                                            ! each component is on (e.g. rank of its
+						            ! local communicator.
+      integer,dimension(:,:),pointer :: idGprocid           ! Translate between local component rank
+                                                            ! rank in global communicator.
+						            ! idGprocid(modelid,localrank)=globalrank
     end type MCTWorld
 
 ! !PUBLIC DATA MEMBERS:
@@ -211,6 +211,7 @@
   if (size(myids) /= size(mycomms)) then
      call die(myname_, "size of myids and mycomms inconsistent")
   endif
+
 
 ! make sure this has not been called already
   if(associated(ThisMCTWorld%nprocspid) ) then

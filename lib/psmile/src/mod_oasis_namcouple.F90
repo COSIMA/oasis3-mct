@@ -1874,7 +1874,7 @@ SUBROUTINE inipar_alloc()
 1001 FORMAT(A9)
 1002 FORMAT(A5000)
 1003 FORMAT(I3)
-1004 FORMAT(I8)
+1004 FORMAT(I12)
 
    !*    2. Get field information
    !        ---------------------
