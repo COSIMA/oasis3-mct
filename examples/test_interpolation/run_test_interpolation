@@ -28,9 +28,17 @@ arch=tioman_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_comput
 if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+#    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == tioman_gfortran_mpich2 ]; then
+    MPIRUN=/usr/lib64/mpich2/bin
+    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+elif [ ${arch} == napali ]; then
+    PATH=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin:/usr/local/pgi/linux86-64/2011/bin:$PATH
+    MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
+    rundir=/data2/${user}/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == corail ]; then
 rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == curie ]; then
@@ -103,7 +111,7 @@ cd $rundir
 ### Linux
 ###---------------------------------------------------------------------
 
-if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == napali ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1
@@ -129,6 +137,12 @@ $host 1 $rundir/$exe2
 EOF
    (( count += 1 ))
   done
+
+elif [ $arch == tioman_gfortan_mpich2 ]; then 
+   cat <<EOF >> $rundir/mpd.hosts
+$host 0: $nproc_exe1
+$host 1: $nproc_exe2
+EOF
 
 ###---------------------------------------------------------------------
 ### CORAIL
@@ -360,12 +374,18 @@ fi
 ###
 ### 4. Execute the model
 
-if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == napali ]; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
 elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+elif [ $arch == tioman_gfortran_mpich2 ] ; then
+    $MPIRUN/mpdboot -f mpd.hosts
+    $MPIRUN/mpiexec -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+# To use totalview : model load totalview
+#    $MPIRUN/mpiexec -tv -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err 
+    $MPIRUN/mpdallexit
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
     qsub -q submit $rundir/run_$casename.$arch

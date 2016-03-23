@@ -3,7 +3,7 @@
 ######################################################################
 #
 ############### User's section #######################################
-##
+#
 ## - Define architecture and coupler 
 arch=tioman_pgi_mpich  #tioman_pgi_mpich/corail/curie(CEA)/jade/neptune_gfortran
 MPILIB=MPI1  #MPI1/MPI2
@@ -24,7 +24,7 @@ casename=`basename $srcdir`
 #
 if [ ${arch} == tioman_pgi_mpich ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
-    rundir=/space/${user}/oasis3-mct-examples_buildbot/${casename}/work_${casename}
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=/space/${user}/oasis3-mct-examples_buildbot/${casename}/work_${casename}

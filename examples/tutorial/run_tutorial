@@ -31,6 +31,16 @@ if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ]; then
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == tioman_gfortran_mpich2 ]; then
+    MPIRUN=/usr/lib64/mpich2/bin
+    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+elif [ ${arch} == tioman_gfortran_mpich ]; then
+    MPIRUN=/usr/local/mpich/3.1.4_gcc/bin/mpirun
+    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+elif [ ${arch} == napali ]; then
+    PATH=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin:/usr/local/pgi/linux86-64/2011/bin:$PATH
+    MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
+    rundir=/data2/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == corail ]; then
 rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == curie ]; then
@@ -50,6 +60,9 @@ elif [ ${arch} == beaufix ]; then
 elif [ ${arch} == ada ]; then
   MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
   rundir=/workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct/examples/tutorial/work_${casename}
+elif [ ${arch} == nemo_lenovo_gfortran_openmpi ]; then
+    MPIRUN=/data/softs/mpi/openmpi/1.8.4/bin/mpirun
+    rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 fi
 #
 ############### End of user's section ################################
@@ -93,7 +106,7 @@ cd $rundir
 ### Linux
 ###---------------------------------------------------------------------
 
-if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == napali ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1
@@ -119,6 +132,12 @@ $host 1 $rundir/$exe2
 EOF
    (( count += 1 ))
   done
+
+elif [ $arch == tioman_gfortan_mpich2 ]; then 
+   cat <<EOF >> $rundir/mpd.hosts
+$host 0: $nproc_exe1
+$host 1: $nproc_exe2
+EOF
 
 ###---------------------------------------------------------------------
 ### CORAIL
@@ -349,13 +368,44 @@ poe -pgmmodel MPMD -cmdfile run_file
 #
 EOF
 
+###---------------------------------------------------------------------
+### NEMO_LENOVO_GFORTRAN_OPENMPI
+###---------------------------------------------------------------------
+elif [ ${arch} == nemo_lenovo_gfortran_openmpi ] ; then
+
+  (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+# Nom du job
+#SBATCH --job-name tutorial
+# Temps limite du job
+#SBATCH --time=00:10:00
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Nombre de noeuds et de processus
+#SBATCH --nodes=1 --ntasks-per-node=$nproc
+#SBATCH --distribution cyclic
+
+cd $rundir
+
+ulimit -s unlimited
+module purge
+module load compiler/gcc 
+module load mpi/openmpi/1.8.4
+#
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+EOF
+
 fi 
 
 ######################################################################
 ###
 ### 4. Execute the model
 
-if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
+if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == napali ]; then
     echo 'Executing the model using '$MPIRUN 
 #    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
     $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
@@ -363,6 +413,16 @@ if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ]; then
 elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+elif [ $arch == tioman_gfortran_mpich2 ] ; then
+    $MPIRUN/mpdboot -f mpd.hosts
+    $MPIRUN/mpiexec -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+# To use totalview : model load totalview
+#    $MPIRUN/mpiexec -tv -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err 
+    $MPIRUN/mpdallexit
+elif [ $arch == tioman_gfortran_mpich ] ; then
+#    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+# To use totalview : model load totalview
+    totalview $MPIRUN -a -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == corail ]; then
     echo 'Submitting the job to queue using qsub'
     qsub -q submit $rundir/run_$casename.$arch
@@ -389,6 +449,10 @@ elif [ $arch == crayXE6 ]; then
 elif [ $arch == ada ]; then
     echo 'Submitting the job to queue using llsubmit'
     llsubmit $rundir/run_$casename.$arch
+elif [ ${arch} == nemo_lenovo_gfortran_openmpi ] ; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $USER
 fi
 echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 

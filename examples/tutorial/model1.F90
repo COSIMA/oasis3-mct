@@ -21,7 +21,7 @@ PROGRAM model1
   ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif USE_DOUBLE_PRECISION
+#elif defined USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
