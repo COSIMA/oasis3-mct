@@ -531,13 +531,16 @@ compatibility, they may still call it with any {\tt name} and {\tt il\_part\_id}
     var\_nodims, kinout, var\_actual\_shape, var\_type, ierror)}
 
   \begin{itemize}
-  \item {\tt var\_id [INTEGER; OUT]}: coupling field ID. Note that if
-      the field does not appear in the {\it namcouple}, {\tt var\_id} will be equal to -1 and it is not permitted to call the corresponding {\tt oasis\_put}
-      and {\tt oasis\_get} (it would lead to an abort). Conversely, all
-      coupling fields appearing in the {\it namcouple} must be defined
-      with a call to {\tt oasis\_def\_var}; this constraint is imposed
-      to avoid that a typo in the  {\it namcouple}  would lead to
-      coupling exchanges not corresponding to what the user intends to activate.
+  \item {\tt var\_id [INTEGER; OUT]}: coupling field ID.  Note that all 
+      coupling fields appearing in the {\it namcouple} must be defined with 
+      a call to {\tt oasis\_def\_var}; not doing so would lead to an abort.  
+      But all fields defined with a call to {\tt oasis\_def\_var} must not necessarily 
+      appear in the {\it namcouple}. If a field does not appear in the {\it namcouple}, 
+      the {\tt var\_id} returned by the {\tt oasis\_def\_var} will be equal to -1; 
+      the value of the {\tt var\_id} should be tested and the corresponding 
+      {\tt oasis\_put} and {\tt oasis\_get} should not be called if {\tt var\_id} 
+      equals -1. These constraints are imposed to avoid that a typo in the {\it namcouple}
+       would lead to coupling exchanges not corresponding to what the user intends to activate. 
   \item {\tt name [CHARACTER; IN]}: field symbolic name (as in the
     {\it namcouple}); maximum length of 80 characters
   \item {\tt il\_part\_id [INTEGER; IN]}: partition ID returned from {\tt oasis\_def\_partition} (see section
