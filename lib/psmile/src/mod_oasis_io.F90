@@ -863,7 +863,9 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
+   logical             :: newfile     ! to create a new history file
    logical             :: whead,wdata ! for writing restart/history cdf files
+   integer(ip_i4_p) ,allocatable :: time(:)
    real(ip_double_p),allocatable :: array3(:,:,:)
    real(ip_double_p)   :: tbnds(2)
 
@@ -953,8 +955,10 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
          count3(2) = ny
          count3(3) = 1
 
+         newfile = .true.
          inquire(file=trim(lfn),exist=exists)
          if (exists) then
+            newfile = .false.
             status = nf90_open(lfn,NF90_WRITE,ncid)
             IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                       mpi_rank_local,':',TRIM(nf90_strerror(status))
@@ -964,9 +968,27 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
             status = nf90_inquire_dimension(ncid,dimid,len=dlen)
             IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                       mpi_rank_local,':',TRIM(nf90_strerror(status))
-            start1(1) = dlen + 1
-            start3(3) = start1(1)
-         else
+            allocate(time(dlen))
+            status = nf90_inq_varid(ncid,'time',varid)
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
+            status = nf90_get_var(ncid,varid,time)
+            IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                      mpi_rank_local,':',TRIM(nf90_strerror(status))
+
+            !--- check whether the current time is less than the current file time axis
+            !--- if so, then assume this is an old file and clobber it and start new
+            do i = 1,dlen
+               if (time(i) >= lmsec(1)) newfile=.true.
+            enddo
+            deallocate(time)
+            if (.not.newfile) then
+               start1(1) = dlen + 1
+               start3(3) = start1(1)
+            endif
+         endif
+
+         if (newfile) then
             status = nf90_create(lfn,NF90_CLOBBER,ncid)
             IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                       mpi_rank_local,':',TRIM(nf90_strerror(status))

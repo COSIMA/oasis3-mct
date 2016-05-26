@@ -33,7 +33,8 @@ MODULE mod_oasis_method
 #else
    integer(kind=ip_intwp_p),parameter :: debug=1
 #endif
-   logical,save :: lg_mpiflag
+   logical :: lg_mpiflag
+   integer(kind=ip_intwp_p) :: mpi_comm_global_world
 
 CONTAINS
 
@@ -41,7 +42,7 @@ CONTAINS
 
 !> OASIS user init method
 
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld)
 
    !> * This is COLLECTIVE, all pes must call
 
@@ -51,6 +52,7 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam        !< model name
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
+   integer (kind=ip_intwp_p),intent(in)   ,optional :: commworld  !< user defined mpi_comm_world to use in oasis
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -86,6 +88,11 @@ CONTAINS
       oasis_coupled = coupled
    endif
 
+   mpi_comm_global_world = MPI_COMM_WORLD
+   if (present(commworld)) then
+     mpi_comm_global_world = commworld
+   endif
+
    !------------------------
    !> * Initialize MPI
    !------------------------
@@ -101,13 +108,13 @@ CONTAINS
 
 ! Initial default for early part of init
 #ifdef use_comm_MPI1
-   mpi_comm_global = MPI_COMM_WORLD
+   mpi_comm_global = mpi_comm_global_world
 #elif defined use_comm_MPI2
    mpi_comm_global = ??
 #endif
 
-   CALL MPI_Comm_Size(MPI_COMM_WORLD,mpi_size_world,ierr)
-   CALL MPI_Comm_Rank(MPI_COMM_WORLD,mpi_rank_world,ierr)
+   CALL MPI_Comm_Size(mpi_comm_global_world,mpi_size_world,ierr)
+   CALL MPI_Comm_Rank(mpi_comm_global_world,mpi_rank_world,ierr)
    mpi_rank_global = mpi_rank_world
 
    !------------------------
@@ -134,7 +141,7 @@ CONTAINS
    IF (mpi_rank_world == 0) THEN
       call oasis_namcouple_init()
    endif
-   call oasis_mpi_barrier(MPI_COMM_WORLD)
+   call oasis_mpi_barrier(mpi_comm_global_world)
    IF (mpi_rank_world /= 0) THEN
       call oasis_namcouple_init()
    endif
@@ -196,9 +203,9 @@ CONTAINS
      k1=oasis_string_listGetNum(namsrcfld(n))
      k2=oasis_string_listGetNum(namdstfld(n))
      if (k1 /= k2) then
-       WRITE(nulprt,*) subname,estr,'namcouple field numbers do not agree '
-       WRITE(nulprt,*) subname,estr,'namsrcfld = ',trim(namsrcfld(n))
-       WRITE(nulprt,*) subname,estr,'namdstfld = ',trim(namdstfld(n))
+       WRITE(nulprt1,*) subname,estr,'namcouple field numbers do not agree '
+       WRITE(nulprt1,*) subname,estr,'namsrcfld = ',trim(namsrcfld(n))
+       WRITE(nulprt1,*) subname,estr,'namdstfld = ',trim(namdstfld(n))
        call oasis_abort()
      endif
      DO i=1,k1
@@ -240,8 +247,8 @@ CONTAINS
    compnm = trim(cdnam)
    allocate(compnmlist(mpi_size_world))
    allocate(coupledlist(mpi_size_world))
-   call MPI_GATHER(compnm, ic_lvar, MPI_CHARACTER, compnmlist, ic_lvar, MPI_CHARACTER, 0, MPI_COMM_WORLD, ierr)
-   call MPI_GATHER(oasis_coupled, 1, MPI_LOGICAL, coupledlist, 1, MPI_LOGICAL, 0, MPI_COMM_WORLD, ierr)
+   call MPI_GATHER(compnm, ic_lvar, MPI_CHARACTER, compnmlist, ic_lvar, MPI_CHARACTER, 0, mpi_comm_global_world, ierr)
+   call MPI_GATHER(oasis_coupled, 1, MPI_LOGICAL, coupledlist, 1, MPI_LOGICAL, 0, mpi_comm_global_world, ierr)
 
    prism_nmodels = 0
    prism_modnam(:) = ' '
@@ -264,8 +271,8 @@ CONTAINS
             if (compnmlist(n) == prism_modnam(m)) then
                found = .true.
                if (coupledlist(n) .neqv. prism_modcpl(m)) then
-                  WRITE(nulprt1,*) subname,estr,'inconsistent coupled flag in oasis_init_comp.'
-                  WRITE(nulprt1,*) subname,estr,'the optional argument, coupled, in oasis_init_comp '
+                  WRITE(nulprt1,*) subname,estr,'inconsistent coupled flag'
+                  WRITE(nulprt1,*) subname,estr,'the optional argument, coupled'
                   WRITE(nulprt1,*) subname,estr,'must be identical on all tasks of a component.'
                   call oasis_abort()
                endif
@@ -324,10 +331,10 @@ CONTAINS
    !------------------------
    !> * Broadcast the model list to all MPI tasks
    !------------------------
-   call oasis_mpi_bcast(prism_nmodels,MPI_COMM_WORLD,subname//' prism_nmodels')
-   call oasis_mpi_bcast(prism_amodels,MPI_COMM_WORLD,subname//' prism_amodels')
-   call oasis_mpi_bcast(prism_modnam ,MPI_COMM_WORLD,subname//' prism_modnam')
-   call oasis_mpi_bcast(prism_modcpl ,MPI_COMM_WORLD,subname//' prism_modcpl')
+   call oasis_mpi_bcast(prism_nmodels,mpi_comm_global_world,subname//' prism_nmodels')
+   call oasis_mpi_bcast(prism_amodels,mpi_comm_global_world,subname//' prism_amodels')
+   call oasis_mpi_bcast(prism_modnam ,mpi_comm_global_world,subname//' prism_modnam')
+   call oasis_mpi_bcast(prism_modcpl ,mpi_comm_global_world,subname//' prism_modcpl')
 
    !------------------------
    !> * Compute compid
@@ -363,7 +370,7 @@ CONTAINS
 
    ikey = 0
    icolor = compid
-   call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_local,ierr)
+   call MPI_COMM_SPLIT(mpi_comm_global_world,icolor,ikey,mpi_comm_local,ierr)
 
    !------------------------
    !>   * Set mpi_comm_global based on oasis_coupled flag
@@ -372,13 +379,13 @@ CONTAINS
    ikey = 0
    icolor = 1
    if (.not.oasis_coupled) icolor = 0
-   call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_global,ierr)
+   call MPI_COMM_SPLIT(mpi_comm_global_world,icolor,ikey,mpi_comm_global,ierr)
 !tcx   if (.not.oasis_coupled) mpi_comm_global = MPI_COMM_NULL
 
 #elif defined use_comm_MPI2
 
    mpi_comm_global = ??
-   mpi_comm_local = MPI_COMM_WORLD
+   mpi_comm_local = mpi_comm_global_world
 
 #endif
 
@@ -415,40 +422,44 @@ CONTAINS
 
    iu=-1
    CALL oasis_unitget(iu)
-
-       IF (OASIS_debug <= 1) THEN
-           CALL oasis_mpi_bcast(iu,mpi_comm_local,TRIM(subname)//':unit of master',0)
-           IF (mpi_rank_local == 0) THEN
-               nulprt=iu
-               WRITE(filename,'(a,i2.2)') 'debug.root.',compid
-               OPEN(nulprt,file=filename)
-               WRITE(nulprt,*) subname,' OPEN debug file for root pe, unit :',nulprt
-               call oasis_flush(nulprt)
-           ELSE
-               nulprt=iu+mpi_size_global
-               WRITE(filename2,'(a,i2.2)') 'debug.notroot.',compid
-               OPEN(nulprt,file=filename2,position='append')
-!               WRITE(nulprt,*) subname,' OPEN debug file for not root pe, unit :',nulprt
-!               CALL oasis_flush(nulprt)
-           ENDIF
-       ELSE
-           nulprt=iu
-           WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
-           OPEN(nulprt,file=filename)
-           WRITE(nulprt,*) subname,' OPEN debug file, unit :',nulprt
+   nulprt=iu
+   IF (OASIS_debug <= 1) THEN
+       WRITE(filename ,'(a,i2.2)') 'debug.root.',compid
+       WRITE(filename2,'(a,i2.2)') 'debug.notroot.',compid
+       IF (mpi_rank_local == 0) THEN
+           OPEN(nulprt,file=filename,status='REPLACE')
+           WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
+           call oasis_flush(nulprt)
+       ENDIF
+       IF (mpi_rank_local == 1) THEN
+           OPEN(nulprt,file=filename2,status='REPLACE')
+           WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
            CALL oasis_flush(nulprt)
        ENDIF
 
-       IF ( (OASIS_debug == 1) .AND. (mpi_rank_local == 0)) OASIS_debug=10
+       call oasis_mpi_barrier(mpi_comm_local)
 
-       IF (OASIS_debug >= 2) THEN
-           WRITE(nulprt,*) subname,' model compid ',TRIM(cdnam),compid
-           CALL oasis_flush(nulprt)
+       IF (mpi_rank_local > 1) THEN
+           OPEN(nulprt,file=filename2,position='APPEND')
+           !WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
+           !CALL oasis_flush(nulprt)
        ENDIF
+   ELSE
+       WRITE(filename,'(a,i2.2,a,i6.6)') 'debug.',compid,'.',mpi_rank_local
+       OPEN(nulprt,file=filename,status='REPLACE')
+       WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file, for pe, unit :',mpi_rank_local,nulprt
+       CALL oasis_flush(nulprt)
+   ENDIF
+
+   IF ( (OASIS_debug == 1) .AND. (mpi_rank_local == 0)) OASIS_debug=10
+
+   IF (OASIS_debug >= 2) THEN
+       WRITE(nulprt,'(3a,i8)') subname,' model compid ',TRIM(cdnam),compid
+       CALL oasis_flush(nulprt)
+   ENDIF
 
    iu=-1
    CALL oasis_unitget(iu)
-
    ! If load balance analysis, new log files opened (lucia.*)
    IF ( LUCIA_debug > 0 ) THEN
       IF (mpi_size_local < 20 ) THEN
@@ -464,8 +475,8 @@ CONTAINS
       ! Define log file name and open it
       IF (nullucia /= 0) THEN
          WRITE(filename,'(a,i2.2,a,i6.6)') 'lucia.',compid,'.',mpi_rank_local
-         OPEN(nullucia,file=filename)
-!         WRITE(nullucia,*) subname,' OPEN LUCIA load balancing analysis file, unit :',nullucia
+         OPEN(nullucia,file=filename,status='REPLACE')
+!         WRITE(nullucia,'(2a,2i8)') subname,' OPEN LUCIA load balancing analysis file for pe, unit :',mpi_size_local,nullucia
 !         CALL oasis_flush(nullucia)
       ENDIF
    ENDIF
@@ -517,7 +528,7 @@ CONTAINS
    if (OASIS_debug >= 15)  then
       write(nulprt,*) subname,' compid         = ',compid
       write(nulprt,*) subname,' compnm         = ',trim(compnm)
-      write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
+      write(nulprt,*) subname,' mpi_comm_world = ',mpi_comm_global_world
       write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
       write(nulprt,*) subname,'     size_global= ',mpi_size_global
       write(nulprt,*) subname,'     rank_global= ',mpi_rank_global
@@ -612,6 +623,9 @@ CONTAINS
 
    call oasis_debug_exit(subname)
 
+   CALL oasis_flush(nulprt)
+   close(nulprt)
+
  END SUBROUTINE oasis_terminate
 
 !----------------------------------------------------------------------
@@ -691,7 +705,7 @@ CONTAINS
       if (OASIS_debug >= 2)  then
          write(nulprt,*) subname,' compid         = ',compid
          write(nulprt,*) subname,' compnm         = ',trim(compnm)
-         write(nulprt,*) subname,' mpi_comm_world = ',MPI_COMM_WORLD
+         write(nulprt,*) subname,' mpi_comm_world = ',mpi_comm_global_world
          write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
          write(nulprt,*) subname,'     size_global= ',mpi_size_global
          write(nulprt,*) subname,'     rank_global= ',mpi_rank_global

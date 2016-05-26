@@ -50,7 +50,7 @@ contains
 !> Send 4 byte real 1D data
 
   SUBROUTINE oasis_put_r14(id_port_id,kstep,fld1,kinfo, &
-    fld2, fld3, fld4, fld5)
+    fld2, fld3, fld4, fld5, write_restart)
 
     IMPLICIT none
     !-------------------------------------
@@ -62,11 +62,13 @@ contains
     real(kind=ip_single_p), optional :: fld3(:)       !< higher order field data
     real(kind=ip_single_p), optional :: fld4(:)       !< higher order field data
     real(kind=ip_single_p), optional :: fld5(:)       !< higher order field data
+    logical               , optional :: write_restart !< write restart now
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
+    logical :: lwrst
     character(len=*),parameter :: subname = '(oasis_put_r14)'
     !-------------------------------------
 
@@ -94,6 +96,12 @@ contains
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
+    endif
+
+    if (present(write_restart)) then
+       lwrst = write_restart
+    else
+       lwrst = .false.
     endif
 
     nfld = id_port_id
@@ -156,29 +164,29 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(fld1),readrest=.FALSE.)
+                               array1din= DBLE(fld1),readrest=.FALSE.,writrest=lwrst)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(fld1),readrest=.FALSE.,&
-                               a2on=a2on,array2=DBLE(fld2))
+                               a2on=a2on,array2=DBLE(fld2),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
-                               a3on=a3on,array3=DBLE(fld3))
+                               a3on=a3on,array3=DBLE(fld3),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
                                a3on=a3on,array3=DBLE(fld3),&
-                               a4on=a4on,array4=DBLE(fld4))
+                               a4on=a4on,array4=DBLE(fld4),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(fld1),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(fld2),&
                                a3on=a3on,array3=DBLE(fld3),&
                                a4on=a4on,array4=DBLE(fld4),&
-                               a5on=a5on,array5=DBLE(fld5))
+                               a5on=a5on,array5=DBLE(fld5),writrest=lwrst)
     ELSE
         WRITE(nulprt,*) 'Wrong field array argument list in oasis_put'
         CALL oasis_flush(nulprt)
@@ -195,7 +203,7 @@ contains
 !> Send 8 byte real 1D data
 
   SUBROUTINE oasis_put_r18(id_port_id,kstep,fld1,kinfo, &
-    fld2, fld3, fld4, fld5)
+    fld2, fld3, fld4, fld5, write_restart)
 
     IMPLICIT none
     !-------------------------------------
@@ -207,11 +215,13 @@ contains
     real(kind=ip_double_p), optional :: fld3(:)       !< higher order field data
     real(kind=ip_double_p), optional :: fld4(:)       !< higher order field data
     real(kind=ip_double_p), optional :: fld5(:)       !< higher order field data
+    logical               , optional :: write_restart !< write restart now
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
+    logical :: lwrst
     character(len=*),parameter :: subname = '(oasis_put_r18)'
     !-------------------------------------
 
@@ -239,6 +249,12 @@ contains
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
+    endif
+
+    if (present(write_restart)) then
+       lwrst = write_restart
+    else
+       lwrst = .false.
     endif
 
     nfld = id_port_id
@@ -300,29 +316,29 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din=fld1,readrest=.FALSE.)
+                               array1din=fld1,readrest=.FALSE.,writrest=lwrst)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din=fld1,readrest=.FALSE.,&
-                               a2on=a2on,array2=fld2)
+                               a2on=a2on,array2=fld2,writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
-                               a3on=a3on,array3=fld3)
+                               a3on=a3on,array3=fld3,writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din=fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
                                a3on=a3on,array3=fld3,&
-                               a4on=a4on,array4=fld4)
+                               a4on=a4on,array4=fld4,writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din=fld1,readrest=.FALSE.,&
                                a2on=a2on,array2=fld2,&
                                a3on=a3on,array3=fld3,&
                                a4on=a4on,array4=fld4,&
-                               a5on=a5on,array5=fld5)
+                               a5on=a5on,array5=fld5,writrest=lwrst)
     ELSE
         WRITE(nulprt,*) 'Wrong field array argument list in oasis_put'
         CALL oasis_flush(nulprt)
@@ -339,7 +355,7 @@ contains
 !> Send 4 byte real 2D data
 
   SUBROUTINE oasis_put_r24(id_port_id,kstep,fld1,kinfo, &
-    fld2, fld3, fld4, fld5)
+    fld2, fld3, fld4, fld5, write_restart)
 
     IMPLICIT none
     !-------------------------------------
@@ -351,11 +367,13 @@ contains
     real(kind=ip_single_p), optional :: fld3(:,:)     !< higher order field data
     real(kind=ip_single_p), optional :: fld4(:,:)     !< higher order field data
     real(kind=ip_single_p), optional :: fld5(:,:)     !< higher order field data
+    logical               , optional :: write_restart !< write restart now
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
+    logical :: lwrst
     character(len=*),parameter :: subname = '(oasis_put_r24)'
     !-------------------------------------
 
@@ -383,6 +401,12 @@ contains
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
+    endif
+
+    if (present(write_restart)) then
+       lwrst = write_restart
+    else
+       lwrst = .false.
     endif
 
     nfld = id_port_id
@@ -451,29 +475,29 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
-                               array1din= DBLE(PACK(fld1, mask= .true.)),readrest=.FALSE.)
+                               array1din= DBLE(PACK(fld1, mask= .true.)),readrest=.FALSE.,writrest=lwrst)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
-                               a2on=a2on,array2=DBLE(PACK(fld2, mask= .true.)))
+                               a2on=a2on,array2=DBLE(PACK(fld2, mask= .true.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
-                               a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)))
+                               a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)),&
-                               a4on=a4on,array4=DBLE(PACK(fld4, mask= .TRUE.)))
+                               a4on=a4on,array4=DBLE(PACK(fld4, mask= .TRUE.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= DBLE(PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=DBLE(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=DBLE(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=DBLE(PACK(fld4, mask= .TRUE.)),&
-                               a5on=a5on,array5=DBLE(PACK(fld5, mask= .TRUE.)))
+                               a5on=a5on,array5=DBLE(PACK(fld5, mask= .TRUE.)),writrest=lwrst)
     ELSE
         WRITE(nulprt,*) 'Wrong field array argument list in oasis_put'
         CALL oasis_flush(nulprt)
@@ -490,7 +514,7 @@ contains
 !> Send 8 byte real 2D data
 
   SUBROUTINE oasis_put_r28(id_port_id,kstep,fld1,kinfo, &
-    fld2, fld3, fld4, fld5)
+    fld2, fld3, fld4, fld5, write_restart)
 
     IMPLICIT none
     !-------------------------------------
@@ -502,11 +526,13 @@ contains
     real(kind=ip_double_p), optional :: fld3(:,:)       !< higher order field data
     real(kind=ip_double_p), optional :: fld4(:,:)       !< higher order field data
     real(kind=ip_double_p), optional :: fld5(:,:)       !< higher order field data
+    logical               , optional :: write_restart   !< write restart now
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
+    logical :: lwrst
     character(len=*),parameter :: subname = '(oasis_put_r28)'
     !-------------------------------------
 
@@ -534,6 +560,12 @@ contains
        call oasis_abort()
        call oasis_debug_exit(subname)
        return
+    endif
+
+    if (present(write_restart)) then
+       lwrst = write_restart
+    else
+       lwrst = .false.
     endif
 
     nfld = id_port_id
@@ -602,29 +634,29 @@ contains
 
     IF ((.NOT. a2on) .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo, &
-                               array1din= (PACK(fld1, mask= .true.)),readrest=.FALSE.)
+                               array1din= (PACK(fld1, mask= .true.)),readrest=.FALSE.,writrest=lwrst)
     ELSE IF (a2on .AND. (.NOT. a3on) .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
-                               a2on=a2on,array2=(PACK(fld2, mask= .true.)))
+                               a2on=a2on,array2=(PACK(fld2, mask= .true.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. (.NOT. a4on) .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
-                               a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)))
+                               a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. (.NOT. a5on)) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)),&
-                               a4on=a4on,array4=(PACK(fld4, mask= .TRUE.)))
+                               a4on=a4on,array4=(PACK(fld4, mask= .TRUE.)),writrest=lwrst)
     ELSE IF (a2on .AND. a3on .AND. a4on .AND. a5on) THEN
         CALL oasis_advance_run(OASIS_Out,nfld,kstep,kinfo,&
                                array1din= (PACK(fld1, mask= .TRUE.)),readrest=.FALSE.,&
                                a2on=a2on,array2=(PACK(fld2, mask= .TRUE.)),&
                                a3on=a3on,array3=(PACK(fld3, mask= .TRUE.)),&
                                a4on=a4on,array4=(PACK(fld4, mask= .TRUE.)),&
-                               a5on=a5on,array5=(PACK(fld5, mask= .TRUE.)))
+                               a5on=a5on,array5=(PACK(fld5, mask= .TRUE.)),writrest=lwrst)
     ELSE
         WRITE(nulprt,*) 'Wrong field array argument list in oasis_put'
         CALL oasis_flush(nulprt)

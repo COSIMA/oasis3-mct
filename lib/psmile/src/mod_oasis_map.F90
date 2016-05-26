@@ -116,7 +116,6 @@ CONTAINS
      CALL oasis_abort()
   endif
 
-  
   do_corners = .false.
   if (trim(namscrmet(namID)) == 'CONSERV') then
      do_corners = .true.

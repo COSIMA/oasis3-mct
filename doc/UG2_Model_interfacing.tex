@@ -155,14 +155,17 @@ a single description of the interface arguments is provided.
 
 \begin{itemize}
 
-\item {\tt CALL oasis\_init\_comp (compid, comp\_name, ierror, coupled)}
-\item {\tt CALL prism\_init\_comp\_proto (compid, comp\_name, ierror, coupled)}
+\item {\tt CALL oasis\_init\_comp (compid, comp\_name, ierror, coupled, commworld)}
+\item {\tt CALL prism\_init\_comp\_proto (compid, comp\_name, ierror, coupled, commworld)}
 
   \begin{itemize}
   \item {\tt compid [INTEGER; OUT]}: returned component ID
   \item {\tt comp\_name [CHARACTER; IN]}: component name; maximum length of 80 characters 
   \item {\tt ierror [INTEGER; OUT]}: returned error code
   \item {\tt coupled [LOGICAL, OPTIONAL; IN]}: flag to specify if the calling task is participating or not to the coupling ({\tt .true.} by default). 
+  \item {\tt commworld [INTEGER, OPTIONAL; IN]} : optional argument to specify the global communicator gathering the components of the coupled model. 
+  If not specified, {\tt MPI\_COMM\_WORLD} will be used as the default communicator to startup. All components of the coupled model must 
+  specify the same {\tt commworld} argument.
 
   \end{itemize}
  
@@ -586,7 +589,7 @@ All processes of components at least partly involved in the coupling (e.g. {\tt 
 \subsection{Sending ``put'' and receiving ``get'' actions}
 \label{subsubsec_sendingreceiving}
 
-\subsubsection{Sending a coupling (or I/O) field}
+\subsubsection{Sending a coupling (or I/O or writing a restart file) field}
 \label{prismput}
 
 In the component time step loop, each process sends its part of the
@@ -594,9 +597,9 @@ coupling (or I/O) field.
 
 \begin{itemize}
 \item {\tt CALL oasis\_put (var\_id, date, fld1, info, fld2, fld3,
-    fld4, fld5)}
+    fld4, fld5, write\_restart)}
 \item {\tt CALL prism\_put\_proto(var\_id, date, fld1, info, fld2,
-    fld3, fld4, fld5)}
+    fld3, fld4, fld5, write\_restart)}
   \begin{itemize}
   \item {\tt var\_id [INTEGER; IN]}: field ID (returned from corresponding {\tt
       oasis\_def\_var}, see section \ref{subsubsec_Declaration})
@@ -632,6 +635,8 @@ coupling (or I/O) field.
     field array; can be 1D or 2D
   \item {\tt fld5 [REAL, IN, OPTIONAL]}: optional $5^{th}$ coupling
     field array; can be 1D or 2D
+  \item {\tt write\_restart [LOGICAL, IN, OPTIONAL]}: optional argument to write an 
+    intermediate restart file associated with the variable {\it var\_id} at the current timestep.
   \end{itemize}
 \end{itemize}
 
@@ -651,10 +656,8 @@ of the following aspects:
   in the second dimension, and its cross-gradient. Bicubic and higher order
   remapping are therefore supported given that the higher order fields
   are provided at each time step as {\tt oasis\_put} arguments. Note
-  that if {\tt fld3}, or {\tt fld4}, or {\tt fld5} are passed, {\tt fld2}, or {\tt fld3} and {\tt fld2}, or {\tt fld4} and {\tt fld3} and {\tt fld2} must also be passed respectively. However, having a $2^{nd}$, $3^{rd}$, $4^{th}$
-  and $5^{th}$ set of weights in the remapping file but not passing a
-  $2^{nd}$, $3^{rd}$, $4^{th}$ and $5^{th}$ source field as argument
-  will not lead to an error.
+  that if {\tt fld3}, or {\tt fld4}, or {\tt fld5} are passed, {\tt fld2}, or {\tt fld3} and 
+  {\tt fld2}, or {\tt fld4} and {\tt fld3} and {\tt fld2} must also be passed respectively. 
 
 %\item Trying to send with {\tt oasis\_put} a field declared with a
 %  {\tt oasis\_def\_var} but not defined in the configuration file {\it
@@ -713,6 +716,23 @@ of the following aspects:
 returned by the {\tt oasis\_def\_var} is equal to -1 and the
 corresponding {\tt oasis\_put} should not be called. 
 
+\item Support to couple multiple fields via a single communication.
+This is supported through colon delimited field lists in the namcouple (see \ref{subsubsec_secondEXPORTED}). 
+All fields will use the namcouple settings for that entry. In the component
+model codes, these fields are still sent ({\bf “put”}) one at a time. Inside
+OASIS3-MCT, the fields are stored and a single mapping and send instruction is executed
+for all fields. This is useful in cases where multiple fields have the same coupling transformations
+and to reduce communication costs by aggregating multiple fields into a single communication. If a
+LOCTRAN transformation is needed for these multiple fields, it is necessary to define a restart file
+for these multiple fields.
+
+\item The optional argument, {\tt write\_restart}, in the {\tt oasis\_put} routine is by default {\bf false}. 
+If a user sets that argument to true, {\bf restarts will be written ONLY for that timestep}. The {\tt write\_restart} 
+will just save the data that exists at the time of the call, taking into account lags and LOCTRANS operations. In 
+cases where multiple fields are coupled as a single operation in the model via a list of colon delimited 
+fields in the namcouple (see \ref{subsubsec_secondEXPORTED}), users are encouraged to specify 
+the {\tt write\_restart} flag on ALL {\tt oasis\_put} calls at a given time for a set of fields 
+that are coupled as a single operation.
 \end{itemize}
 
 \subsubsection{Receiving a coupling (or I/O) field}
@@ -771,6 +791,15 @@ corresponding {\tt oasis\_get} should not be called.
   restart file written by the last active {\tt oasis\_put} of the
   previous run (see section \ref{subsubsec_Algoritms}). 
 
+\item Support to couple multiple fields via a single communication.
+This is supported through colon delimited field lists in the namcouple (see \ref{subsubsec_secondEXPORTED}). 
+All fields will use the namcouple settings for that entry. In the component
+model codes, these fields are still received ({\bf “get”}) one at a time. Inside
+OASIS3-MCT, the fields are stored and a single mapping and receive instruction is executed
+for all fields. This is useful in cases where multiple fields have the same coupling transformations
+and to reduce communication costs by aggregating multiple fields into a single communication. If a
+LOCTRAN transformation is needed for these multiple fields, it is necessary to define a restart file
+for these multiple fields.
 \end{itemize}
 
 \subsection{Termination}
@@ -922,7 +951,7 @@ involved. This number is needed to get the coupling frequencies with the
 routine oasis\_get\_freqs, see below.
 
 \item {\tt CALL oasis\_get\_freqs(var\_id, ncpl, cpl\_freqs, kinfo)}
-\item {\tt CALL prims\_get\_freqs\_proto(var\_id, ncpl, cpl\_freqs, kinfo)}
+\item {\tt CALL prism\_get\_freqs\_proto(var\_id, ncpl, cpl\_freqs, kinfo)}
   \begin{itemize}
   \item {\tt var\_id [INTEGER; IN]}: field ID (from
   corresponding oasis\_def\_var)

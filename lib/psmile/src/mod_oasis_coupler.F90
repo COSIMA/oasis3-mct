@@ -52,6 +52,7 @@ MODULE mod_oasis_coupler
      type(mct_aVect)       :: aVect5   !< higher order mapping data
      logical               :: aVon(prism_coupler_avsmax)  !< flags indicating whether aVects 2-5 are active
      character(len=ic_xl)  :: rstfile  !< restart file
+     logical               :: writrest !< flag to write a restart file
      character(len=ic_xl)  :: inpfile  !< input file if data is read
      character(len=ic_xl)  :: fldlist  !< field list
      integer(kind=ip_i4_p) :: nflds    !< number of fields
@@ -234,6 +235,7 @@ CONTAINS
         pcpntpair => prism_coupler_put(nc)
      endif
      pcpointer%rstfile = ""
+     pcpointer%writrest= .false.
      pcpointer%inpfile = ""
      pcpointer%fldlist = ""
      pcpointer%nflds   = 0

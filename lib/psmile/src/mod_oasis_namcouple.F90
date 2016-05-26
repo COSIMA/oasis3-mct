@@ -441,13 +441,12 @@ CONTAINS
   namscrbin(:) = -1
 
 !  maxunit = max(maxval(iga_unitmod),1024)
-  maxunit = 1024
-  IF (mpi_rank_global == 0) THEN
-      WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
-      CALL oasis_flush(nulprt1)
-  ENDIF
-
-  call oasis_unitsetmin(maxunit)
+!  maxunit = 1024
+!  IF (mpi_rank_global == 0) THEN
+!      WRITE(nulprt1,*) subname,' maximum unit number = ',maxunit
+!      CALL oasis_flush(nulprt1)
+!  ENDIF
+!  call oasis_unitsetmin(maxunit)
 
   nnamcpl = ig_final_nfield
   namruntim = ntime

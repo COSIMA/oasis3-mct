@@ -17,15 +17,15 @@ MODULE mod_oasis_sys
    public oasis_abort
    public oasis_flush
    public oasis_unitsetmin
+   public oasis_unitsetmax
    public oasis_unitget
    public oasis_unitfree
    public oasis_debug_enter
    public oasis_debug_exit
    public oasis_debug_note
 
-   integer(ip_intwp_p),parameter :: muni = 20
-   integer(ip_intwp_p),save :: unitno(muni) = -1
-   integer(ip_intwp_p),save :: maxion
+   integer(ip_intwp_p),save :: minion = 1024
+   integer(ip_intwp_p),save :: maxion = 999999
    integer(ip_intwp_p),parameter :: tree_delta = 2
    integer(ip_intwp_p),save :: tree_indent = 0
 
@@ -37,7 +37,7 @@ CONTAINS
 
 !> OASIS abort method, publically available to users
 
-   SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, rcode)
+SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, rcode)
 
    IMPLICIT NONE
 !--------------------------------------------------------------------
@@ -75,13 +75,13 @@ CONTAINS
 
    STOP
 
- END SUBROUTINE oasis_abort
+END SUBROUTINE oasis_abort
 
 !==========================================================================
 
 !> Flushes output to file
 
-   SUBROUTINE oasis_flush(nu)
+SUBROUTINE oasis_flush(nu)
 
    IMPLICIT NONE
 
@@ -93,48 +93,48 @@ CONTAINS
 
    CALL FLUSH(nu)
 
- END SUBROUTINE oasis_flush
+END SUBROUTINE oasis_flush
 
 !==========================================================================
 
 !> Get a free unit number
 
-   SUBROUTINE oasis_unitget(uio)
+SUBROUTINE oasis_unitget(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(out) :: uio  !< unit number
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p) :: n1
-   logical :: found
+   INTEGER(kind=ip_intwp_p) :: n1  ! search for unit number 
+   logical :: found,l_open
    character(len=*),parameter :: subname = '(oasis_unitget)'
 !--------------------------------------------------------------------
 
-   n1 = 0
+   n1 = minion-1
    found = .false.
-   do while (n1 < muni .and. .not.found)
+   do while (n1 < maxion .and. .not.found)
       n1 = n1 + 1
-      if (unitno(n1) < 0) then
-         found = .true.
-         uio = n1 + maxion
-         unitno(n1) = uio
-         if (OASIS_debug >= 2) write(nulprt,*) subname,n1,uio
-      endif
+      inquire(unit=n1,opened=l_open)
+      if(.not.l_open) found=.true.
+      if (OASIS_debug >= 2) write(nulprt,*) subname,n1
    enddo
 
    if (.not.found) then
       write(nulprt,*) subname,estr,'no unit number available '
+      write(nulprt,*) subname,estr,'min/max units checked = ',minion,maxion
       call oasis_abort()
    endif
+
+   uio = n1
      
- END SUBROUTINE oasis_unitget
+END SUBROUTINE oasis_unitget
 
 !==========================================================================
 
 !> Set the minimum unit number allowed
 
-   SUBROUTINE oasis_unitsetmin(uio)
+SUBROUTINE oasis_unitsetmin(uio)
 
    IMPLICIT NONE
 
@@ -144,34 +144,51 @@ CONTAINS
    character(len=*),parameter :: subname = '(oasis_unitsetmin)'
 !--------------------------------------------------------------------
 
-   maxion = uio
-   if (OASIS_debug >= 20) write(nulprt,*) subname,maxion
+   minion = uio
+   if (OASIS_debug >= 20) write(nulprt,*) subname,minion
      
- END SUBROUTINE oasis_unitsetmin
+END SUBROUTINE oasis_unitsetmin
 
 !==========================================================================
 
-!> Release a unit number for reuse
+!> Set the maximum unit number allowed
 
-   SUBROUTINE oasis_unitfree(uio)
+SUBROUTINE oasis_unitsetmax(uio)
 
    IMPLICIT NONE
 
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(in) :: uio  !< unit number
 !--------------------------------------------------------------------
-   INTEGER(kind=ip_intwp_p) :: n1
+   character(len=*),parameter :: subname = '(oasis_unitsetmax)'
+!--------------------------------------------------------------------
+
+   maxion = uio
+   if (OASIS_debug >= 20) write(nulprt,*) subname,maxion
+     
+END SUBROUTINE oasis_unitsetmax
+
+!==========================================================================
+
+!> Release a unit number for reuse
+
+SUBROUTINE oasis_unitfree(uio)
+
+   IMPLICIT NONE
+
+!--------------------------------------------------------------------
+   INTEGER(kind=ip_intwp_p),INTENT(in) :: uio  !< unit number
+!--------------------------------------------------------------------
    character(len=*),parameter :: subname = '(oasis_unitfree)'
 !--------------------------------------------------------------------
 
-   do n1 = 1,muni
-      if (unitno(n1) == uio) then
-         unitno(n1) = -1
-         if (OASIS_debug >= 20) write(nulprt,*) subname,n1,uio
-      endif
-   enddo
+! tcraig, this is a no-op since we are no longer tracking units
+! explicitly.  instead, we are searching for free units and using them.
+! either a unit number is open or closed and we'll check that explicitly
 
- END SUBROUTINE oasis_unitfree
+   if (OASIS_debug >= 20) write(nulprt,*) subname,uio
+
+END SUBROUTINE oasis_unitfree
 
 !=========================================================================
 !==========================================================================
@@ -199,7 +216,7 @@ SUBROUTINE oasis_debug_enter(string)
        CALL oasis_flush(nulprt)
    endif
 
- END SUBROUTINE oasis_debug_enter
+END SUBROUTINE oasis_debug_enter
 
 !==========================================================================
 
@@ -226,7 +243,7 @@ SUBROUTINE oasis_debug_exit(string)
        CALL oasis_flush(nulprt)
    ENDIF
 
- END SUBROUTINE oasis_debug_exit
+END SUBROUTINE oasis_debug_exit
 
 !==========================================================================
 
@@ -252,7 +269,7 @@ SUBROUTINE oasis_debug_note(string)
       call oasis_flush(nulprt)
    endif
 
- END SUBROUTINE oasis_debug_note
+END SUBROUTINE oasis_debug_note
 
 !==========================================================================
 

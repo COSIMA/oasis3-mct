@@ -41,7 +41,7 @@ contains
 !   ----------------------------------------------------------------
     INTEGER(kind=ip_i4_p), intent(inout) :: kinfo    !< status, not used
 !   ----------------------------------------------------------------
-    integer(kind=ip_i4_p) :: cplid,partid,varid
+    integer(kind=ip_i4_p) :: cplid,partid,varid,mapid
     INTEGER(kind=ip_i4_p) :: nf,lsize,nflds,npc
     integer(kind=ip_i4_p) :: dt,ltime,lag,getput
     integer(kind=ip_i4_p) :: msec
@@ -97,6 +97,7 @@ contains
        getput= pcpointer%getput
        rstfile=TRIM(pcpointer%rstfile)
        partid= pcpointer%partID
+       mapid   = pcpointer%mapperid
        msec = 0   ! reasonable default to start with
        mseclag = msec
 
@@ -105,6 +106,7 @@ contains
            WRITE(nulprt,*) subname,' Field cplid :',cplid
            WRITE(nulprt,*) subname,' read restart:',npc,TRIM(pcpointer%fldlist)
            WRITE(nulprt,*) subname,' lag prism_mcoupler :',lag,prism_mcoupler
+           WRITE(nulprt,*) subname,' getput , mapid :',getput, mapid
            WRITE(nulprt,*) '----------------------------------------------------------------'
            CALL oasis_flush(nulprt)
        ENDIF
@@ -136,12 +138,28 @@ contains
           ALLOCATE(array4(lsize))
           ALLOCATE(array5(lsize))
 
+          a2on=.false.          
+          a3on=.false.
+          a4on=.false.
+          a5on=.false.
+
+          if (mapid > 0) then
+           if (prism_mapper(mapid)%nwgts == 4) then
+             a2on=.true.
+             a3on=.true.
+             a4on=.true.
+             a5on=.false.
+           endif
+          endif
+          
+
           DO nf = 1,nflds
              varid = pcpointer%varid(nf)
              CALL oasis_advance_run(OASIS_Out,varid,msec,kinfo,nff=nf, &
                                  namid=cplid,array1din=array,&
-                                 readrest=.TRUE., array2=array2,array3=array3, &
-                                 array4=array4,array5=array5)
+                                 readrest=.TRUE., a2on=a2on,array2=array2, &
+                                 a3on=a3on,array3=array3, &
+                                 a4on=a4on,array4=array4,a5on=a5on,array5=array5)
           ENDDO
           IF (OASIS_Debug >= 2) THEN
              write(nulprt,*) subname,' advance_run ',cplid,TRIM(pcpointer%fldlist)
@@ -282,7 +300,8 @@ contains
 
   SUBROUTINE oasis_advance_run(mop,varid,msec,kinfo,nff,namid,&
              array1din,array1dout,array2dout,readrest,&
-             a2on,array2,a3on,array3,a4on,array4,a5on,array5)
+             a2on,array2,a3on,array3,a4on,array4,a5on,array5, &
+             writrest)
 
     IMPLICIT none
 !   ----------------------------------------------------------------
@@ -307,6 +326,7 @@ contains
     REAL   (kind=ip_r8_p), optional :: array4(:) !< hot put data
     logical              , optional :: a5on      !< logical for array5
     REAL   (kind=ip_r8_p), optional :: array5(:) !< hot put data
+    logical              , optional :: writrest  !< flag to write restart now
 !   ----------------------------------------------------------------
     character(len=ic_lvar):: vname
     INTEGER(kind=ip_i4_p) :: cplid,rouid,mapid,partid
@@ -320,6 +340,7 @@ contains
     LOGICAL               :: a11on,a22on,a33on,a44on,a55on
     real(kind=ip_double_p):: sndmult,sndadd,rcvmult,rcvadd
     character(len=ic_xl)  :: rstfile   ! restart filename
+    character(len=ic_xl)  :: rstfile2  ! restart filename
     character(len=ic_xl)  :: inpfile   ! input filename
     integer(kind=ip_i4_p) :: nx,ny
     integer(kind=ip_i4_p) :: mseclag   ! model time + lag
@@ -338,6 +359,7 @@ contains
     type(mct_avect)       :: avtmp3  ! data read from restart
     type(mct_avect)       :: avtmp4  ! data read from restart
     type(mct_avect)       :: avtmp5  ! data read from restart
+    type(mct_avect)       :: avtmpW  ! for writing restart
     type(prism_coupler_type),pointer :: pcpointer
     type(prism_coupler_type),pointer :: pcpointmp
     logical, parameter    :: allow_no_restart = .false.
@@ -471,7 +493,17 @@ contains
        sndmult = pcpointer%sndmult
        rcvadd  = pcpointer%rcvadd
        rcvmult = pcpointer%rcvmult
-      
+
+       ! update writrest only if true
+       ! never want to switch to false here
+       if (present(writrest)) then
+          if (writrest .and. mop /= OASIS_Out) then
+             write(nulprt,*) subname,estr,'mop must be OASIS_Out if writrest is true, mop=',mop
+             call oasis_abort()
+          endif
+          if (writrest) pcpointer%writrest = writrest
+       endif
+
        unpack = (sndrcv .OR. input)
       
        CALL oasis_debug_note(subname//' set nx and ny')
@@ -507,6 +539,7 @@ contains
        IF (getput == OASIS3_PUT .AND. lag > 0 .AND. lreadrest) THEN
        ! effective model time of restart : msec
            mseclag = msec + lag
+
            IF (.not.present(nff)) THEN
                WRITE(nulprt,*) subname,estr,'nff optional argument not passed but expected for var = ',trim(vname)
                CALL oasis_abort()
@@ -683,13 +716,17 @@ contains
        ! optional args only on put side
        !------------------------------------------------
 
-       IF (.not.lreadrest) THEN
        arrayon = .false.
        arrayon(1) = .true.
        if (present(a2on)) arrayon(2) = a2on
        if (present(a3on)) arrayon(3) = a3on
        if (present(a4on)) arrayon(4) = a4on
        if (present(a5on)) arrayon(5) = a5on
+
+       if (OASIS_debug >= 10) then
+          write(nulprt,*) subname,' lreadrest :',lreadrest,' arrayon = ',arrayon
+       endif
+
 
        if ((getput == OASIS3_GET) .or. &
            (getput == OASIS3_PUT .and. trim(pcpointer%maploc) == "dst" )) then
@@ -754,11 +791,11 @@ contains
                              trim(vname),' ','aVect5'
           endif
        endif
-       endif  ! .not. lreadrest
 
        !------------------------------------------------
        !>   * update avect1-5 on put side and apply appropriate transform
        !>   * if its coupling time, set status of this var to ready
+       !>   * write restart if requested by interface
        ! on restart, treat as instant value
        !------------------------------------------------
 
@@ -766,6 +803,7 @@ contains
 
           call oasis_debug_note(subname//' loctrans operation')
           write(tstring,F01) 'pcpy_',cplid
+
           call oasis_timer_start(tstring)
 
           cstring = 'none'
@@ -984,7 +1022,7 @@ contains
           ! (not cache friendly yet)
           !------------------------------------------------
 
-          IF (getput == OASIS3_PUT) THEN
+          if (getput == OASIS3_PUT) then
              call oasis_debug_note(subname//' loctrans calc')
              write(tstring,F01) 'pavg_',cplid
              call oasis_timer_start(tstring)
@@ -1038,7 +1076,7 @@ contains
                 endif
              enddo             
              call oasis_timer_stop(tstring)
-         ENDIF
+          endif
 
           !------------------------------------------------
           !>     * write to restart file if put and at the end of the run, 
@@ -1051,34 +1089,46 @@ contains
           if (mseclag >= maxtime) then
              sndrcv = .false.   ! turn off communication
              unpack = .false.   ! nothing to unpack
-             if (getput == OASIS3_PUT .and. lag > 0 .and. mseclag == maxtime) then
+          endif
+
+          if (len_trim(rstfile) > 0) then
+          if ((getput == OASIS3_PUT .and. lag > 0 .and. mseclag == maxtime) .or. &
+              (getput == OASIS3_PUT .and. pcpointer%writrest)) then
+             call oasis_debug_note(subname//' lag restart write')
+
+             if (lag > 0 .and. mseclag == maxtime) then
                 kinfo = OASIS_ToRest
-                call oasis_debug_note(subname//' lag restart write')
-                write(tstring,F01) 'wrst_',cplid
-                call oasis_timer_start(tstring)
-                call oasis_io_write_avfile(rstfile,pcpointer%avect1, &
-                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny)
-                if (pcpointer%aVon(2)) &
-                   call oasis_io_write_avfile(rstfile,pcpointer%avect2, &
-                      prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av2_')
-                if (pcpointer%aVon(3)) &
-                   call oasis_io_write_avfile(rstfile,pcpointer%avect3, &
-                      prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av3_')
-                if (pcpointer%aVon(4)) &
-                   call oasis_io_write_avfile(rstfile,pcpointer%avect4, &
-                      prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av4_')
-                if (pcpointer%aVon(5)) &
-                   call oasis_io_write_avfile(rstfile,pcpointer%avect5, &
-                      prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av5_')
-                call oasis_timer_stop(tstring)
-                if (OASIS_debug >= 2) then
-                   write(nulprt,*) subname,' at ',msec,mseclag,' WRST: ', &
-                      trim(mct_avect_exportRList2c(pcpointer%avect1)),' ',&
-                      trim(rstfile)
-                   call oasis_flush(nulprt)
-                endif
+                rstfile2 = rstfile
+             else  ! writrest
+                pcpointer%writrest = .false.
+                write(rstfile2,'(a,i9.9,a,a)') 'TC',msec,'_',trim(rstfile)
+             endif
+
+             write(tstring,F01) 'wrst_',cplid
+             call oasis_timer_start(tstring)
+             call oasis_io_write_avfile(rstfile2,pcpointer%avect1, &
+                prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny)
+             if (pcpointer%aVon(2)) &
+                call oasis_io_write_avfile(rstfile2,pcpointer%avect2, &
+                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av2_')
+             if (pcpointer%aVon(3)) &
+                call oasis_io_write_avfile(rstfile2,pcpointer%avect3, &
+                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av3_')
+             if (pcpointer%aVon(4)) &
+                call oasis_io_write_avfile(rstfile2,pcpointer%avect4, &
+                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av4_')
+             if (pcpointer%aVon(5)) &
+                call oasis_io_write_avfile(rstfile2,pcpointer%avect5, &
+                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre='av5_')
+             call oasis_timer_stop(tstring)
+             if (OASIS_debug >= 2) then
+                write(nulprt,*) subname,' at ',msec,mseclag,' WRST: ', &
+                   trim(mct_avect_exportRList2c(pcpointer%avect1)),' ',&
+                   trim(rstfile2)
+                call oasis_flush(nulprt)
              endif
           endif
+          endif  ! len_trim(rstfile)
 
           !------------------------------------------------
           !>     * map and communicate operations
@@ -1342,56 +1392,66 @@ contains
 
        endif   ! comm_now
 
-          !------------------------------------------------
-          !>   * at the end of the run only,  save fields associated
-          !>     with non-instant loctrans operations to restart files
-          !------------------------------------------------
+       !------------------------------------------------
+       !>   * at the end of the run only,  save fields associated
+       !>     with non-instant loctrans operations to restart files
+       !------------------------------------------------
 
-          IF (mseclag + dt >= maxtime .AND. &
-             getput == OASIS3_PUT .and. pcpointer%trans /= ip_instant) then
-             call oasis_debug_note(subname//' loctrans restart write')
-             write(tstring,F01) 'wtrn_',cplid
-             call oasis_timer_start(tstring)
-             WRITE(vstring,'(a,i6.6,a)') 'loc',pcpointer%namID,'_cnt'
-             CALL oasis_io_write_array(rstfile,prism_part(partid)%mpicom,iarray=pcpointer%avcnt,&
-                                       ivarname=TRIM(vstring))
-             write(vstring,'(a,i6.6,a)') 'loc',pcpointer%namID,'_'
-             CALL oasis_io_write_avfile(rstfile,pcpointer%avect1, &
+       IF ((mseclag + dt >= maxtime .AND. &
+           getput == OASIS3_PUT .and. pcpointer%trans /= ip_instant .and. &
+           len_trim(rstfile) > 0) .or. &
+           (getput == OASIS3_PUT .and. pcpointer%writrest .and. len_trim(rstfile) > 0)) then
+
+          if (mseclag + dt >= maxtime) then
+             rstfile2 = rstfile
+          else  ! writrest
+             pcpointer%writrest = .false.
+             write(rstfile2,'(a,i9.9,a,a)') 'TA',msec,'_',trim(rstfile)
+          endif
+
+          call oasis_debug_note(subname//' loctrans restart write')
+          write(tstring,F01) 'wtrn_',cplid
+          call oasis_timer_start(tstring)
+          WRITE(vstring,'(a,i6.6,a)') 'loc',pcpointer%namID,'_cnt'
+          CALL oasis_io_write_array(rstfile2,prism_part(partid)%mpicom,iarray=pcpointer%avcnt,&
+                                    ivarname=TRIM(vstring))
+          write(vstring,'(a,i6.6,a)') 'loc',pcpointer%namID,'_'
+          CALL oasis_io_write_avfile(rstfile2,pcpointer%avect1, &
+             prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
+          if (pcpointer%aVon(2)) then
+             write(vstring,'(a,i6.6,a)') 'av2loc',pcpointer%namID,'_'
+             CALL oasis_io_write_avfile(rstfile2,pcpointer%avect2, &
                 prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
-             if (pcpointer%aVon(2)) then
-                write(vstring,'(a,i6.6,a)') 'av2loc',pcpointer%namID,'_'
-                CALL oasis_io_write_avfile(rstfile,pcpointer%avect2, &
-                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
-             endif
-             if (pcpointer%aVon(3)) then
-                write(vstring,'(a,i6.6,a)') 'av3loc',pcpointer%namID,'_'
-                CALL oasis_io_write_avfile(rstfile,pcpointer%avect3, &
-                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
-             endif
-             if (pcpointer%aVon(4)) then
-                write(vstring,'(a,i6.6,a)') 'av4loc',pcpointer%namID,'_'
-                CALL oasis_io_write_avfile(rstfile,pcpointer%avect4, &
-                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
-             endif
-             if (pcpointer%aVon(5)) then
-                write(vstring,'(a,i6.6,a)') 'av5loc',pcpointer%namID,'_'
-                CALL oasis_io_write_avfile(rstfile,pcpointer%avect5, &
-                   prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
-             endif
-             call oasis_timer_stop(tstring)
-             if (OASIS_debug >= 2) then
-                write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
-                   trim(mct_avect_exportRList2c(pcpointer%avect1)),' ',trim(rstfile)
-                call oasis_flush(nulprt)
-             endif
-             if (OASIS_debug >= 20) then
-                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
-                                pcpointer%avcnt
-                write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
-                                minval(pcpointer%avect1%rAttr),&
-                                maxval(pcpointer%avect1%rAttr)
-             endif
-         ENDIF
+          endif
+          if (pcpointer%aVon(3)) then
+             write(vstring,'(a,i6.6,a)') 'av3loc',pcpointer%namID,'_'
+             CALL oasis_io_write_avfile(rstfile2,pcpointer%avect3, &
+                prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
+          endif
+          if (pcpointer%aVon(4)) then
+             write(vstring,'(a,i6.6,a)') 'av4loc',pcpointer%namID,'_'
+             CALL oasis_io_write_avfile(rstfile2,pcpointer%avect4, &
+                prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
+          endif
+          if (pcpointer%aVon(5)) then
+             write(vstring,'(a,i6.6,a)') 'av5loc',pcpointer%namID,'_'
+             CALL oasis_io_write_avfile(rstfile2,pcpointer%avect5, &
+                prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny,nampre=TRIM(vstring))
+          endif
+          call oasis_timer_stop(tstring)
+          if (OASIS_debug >= 2) then
+             write(nulprt,*) subname,' at ',msec,mseclag,' WTRN: ', &
+                trim(mct_avect_exportRList2c(pcpointer%avect1)),' ',trim(rstfile2)
+             call oasis_flush(nulprt)
+          endif
+          if (OASIS_debug >= 20) then
+             write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
+                             pcpointer%avcnt
+             write(nulprt,*) subname,'  DEBUG write loctrans restart',cplid,&
+                             minval(pcpointer%avect1%rAttr),&
+                             maxval(pcpointer%avect1%rAttr)
+          endif
+       ENDIF
 
        !------------------------------------------------
        !>   * GET only, unpack avect1 if it's newly received
@@ -1501,7 +1561,8 @@ contains
     logical               :: lconsbfb
     integer(kind=ip_i4_p),parameter :: avsmax = prism_coupler_avsmax
     logical               :: locavon(avsmax)   ! local avon
-    integer(kind=ip_i4_p) :: avonsize, nterm
+    integer(kind=ip_i4_p) :: avonsize
+    integer(kind=ip_i4_p) :: higher_order_check
     character(len=*),parameter :: subname = '(oasis_advance_map)'
 
     call oasis_debug_enter(subname)
@@ -1517,15 +1578,17 @@ contains
     !> * check for higher order terms
     !--- assume avon and av2-5 are not passed but av1 always is ---
     avonsize = 1
-    nterm = 1
     locavon = .false.
     locavon(1) = .true.
 
     !--- but if avon is passed, use avon flags ---
     if (present(avon)) then
        avonsize = size(avon)
-       nterm = min(avsmax,avonsize)
-       locavon(1:nterm) = avon(1:nterm)
+       if (avonsize > avsmax) then
+          WRITE(nulprt,*) subname,estr,'avon size',avonsize,' passed in is too large',avsmax
+          CALL oasis_abort()
+       endif
+       locavon(1:avonsize) = avon(1:avonsize)
     else
        !--- if avon is not passed, av2-5 should not be ---
        if (present(av2) .or. present(av3) .or. present(av4) .or. present(av5)) then
@@ -1535,12 +1598,33 @@ contains
     endif
 
     !> * check consistency between weights and coupling terms
-    do n = 1,nterm
-       if (locavon(n) .and. n > mapper%nwgts) then
-          WRITE(nulprt,*) subname,estr,'in nwgts and coupling terms',mapper%nwgts,n
-          CALL oasis_abort()
-       endif
-    enddo
+
+    ! nwgts=4 assumes bicubic which requires 4 higher order fields
+    higher_order_check = 0
+    if (mapper%nwgts == 4) higher_order_check = 1
+
+    if (higher_order_check == 0) then
+       ! must have weights for each higher order field passed but can have extra weights
+       do n = 1,avsmax
+          if (locavon(n) .and. n > mapper%nwgts) then
+             WRITE(nulprt,*) subname,estr,'higher_order_check = ',higher_order_check
+             WRITE(nulprt,*) subname,estr,'missing weights for higher order field'
+             WRITE(nulprt,*) subname,estr,'missing weights output ',n,avsmax,mapper%nwgts,locavon(n)
+             CALL oasis_abort()
+          endif
+       enddo
+    else
+       ! number of higher order fields passed must exactly match the number of higher order weights
+       do n = 1,avsmax
+          if ((locavon(n) .and. n > mapper%nwgts) .or. &
+              (.not. locavon(n) .and. n <= mapper%nwgts)) then
+             WRITE(nulprt,*) subname,estr,'higher_order_check = ',higher_order_check
+             WRITE(nulprt,*) subname,estr,'mismatch of higher order fields passed and weights'
+             WRITE(nulprt,*) subname,estr,'mismatch weights output ',n,avsmax,mapper%nwgts,locavon(n)
+             CALL oasis_abort()
+          endif
+       enddo
+    endif
 
     !> * run mct sparse matrix mapper on data and separately on hot as needed
 
