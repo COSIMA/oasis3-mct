@@ -8,7 +8,7 @@ LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR
 # type of decomposition :
 # DECOMP_APPLE for 1D decomposition
 # DECOMP_BOX for 2D decomposition
-CPPKEYDECOMP_M1=DECOMP_APPLE
+CPPKEYDECOMP_M1=DECOMP_BOX
 CPPKEYDECOMP_M2=DECOMP_APPLE
 #
 # Precision for REAL: USE_DOUBLE_PRECISION or NO_USE_DOUBLE_PRECISION
@@ -19,7 +19,7 @@ CPPLOCAL_M2 = -D${CPPKEYDP} -D${CPPKEYDECOMP_M2}
 ### End User configurable options ###
 #
 OBJ_M1 =  routine_hdlerr.o read_all_data.o \
-          decomp_def.o \
+          decomp_def.o gradient_bicubic.o \
           function_ana.o write_all_fields.o
 OBJ_M2 =  routine_hdlerr.o read_all_data.o \
           decomp_def_m2.o \
@@ -62,6 +62,8 @@ decomp_def.o : 			decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c decomp_def.F90
 decomp_def_m2.o : 		decomp_def.F90
 				$(F90) $(F90FLAGS) $(CPPLOCAL_M2) -o decomp_def_m2.o -c decomp_def.F90
+gradient_bicubic.o :	gradient_bicubic.F90
+				$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c gradient_bicubic.F90
 
 model1.o :	model1.F90 Makefile
 		$(F90) $(F90FLAGS) $(CPPLOCAL_M1) -c model1.F90

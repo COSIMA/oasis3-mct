@@ -1,6 +1,11 @@
 $grid_source_characteristics
 cl_grd_src='torc'
+cl_remap='bicubic'
+cl_period_src='P'
+il_overlap_src=2
 $end
 $grid_target_characteristics
 cl_grd_tgt='lmdz'
+cl_period_tgt='P'
+il_overlap_tgt=0
 $end

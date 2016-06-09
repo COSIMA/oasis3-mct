@@ -39,8 +39,17 @@ PROGRAM model1
   CHARACTER(len=3)   :: chout
   CHARACTER(len=4)   :: cl_grd_src ! name of the source grid
   CHARACTER(len=4)   :: cl_grd_tgt ! name of the target grid
+  CHARACTER(len=8)   :: cl_period_src ! type of grid (P=periodic or R=regional
+  CHARACTER(len=8)   :: cl_period_tgt ! type of grid (P=periodic or R=regional
+  CHARACTER(len=8)   :: cl_remap      ! type of remapping (only BICUBIC + BOX will be used)
+  INTEGER            :: il_overlap_src, il_overlap_tgt
   NAMELIST /grid_source_characteristics/cl_grd_src
+  NAMELIST /grid_source_characteristics/cl_remap
+  NAMELIST /grid_source_characteristics/cl_period_src
+  NAMELIST /grid_source_characteristics/il_overlap_src
   NAMELIST /grid_target_characteristics/cl_grd_tgt
+  NAMELIST /grid_target_characteristics/cl_period_tgt
+  NAMELIST /grid_target_characteristics/il_overlap_tgt
   !
   ! Global grid parameters : 
   INTEGER :: nlon, nlat, ntot    ! dimensions in the 2 directions of space + total size
@@ -87,6 +96,7 @@ PROGRAM model1
   ! Exchanged local fields arrays
   ! used in routines oasis_put and oasis_get
   REAL (kind=wp),   POINTER     :: field_send(:,:)
+  REAL (kind=wp),   POINTER     :: gradient_i(:,:), gradient_j(:,:), gradient_ij(:,:)
   !
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !   INITIALISATION 
@@ -174,6 +184,9 @@ PROGRAM model1
   !
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'Source grid name :',cl_grd_src
+      WRITE(w_unit,*) 'Remapping :',cl_remap
+      WRITE(w_unit,*) 'Source grid type :',cl_period_src
+      WRITE(w_unit,*) 'Source grid overlapping pts :',il_overlap_src
       CALL flush(w_unit)
   ENDIF
   !
@@ -280,6 +293,12 @@ PROGRAM model1
   !
   ALLOCATE(field_send(var_sh(2), var_sh(4)), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field1_send'
+  ALLOCATE(gradient_i(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gradient_i'
+  ALLOCATE(gradient_j(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gradient_j'
+  ALLOCATE(gradient_ij(nlon,nlat), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gradient_ij'
   !
   !!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
   !
@@ -303,6 +322,28 @@ PROGRAM model1
                     RESHAPE(gg_lat(indi_beg:indi_end,indj_beg:indj_end),(/ var_sh(2), var_sh(4) /)), &
                     field_send,ib)
   !
+  ! Calculate the gradients for bicubic remapping only if DECOMP_BOX
+  
+#if defined DECOMP_BOX
+    IF (cl_remap == 'bicubic') THEN
+      call gradient_bicubic(nlon, nlat, field_send, gg_mask, &
+                                  gg_lat, gg_lon, &
+                                  il_overlap_src, cl_period_src, &
+                                  gradient_i, gradient_j, gradient_ij)
+      IF (FILE_Debug >= 2) THEN
+        WRITE(w_unit,*) 'Bicubic_gradient calculated '
+        CALL FLUSH(w_unit)
+      ENDIF
+      call oasis_put(var_id,itap_sec, field_send, ierror, gradient_i, gradient_j, gradient_ij)
+    ELSE
+      CALL oasis_put(var_id,itap_sec, field_send, ierror)
+      IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Sent) THEN
+      WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 313')
+      ENDIF
+    ENDIF
+#else
+  !
   ! Send FSENDANA
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'tcx sendf ',itap_sec,MINVAL(field_send),MAXVAL(field_send)
@@ -312,6 +353,7 @@ PROGRAM model1
       WRITE (w_unit,*) 'oasis_put abort by model1 compid ',comp_id
       CALL oasis_abort(comp_id,comp_name,'Problem at line 313')
   ENDIF
+#endif
   !
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
