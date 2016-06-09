@@ -284,6 +284,13 @@ CONTAINS
          write(nulprt,*) subname,estr,'strategy set in kparal array index ',CLIM_Strategy
          call oasis_abort()
       endif
+
+      IF (OASIS_debug >= 30)  THEN
+         WRITE(nulprt,*) subname, ' Nsegs before calling mct_gsmap_init :',nsegs
+         WRITE(nulprt,*) subname, ' Numel before calling mct_gsmap_init :',numel
+         CALL oasis_flush(nulprt)
+      ENDIF
+
       if (local_timers_on) call oasis_timer_stop('part_setup_initgsm_C')
    
       !-------------------------------------------------     
