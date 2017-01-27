@@ -2523,7 +2523,7 @@ END SUBROUTINE oasis_mpi_finalize
 !> Custom method for reducing MPI lists across pes for OASIS
 
 SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastcheckout, &
-   linp2,lout2,spval2,linp3,lout3,spval3)
+   linp2,lout2,spval2,linp3,lout3,spval3,linp4,lout4,spval4)
 
    IMPLICIT none
 
@@ -2541,6 +2541,9 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    integer     ,pointer,intent(in)   ,optional :: linp3(:)  !< input list on each task
    integer     ,pointer,intent(inout),optional :: lout3(:)  !< reduced output list, same on all tasks
    integer             ,intent(in)   ,optional :: spval3    !< unset value for linp3
+   integer     ,pointer,intent(in)   ,optional :: linp4(:)  !< input list on each task
+   integer     ,pointer,intent(inout),optional :: lout4(:)  !< reduced output list, same on all tasks
+   integer             ,intent(in)   ,optional :: spval4    !< unset value for linp4
 
    !----- local ---
    integer(kind=ip_i4_p) :: m,n,k,p
@@ -2549,11 +2552,12 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    integer(kind=ip_i4_p) :: commrank, commsize
    integer(kind=ip_i4_p) :: listcheck, listcheckall
    integer(kind=ip_i4_p) :: maxloops, sendid, recvid, kfac
-   logical               :: found, present2, present3
+   logical               :: found, present2, present3, present4
    integer(kind=ip_i4_p) :: status(MPI_STATUS_SIZE)  ! mpi status info
    character(len=ic_lvar2),pointer :: recv_varf1(:),varf1a(:),varf1b(:)
    character(len=ic_lvar2),pointer :: recv_varf2(:),varf2a(:),varf2b(:)
    integer(kind=ip_i4_p)  ,pointer :: recv_varf3(:),varf3a(:),varf3b(:)
+   integer(kind=ip_i4_p)  ,pointer :: recv_varf4(:),varf4a(:),varf4b(:)
    character(len=ic_lvar2) :: string
    logical, parameter      :: local_timers_on = .false.
    integer(ip_i4_p)        :: ierr
@@ -2593,6 +2597,12 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    endif
    present3 = present(linp3)
 
+   if ((present(linp4) .and. .not.present(lout4)) .or. &
+       (present(lout4) .and. .not.present(linp4))) then
+      call oasis_mpi_abort(subname//trim(string)//" linp4 lout4 both must be present ")
+   endif
+   present4 = present(linp4)
+
    if (len(linp1) > len(varf1a)) then
       call oasis_mpi_abort(subname//trim(string)//" linp1 too long ")
    endif
@@ -2612,6 +2622,12 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    if (present(linp3)) then
       if (size(linp3) /= size(linp1)) then
          call oasis_mpi_abort(subname//trim(string)//" linp1 linp3 not same size ")
+      endif
+   endif
+
+   if (present(linp4)) then
+      if (size(linp4) /= size(linp1)) then
+         call oasis_mpi_abort(subname//trim(string)//" linp1 linp4 not same size ")
       endif
    endif
 
@@ -2661,7 +2677,7 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
       if (local_timers_on) call oasis_timer_stop(trim(string)//'_rl_fastcheck')
 
       !-------------------------------------------------     
-      ! linp1 same on all tasks, update lout1, lout2, lout3 and return
+      ! linp1 same on all tasks, update lout1, lout2, lout3, lout4 and return
       !-------------------------------------------------     
 
       if (listcheckall == 1) then
@@ -2675,6 +2691,10 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
          if (present3) then
             allocate(lout3(lsize))
             lout3(1:lsize) = linp3(1:lsize)
+         endif
+         if (present4) then
+            allocate(lout4(lsize))
+            lout4(1:lsize) = linp4(1:lsize)
          endif
          call oasis_debug_exit(subname)
          if (present(fastcheckout)) fastcheckout = .true.
@@ -2698,6 +2718,7 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    allocate(varf1a(max(lsize,20)))  ! 20 is arbitrary starting number
    if (present2) allocate(varf2a(max(lsize,20)))  ! 20 is arbitrary starting number
    if (present3) allocate(varf3a(max(lsize,20)))  ! 20 is arbitrary starting number
+   if (present4) allocate(varf4a(max(lsize,20)))  ! 20 is arbitrary starting number
    cnt = 0
    do n = 1,lsize
       p = 0
@@ -2711,6 +2732,7 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
          varf1a(cnt) = linp1(n)
          if (present2) varf2a(cnt) = linp2(n)
          if (present3) varf3a(cnt) = linp3(n)
+         if (present4) varf4a(cnt) = linp4(n)
       endif
    enddo
 
@@ -2761,6 +2783,10 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                call MPI_SEND(varf3a(1:cnt), cnt, MPI_INTEGER, sendid, 8900+m, comm, ierr)
                call oasis_mpi_chkerr(ierr,subname//trim(string)//':send varf3a')
             endif
+            if (present4) then
+               call MPI_SEND(varf4a(1:cnt), cnt, MPI_INTEGER, sendid, 9900+m, comm, ierr)
+               call oasis_mpi_chkerr(ierr,subname//trim(string)//':send varf4a')
+            endif
          endif  ! cnt > 0
          if (local_timers_on) call oasis_timer_stop (trim(string)//'_rl_send')
       endif  ! sendid >= 0
@@ -2791,6 +2817,11 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                allocate(recv_varf3(cntr))
                call MPI_RECV(recv_varf3, cntr, MPI_INTEGER, recvid, 8900+m, comm, status, ierr)
                call oasis_mpi_chkerr(ierr,subname//trim(string)//':recv varf3')
+            endif
+            if (present4) then
+               allocate(recv_varf4(cntr))
+               call MPI_RECV(recv_varf4, cntr, MPI_INTEGER, recvid, 9900+m, comm, status, ierr)
+               call oasis_mpi_chkerr(ierr,subname//trim(string)//':recv varf4')
             endif
          endif  ! cntr > 0
          if (local_timers_on) call oasis_timer_stop (trim(string)//'_rl_recv')
@@ -2841,6 +2872,26 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                         endif
                      endif
                   endif
+                  if (present4) then
+                     if (present(spval4)) then
+                        !--- use something other than spval4 if it exists and check consistency
+                        if (varf4a(p) == spval4) then
+                           varf4a(p) = recv_varf4(n)
+                        elseif (recv_varf4(n) /= spval4 .and. varf4a(p) /= recv_varf4(n)) then
+                           write(nulprt,*) subname//trim(string),astr,'inconsistent linp4 var: ',&
+                                     recv_varf4(n),':',trim(varf1a(p)),':',varf4a(p)
+                           call oasis_abort(cd_routine=subname//trim(string),cd_message= &
+                                'inconsistent linp4 value: '//trim(varf1a(p)))
+                        endif
+                     else
+                        if (varf4a(p) /= recv_varf4(n)) then
+                           write(nulprt,*) subname//trim(string),astr,'inconsistent linp4 var: ',&
+                                     recv_varf4(n),':',trim(varf1a(p)),':',varf4a(p)
+                           call oasis_abort(cd_routine=subname//trim(string),cd_message= &
+                                'inconsistent linp4 value: '//trim(varf1a(p)))
+                        endif
+                     endif
+                  endif
                endif
             enddo
             if (.not.found) then
@@ -2880,10 +2931,23 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                      varf3a(1:size(varf3b)) = varf3b(1:size(varf3b))
                      deallocate(varf3b)
                   endif
+                  if (present4) then
+                     allocate(varf4b(size(varf4a)))
+                     varf4b = varf4a
+                     deallocate(varf4a)
+                     if (OASIS_Debug >= 15) then
+                        write(nulprt,*) subname//trim(string),' resize varf4a ',size(varf4b),cnt+cntr
+                        call oasis_flush(nulprt)
+                     endif
+                     allocate(varf4a(cnt+cntr))
+                     varf4a(1:size(varf4b)) = varf4b(1:size(varf4b))
+                     deallocate(varf4b)
+                  endif
                endif
                varf1a(cnt) = recv_varf1(n)
                if (present2) varf2a(cnt) = recv_varf2(n)
                if (present3) varf3a(cnt) = recv_varf3(n)
+               if (present4) varf4a(cnt) = recv_varf4(n)
             endif
          enddo  ! cntr
          if (local_timers_on) call oasis_timer_stop(trim(string)//'_rl_rootsrch')
@@ -2891,6 +2955,7 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
             deallocate(recv_varf1)
             if (present2) deallocate(recv_varf2)
             if (present3) deallocate(recv_varf3)
+            if (present4) deallocate(recv_varf4)
          endif
 
       endif  ! recvid >= 0
@@ -2941,16 +3006,35 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
       call oasis_mpi_bcast(lout3,comm,subname//trim(string)//' lout3')
    endif
 
+   if (present4) then
+      allocate(lout4(cntout))
+      if (commrank == 0) then
+         do n = 1,cntout
+            lout4(n) = varf4a(n)
+         enddo
+      endif
+      deallocate(varf4a)
+      call oasis_mpi_bcast(lout4,comm,subname//trim(string)//' lout4')
+   endif
+
    !--- document
 
    if (OASIS_debug >= 15) then
       do n = 1,cnt
-         if (present2 .and. present3) then
+         if (present2 .and. present3 .and. present4) then
+            write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),' ',trim(lout2(n)),lout3(n),lout4(n)
+         elseif (present2 .and. present3) then
             write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),' ',trim(lout2(n)),lout3(n)
+         elseif (present2 .and. present4) then
+            write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),' ',trim(lout2(n)),lout4(n)
+         elseif (present3 .and. present4) then
+            write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),' ',lout3(n),lout4(n)
          elseif (present2) then
             write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),' ',trim(lout2(n))
          elseif (present3) then
             write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),lout3(n)
+         elseif (present4) then
+            write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n)),lout4(n)
          else
             write(nulprt,*) subname,trim(string),' list: ',n,trim(lout1(n))
          endif

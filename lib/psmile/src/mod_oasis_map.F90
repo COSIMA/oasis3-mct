@@ -306,7 +306,7 @@ CONTAINS
       CALL oasis_flush(nulprt)
   ENDIF
   call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
-             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID))
+             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID),namscrord(namID))
   IF (OASIS_debug >= 15) THEN
       WRITE(nulprt,*) subname,' done scrip '
       CALL oasis_flush(nulprt)

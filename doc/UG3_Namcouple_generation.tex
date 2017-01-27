@@ -23,8 +23,8 @@ The {\it namcouple} is a text file with the following characteristics:
 \item the number of blanks between two character strings is
   non-significant;
 \item all lines beginning with \# are ignored and considered as
-  comments.
-\item {\bf blank lines are not allowed.}
+  comments;
+\item blank lines are supported, but only since OASIS3-MCT4.0 version.
 \end{itemize}
 
 The first part of {\it namcouple } is devoted to configuration of
@@ -68,6 +68,9 @@ chemistry (also running on grid {\tt atmo}), and one field SOALBEDO is read from
 #
  $NLOGPRT
    2     1
+#
+ $NUNITNO
+   901     920
 #
  $SEQMODE
  $CHANNEL
@@ -124,7 +127,8 @@ chemistry (also running on grid {\tt atmo}), and one field SOALBEDO is read from
 
 The first section of {\it namcouple } uses some predefined keywords
 prefixed by the \$ sign to locate the related information. The \$ sign
-must be in the second column. Only 4 keywords are really used by OASIS3-MCT\_3.0:
+must be the first non-blank character on the line but can be in any column.
+Only 5 keywords are really used since OASIS3-MCT\_3.0 version and 2 of these 5 are optional :
 
 \begin{itemize}
 
@@ -209,6 +213,23 @@ The second number can also be set to -1 to activate the {\it lucia}
 tool that can be used to perform an analysis of the coupled components
 load balance. More information can be found in the README file in {\tt
   oasis3-mct/util/lucia} directory and report mentioned therein.
+ 
+\item {\tt \$NUNITNO}: Optional; on the line below this keyword are two integers
+  that indicate the minimum and maximum unit numbers to be used for
+  input and output files in the coupling layer.  The user should
+  choose values that will NOT conflict or overlap with unit numbers in 
+  use in any of the component models. The defaults are 1024 for the minimum and 9999
+  for the maximum unit number if not explicitly set by the user.
+
+\item {\tt \$NNOREST}: Optional; on the line below this keyword is a character
+  string that can override the requirement that restart files must exist
+  if they are needed.  If the character string value starts with T, t, .T, 
+  or .t (as in true), then OASIS3-MCT will initialise with zero any variable that normally requires
+  a restart (for instance, variables with LAG > 0) if the restart file does not exist. By default, missing
+  restart files will cause the model to abort.  It is strongly recommended
+  that this keyword NOT be used in production runs.  It exists to provide a 
+  quick shortcut for generating initial restarts or running technical tests. 
+  Note that if {\tt \$NNOREST{} is true but the restart file nonetheless exists, it will be used.
  
 \item {\tt \$SEQMODE, \$CHANNEL, \$JOBNAME, \$NBMODEL, \$INIDATE, \$MODINFO, \$CALTYPE:} UNUSED
 
@@ -351,8 +372,13 @@ time through individual {\tt oasis\_put} and {\tt oasis\_get}. Inside OASIS3-MCT
 and send or receive instruction is executed for all fields. This is
 useful in cases where multiple fields have the same coupling
 transformations and to reduce communication costs by aggregating multiple 
-fields into a single communication. Only one restart file can be
-defined for these multiple fields. 
+fields into a single communication. 
+
+This option does not put any constraint
+on the order of the related {\tt oasis\_put} and {\tt oasis\_get} in the codes.
+
+As they appear in one single entry line, these fields must share the same coupling restart file 
+but this restart file may contain other fields.
 
 \subsection{Second section of {\it namcouple} for {\tt OUTPUT} fields}
 \label{subsubsec_secondOUTPUT}

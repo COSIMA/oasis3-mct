@@ -25,6 +25,4 @@ CHECKIN MAPPING CHECKOUT
 INT=1
 myfile_torc_to_lmdz_CONSERV_FRACNNEI.nc src bfb 
 INT=1
-####
  $END
-############################################

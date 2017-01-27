@@ -20,6 +20,7 @@ SAVE
   INTEGER, PARAMETER :: ic_med  = 64
   INTEGER, PARAMETER :: ic_long = 256
   INTEGER, PARAMETER :: ic_xl   = 1024
+  INTEGER, PARAMETER :: ic_xxl  = 4096
   INTEGER, PARAMETER :: ic_lvar = 80   ! max length of variable, model name, grid name
   INTEGER, PARAMETER :: ic_lvar2= 120  ! max length of partition
   INTEGER, PARAMETER :: ip_single_p = SELECTED_REAL_KIND(6,37)

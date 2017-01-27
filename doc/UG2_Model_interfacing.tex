@@ -283,7 +283,7 @@ they may still call it describing a null partition, i.e. with {\tt ig\_paral(:)=
   \begin{itemize}
   \item {\tt il\_part\_id [INTEGER; OUT]}: partition ID
   \item {\tt ig\_paral [INTEGER, DIMENSION(:), IN]}: vector of
-    integers describing the local partition in the global index space;
+    integers describing the local grid partition in the global index space;
     has a different expression depending on the type of the partition;
     in OASIS3-MCT, 5 types of partition are supported: Serial (no
     partition), Apple, Box, Orange, and Points (see below).
@@ -432,8 +432,9 @@ These routines can be called only by one component process to write the whole gr
 \item {\tt CALL oasis\_start\_grids\_writing (flag)} or
 \item {\tt CALL prism\_start\_grids\_writing (flag)}
   \begin{itemize}
-  \item {\tt flag [INTEGER; OUT]}: not used ; obsolete in OASIS3-MCT; can be called for upward compatibility. 
-  \end{itemize}
+  \item {\tt flag [INTEGER; OUT]}: always 1 
+  \end{itemize} 
+Must be called to start the grid writing process. 
   
   \vspace{0.2cm}
 \item {\tt CALL oasis\_write\_grid (cgrid, nx\_global, ny\_global, lon, lat, il\_part\_id)}
@@ -549,8 +550,10 @@ compatibility, they may still call it with any {\tt name} and {\tt il\_part\_id}
   \item {\tt il\_part\_id [INTEGER; IN]}: partition ID returned from {\tt oasis\_def\_partition} (see section
     \ref{subsubsec_Partition})
   \item {\tt var\_nodims [INTEGER, DIMENSION(2); IN]}: var\_nodims(1)
-    is the rank of field array (1 or 2); var\_nodims(2) is the number
-    of bundles (always 1 in the current OASIS3-MCT version).
+    is not used anymore in OASIS3-MCT so its value can be anything but
+    it is still part of the oasis\_def\_var arguments; var\_nodims(2) is the number
+    of fields in a bundle (this will be 1 for unbundled fields or greater
+    than 1 for fields that are bundled).  
   \item {\tt kinout [INTEGER; IN]}: {\tt OASIS\_In} or {\tt PRISM\_In}
     (i.e. = 15) for fields received by the component; {\tt OASIS\_Out},
     {\tt PRISM\_Out} (i.e. = 14) for fields sent by the component
@@ -589,7 +592,57 @@ All processes of components at least partly involved in the coupling (e.g. {\tt 
 \subsection{Sending ``put'' and receiving ``get'' actions}
 \label{subsubsec_sendingreceiving}
 
-\subsubsection{Sending a coupling (or I/O or writing a restart file) field}
+This section describes how to send (put) and receive (get) fields through
+the coupling interface.  This interface supports several ranks and
+types of coupling fields.  First, the fields passed into the interface can be 
+4 byte or 8 byte reals.  Second, the decomposition of each field can be either one
+dimensional or two dimensional.  While the rank of the field decomposition does not
+have to match the rank of the grid partition, the field decomposition must be 
+consistent with the decomposition defined in the grid partition (see \ref{subsubsec_Partition}).  Third, the fields
+can be bundled.  The bundled dimension is always the last dimension in any
+field passed into the get and put routines.  And the size of the bundle dimension
+must match the value defined for the variable in var\_nodims(2) in the
+{\tt oasis\_def\_var} interface (see section \ref{subsubsec_Declaration}).
+
+So in general, the fields passed into the get and put interface can have rank
+1, 2, or 3 and include the following possible options where fld can be a 4
+byte or 8 byte real array.
+
+\begin{itemize}
+\item 1D, fld(:) = an single, unbundled field of decomposition rank 1.
+\item 2D, fld(:,:) = a single, unbundled field of decomposition rank 2.
+\item 1D bundled, fld(:,:) = a bundled set of fields of decomposition rank 1.
+  The size of the second dimension must equal the number of fields in the 
+  bundle, defined by var\_nodims(2) in the {\tt oasis\_def\_var} interface.
+\item 2D bundled, fld(:,:,:) = a bundled set of fields of decomposition rank 2.
+  The size of the third dimension must equal the number of fields in the 
+  bundle, defined by var\_nodims(2) in the {\tt oasis\_def\_var} interface.
+\end{itemize}
+
+With bundled fields, it is important that the number of fields in the bundle match
+in the two models being coupled.  This requires that the var\_nodims(2) values
+in the send and receive model match the bundle dimension of that bundled coupling field.
+Different bundled fields
+can have different numbers of fields, but for a given bundled field, the
+number of fields must match on the send and receive side.  This is explicitly
+checked within the coupling layer and will lead to an abort if not done correctly.
+It is possible to use the 1D bundled and 2D bundled 
+options with a bundle dimension of 1, i.e. for a bundle that contains only one single field.
+
+Finally, the bundled field option can be used to
+bundle together multi-level variables, multiple related fields, and other types
+of fields.  The fields must share a common partition and common namcouple settings (e.g. interpolation)
+to be bundled.  While this is a useful feature for multi-level fields, {\bf this does not mean
+that 3D interpolation is supported}.
+Each field in the bundle is
+treated internally as a separate field in the coupling layer without
+any information about the relationship between the fields in the bundle.  In fact,
+the bundled field variables are renamed within Oasis and a field number is appended
+to the variable name to keep track of the distinct fields in the bundle.  That
+updated variable name will appear in restart and output files.
+
+
+\subsubsection{Sending a coupling (or I/O) field or writing a coupling restart file}
 \label{prismput}
 
 In the component time step loop, each process sends its part of the
@@ -608,7 +661,7 @@ coupling (or I/O) field.
       namcouple}) at the time of the call (by convention at the
     beginning of the timestep)
   \item {\tt fld1 [REAL, IN]}: coupling (or I/O) field array; can be
-    1D or 2D
+    1D, 2D, bundled 1D, or bundled 2D 
   \item {\tt info [INTEGER; OUT]}: returned info code:
     \begin{itemize}
     \item OASIS\_Sent(=4) if the field was sent to another component
@@ -624,17 +677,21 @@ coupling (or I/O) field.
     \item OASIS\_ToRestOut (=9) if the field was written both to a
       restart file and to an output file.
     \item OASIS\_WaitGroup (=14) if the field was not sent because it is part of a group.
-    It will be sent only when the oasis\_put of the last field in the group will be called.
+    It will be sent only when the oasis\_put of the last field in the group will be called; however, the field is buffered and therefore the field array can be modified in the component code when returning from the oasis\_put call.
     \item OASIS\_Ok (=0) otherwise and no error occurred.
     \end{itemize}
   \item {\tt fld2 [REAL, IN, OPTIONAL]}: optional $2^{nd}$ coupling
-    field array; can be 1D or 2D
+    field array; can be 1D, 2D, bundled 1D, or bundled 2D.  Rank and size
+    must match {\it fld1}.
   \item {\tt fld3 [REAL, IN, OPTIONAL]}: optional $3^{rd}$ coupling
-    field array; can be 1D or 2D
+    field array; can be 1D, 2D, bundled 1D, or bundled 2D.  Rank and size
+    must match {\it fld1}.
   \item {\tt fld4 [REAL, IN, OPTIONAL]}: optional $4^{th}$ coupling
-    field array; can be 1D or 2D
+    field array; can be 1D, 2D, bundled 1D, or bundled 2D.  Rank and size
+    must match {\it fld1}.
   \item {\tt fld5 [REAL, IN, OPTIONAL]}: optional $5^{th}$ coupling
-    field array; can be 1D or 2D
+    field array; can be 1D, 2D, bundled 1D, or bundled 2D.  Rank and size
+    must match {\it fld1}.
   \item {\tt write\_restart [LOGICAL, IN, OPTIONAL]}: optional argument to write an 
     intermediate restart file associated with the variable {\it var\_id} at the current timestep.
   \end{itemize}
@@ -657,7 +714,12 @@ of the following aspects:
   remapping are therefore supported given that the higher order fields
   are provided at each time step as {\tt oasis\_put} arguments. Note
   that if {\tt fld3}, or {\tt fld4}, or {\tt fld5} are passed, {\tt fld2}, or {\tt fld3} and 
-  {\tt fld2}, or {\tt fld4} and {\tt fld3} and {\tt fld2} must also be passed respectively. 
+  {\tt fld2}, or {\tt fld4} and {\tt fld3} and {\tt fld2} must also be passed respectively.
+\item {\bf Note that from OASIS3-MCT\_4.0 onwards, 
+the number of weights in the remapping file and the number of fields in the coupling restart file 
+(when such a file is needed) must strictly match the number of source fields passed to the 
+oasis\_put .} If the weight-and-address remapping files are calculated by OASIS, this
+is automatically ensured.
 
 %\item Trying to send with {\tt oasis\_put} a field declared with a
 %  {\tt oasis\_def\_var} but not defined in the configuration file {\it
@@ -712,7 +774,7 @@ of the following aspects:
 
 \item Trying to send with {\tt oasis\_put} a field declared with a {\tt
   oasis\_def\_var} but not defined in the configuration file {\it
-  namcouple} will lead to an abort. In this case, the field ID
+  namcouple} will lead to an abort. When a field is not defined in the {\it namcouple}, the field ID
 returned by the {\tt oasis\_def\_var} is equal to -1 and the
 corresponding {\tt oasis\_put} should not be called. 
 
@@ -722,17 +784,20 @@ All fields will use the namcouple settings for that entry. In the component
 model codes, these fields are still sent ({\bf “put”}) one at a time. Inside
 OASIS3-MCT, the fields are stored and a single mapping and send instruction is executed
 for all fields. This is useful in cases where multiple fields have the same coupling transformations
-and to reduce communication costs by aggregating multiple fields into a single communication. If a
-LOCTRAN transformation is needed for these multiple fields, it is necessary to define a restart file
-for these multiple fields.
+and to reduce communication costs by aggregating multiple fields into a single communication.
 
-\item The optional argument, {\tt write\_restart}, in the {\tt oasis\_put} routine is by default {\bf false}. 
-If a user sets that argument to true, {\bf restarts will be written ONLY for that timestep}. The {\tt write\_restart} 
+This option does not put any constraint
+on the order of the related {\tt oasis\_put} and {\tt oasis\_get} in the codes.
+
+As they appear in one single entry line, these fields must share the same coupling restart file 
+but this restart file may contain other fields.
+
+\item The optional argument, {\tt write\_restart}, in the {\tt oasis\_put} routine is {\bf false} by default. 
+If a user sets that argument to true, a restart file will be written for that field {\bf only for that timestep}. The {\tt write\_restart} 
 will just save the data that exists at the time of the call, taking into account lags and LOCTRANS operations. In 
-cases where multiple fields are coupled as a single operation in the model via a list of colon delimited 
-fields in the namcouple (see \ref{subsubsec_secondEXPORTED}), users are encouraged to specify 
-the {\tt write\_restart} flag on ALL {\tt oasis\_put} calls at a given time for a set of fields 
-that are coupled as a single operation.
+cases where multiple fields are coupled as a single operation in the model (indicated via a list of colon delimited 
+fields in the {\it namcouple}, see \ref{subsubsec_secondEXPORTED}), users are encouraged to specify 
+the {\tt write\_restart} flag on ALL {\tt oasis\_put} calls at a given time for this set of fields.
 \end{itemize}
 
 \subsubsection{Receiving a coupling (or I/O) field}
@@ -751,7 +816,8 @@ coupling field.
     units as long as the same are used in all components and in the {\it
       namcouple}) at the time of the call (by convention at the
     beginning of the timestep)
-  \item {\tt fld [REAL, OUT]}: I/O or coupling field array
+  \item {\tt fld [REAL, OUT]}: I/O or coupling field array;  
+    can be 1D, 2D, bundled 1D, or bundled 2D.
   \item {\tt info [INTEGER; OUT]}: returned info code:
     \begin{itemize}
     \item OASIS\_Recvd(=3) if the field was received from another

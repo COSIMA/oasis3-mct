@@ -1068,6 +1068,7 @@
       use m_String, only : String_ToChar => ToChar
 
       use m_List, only : index
+      use m_List,  only : List_exportToChar => exportToChar
 
       use m_TraceBack, only : GenTraceBackString
 
@@ -1109,10 +1110,14 @@
         ! do nothing
        else
         write(stderr,'(5a)') myname_, &
+             ':: FATAL--in list: "',trim(List_exportToChar(aV%iList))
+        write(stderr,'(5a)') myname_, &
              ':: ERROR--attribute not found: "',trim(item),'" ', &
              'Traceback:  ',String_ToChar(myTrace)
        endif
      else ! Shutdown
+        write(stderr,'(5a)') myname_, &
+             ':: FATAL--in list: "',trim(List_exportToChar(aV%iList))
 	write(stderr,'(5a)') myname_, &
 	     ':: FATAL--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)
@@ -1170,6 +1175,7 @@
       use m_stdio,only : stderr
 
       use m_List, only : index
+      use m_List,  only : List_exportToChar => exportToChar
 
       use m_String, only : String
       use m_String, only : String_init => init
@@ -1215,11 +1221,15 @@
        if (trim(perrWith).eq.'quiet') then
         ! do nothing
        else
+        write(stderr,'(5a)') myname_, &
+             ':: FATAL--in list: "',trim(List_exportToChar(aV%rList))
 	write(stderr,'(5a)') myname_, &
 	     ':: ERROR--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)
        endif
      else ! Shutdown if dieWith or no arguments present
+        write(stderr,'(5a)') myname_, &
+             ':: FATAL--in list: "',trim(List_exportToChar(aV%rList))
 	write(stderr,'(5a)') myname_, &
 	     ':: FATAL--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)

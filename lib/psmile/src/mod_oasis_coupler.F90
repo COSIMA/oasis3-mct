@@ -25,6 +25,8 @@ MODULE mod_oasis_coupler
   private
 
   public oasis_coupler_setup
+  public oasis_coupler_bldvarname
+  public oasis_coupler_unbldvarname
 
 ! Type of data
 
@@ -54,7 +56,7 @@ MODULE mod_oasis_coupler
      character(len=ic_xl)  :: rstfile  !< restart file
      logical               :: writrest !< flag to write a restart file
      character(len=ic_xl)  :: inpfile  !< input file if data is read
-     character(len=ic_xl)  :: fldlist  !< field list
+     character(len=ic_xxl) :: fldlist  !< field list
      integer(kind=ip_i4_p) :: nflds    !< number of fields
      integer(kind=ip_i4_p),pointer :: varid(:)    !< varid for each field
      logical               :: valid    !< is this coupler valid
@@ -102,7 +104,7 @@ MODULE mod_oasis_coupler
   integer(kind=ip_i4_p)   ,public :: lcouplertime  !< last coupler time 
   integer(kind=ip_i4_p)   ,public :: lastseq       !< last coupler sequence
   integer(kind=ip_i4_p)   ,public :: lastseqtime   !< last coupler sequence time
-
+  logical                 ,public :: allow_no_restart  !< flag to allow no restart files at startup
 
 !#include <netcdf.inc>
 
@@ -125,7 +127,7 @@ CONTAINS
   IMPLICIT none
 
   integer(kind=ip_i4_p) :: n,n1,n2,nn,nv,nm,nv1,nv1a,nns,lnn,nc,nf,nvf,npc,r1
-  integer(kind=ip_i4_p) :: pe
+  integer(kind=ip_i4_p) :: pe,nflds1,nflds2,ncnt
   integer(kind=ip_i4_p) :: part1, part2
   integer(kind=ip_i4_p) :: spart,dpart ! src, dst partitions for mapping
         ! part1 = my local part, partID
@@ -139,12 +141,13 @@ CONTAINS
   integer(kind=ip_i4_p) :: svarid
   integer(kind=ip_i4_p),allocatable :: varidtmp(:)
   integer(kind=ip_i4_p) :: part
-  character(len=ic_med) :: cstring
+  integer(kind=ip_i4_p),pointer :: varid1(:)
+  character(len=ic_med) :: cstring,delim,vname
   character(len=ic_lvar):: myfld
   integer(kind=ip_i4_p) :: myfldi
-  character(len=ic_xl)  :: myfldlist  ! field list
+  character(len=ic_xxl) :: myfldlist  ! field list for my model
   character(len=ic_lvar):: otfld
-  character(len=ic_xl)  :: otfldlist  ! field list
+  character(len=ic_xxl) :: otfldlist  ! field list for other model
   integer(kind=ip_i4_p) :: nx,ny
   character(len=ic_lvar):: gridname
   character(len=ic_long):: tmp_mapfile
@@ -158,9 +161,11 @@ CONTAINS
   integer(kind=ip_i4_p) :: ifind,nfind
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
+  integer(kind=ip_i4_p) ,pointer :: mynum(:)
   integer(kind=ip_i4_p) ,pointer :: nallvar(:)
   character(len=ic_lvar),pointer :: allvar(:,:)
   integer(kind=ip_i4_p) ,pointer :: allops(:,:)
+  integer(kind=ip_i4_p) ,pointer :: allnum(:,:)
   integer(kind=ip_i4_p) ,pointer :: namsrc_checkused(:) ! 0 = not used
   integer(kind=ip_i4_p) ,pointer :: namsrc_checkused_g(:)  ! 0 = not used
   type sortnamfld_type
@@ -286,21 +291,26 @@ CONTAINS
   allocate(allvar(maxvar,prism_amodels))
   allocate(nallvar(prism_amodels))
   allocate(allops(maxvar,prism_amodels))
+  allocate(allnum(maxvar,prism_amodels))
   allocate(myvar(maxvar))
   allocate(myops(maxvar))
+  allocate(mynum(maxvar))
 
   allvar = " "
   nallvar = 0
   allops = -1
+  allnum = -1
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1_bcast')
   do n = 1,prism_amodels
      if (n == compid) then
         myvar = " "
         myops = 0
+        mynum = 0
         mynvar = prism_nvar
         do n1 = 1, prism_nvar
            myvar(n1) = trim(prism_var(n1)%name)
            myops(n1) = prism_var(n1)%ops
+           mynum(n1) = prism_var(n1)%num
            ! check that each var name is unique for a given model
            do n2 = 1,n1-1
               if (myvar(n1) == myvar(n2)) then
@@ -332,6 +342,12 @@ CONTAINS
         call oasis_flush(nulprt)
      endif
      allops(:,n) = myops(:)
+     call oasis_mpi_bcast(mynum,mpi_comm_global,'mynum',mpi_root_global(n))
+     if (OASIS_debug >= 5) then
+        write(nulprt,*) subname,' bcast mynum ',mynum(1)
+        call oasis_flush(nulprt)
+     endif
+     allnum(:,n) = mynum(:)
   enddo
   if (local_timers_on) call oasis_timer_stop('cpl_setup_n1_bcast')
 
@@ -345,9 +361,8 @@ CONTAINS
            cstring = 'unknown'
            if (allops(nv,nm) == OASIS_Out) cstring = 'prism_out'
            if (allops(nv,nm) == OASIS_In)  cstring = 'prism_in'
-           write(nulprt,'(16x,a,2i6,2x,a,i6,2x,a)') ' model,idx,var,ops = ',nm,nv,&
-                                                      trim(allvar(nv,nm)),allops(nv,nm),&
-                                                      trim(cstring)
+           write(nulprt,'(16x,a,2i6,2x,a,2i6,2x,a)') ' model,idx,var,num,ops = ',nm,nv,&
+                                                      trim(allvar(nv,nm)),allnum(nv,nm),allops(nv,nm),trim(cstring)
         enddo
      enddo
      write(nulprt,*) ' '
@@ -492,6 +507,9 @@ CONTAINS
   endif
   deallocate(sortkey)
 
+  !==========================================================
+  ! Test Sort Code
+  !==========================================================
   if (OASIS_debug >= 1500) then
 
      write(nulprt,*) subname,' Test sort code: '
@@ -610,6 +628,9 @@ CONTAINS
 
      CALL oasis_flush(nulprt)
   endif
+  !==========================================================
+  ! END Test Sort Code
+  !==========================================================
 
   if (local_timers_on) call oasis_timer_stop ('cpl_setup_n2')
 
@@ -803,7 +824,6 @@ CONTAINS
 
               !--------------------------------
               !>       * Check that one side is In and other side is Out for communication
-              !>       * Check if input or output, field name should match on both sides.
               !--------------------------------
 
               if (namfldops(nn) == ip_exported .or. namfldops(nn) == ip_expout) then
@@ -825,12 +845,26 @@ CONTAINS
                  endif
               endif
 
+              !--------------------------------
+              !>       * Check if input or output, field name should match on both sides.
+              !--------------------------------
+
               if (namfldops(nn) == ip_input .or. namfldops(nn) == ip_output) then
                  if (trim(myfld) /= trim(otfld)) then
                     write(nulprt,*) subname,estr,'namcouple field names do not match in/out = ', &
                        trim(myfld),' ',trim(otfld)
                     call oasis_abort()
                  endif
+              endif
+
+              !--------------------------------
+              !>       * Check that the bundle size matches in both models for bundled fields
+              !--------------------------------
+
+              if (prism_var(nv1)%num /= allnum(nv,nm)) then
+                 write(nulprt,*) subname,estr,'namcouple bundle fields do not match for ',trim(myfld),' ',trim(otfld)
+                 write(nulprt,*) subname,estr,'namcouple bundle numbers are ',prism_var(nv1)%num,allnum(nv,nm)
+                 call oasis_abort()
               endif
 
               !--------------------------------
@@ -1103,7 +1137,7 @@ CONTAINS
   deallocate(namsrc_checkused_g)
 
   !--- deallocate temporary ---
-  deallocate(allvar,nallvar,allops)
+  deallocate(allvar,nallvar,allops,allnum)
   deallocate(namsrc_checkused)
   deallocate(sortnsrc%fld)
   deallocate(sortnsrc%namnum)
@@ -1114,6 +1148,68 @@ CONTAINS
   deallocate(sortvars%fld)
   deallocate(sortvars%modnum)
   deallocate(sortvars%varnum)
+
+  !----------------------------------------------------------
+  !> * Rebuild the fields list based on field bundles as needed
+  ! need to modify fldlist and varids in prism_couplers
+  ! order of fields needs to be preserved
+  !----------------------------------------------------------
+
+  do nc = 1,prism_mcoupler
+  do npc = 1,2
+     if (npc == 1) then
+        pcpointer => prism_coupler_put(nc)
+     endif
+     if (npc == 2) then
+        pcpointer => prism_coupler_get(nc)
+     endif
+
+     if (pcpointer%valid) then
+        nflds1 = oasis_string_listGetNum(pcpointer%fldlist)
+        nflds2 = 0
+        do n1 = 1,nflds1
+           nflds2 = nflds2 + prism_var(pcpointer%varid(n1))%num
+        enddo
+        write(nulprt,*) subname,' fldlist rebuild nflds1,nflds2 for ',trim(pcpointer%fldlist)
+        write(nulprt,*) subname,' fldlist rebuild nflds1,nflds2 ',nflds1,nflds2
+        if (nflds2 < nflds1) then
+           write(nulprt,*) subname,estr,'fldlist rebuild nflds2 < nflds1 for ',trim(pcpointer%fldlist)
+           write(nulprt,*) subname,estr,'fldlist reset error in fld cnt = ',nflds1,nflds2
+           call oasis_abort()
+        else
+           write(nulprt,*) subname,' fldlist rebuild nflds2 > nflds1 for ',trim(pcpointer%fldlist)
+           allocate(varid1(nflds1))
+           varid1(1:nflds1) = pcpointer%varid(1:nflds1)
+           myfldlist = pcpointer%fldlist  ! temporary storage
+           pcpointer%fldlist = ""
+           deallocate(pcpointer%varid)
+           allocate(pcpointer%varid(nflds2))
+           ncnt = 0
+           do n1 = 1,nflds1
+              do n2 = 1,prism_var(varid1(n1))%num
+                 ncnt = ncnt + 1
+                 pcpointer%varid(ncnt) = varid1(n1)
+                 delim = ":"
+                 if (ncnt == 1) delim = ""
+                 if (len_trim(pcpointer%fldlist) > 0.99 * len(pcpointer%fldlist)) then
+                    write(nulprt,*) subname,estr,'fldlist rebuild too long, limit is ',len(pcpointer%fldlist),' chars'
+                    write(nulprt,*) subname,estr,'current rebuid fldlist is ',trim(pcpointer%fldlist)
+                    call oasis_abort()
+                 endif
+                 call oasis_coupler_bldvarname(varid1(n1),n2,vname)
+                 write(pcpointer%fldlist,'(a)') trim(pcpointer%fldlist)//trim(delim)//trim(vname)
+                 if (OASIS_debug >= 1) then
+                    write(nulprt,*) subname,' fldlist rebuild n1, n2 ',n1,n2,ncnt
+                    write(nulprt,*) subname,' fldlist rebuild fldlist ',ncnt,trim(pcpointer%fldlist)
+                    write(nulprt,*) subname,' fldlist rebuild varid ',ncnt,pcpointer%varid(ncnt)
+                 endif
+              enddo  ! n2
+           enddo  ! n1
+           deallocate(varid1)
+        endif
+     endif  ! valid
+  enddo  ! npc
+  enddo  ! nc
 
   if (OASIS_debug >= 20) then
      write(nulprt,*) ' '
@@ -1685,6 +1781,7 @@ CONTAINS
      write(nulprt,*) ' '
      write(nulprt,*) subname,' model and cplid',compid,cplid
   if (pcprint%getput == OASIS3_PUT) then
+     write(nulprt,*) subname,'   timerid send     ',cplid,trim(pcprint%fldlist)
      write(nulprt,*) subname,'   send fields      ',trim(pcprint%fldlist)
      write(nulprt,*) subname,'   from model       ',compid
      write(nulprt,*) subname,'   to model         ',pcprint%comp
@@ -1695,6 +1792,7 @@ CONTAINS
      write(nulprt,*) subname,'   snd fld add      ',pcprint%sndadd
   endif
   if (pcprint%getput == OASIS3_GET) then
+     write(nulprt,*) subname,'   timerid recv     ',cplid,trim(pcprint%fldlist)
      write(nulprt,*) subname,'   recv fields      ',trim(pcprint%fldlist)
      write(nulprt,*) subname,'   from model       ',pcprint%comp
      write(nulprt,*) subname,'   to model         ',compid
@@ -1754,6 +1852,100 @@ CONTAINS
   call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_coupler_print
+
+!------------------------------------------------------------
+! !BOP ===========================================================================
+!
+!> Build a consistent variable name based on bundles
+!
+! !DESCRIPTION: 
+!     Build a variable name for a given variable based on the name, number
+!     of bundled fields, and bundle level.  Needs to be used in a few different
+!     places in oasis.
+!
+! !INTERFACE:  -----------------------------------------------------------------
+
+  SUBROUTINE oasis_coupler_bldvarname(varid, varnum, vname)
+
+  IMPLICIT NONE
+
+  integer(ip_i4_p), intent(in)  :: varid   !< variable id
+  integer(ip_i4_p), intent(in)  :: varnum  !< variable bundle level number
+  character(len=*), intent(out) :: vname   !< variable name
+  !----------------------------------------------------------
+  character(len=*),parameter :: subname = '(oasis_coupler_bldvarname)'
+
+  call oasis_debug_enter(subname)
+
+  if (varnum > prism_var(varid)%num) then
+     write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
+     write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
+     call oasis_abort()
+  endif
+
+  if (prism_var(varid)%num > 1) then
+     write(vname,'(a,i3.3)') trim(prism_var(varid)%name)//'.',varnum
+  else
+     vname = trim(prism_var(varid)%name)
+  endif
+
+  if (OASIS_debug >= 20) then
+     write(nulprt,*) subname,' check vname ',varnum,trim(vname)
+  endif
+
+  call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_coupler_bldvarname
+
+!------------------------------------------------------------
+! !BOP ===========================================================================
+!
+!> Deconstruct the varname based on oasis_coupler_bldvarname
+!
+! !DESCRIPTION: 
+!     Deconstruct a variable name for a given variable based on the name, number
+!     of bundled fields, and bundle level.  Must be consistent with oasis_coupler_bldvarname
+!
+! !INTERFACE:  -----------------------------------------------------------------
+
+  SUBROUTINE oasis_coupler_unbldvarname(varid, vname, varnum)
+
+  IMPLICIT NONE
+
+  integer(ip_i4_p), intent(in)  :: varid   !< variable id
+  character(len=*), intent(in)  :: vname   !< variable name
+  integer(ip_i4_p), intent(out) :: varnum  !< variable bundle level number
+  !----------------------------------------------------------
+  integer(ip_i4_p)  :: vlen
+  character(len=16) :: clen
+  character(len=*),parameter :: subname = '(oasis_coupler_unbldvarname)'
+
+  call oasis_debug_enter(subname)
+
+  if (prism_var(varid)%num > 1) then
+     vlen = len_trim(vname)
+     clen = vname(vlen-2:vlen)
+     read(clen,'(i3.3)') varnum
+     if (OASIS_debug >= 20) then
+        write(nulprt,*) subname,' check vlen ',vlen,trim(clen)
+     endif
+  else
+     varnum = 1
+  endif
+
+  if (OASIS_debug >= 20) then
+     write(nulprt,*) subname,' check varnum ',varnum,trim(vname)
+  endif
+
+  if (varnum > prism_var(varid)%num) then
+     write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
+     write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
+     call oasis_abort()
+  endif
+
+  call oasis_debug_exit(subname)
+
+  END SUBROUTINE oasis_coupler_unbldvarname
 
 !------------------------------------------------------------
 ! !BOP ===========================================================================

@@ -274,6 +274,8 @@ C***********************************************************************
      &, itmp4             ! integer temp
 
       integer (kind=int_kind) :: il_nftype
+      real (kind=dbl_kind), dimension(:),allocatable ::
+     &  wts1              ! temporary for first order conservative weights
 !-----------------------------------------------------------------------
       IF (nlogprt .GE. 2) THEN
        WRITE (UNIT = nulou,FMT = *)' '
@@ -419,8 +421,13 @@ C***********************************************************************
       ncstat = nf_def_dim (nc_file_id, 'num_links', 
      &                     itmp1, nc_numlinks_id)
       call netcdf_error_handler(ncstat)
-      ncstat = nf_def_dim (nc_file_id, 'num_wgts', 
-     &                     num_wts, nc_numwgts_id)
+      if (map_type == map_type_conserv .and. conserve_opt == 1) then
+        ncstat = nf_def_dim (nc_file_id, 'num_wgts', 
+     &                       1, nc_numwgts_id)
+      else
+        ncstat = nf_def_dim (nc_file_id, 'num_wgts', 
+     &                       num_wts, nc_numwgts_id)
+      endif
       call netcdf_error_handler(ncstat)
       !***
       !*** define grid dimensions
@@ -865,13 +872,27 @@ C***********************************************************************
         ncstat = nf_put_var_int(nc_file_id, nc_dstadd_id, 
      &                          grid2_add_map1)
         call netcdf_error_handler(ncstat)
-        IF (ll_single) THEN
+
+        if (map_type == map_type_conserv .and. conserve_opt == 1) then
+          allocate(wts1(num_links_map1))
+          wts1 = wts_map1(1,:)
+          IF (ll_single) THEN
+            ncstat = nf_put_var_real(nc_file_id, nc_rmpmatrix_id, 
+     &          wts1)
+          ELSE
+            ncstat = nf_put_var_double(nc_file_id, nc_rmpmatrix_id, 
+     &          wts1)
+          ENDIF
+          deallocate(wts1)
+        else
+          IF (ll_single) THEN
             ncstat = nf_put_var_real(nc_file_id, nc_rmpmatrix_id, 
      &          wts_map1)
-        ELSE
+          ELSE
             ncstat = nf_put_var_double(nc_file_id, nc_rmpmatrix_id, 
      &          wts_map1)
-        ENDIF
+          ENDIF
+        endif
         call netcdf_error_handler(ncstat)
       else
         ncstat = nf_put_var_int(nc_file_id, nc_srcadd_id, 
@@ -881,13 +902,26 @@ C***********************************************************************
         ncstat = nf_put_var_int(nc_file_id, nc_dstadd_id, 
      &                          grid1_add_map2)
         call netcdf_error_handler(ncstat)
-        IF (ll_single) THEN
+        if (map_type == map_type_conserv .and. conserve_opt == 1) then
+          allocate(wts1(num_links_map2))
+          wts1 = wts_map2(1,:)
+          IF (ll_single) THEN
+            ncstat = nf_put_var_real(nc_file_id, nc_rmpmatrix_id, 
+     &          wts1)
+          ELSE
+            ncstat = nf_put_var_double(nc_file_id, nc_rmpmatrix_id, 
+     &          wts1)
+          ENDIF
+          deallocate(wts1)
+        else
+          IF (ll_single) THEN
             ncstat = nf_put_var_real(nc_file_id, nc_rmpmatrix_id, 
      &          wts_map2)
-        ELSE
+          ELSE
             ncstat = nf_put_var_double(nc_file_id, nc_rmpmatrix_id, 
      &          wts_map2)
-        ENDIF
+          ENDIF
+        endif
         call netcdf_error_handler(ncstat)
       endif
 

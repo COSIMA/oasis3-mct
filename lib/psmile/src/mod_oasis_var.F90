@@ -54,7 +54,7 @@
      INTEGER(kind=ip_i4_p),intent(in)  :: id_part      !< partition ID
      INTEGER(kind=ip_i4_p),intent(in)  :: id_var_nodims(2)  !< rank and number of bundles
      INTEGER(kind=ip_i4_p),intent(in)  :: kinout       !< input or output flag
-     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(2*id_var_nodims(1)) !< size of field
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(:) !< size of field
      INTEGER(kind=ip_i4_p),intent(in)  :: ktype        !< type of coupling field
      INTEGER(kind=ip_i4_p),intent(out),optional :: kinfo    !< return code
      !---------------------------------------------------------------
@@ -127,6 +127,13 @@
         endif
      enddo
 
+     ! tcraig, this is due to i3.3 in the 2d->1d field bundle renaming
+     if (id_var_nodims(2) > 999) then
+        write(nulprt,*) subname,estr,'variable id_var_nodims2 too large.  limit is 999 ',id_var_nodims(2)
+        write(nulprt,*) subname,estr,'check oasis_def_var calls in your model'
+        call oasis_abort()
+     endif
+
      !-------------------------------------------------     
      !> * Increment the variable and store the values
      !-------------------------------------------------     
@@ -143,15 +150,10 @@
      call oasis_var_zero(prism_var(prism_nvar))
      prism_var(prism_nvar)%name = trimmed_cdport
      prism_var(prism_nvar)%part = id_part
-     prism_var(prism_nvar)%ndim = id_var_nodims(1)
      prism_var(prism_nvar)%num  = id_var_nodims(2)
      prism_var(prism_nvar)%ops  = kinout
      prism_var(prism_nvar)%type = ktype
      prism_var(prism_nvar)%size = 1
-     do n = 1,prism_var(prism_nvar)%ndim
-        prism_var(prism_nvar)%size = prism_var(prism_nvar)%size*(id_var_shape(2*n)-&
-                                     id_var_shape(2*n-1)+1)
-     enddo
      prism_var(prism_nvar)%ncpl = 0
      prism_var(prism_nvar)%cpl  = 0
 
@@ -164,11 +166,9 @@
         write(nulprt,*) subname,' prism_nvar    = ',prism_nvar
         write(nulprt,*) subname,' varname = ',prism_nvar,trim(prism_var(prism_nvar)%name)
         write(nulprt,*) subname,' varpart = ',prism_nvar,prism_var(prism_nvar)%part
-        write(nulprt,*) subname,' varndim = ',prism_nvar,prism_var(prism_nvar)%ndim
         write(nulprt,*) subname,' varnum  = ',prism_nvar,prism_var(prism_nvar)%num
         write(nulprt,*) subname,' varops  = ',prism_nvar,prism_var(prism_nvar)%ops
         write(nulprt,*) subname,' vartype = ',prism_nvar,prism_var(prism_nvar)%type
-        write(nulprt,*) subname,' varsize = ',prism_nvar,prism_var(prism_nvar)%size
         write(nulprt,*) ' '
         CALL oasis_flush(nulprt)
      endif
@@ -192,6 +192,7 @@
    character(len=ic_lvar)  ,pointer :: vname0(:),vname(:)
    character(len=ic_lvar2) ,pointer :: pname0(:),pname(:)
    integer(kind=ip_intwp_p),pointer :: inout0(:),inout(:)
+   integer(kind=ip_intwp_p),pointer :: vanum0(:),vanum(:)
    logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_var_setup)'
    !--------------------------------------------------------
@@ -204,19 +205,22 @@
    allocate(vname0(prism_nvar))
    allocate(pname0(prism_nvar))
    allocate(inout0(prism_nvar))
+   allocate(vanum0(prism_nvar))
    do n = 1,prism_nvar
       vname0(n) = prism_var(n)%name
       inout0(n) = prism_var(n)%ops
+      vanum0(n) = prism_var(n)%num
       pname0(n) = prism_part(prism_var(n)%part)%partname
    enddo
 
    call oasis_mpi_reducelists(vname0,mpi_comm_local,vcnt,vname,'var_setup', &
         fastcheck=.true.,fastcheckout=fastcheckout, &
-        linp2=pname0,lout2=pname,linp3=inout0,lout3=inout)
+        linp2=pname0,lout2=pname,linp3=inout0,lout3=inout,linp4=vanum0,lout4=vanum)
 
    deallocate(vname0)
    deallocate(pname0)
    deallocate(inout0)
+   deallocate(vanum0)
    IF (local_timers_on) call oasis_timer_stop('var_setup_reducelists')
 
    !-------------------------------------------------     
@@ -246,6 +250,7 @@
             call oasis_var_zero(prism_var(prism_nvar))
             prism_var(prism_nvar)%name = vname(v)
             prism_var(prism_nvar)%ops  = inout(v)
+            prism_var(prism_nvar)%num  = vanum(v)
             prism_var(prism_nvar)%ncpl = 0
             !--- figure out the local part id for the part name
             p = 0
@@ -280,7 +285,7 @@
 
    endif   ! fastcheckout
 
-   deallocate(vname,pname,inout)
+   deallocate(vname,pname,inout,vanum)
 
    IF (local_timers_on) call oasis_timer_stop('var_setup')
       

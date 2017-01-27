@@ -18,14 +18,15 @@ However, in the next paragraph, the main differences between the
 OASIS3.3 and the current OASIS3-MCT version are described to help the
 user migrate from the old version to the newest one.
 
-\section{Changes between OASIS3.3 and OASIS3-MCT\_3.0}
+\section{Changes between OASIS3.3 and OASIS3-MCT\_4.0}
+XXXXXX Should we really keep this section , maybe refer to Redmine tickets only XXXXX
 \label{sec_oa2_oa3}
 
 \subsection {Main differences}
 
 \begin{itemize}
 
-\item OASIS3-MCT is (only) a coupling library
+\item OASIS3-MCT is (only) a coupling library.
 
 Much of the underlying implementation of OASIS3 was refactored to
 leverage the Model Coupling Toolkit (MCT). OASIS3-MCT is a coupling
@@ -63,7 +64,7 @@ fields into a single communication. If a LOCTRAN transformation is needed
 for these multiple fields, it is necessary to define a restart file for 
 these multiple fields.
 
-\item Matching one source filed with multiple targets
+\item Matching one source filed with multiple targets.
 
   A coupling field sent by a source component model can be associated
   with more than one target field and model (get). In that case, the
@@ -83,7 +84,14 @@ these multiple fields.
 The inverse feature is not allowed, i.e. a single target (get) field
 CANNOT be associated with multiple source (put) fields.
 
-\item {\tt MAPPING} transformation to use a pre-defined mapping file
+\item Support for bundled coupling fields.
+
+Bundled fields is now supported in the put and get interfaces to allow
+easier coupling of multi-level or other related fields via a single
+namcouple coupling definition and a single call to a get or put interface.
+Further details are provided in sec \ref{subsubsec_sendingreceiving}
+
+\item {\tt MAPPING} transformation to use a pre-defined mapping file.
 
 With {\tt MAPPING}, OASIS3-MCT has the ability to read a predefined
 set of weights and addresses (mapping file) specified in the {\it
@@ -91,7 +99,7 @@ set of weights and addresses (mapping file) specified in the {\it
 the flexibility to choose the location and the parallelization strategy of the
 remapping with specific {\tt MAPPING} options (see section \ref{subsec_interp}).
 
-\item Mono-process mapping file generation with the SCRIP library
+\item Mono-process mapping file generation with the SCRIP library.
 
 But as before, OASIS3-MCT can
 also generate the mapping file using the SCRIP library
@@ -111,7 +119,7 @@ done on one process of the model components.
 \item Support of {\tt CONSERV/SECOND} regridding, see paragraph {\tt
     CONSERV/SECOND} in section \ref{subsec_interp}.
 
-\item Exact restart for {\tt LOCTRANS} transformations
+\item Exact restart for {\tt LOCTRANS} transformations.
 
 If needed, LOCTRANS transformations write partially
   transformed fields  in the coupling restart file at the end of a run
@@ -143,7 +151,7 @@ If the coupling periods of
   section \ref{timestat}.
 
 
-\item The debug files: 
+\item Improved debug files.
 The debug mode was greatly improved as compared to OASIS3.3. The level
 of debug information written out to the OASIS3-MCT debug files for
 each model process is defined by the \$NLOGPRT value in the {\it

@@ -50,11 +50,9 @@ noted with the string UNUSED but not described.
   With OASIS3-MCT, time transformations are supported more generally
   with use of the coupling restart file.  The coupling restart file
   allows the partial time transformation to be saved at the end of a
-  run for exact restart at the start of the next run.  For that
-  reason, a different coupling restart filename is now required for each {\it
-    namcouple} entry that uses LOCTRANS (except for INSTANT for which a
-restart file is not needed at all). This is
-  also the reason why it is now possible to specify a restart file name
+  run for exact restart at the start of the next run.
+  This is
+  the reason why it is now possible to specify a restart file name
   on the OUTPUT {\it namcouple} input line.
 
 \end{itemize}
@@ -594,12 +592,18 @@ restart file is not needed at all). This is
       it does not change the sign of the field.
     \end{itemize}
   \item {\tt \$CONSOPT} is an optional argument specifying the
-    algorithm.  {\tt \$CONSOPT} can be {\tt bfb} or {\tt opt}.  The
-    {\tt bfb} option enforces a bit-for-bit transformation regardless
-    of the grid decomposition or process count.  The {\tt opt} option
-    carries out the conservation using an optimal algorithm using less
-    memory and a faster approach. Option {\tt bfb} is the default
-    setting.
+    algorithm.  {\tt \$CONSOPT} can be {\tt bfb} or {\tt opt}.  
+\begin{itemize}
+\item The {\tt bfb} option enforces a bit-for-bit transformation regardless
+    of the component grid decomposition or number of processes. It is currently the default setting. 
+With {\tt bfb}, the entire field is gathered from the different component processes to the master process that performs the global integration and then 
+broadcasts the resulting sum to all component processes. Compared to {\tt opt}, {\tt bfb} is clearly more expensive with respect to
+MPI communications and memory requirement.  
+\item The {\tt opt} option
+    carries out the global conservation with an optimal algorithm using less
+    memory and a faster approach. With {\tt opt}, a local sum is performed on each process that then sends its local sum to all other processes; all processes can then compute the global sum of all local sums. This is more efficient than the {\tt bfb} algorithm but does not ensure bit-for-bit reproducibility when the  grid decomposition or number of processes of the component are changed.
+ 
+\end{itemize}
   \end{itemize}
 
 

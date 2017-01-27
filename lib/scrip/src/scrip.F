@@ -60,7 +60,7 @@ C***********************************************************************
 
       subroutine scrip
      $           (interp_file1, map1_name, m_method, n_opt, 
-     $            lextrapdone, rl_varmul, id_scripvoi)
+     $            lextrapdone, rl_varmul, id_scripvoi, cons_order)
 
 !-----------------------------------------------------------------------
 
@@ -94,7 +94,8 @@ C***********************************************************************
 
       character*8, intent(in) ::
      &           m_method,     ! choice for mapping method
-     &           n_opt         ! option for normalizing weights
+     &           n_opt,        ! option for normalizing weights
+     &           cons_order    ! conservation order, FIRST or SECOND
 
       LOGICAL ::
      &           lextrapdone   ! logical, true if EXTRAP done on field
@@ -172,6 +173,13 @@ C***********************************************************************
       select case(map_method)
       case ('CONSERV')
         map_type = map_type_conserv
+        if (cons_order == 'FIRST') then
+           conserve_opt = 1
+        elseif (cons_order == 'SECOND') then
+           conserve_opt = 2
+        else
+           stop 'unknown conserve_order '
+        endif
       case ('BILINEAR')
         map_type = map_type_bilinear
       case ('BICUBIC')

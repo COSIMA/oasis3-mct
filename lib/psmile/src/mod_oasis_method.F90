@@ -124,6 +124,7 @@ CONTAINS
    iu=-1
 
    call oasis_unitsetmin(1024)
+   call oasis_unitsetmax(9999)
    IF (mpi_rank_world == 0) THEN
        CALL oasis_unitget(iu)
        nulprt1 = iu
@@ -147,6 +148,9 @@ CONTAINS
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
+   call oasis_unitsetmin(namuntmin)
+   call oasis_unitsetmax(namuntmax)
+   allow_no_restart = namnorest
 
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
@@ -203,9 +207,10 @@ CONTAINS
      k1=oasis_string_listGetNum(namsrcfld(n))
      k2=oasis_string_listGetNum(namdstfld(n))
      if (k1 /= k2) then
-       WRITE(nulprt1,*) subname,estr,'namcouple field numbers do not agree '
+       WRITE(nulprt1,*) subname,estr,'namcouple fields do not agree in number'
        WRITE(nulprt1,*) subname,estr,'namsrcfld = ',trim(namsrcfld(n))
        WRITE(nulprt1,*) subname,estr,'namdstfld = ',trim(namdstfld(n))
+       WRITE(nulprt1,*) subname,estr,'check your namcouple file '
        call oasis_abort()
      endif
      DO i=1,k1

@@ -1,6 +1,6 @@
 $grid_source_characteristics
 cl_grd_src='torc'
-cl_remap='bicubic'
+cl_remap='conserv'
 cl_period_src='P'
 il_overlap_src=2
 $end

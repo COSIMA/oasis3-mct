@@ -87,6 +87,7 @@ C***********************************************************************
      &,     num_wts         ! num of weights used in remapping
      &,     map_type        ! identifier for remapping method
      &,     norm_opt        ! option for normalization (conserv only)
+     &,     conserve_opt    ! option for conservation first or second
      &,     resize_increment ! default amount to increase array size
 
       integer (kind=int_kind), dimension(:), allocatable, save ::

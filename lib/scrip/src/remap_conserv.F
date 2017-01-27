@@ -84,7 +84,7 @@ C***********************************************************************
 
       integer (kind=int_kind), dimension(:), allocatable, save :: 
      &        srch_add       ! global address of cells in srch arrays
-      integer (kind=int_kind), dimension(:), allocatable, save :: 
+      logical (kind=log_kind), dimension(:), allocatable, save :: 
      &        msk_srch_add       ! masks of cells in srch arrays
 
       real (kind=dbl_kind), parameter :: 
@@ -318,7 +318,7 @@ C***********************************************************************
         !***
         !*** create search arrays
         !***
-        allocate(srch_add(num_srch_cells), msk_srch_add(num_srch_cells),
+        allocate(srch_add(num_srch_cells), 
      &           srch_corner_lat(grid2_corners,num_srch_cells),
      &           srch_corner_lon(grid2_corners,num_srch_cells))
 
@@ -604,7 +604,7 @@ C***********************************************************************
         !*** finished with this cell: deallocate search array and
         !*** start on next cell
 
-        deallocate(srch_add, msk_srch_add, srch_corner_lat, 
+        deallocate(srch_add, srch_corner_lat, 
      & srch_corner_lon)
 
       end do
@@ -673,7 +673,9 @@ C***********************************************************************
           if (srch_mask(grid1_add)) then
             n = n+1
             srch_add(n) = grid1_add
-            msk_srch_add(n) = srch_mask(grid1_add)
+            IF (ll_debug) THEN
+               msk_srch_add(n) = srch_mask(grid1_add)
+            ENDIF
             srch_corner_lat(:,n) = grid1_corner_lat(:,grid1_add)
             srch_corner_lon(:,n) = grid1_corner_lon(:,grid1_add)
           endif

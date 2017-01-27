@@ -314,8 +314,7 @@ MODULE mod_oasis_auxiliary_routines
     vname = prism_var(varid)%name
     
     IF (varid == OASIS_Var_Uncpl) THEN
-       WRITE(nulprt,*) subname,estr, &
-          'Routine is called for a variable not in namcouple: it will not be sent'
+       WRITE(nulprt,*) subname,estr,'Routine is called for an invalid varid'
        CALL oasis_abort()
     ENDIF
     
@@ -362,8 +361,7 @@ MODULE mod_oasis_auxiliary_routines
     vname = prism_var(varid)%name
     
     IF (varid == OASIS_Var_Uncpl) THEN
-       WRITE(nulprt,*) subname,estr, &
-          'Routine is called for a variable not in namcouple: it will not be sent'
+       WRITE(nulprt,*) subname,estr,'Routine is called for an invalid varid'
        CALL oasis_abort()
     ENDIF
     

@@ -25,7 +25,7 @@ MODULE mod_oasis_sys
    public oasis_debug_note
 
    integer(ip_intwp_p),save :: minion = 1024
-   integer(ip_intwp_p),save :: maxion = 999999
+   integer(ip_intwp_p),save :: maxion = 9999
    integer(ip_intwp_p),parameter :: tree_delta = 2
    integer(ip_intwp_p),save :: tree_indent = 0
 
@@ -111,13 +111,14 @@ SUBROUTINE oasis_unitget(uio)
    character(len=*),parameter :: subname = '(oasis_unitget)'
 !--------------------------------------------------------------------
 
-   n1 = minion-1
+   ! start at maxion and decrement the unit numbers
+   n1 = maxion+1
    found = .false.
-   do while (n1 < maxion .and. .not.found)
-      n1 = n1 + 1
+   do while (n1 > minion .and. .not.found)
+      n1 = n1 - 1
       inquire(unit=n1,opened=l_open)
       if(.not.l_open) found=.true.
-      if (OASIS_debug >= 2) write(nulprt,*) subname,n1
+      if (found .and. OASIS_debug >= 2) write(nulprt,*) subname,n1
    enddo
 
    if (.not.found) then
