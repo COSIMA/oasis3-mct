@@ -759,6 +759,7 @@ SUBROUTINE inipar_alloc()
 
   IF (mpi_rank_global == 0) THEN
      WRITE(nulprt1,*) '  Executing valid keyword check '
+     CALL oasis_flush(nulprt1)
   ENDIF
   readfile = .true.
   DO WHILE (readfile)
@@ -773,11 +774,13 @@ SUBROUTINE inipar_alloc()
         IF (.not. found) THEN
            IF (mpi_rank_global == 0) THEN
               WRITE(nulprt1,*) '    Found invalid keyword = '//trim(clvari)
+              CALL oasis_flush(nulprt1)
            ENDIF
            CALL namcouple_abort(subname,__LINE__,' ERROR: invalid keyword = '//trim(clvari))
         ELSE
            IF (mpi_rank_global == 0) THEN
               WRITE(nulprt1,*) '    Found valid keyword = '//trim(clvari)
+              CALL oasis_flush(nulprt1)
            ENDIF
         ENDIF
      ENDIF
@@ -791,12 +794,14 @@ SUBROUTINE inipar_alloc()
   CALL findkeyword (keyword, clline, found)
   IF (found .and. mpi_rank_global == 0) THEN
      WRITE(nulprt1,*) ' ***WARNING*** '//trim(keyword)//' is obsolete in OASIS3-MCT'
+     CALL oasis_flush(nulprt1)
   ENDIF
 
   keyword = clchan
   CALL findkeyword (keyword, clline, found)
   IF (found .and. mpi_rank_global == 0) THEN
      WRITE(nulprt1,*) ' ***WARNING*** '//trim(keyword)//' is obsolete in OASIS3-MCT'
+     CALL oasis_flush(nulprt1)
   ENDIF
 
   !*    2. Get field information
