@@ -1,0 +1,72 @@
+###############################################################################
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# COUPLE	: path for oasis3-mct main directory
+COUPLE          = $(HOME)/oasis3-mct
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(COUPLE)/crayxc40
+#
+# MPI library
+MPIDIR      = 
+MPIBIN      = 
+MPI_INCLUDE = 
+MPILIB      = 
+#
+# NETCDF library
+NETCDF_INCLUDE  =
+NETCDF_LIBRARY  =
+#
+# Compiling and other commands
+MAKE        = make
+F90         = ftn 
+#F90         = mpif90 -r8 -byteswapio -O0 -I$(INCLUDE_PATH)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = gcc
+LD          = ftn
+AR          = ar
+ARFLAGS     = -ruv
+#
+# compiler options and cpp keys
+# 
+#CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+
+CPPDEF    = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG 
+CCPPDEF   = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG 
+
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# 
+F90FLAGS_1  = -e m -sreal64 -O2 $(PSMILE_INCDIR) $(CPPDEF)
+f90FLAGS_1  = $(F90FLAGS_1)
+FFLAGS_1    = $(F90FLAGS_1)
+fFLAGS_1    = $(F90FLAGS_1)
+CCFLAGS_1   = $(PSMILE_INCDIR) $(CPPDEF) 
+LDFLAGS   =  -h byteswapio
+#
+###################
+#
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+# INCPSMILE     : includes all *o and *mod for each library
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct 
+
+F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) 
+f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) 
+FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) 
+fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) 
+CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) 	
+#
+#
+#############################################################################
