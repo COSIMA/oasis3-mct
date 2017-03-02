@@ -208,6 +208,9 @@ argument.
   communicator {\tt local\_comm} based on the value of the {\tt
     comp\_name} argument in the {\tt oasis\_init\_comp} call.
 
+  Retrieving a local communicator local\_comm is also needed if
+  oasis\_create\_couplcomm is called, as local\_comm is an argument of this routine (see below).
+
   % With CLIM-MPI2, OASIS3 executable spawns the component
   % executables at the beginning of the run; the components keep their
   % internal parallelisation context unchanged with respect to their
@@ -232,14 +235,15 @@ argument.
   \end{itemize}
 
   This routine creates a coupling communicator for a subset of
-  processes. All processes of components at least partly involved in
-  the coupling (e.g. {\tt comp3} in figure
-    \ref{Fig_coupling_layouts_b}) have to call it with {\tt
-    icpl=1} for processes participating in the coupling and with {\tt
-    icpl =} {\tt MPI\_UNDEFINED} for the others. Argument {\tt
-    local\_comm} is the MPI communicator associated with all processes
-  of the component. The new coupling communicator is returned in {\tt
-    coupl\_comm}.
+  processes. It is mandatory to call this routine if only a subset of
+  the component processes participate in the coupling (e.g. {\tt comp3} in figure
+    \ref{Fig_coupling_layouts_b}); in that case, the processes
+    involved in the coupling have to call it with icpl=1 while the
+    other have to call it with icpl = MPI UNDEFINED. Argument
+    local\_comm is the MPI communicator associated with all processes
+    of the component returned by oasis\_get\_localcomm. The new coupling 
+    communicator is returned in coupl\_comm.
+
 \end{itemize}
 If this communicator already exist in the code, the component should
 simply provide it to OASIS3-MCT with:
