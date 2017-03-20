@@ -721,7 +721,7 @@ SUBROUTINE inipar_alloc()
      nlonaf_notnc, nlataf_notnc
   INTEGER (kind=ip_intwp_p) iind, il_redu, ib, il_aux, il_auxbf, &
      il_auxaf, istatus, il_id
-  INTEGER (kind=ip_intwp_p) :: ja,jz,jm,jf,ilen,n
+  INTEGER (kind=ip_intwp_p) :: ja,jz,jm,jf,ILEN,n,ios
   INTEGER (kind=ip_intwp_p) :: ig_clim_maxport
   LOGICAL :: lg_bsend,endflag
   LOGICAL :: found, readfile
@@ -764,28 +764,33 @@ SUBROUTINE inipar_alloc()
   readfile = .true.
   DO WHILE (readfile)
      READ(nulin, FMT=rform, END=501) clline
-     CALL skip(clline, jpeighty)
-     CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
-     IF (clvari(1:1) == "$") THEN
-        found = .false.
-        DO n = 1, nkeywords
-           IF (clvari == keyword_list(n)) found = .true.
-        ENDDO
-        IF (.not. found) THEN
-           IF (mpi_rank_global == 0) THEN
-              WRITE(nulprt1,*) '    Found invalid keyword = '//trim(clvari)
-              CALL oasis_flush(nulprt1)
-           ENDIF
-           CALL namcouple_abort(subname,__LINE__,' ERROR: invalid keyword = '//trim(clvari))
-        ELSE
-           IF (mpi_rank_global == 0) THEN
-              WRITE(nulprt1,*) '    Found valid keyword = '//trim(clvari)
-              CALL oasis_flush(nulprt1)
-           ENDIF
-        ENDIF
+     CALL skip(clline, jpeighty, ios=ios)
+     IF (ios == 0) THEN
+         CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
+         IF (clvari(1:1) == "$") THEN
+             found = .FALSE.
+             DO n = 1, nkeywords
+               IF (clvari == keyword_list(n)) found = .TRUE.
+             ENDDO
+             IF (.NOT. found) THEN
+                 IF (mpi_rank_global == 0) THEN
+                     WRITE(nulprt1,*) '    Found invalid keyword = '//TRIM(clvari)
+                     CALL oasis_flush(nulprt1)
+                 ENDIF
+                 CALL namcouple_abort(subname,__LINE__,' ERROR: invalid keyword = '//TRIM(clvari))
+             ELSE
+                 IF (mpi_rank_global == 0) THEN
+                     WRITE(nulprt1,*) '    Found valid keyword = '//TRIM(clvari)
+                     CALL oasis_flush(nulprt1)
+                 ENDIF
+             ENDIF
+         ENDIF
+     ELSE
+         GOTO 501
      ENDIF
   ENDDO
 501 CONTINUE
+
   WRITE(nulprt1,*) ' '
 
   !* Get number of models involved in this simulation
@@ -993,7 +998,7 @@ SUBROUTINE inipar_alloc()
               !* Get input file name
               cg_input_file(jf) = clvari
            ENDIF
-        ENDIF
+       ENDIF
 
         IF (lg_state(jf)) THEN
            IF (ig_total_ntrans(jf) .eq. 0) THEN
@@ -1027,7 +1032,7 @@ SUBROUTINE inipar_alloc()
                  CALL skip(clline, jpeighty)
               ENDIF
            ENDDO
-        ELSE
+       ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
               READ(nulin, FMT=rform) clline
               CALL skip(clline, jpeighty)
@@ -1048,28 +1053,32 @@ SUBROUTINE inipar_alloc()
                  CALL skip(clline, jpeighty)
               ENDDO
            ENDIF
-        ENDIF
+       ENDIF
 
         ig_final_nfield = ig_final_nfield + 1
-
-     ENDIF   ! found
+ 
+    ENDIF ! endflag
 
   ENDDO  ! DO jf
 
   !* Verify we're at the end of the namcouple, if not STOP (tcraig, june 2012)
   !* The only thing that should be found is a $END, anything ELSE is wrong
 
-  endflag = .false.
-  DO WHILE (.not. endflag)
+  ios=0
+  DO WHILE (ios .eq. 0)
      READ(nulin, FMT=rform, END=241) clline
-     CALL skip(clline, jpeighty,endflag=endflag)
-     IF (.not.endflag) THEN 
+     CALL skip(clline, jpeighty,ios=ios)
+     IF (ios .EQ. 0) THEN 
         CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
         IF (trim(clvari) /= "$END") THEN
-           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
+!           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
+           WRITE(nulprt1,*) ' NFIELDS too small, increase it in namcouple'
+           CALL oasis_flush(nulprt1)
            CALL namcouple_abort(subname,__LINE__,tmpstr1)
         ENDIF
-     ENDIF
+    ELSE
+        GOTO 241
+    ENDIF
   ENDDO
 
 241 CONTINUE
@@ -3149,7 +3158,7 @@ SUBROUTINE findkeyword (keyword, line, found)
 !
   CHARACTER (len=jpeighty) :: clline
   CHARACTER (len=jpeighty) :: clvari
-  INTEGER (kind=ip_intwp_p):: ilen
+  INTEGER (kind=ip_intwp_p):: ILEN, ios
   CHARACTER(len=*),parameter :: subname='(mod_oasis_namcouple:findkeyword)'
 !
 !* ---------------------------- Poema verses ----------------------------
@@ -3163,13 +3172,15 @@ SUBROUTINE findkeyword (keyword, line, found)
   REWIND nulin
   DO WHILE (.not.found)
      READ(nulin, FMT=rform, END=110) clline
-     CALL skip(clline,jpeighty)
+     CALL skip(clline,jpeighty, ios=ios)
 !    write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
-     CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
+     IF (ios == 0) THEN
+         CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
 !    write(nulprt1,*) trim(subname),'tcx2: ',trim(clvari),trim(keyword)
-     IF (clvari == adjustl(keyword)) THEN
-        line = clline
-        found = .true.
+         IF (clvari == ADJUSTL(keyword)) THEN
+             line = clline
+             found = .TRUE.
+         ENDIF
      ENDIF
   ENDDO
 
@@ -3390,7 +3401,7 @@ END SUBROUTINE parse
 
 !===============================================================================
 
-SUBROUTINE skip (cd_one, id_len, endflag)
+SUBROUTINE skip (cd_one, id_len, endflag, ios)
 
 !**** SKIP
 !
@@ -3433,6 +3444,7 @@ SUBROUTINE skip (cd_one, id_len, endflag)
   CHARACTER(len=*),intent(inout)       :: cd_one
   INTEGER (kind=ip_intwp_p),intent(in) :: id_len
   LOGICAL, optional, intent(inout)     :: endflag
+  INTEGER (kind=ip_intwp_p), OPTIONAL, INTENT(out) :: ios
 !
 !** ++ Local declarations
 !
@@ -3450,7 +3462,7 @@ SUBROUTINE skip (cd_one, id_len, endflag)
 
   DO WHILE (.not.found)
      IF (checkcomment(cl_line)) THEN
-        READ(nulin, FMT=rform, END=140) cl_line
+        READ(nulin, FMT=rform, END=140, IOSTAT=ios) cl_line
      ELSE
         found = .true.
      ENDIF
