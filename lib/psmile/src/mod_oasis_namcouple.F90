@@ -818,7 +818,8 @@ SUBROUTINE inipar_alloc()
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
+     IF (ios == 0) THEN
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (ilen > 0) THEN
         READ(clvari, FMT=2003) ig_total_nfield
@@ -830,6 +831,7 @@ SUBROUTINE inipar_alloc()
            CALL oasis_flush(nulprt1)
         ENDIF
      ENDIF
+    ENDIF
   ELSE
      WRITE(tmpstr1,*) trim(keyword)//' not found in namcouple'
      CALL namcouple_abort(subname,__LINE__,tmpstr1)
@@ -910,8 +912,10 @@ SUBROUTINE inipar_alloc()
      !* First line
 
      READ(nulin, FMT=rform, END=241) clline
-     CALL skip(clline, jpeighty, endflag=endflag)
+     CALL skip(clline, jpeighty, ios=ios)
+     IF (ios == 0) THEN
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
+     ENDIF
      IF (trim(clvari) .eq. "$END") endflag = .true.
 
      IF (TRIM(clvari) .EQ. " ") THEN
@@ -1008,39 +1012,39 @@ SUBROUTINE inipar_alloc()
            ENDIF
 
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
            READ(nulin, FMT=rform) clline_aux
-           CALL skip(clline_aux, jpeighty)
+           CALL skip(clline_aux, jpeighty, ios=ios)
            DO ja=1,ig_total_ntrans(jf)
               CALL parse(clline_aux, clvari, ja, jpeighty, ilen, __LINE__)
               IF (clvari.eq.'CORRECT'.or.clvari.eq.'BLASOLD'.or. &
                   clvari.eq.'BLASNEW') THEN
                  READ(nulin, FMT=rform) clline
-                 CALL skip(clline, jpeighty)
+                 CALL skip(clline, jpeighty, ios=ios)
                  CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
                  READ(clvari, FMT=2003) il_aux
                  DO ib = 1, il_aux
                     READ(nulin, FMT=rform) clline
-                    CALL skip(clline, jpeighty)
+                    CALL skip(clline, jpeighty, ios=ios)
                  ENDDO
               ELSEIF (clvari.eq.'NOINTERP') THEN
                  CONTINUE
               ELSE
                  READ(nulin, FMT=rform) clline
-                 CALL skip(clline, jpeighty)
+                 CALL skip(clline, jpeighty, ios=ios)
               ENDIF
            ENDDO
        ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
               READ(nulin, FMT=rform) clline
-              CALL skip(clline, jpeighty)
+              CALL skip(clline, jpeighty, ios=ios)
            ENDIF
            IF (ig_total_state(jf) .ne. ip_input .and.  &
                ig_total_ntrans(jf) .gt. 0 ) THEN
               READ(nulin, FMT=rform) clline
-              CALL skip(clline, jpeighty)
+              CALL skip(clline, jpeighty, ios=ios)
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
               IF (clvari(1:8) .ne. 'LOCTRANS') THEN
                  WRITE(tmpstr1,*) 'You want a transformation which is not available !'
@@ -1050,7 +1054,7 @@ SUBROUTINE inipar_alloc()
               ENDIF
               DO ja=1,ig_total_ntrans(jf)
                  READ(nulin, FMT=rform) clline
-                 CALL skip(clline, jpeighty)
+                 CALL skip(clline, jpeighty, ios=ios)
               ENDDO
            ENDIF
        ENDIF
@@ -1285,7 +1289,7 @@ SUBROUTINE inipar_alloc()
      !*        Skip first line read before
 
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
 
      !* Second line
 
@@ -1295,7 +1299,7 @@ SUBROUTINE inipar_alloc()
      IF (ig_total_state(jf) .NE. ip_input) THEN
         READ(nulin, FMT=rform) clline
         !*            First determine what information is on the line
-        CALL skip(clline, jpeighty)
+        CALL skip(clline, jpeighty, ios=ios)
         CALL parse(clline, clvari, 3, jpeighty, ILEN, __LINE__)
         IF (ILEN .LT. 0) THEN
            !*                IF only two words on the line, THEN they are the locator 
@@ -1359,7 +1363,7 @@ SUBROUTINE inipar_alloc()
           
         IF (lg_state(jf)) THEN
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
         ENDIF
  
         !*            Read next line of strings
@@ -1367,7 +1371,7 @@ SUBROUTINE inipar_alloc()
 
         IF (ig_total_ntrans(jf) .GT. 0) THEN 
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
            DO ja = 1, ig_total_ntrans(jf)
               CALL parse(clline, clvari, ja, jpeighty, ILEN, __LINE__)
               !*              Get the whole set of analysis to be performed
@@ -1390,7 +1394,7 @@ SUBROUTINE inipar_alloc()
                     CALL namcouple_abort(subname,__LINE__,tmpstr1)
                  ENDIF
                  READ(nulin, FMT=rform) clline
-                 CALL skip(clline, jpeighty)
+                 CALL skip(clline, jpeighty, ios=ios)
                  IF (canal(ja,ig_number_field(jf)) .EQ. 'SCRIPR')THEN
                     !* Get field type (scalar/vector)
                     CALL parse(clline, clvari, 3, jpeighty, ILEN, __LINE__)
@@ -1401,7 +1405,7 @@ SUBROUTINE inipar_alloc()
                     READ(clvari, FMT=2003) nbofld (ig_number_field(jf))
                     DO ib = 1,nbofld (ig_number_field(jf))
                        READ(nulin, FMT=rform) clline
-                       CALL skip(clline, jpeighty)
+                       CALL skip(clline, jpeighty, ios=ios)
                     ENDDO
                  ELSEIF (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW') THEN
                     CALL parse(clline, clvari, 2, jpeighty, ILEN, __LINE__)
@@ -1409,13 +1413,13 @@ SUBROUTINE inipar_alloc()
                     READ(clvari, FMT=2003) nbnfld (ig_number_field(jf))
                     DO ib = 1,nbnfld (ig_number_field(jf))
                        READ(nulin, FMT=rform) clline
-                       CALL skip(clline, jpeighty)
+                       CALL skip(clline, jpeighty, ios=ios)
                     ENDDO
                  ENDIF
               ELSE
                  ! For IGNORED, IGNOUT and OUTPUT, only one line for LOCTRANS
                  READ(nulin, FMT=rform) clline
-                 CALL skip(clline, jpeighty)
+                 CALL skip(clline, jpeighty, ios=ios)
                  IF (mpi_rank_global == 0) THEN
                     WRITE(nulprt1,*)'OUTPUT clline=', trim(clline)
                     CALL oasis_flush(nulprt1)
@@ -1524,7 +1528,7 @@ SUBROUTINE inipar
   INTEGER (kind=ip_intwp_p) :: ib,ilind1,ilind2,ilind
   INTEGER (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
   INTEGER (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
-  INTEGER (kind=ip_intwp_p) :: icofld,imodel
+  INTEGER (kind=ip_intwp_p) :: icofld,imodel, ios
   CHARACTER(len=32) :: keyword
   LOGICAL :: found
   CHARACTER(len=*),parameter :: subname='(mod_oasis_namcouple:inipar)'
@@ -1586,7 +1590,7 @@ SUBROUTINE inipar
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (ilen > 0) THEN
         READ(clvari, FMT=1004) ntime
@@ -1635,7 +1639,7 @@ SUBROUTINE inipar
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
 
      IF (ilen .LE. 0) THEN
@@ -1681,7 +1685,7 @@ SUBROUTINE inipar
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (ilen .LE. 0) THEN
         nnorest = .false.
@@ -1723,7 +1727,7 @@ SUBROUTINE inipar
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (ilen .LE. 0) THEN
         IF (mpi_rank_global == 0) THEN
@@ -1804,7 +1808,7 @@ SUBROUTINE inipar
 
 !* First line
      READ(nulin, FMT=rform) clline
-     CALL skip(clline, jpeighty)
+     CALL skip(clline, jpeighty, ios=ios)
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
 !* Get output field symbolic name
      cg_input_field(jf) = clvari
@@ -1882,7 +1886,7 @@ SUBROUTINE inipar
      IF (ig_total_state(jf) .ne. ip_input) THEN
         READ(nulin, FMT=rform) clline
 !     *      First determine what information is on the line
-        CALL skip(clline, jpeighty)
+        CALL skip(clline, jpeighty, ios=ios)
         CALL parse(clline, clvari, 3, jpeighty, ilen, __LINE__)
         IF (ilen .lt. 0) THEN
 !     *          IF only two words on the line, THEN they are the locator 
@@ -1957,7 +1961,7 @@ SUBROUTINE inipar
 
      IF (lg_state(jf)) THEN
         READ(nulin, FMT=rform) clline
-        CALL skip(clline, jpeighty)
+        CALL skip(clline, jpeighty, ios=ios)
         CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
         !     * Get source grid periodicity type
         csper(ig_number_field(jf)) = clvari
@@ -1993,10 +1997,10 @@ SUBROUTINE inipar
         IF (ig_total_state(jf) .ne. ip_input .and.  &
             ig_total_ntrans(jf) .gt. 0 ) THEN
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
            DO ja=1,ig_total_ntrans(jf)
               READ(nulin, FMT=rform) clline 
-              CALL skip(clline, jpeighty)
+              CALL skip(clline, jpeighty, ios=ios)
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
               IF (clvari(1:7) .eq. 'INSTANT') THEN 
                  ig_local_trans(jf) = ip_instant
@@ -2017,7 +2021,7 @@ SUBROUTINE inipar
         ENDIF
      ELSE
         READ(nulin, FMT=rform) clline
-        CALL skip(clline, jpeighty)
+        CALL skip(clline, jpeighty, ios=ios)
 
 !     * Now read specifics for each transformation
  
@@ -2026,7 +2030,7 @@ SUBROUTINE inipar
 !     * Read next line unless if analysis is NOINTERP (no input)
 
            READ(nulin, FMT=rform) clline
-           CALL skip(clline, jpeighty)
+           CALL skip(clline, jpeighty, ios=ios)
            IF (canal(ja,ig_number_field(jf)) .EQ. 'LOCTRANS') THEN
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
               IF (clvari(1:7) .eq. 'INSTANT') THEN 
@@ -3457,6 +3461,7 @@ SUBROUTINE skip (cd_one, id_len, endflag, ios)
 !  CALL oasis_debug_enter(subname)
 
   IF (present(endflag)) endflag = .false.
+  IF (present(ios)) ios = 0
   cl_line = cd_one
   found = .false.
 
@@ -3474,6 +3479,7 @@ SUBROUTINE skip (cd_one, id_len, endflag, ios)
      cd_one = cl_line
   ELSE
      IF (present(endflag)) ENDFLAG = .true.
+     IF (PRESENT(ios)) ios = -1
   ENDIF
 
 !  CALL oasis_debug_exit(subname)
