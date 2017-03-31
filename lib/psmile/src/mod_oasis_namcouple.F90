@@ -813,13 +813,12 @@ SUBROUTINE inipar_alloc()
   !        --------------------
   
   !* Read total number of fields exchanged by this OASIS process
-  
+
   keyword = clfield
   CALL findkeyword (keyword, clline, found)
   IF (found) THEN
      READ(nulin, FMT=rform) clline
      CALL skip(clline, jpeighty, ios=ios)
-     IF (ios == 0) THEN
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (ilen > 0) THEN
         READ(clvari, FMT=2003) ig_total_nfield
@@ -831,7 +830,6 @@ SUBROUTINE inipar_alloc()
            CALL oasis_flush(nulprt1)
         ENDIF
      ENDIF
-    ENDIF
   ELSE
      WRITE(tmpstr1,*) trim(keyword)//' not found in namcouple'
      CALL namcouple_abort(subname,__LINE__,tmpstr1)
@@ -913,9 +911,7 @@ SUBROUTINE inipar_alloc()
 
      READ(nulin, FMT=rform, END=241) clline
      CALL skip(clline, jpeighty, ios=ios)
-     IF (ios == 0) THEN
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
-     ENDIF
      IF (trim(clvari) .eq. "$END") endflag = .true.
 
      IF (TRIM(clvari) .EQ. " ") THEN
@@ -3162,7 +3158,7 @@ SUBROUTINE findkeyword (keyword, line, found)
 !
   CHARACTER (len=jpeighty) :: clline
   CHARACTER (len=jpeighty) :: clvari
-  INTEGER (kind=ip_intwp_p):: ILEN, ios
+  INTEGER (kind=ip_intwp_p):: ILEN, ios, ios2
   CHARACTER(len=*),parameter :: subname='(mod_oasis_namcouple:findkeyword)'
 !
 !* ---------------------------- Poema verses ----------------------------
@@ -3171,11 +3167,13 @@ SUBROUTINE findkeyword (keyword, line, found)
 
 !  CALL oasis_debug_enter(subname)
 
-  found = .false.
+  found = .FALSE.
+  ios2 = 0 
 
   REWIND nulin
   DO WHILE (.not.found)
-     READ(nulin, FMT=rform, END=110) clline
+     READ(nulin, FMT=rform, END=110, IOSTAT=ios2) clline
+     IF (ios2 == 0) then
      CALL skip(clline,jpeighty, ios=ios)
 !    write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
      IF (ios == 0) THEN
@@ -3186,6 +3184,9 @@ SUBROUTINE findkeyword (keyword, line, found)
              found = .TRUE.
          ENDIF
      ENDIF
+     else
+       goto 110
+     endif
   ENDDO
 
 110 CONTINUE
