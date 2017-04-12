@@ -697,7 +697,8 @@ coupling (or I/O) field.
     field array; can be 1D, 2D, bundled 1D, or bundled 2D.  Rank and size
     must match {\it fld1}.
   \item {\tt write\_restart [LOGICAL, IN, OPTIONAL]}: optional argument to write an 
-    intermediate restart file associated with the variable {\it var\_id} at the current timestep.
+    intermediate restart file associated with the variable {\it
+      var\_id} at the current timestep (see below).
   \end{itemize}
 \end{itemize}
 
@@ -801,7 +802,17 @@ If a user sets that argument to true, a restart file will be written for that fi
 will just save the data that exists at the time of the call, taking into account lags and LOCTRANS operations. In 
 cases where multiple fields are coupled as a single operation in the model (indicated via a list of colon delimited 
 fields in the {\it namcouple}, see \ref{subsubsec_secondEXPORTED}), users are encouraged to specify 
-the {\tt write\_restart} flag on ALL {\tt oasis\_put} calls at a given time for this set of fields.
+the {\tt write\_restart} flag on ALL {\tt oasis\_put} calls at a given
+time for this set of fields.
+Intermediate restarts will be created with a timestamp prepended to
+their filename, like TA000003600\_rst4.nc or TC000014400\_rst4.nc. 
+A restart file that starts with TA will be a restart file associated
+with LOCTRANS operations. A restart 
+file that starts with TC will be a restart file associated with
+coupling operations. The 9 digit timestamp in 
+the filename is the date in seconds at the time of the oasis\_put
+call. The restart filename (ie. rst4.nc) 
+defined in the namcouple for variables will be used to generate a filename for intermediate restart files.
 \end{itemize}
 
 \subsubsection{Receiving a coupling (or I/O) field}
