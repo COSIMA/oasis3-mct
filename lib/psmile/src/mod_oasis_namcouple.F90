@@ -765,7 +765,7 @@ SUBROUTINE inipar_alloc()
   DO WHILE (readfile)
      READ(nulin, FMT=rform, END=501) clline
      CALL skip(clline, jpeighty, ios=ios)
-     IF (ios == 0 THEN
+     IF ios == 0 THEN
          CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
          IF (clvari(1:1) == "$") THEN
              found = .FALSE.
