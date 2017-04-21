@@ -36,6 +36,12 @@ CONTAINS
    character(len=*),parameter   :: subname = 'oasis_abort_noarg'
 !--------------------------------------------------------------------
 
+#if defined(__INTEL_COMPILER)
+    CALL TRACEBACKQQ()
+#elif defined(__GFORTRAN__)
+    CALL BACKTRACE()
+#endif
+
 #if defined use_comm_MPI1 || defined use_comm_MPI2
    CALL MPI_ABORT (mpi_comm_global, 0, ierror)
 #endif
@@ -60,6 +66,12 @@ CONTAINS
 
    WRITE (nulprt,'(a)') subname//' from '//TRIM(cd_routine)
    WRITE (nulprt,'(a)') subname//' error = '//TRIM(cd_message)
+
+#if defined(__INTEL_COMPILER)
+    CALL TRACEBACKQQ()
+#elif defined(__GFORTRAN__)
+    CALL BACKTRACE()
+#endif
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
    CALL MPI_ABORT (mpi_comm_global, 0, ierror)
