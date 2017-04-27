@@ -2408,9 +2408,9 @@ SUBROUTINE oasis_mpi_abort(string,rcode)
    endif
 
    IF ( PRESENT(rcode)) THEN
-       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string),rcode=rcode)
+       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string),file=__FILE__,line=__LINE__,rcode=rcode)
    ELSE
-       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string))
+       CALL oasis_abort(cd_routine=subName,cd_message=TRIM(string),file=__FILE__,line=__LINE__)
    ENDIF
 
    call oasis_debug_exit(subname)
@@ -2843,12 +2843,14 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                            varf2a(p) = recv_varf2(n)
                         elseif (recv_varf2(n) /= spval2 .and. varf2a(p) /= recv_varf2(n)) then
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp2 value: '//trim(recv_varf2(n))//':'//trim(varf1a(p))//':'//trim(varf2a(p)))
+                                'inconsistent linp2 value: '//trim(recv_varf2(n))//':'//trim(varf1a(p))//':'//trim(varf2a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      else
                         if (varf2a(p) /= recv_varf2(n)) then
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp2 value: '//trim(recv_varf2(n))//':'//trim(varf1a(p))//':'//trim(varf2a(p)))
+                                'inconsistent linp2 value: '//trim(recv_varf2(n))//':'//trim(varf1a(p))//':'//trim(varf2a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      endif
                   endif
@@ -2861,14 +2863,16 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                            write(nulprt,*) subname//trim(string),astr,'inconsistent linp3 var: ',&
                                      recv_varf3(n),':',trim(varf1a(p)),':',varf3a(p)
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp3 value: '//trim(varf1a(p)))
+                                'inconsistent linp3 value: '//trim(varf1a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      else
                         if (varf3a(p) /= recv_varf3(n)) then
                            write(nulprt,*) subname//trim(string),astr,'inconsistent linp3 var: ',&
                                      recv_varf3(n),':',trim(varf1a(p)),':',varf3a(p)
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp3 value: '//trim(varf1a(p)))
+                                'inconsistent linp3 value: '//trim(varf1a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      endif
                   endif
@@ -2881,14 +2885,16 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
                            write(nulprt,*) subname//trim(string),astr,'inconsistent linp4 var: ',&
                                      recv_varf4(n),':',trim(varf1a(p)),':',varf4a(p)
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp4 value: '//trim(varf1a(p)))
+                                'inconsistent linp4 value: '//trim(varf1a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      else
                         if (varf4a(p) /= recv_varf4(n)) then
                            write(nulprt,*) subname//trim(string),astr,'inconsistent linp4 var: ',&
                                      recv_varf4(n),':',trim(varf1a(p)),':',varf4a(p)
                            call oasis_abort(cd_routine=subname//trim(string),cd_message= &
-                                'inconsistent linp4 value: '//trim(varf1a(p)))
+                                'inconsistent linp4 value: '//trim(varf1a(p)), &
+                                file=__FILE__,line=__LINE__)
                         endif
                      endif
                   endif

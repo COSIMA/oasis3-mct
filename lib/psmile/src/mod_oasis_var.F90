@@ -79,7 +79,7 @@
      if (len_trim(cdport) > ic_lvar) then
         WRITE(nulprt,*) subname,estr,'variable too long = ',trim(cdport)
         WRITE(nulprt,*) subname,estr,'max variable length (ic_lvar) = ',ic_lvar
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
      trimmed_cdport = trim(cdport)
 
@@ -123,7 +123,7 @@
         if (trimmed_cdport == prism_var(n)%name) then
            write(nulprt,*) subname,estr,'variable already defined with def_var = ',trimmed_cdport
            write(nulprt,*) subname,estr,'check oasis_def_var calls in your model'
-           call oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
         endif
      enddo
 
@@ -131,7 +131,7 @@
      if (id_var_nodims(2) > 999) then
         write(nulprt,*) subname,estr,'variable id_var_nodims2 too large.  limit is 999 ',id_var_nodims(2)
         write(nulprt,*) subname,estr,'check oasis_def_var calls in your model'
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
 
      !-------------------------------------------------     
@@ -144,7 +144,7 @@
      if (prism_nvar > maxvar) then
         write(nulprt,*) subname,estr,'prism_nvar too large = ',prism_nvar,maxvar
         write(nulprt,*) subname,estr,'check maxvar set in oasis_init_comp'
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
 
      call oasis_var_zero(prism_var(prism_nvar))
@@ -268,7 +268,7 @@
                endif
             else
                write(nulprt,*) subname,estr,'prism part not found part = ',trim(pname(v)),' var = ',trim(vname(v))
-               call oasis_abort()
+               call oasis_abort(file=__FILE__,line=__LINE__)
             endif
    
             if (OASIS_debug >= 2) then

@@ -103,7 +103,7 @@ CONTAINS
    if (prism_npart > mpart) then
       write(nulprt,*) subname,estr,'prism_npart too large = ',prism_npart,mpart
       write(nulprt,*) subname,estr,'increase mpart in mod_oasis_part.F90'
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
    call oasis_part_zero(prism_part(prism_npart))
    id_part = prism_npart
@@ -112,7 +112,7 @@ CONTAINS
       if (len_trim(name) > len(prism_part(prism_npart)%partname)) then
          write(nulprt,*) subname,estr,'part name too long = ',trim(name)
          write(nulprt,*) subname,estr,'part name max length = ',len(prism_part(prism_npart)%partname)
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
       prism_part(prism_npart)%partname = trim(name)
    else
@@ -282,7 +282,7 @@ CONTAINS
      else
          write(nulprt,*) subname,estr,'part strategy unknown in def_part = ',kparal(CLIM_Strategy)
          write(nulprt,*) subname,estr,'strategy set in kparal array index ',CLIM_Strategy
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
 
       IF (OASIS_debug >= 30)  THEN
@@ -548,7 +548,7 @@ CONTAINS
      endif
   else
      write(nulprt,*) subname,estr,'type argument unknown = ',trim(type)
-     call oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   id_part = prism_npart

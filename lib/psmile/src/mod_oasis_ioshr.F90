@@ -395,7 +395,7 @@ subroutine oasis_ioshr_wopen(filename,clobber,cdf64)
     elseif (trim(wfilename) /= trim(filename)) then
        ! filename is open, better match open filename
        write(nulprt,*) subname,estr,'different file currently open ',trim(filename)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     else
        ! filename is already open, just return
     endif
@@ -439,7 +439,7 @@ subroutine oasis_ioshr_close(filename)
     else
        ! different filename is open, abort
        write(nulprt,*) subname,estr,'different file currently open ',trim(filename)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     wfilename = ''
@@ -488,7 +488,7 @@ character(len=10) function oasis_ioshr_date2yyyymmdd (date)
 
    if (date < 0) then
        WRITE(nulprt,*) subname,estr,'oasis_ioshr_date2yyyymmdd: negative date not allowed'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
    end if
 
    year  = date / 10000
@@ -520,7 +520,7 @@ character(len=8) function oasis_ioshr_sec2hms (seconds)
 
    if (seconds < 0 .or. seconds > 86400) then
        WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad input seconds:', seconds
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
    end if
 
    hours   = seconds / 3600
@@ -529,12 +529,12 @@ character(len=8) function oasis_ioshr_sec2hms (seconds)
 
    if (minutes < 0 .or. minutes > 60) then
        WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad minutes = ',minutes
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
    end if
 
    if (secs < 0 .or. secs > 60) then
        WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad secs = ',secs
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
    end if
 
    write(oasis_ioshr_sec2hms,80) hours, minutes, secs
@@ -632,7 +632,7 @@ end function oasis_ioshr_sec2hms
     nf = mct_aVect_nRattr(AV)
     if (nf < 1) then
        write(nulprt,*) subname,estr,'nf = ',nf,trim(dname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(nx)) then
@@ -643,7 +643,7 @@ end function oasis_ioshr_sec2hms
     endif
     if (lnx*lny /= ng) then
        write(nulprt,*) subname,estr,'grid2d size not consistent ',ng,lnx,lny,trim(dname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (lwhead) then
@@ -1218,7 +1218,7 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
        write(nulprt,*) subname,estr,'file invalid ',trim(filename),' ',trim(dname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     do k = 1,nf
@@ -1242,7 +1242,7 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
              if (ng /= mct_gsmap_gsize(gsmap)) then
                  WRITE(nulprt,*) subname,estr,'dimensions do not match',&
                      lnx,lny,mct_gsmap_gsize(gsmap)
-                 CALL oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
              end if
              call pio_initdecomp(pio_iosystem, pio_double, (/lnx,lny/), dof, iodesc)
              deallocate(dof)
@@ -1347,7 +1347,7 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
         WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     name1 = trim(dname)
@@ -1441,7 +1441,7 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
         WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     name1 = trim(dname)
@@ -1499,7 +1499,7 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
         WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     name1 = trim(dname)

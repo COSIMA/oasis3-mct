@@ -89,7 +89,7 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
       if (trim(fldtype) == 'real') ifldtype = 2
       if (ifldtype == 0) then
           WRITE(nulprt,*) subname,estr,'in fldtype argument'
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
       endif
    endif
 
@@ -104,21 +104,21 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
          write(nulprt,*) subname,estr,'file missing ',trim(filename)
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
 
       status = nf90_inq_varid(ncid,trim(filefld),varid)
       if (status /= nf90_noerr) then
          write(nulprt,*) subname,':',trim(nf90_strerror(status))
          WRITE(nulprt,*) subname,estr,'filefld variable not found '//trim(filefld)
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
       if (dlen /= 2) then
          write(nulprt,*) subname,estr,'variable ndims ne 2 ',trim(filefld),dlen
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -130,7 +130,7 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
                                        TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
 
       if (ifldtype == 1) then
@@ -244,7 +244,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          write(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
                          TRIM(lstring),SIZE(av_g%rAttr,dim=2),nx,ny
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
 
       inquire(file=trim(rstfile),exist=exists)
@@ -281,7 +281,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
          if (dlen /= nx) then
             write(nulprt,*) subname,wstr,'dlen ne nx ',dlen,nx
             CALL oasis_flush(nulprt)
-!            call oasis_abort()
+!            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
@@ -290,7 +290,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
          if (dlen /= ny) then
             write(nulprt,*) subname,wstr,'dlen ne ny ',dlen,ny
             CALL oasis_flush(nulprt)
-!            call oasis_abort()
+!            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -328,7 +328,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
                                       mpi_rank_local,':',TRIM(nf90_strerror(status))
             if (dlen /= 2 .or. nx*ny /= nxf*nyf) then
                WRITE(nulprt,*) subname,estr,'ndims and size does not match on file'
-               call oasis_abort()
+               call oasis_abort(file=__FILE__,line=__LINE__)
             endif
             allocate(array2(nxf,nyf))
          endif
@@ -431,7 +431,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
       if (.not.exists) then
          IF (labort) THEN
             write(nulprt,*) subname,estr,'file missing ',trim(rstfile)
-            CALL oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          ELSE
             write(nulprt,*) subname,wstr,'file missing ',trim(rstfile)
             CALL oasis_flush(nulprt)
@@ -452,7 +452,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
             if (status /= nf90_noerr) then
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
-                  CALL oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
 !               ELSE
 !                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
 !                  CALL oasis_flush(nulprt)
@@ -464,7 +464,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 2) then
                   write(nulprt,*) subname,estr,'variable ndims ne 2 on file ',trim(itemc),dlen
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -476,7 +476,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
                   WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file = ',&
                                                TRIM(rstfile),SIZE(av_g%rAttr,dim=2),nx,ny
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
 
                allocate(array2(nx,ny))
@@ -570,7 +570,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
       if (.not.exists) then
          IF (labort) THEN
             write(nulprt,*) subname,estr,'file missing ',trim(rstfile)
-            CALL oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          ELSE
             write(nulprt,*) subname,wstr,'file missing ',trim(rstfile)
             CALL oasis_flush(nulprt)
@@ -583,7 +583,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
          if (present(iarray)) then
             if (.not. present(ivarname)) then
                write(nulprt,*) subname,estr,'iarray must have ivarname set'
-               call oasis_abort()
+               call oasis_abort(file=__FILE__,line=__LINE__)
             endif
 
             ncnt = size(iarray)
@@ -592,7 +592,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
             if (status /= nf90_noerr) then
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
-                  CALL oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
 !               ELSE
 !                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
 !                  CALL oasis_flush(nulprt)
@@ -603,7 +603,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
                   write(nulprt,*) subname,estr,'variable ndims ne 1 ',trim(ivarname),dlen
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -611,7 +611,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
 
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,estr,'iarray ncnt dlen mismatch ',ncnt,dlen
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
 
                status = nf90_get_var(ncid,varid,iarray)
@@ -623,7 +623,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
          if (present(rarray)) then
             if (.not. present(rvarname)) then
                write(nulprt,*) subname,estr,'rarray must have rvarname set'
-               call oasis_abort()
+               call oasis_abort(file=__FILE__,line=__LINE__)
             endif
 
             ncnt = size(rarray)
@@ -632,7 +632,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
             if (status /= nf90_noerr) then
                IF (labort) THEN
                   write(nulprt,*) subname,estr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
-                  CALL oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
 !               ELSE
 !                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
 !                  CALL oasis_flush(nulprt)
@@ -643,7 +643,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
                   write(nulprt,*) subname,estr,'variable ndims ne 1 ',trim(rvarname),dlen
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -651,7 +651,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
 
                if (ncnt /= dlen) then
                   write(nulprt,*) subname,estr,'rarray ncnt dlen mismatch ',ncnt,dlen
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
 
                status = nf90_get_var(ncid,varid,rarray)
@@ -739,7 +739,7 @@ subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
       if (present(iarray)) then
          if (.not. present(ivarname)) then
             write(nulprt,*) subname,estr,'iarray must have ivarname set'
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          ncnt = size(iarray)
@@ -754,7 +754,7 @@ subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
             write(nulprt,*) subname,estr,'iarray dlen ne ncnt ',dlen,ncnt
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
@@ -768,7 +768,7 @@ subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
       if (present(rarray)) then
          if (.not. present(rvarname)) then
             write(nulprt,*) subname,estr,'rarray must have rvarname set'
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          ncnt = size(rarray)
@@ -783,7 +783,7 @@ subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
             write(nulprt,*) subname,estr,'rarray dlen ne ncnt ',dlen,ncnt
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
@@ -905,7 +905,7 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
          wdata = .true.
       else
          WRITE(nulprt,*) subname,estr,'fk illegal'
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       end if
 
       call oasis_ioshr_write(lfn,&
@@ -927,7 +927,7 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
                                       TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
 
       allocate(array3(nx,ny,1))
@@ -1118,7 +1118,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
          inquire(file=trim(lfn),exist=exists)
          if (.not.exists) then
             write(nulprt,*) subname,estr,'file not found ',trim(lfn)
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_open(lfn,NF90_NOWRITE,ncid)
@@ -1145,7 +1145,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
          deallocate(time)
          if (n1 < 1) then
             write(nulprt,*) subname,estr,'time not found on file ',trim(lfn),lmsec
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -1164,7 +1164,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
              WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
                                            TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
          endif
 
          start3 = 1
@@ -1255,13 +1255,13 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
    else
       write(nulprt,*) subname,estr,'in filename ',trim(filename)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    status = nf90_inq_varid(ncid,trim(fldname),varid)
    if (status /= nf90_noerr) then
       write(nulprt,*) subname,estr,'in variable name ',trim(fldname)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
@@ -1294,7 +1294,7 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
          write(nulprt,*) subname,estr,'mismatch in field and data'
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
    endif
     
@@ -1365,7 +1365,7 @@ subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
     ind = index(trim(fldname),'.')
     if (ind < 2) then
        write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
     gridname = fldname(1:ind-1)
 
@@ -1468,7 +1468,7 @@ subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
     ind = index(trim(fldname),'.')
     if (ind < 2) then
        write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
     gridname = fldname(1:ind-1)
 
@@ -1572,7 +1572,7 @@ subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
     ind = index(trim(fldname),'.')
     if (ind < 2) then
        write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
     gridname = fldname(1:ind-1)
 

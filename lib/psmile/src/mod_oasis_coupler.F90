@@ -315,7 +315,7 @@ CONTAINS
            do n2 = 1,n1-1
               if (myvar(n1) == myvar(n2)) then
                  WRITE(nulprt,*) subname,estr,'variable name defined more than once by def_var = ',trim(myvar(n1))
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
            enddo
         enddo
@@ -433,7 +433,7 @@ CONTAINS
         WRITE(nulprt,*) subname,estr,'number of fields in namcouple inconsistent ',nn,n1,n2
         WRITE(nulprt,*) subname,estr,'namcouple src fields = ',trim(namsrcfld(nn))
         WRITE(nulprt,*) subname,estr,'namcouple dst fields = ',trim(namdstfld(nn))
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
   enddo
 
@@ -748,7 +748,7 @@ CONTAINS
 
            if (flag /= OASIS_In .and. flag /= OASIS_Out) then
               write(nulprt,*) subname,estr,'var must be either OASIS_In or OASIS_Out for var = ',trim(myfld)
-              call oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            if (OASIS_debug >= 20) then
@@ -831,17 +831,17 @@ CONTAINS
 !                if (nm == compid) then
 !                   write(nulprt,*) subname,estr,'send recv pair on same model = ', &
 !                      trim(myfld),' ',trim(otfld)
-!                   call oasis_abort()
+!                   call oasis_abort(file=__FILE__,line=__LINE__)
 !                endif
                  if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
                     write(nulprt,*) subname,estr,'send recv pair both Out = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
                     write(nulprt,*) subname,estr,'send recv pair both In = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -853,7 +853,7 @@ CONTAINS
                  if (trim(myfld) /= trim(otfld)) then
                     write(nulprt,*) subname,estr,'namcouple field names do not match in/out = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -864,7 +864,7 @@ CONTAINS
               if (prism_var(nv1)%num /= allnum(nv,nm)) then
                  write(nulprt,*) subname,estr,'namcouple bundle fields do not match for ',trim(myfld),' ',trim(otfld)
                  write(nulprt,*) subname,estr,'namcouple bundle numbers are ',prism_var(nv1)%num,allnum(nv,nm)
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
 
               !--------------------------------
@@ -874,7 +874,7 @@ CONTAINS
 
               if (flag == OASIS_In .and. found) then
                  write(nulprt,*) subname,estr,'found two sources for field = ',trim(otfld)
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
               found = .true.
 
@@ -930,7 +930,7 @@ CONTAINS
               svarid = size(pcpointer%varid)
               if (myfldi > svarid .or. pcpointer%nflds > svarid) then
                  WRITE(nulprt,*) subname,estr,'multiple field coupling setup error',svarid,myfldi,pcpointer%nflds
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
 
               pcpointer%varid(myfldi) = nv1
@@ -943,7 +943,7 @@ CONTAINS
               if (prism_var(nv1)%ncpl > mvarcpl) then
                  WRITE(nulprt,*) subname,estr,'ncpl too high, max size (mvarcpl) = ',mvarcpl
                  WRITE(nulprt,*) subname,estr,'increase mvarcpl in mod_oasis_var'
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
               prism_var(nv1)%cpl(prism_var(nv1)%ncpl) = nc
 
@@ -956,15 +956,15 @@ CONTAINS
               if (pcpointer%valid) then
                  if (pcpointer%comp /= nm) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field comp for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (pcpointer%namID /= nn) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field namID for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (pcpointer%partID /= part1) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field partID for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
 
              else
@@ -1034,7 +1034,7 @@ CONTAINS
                        if (prism_nrouter > prism_mrouter) then
                           write(nulprt,*) subname,estr,'prism_nrouter too large = ',prism_nrouter,prism_mrouter
                           write(nulprt,*) subname,estr,'check prism_mrouter in oasis_coupler_setup '
-                          call oasis_abort()
+                          call oasis_abort(file=__FILE__,line=__LINE__)
                        endif
                        pcpointer%routerID = prism_nrouter
                     endif
@@ -1086,7 +1086,7 @@ CONTAINS
                           if (prism_nmapper > prism_mmapper) then
                              write(nulprt,*) subname,estr,'prism_nmapper too large',prism_nmapper,prism_mmapper
                              write(nulprt,*) subname,estr,'check prism_mmapper in oasis_coupler_setup '
-                             call oasis_abort()
+                             call oasis_abort(file=__FILE__,line=__LINE__)
                           endif
                           mapID = prism_nmapper
                           prism_mapper(mapID)%file = trim(tmp_mapfile)
@@ -1133,7 +1133,7 @@ CONTAINS
      endif
   enddo
 !  call oasis_mpi_barrier(mpi_comm_global)
-  if (found) call oasis_abort()
+  if (found) call oasis_abort(file=__FILE__,line=__LINE__)
   deallocate(namsrc_checkused_g)
 
   !--- deallocate temporary ---
@@ -1175,7 +1175,7 @@ CONTAINS
         if (nflds2 < nflds1) then
            write(nulprt,*) subname,estr,'fldlist rebuild nflds2 < nflds1 for ',trim(pcpointer%fldlist)
            write(nulprt,*) subname,estr,'fldlist reset error in fld cnt = ',nflds1,nflds2
-           call oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
         else
            write(nulprt,*) subname,' fldlist rebuild nflds2 > nflds1 for ',trim(pcpointer%fldlist)
            allocate(varid1(nflds1))
@@ -1194,7 +1194,7 @@ CONTAINS
                  if (len_trim(pcpointer%fldlist) > 0.99 * len(pcpointer%fldlist)) then
                     write(nulprt,*) subname,estr,'fldlist rebuild too long, limit is ',len(pcpointer%fldlist),' chars'
                     write(nulprt,*) subname,estr,'current rebuid fldlist is ',trim(pcpointer%fldlist)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  call oasis_coupler_bldvarname(varid1(n1),n2,vname)
                  write(pcpointer%fldlist,'(a)') trim(pcpointer%fldlist)//trim(delim)//trim(vname)
@@ -1268,7 +1268,7 @@ CONTAINS
 
      if (part1 <= 0) then
         write(nulprt,*) subname,estr,'part1 invalid = ',part1
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
 
      !--------------------------------
@@ -1362,7 +1362,7 @@ CONTAINS
                  else
                     write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
                                     trim(prism_mapper(mapID)%file)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -1454,13 +1454,13 @@ CONTAINS
               cstring = 'dst'
            else
               write(nulprt,*) subname,estr,'mapper opt invalid expect bfb or sum  =',trim(prism_mapper(mapID)%opt)
-              call oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
            endif
            if (prism_mapper(mapID)%optval /= '' .and. &
                prism_mapper(mapID)%optval /= trim(cstring)) then
               write(nulprt,*) subname,estr,'mapper opt changed',&
                               trim(prism_mapper(mapID)%optval),' ',trim(cstring)
-              call oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
            endif
            prism_mapper(mapID)%optval = trim(cstring)
            if (local_timers_on) call oasis_timer_stop('cpl_setup_n4de')
@@ -1880,7 +1880,7 @@ CONTAINS
   if (varnum > prism_var(varid)%num) then
      write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
      write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
-     call oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   if (prism_var(varid)%num > 1) then
@@ -1940,7 +1940,7 @@ CONTAINS
   if (varnum > prism_var(varid)%num) then
      write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
      write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
-     call oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   call oasis_debug_exit(subname)
@@ -2042,7 +2042,7 @@ subroutine cplsortkey(num, arr, sortkey)
 
    if (num /= size(arr) .or. num /= size(sortkey)) then
       WRITE(nulprt,*) subname,estr,'on size of input arrays :',num,size(arr),size(sortkey)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    allocate(tmparr(num))

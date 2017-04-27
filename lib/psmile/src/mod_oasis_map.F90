@@ -113,7 +113,7 @@ CONTAINS
 
   if (trim(namscrtyp(namID)) /= 'SCALAR') then
      write(nulprt,*) subname,estr,'only scrip type SCALAR mapping supported'
-     CALL oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   do_corners = .false.
@@ -475,7 +475,7 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
    if (status /= NF90_NOERR) then
       write(nulprt,*) subname,' nf90_strerror = ',trim(nf90_strerror(status))
       WRITE(nulprt,*) subname,estr,'mapping file not found = ',trim(filename)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    !--- get matrix dimensions ----------
@@ -606,7 +606,7 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
       mygsmap => SgsMap
    else
       write(nulprt,*) subname,estr,'invalid newdom value, expect src or dst = ',newdom
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
    lsize = 0
    do n = 1,size(mygsmap%start)
@@ -644,7 +644,7 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
    do n = 1,lsize-1
       if (lsstart(n) > lsstart(n+1)) then
          write(nulprt,*) subname,estr,'lsstart not properly sorted'
-         call oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       endif
    enddo
 
@@ -1052,7 +1052,7 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
    if (status /= NF90_NOERR) then
       write(nulprt,*) subname,' nf90_strerror = ',trim(nf90_strerror(status))
       WRITE(nulprt,*) subname,estr,'mapping file not found = ',trim(filename)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    !--- get matrix dimensions ----------
@@ -1199,7 +1199,7 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
       mygsmap => SgsMap
    else
       write(nulprt,*) subname,estr,'invalid newdom value, expect src or dst = ',newdom
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    !----------------------------------------------------------------------------
@@ -1260,7 +1260,7 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
       do n = 1,size(mygsmap%start)-1
          if (lsstart(n) > lsstart(n+1)) then
             write(nulprt,*) subname,estr,'lsstart not properly sorted'
-            call oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
       enddo
 

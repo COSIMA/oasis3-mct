@@ -1071,7 +1071,7 @@ SUBROUTINE inipar_alloc()
      IF (ios .EQ. 0) THEN 
         CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
         IF (trim(clvari) /= "$END") THEN
-!           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
+           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
            WRITE(nulprt1,*) ' NFIELDS too small, increase it in namcouple'
            CALL oasis_flush(nulprt1)
            CALL namcouple_abort(subname,__LINE__,tmpstr1)
@@ -3173,17 +3173,17 @@ SUBROUTINE findkeyword (keyword, line, found)
   REWIND nulin
   DO WHILE (.not.found)
      READ(nulin, FMT=rform, END=110, IOSTAT=ios2) clline
-     IF (ios2 == 0) then
-     CALL skip(clline,jpeighty, ios=ios)
-!    write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
-     IF (ios == 0) THEN
+     if (ios2 == 0) then
+       CALL skip(clline,jpeighty, ios=ios)
+!      write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
+       IF (ios == 0) THEN
          CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
-!    write(nulprt1,*) trim(subname),'tcx2: ',trim(clvari),trim(keyword)
+!        write(nulprt1,*) trim(subname),'tcx2: ',trim(clvari),trim(keyword)
          IF (clvari == ADJUSTL(keyword)) THEN
              line = clline
              found = .TRUE.
          ENDIF
-     ENDIF
+       ENDIF
      else
        goto 110
      endif
@@ -3521,7 +3521,7 @@ SUBROUTINE namcouple_abort(isubname,lineno,string1,string2,string3,string4)
      WRITE(nulprt1,*) ' '
      CALL oasis_flush(nulprt1)
   ENDIF
-  CALL oasis_abort()
+  call oasis_abort(file=__FILE__,line=__LINE__)
 
 !  CALL oasis_debug_enter(subname)
 

@@ -72,7 +72,7 @@ contains
 
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,estr,'called on non coupling task'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     kinfo = OASIS_OK
@@ -122,7 +122,7 @@ contains
 
        IF (lag > dt .OR. lag <= -dt) THEN
           WRITE(nulprt,*) subname,estr,'lag out of dt range cplid/dt/lag=',cplid,dt,lag
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ENDIF
 
        !------------------------------------------------
@@ -220,7 +220,7 @@ contains
        IF (getput == OASIS3_PUT .AND. pcpointer%trans /= ip_instant) THEN
           if (len_trim(rstfile) < 1) then
              write(nulprt,*) subname,estr,'restart undefined'
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (OASIS_debug >= 2) then
              lstring = pcpointer%fldlist
@@ -394,13 +394,13 @@ contains
 
     if (mpi_comm_local == MPI_COMM_NULL) then
        write(nulprt,*) subname,estr,'called on non coupling task'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     kinfo = OASIS_OK
     if (varid < 1 .or. varid > prism_nvar) then
        write(nulprt,*) subname,estr,'invalid varid',varid,trim(prism_var(varid)%name),prism_nvar
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(varnum)) then
@@ -427,7 +427,7 @@ contains
     if (mop /= OASIS_Out .and. mop /= OASIS_In) then
        write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
        write(nulprt,*) subname,estr,'mop invalid expecting OASIS_Out or OASIS_In = ',mop
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     call oasis_debug_note(subname//' loop over var ncpl')
@@ -449,7 +449,7 @@ contains
        if (.not.runit) then
           WRITE(nulprt,*) subname,estr,'namid not found for var = ',trim(vname)
           WRITE(nulprt,*) subname,estr,'namid = ',namid
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -490,7 +490,7 @@ contains
        !------------------------------------------------
        if (.not.pcpointer%valid) then
           WRITE(nulprt,*) subname,estr,'invalid prism_coupler for var = ',trim(vname)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
@@ -502,7 +502,7 @@ contains
           !-continue
        else
           write(nulprt,*) subname,estr,'model def_var in-out does not match model get-put call for var = ',trim(vname)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
@@ -536,7 +536,7 @@ contains
        if (present(writrest)) then
           if (writrest .and. mop /= OASIS_Out) then
              write(nulprt,*) subname,estr,'mop must be OASIS_Out if writrest is true, mop=',mop
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (writrest) pcpointer%writrest = writrest
        endif
@@ -563,7 +563,7 @@ contains
 
        IF (ABS(lag) > dt) THEN
           WRITE(nulprt,*) subname,estr,'lag setting greater than dt for var = ',trim(vname)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ENDIF
 
        !------------------------------------------------
@@ -579,11 +579,11 @@ contains
 
           IF (.not.present(nff)) THEN
              WRITE(nulprt,*) subname,estr,'nff optional argument not passed but expected for var = ',trim(vname)
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           ENDIF
           IF (LEN_TRIM(rstfile) < 1) THEN
              WRITE(nulprt,*) subname,estr,'restart file undefined for var = ',trim(vname)
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           ENDIF
           lsize = mct_aVect_lsize(pcpointer%aVect1)
           IF (OASIS_debug >= 2) THEN
@@ -663,7 +663,7 @@ contains
        if (msec >= maxtime) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
           write(nulprt,*) subname,estr,'model time beyond namcouple maxtime = ',msec,maxtime
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
@@ -674,7 +674,7 @@ contains
        if (lcouplertime /= ispval .and. msec >= 0 .and. msec < lcouplertime) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
           write(nulprt,*) subname,estr,'model seems to be running backwards = ',lcouplertime
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
@@ -700,7 +700,7 @@ contains
              write(nulprt,*) subname,estr,'skipped coupler last time and dt = ',&
                              pcpointmp%ltime,pcpointmp%dt
              WRITE(nulprt,*) subname,estr,'model timestep does not match coupling timestep'
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif  ! valid
        enddo  ! npc
@@ -721,7 +721,7 @@ contains
              write(nulprt,*) subname,estr,'current time = ',msec,' mseclag = ',mseclag
              write(nulprt,*) subname,estr,'last sequence and time = ',lastseq,lastseqtime
              WRITE(nulprt,*) subname,estr,'model sequence does not match coupling sequence'
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           else
              lastseq = pcpointer%seq
              lastseqtime = msec
@@ -750,13 +750,13 @@ contains
        if (nsav /= nsa) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
           write(nulprt,*) subname,estr,'in field size passed into get/put compare to expected size ',nsav,nsa
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        if (nfav < 1 .or. nfav > mct_avect_nRattr(pcpointer%avect1)) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
           write(nulprt,*) subname,estr,'ivalid variable name nfav = ',nfav
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
@@ -773,7 +773,7 @@ contains
              write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
              write(nulprt,*) subname,estr,'higher order mapping not allowed on get side'
              write(nulprt,*) subname,estr,'consider changing map location from dst to src'
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -783,7 +783,7 @@ contains
            (arrayon(5) .and. .not.present(array5))) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
           write(nulprt,*) subname,estr,'arrayon true but array not sent'
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ! With the current way of using oasis_advance_run, the above test is useless but we keep the test
        ! as someone might be later adding an interface call that would violate the consistency
        endif
@@ -955,7 +955,7 @@ contains
                  pcpointer%aVon(4) .or. pcpointer%aVon(5)) then
                 write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
                 write(nulprt,*) subname,estr,'higher order mapping with MAX transform not supported'
-                call oasis_abort()      
+                call oasis_abort(file=__FILE__,line=__LINE__)      
              endif
              do n = 1,nsav
                 if (pcpointer%avcnt(nfav) == 0) then
@@ -974,7 +974,7 @@ contains
                  pcpointer%aVon(4) .or. pcpointer%aVon(5)) then
                 write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
                 write(nulprt,*) subname,estr,'higher order mapping with MIN transform not supported'
-                call oasis_abort()      
+                call oasis_abort(file=__FILE__,line=__LINE__)      
              endif
              do n = 1,nsav
                 if (pcpointer%avcnt(nfav) == 0) then
@@ -988,7 +988,7 @@ contains
 
           else
              write(nulprt,*) subname,estr,'transform not known for var = ',trim(vname),pcpointer%trans
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           call oasis_timer_stop(tstring)
 
@@ -1052,7 +1052,7 @@ contains
           if (pcpointer%ltime /= ispval .and. msec <= pcpointer%ltime) then
              write(nulprt,*) subname,estr,'model did not advance in time correctly for var = ',trim(vname)
              write(nulprt,*) subname,estr,'msec, ltime = ',msec,pcpointer%ltime
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
 
           !------------------------------------------------
@@ -1327,6 +1327,11 @@ contains
                 endif
                 call oasis_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
+                if (detailed_timing .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
+                   call oasis_timer_start(trim(tstring)//'_prebarrier')
+                   call MPI_BARRIER(prism_part(partid)%mpicom, ierr)
+                   call oasis_timer_stop(trim(tstring)//'_prebarrier')
+                endif
                 call oasis_timer_start(tstring)
                 if (LUCIA_debug > 0) &
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
@@ -1682,14 +1687,14 @@ contains
        avonsize = size(avon)
        if (avonsize > avsmax) then
           WRITE(nulprt,*) subname,estr,'avon size',avonsize,' passed in is too large',avsmax
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        locavon(1:avonsize) = avon(1:avonsize)
     else
        !--- if avon is not passed, av2-5 should not be ---
        if (present(av2) .or. present(av3) .or. present(av4) .or. present(av5)) then
           WRITE(nulprt,*) subname,estr,'av2-5 passed but avon not passed'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -1711,7 +1716,7 @@ contains
              WRITE(nulprt,*) subname,estr,'higher_order_check = ',higher_order_check
              WRITE(nulprt,*) subname,estr,'missing weights for higher order field'
              WRITE(nulprt,*) subname,estr,'missing weights output ',n,avsmax,mapper%nwgts,locavon(n)
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
     else
@@ -1722,7 +1727,7 @@ contains
              WRITE(nulprt,*) subname,estr,'higher_order_check = ',higher_order_check
              WRITE(nulprt,*) subname,estr,'mismatch of higher order fields passed and weights'
              WRITE(nulprt,*) subname,estr,'mismatch weights output ',n,avsmax,mapper%nwgts,locavon(n)
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
     endif
@@ -1734,7 +1739,7 @@ contains
     if (locavon(1)) then
        if (mct_avect_nRattr(av1) /= mct_avect_nRattr(avd)) then
           WRITE(nulprt,*) subname,estr,'in av1 num of flds'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avMult1')
        call mct_sMat_avMult(av1, mapper%sMatP(1), avd)
@@ -1748,7 +1753,7 @@ contains
        if (locavon(2)) then
           if (mct_avect_nRattr(av2) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,estr,'in av2 num of flds'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avMult2')
           call mct_sMat_avMult(av2, mapper%sMatP(2), avdtmp)
@@ -1759,7 +1764,7 @@ contains
        if (locavon(3)) then
           if (mct_avect_nRattr(av3) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,estr,'in av3 num of flds'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avMult3')
           call mct_sMat_avMult(av3, mapper%sMatP(3), avdtmp)
@@ -1770,7 +1775,7 @@ contains
        if (locavon(4)) then
           if (mct_avect_nRattr(av4) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,estr,'in av4 num of flds'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avMult4')
           call mct_sMat_avMult(av4, mapper%sMatP(4), avdtmp)
@@ -1781,7 +1786,7 @@ contains
        if (locavon(5)) then
           if (mct_avect_nRattr(av5) /= mct_avect_nRattr(avd)) then
              WRITE(nulprt,*) subname,estr,'in av5 num of flds'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avMult5')
           call mct_sMat_avMult(av5, mapper%sMatP(5), avdtmp)
@@ -1809,7 +1814,7 @@ contains
        if ((prism_part(mapper%spart)%mpicom /= MPI_COMM_NULL .and. prism_part(mapper%dpart)%mpicom == MPI_COMM_NULL) .or. &
            (prism_part(mapper%spart)%mpicom == MPI_COMM_NULL .and. prism_part(mapper%dpart)%mpicom /= MPI_COMM_NULL)) then
            WRITE(nulprt,*) subname,estr,'illegal conserve on non overlapping pes '
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
     IF (prism_part(mapper%spart)%mpicom /= MPI_COMM_NULL) then
@@ -1924,7 +1929,7 @@ contains
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_cglobal')
           if (wts_sumd == 0.0_ip_r8_p) then
               WRITE(nulprt,*) subname,estr,'global conserve sums to zero '
-              CALL oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           do m = 1,fsize
              zlagr = (av_sumd(m) - av_sums(m)) / wts_sumd
@@ -1938,7 +1943,7 @@ contains
           do m = 1,fsize
              if (av_sumd(m) == 0.0_ip_r8_p .and. av_sums(m) /= 0.0_ip_r8_p) then
                  WRITE(nulprt,*) subname,estr,'cglpos conserve one of the sums is zero'
-                 CALL oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = av_sums(m) / av_sumd(m)
                 do n = 1,lsized
@@ -1951,7 +1956,7 @@ contains
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_cbasbal')
           if (wts_sumd == 0.0_ip_r8_p .or. wts_sums == 0.0_ip_r8_p) then
               WRITE(nulprt,*) subname,estr,'cbasbal conserve both sums are zero'
-              CALL oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           do m = 1,fsize
              zlagr = (av_sumd(m) - (av_sums(m)*(wts_sumd/wts_sums))) / wts_sumd
@@ -1965,7 +1970,7 @@ contains
           do m = 1,fsize
              if (av_sumd(m) == 0.0_ip_r8_p .and. av_sums(m) /= 0.0_ip_r8_p) then
                  WRITE(nulprt,*) subname,estr,'cbaspos conserve one of the sums is zero'
-                 CALL oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
              elseif (av_sumd(m) /= 0.0_ip_r8_p) then
                 zlagr = (av_sums(m)/av_sumd(m)) * (wts_sumd/wts_sums)
                 do n = 1,lsized
@@ -1976,7 +1981,7 @@ contains
           if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_cbaspos')
        else
            WRITE(nulprt,*) subname,estr,'conserv option unknown = ',conserv
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        if (OASIS_debug >= 20) then
@@ -2047,13 +2052,13 @@ contains
 
     if (size(sum) /= fsize) then
         WRITE(nulprt,*) subname,estr,'size sum ne size av'
-        CALL oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(mask)) then
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,estr,'size mask ne size av'
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
@@ -2063,7 +2068,7 @@ contains
     if (present(wts)) then
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,estr,'size wts ne size av'
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           lwts(n) = lwts(n) * wts(n)
@@ -2160,7 +2165,7 @@ contains
     if (present(mask)) then
        if (size(mask) /= lsize) then
            WRITE(nulprt,*) subname,estr,'size mask ne size av'
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
@@ -2170,7 +2175,7 @@ contains
     if (present(wts)) then
        if (size(wts) /= lsize) then
            WRITE(nulprt,*) subname,estr,'size wts ne size av'
-           CALL oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           lwts(n) = lwts(n) * wts(n)

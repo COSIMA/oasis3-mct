@@ -211,7 +211,7 @@ CONTAINS
        WRITE(nulprt1,*) subname,estr,'namsrcfld = ',trim(namsrcfld(n))
        WRITE(nulprt1,*) subname,estr,'namdstfld = ',trim(namdstfld(n))
        WRITE(nulprt1,*) subname,estr,'check your namcouple file '
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
      endif
      DO i=1,k1
        m=m+1
@@ -240,7 +240,7 @@ CONTAINS
    if (len_trim(cdnam) > ic_lvar) then
       WRITE(nulprt1,*) subname,estr,'model name too long = ',trim(cdnam)
       write(nulprt1,*) subname,estr,'max model name length = ',ic_lvar
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    !------------------------
@@ -279,7 +279,7 @@ CONTAINS
                   WRITE(nulprt1,*) subname,estr,'inconsistent coupled flag'
                   WRITE(nulprt1,*) subname,estr,'the optional argument, coupled'
                   WRITE(nulprt1,*) subname,estr,'must be identical on all tasks of a component.'
-                  call oasis_abort()
+                  call oasis_abort(file=__FILE__,line=__LINE__)
                endif
             endif
          enddo
@@ -287,7 +287,7 @@ CONTAINS
             prism_nmodels = prism_nmodels + 1
             if (prism_nmodels > prism_mmodels) then
                WRITE(nulprt1,*) subname,estr,'prism_nmodels too large, increase prism_mmodels in mod_oasis_data'
-               call oasis_abort()
+               call oasis_abort(file=__FILE__,line=__LINE__)
             endif
             prism_modnam(prism_nmodels) = trim(compnmlist(n))
             prism_modcpl(prism_nmodels) = coupledlist(n)
@@ -316,7 +316,7 @@ CONTAINS
          write(nulprt1,*) subname,'   COUPLED models ',n,trim(prism_modnam(n)),prism_modcpl(n)
          if (.not.prism_modcpl(n)) then
             WRITE(nulprt1,*) subname,estr,'model expected to be coupled but is not = ',trim(prism_modnam(n))
-            CALL oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
          call oasis_flush(nulprt1)
       enddo
@@ -324,7 +324,7 @@ CONTAINS
          write(nulprt1,*) subname,' UNCOUPLED models ',n,trim(prism_modnam(n)),prism_modcpl(n)
          if (prism_modcpl(n)) then
             WRITE(nulprt1,*) subname,estr,'model expected to be uncoupled but is not = ',trim(prism_modnam(n))
-            CALL oasis_abort()
+            call oasis_abort(file=__FILE__,line=__LINE__)
          endif
          call oasis_flush(nulprt1)
       enddo
@@ -358,7 +358,7 @@ CONTAINS
 ! tcraig, this should never happen based on logic above
    if (compid < 0) then
       WRITE(nulprt1,*) subname,estr,'prism_modnam internal inconsistency = ',TRIM(cdnam)
-      CALL oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    !------------------------
@@ -658,7 +658,7 @@ CONTAINS
 
    if (enddef_called) then
        write(nulprt,*) subname,estr,'enddef called already'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
    endif
    enddef_called = .true.
 
@@ -844,7 +844,7 @@ CONTAINS
    do n = 1,prism_amodels
       IF (mpi_root_global(n) < 0) THEN
          WRITE(nulprt,*) subname,estr,'global root invalid, check couplcomm for active tasks'
-         CALL oasis_abort()
+         call oasis_abort(file=__FILE__,line=__LINE__)
       ENDIF
    enddo
 

@@ -37,13 +37,15 @@ CONTAINS
 
 !> OASIS abort method, publically available to users
 
-SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, rcode)
+SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, file, line, rcode)
 
    IMPLICIT NONE
 !--------------------------------------------------------------------
    INTEGER(kind=ip_intwp_p),INTENT(in),optional :: id_compid  !< component id
    CHARACTER(len=*), INTENT(in),optional :: cd_routine   !< string defining calling routine
    CHARACTER(len=*), INTENT(in),optional :: cd_message   !< error message string
+   CHARACTER(len=*), INTENT(in),optional :: file         !< file called from
+   INTEGER,INTENT(in),optional           :: line         !< line in file called from
    INTEGER,INTENT(in),optional           :: rcode        !< optional code to return to invoking environment 
 !--------------------------------------------------------------------
    INTEGER                      :: ierror, errcode
@@ -51,11 +53,15 @@ SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, rcode)
 !--------------------------------------------------------------------
 
    if (present(id_compid)) &
-   WRITE (nulprt,*) subname,astr,'compid    = ',id_compid
+       WRITE (nulprt,*) subname,astr,'compid    = ',id_compid
    if (present(cd_routine)) &
-   WRITE (nulprt,*) subname,astr,'called by = ',trim(cd_routine)
+       WRITE (nulprt,*) subname,astr,'called by = ',trim(cd_routine)
    if (present(cd_message))  &
-   WRITE (nulprt,*) subname,astr,'message   = ',trim(cd_message)
+       WRITE (nulprt,*) subname,astr,'message   = ',trim(cd_message)
+   if (present(file))  &
+       WRITE (nulprt,*) subname,astr,'file      = ',trim(file)
+   if (present(line))  &
+       WRITE (nulprt,*) subname,astr,'line      = ',line
    IF (PRESENT(rcode))  THEN
        errcode=rcode
        WRITE (nulprt,*) subname,astr,'errcode   = ',errcode
@@ -124,7 +130,7 @@ SUBROUTINE oasis_unitget(uio)
    if (.not.found) then
       write(nulprt,*) subname,estr,'no unit number available '
       write(nulprt,*) subname,estr,'min/max units checked = ',minion,maxion
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    endif
 
    uio = n1
