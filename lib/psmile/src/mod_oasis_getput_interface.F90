@@ -737,9 +737,12 @@ contains
     kinfo = OASIS_OK
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
+       if (OASIS_debug >= 1) then
+         write(nulprt,*) subname, &
           ' Routine oasis_get is called for variable not in namcouple; it will not be received'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+         write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+         flush(nulprt)
+       endif
        call oasis_abort_noarg()
        return
     endif
