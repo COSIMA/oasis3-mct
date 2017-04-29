@@ -1180,6 +1180,7 @@ contains
     if (var_id == OASIS_Var_Uncpl) then
        write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
        write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       flush(nulprt)
        call oasis_abort(file=__FILE__,line=__LINE__)
        call oasis_debug_exit(subname)
        return
