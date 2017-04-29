@@ -13,11 +13,7 @@ NETCDF_LIBRARY = -L$(NETCDF_ROOT)/lib -lnetcdf -lnetcdff
 #
 # Compiling and other commands
 MAKE        = /usr/bin/make
-ifeq ($(VTRACE), yes)
-    F90         = mpif90-vt
-else
-    F90         = mpif90
-endif 
+F90         = mpif90
 CC          = mpicc
 F           = $(F90)
 f90         = $(F90)
@@ -26,19 +22,16 @@ f           = $(F90)
 LD          = $(F90)
 AR          = ar
 ARFLAGS     = -ruv
-#
-# CPP keys and compiler options
-# 
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG -D__VERBOSE -DTREAT_OVERLAY
-#
+
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # For compiling in double precision, put -r8
 # For compiling in single precision, remove -r8 and add -Duse_realtype_single
-# 
 ifeq ($(DEBUG), yes)
-    F90FLAGS_1  = -convert big_endian -i4 -r8 -traceback -O -debug all -g -check all -fpe0 -CB -fno-alias -ip -align all -assume buffered_io -check noarg_temp_created
+    F90FLAGS_1  = -convert big_endian -i4 -r8 -traceback -O -debug all -g -check all -fpe0 -CB -fno-alias -ip -align all -assume nobuffered_io -check noarg_temp_created
+    CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY -DDEBUG -D__VERBOSE
 else
-    F90FLAGS_1  = -convert big_endian -i4 -r8 -O3 -g -fno-alias -ip -align all -fpe0 -assume buffered_io -check noarg_temp_created
+    F90FLAGS_1  = -convert big_endian -i4 -r8 -O3 -g -traceback -fno-alias -ip -align all -fpe0 -assume buffered_io -check noarg_temp_created
+    CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY
 endif 
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
