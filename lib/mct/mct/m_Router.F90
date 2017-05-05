@@ -760,7 +760,7 @@
 
     do iproc=1,rout%nprocs
       if (rout%num_segs(iproc) > 0) then
-        write(lun,*) myrank,rout%pe_list(iproc),rout%locsize(iproc)
+        write(lun,*) myname_,myrank,rout%pe_list(iproc),rout%locsize(iproc)
       endif
     end do        
 

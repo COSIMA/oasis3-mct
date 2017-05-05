@@ -29,6 +29,8 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
                                                          !< in each line of the file namcouple 
   CHARACTER(len=*),parameter :: rform = '(A5000)'        !< formatted line read format
+  CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_wghtfile'  ! decomp_wghtfile or decomp_1d
+  CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
@@ -37,6 +39,8 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_i4_p)   ,public :: namuntmin     !< namcouple min IO unit value
   INTEGER(kind=ip_i4_p)   ,public :: namuntmax     !< namcouple max IO unit value
   LOGICAL                 ,public :: namnorest     !< namcouple allow no restarts
+  CHARACTER(len=ic_med)   ,public :: nammapdec     !< namcouple map decomp value
+  CHARACTER(len=ic_med)   ,public :: nammatxrd     !< namcouple matrix read option
  
   CHARACTER(len=jpeighty) ,public,pointer :: namsrcfld(:)  !< list of src fields
   CHARACTER(len=jpeighty) ,public,pointer :: namdstfld(:)  !< list of dst fields
@@ -131,6 +135,9 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_intwp_p) :: nuntmax
 !---- allow no restart files
   LOGICAL :: nnorest
+!---- specify mapping decomp
+  CHARACTER(len=ic_med) :: nmapdec
+  CHARACTER(len=ic_med) :: nmatxrd
 ! --- mod_string
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: numlab
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: ig_numlab
@@ -267,14 +274,17 @@ MODULE mod_oasis_namcouple
     cldate   = '$INIDATE ', &
     clhead   = '$MODINFO ', &
     clprint  = '$NLOGPRT ', &
+    clmapdec = '$NMAPDEC ', &
+    clmatxrd = '$NMATXRD ', &
     clunit   = '$NUNITNO ', &
     clrest   = '$NNOREST ', &
     clcal    = '$CALTYPE ', &
     clend    = '$END     '
-  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 14
+  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 16
   CHARACTER*9, parameter :: keyword_list(nkeywords) = &
     (/clfield, clchan, clstring, clmod, cljob, cltime, clseq, &
-     cldate, clhead, clprint, clunit, clrest, clcal, clend /)
+     cldate, clhead, clprint, clmapdec, clmatxrd, clunit, clrest, &
+     clcal, clend /)
   CHARACTER*512 :: tmpstr1, tmpstr2, tmpstr3, tmpstr4
 
 
@@ -481,6 +491,8 @@ SUBROUTINE oasis_namcouple_init()
   namuntmin = nuntmin
   namuntmax = nuntmax
   namnorest = nnorest
+  nammapdec = nmapdec
+  nammatxrd = nmatxrd
   DO jf = 1,ig_final_nfield
      namsrcfld(jf) = cg_input_field(jf)
      namdstfld(jf) = cg_output_field(jf)
@@ -588,7 +600,11 @@ SUBROUTINE oasis_namcouple_init()
 
   IF (mpi_rank_global == 0) THEN
      WRITE(nulprt1,*) ' '
-     WRITE(nulprt1,*) subname,'namlogprt ',namlogprt
+     WRITE(nulprt1,*) subname,'namlogprt,t   ',namlogprt, namtlogprt
+     WRITE(nulprt1,*) subname,'namuntmin,max ',namuntmin, namuntmax
+     WRITE(nulprt1,*) subname,'namnorest     ',namnorest
+     WRITE(nulprt1,*) subname,'nammapdec     ',trim(nammapdec)
+     WRITE(nulprt1,*) subname,'nammatxrd     ',trim(nammatxrd)
      WRITE(nulprt1,*) ' '
      DO n = 1,nnamcpl
         WRITE(nulprt1,*) subname,n,'namsrcfld ',TRIM(namsrcfld(n))
@@ -1714,6 +1730,58 @@ SUBROUTINE inipar
   endif
 
   REWIND nulin
+
+  !* Get the unit map decomp value
+
+  nmapdec = nmapdec_default
+  keyword = clmapdec
+  CALL findkeyword (keyword, clline, found)
+  IF (found) THEN
+     READ(nulin, FMT=rform) clline
+     CALL skip(clline, jpeighty, ios=ios)
+     CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
+     nmapdec = clvari
+     IF (ilen .LE. 0) THEN
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
+           WRITE(nulprt1,*) ' Default value wght will be used '
+           WRITE(nulprt1,*) ' '
+           CALL oasis_flush(nulprt1)
+        ENDIF
+     ENDIF
+  ENDIF   ! found
+
+  !* Print out the mapdec value
+
+  IF (mpi_rank_global == 0) THEN
+     write(nulprt1,*) ' The mapdec value is nmapdec = ',trim(nmapdec)
+  endif
+
+  !* Get the unit matrix read value
+
+  nmatxrd = nmatxrd_default
+  keyword = clmatxrd
+  CALL findkeyword (keyword, clline, found)
+  IF (found) THEN
+     READ(nulin, FMT=rform) clline
+     CALL skip(clline, jpeighty, ios=ios)
+     CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
+     nmatxrd = clvari
+     IF (ilen .LE. 0) THEN
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
+           WRITE(nulprt1,*) ' Default value wght will be used '
+           WRITE(nulprt1,*) ' '
+           CALL oasis_flush(nulprt1)
+        ENDIF
+     ENDIF
+  ENDIF   ! found
+
+  !* Print out the matxrd value
+
+  IF (mpi_rank_global == 0) THEN
+     write(nulprt1,*) ' The matxrd value is nmatxrd = ',trim(nmatxrd)
+  endif
 
   !* Get the unit min/max values
 

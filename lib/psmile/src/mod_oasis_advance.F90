@@ -380,7 +380,7 @@ contains
     type(mct_avect)       :: avtmpW  ! for writing restart
     type(prism_coupler_type),pointer :: pcpointer
     type(prism_coupler_type),pointer :: pcpointmp
-    logical, parameter    :: detailed_timing = .true.
+    logical, parameter    :: detailed_timing = .false.
     character(len=*),parameter :: subname = '(oasis_advance_run)'
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------

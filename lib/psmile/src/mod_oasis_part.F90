@@ -404,16 +404,29 @@ CONTAINS
    write(nulprt,*) subname,' compid = ',s_prism_part%gsmap%comp_id
    write(nulprt,*) subname,' ngseg  = ',s_prism_part%gsmap%ngseg
    write(nulprt,*) subname,' gsize  = ',s_prism_part%gsmap%gsize
-   IF (mpi_comm_local /= MPI_COMM_NULL) THEN
-      WRITE(nulprt,*) subname,' start  = ',s_prism_part%gsmap%start
-      WRITE(nulprt,*) subname,' length = ',s_prism_part%gsmap%length
-      WRITE(nulprt,*) subname,' pe_loc = ',s_prism_part%gsmap%pe_loc
-   ENDIF
-   IF (s_prism_part%mpicom /= MPI_COMM_NULL) THEN
-      WRITE(nulprt,*) subname,' pstart = ',s_prism_part%pgsmap%start
-      WRITE(nulprt,*) subname,' plength= ',s_prism_part%pgsmap%length
-      WRITE(nulprt,*) subname,' ppe_loc= ',s_prism_part%pgsmap%pe_loc
-   ENDIF
+   if (s_prism_part%gsmap%ngseg > 10) then
+      IF (mpi_comm_local /= MPI_COMM_NULL) THEN
+         WRITE(nulprt,*) subname,' start  = ',s_prism_part%gsmap%start(1:10)
+         WRITE(nulprt,*) subname,' length = ',s_prism_part%gsmap%length(1:10)
+         WRITE(nulprt,*) subname,' pe_loc = ',s_prism_part%gsmap%pe_loc(1:10)
+      ENDIF
+      IF (s_prism_part%mpicom /= MPI_COMM_NULL) THEN
+         WRITE(nulprt,*) subname,' pstart = ',s_prism_part%pgsmap%start(1:10)
+         WRITE(nulprt,*) subname,' plength= ',s_prism_part%pgsmap%length(1:10)
+         WRITE(nulprt,*) subname,' ppe_loc= ',s_prism_part%pgsmap%pe_loc(1:10)
+      ENDIF
+   else
+      IF (mpi_comm_local /= MPI_COMM_NULL) THEN
+         WRITE(nulprt,*) subname,' start  = ',s_prism_part%gsmap%start
+         WRITE(nulprt,*) subname,' length = ',s_prism_part%gsmap%length
+         WRITE(nulprt,*) subname,' pe_loc = ',s_prism_part%gsmap%pe_loc
+      ENDIF
+      IF (s_prism_part%mpicom /= MPI_COMM_NULL) THEN
+         WRITE(nulprt,*) subname,' pstart = ',s_prism_part%pgsmap%start
+         WRITE(nulprt,*) subname,' plength= ',s_prism_part%pgsmap%length
+         WRITE(nulprt,*) subname,' ppe_loc= ',s_prism_part%pgsmap%pe_loc
+      ENDIF
+   endif
    write(nulprt,*) ' '
    CALL oasis_flush(nulprt)
 
@@ -424,7 +437,7 @@ CONTAINS
 
 !> Create a new partition internally, needed for mapping
 
-  SUBROUTINE oasis_part_create(id_part,TYPE,gsize,nx,ny,gridname,gscomm,mpicom)
+  SUBROUTINE oasis_part_create(id_part,TYPE,gsize,nx,ny,gridname,gscomm,mpicom,gridID)
 
   IMPLICIT NONE
 
@@ -436,11 +449,13 @@ CONTAINS
   character(len=*),intent(in)  :: gridname !< grid name
   integer(ip_i4_p),intent(in)  :: gscomm   !< global seg map communicator
   integer(ip_i4_p),intent(in)  :: mpicom   !< local mpi comm
+  integer(ip_i4_p), optional   :: gridID(:)!< gridcell ID
   !--------------------------------------------------------
   integer(ip_i4_p) :: gsrank
   integer(ip_i4_p) :: gssize
   integer(ip_i4_p) :: numel
   integer(ip_i4_p),pointer :: start(:),length(:)
+  integer(ip_i4_p),pointer :: llist(:),glist(:)
   integer(ip_i4_p) :: pts
   integer(ip_i4_p) :: found,foundall
   integer(ip_i4_p) :: n
@@ -461,6 +476,12 @@ CONTAINS
   if (OASIS_debug >= 15) then
      write(nulprt,*) subname,' called with ',gsize,nx,ny,trim(gridname)
      write(nulprt,*) subname,' local ',gsrank,gssize
+  endif
+
+  if ((type == 'decomp_wghtfile' .and. .not.present(gridID)) .or. &
+      (type /= 'decomp_wghtfile' .and.      present(gridID))) then
+     write(nulprt,*) subname,estr,'decomp_wghtfile and gridID arguments inconsistent ',trim(type)
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   !-----------------------------------------------
@@ -500,11 +521,29 @@ CONTAINS
   !> * Instantiate a decomposition based on gsize and type
   !-----------------------------------------------
 
-  if (trim(type) == '1d') then
-     allocate(start(1),length(1))
-     start = 1
-     length = 0
-     numel = 0
+  prism_npart = prism_npart + 1
+  call oasis_part_zero(prism_part(prism_npart))
+
+  !-----------------------------------------------
+  !>   * Create a new partition and set values
+  !-----------------------------------------------
+
+  part_name_cnt = part_name_cnt + 1
+  write(prism_part(prism_npart)%partname,'(a,i6.6)') trim(compnm)//'_part',part_name_cnt
+  prism_part(prism_npart)%gsize = gsize
+  prism_part(prism_npart)%nx = nx
+  prism_part(prism_npart)%ny = ny
+  prism_part(prism_npart)%gridname = trim(gridname)
+  prism_part(prism_npart)%mpicom = gscomm
+  prism_part(prism_npart)%npes = gssize
+  prism_part(prism_npart)%rank = gsrank
+
+  allocate(start(1),length(1))
+  start = 1
+  length = 0
+  numel = 0
+
+  if (trim(type) == 'decomp_1d') then
      pts = 0
      if (gsrank >= 0) then
         numel = 1
@@ -513,42 +552,80 @@ CONTAINS
         if (gsrank < pts) length(1) = length(1) + 1
         start(1) = gsize/gssize*(gsrank) + min(gsrank,pts) + 1
      endif
-     prism_npart = prism_npart + 1
+
      if (OASIS_debug >= 15) then
-        write(nulprt,*) subname,' start ',numel,start,length,pts
+        write(nulprt,*) subname,trim(type),numel,start,length,pts
      endif
-     call oasis_part_zero(prism_part(prism_npart))
 
-     !-----------------------------------------------
-     !>   * Create a new partition and set values
-     !-----------------------------------------------
+  elseif (trim(type) == 'decomp_wghtfile') then
+     allocate(llist(gsize),glist(gsize))
+     llist = -1
+     numel = 0
+     if (gsrank >= 0) then
+        numel = size(gridID)
+!        if (OASIS_debug >= 15) then
+           write(nulprt,*) subname,' wgts1 ',numel
+           write(nulprt,*) subname,' gridID ',minval(gridID),maxval(gridID)
+!        endif
+        do n = 1,numel
+           if (gridID(n) > gsize) then
+              write(nulprt,*) subname,estr,'gridID > gsize',gridID(n),gsize
+              call oasis_abort(file=__FILE__,line=__LINE__)
+           elseif (gridID(n) > 0) then
+              llist(gridID(n)) = gsrank
+           else
+              write(nulprt,*) subname,estr,'gridID <= 0',gridID(n),gsize
+              call oasis_abort(file=__FILE__,line=__LINE__)
+           endif
+        enddo
 
-     part_name_cnt = part_name_cnt + 1
-     write(prism_part(prism_npart)%partname,'(a,i6.6)') trim(compnm)//'_part',part_name_cnt
-     prism_part(prism_npart)%gsize = gsize
-     prism_part(prism_npart)%nx = -1
-     prism_part(prism_npart)%ny = -1
-     prism_part(prism_npart)%mpicom = gscomm
-     prism_part(prism_npart)%npes = gssize
-     prism_part(prism_npart)%rank = gsrank
+        ! this computes the max MPI rank that includes the gridcell
+        ! max is arbitrary but this forces each gridcell to be associated with just one rank
+        call oasis_mpi_max(llist,glist,gscomm,string=trim(subname)//' glist',all=.true.)
 
-     !-----------------------------------------------
-     !>   * Initialize the partition gsmap and pgsmap
-     !-----------------------------------------------
+        deallocate(llist)
+        deallocate(start,length)
+        allocate(start(numel),length(numel))
+        start = -1
+        length = -1
+        numel = 0
+        do n = 1,gsize
+           if (glist(n) == gsrank) then
+              numel = numel + 1
+              if (numel > size(gridID)) then
+                 write(nulprt,*) subname,estr,'numel error ',numel,size(gridID)
+                 call oasis_abort(file=__FILE__,line=__LINE__)
+              endif
+              start(numel) = n
+              length(numel) = 1
+           endif
+        enddo
+        deallocate(glist)
+     endif   ! gsrank >= 0
 
-     call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,0,mpicom,compid,numel=numel)
-     if (numel > 0) then
-        call mct_gsmap_init(prism_part(prism_npart)%pgsmap,start,length,0, &
-                            prism_part(prism_npart)%mpicom,compid,numel=numel)
+     if (OASIS_debug >= 15) then
+        write(nulprt,*) subname,trim(type),numel
+        call oasis_flush(nulprt)
      endif
-     deallocate(start,length)
-     if (OASIS_debug >= 2) then
-        write(nulprt,*) subname,' create new part ',prism_npart,gsize
-        call oasis_part_write(prism_part(prism_npart),prism_npart)
-     endif
+
   else
      write(nulprt,*) subname,estr,'type argument unknown = ',trim(type)
      call oasis_abort(file=__FILE__,line=__LINE__)
+  endif
+
+  !-----------------------------------------------
+  !>   * Initialize the partition gsmap and pgsmap
+  !-----------------------------------------------
+
+  call mct_gsmap_init(prism_part(prism_npart)%gsmap,start,length,0,mpicom,compid,gsize=gsize,numel=numel)
+  if (gsrank >= 0) then
+     call mct_gsmap_init(prism_part(prism_npart)%pgsmap,start,length,0, &
+                         prism_part(prism_npart)%mpicom,compid,gsize=gsize,numel=numel)
+  endif
+  deallocate(start,length)
+  if (OASIS_debug >= 2) then
+     write(nulprt,*) subname,' create new part ',prism_npart,gsize
+     call oasis_part_write(prism_part(prism_npart),prism_npart)
   endif
 
   id_part = prism_npart
