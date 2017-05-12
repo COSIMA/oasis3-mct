@@ -118,7 +118,15 @@ fields written in one coupling restart file. One exception is when a coupling fi
 
 The coupling restart files are also used automatically by OASIS3-MCT
 to allow partial LOCTRANS time transformation to be saved at the end
-of a run for exact restart at the start of the next run. 
+of a run for exact restart at the start of the next run. When LOCTRANS
+transformations are specified, the initial coupling restart file
+should not contain any LOCTRANS restart fields. For the following
+runs, it is mandatory that the coupling restart file contains LOCTRANS
+restart fields coherent with the current namcouple entries. For
+example, it will not be possible to restart a run with a multiple
+field entry in the namcouple with a coupling restart file created by a 
+run not activating this multiple file option.
+
 
 In the coupling restart files, the fields must be provided on the
 source grid in single or double precision REAL arrays and, as the grid

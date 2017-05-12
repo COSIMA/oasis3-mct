@@ -229,11 +229,11 @@ load balance. More information can be found in the README file in {\tt
 
 \item {\tt \$NMAPDEC}: Optional; on the line below this keyword is a character string
   that indicates the mapping decomposition value to be used during local mapping.  The
-  options are decomp_1d and decomp_wghtfile.  decomp_1d decomposes the grid in a simple
-  one dimensional, 1 chunk per pe.  decomp_wghtfile decomposes the grid using the
-  information in the weight file to reduced mapping communication.  decomp_wghtfile
+  options are decomp\_1d and decomp\_wghtfile.  decomp\_1d decomposes the grid in a simple
+  one dimensional, 1 chunk per pe.  decomp\_wghtfile decomposes the grid using the
+  information in the weight file to reduced mapping communication. decomp\_wghtfile
   will take some extra time in initialization but it should result in faster mapping.
-  The default in decomp_wghtfile.
+  The default in decomp\_wghtfile.
 
 \item {\tt \$NMATXRD}: Optional; on the line below this keyword is a character string
   that indicates the method used to read mapping weights.  There are two options, orig

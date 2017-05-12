@@ -50,7 +50,15 @@ noted with the string UNUSED but not described.
   With OASIS3-MCT, time transformations are supported more generally
   with use of the coupling restart file.  The coupling restart file
   allows the partial time transformation to be saved at the end of a
-  run for exact restart at the start of the next run.
+  run for exact restart at the start of the next run. When LOCTRANS 
+  transformations are specified, the initial coupling restart file
+  should not contain any LOCTRANS restart fields. For the following
+  runs, it is mandatory that the coupling restart file contains
+  LOCTRANS restart fields coherent with the current namcouple
+  entries. For example, it will not be possible to restart a run with
+  a multiple field entry in the namcouple with a coupling restart file 
+  created by a run not activating this multiple file option.
+
   This is
   the reason why it is now possible to specify a restart file name
   on the OUTPUT {\it namcouple} input line.
