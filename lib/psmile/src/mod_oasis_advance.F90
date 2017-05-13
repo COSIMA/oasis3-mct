@@ -380,7 +380,8 @@ contains
     type(mct_avect)       :: avtmpW  ! for writing restart
     type(prism_coupler_type),pointer :: pcpointer
     type(prism_coupler_type),pointer :: pcpointmp
-    logical, parameter    :: detailed_timing = .false.
+    logical, parameter    :: map_barrier = .false.
+    logical, parameter    :: detailed_map_timing = .false.
     character(len=*),parameter :: subname = '(oasis_advance_run)'
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
@@ -1230,7 +1231,7 @@ contains
                                    minval(pcpointer%avect5%rAttr),&
                                    maxval(pcpointer%avect5%rAttr)
                 endif
-                if (detailed_timing .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
+                if (map_barrier .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
                    call oasis_timer_start(trim(tstring)//'_prebarrier')
                    call MPI_BARRIER(prism_part(partid)%mpicom, ierr)
                    call oasis_timer_stop(trim(tstring)//'_prebarrier')
@@ -1240,7 +1241,7 @@ contains
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
                               'Balance: ',pcpointer%namID,' Before interpo ', MPI_Wtime()
                 call mct_avect_zero(pcpointer%avect1m)
-                if (detailed_timing) then
+                if (detailed_map_timing) then
                    call oasis_advance_map(pcpointer%avect1, &
                         pcpointer%avect1m,prism_mapper(mapid),conserv,consbfb, &
                         pcpointer%aVon  ,pcpointer%avect2, &
@@ -1327,7 +1328,7 @@ contains
                 endif
                 call oasis_debug_note(subname//' get map')
                 write(tstring,F01) 'gmap_',cplid
-                if (detailed_timing .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
+                if (map_barrier .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
                    call oasis_timer_start(trim(tstring)//'_prebarrier')
                    call MPI_BARRIER(prism_part(partid)%mpicom, ierr)
                    call oasis_timer_stop(trim(tstring)//'_prebarrier')
@@ -1337,8 +1338,13 @@ contains
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
                               'Balance: ',pcpointer%namID,' Before interpo ', MPI_Wtime()
                 call mct_avect_zero(pcpointer%avect1)
-                call oasis_advance_map(pcpointer%avect1m, &
-                     pcpointer%avect1,prism_mapper(mapid),conserv,consbfb)
+                if (detailed_map_timing) then
+                   call oasis_advance_map(pcpointer%avect1m, &
+                        pcpointer%avect1,prism_mapper(mapid),conserv,consbfb,tstrinp=tstring)
+                else
+                   call oasis_advance_map(pcpointer%avect1m, &
+                        pcpointer%avect1,prism_mapper(mapid),conserv,consbfb)
+                endif
                 if (LUCIA_debug > 0) &
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
                               'Balance: ',pcpointer%namID,' After  interpo ', MPI_Wtime()

@@ -1577,12 +1577,11 @@ CONTAINS
            deallocate(sMati)
            if (local_timers_on) call oasis_timer_stop('cpl_setup_sminit')
 
-           if (OASIS_Debug >= 2) then
-              if (local_timers_on) call oasis_timer_start('cpl_setup_smprint')
-              call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%xtoxprime,mpi_comm_local,nulprt)
-              call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%yprimetoy,mpi_comm_local,nulprt)
-              if (local_timers_on) call oasis_timer_stop('cpl_setup_smprint')
-           endif
+           if (local_timers_on) call oasis_timer_start('cpl_setup_smprint')
+           write(cstring,'(a1,i4.4,a1)') 'm',mapID,'-'
+           call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%xtoxprime,mpi_comm_local,nulprt,trim(cstring)//'smpx')
+           call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%yprimetoy,mpi_comm_local,nulprt,trim(cstring)//'smpy')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_smprint')
 
            if (local_timers_on) call oasis_timer_start('cpl_setup_n4e')
 

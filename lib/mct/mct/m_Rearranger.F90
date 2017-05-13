@@ -1310,7 +1310,7 @@ endif
 !
 ! !INTERFACE:
 
-    subroutine print_(rearr,mycomm,lun)
+    subroutine print_(rearr,mycomm,lun,string)
 !
 ! !USES:
 !
@@ -1323,14 +1323,20 @@ endif
       type(Rearranger),      intent(in) :: rearr
       integer, intent(in)           :: mycomm
       integer, intent(in)           :: lun
+      character(len=*),intent(in),optional :: string
 
 ! !REVISION HISTORY:
 ! 27Jul07 - R. Loy <rloy@mcs.anl.gov>  initial version
 !EOP ___________________________________________________________________
 
 
-      call router_print(rearr%SendRouter,mycomm,lun)
-      call router_print(rearr%RecvRouter,mycomm,lun)
+      if (present(string)) then
+         call router_print(rearr%SendRouter,mycomm,lun,string//':S')
+         call router_print(rearr%RecvRouter,mycomm,lun,string//':R')
+      else
+         call router_print(rearr%SendRouter,mycomm,lun)
+         call router_print(rearr%RecvRouter,mycomm,lun)
+      endif
 
   end subroutine print_
 
