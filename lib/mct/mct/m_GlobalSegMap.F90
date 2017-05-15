@@ -150,6 +150,8 @@
 !EOP ___________________________________________________________________
 
   character(len=*),parameter :: myname='m_GlobalSegMap'
+  integer, parameter :: USE_MPI_GATHER = -1
+  integer, parameter :: USE_POINT_TO_POINT = 16
 
  contains
 
@@ -304,7 +306,9 @@
 
   nlseg_tmp(1) = nlseg
   call fc_gather_int(nlseg_tmp, 1, MP_INTEGER, counts, 1, MP_INTEGER, &
-                     root, my_comm)
+                     root, my_comm, USE_MPI_GATHER)
+
+  call MPI_BARRIER(my_comm, ier)
 
         ! On the root compute the value of ngseg, along with
         ! the entries of counts and displs.
@@ -357,14 +361,17 @@
 
   call fc_gatherv_int(start, nlseg, MP_INTEGER, &
                       root_start, counts, displs, MP_INTEGER, &
-                      root, my_comm)
+                      root, my_comm, USE_MPI_GATHER)
+
+  call MPI_BARRIER(my_comm, ier)
 
         ! Next, each process sends its values of length(:) to fill in 
         ! the appropriate portion of root_length(:) on the root.
 
   call fc_gatherv_int(length, nlseg, MP_INTEGER, &
                       root_length, counts, displs, MP_INTEGER, &
-                      root, my_comm)
+                      root, my_comm, USE_MPI_GATHER)
+  call MPI_BARRIER(my_comm, ier)
 
         ! Finally, if the argument pe_loc is present, each process sends 
         ! its values of pe_loc(:) to fill in the appropriate portion of 
@@ -372,9 +379,9 @@
    
   call fc_gatherv_int(my_pe_loc, nlseg, MP_INTEGER, &
                       root_pe_loc, counts, displs, MP_INTEGER, &
-                      root, my_comm)
-
+                      root, my_comm, USE_MPI_GATHER)
   call MPI_BARRIER(my_comm, ier)
+
   if(ier /= 0) call MP_perr_die(myname_,'MPI_BARRIER my_pe_loc',ier)
 
         ! Now, we have everything on the root needed to call initr_().
