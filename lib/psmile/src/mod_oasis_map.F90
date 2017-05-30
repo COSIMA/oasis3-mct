@@ -66,6 +66,7 @@ MODULE mod_oasis_map
   integer,private,allocatable :: Cnew(:),Cold(:)  ! ints
 
   logical, parameter :: local_timers_on = .false.
+  logical, parameter :: remove_bad_weights = .false.
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
@@ -750,8 +751,9 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
 
       do m = 1,count(1)
          !--- should this weight be on my pe
-         if (Rbuf(m) <= 0 .or. Rbuf(m) >= nb .or. &
-             Cbuf(m) <= 0 .or. Cbuf(m) >= na) then
+         if (remove_bad_weights .and. &
+             (Rbuf(m) <= 0 .or. Rbuf(m) >= nb .or. &
+              Cbuf(m) <= 0 .or. Cbuf(m) >= na)) then
             if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
                WRITE(nulprt,*) subname,wstr,'BAD weight found',Cbuf(m),Rbuf(m),minval(Sbuf(:,m)),maxval(Sbuf(:,m))
 !tcx               call oasis_abort(file=__FILE__,line=__LINE__)
@@ -1329,8 +1331,9 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
 
          do m = 1,count(1)
             !--- which process owns this point?
-            if (RReadData(m) <= 0 .or. RReadData(m) >= nb .or. &
-                CReadData(m) <= 0 .or. CReadData(m) >= na) then
+            if (remove_bad_weights .and. &
+                (RReadData(m) <= 0 .or. RReadData(m) >= nb .or. &
+                 CReadData(m) <= 0 .or. CReadData(m) >= na)) then
                if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
                   WRITE(nulprt,*) subname,wstr,'BAD weight found',Cbuf(m),Rbuf(m),minval(Sbuf(:,m)),maxval(Sbuf(:,m))
 !tcx                  call oasis_abort(file=__FILE__,line=__LINE__)

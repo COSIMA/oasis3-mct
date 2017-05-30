@@ -29,8 +29,10 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
                                                          !< in each line of the file namcouple 
   CHARACTER(len=*),parameter :: rform = '(A5000)'        !< formatted line read format
+! CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_1d'        ! decomp_wghtfile or decomp_1d
   CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_wghtfile'  ! decomp_wghtfile or decomp_1d
-  CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'
+! CHARACTER(len=*),parameter :: nmatxrd_default = 'orig'   ! ceg or orig
+  CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'    ! ceg or orig
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
