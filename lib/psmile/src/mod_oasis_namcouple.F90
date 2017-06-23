@@ -928,6 +928,10 @@ SUBROUTINE inipar_alloc()
      !* First line
 
      READ(nulin, FMT=rform, END=241) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'1 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
      CALL skip(clline, jpeighty, ios=ios)
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (trim(clvari) .eq. "$END") endflag = .true.
@@ -940,18 +944,17 @@ SUBROUTINE inipar_alloc()
 
      IF (.not. endflag) THEN
 
-        IF (mpi_rank_global == 0) THEN
-           write(nulprt1,*) 'parsing: ',trim(clline)
-           CALL oasis_flush(nulprt1)
-        ENDIF
-
         !* Get output field symbolic name
         CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
         cg_output_field(jf) = clvari
 
         !* Get total number of analysis
         CALL parse(clline, clvari, 5, jpeighty, ilen, __LINE__)
-        READ(clvari, FMT=2003) ig_total_ntrans(jf)
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'parsing 1 Read line, clvari in 5 position: ',TRIM(clline),TRIM(clvari)
+           CALL oasis_flush(nulprt1) 
+        ENDIF
+        READ(clvari,FMT=2003) ig_total_ntrans(jf)
 
         !* Get field STATUS for OUTPUT fields
         CALL parse(clline, clvari, 6, jpeighty, ilen, __LINE__)
@@ -1018,18 +1021,33 @@ SUBROUTINE inipar_alloc()
            ENDIF
        ENDIF
 
+       WRITE(nulprt1,*) subname,'field jf : ',jf,' lg_state(jf) : ',lg_state(jf)
+       WRITE(nulprt1,*) subname,'field jf : ',jf,' endflag : ',endflag
         IF (lg_state(jf)) THEN
-           IF (ig_total_ntrans(jf) .eq. 0) THEN
-              WRITE(tmpstr1,*) 'If there is no analysis for the field',jf, &
-                    'THEN the status must not be EXPORTED, AUXILIARY, or EXPOUT'
-              CALL namcouple_abort(subname,__LINE__,tmpstr1)
-           ENDIF
+!           IF (ig_total_ntrans(jf) .eq. 0) THEN
+ !             WRITE(tmpstr1,*) 'If there is no analysis for the field',jf, &
+ !                   'THEN the status must not be EXPORTED, AUXILIARY, or EXPOUT'
+ !             CALL namcouple_abort(subname,__LINE__,tmpstr1)
+ !          ENDIF
 
            READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'2 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline, jpeighty, ios=ios)
            READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'3 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline, jpeighty, ios=ios)
+           IF (ig_total_ntrans(jf) .GT. 0) THEN
            READ(nulin, FMT=rform) clline_aux
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'4 Read line_aux: ',TRIM(clline_aux)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline_aux, jpeighty, ios=ios)
            DO ja=1,ig_total_ntrans(jf)
               CALL parse(clline_aux, clvari, ja, jpeighty, ilen, __LINE__)
@@ -1047,17 +1065,31 @@ SUBROUTINE inipar_alloc()
                  CONTINUE
               ELSE
                  READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'5 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
                  CALL skip(clline, jpeighty, ios=ios)
               ENDIF
            ENDDO
+        ENDIF
        ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
               READ(nulin, FMT=rform) clline
+           READ(nulin, FMT=rform) clline_aux
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'6 Read line and line_aux: ',TRIM(clline),TRIM(clline_aux)
+           CALL oasis_flush(nulprt1)
+        ENDIF
               CALL skip(clline, jpeighty, ios=ios)
            ENDIF
            IF (ig_total_state(jf) .ne. ip_input .and.  &
                ig_total_ntrans(jf) .gt. 0 ) THEN
               READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'7 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
               CALL skip(clline, jpeighty, ios=ios)
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
               IF (clvari(1:8) .ne. 'LOCTRANS') THEN
@@ -1068,6 +1100,10 @@ SUBROUTINE inipar_alloc()
               ENDIF
               DO ja=1,ig_total_ntrans(jf)
                  READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'8 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
                  CALL skip(clline, jpeighty, ios=ios)
               ENDDO
            ENDIF
@@ -2027,8 +2063,16 @@ SUBROUTINE inipar
 
      IF (lg_state(jf)) THEN
         READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'9 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
         CALL skip(clline, jpeighty, ios=ios)
         CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'9 Read line :',TRIM(clline),'  clvari in 1 position: ',TRIM(clvari)
+           CALL oasis_flush(nulprt1)
+        ENDIF
         !     * Get source grid periodicity type
         csper(ig_number_field(jf)) = clvari
         IF (csper(ig_number_field(jf)) .NE. 'P' .AND.  &
@@ -2086,6 +2130,7 @@ SUBROUTINE inipar
            ENDDO  ! ja
         ENDIF
      ELSE
+         IF (ig_total_ntrans(jf) .GT. 0 ) THEN
         READ(nulin, FMT=rform) clline
         CALL skip(clline, jpeighty, ios=ios)
 
@@ -2348,6 +2393,7 @@ SUBROUTINE inipar
               CALL namcouple_abort(subname,__LINE__,tmpstr1,tmpstr2,tmpstr3,tmpstr4)
            ENDIF
         ENDDO  ! DO ja
+       endif
      ENDIF
 
 !* End of loop on NoF
