@@ -1042,6 +1042,7 @@ SUBROUTINE inipar_alloc()
            CALL oasis_flush(nulprt1)
         ENDIF
            CALL skip(clline, jpeighty, ios=ios)
+! MODIF LC quand il n'y a pas de transformations
            IF (ig_total_ntrans(jf) .GT. 0) THEN
            READ(nulin, FMT=rform) clline_aux
         IF (mpi_rank_global == 0) THEN
@@ -1076,9 +1077,8 @@ SUBROUTINE inipar_alloc()
        ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
               READ(nulin, FMT=rform) clline
-           READ(nulin, FMT=rform) clline_aux
         IF (mpi_rank_global == 0) THEN
-           WRITE(nulprt1,*) subname,'6 Read line and line_aux: ',TRIM(clline),TRIM(clline_aux)
+           WRITE(nulprt1,*) subname,'6 Read line : ',TRIM(clline)
            CALL oasis_flush(nulprt1)
         ENDIF
               CALL skip(clline, jpeighty, ios=ios)
