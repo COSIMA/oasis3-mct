@@ -1073,6 +1073,7 @@ SUBROUTINE inipar_alloc()
                  CALL skip(clline, jpeighty, ios=ios)
               ENDIF
            ENDDO
+! MODIF LC
         ENDIF
        ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
@@ -2130,6 +2131,7 @@ SUBROUTINE inipar
            ENDDO  ! ja
         ENDIF
      ELSE
+! MODIF LC
          IF (ig_total_ntrans(jf) .GT. 0 ) THEN
         READ(nulin, FMT=rform) clline
         CALL skip(clline, jpeighty, ios=ios)
@@ -2393,7 +2395,8 @@ SUBROUTINE inipar
               CALL namcouple_abort(subname,__LINE__,tmpstr1,tmpstr2,tmpstr3,tmpstr4)
            ENDIF
         ENDDO  ! DO ja
-       endif
+! MODIF LC
+       ENDIF
      ENDIF
 
 !* End of loop on NoF
