@@ -1,7 +1,7 @@
 
 SRCS1	= $(shell ls $(COUPLE)/lib/psmile/src/*.F90)
 OBJS0	= $(patsubst $(COUPLE)/lib/psmile/src/%.F90, %.o, $(SRCS1))
-OBJS1   = $(OBJS0) GPTLget_memusage.o
+OBJS1   = $(OBJS0) GPTLget_memusage.o shr_reprosumx86.o
 
 VPATH 	= .:$(COUPLE)/lib/psmile/src:\
 	     $(COUPLE)/lib/psmile/include:\
@@ -35,6 +35,9 @@ INCLSC = -I$(COUPLE)/lib/psmile/include
 GPTLget_memusage.o: GPTLget_memusage.c
 	$(CC) $(CCFLAGS) -DHAVE_SLASHPROC -c   $<
 
+shr_reprosumx86.o: shr_reprosumx86.c
+	$(CC) $(CCFLAGS) -DFORTRANUNDERSCORE -c   $<
+
 mod_psmile_io.o: mod_psmile_io.F90
 	$(F90) $(F90FLAGS) $(INCLS)  -c   $<
 
@@ -50,6 +53,7 @@ mct_mod.o:
 # ALL dependencies ...
 #
 
+shr_reprosumx86.o:
 GPTLget_memusage.o:
 mod_oasis_kinds.o:
 mod_oasis_parameters.o: mod_oasis_kinds.o
@@ -58,6 +62,8 @@ mod_oasis_sys.o: mod_oasis_kinds.o mod_oasis_data.o
 mod_oasis_mem.o: mod_oasis_kinds.o GPTLget_memusage.o mod_oasis_sys.o
 mod_oasis_timer.o: mod_oasis_kinds.o mod_oasis_sys.o mod_oasis_data.o
 mod_oasis_mpi.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o mod_oasis_timer.o
+mod_oasis_reprosum.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
+        mod_oasis_timer.o shr_reprosumx86.o
 mod_oasis_string.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o
 mod_oasis_namcouple.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
@@ -82,7 +88,7 @@ mod_oasis_coupler.o: mod_oasis_kinds.o  mod_oasis_data.o mod_oasis_sys.o \
 mod_oasis_advance.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_var.o mod_oasis_part.o mod_oasis_mpi.o \
         mod_oasis_coupler.o mod_oasis_timer.o mod_oasis_io.o mod_oasis_mem.o mct_mod.o \
-        mod_oasis_map.o
+        mod_oasis_map.o mod_oasis_reprosum.o
 mod_oasis_method.o: mod_oasis_kinds.o mod_oasis_data.o mod_oasis_sys.o \
         mod_oasis_parameters.o mod_oasis_coupler.o mod_oasis_namcouple.o \
         mod_oasis_timer.o mod_oasis_ioshr.o mod_oasis_advance.o mod_oasis_grid.o \

@@ -93,7 +93,11 @@ MODULE mod_oasis_mpi
      oasis_mpi_sumr0, &
      oasis_mpi_sumr1, &
      oasis_mpi_sumr2, &
-     oasis_mpi_sumr3
+     oasis_mpi_sumr3, &
+     oasis_mpi_sumq0, &
+     oasis_mpi_sumq1, &
+     oasis_mpi_sumq2, &
+     oasis_mpi_sumq3
    end interface
 
    !> Generic overloaded interface into MPI min reduction
@@ -1738,6 +1742,267 @@ SUBROUTINE oasis_mpi_sumr3(lvec,gvec,comm,string,all)
    call oasis_debug_exit(subname)
 
 END SUBROUTINE oasis_mpi_sumr3
+
+!===============================================================================
+!===============================================================================
+
+!> Compute a global sum for a scalar quad
+
+SUBROUTINE oasis_mpi_sumq0(lvec,gvec,comm,string,all)
+
+   IMPLICIT none
+
+   !----- arguments ---
+   real(ip_quad_p),      intent(in) :: lvec     !< local values
+   real(ip_quad_p),      intent(out):: gvec     !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
+
+   !----- local ---
+   character(*),parameter       :: subname = '(oasis_mpi_sumq0)'
+   logical                      :: lall
+   character(len=256)           :: lstring
+   integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
+   integer(ip_i4_p)             :: lsize
+   integer(ip_i4_p)             :: gsize
+   integer(ip_i4_p)             :: ierr
+
+!-------------------------------------------------------------------------------
+! PURPOSE: Finds sum of a distributed vector of values, assume local sum
+!          already computed
+!-------------------------------------------------------------------------------
+
+   call oasis_debug_enter(subname)
+
+   reduce_type = MPI_SUM
+   if (present(all)) then
+     lall = all
+   else
+     lall = .false.
+   endif
+   if (present(string)) then
+     lstring = trim(subName)//":"//trim(string)
+   else
+     lstring = trim(subName)
+   endif
+
+   lsize = 1
+   gsize = 1
+
+   if (lsize /= gsize) then
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+   endif
+
+   if (lall) then
+     call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+   else
+     call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,0,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+   endif
+
+   call oasis_debug_exit(subname)
+
+END SUBROUTINE oasis_mpi_sumq0
+
+!===============================================================================
+!===============================================================================
+
+!> Compute a 1D array of global sums for an array of 1D quads
+
+!> This sums an array of local quads to an array of summed quads.
+!> This does not reduce the array to a scalar.
+
+SUBROUTINE oasis_mpi_sumq1(lvec,gvec,comm,string,all)
+
+   IMPLICIT none
+
+   !----- arguments ---
+   real(ip_quad_p),      intent(in) :: lvec(:)  !< local values
+   real(ip_quad_p),      intent(out):: gvec(:)  !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
+
+   !----- local ---
+   character(*),parameter       :: subname = '(oasis_mpi_sumq1)'
+   logical                      :: lall
+   character(len=256)           :: lstring
+   integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
+   integer(ip_i4_p)             :: lsize
+   integer(ip_i4_p)             :: gsize
+   integer(ip_i4_p)             :: ierr
+
+!-------------------------------------------------------------------------------
+! PURPOSE: Finds sum of a distributed vector of values, assume local sum
+!          already computed
+!-------------------------------------------------------------------------------
+
+   call oasis_debug_enter(subname)
+
+   reduce_type = MPI_SUM
+   if (present(all)) then
+     lall = all
+   else
+     lall = .false.
+   endif
+   if (present(string)) then
+     lstring = trim(subName)//":"//trim(string)
+   else
+     lstring = trim(subName)
+   endif
+
+   lsize = size(lvec)
+   gsize = size(gvec)
+
+   if (lsize /= gsize) then
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+   endif
+
+   if (lall) then
+     call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+   else
+     call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,0,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+   endif
+
+   call oasis_debug_exit(subname)
+
+END SUBROUTINE oasis_mpi_sumq1
+
+!===============================================================================
+!===============================================================================
+
+!> Compute a 2D array of global sums for an array of 2D quads
+
+!> This sums an array of local quads to an array of summed quads.
+!> This does not reduce the array to a scalar.
+
+SUBROUTINE oasis_mpi_sumq2(lvec,gvec,comm,string,all)
+
+   IMPLICIT none
+
+   !----- arguments ---
+   real(ip_quad_p),      intent(in) :: lvec(:,:)!< local values
+   real(ip_quad_p),      intent(out):: gvec(:,:)!< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
+
+   !----- local ---
+   character(*),parameter       :: subname = '(oasis_mpi_sumq2)'
+   logical                      :: lall
+   character(len=256)           :: lstring
+   integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
+   integer(ip_i4_p)             :: lsize
+   integer(ip_i4_p)             :: gsize
+   integer(ip_i4_p)             :: ierr
+
+!-------------------------------------------------------------------------------
+! PURPOSE: Finds sum of a distributed vector of values, assume local sum
+!          already computed
+!-------------------------------------------------------------------------------
+
+   call oasis_debug_enter(subname)
+
+   reduce_type = MPI_SUM
+   if (present(all)) then
+     lall = all
+   else
+     lall = .false.
+   endif
+   if (present(string)) then
+     lstring = trim(subName)//":"//trim(string)
+   else
+     lstring = trim(subName)
+   endif
+
+   lsize = size(lvec)
+   gsize = size(gvec)
+
+   if (lsize /= gsize) then
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+   endif
+
+   if (lall) then
+     call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+   else
+     call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,0,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+   endif
+
+   call oasis_debug_exit(subname)
+
+END SUBROUTINE oasis_mpi_sumq2
+
+!===============================================================================
+!===============================================================================
+
+!> Compute a 3D array of global sums for an array of 3D quads
+
+!> This sums an array of local quads to an array of summed quads.
+!> This does not reduce the array to a scalar.
+
+SUBROUTINE oasis_mpi_sumq3(lvec,gvec,comm,string,all)
+
+   IMPLICIT none
+
+   !----- arguments ---
+   real(ip_quad_p),      intent(in) :: lvec(:,:,:) !< local values
+   real(ip_quad_p),      intent(out):: gvec(:,:,:) !< global values
+   integer(ip_i4_p),     intent(in) :: comm     !< mpi communicator
+   character(*),optional,intent(in) :: string   !< to identify caller
+   logical,     optional,intent(in) :: all      !< if true call allreduce, otherwise reduce to task 0
+
+   !----- local ---
+   character(*),parameter       :: subname = '(oasis_mpi_sumq3)'
+   logical                      :: lall
+   character(len=256)           :: lstring
+   integer(ip_i4_p)             :: reduce_type  ! mpi reduction type
+   integer(ip_i4_p)             :: lsize
+   integer(ip_i4_p)             :: gsize
+   integer(ip_i4_p)             :: ierr
+
+!-------------------------------------------------------------------------------
+! PURPOSE: Finds sum of a distributed vector of values, assume local sum
+!          already computed
+!-------------------------------------------------------------------------------
+
+   call oasis_debug_enter(subname)
+
+   reduce_type = MPI_SUM
+   if (present(all)) then
+     lall = all
+   else
+     lall = .false.
+   endif
+   if (present(string)) then
+     lstring = trim(subName)//":"//trim(string)
+   else
+     lstring = trim(subName)
+   endif
+
+   lsize = size(lvec)
+   gsize = size(gvec)
+
+   if (lsize /= gsize) then
+     call oasis_mpi_abort(subName//" lsize,gsize incompatable "//trim(string))
+   endif
+
+   if (lall) then
+     call MPI_ALLREDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_ALLREDUCE")
+   else
+     call MPI_REDUCE(lvec,gvec,gsize,MPI_REAL16,reduce_type,0,comm,ierr)
+     call oasis_mpi_chkerr(ierr,trim(lstring)//" MPI_REDUCE")
+   endif
+
+   call oasis_debug_exit(subname)
+
+END SUBROUTINE oasis_mpi_sumq3
 
 !===============================================================================
 !===============================================================================

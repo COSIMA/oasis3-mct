@@ -14,6 +14,7 @@ MODULE mod_oasis_advance
     USE mod_oasis_sys
     USE mod_oasis_io
     USE mod_oasis_mpi
+    USE mod_oasis_reprosum
     USE mct_mod
 
     IMPLICIT NONE
@@ -23,6 +24,10 @@ MODULE mod_oasis_advance
     public oasis_advance_init
     public oasis_advance_run
 
+    ! local private
+
+    logical, parameter    :: map_barrier = .false.
+    logical, parameter    :: detailed_map_timing = .false.
 
 contains
 
@@ -348,7 +353,7 @@ contains
     INTEGER(kind=ip_i4_p) :: nfav,nsav,nsa,n,nc,nf,npc
     INTEGER(kind=ip_i4_p) :: lsize,nflds,ierr
     integer(kind=ip_i4_p) :: tag,dt,ltime,lag,getput,maxtime,conserv
-    logical               :: consbfb
+    character(len=ic_med) :: consopt
     logical               :: sndrcv,output,input,unpack
     logical               :: snddiag,rcvdiag
     logical               :: arrayon(prism_coupler_avsmax)
@@ -380,8 +385,6 @@ contains
     type(mct_avect)       :: avtmpW  ! for writing restart
     type(prism_coupler_type),pointer :: pcpointer
     type(prism_coupler_type),pointer :: pcpointmp
-    logical, parameter    :: map_barrier = .false.
-    logical, parameter    :: detailed_map_timing = .false.
     character(len=*),parameter :: subname = '(oasis_advance_run)'
     character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
@@ -523,8 +526,7 @@ contains
        input   = pcpointer%input
        partid  = pcpointer%partID
        conserv = pcpointer%conserv
-       consbfb = .TRUE.
-       IF (TRIM(pcpointer%consopt) == "opt") consbfb = .FALSE.
+       consopt = pcpointer%consopt
        snddiag = pcpointer%snddiag
        rcvdiag = pcpointer%rcvdiag
        sndadd  = pcpointer%sndadd
@@ -1243,13 +1245,13 @@ contains
                 call mct_avect_zero(pcpointer%avect1m)
                 if (detailed_map_timing) then
                    call oasis_advance_map(pcpointer%avect1, &
-                        pcpointer%avect1m,prism_mapper(mapid),conserv,consbfb, &
+                        pcpointer%avect1m,prism_mapper(mapid),conserv,consopt, &
                         pcpointer%aVon  ,pcpointer%avect2, &
                         pcpointer%avect3,pcpointer%avect4, &
                         pcpointer%avect5,tstrinp=tstring)
                 else
                    call oasis_advance_map(pcpointer%avect1, &
-                        pcpointer%avect1m,prism_mapper(mapid),conserv,consbfb, &
+                        pcpointer%avect1m,prism_mapper(mapid),conserv,consopt, &
                         pcpointer%aVon  ,pcpointer%avect2, &
                         pcpointer%avect3,pcpointer%avect4, &
                         pcpointer%avect5)
@@ -1340,10 +1342,10 @@ contains
                 call mct_avect_zero(pcpointer%avect1)
                 if (detailed_map_timing) then
                    call oasis_advance_map(pcpointer%avect1m, &
-                        pcpointer%avect1,prism_mapper(mapid),conserv,consbfb,tstrinp=tstring)
+                        pcpointer%avect1,prism_mapper(mapid),conserv,consopt,tstrinp=tstring)
                 else
                    call oasis_advance_map(pcpointer%avect1m, &
-                        pcpointer%avect1,prism_mapper(mapid),conserv,consbfb)
+                        pcpointer%avect1,prism_mapper(mapid),conserv,consopt)
                 endif
                 if (LUCIA_debug > 0) &
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
@@ -1638,7 +1640,7 @@ contains
 !> Maps (regrids, interpolates) data from av1 to avd.
 !> av2-av5 are for higher order mapping (hot).
 
-  SUBROUTINE oasis_advance_map(av1,avd,mapper,conserv,consbfb,&
+  SUBROUTINE oasis_advance_map(av1,avd,mapper,conserv,consopt,&
                                avon,av2,av3,av4,av5,tstrinp)
 
     ! NOTE: mask = 0 is active point according to oasis3 conserv.f
@@ -1648,7 +1650,7 @@ contains
     type(mct_aVect)        ,intent(inout) :: avd    !< dst av
     type(prism_mapper_type),intent(inout) :: mapper !< prism_mapper
     integer(kind=ip_i4_p)  ,intent(in),optional :: conserv  !< conserv flag
-    logical                ,intent(in),optional :: consbfb  !< conserv bfb option
+    character(len=ic_med)  ,intent(in),optional :: consopt  !< conserv algorithm option
     logical                ,intent(in),optional :: avon(:) !< which source hot are on
     type(mct_aVect)        ,intent(in),optional :: av2  !< source av2 hot
     type(mct_aVect)        ,intent(in),optional :: av3  !< source av3 hot
@@ -1656,14 +1658,16 @@ contains
     type(mct_aVect)        ,intent(in),optional :: av5  !< source av5 hot
     character(len=*)       ,intent(in),optional :: tstrinp  ! timer label string
 
-    integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m
+    integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m,ierr
     real(kind=ip_r8_p)     :: sumtmp, wts_sums, wts_sumd, zradi, zlagr
+    real(kind=ip_r8_p)     :: wts_sums1(1), wts_sumd1(1)
     integer(kind=ip_i4_p),allocatable :: imasks(:),imaskd(:)
     real(kind=ip_r8_p),allocatable :: areas(:),aread(:)
     real(kind=ip_r8_p),allocatable  :: av_sums(:),av_sumd(:)  ! local sums
     type(mct_aVect)       :: avdtmp    ! for summing multiple mapping weights
     type(mct_aVect)       :: av2g      ! for bfb sums
-    logical               :: lconsbfb
+    type(mct_aVect)       :: avone     ! for conserve
+    character(len=ic_med) :: lconsopt  ! conserve algorithm option
     character(len=ic_med) :: tstring   ! timer string
     integer(kind=ip_i4_p),parameter :: avsmax = prism_coupler_avsmax
     logical               :: locavon(avsmax)   ! local avon
@@ -1677,9 +1681,9 @@ contains
     !> oasis_advance_map does the following
     !> * check for conservation flags
 
-    lconsbfb = .true.
-    if (present(consbfb)) then
-       lconsbfb = consbfb
+    lconsopt = 'bfb'
+    if (present(consopt)) then
+       lconsopt = consopt
     endif
 
     !> * check for higher order terms
@@ -1840,32 +1844,20 @@ contains
        nf = mct_aVect_indexRA(mapper%av_ms,'area')
        areas(:) = mapper%av_ms%rAttr(nf,:)*zradi
 
-       if (lconsbfb) then
-          if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_consbfb1')
-          call mct_avect_gather(mapper%av_ms,av2g,prism_part(mapper%spart)%pgsmap,0,prism_part(mapper%spart)%mpicom)
-          wts_sums = 0.0_ip_r8_p
-          if (prism_part(mapper%spart)%rank == 0) then
-             ni = mct_aVect_indexIA(av2g,'mask')
-             nf = mct_aVect_indexRA(av2g,'area')
-             do n = 1,mct_avect_lsize(av2g)
-                if (av2g%iAttr(ni,n) == 0) wts_sums = wts_sums + av2g%rAttr(nf,n)*zradi
-             enddo
-          endif
-          call oasis_mpi_bcast(wts_sums,prism_part(mapper%spart)%mpicom,subname//" bcast wts_sums")
-          if (prism_part(mapper%spart)%rank == 0) then 
-             call mct_avect_clean(av2g)
-          endif 
-          if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_consbfb1')
-       else
-          if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_consopt1')
-          sumtmp = 0.0_ip_r8_p
-          do n = 1,lsizes
-             if (imasks(n) == 0) sumtmp = sumtmp + areas(n)
-          enddo
-          call oasis_mpi_sum(sumtmp,wts_sums,prism_part(mapper%spart)%mpicom,string=subname//':wts_sums',&
-                             all=.true.)
-          if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_consopt1')
+       if (map_barrier .and. present(tstrinp)) then
+          call oasis_timer_start(trim(tstrinp)//'_cons_prebarrier')
+          call MPI_BARRIER(prism_part(mapper%spart)%mpicom, ierr)
+          call oasis_timer_stop(trim(tstrinp)//'_cons_prebarrier')
        endif
+
+       if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_cons1')
+       call mct_avect_init(avone,rList='one',lsize=lsizes)
+       avone%rAttr = 1.0_ip_r8_p
+       call oasis_advance_avsum(avone,wts_sums1,prism_part(mapper%spart)%pgsmap,prism_part(mapper%spart)%mpicom, &
+                                mask=imasks,wts=areas,consopt=lconsopt)
+       wts_sums = wts_sums1(1)
+       call mct_avect_clean(avone)
+       if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_cons1')
 
        !-------------------
        ! extract mask and area and compute sum of masked area for destination
@@ -1877,31 +1869,14 @@ contains
        nf = mct_aVect_indexRA(mapper%av_md,'area')
        aread(:) = mapper%av_md%rAttr(nf,:)*zradi
 
-       if (lconsbfb) then
-          if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_consbfb2')
-          call mct_avect_gather(mapper%av_md,av2g,prism_part(mapper%dpart)%pgsmap,0,prism_part(mapper%dpart)%mpicom)
-          wts_sumd = 0.0_ip_r8_p
-          if (prism_part(mapper%dpart)%rank == 0) then
-             ni = mct_aVect_indexIA(av2g,'mask')
-             nf = mct_aVect_indexRA(av2g,'area')
-             do n = 1,mct_avect_lsize(av2g)
-                if (av2g%iAttr(ni,n) == 0) wts_sumd = wts_sumd + av2g%rAttr(nf,n)*zradi
-             enddo
-          endif
-          call oasis_mpi_bcast(wts_sumd,prism_part(mapper%dpart)%mpicom,subname//" bcast wts_sumd")
-          if (prism_part(mapper%dpart)%rank == 0) then
-             call mct_avect_clean(av2g)
-          endif
-          if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_consbfb2')
-       else
-          if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_consopt2')
-          sumtmp = 0.0_ip_r8_p
-          do n = 1,lsized
-             if (imaskd(n) == 0) sumtmp = sumtmp + aread(n)
-          enddo
-          call oasis_mpi_sum(sumtmp,wts_sumd,prism_part(mapper%dpart)%mpicom,string=subname//':wts_sumd',all=.true.)
-          if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_consopt2')
-       endif
+       if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_cons2')
+       call mct_avect_init(avone,rList='one',lsize=lsized)
+       avone%rAttr = 1.0_ip_r8_p
+       call oasis_advance_avsum(avone,wts_sumd1,prism_part(mapper%dpart)%pgsmap,prism_part(mapper%dpart)%mpicom, &
+                                mask=imaskd,wts=aread,consopt=lconsopt)
+       wts_sumd = wts_sumd1(1)
+       call mct_avect_clean(avone)
+       if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_cons2')
 
        if (OASIS_debug >= 30) then
           write(nulprt,*) subname,' DEBUG conserve src mask ',minval(imasks),&
@@ -1921,9 +1896,9 @@ contains
        !-------------------
        if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avsum')
        call oasis_advance_avsum(av1,av_sums,prism_part(mapper%spart)%pgsmap,prism_part(mapper%spart)%mpicom, &
-                                mask=imasks,wts=areas,consbfb=lconsbfb)
+                                mask=imasks,wts=areas,consopt=lconsopt)
        call oasis_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%pgsmap,prism_part(mapper%dpart)%mpicom, &
-                                mask=imaskd,wts=aread,consbfb=lconsbfb)
+                                mask=imaskd,wts=aread,consopt=lconsopt)
        if (present(tstrinp)) call oasis_timer_stop(trim(tstrinp)//'_avsum')
 
        if (OASIS_debug >= 20) then
@@ -1993,9 +1968,9 @@ contains
        if (OASIS_debug >= 20) then
           if (present(tstrinp)) call oasis_timer_start(trim(tstrinp)//'_avsumdiag')
           call oasis_advance_avsum(av1,av_sums,prism_part(mapper%spart)%pgsmap,prism_part(mapper%spart)%mpicom, &
-                                   mask=imasks,wts=areas,consbfb=lconsbfb)
+                                   mask=imasks,wts=areas,consopt=lconsopt)
           call oasis_advance_avsum(avd,av_sumd,prism_part(mapper%dpart)%pgsmap,prism_part(mapper%dpart)%mpicom, &
-                                   mask=imaskd,wts=aread,consbfb=lconsbfb)
+                                   mask=imaskd,wts=aread,consopt=lconsopt)
           if (prism_part(mapper%spart)%mpicom /= MPI_COMM_NULL) write(nulprt,*) subname,' DEBUG src sum af conserve ',av_sums 
           if (prism_part(mapper%dpart)%mpicom /= MPI_COMM_NULL) write(nulprt,*) subname,' DEBUG dst sum af conserve ',av_sumd
           CALL oasis_flush(nulprt)
@@ -2017,7 +1992,7 @@ contains
 
 !> A generic method for summing fields in an attribute vector
 
-  SUBROUTINE oasis_advance_avsum(av,sum,gsmap,mpicom,mask,wts,consbfb)
+  SUBROUTINE oasis_advance_avsum(av,sum,gsmap,mpicom,mask,wts,consopt)
 
     implicit none
     type(mct_aVect)      ,intent(in)    :: av      ! input av
@@ -2026,14 +2001,17 @@ contains
     integer(kind=ip_i4_p),intent(in)    :: mpicom  ! mpicom
     integer(kind=ip_i4_p),intent(in),optional :: mask(:) ! mask to apply to av
     real(kind=ip_r8_p)   ,intent(in),optional :: wts(:)  ! wts to apply to av
-    logical              ,intent(in),optional :: consbfb ! bfb conserve
+    character(len=ic_med),intent(in),optional :: consopt ! conserve algorithm option
 
     integer(kind=ip_i4_p) :: n,m,ierr,mytask
     integer(kind=ip_i4_p) :: lsize,fsize        ! local size of av, number of flds in av
     real(kind=ip_r8_p),allocatable  :: lsum(:)  ! local sums
     real(kind=ip_r8_p),allocatable  :: lwts(:)  ! local wts taking into account mask and wts
+    real(kind=ip_r16_p),allocatable :: lsum16(:)! local sums
+    real(kind=ip_r16_p),allocatable :: sum16(:) ! global sums
+    real(kind=ip_r8_p),allocatable  :: reproarr(:,:) ! array of data and flds for reprosum
     type(mct_aVect)       :: av1, av1g    ! use av1,av1g for gather and bfb sum
-    logical               :: lconsbfb     ! local conserve bfb
+    character(len=ic_med) :: lconsopt     ! local conserve algorithm option
     character(len=*),parameter :: subname = '(oasis_advance_avsum)'
 
     call oasis_debug_enter(subname)
@@ -2043,9 +2021,9 @@ contains
        return
     endif
 
-    lconsbfb = .true.
-    if (present(consbfb)) then
-       lconsbfb = consbfb
+    lconsopt = 'bfb'
+    if (present(consopt)) then
+       lconsopt = consopt
     endif
 
     fsize = mct_avect_nRattr(av)
@@ -2057,14 +2035,14 @@ contains
     lwts = 1.0_ip_r8_p
 
     if (size(sum) /= fsize) then
-        WRITE(nulprt,*) subname,estr,'size sum ne size av'
-        call oasis_abort(file=__FILE__,line=__LINE__)
+       WRITE(nulprt,*) subname,estr,'size sum ne size av'
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(mask)) then
        if (size(mask) /= lsize) then
-           WRITE(nulprt,*) subname,estr,'size mask ne size av'
-           call oasis_abort(file=__FILE__,line=__LINE__)
+          WRITE(nulprt,*) subname,estr,'size mask ne size av'
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           if (mask(n) /= 0) lwts(n) = 0.0_ip_r8_p
@@ -2073,15 +2051,15 @@ contains
 
     if (present(wts)) then
        if (size(wts) /= lsize) then
-           WRITE(nulprt,*) subname,estr,'size wts ne size av'
-           call oasis_abort(file=__FILE__,line=__LINE__)
+          WRITE(nulprt,*) subname,estr,'size wts ne size av'
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        do n = 1,lsize
           lwts(n) = lwts(n) * wts(n)
        enddo
     endif
 
-    if (lconsbfb) then
+    if (lconsopt == 'gather' .or. lconsopt == 'bfb') then
        call mct_avect_init(av1,av,lsize)
        do n = 1,lsize
        do m = 1,fsize
@@ -2103,7 +2081,8 @@ contains
        if (mytask == 0) then 
           call mct_avect_clean(av1g)
        endif
-    else
+
+    elseif (lconsopt == 'lsum8' .or. lconsopt == 'opt') then
        lsum = 0.0_ip_r8_p
        do n = 1,lsize
        do m = 1,fsize
@@ -2111,6 +2090,39 @@ contains
        enddo
        enddo
        call oasis_mpi_sum(lsum,sum,mpicom,string=trim(subname)//':sum',all=.true.)
+
+    elseif (lconsopt == 'lsum16') then
+       allocate(lsum16(fsize))
+       allocate(sum16(fsize))
+       lsum16 = 0.0_ip_r16_p
+       do n = 1,lsize
+       do m = 1,fsize
+          lsum16(m) = lsum16(m) + real(av%rAttr(m,n),ip_r16_p)*real(lwts(n),ip_r16_p)
+       enddo
+       enddo
+       call oasis_mpi_sum(lsum16,sum16,mpicom,string=trim(subname)//':sum',all=.true.)
+       sum = real(sum16,ip_r8_p)
+       deallocate(lsum16)
+       deallocate(sum16)
+
+    elseif (lconsopt == 'reprosum' .or. lconsopt == 'ddpdd') then
+       allocate(reproarr(lsize,fsize))
+       do n = 1,lsize
+       do m = 1,fsize
+          reproarr(n,m) = av%rAttr(m,n)*lwts(n)
+       enddo
+       enddo
+       if (lconsopt == 'reprosum') then
+          call oasis_reprosum_calc(reproarr,sum,lsize,lsize,fsize,ddpdd_sum=.false.,commid=mpicom)
+       else
+          call oasis_reprosum_calc(reproarr,sum,lsize,lsize,fsize,ddpdd_sum=.true. ,commid=mpicom)
+       endif
+       deallocate(reproarr)
+
+    else
+       WRITE(nulprt,*) subname,estr,'consopt unknown: '//trim(lconsopt)
+       call oasis_abort(file=__FILE__,line=__LINE__)
+
     endif
 
     deallocate(lsum)

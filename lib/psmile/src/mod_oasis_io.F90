@@ -116,16 +116,19 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
-      if (dlen /= 2) then
-         write(nulprt,*) subname,estr,'variable ndims ne 2 ',trim(filefld),dlen
+      if (dlen > 2) then
+         write(nulprt,*) subname,estr,'variable ndims gt 2 ',trim(filefld),dlen
          call oasis_abort(file=__FILE__,line=__LINE__)
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
-      status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
+      ny = 1
+      if (dlen == 2) then
+         status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
+         IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                   mpi_rank_local,':',TRIM(nf90_strerror(status))
+      endif
 
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
          WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
@@ -462,16 +465,19 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
-               if (dlen /= 2) then
-                  write(nulprt,*) subname,estr,'variable ndims ne 2 on file ',trim(itemc),dlen
+               if (dlen > 2) then
+                  write(nulprt,*) subname,estr,'variable ndims gt 2 on file ',trim(itemc),dlen
                   call oasis_abort(file=__FILE__,line=__LINE__)
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
-               status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
-               IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                                         mpi_rank_local,':',TRIM(nf90_strerror(status))
+               ny = 1
+               if (dlen == 2) then
+                  status = nf90_inquire_dimension(ncid,dimid2(2),len=ny)
+                  IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                            mpi_rank_local,':',TRIM(nf90_strerror(status))
+               endif
 
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
                   WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file = ',&

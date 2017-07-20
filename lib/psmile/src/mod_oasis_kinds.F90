@@ -25,6 +25,7 @@ SAVE
   INTEGER, PARAMETER :: ic_lvar2= 120  ! max length of partition
   INTEGER, PARAMETER :: ip_single_p = SELECTED_REAL_KIND(6,37)
   INTEGER, PARAMETER :: ip_double_p = SELECTED_REAL_KIND(12,307)
+  INTEGER, PARAMETER :: ip_quad_p   = SELECTED_REAL_KIND(33,4931)
   INTEGER, PARAMETER :: ip_realwp_p = ip_double_p
   LOGICAL, PARAMETER :: ll_single = .FALSE.  
   INTEGER, PARAMETER :: ip_i2_p = SELECTED_INT_KIND(4)
@@ -35,7 +36,8 @@ SAVE
   INTEGER, PARAMETER :: ip_i8_p = SELECTED_INT_KIND(18)
 #endif
   INTEGER, PARAMETER :: ip_intwp_p = ip_i4_p 
-  INTEGER, PARAMETER :: ip_r8_p = ip_double_p
+  INTEGER, PARAMETER :: ip_r8_p  = ip_double_p
+  INTEGER, PARAMETER :: ip_r16_p = ip_quad_p
 !
 ! !PUBLIC DATA MEMBERS:
 !

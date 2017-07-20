@@ -2349,7 +2349,10 @@ SUBROUTINE inipar
               CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
               cconopt(ig_number_field(jf)) = 'bfb'
               IF (ilen > 0) THEN
-                 IF (trim(clvari) == 'bfb' .or. trim(clvari) == 'opt') THEN
+                 IF (trim(clvari) == 'bfb'    .or. trim(clvari) == 'opt'    .or. &
+                     trim(clvari) == 'lsum8'  .or. trim(clvari) == 'lsum16' .or. &
+                     trim(clvari) == 'gather' .or. trim(clvari) == 'ddpdd'  .or. &
+                     trim(clvari) == 'reprosum') THEN
                     cconopt(ig_number_field(jf)) = clvari
                  ELSE
                     CALL prtout('ERROR in namcouple conserv argument',jf,1)
