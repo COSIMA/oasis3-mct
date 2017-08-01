@@ -2092,6 +2092,10 @@ contains
        call oasis_mpi_sum(lsum,sum,mpicom,string=trim(subname)//':sum',all=.true.)
 
     elseif (lconsopt == 'lsum16') then
+#ifdef __NO_16BYTE_REALS
+       WRITE(nulprt,*) subname,estr,'consopt lsum16 not support with __NO_16BYTE_REALS cpp'
+       call oasis_abort(file=__FILE__,line=__LINE__)
+#endif
        allocate(lsum16(fsize))
        allocate(sum16(fsize))
        lsum16 = 0.0_ip_r16_p

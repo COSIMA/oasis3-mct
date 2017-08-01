@@ -90,14 +90,16 @@ MODULE mod_oasis_mpi
      oasis_mpi_sumi1, &
      oasis_mpi_sumb0, &
      oasis_mpi_sumb1, &
-     oasis_mpi_sumr0, &
-     oasis_mpi_sumr1, &
-     oasis_mpi_sumr2, &
-     oasis_mpi_sumr3, &
+#ifndef __NO_16BYTE_REALS
      oasis_mpi_sumq0, &
      oasis_mpi_sumq1, &
      oasis_mpi_sumq2, &
-     oasis_mpi_sumq3
+     oasis_mpi_sumq3, &
+#endif
+     oasis_mpi_sumr0, &
+     oasis_mpi_sumr1, &
+     oasis_mpi_sumr2, &
+     oasis_mpi_sumr3
    end interface
 
    !> Generic overloaded interface into MPI min reduction
@@ -1744,6 +1746,8 @@ SUBROUTINE oasis_mpi_sumr3(lvec,gvec,comm,string,all)
 END SUBROUTINE oasis_mpi_sumr3
 
 !===============================================================================
+
+#ifndef __NO_16BYTE_REALS
 !===============================================================================
 
 !> Compute a global sum for a scalar quad
@@ -2005,6 +2009,8 @@ SUBROUTINE oasis_mpi_sumq3(lvec,gvec,comm,string,all)
 END SUBROUTINE oasis_mpi_sumq3
 
 !===============================================================================
+!  __NO_16BYTE_REALS
+#endif
 !===============================================================================
 
 !> Compute a global minimum for a scalar integer
