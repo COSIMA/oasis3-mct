@@ -2059,7 +2059,7 @@ contains
        enddo
     endif
 
-    if (lconsopt == 'gather' .or. lconsopt == 'bfb') then
+    if (lconsopt == 'gather') then
        call mct_avect_init(av1,av,lsize)
        do n = 1,lsize
        do m = 1,fsize
@@ -2109,14 +2109,14 @@ contains
        deallocate(lsum16)
        deallocate(sum16)
 
-    elseif (lconsopt == 'reprosum' .or. lconsopt == 'ddpdd') then
+    elseif (lconsopt == 'reprosum' .or. lconsopt == 'ddpdd' .or. lconsopt == 'bfb') then
        allocate(reproarr(lsize,fsize))
        do n = 1,lsize
        do m = 1,fsize
           reproarr(n,m) = av%rAttr(m,n)*lwts(n)
        enddo
        enddo
-       if (lconsopt == 'reprosum') then
+       if (lconsopt == 'reprosum' .or. lconsopt == 'bfb') then
           call oasis_reprosum_calc(reproarr,sum,lsize,lsize,fsize,ddpdd_sum=.false.,commid=mpicom)
        else
           call oasis_reprosum_calc(reproarr,sum,lsize,lsize,fsize,ddpdd_sum=.true. ,commid=mpicom)
