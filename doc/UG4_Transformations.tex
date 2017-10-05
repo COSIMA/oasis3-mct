@@ -56,8 +56,9 @@ noted with the string UNUSED but not described.
   runs, it is mandatory that the coupling restart file contains
   LOCTRANS restart fields coherent with the current namcouple
   entries. For example, it will not be possible to restart a run with
-  a multiple field entry in the namcouple with a coupling restart 
-  file created by a run not activating this multiple file option.
+  a multiple field entry in the namcouple with a coupling restart file 
+  created by a run not activating this multiple file option.
+
   This is
   the reason why it is now possible to specify a restart file name
   on the OUTPUT {\it namcouple} input line.
@@ -133,7 +134,7 @@ noted with the string UNUSED but not described.
   The {\tt MAPPING} keyword is used to specify an input file to be
   read and used for mapping (ie. regridding or interpolation); the
   {\tt MAPPING} file must follow the {\tt SCRIPR} format (see
-    section \ref{subsec_mapdata}).
+    section \ref{subsec_mapdata}). As for the other transformations and interpolations, different mappings can be specified for the different coupling fields.
  
   Since OASIS3-MCT\_2.0, {\tt MAPPING} can be used for higher order
   remapping. Up to 5 different sets of weights (see section
@@ -599,17 +600,33 @@ noted with the string UNUSED but not described.
       it does not change the sign of the field.
     \end{itemize}
   \item {\tt \$CONSOPT} is an optional argument specifying the
-    algorithm.  {\tt \$CONSOPT} can be {\tt bfb} or {\tt opt}.  
+    algorithm.  {\tt \$CONSOPT} can be {\tt gather}, {\tt lsum16}, {\tt lsum8},
+    {\tt ddpdd}, {\tt reprosum}, {\tt bfb}, or {\tt opt}.  
 \begin{itemize}
+\item The {\tt gather} option computes global sums by gathering a decomposed array
+  onto the root pe before doing an index ordered sum.  This is guaranteed to produce
+  identical results for different numbers of processors and decompositions but is expensive
+  both with respect to performance and memory use.
+\item The {\tt lsum16} option computes a local sum at quadruple precision before doing
+  an MPI SUM ALL reduction on the local sums at quadruple precision.  This is likely to be
+  bit-for-bit for different numbers of processors and decompostions but that's not guaranteed.
+  This is just like {\tt lsum8} but at quadruple precision and a little slower.
+\item The {\tt lsum8} option computes a local sum at double precision before doing
+  an MPI SUM ALL reduction on the local sums at double precision.  This is NOT likely to be
+  bit-for-bit for different numbers of processors and decompostions.  This is just like {\tt lsum16}
+  but at double precision and faster.
+\item The {\tt ddpdd} option is a parallel double-double algorithm using a single scalar
+  reduction.  It should behave between {\tt lsum8} and {\tt lsum16} with respect to performance and
+  reproducibility.
+\item The {\tt reprosum} option is a fixed point method based on ordered double integer sums
+  that requires two scalar reductions per global sum.  The cost of reprosum will be higher than
+  some of the other methods but it will be bit-for-bit for different processor counts or
+  different decompostions except in extremely rare cases and the cost is significantly less
+  than the {\tt gather} option.
 \item The {\tt bfb} option enforces a bit-for-bit transformation regardless
-    of the component grid decomposition or number of processes. It is currently the default setting. 
-With {\tt bfb}, the entire field is gathered from the different component processes to the master process that performs the global integration and then 
-broadcasts the resulting sum to all component processes. Compared to {\tt opt}, {\tt bfb} is clearly more expensive with respect to
-MPI communications and memory requirement.  
-\item The {\tt opt} option
-    carries out the global conservation with an optimal algorithm using less
-    memory and a faster approach. With {\tt opt}, a local sum is performed on each process that then sends its local sum to all other processes; all processes can then compute the global sum of all local sums. This is more efficient than the {\tt bfb} algorithm but does not ensure bit-for-bit reproducibility when the  grid decomposition or number of processes of the component are changed.
- 
+  of the component grid decomposition or number of processes. It is currently using the {\tt reprosum} option.
+\item The {\tt opt} option carries out the global sum using the fastest algorithm generally available.  Currently,
+  this is set to {\tt lsum8}.
 \end{itemize}
   \end{itemize}
 

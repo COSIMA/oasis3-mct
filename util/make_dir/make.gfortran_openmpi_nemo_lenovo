@@ -22,6 +22,10 @@ MPI_INCLUDE      = $(MPIDIR)/include
 MPILIB           = -L$(MPIDIR)/lib
 #
 # NETCDF library
+# New version of NetCDF compiled with new version gcc484
+NETCDF_INCLUDE = /data/softs/local/netcdf/4.4.1_gcc484/include 
+NETCDF_LIBRARY  = -Wl,-rpath,/data/softs/local/netcdf/4.4.1_gcc484/lib -L/data/softs/local/netcdf/4.4.1_gcc484/lib -lnetcdff -lnetcdf
+# NETCDF library
 NETCDF_INCLUDE1 = /usr/include 
 NETCDF_INCLUDE2 = /usr/lib64/gfortran/modules
 NETCDF_LIBRARY  = -L/usr/lib64 -lnetcdff -lnetcdf  
@@ -63,10 +67,10 @@ LIBBUILD        = $(ARCHDIR)/build/lib
 # INCPSMILE     : includes all *o and *mod for each library
 INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct 
 
-F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
-f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
-FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
-fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
-CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) 
+F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE) 
+f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE) 
+FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE) 
+fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE) 
+CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE) 
 #
 #############################################################################

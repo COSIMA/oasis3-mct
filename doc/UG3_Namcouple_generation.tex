@@ -72,6 +72,12 @@ chemistry (also running on grid {\tt atmo}), and one field SOALBEDO is read from
  $NUNITNO
    901     920
 #
+ $NMAPDEC
+   decomp_wghtfile
+#
+ $NMATXRD
+   ceg
+#
  $SEQMODE
  $CHANNEL
  $JOBNAME
@@ -220,6 +226,26 @@ load balance. More information can be found in the README file in {\tt
   choose values that will NOT conflict or overlap with unit numbers in 
   use in any of the component models. The defaults are 1024 for the minimum and 9999
   for the maximum unit number if not explicitly set by the user.
+
+\item {\tt \$NMAPDEC}: Optional; on the line below this keyword is a character string
+  that indicates the mapping decomposition value to be used during local mapping.  The
+  options are decomp\_1d and decomp\_wghtfile.  decomp\_1d decomposes the grid in a simple
+  one dimensional, 1 chunk per pe.  decomp\_wghtfile decomposes the grid using the
+  information in the weight file to reduced mapping communication. decomp\_wghtfile
+  will take some extra time in initialization but it should result in faster mapping.
+  The default in decomp\_1d.  It is worth testing decomp\_wghtfile to see if that
+  option improves performance.
+
+\item {\tt \$NMATXRD}: Optional; on the line below this keyword is a character string
+  that indicates the method used to read mapping weights.  There are two options, orig
+  and ceg.  In both, the weights are read in chunks on the root pe.  In the orig option, 
+  the weights are then broadcast to all pes and each pe then saves the weights needed in
+  order to be consistent with the mapping decomposition.  In the ceg option, the root pe 
+  reads the weights and then decides which pes each weight should be assigned too.  A
+  series or sends and recvs are then done with all pes and just the weights needed on
+  each pe are sent.  The orig method sends much more data but is more parallel.  The ceg
+  method does most of the work on the root pe but less data is communicated.  The default
+  is ceg.
 
 \item {\tt \$NNOREST}: Optional; on the line below this keyword is a character
   string that can override the requirement that restart files must exist

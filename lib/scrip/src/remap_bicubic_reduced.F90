@@ -134,17 +134,13 @@ CONTAINS
       !   Search for non-masked points among the closest 16 points 
       !   on source grid (grid1)
       !
-
       CALL grid_search_16_points(ila_src_add,   rla_src_lats, rla_src_lons,&
 	                         ila_nbr_found, bin,          rl_plat, &
-				 rl_plon,       ld_extrapdone)
-    
-		      
+				 rl_plon,       ld_extrapdone)		      
       !
-      ! If there is no point found, search the neaerst 
+      ! If there is no point found, search the nearest 
       ! non-masked point
       !
-
       IF (SUM(ila_nbr_found)==0) THEN
           IF (ll_nnei .EQV. .TRUE. ) THEN
           IF (nlogprt .GE. 2) THEN
@@ -196,9 +192,35 @@ CONTAINS
 		END IF
 	    END IF
 	  END DO
+          IF (ila_src_add(1,1) == 0) THEN
+	     rla_weight(1,1) = bignum
+!cdir novector
+	     DO ib_i=1,grid1_size	 	   
+	       IF (grid1_mask(ib_i) .or. ld_extrapdone) THEN
+                arg = rl_coslat_dst*COS(grid1_center_lat(ib_i))* &
+		     (rl_coslon_dst*COS(grid1_center_lon(ib_i)) + &
+		      rl_sinlon_dst*SIN(grid1_center_lon(ib_i)))+&
+		      rl_sinlat_dst*SIN(grid1_center_lat(ib_i))
+                IF (arg < -1.0d0) THEN
+                    arg = -1.0d0
+                ELSE IF (arg > 1.0d0) THEN
+                    arg = 1.0d0
+                END IF
+		rl_distance = ACOS(arg)
+		IF (rl_distance < rla_weight(1,1)) THEN
+		    rla_weight(1,1) = rl_distance
+		    ila_src_add(1,1) = ib_i
+	        END IF
+	       END IF
+	     END DO
+          ENDIF
+          if (ila_src_add(1,1) == 0) then
+             WRITE(nulou,*) 'Problem with neighbour identification for target grid point'
+             WRITE(nulou,*) 'with address = ',ib_dst_add 
+             call abort
+          endif
 	  rla_weight(:,:) = 0
 	  rla_weight(1,1) = 1
-	  
 	  CALL store_link_bicub(ib_dst_add, ila_src_add, rla_weight)
           IF (nlogprt .GE. 2) THEN
               WRITE(nulou,*)  &

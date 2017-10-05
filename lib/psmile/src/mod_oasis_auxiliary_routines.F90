@@ -134,7 +134,7 @@ MODULE mod_oasis_auxiliary_routines
     CALL MPI_COMM_Split(allcomm,icpl,1,cplcomm,ierr)
     IF (ierr /= 0) THEN
        WRITE (nulprt,*) subname,estr,'MPI_Comm_Split ierr = ',ierr
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
 
     !------------------------
@@ -231,7 +231,7 @@ MODULE mod_oasis_auxiliary_routines
        if (trim(cdnam) == trim(prism_modnam(n))) then
           if (found) then
              write(nulprt,*) subname,estr,'found same model name twice'
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
           il = n
           found = .true.
@@ -240,7 +240,7 @@ MODULE mod_oasis_auxiliary_routines
 
     if (.not. found) then
        write(nulprt,*) subname,estr,'input model name not found'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     IF (OASIS_debug >= 2) THEN
@@ -307,7 +307,7 @@ MODULE mod_oasis_auxiliary_routines
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
        WRITE(nulprt,*) subname,estr,'called on non coupling task'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
 
     kinfo = OASIS_OK
@@ -315,7 +315,7 @@ MODULE mod_oasis_auxiliary_routines
     
     IF (varid == OASIS_Var_Uncpl) THEN
        WRITE(nulprt,*) subname,estr,'Routine is called for an invalid varid'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
     
     ncpl  = prism_var(varid)%ncpl
@@ -354,7 +354,7 @@ MODULE mod_oasis_auxiliary_routines
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
        WRITE(nulprt,*) subname,estr,'called on non coupling task'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
 
     kinfo = OASIS_OK
@@ -362,7 +362,7 @@ MODULE mod_oasis_auxiliary_routines
     
     IF (varid == OASIS_Var_Uncpl) THEN
        WRITE(nulprt,*) subname,estr,'Routine is called for an invalid varid'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
     
     ncpl_calc  = prism_var(varid)%ncpl
@@ -370,7 +370,7 @@ MODULE mod_oasis_auxiliary_routines
     IF (ncpl_calc /= ncpl) THEN
        WRITE(nulprt,*) subname,estr,' Wrong number of couplings for variable: ',TRIM(vname), &
                        ncpl_calc, ncpl
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
     
     IF (ncpl <= 0) THEN
@@ -394,7 +394,7 @@ MODULE mod_oasis_auxiliary_routines
 
        IF (cpl_freqs(nc) .le. 0) THEN
           WRITE(nulprt,*) subname,estr,' The coupling frequency is < or equal to 0'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ENDIF
     ENDDO
 
@@ -424,7 +424,7 @@ MODULE mod_oasis_auxiliary_routines
 
     IF (mpi_comm_local == MPI_COMM_NULL) THEN
        WRITE(nulprt,*) subname,estr,'called on non coupling task'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
 
     kinfo = OASIS_OK
@@ -433,7 +433,7 @@ MODULE mod_oasis_auxiliary_routines
     IF (varid == OASIS_Var_Uncpl) THEN
        WRITE(nulprt,*) subname,estr, &
           'Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
     
     ncpl  = prism_var(varid)%ncpl
@@ -460,7 +460,7 @@ MODULE mod_oasis_auxiliary_routines
 
        IF (ABS(lag) > dt) THEN
           WRITE(nulprt,*) subname,estr,' ERROR lag gt dt for cplid',cplid
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ENDIF
 
        !------------------------------------------------
@@ -469,7 +469,7 @@ MODULE mod_oasis_auxiliary_routines
 
        IF (getput == OASIS3_GET) THEN
           WRITE(nulprt,*) subname,estr,'routine can only be called for OASIS_PUT variable'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        ENDIF
 
        CALL oasis_debug_note(subname//' set mseclag')
@@ -485,7 +485,7 @@ MODULE mod_oasis_auxiliary_routines
           write(nulprt,*) subname,' at ',msec,mseclag,'  ERROR: ',trim(vname)
           write(nulprt,*) subname,estr,'model time beyond namcouple maxtime',&
                           msec,maxtime
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        time_now = .FALSE.

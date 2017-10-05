@@ -296,7 +296,7 @@ CONTAINS
     if (present(partid)) then
        if (prism_grid(gridID)%partid > 0 .and. prism_grid(gridID)%partid /= partid) then
           write(nulprt,*) subname,estr,'partid inconsistency',gridID,prism_grid(gridID)%partid,partid
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        prism_grid(gridID)%partid = partid
        if (OASIS_debug >= 15) then
@@ -418,7 +418,7 @@ CONTAINS
     if (present(partid)) then
        if (prism_grid(gridID)%partid > 0 .and. prism_grid(gridID)%partid /= partid) then
           write(nulprt,*) subname,estr,'partid inconsistency',gridID,prism_grid(gridID)%partid,partid
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        prism_grid(gridID)%partid = partid
        if (OASIS_debug >= 15) then
@@ -541,7 +541,7 @@ CONTAINS
     if (present(partid)) then
        if (prism_grid(gridID)%partid > 0 .and. prism_grid(gridID)%partid /= partid) then
           write(nulprt,*) subname,estr,'partid inconsistency',gridID,prism_grid(gridID)%partid,partid
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        prism_grid(gridID)%partid = partid
        if (OASIS_debug >= 15) then
@@ -665,7 +665,7 @@ CONTAINS
     if (present(partid)) then
        if (prism_grid(gridID)%partid > 0 .and. prism_grid(gridID)%partid /= partid) then
           write(nulprt,*) subname,estr,'partid inconsistency',gridID,prism_grid(gridID)%partid,partid
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        prism_grid(gridID)%partid = partid
        if (OASIS_debug >= 15) then
@@ -722,7 +722,7 @@ CONTAINS
     if (present(partid)) then
        if (prism_grid(gridID)%partid > 0 .and. prism_grid(gridID)%partid /= partid) then
           write(nulprt,*) subname,estr,'partid inconsistency',gridID,prism_grid(gridID)%partid,partid
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
        prism_grid(gridID)%partid = partid
        if (OASIS_debug >= 15) then
@@ -902,7 +902,7 @@ CONTAINS
                 enddo
                 if (.not. found) then
                    write(nulprt,*) subname,estr,'grid with partition not defined on all partition tasks: ',trim(gname(n))
-                   call oasis_abort()
+                   call oasis_abort(file=__FILE__,line=__LINE__)
                 endif
              endif
           enddo
@@ -947,7 +947,7 @@ CONTAINS
              write_task = .false.
           else
              write(nulprt,*) subname,estr,'illegal partid for grid:',trim(gname(g)),trim(pname(g)),partid
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -980,7 +980,7 @@ CONTAINS
              write(nulprt,*) subname,estr,'inconsistent array size lon/lat ',tnx,tny, &
                size(prism_grid(n)%lon,dim=1),size(prism_grid(n)%lon,dim=2),  &
                size(prism_grid(n)%lat,dim=1),size(prism_grid(n)%lat,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            !-------------------------------------
@@ -1022,7 +1022,7 @@ CONTAINS
              write(nulprt,*) subname,estr,'inconsistent array size clon/clat ',tnx,tny, &
                size(prism_grid(n)%clon,dim=1),size(prism_grid(n)%clon,dim=2),  &
                size(prism_grid(n)%clat,dim=1),size(prism_grid(n)%clat,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            !-------------------------------------
@@ -1075,7 +1075,7 @@ CONTAINS
                size(prism_grid(n)%area,dim=2) /= tny ) then
              write(nulprt,*) subname,estr,'inconsistent array size area ',tnx,tny, &
                size(prism_grid(n)%area,dim=1),size(prism_grid(n)%area,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            !-------------------------------------
@@ -1101,7 +1101,7 @@ CONTAINS
                size(prism_grid(n)%angle,dim=2) /= tny ) then
              write(nulprt,*) subname,estr,'inconsistent array size angle ',tnx,tny, &
                 size(prism_grid(n)%angle,dim=1),size(prism_grid(n)%angle,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            !-------------------------------------
@@ -1127,7 +1127,7 @@ CONTAINS
                size(prism_grid(n)%mask,dim=2) /= tny ) then
              write(nulprt,*) subname,estr,'inconsistent array size mask ',tnx,tny, &
                 size(prism_grid(n)%mask,dim=1),size(prism_grid(n)%mask,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            !-------------------------------------
@@ -1197,7 +1197,7 @@ CONTAINS
           if (nx /= prism_grid(gridID)%nx .or. ny /= prism_grid(gridID)%ny) then
              write(nulprt,*) subname,estr,'in predefined grid size = ',nx,ny, &
                 prism_grid(gridID)%nx,prism_grid(gridID)%ny
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
     enddo

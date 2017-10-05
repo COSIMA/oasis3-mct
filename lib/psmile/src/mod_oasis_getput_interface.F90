@@ -82,7 +82,7 @@ contains
     if (prism_var(var_id)%num > 1) then
        write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
        write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(write_restart)) then
@@ -107,7 +107,7 @@ contains
        CALL oasis_put_worker(var_id,kstep,DBLE(fld1),kinfo,write_restart=lwrst)
     else
        WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     call oasis_debug_exit(subname)
@@ -148,7 +148,7 @@ contains
     if (prism_var(var_id)%num > 1) then
        write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
        write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (present(write_restart)) then
@@ -173,7 +173,7 @@ contains
        CALL oasis_put_worker(var_id,kstep,fld1,kinfo,write_restart=lwrst)
     else
        WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     call oasis_debug_exit(subname)
@@ -225,32 +225,32 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 2nd dim size = ',size(fld1,dim=2)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        size_fld1 = size(fld1,dim=2)
        if (present(fld2)) then
           if (size(fld2,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld2 size different than fld1 size ',size_fld1,size(fld2,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld3)) then
           if (size(fld3,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld3 size different than fld1 size ',size_fld1,size(fld3,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld4)) then
           if (size(fld4,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld4 size different than fld1 size ',size_fld1,size(fld4,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld5)) then
           if (size(fld5,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld5 size different than fld1 size ',size_fld1,size(fld5,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -271,7 +271,7 @@ contains
              CALL oasis_put_worker(var_id,kstep,DBLE(fld1(:,n)),kinfo,write_restart=lwrst,varnum=n)
           else
              WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
 
@@ -294,7 +294,7 @@ contains
           CALL oasis_put_worker(var_id,kstep,DBLE(PACK(fld1,mask=.true.)),kinfo,write_restart=lwrst)
        else
           WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
     endif
@@ -349,32 +349,32 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 3rd dim size = ',size(fld1,dim=3)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        size_fld1 = size(fld1,dim=3)
        if (present(fld2)) then
           if (size(fld2,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld2 size different than fld1 size ',size_fld1,size(fld2,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld3)) then
           if (size(fld3,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld3 size different than fld1 size ',size_fld1,size(fld3,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld4)) then
           if (size(fld4,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld4 size different than fld1 size ',size_fld1,size(fld4,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld5)) then
           if (size(fld5,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld5 size different than fld1 size ',size_fld1,size(fld5,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -396,13 +396,13 @@ contains
              CALL oasis_put_worker(var_id,kstep,DBLE(PACK(fld1(:,:,n),mask=.true.)),kinfo,write_restart=lwrst,varnum=n)
           else
              WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
 
     else
        WRITE(nulprt,*) subname,estr,' Dimension sizes incorrect'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
 
     endif
 
@@ -455,32 +455,32 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 2nd dim size = ',size(fld1,dim=2)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        size_fld1 = size(fld1,dim=2)
        if (present(fld2)) then
           if (size(fld2,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld2 size different than fld1 size ',size_fld1,size(fld2,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld3)) then
           if (size(fld3,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld3 size different than fld1 size ',size_fld1,size(fld3,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld4)) then
           if (size(fld4,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld4 size different than fld1 size ',size_fld1,size(fld4,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld5)) then
           if (size(fld5,dim=2) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld5 size different than fld1 size ',size_fld1,size(fld5,dim=2)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -501,7 +501,7 @@ contains
              CALL oasis_put_worker(var_id,kstep,(fld1(:,n)),kinfo,write_restart=lwrst,varnum=n)
           else
              WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
 
@@ -524,7 +524,7 @@ contains
           CALL oasis_put_worker(var_id,kstep,PACK(fld1,mask=.true.),kinfo,write_restart=lwrst)
        else
           WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
     endif
@@ -578,32 +578,32 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 3rd dim size = ',size(fld1,dim=3)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        size_fld1 = size(fld1,dim=3)
        if (present(fld2)) then
           if (size(fld2,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld2 size different than fld1 size ',size_fld1,size(fld2,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld3)) then
           if (size(fld3,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld3 size different than fld1 size ',size_fld1,size(fld3,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld4)) then
           if (size(fld4,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld4 size different than fld1 size ',size_fld1,size(fld4,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
        if (present(fld5)) then
           if (size(fld5,dim=3) /= size_fld1) then
              write(nulprt,*) subname,estr,'fld5 size different than fld1 size ',size_fld1,size(fld5,dim=3)
-             call oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        endif
 
@@ -625,13 +625,13 @@ contains
              CALL oasis_put_worker(var_id,kstep,PACK(fld1(:,:,n),mask=.true.),kinfo,write_restart=lwrst,varnum=n)
           else
              WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-             CALL oasis_abort()
+             call oasis_abort(file=__FILE__,line=__LINE__)
           endif
        enddo
 
     else
        WRITE(nulprt,*) subname,estr,' Dimension sizes incorrect'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
 
     endif
 
@@ -677,19 +677,19 @@ contains
 
     if (.not. enddef_called) then
        write(nulprt,*) subname,estr,'called before oasis_enddef'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (var_id == OASIS_Var_Uncpl) then
        write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
        call oasis_debug_exit(subname)
        return
     endif
 
     if (var_id < 1 .or. var_id > prism_nvar) then
        write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
        call oasis_debug_exit(subname)
        return
     endif
@@ -729,7 +729,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -739,7 +739,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -749,7 +749,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -759,7 +759,7 @@ contains
        if (nsx /= ns) then
           write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
     endif
 
@@ -790,7 +790,7 @@ contains
                                a5on=a5on,array5=fld5,writrest=lwrst,varnum=lvarnum)
     ELSE
         WRITE(nulprt,*) subname,estr,' Wrong field array argument list in oasis_put'
-        CALL oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
     ENDIF
 
     call oasis_debug_exit(subname)
@@ -827,7 +827,7 @@ contains
     if (prism_var(var_id)%num > 1) then
        write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
        write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     ns = size(fld,dim=1)
@@ -872,7 +872,7 @@ contains
     if (prism_var(var_id)%num > 1) then
        write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
        write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     call oasis_get_worker(var_id,kstep,fld,kinfo)
@@ -913,7 +913,7 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 2nd dim size = ',size(fld,dim=2)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        nis = size(fld,dim=1)
@@ -986,7 +986,7 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 3rd dim size = ',size(fld,dim=3)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        nis = size(fld,dim=1)
@@ -1008,7 +1008,7 @@ contains
     else
 
        WRITE(nulprt,*) subname,estr,' Dimension sizes incorrect'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
 
     endif
 
@@ -1048,7 +1048,7 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 2nd dim size = ',size(fld,dim=2)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        nis = size(fld,dim=1)
@@ -1118,7 +1118,7 @@ contains
           write(nulprt,*) subname,estr,'called for variable ',trim(prism_var(var_id)%name)
           write(nulprt,*) subname,estr,'expecting bundled field with num = ',prism_var(var_id)%num
           write(nulprt,*) subname,estr,'passing in field with incorrect 3rd dim size = ',size(fld,dim=3)
-          call oasis_abort()
+          call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        nis = size(fld,dim=1)
@@ -1139,7 +1139,7 @@ contains
 
     else
        WRITE(nulprt,*) subname,estr,' Dimension sizes incorrect'
-       CALL oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
 
     endif
 
@@ -1174,20 +1174,20 @@ contains
 
     if (.not. enddef_called) then
        write(nulprt,*) subname,estr,'called before oasis_enddef'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
     endif
 
     if (var_id == OASIS_Var_Uncpl) then
        write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
        write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
        call oasis_debug_exit(subname)
        return
     endif
 
     if (var_id < 1 .or. var_id > prism_nvar) then
        write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
-       call oasis_abort()
+       call oasis_abort(file=__FILE__,line=__LINE__)
        call oasis_debug_exit(subname)
        return
     endif

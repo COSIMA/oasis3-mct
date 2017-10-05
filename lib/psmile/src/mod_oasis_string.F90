@@ -1702,7 +1702,7 @@ subroutine oasis_string_abort(string)
 
    if (doabort) then
       WRITE(nulprt,*) subname,estr,'abort for ',TRIM(lstring)
-      call oasis_abort()
+      call oasis_abort(file=__FILE__,line=__LINE__)
    else
       write(nulprt,*) subname,wstr,'no abort for '//trim(lstring)
       CALL oasis_flush(nulprt)

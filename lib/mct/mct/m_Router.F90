@@ -18,6 +18,7 @@
  module m_Router
 
       use m_realkinds, only : FP
+      use m_mpif90
 
       implicit none
 
@@ -730,7 +731,7 @@
 !
 ! !INTERFACE:
 
-    subroutine print_(rout,mycomm,lun)
+    subroutine print_(rout,mycomm,lun,string)
 !
 ! !USES:
 !
@@ -743,6 +744,7 @@
       type(Router),      intent(in) :: Rout
       integer, intent(in)           :: mycomm
       integer, intent(in)           :: lun
+      character(len=*),intent(in),optional :: string
 
 ! !REVISION HISTORY:
 ! 27Jul07 - R. Loy <rloy@mcs.anl.gov>  initial version
@@ -752,18 +754,42 @@
     integer iproc
     integer myrank
     integer ier
+    integer cnt,cntg,cntmin,cntmax,cntnum
+    character(len=64) :: lstring
     character(len=*),parameter :: myname_=myname//'::print_'
   
     call MP_comm_rank(mycomm,myrank,ier)
     if(ier/=0) call MP_perr_die(myname_,'MP_comm_rank',ier)
 
+    lstring = " "
+    if (present(string)) lstring = trim(string)
 
+    cnt = 0
+    cntnum = 0
+    cntmin = 0
+    cntmax = 0
     do iproc=1,rout%nprocs
       if (rout%num_segs(iproc) > 0) then
-        write(lun,*) myrank,rout%pe_list(iproc),rout%locsize(iproc)
+!        write(lun,*) myname_,myrank,trim(lstring),rout%pe_list(iproc),rout%locsize(iproc)
+        cnt = cnt + rout%locsize(iproc)
+        cntnum = cntnum + 1
+        if (cntmin == 0) then 
+           cntmin = rout%locsize(iproc)
+        else
+           cntmin = min(cntmin, rout%locsize(iproc))
+        endif
+        if (cntmax == 0) then 
+           cntmax = rout%locsize(iproc)
+        else
+           cntmax = max(cntmax, rout%locsize(iproc))
+        endif
       endif
     end do        
-
+    if (cnt > 0) write(lun,'(a,i8,1x,2a,4i12)') myname_,myrank,trim(lstring),' local_cnt ',cnt,cntnum,cntmin,cntmax
+    call MPI_REDUCE(cnt,cntg,1,MP_INTEGER,MP_SUM,0,mycomm,ier)
+    if (myrank == 0 .and. cntg > 0) then
+      write(lun,'(a,i8,1x,2a,i12)') myname_,myrank,trim(lstring),' total_cnt ',cntg
+    endif
 
   end subroutine print_
 

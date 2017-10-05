@@ -151,7 +151,7 @@ module mod_oasis_timer
             IF (ntimer+1 > mtimer) THEN
                 WRITE(nulprt,*) subname,estr,'Timer number exceeded' 
                 WRITE(nulprt,*) subname,estr,'Increase nt oasis_timer_init interface'
-                CALL oasis_abort()
+                call oasis_abort(file=__FILE__,line=__LINE__)
             ENDIF
          endif
 

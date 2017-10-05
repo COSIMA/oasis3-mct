@@ -29,6 +29,10 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
                                                          !< in each line of the file namcouple 
   CHARACTER(len=*),parameter :: rform = '(A5000)'        !< formatted line read format
+  CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_1d'        ! decomp_wghtfile or decomp_1d
+!  CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_wghtfile'  ! decomp_wghtfile or decomp_1d
+! CHARACTER(len=*),parameter :: nmatxrd_default = 'orig'   ! ceg or orig
+  CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'    ! ceg or orig
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
@@ -37,6 +41,8 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_i4_p)   ,public :: namuntmin     !< namcouple min IO unit value
   INTEGER(kind=ip_i4_p)   ,public :: namuntmax     !< namcouple max IO unit value
   LOGICAL                 ,public :: namnorest     !< namcouple allow no restarts
+  CHARACTER(len=ic_med)   ,public :: nammapdec     !< namcouple map decomp value
+  CHARACTER(len=ic_med)   ,public :: nammatxrd     !< namcouple matrix read option
  
   CHARACTER(len=jpeighty) ,public,pointer :: namsrcfld(:)  !< list of src fields
   CHARACTER(len=jpeighty) ,public,pointer :: namdstfld(:)  !< list of dst fields
@@ -131,6 +137,9 @@ MODULE mod_oasis_namcouple
   INTEGER(kind=ip_intwp_p) :: nuntmax
 !---- allow no restart files
   LOGICAL :: nnorest
+!---- specify mapping decomp
+  CHARACTER(len=ic_med) :: nmapdec
+  CHARACTER(len=ic_med) :: nmatxrd
 ! --- mod_string
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: numlab
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: ig_numlab
@@ -267,14 +276,17 @@ MODULE mod_oasis_namcouple
     cldate   = '$INIDATE ', &
     clhead   = '$MODINFO ', &
     clprint  = '$NLOGPRT ', &
+    clmapdec = '$NMAPDEC ', &
+    clmatxrd = '$NMATXRD ', &
     clunit   = '$NUNITNO ', &
     clrest   = '$NNOREST ', &
     clcal    = '$CALTYPE ', &
     clend    = '$END     '
-  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 14
+  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 16
   CHARACTER*9, parameter :: keyword_list(nkeywords) = &
     (/clfield, clchan, clstring, clmod, cljob, cltime, clseq, &
-     cldate, clhead, clprint, clunit, clrest, clcal, clend /)
+     cldate, clhead, clprint, clmapdec, clmatxrd, clunit, clrest, &
+     clcal, clend /)
   CHARACTER*512 :: tmpstr1, tmpstr2, tmpstr3, tmpstr4
 
 
@@ -481,6 +493,8 @@ SUBROUTINE oasis_namcouple_init()
   namuntmin = nuntmin
   namuntmax = nuntmax
   namnorest = nnorest
+  nammapdec = nmapdec
+  nammatxrd = nmatxrd
   DO jf = 1,ig_final_nfield
      namsrcfld(jf) = cg_input_field(jf)
      namdstfld(jf) = cg_output_field(jf)
@@ -588,7 +602,11 @@ SUBROUTINE oasis_namcouple_init()
 
   IF (mpi_rank_global == 0) THEN
      WRITE(nulprt1,*) ' '
-     WRITE(nulprt1,*) subname,'namlogprt ',namlogprt
+     WRITE(nulprt1,*) subname,'namlogprt,t   ',namlogprt, namtlogprt
+     WRITE(nulprt1,*) subname,'namuntmin,max ',namuntmin, namuntmax
+     WRITE(nulprt1,*) subname,'namnorest     ',namnorest
+     WRITE(nulprt1,*) subname,'nammapdec     ',trim(nammapdec)
+     WRITE(nulprt1,*) subname,'nammatxrd     ',trim(nammatxrd)
      WRITE(nulprt1,*) ' '
      DO n = 1,nnamcpl
         WRITE(nulprt1,*) subname,n,'namsrcfld ',TRIM(namsrcfld(n))
@@ -910,6 +928,10 @@ SUBROUTINE inipar_alloc()
      !* First line
 
      READ(nulin, FMT=rform, END=241) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'1 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
      CALL skip(clline, jpeighty, ios=ios)
      CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
      IF (trim(clvari) .eq. "$END") endflag = .true.
@@ -922,18 +944,17 @@ SUBROUTINE inipar_alloc()
 
      IF (.not. endflag) THEN
 
-        IF (mpi_rank_global == 0) THEN
-           write(nulprt1,*) 'parsing: ',trim(clline)
-           CALL oasis_flush(nulprt1)
-        ENDIF
-
         !* Get output field symbolic name
         CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
         cg_output_field(jf) = clvari
 
         !* Get total number of analysis
         CALL parse(clline, clvari, 5, jpeighty, ilen, __LINE__)
-        READ(clvari, FMT=2003) ig_total_ntrans(jf)
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'parsing 1 Read line, clvari in 5 position: ',TRIM(clline),TRIM(clvari)
+           CALL oasis_flush(nulprt1) 
+        ENDIF
+        READ(clvari,FMT=2003) ig_total_ntrans(jf)
 
         !* Get field STATUS for OUTPUT fields
         CALL parse(clline, clvari, 6, jpeighty, ilen, __LINE__)
@@ -1000,18 +1021,34 @@ SUBROUTINE inipar_alloc()
            ENDIF
        ENDIF
 
+       WRITE(nulprt1,*) subname,'field jf : ',jf,' lg_state(jf) : ',lg_state(jf)
+       WRITE(nulprt1,*) subname,'field jf : ',jf,' endflag : ',endflag
         IF (lg_state(jf)) THEN
-           IF (ig_total_ntrans(jf) .eq. 0) THEN
-              WRITE(tmpstr1,*) 'If there is no analysis for the field',jf, &
-                    'THEN the status must not be EXPORTED, AUXILIARY, or EXPOUT'
-              CALL namcouple_abort(subname,__LINE__,tmpstr1)
-           ENDIF
+!           IF (ig_total_ntrans(jf) .eq. 0) THEN
+ !             WRITE(tmpstr1,*) 'If there is no analysis for the field',jf, &
+ !                   'THEN the status must not be EXPORTED, AUXILIARY, or EXPOUT'
+ !             CALL namcouple_abort(subname,__LINE__,tmpstr1)
+ !          ENDIF
 
            READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'2 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline, jpeighty, ios=ios)
            READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'3 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline, jpeighty, ios=ios)
+! MODIF LC quand il n'y a pas de transformations
+           IF (ig_total_ntrans(jf) .GT. 0) THEN
            READ(nulin, FMT=rform) clline_aux
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'4 Read line_aux: ',TRIM(clline_aux)
+           CALL oasis_flush(nulprt1)
+        ENDIF
            CALL skip(clline_aux, jpeighty, ios=ios)
            DO ja=1,ig_total_ntrans(jf)
               CALL parse(clline_aux, clvari, ja, jpeighty, ilen, __LINE__)
@@ -1029,17 +1066,31 @@ SUBROUTINE inipar_alloc()
                  CONTINUE
               ELSE
                  READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'5 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
                  CALL skip(clline, jpeighty, ios=ios)
               ENDIF
            ENDDO
+! MODIF LC
+        ENDIF
        ELSE
            IF (ig_total_state(jf) .ne. ip_input) THEN
               READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'6 Read line : ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
               CALL skip(clline, jpeighty, ios=ios)
            ENDIF
            IF (ig_total_state(jf) .ne. ip_input .and.  &
                ig_total_ntrans(jf) .gt. 0 ) THEN
               READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'7 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
               CALL skip(clline, jpeighty, ios=ios)
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
               IF (clvari(1:8) .ne. 'LOCTRANS') THEN
@@ -1050,6 +1101,10 @@ SUBROUTINE inipar_alloc()
               ENDIF
               DO ja=1,ig_total_ntrans(jf)
                  READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'8 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
                  CALL skip(clline, jpeighty, ios=ios)
               ENDDO
            ENDIF
@@ -1071,7 +1126,7 @@ SUBROUTINE inipar_alloc()
      IF (ios .EQ. 0) THEN 
         CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
         IF (trim(clvari) /= "$END") THEN
-!           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
+           WRITE(tmpstr1,*) ' NFIELDS too small, increase it in namcouple'
            WRITE(nulprt1,*) ' NFIELDS too small, increase it in namcouple'
            CALL oasis_flush(nulprt1)
            CALL namcouple_abort(subname,__LINE__,tmpstr1)
@@ -1715,6 +1770,58 @@ SUBROUTINE inipar
 
   REWIND nulin
 
+  !* Get the unit map decomp value
+
+  nmapdec = nmapdec_default
+  keyword = clmapdec
+  CALL findkeyword (keyword, clline, found)
+  IF (found) THEN
+     READ(nulin, FMT=rform) clline
+     CALL skip(clline, jpeighty, ios=ios)
+     CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
+     nmapdec = clvari
+     IF (ilen .LE. 0) THEN
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
+           WRITE(nulprt1,*) ' Default value wght will be used '
+           WRITE(nulprt1,*) ' '
+           CALL oasis_flush(nulprt1)
+        ENDIF
+     ENDIF
+  ENDIF   ! found
+
+  !* Print out the mapdec value
+
+  IF (mpi_rank_global == 0) THEN
+     write(nulprt1,*) ' The mapdec value is nmapdec = ',trim(nmapdec)
+  endif
+
+  !* Get the unit matrix read value
+
+  nmatxrd = nmatxrd_default
+  keyword = clmatxrd
+  CALL findkeyword (keyword, clline, found)
+  IF (found) THEN
+     READ(nulin, FMT=rform) clline
+     CALL skip(clline, jpeighty, ios=ios)
+     CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
+     nmatxrd = clvari
+     IF (ilen .LE. 0) THEN
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
+           WRITE(nulprt1,*) ' Default value wght will be used '
+           WRITE(nulprt1,*) ' '
+           CALL oasis_flush(nulprt1)
+        ENDIF
+     ENDIF
+  ENDIF   ! found
+
+  !* Print out the matxrd value
+
+  IF (mpi_rank_global == 0) THEN
+     write(nulprt1,*) ' The matxrd value is nmatxrd = ',trim(nmatxrd)
+  endif
+
   !* Get the unit min/max values
 
   nuntmin = 1024
@@ -1957,8 +2064,16 @@ SUBROUTINE inipar
 
      IF (lg_state(jf)) THEN
         READ(nulin, FMT=rform) clline
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'9 Read line: ',TRIM(clline)
+           CALL oasis_flush(nulprt1)
+        ENDIF
         CALL skip(clline, jpeighty, ios=ios)
         CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) subname,'9 Read line :',TRIM(clline),'  clvari in 1 position: ',TRIM(clvari)
+           CALL oasis_flush(nulprt1)
+        ENDIF
         !     * Get source grid periodicity type
         csper(ig_number_field(jf)) = clvari
         IF (csper(ig_number_field(jf)) .NE. 'P' .AND.  &
@@ -2016,6 +2131,8 @@ SUBROUTINE inipar
            ENDDO  ! ja
         ENDIF
      ELSE
+! MODIF LC
+         IF (ig_total_ntrans(jf) .GT. 0 ) THEN
         READ(nulin, FMT=rform) clline
         CALL skip(clline, jpeighty, ios=ios)
 
@@ -2232,7 +2349,10 @@ SUBROUTINE inipar
               CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
               cconopt(ig_number_field(jf)) = 'bfb'
               IF (ilen > 0) THEN
-                 IF (trim(clvari) == 'bfb' .or. trim(clvari) == 'opt') THEN
+                 IF (trim(clvari) == 'bfb'    .or. trim(clvari) == 'opt'    .or. &
+                     trim(clvari) == 'lsum8'  .or. trim(clvari) == 'lsum16' .or. &
+                     trim(clvari) == 'gather' .or. trim(clvari) == 'ddpdd'  .or. &
+                     trim(clvari) == 'reprosum') THEN
                     cconopt(ig_number_field(jf)) = clvari
                  ELSE
                     CALL prtout('ERROR in namcouple conserv argument',jf,1)
@@ -2278,6 +2398,8 @@ SUBROUTINE inipar
               CALL namcouple_abort(subname,__LINE__,tmpstr1,tmpstr2,tmpstr3,tmpstr4)
            ENDIF
         ENDDO  ! DO ja
+! MODIF LC
+       ENDIF
      ENDIF
 
 !* End of loop on NoF
@@ -3173,17 +3295,17 @@ SUBROUTINE findkeyword (keyword, line, found)
   REWIND nulin
   DO WHILE (.not.found)
      READ(nulin, FMT=rform, END=110, IOSTAT=ios2) clline
-     IF (ios2 == 0) then
-     CALL skip(clline,jpeighty, ios=ios)
-!    write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
-     IF (ios == 0) THEN
+     if (ios2 == 0) then
+       CALL skip(clline,jpeighty, ios=ios)
+!      write(nulprt1,*) trim(subname),'tcx1: ',trim(clline)
+       IF (ios == 0) THEN
          CALL parse(clline, clvari, 1, jpeighty, ILEN, __LINE__)
-!    write(nulprt1,*) trim(subname),'tcx2: ',trim(clvari),trim(keyword)
+!        write(nulprt1,*) trim(subname),'tcx2: ',trim(clvari),trim(keyword)
          IF (clvari == ADJUSTL(keyword)) THEN
              line = clline
              found = .TRUE.
          ENDIF
-     ENDIF
+       ENDIF
      else
        goto 110
      endif
@@ -3521,7 +3643,7 @@ SUBROUTINE namcouple_abort(isubname,lineno,string1,string2,string3,string4)
      WRITE(nulprt1,*) ' '
      CALL oasis_flush(nulprt1)
   ENDIF
-  CALL oasis_abort()
+  call oasis_abort(file=__FILE__,line=__LINE__)
 
 !  CALL oasis_debug_enter(subname)
 

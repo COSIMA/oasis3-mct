@@ -142,7 +142,7 @@ CONTAINS
   integer(kind=ip_i4_p),allocatable :: varidtmp(:)
   integer(kind=ip_i4_p) :: part
   integer(kind=ip_i4_p),pointer :: varid1(:)
-  character(len=ic_med) :: cstring,delim,vname
+  character(len=ic_med) :: cstring,delim,vname,mapopt,mapopt1
   character(len=ic_lvar):: myfld
   integer(kind=ip_i4_p) :: myfldi
   character(len=ic_xxl) :: myfldlist  ! field list for my model
@@ -154,11 +154,12 @@ CONTAINS
   integer(kind=ip_i4_p) :: flag
   logical               :: found, exists, found2
   integer(kind=ip_i4_p) :: mynvar
-  integer(kind=ip_i4_p) :: nwgts
+  integer(kind=ip_i4_p) :: nwgts, arrlen
   character(len=ic_lvar):: tmpfld
   type(prism_coupler_type),pointer :: pcpointer
   type(prism_coupler_type),pointer :: pcpntpair
   integer(kind=ip_i4_p) :: ifind,nfind
+  integer(kind=ip_i4_p) ,pointer :: gridID(:)
   character(len=ic_lvar),pointer :: myvar(:)
   integer(kind=ip_i4_p) ,pointer :: myops(:)
   integer(kind=ip_i4_p) ,pointer :: mynum(:)
@@ -185,8 +186,8 @@ CONTAINS
   type(sortvarfld_type) :: sortvars
   type(sortvarfld_type) :: sorttest
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
-!  character(len=*),parameter :: smatread_method = 'orig'
-  character(len=*),parameter :: smatread_method = 'ceg'
+  character(len=ic_med) :: part2decomp   ! decomp_1d or decomp_wghtfile
+  character(len=ic_med) :: smatread_method ! orig or ceg
   logical, parameter :: local_timers_on = .false.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
@@ -199,6 +200,9 @@ CONTAINS
 
   if (local_timers_on) call oasis_timer_start('cpl_setup_n1')
 
+  part2decomp = nammapdec
+  smatread_method = nammatxrd
+  write(nulprt,*) subname,' part2decomp = ',trim(part2decomp)
   write(nulprt,*) subname,' smatread_method = ',trim(smatread_method)
 
   !-----------------------------------------
@@ -315,7 +319,7 @@ CONTAINS
            do n2 = 1,n1-1
               if (myvar(n1) == myvar(n2)) then
                  WRITE(nulprt,*) subname,estr,'variable name defined more than once by def_var = ',trim(myvar(n1))
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
            enddo
         enddo
@@ -392,9 +396,9 @@ CONTAINS
   enddo
   enddo
 
-  call cplsort(sortvars%num, sortvars%fld, sortkey)
-  call cplsortkey(sortvars%num, sortvars%modnum, sortkey)
-  call cplsortkey(sortvars%num, sortvars%varnum, sortkey)
+  call oasis_sys_sortC(sortvars%num, sortvars%fld, sortkey)
+  call oasis_sys_sortIkey(sortvars%num, sortvars%modnum, sortkey)
+  call oasis_sys_sortIkey(sortvars%num, sortvars%varnum, sortkey)
 
   if (OASIS_debug >= 15) then
      write(nulprt,*) subname//' Sorted array : sortvars'
@@ -433,7 +437,7 @@ CONTAINS
         WRITE(nulprt,*) subname,estr,'number of fields in namcouple inconsistent ',nn,n1,n2
         WRITE(nulprt,*) subname,estr,'namcouple src fields = ',trim(namsrcfld(nn))
         WRITE(nulprt,*) subname,estr,'namcouple dst fields = ',trim(namdstfld(nn))
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
   enddo
 
@@ -467,9 +471,9 @@ CONTAINS
   enddo
   enddo
 
-  call cplsort(sortnsrc%num, sortnsrc%fld, sortkey)
-  call cplsortkey(sortnsrc%num, sortnsrc%namnum, sortkey)
-  call cplsortkey(sortnsrc%num, sortnsrc%fldnum, sortkey)
+  call oasis_sys_sortC(sortnsrc%num, sortnsrc%fld, sortkey)
+  call oasis_sys_sortIkey(sortnsrc%num, sortnsrc%namnum, sortkey)
+  call oasis_sys_sortIkey(sortnsrc%num, sortnsrc%fldnum, sortkey)
 
   if (OASIS_debug >= 15) then
      write(nulprt,*) subname//' Sorted array : sortnsrc'
@@ -494,9 +498,9 @@ CONTAINS
   enddo
   enddo
 
-  call cplsort(sortndst%num, sortndst%fld, sortkey)
-  call cplsortkey(sortndst%num, sortndst%namnum, sortkey)
-  call cplsortkey(sortndst%num, sortndst%fldnum, sortkey)
+  call oasis_sys_sortC(sortndst%num, sortndst%fld, sortkey)
+  call oasis_sys_sortIkey(sortndst%num, sortndst%namnum, sortkey)
+  call oasis_sys_sortIkey(sortndst%num, sortndst%fldnum, sortkey)
 
   if (OASIS_debug >= 15) then
      write(nulprt,*) subname//' Sorted array : sortndst'
@@ -535,9 +539,9 @@ CONTAINS
         sorttest%varnum(n1) = n1
      enddo
 
-     call cplsort(sorttest%num, sorttest%fld, sortkey)
-     call cplsortkey(sorttest%num, sorttest%modnum, sortkey)
-     call cplsortkey(sorttest%num, sorttest%varnum, sortkey)
+     call oasis_sys_sortC(sorttest%num, sorttest%fld, sortkey)
+     call oasis_sys_sortIkey(sorttest%num, sorttest%modnum, sortkey)
+     call oasis_sys_sortIkey(sorttest%num, sorttest%varnum, sortkey)
 
      write(nulprt,*) subname//' Sorted array : sorttest'
      do n1 = 1,sorttest%num
@@ -748,7 +752,7 @@ CONTAINS
 
            if (flag /= OASIS_In .and. flag /= OASIS_Out) then
               write(nulprt,*) subname,estr,'var must be either OASIS_In or OASIS_Out for var = ',trim(myfld)
-              call oasis_abort()
+              call oasis_abort(file=__FILE__,line=__LINE__)
            endif
 
            if (OASIS_debug >= 20) then
@@ -831,17 +835,17 @@ CONTAINS
 !                if (nm == compid) then
 !                   write(nulprt,*) subname,estr,'send recv pair on same model = ', &
 !                      trim(myfld),' ',trim(otfld)
-!                   call oasis_abort()
+!                   call oasis_abort(file=__FILE__,line=__LINE__)
 !                endif
                  if (flag == OASIS_Out .and. allops(nv,nm) /= OASIS_In) then
                     write(nulprt,*) subname,estr,'send recv pair both Out = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (flag == OASIS_In .and. allops(nv,nm) /= OASIS_Out) then
                     write(nulprt,*) subname,estr,'send recv pair both In = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -853,7 +857,7 @@ CONTAINS
                  if (trim(myfld) /= trim(otfld)) then
                     write(nulprt,*) subname,estr,'namcouple field names do not match in/out = ', &
                        trim(myfld),' ',trim(otfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -864,7 +868,7 @@ CONTAINS
               if (prism_var(nv1)%num /= allnum(nv,nm)) then
                  write(nulprt,*) subname,estr,'namcouple bundle fields do not match for ',trim(myfld),' ',trim(otfld)
                  write(nulprt,*) subname,estr,'namcouple bundle numbers are ',prism_var(nv1)%num,allnum(nv,nm)
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
 
               !--------------------------------
@@ -874,7 +878,7 @@ CONTAINS
 
               if (flag == OASIS_In .and. found) then
                  write(nulprt,*) subname,estr,'found two sources for field = ',trim(otfld)
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
               found = .true.
 
@@ -930,7 +934,7 @@ CONTAINS
               svarid = size(pcpointer%varid)
               if (myfldi > svarid .or. pcpointer%nflds > svarid) then
                  WRITE(nulprt,*) subname,estr,'multiple field coupling setup error',svarid,myfldi,pcpointer%nflds
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
 
               pcpointer%varid(myfldi) = nv1
@@ -943,7 +947,7 @@ CONTAINS
               if (prism_var(nv1)%ncpl > mvarcpl) then
                  WRITE(nulprt,*) subname,estr,'ncpl too high, max size (mvarcpl) = ',mvarcpl
                  WRITE(nulprt,*) subname,estr,'increase mvarcpl in mod_oasis_var'
-                 call oasis_abort()
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
               prism_var(nv1)%cpl(prism_var(nv1)%ncpl) = nc
 
@@ -956,15 +960,15 @@ CONTAINS
               if (pcpointer%valid) then
                  if (pcpointer%comp /= nm) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field comp for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (pcpointer%namID /= nn) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field namID for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  if (pcpointer%partID /= part1) then
                     WRITE(nulprt,*) subname,estr,'mismatch in field partID for var = ',trim(myfld)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
 
              else
@@ -1034,7 +1038,7 @@ CONTAINS
                        if (prism_nrouter > prism_mrouter) then
                           write(nulprt,*) subname,estr,'prism_nrouter too large = ',prism_nrouter,prism_mrouter
                           write(nulprt,*) subname,estr,'check prism_mrouter in oasis_coupler_setup '
-                          call oasis_abort()
+                          call oasis_abort(file=__FILE__,line=__LINE__)
                        endif
                        pcpointer%routerID = prism_nrouter
                     endif
@@ -1086,7 +1090,7 @@ CONTAINS
                           if (prism_nmapper > prism_mmapper) then
                              write(nulprt,*) subname,estr,'prism_nmapper too large',prism_nmapper,prism_mmapper
                              write(nulprt,*) subname,estr,'check prism_mmapper in oasis_coupler_setup '
-                             call oasis_abort()
+                             call oasis_abort(file=__FILE__,line=__LINE__)
                           endif
                           mapID = prism_nmapper
                           prism_mapper(mapID)%file = trim(tmp_mapfile)
@@ -1133,7 +1137,7 @@ CONTAINS
      endif
   enddo
 !  call oasis_mpi_barrier(mpi_comm_global)
-  if (found) call oasis_abort()
+  if (found) call oasis_abort(file=__FILE__,line=__LINE__)
   deallocate(namsrc_checkused_g)
 
   !--- deallocate temporary ---
@@ -1175,7 +1179,7 @@ CONTAINS
         if (nflds2 < nflds1) then
            write(nulprt,*) subname,estr,'fldlist rebuild nflds2 < nflds1 for ',trim(pcpointer%fldlist)
            write(nulprt,*) subname,estr,'fldlist reset error in fld cnt = ',nflds1,nflds2
-           call oasis_abort()
+           call oasis_abort(file=__FILE__,line=__LINE__)
         else
            write(nulprt,*) subname,' fldlist rebuild nflds2 > nflds1 for ',trim(pcpointer%fldlist)
            allocate(varid1(nflds1))
@@ -1194,7 +1198,7 @@ CONTAINS
                  if (len_trim(pcpointer%fldlist) > 0.99 * len(pcpointer%fldlist)) then
                     write(nulprt,*) subname,estr,'fldlist rebuild too long, limit is ',len(pcpointer%fldlist),' chars'
                     write(nulprt,*) subname,estr,'current rebuid fldlist is ',trim(pcpointer%fldlist)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
                  call oasis_coupler_bldvarname(varid1(n1),n2,vname)
                  write(pcpointer%fldlist,'(a)') trim(pcpointer%fldlist)//trim(delim)//trim(vname)
@@ -1241,21 +1245,23 @@ CONTAINS
   if (local_timers_on) call oasis_timer_stop('cpl_setup_n4a')
 
   do nc = 1,prism_mcoupler
+  ! tcraig, this barrier make sure mapping files are generated one coupler at a time
+  call oasis_mpi_barrier(mpi_comm_global)
   do npc = 1,2
-  if (npc == 1) then
+   if (npc == 1) then
      pcpointer => prism_coupler_put(nc)
      pcpntpair => prism_coupler_get(nc)
-  endif
-  if (npc == 2) then
+   endif
+   if (npc == 2) then
      pcpointer => prism_coupler_get(nc)
      pcpntpair => prism_coupler_put(nc)
-  endif
-  if (OASIS_debug >= 20) then
+   endif
+   if (OASIS_debug >= 20) then
      write(nulprt,*) subname,' DEBUG cb:initialize coupler ',nc,npc,pcpointer%valid
      call oasis_flush(nulprt)
-  endif
+   endif
 
-  if (pcpointer%valid) then
+   if (pcpointer%valid) then
      if (local_timers_on) call oasis_timer_start('cpl_setup_n4b')
      if (OASIS_debug >= 5) then
         write(nulprt,*) subname,' DEBUG ci:initialize coupler ',nc,npc
@@ -1268,7 +1274,7 @@ CONTAINS
 
      if (part1 <= 0) then
         write(nulprt,*) subname,estr,'part1 invalid = ',part1
-        call oasis_abort()
+        call oasis_abort(file=__FILE__,line=__LINE__)
      endif
 
      !--------------------------------
@@ -1281,7 +1287,7 @@ CONTAINS
         write(nulprt,'(1x,2a,5i10)') subname,' DEBUG ci:part1 info ',namID,part1,mapID,gsize,lsize
         write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1a',prism_part(part1)%gsmap%ngseg,&
                                      prism_part(part1)%gsmap%gsize
-        do n1 = 1,prism_part(part1)%gsmap%ngseg
+        do n1 = 1,min(prism_part(part1)%gsmap%ngseg,10)
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part1b',n1,&
                                         prism_part(part1)%gsmap%start(n1),&
                                         prism_part(part1)%gsmap%length(n1),&
@@ -1362,7 +1368,7 @@ CONTAINS
                  else
                     write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
                                     trim(prism_mapper(mapID)%file)
-                    call oasis_abort()
+                    call oasis_abort(file=__FILE__,line=__LINE__)
                  endif
               endif
 
@@ -1396,39 +1402,132 @@ CONTAINS
               nx = namdst_nx(namID)
               ny = namdst_ny(namID)
               gridname = trim(namdstgrd(namID))
+              mapopt1 = 'dst'
            else
               nx = namsrc_nx(namID)
               ny = namsrc_ny(namID)
               gridname = trim(namsrcgrd(namID))
+              mapopt1 = 'src'
            endif
+
+           !--- mapopt sets whether src or dst are rearranged in remap
+           !--- src = rearrange and map (bfb), dst = map and rearrange (partial sum)
+           if (prism_mapper(mapID)%opt == 'opt') then
+              if (pcpointer%getput == OASIS3_PUT .and. prism_part(part1)%gsize > gsize) then
+                 mapopt = 'dst'
+              elseif (pcpointer%getput == OASIS3_GET .and. prism_part(part1)%gsize < gsize) then
+                 mapopt = 'dst'
+              else
+                 mapopt = 'src'
+              endif
+           elseif (prism_mapper(mapID)%opt == 'bfb') then
+              mapopt = 'src'
+           elseif (prism_mapper(mapID)%opt == 'sum') then
+              mapopt = 'dst'
+           else
+              write(nulprt,*) subname,estr,'mapper opt invalid expect bfb or sum  =',trim(prism_mapper(mapID)%opt)
+              call oasis_abort(file=__FILE__,line=__LINE__)
+           endif
+
+           if (prism_mapper(mapID)%optval /= '' .and. &
+               prism_mapper(mapID)%optval /= trim(mapopt)) then
+              write(nulprt,*) subname,estr,'mapper opt changed',&
+                              trim(prism_mapper(mapID)%optval),' ',trim(mapopt)
+              call oasis_abort(file=__FILE__,line=__LINE__)
+           endif
+           prism_mapper(mapID)%optval = trim(mapopt)
            if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dc')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4d')
 
-           !tcx improve match here with nx,ny,gridname 
-           if (local_timers_on) call oasis_timer_start('cpl_setup_n4dd')
-           call oasis_part_create(part2,'1d',gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local)
-           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4dd')
+           !-------------------------------
+           ! smatreaddnc allocates sMati to nwgts
+           ! then instantiate an sMatP for each set of wgts
+           ! to support higher order mapping
+           !-------------------------------
 
-           if (OASIS_Debug >= 15) then
-              write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
-              do r1 = 1,prism_part(part1)%gsmap%ngseg
-                 write(nulprt,*) subname," DEBUG part_create part1 info ",&
-                                 prism_part(part1)%gsmap%start(r1),prism_part(part1)%gsmap%length(r1),&
-                                 prism_part(part1)%gsmap%pe_loc(r1)
-              enddo
-
-              write(nulprt,*) subname," DEBUG part_create part2 gsize",prism_part(part2)%gsize
-              do r1 = 1,prism_part(part2)%gsmap%ngseg
-                 write(nulprt,*) subname," DEBUG part_create part2 info ",prism_part(part2)%gsmap%start(r1),&
-                                 prism_part(part2)%gsmap%length(r1),prism_part(part2)%gsmap%pe_loc(r1)
-              enddo
+           if (OASIS_debug > 15) then
+              write(nulprt,*) subname,' using part2decomp = ',trim(part2decomp)
+              write(nulprt,*) subname,' mapopt, mapopt1 = ',trim(mapopt),' ',trim(mapopt1)
            endif
 
-           if (local_timers_on) call oasis_timer_start('cpl_setup_n4de')
-           if (prism_part(part2)%nx < 1) then
-              prism_part(part2)%nx = nx
-              prism_part(part2)%ny = ny
-              prism_part(part2)%gridname = trim(gridname)
+           if (trim(part2decomp) == 'decomp_wghtfile') then
+              ! reads wgts based on part1 then creates new part2 decomp based on wgts decomp
+              ! pass in part1 decomp for "both" decomps for smatreaddnc
+
+              if (smatread_method == "ceg") then
+                 if (local_timers_on) call oasis_timer_start('smatrdw_ceg')
+                 call oasis_map_smatreaddnc_ceg(sMati,prism_part(part1)%gsmap,prism_part(part1)%gsmap, &
+                    trim(mapopt1),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+                 if (local_timers_on) call oasis_timer_stop('smatrdw_ceg')
+              else
+                 if (local_timers_on) call oasis_timer_start('smatrdw_orig')
+                 call oasis_map_smatreaddnc_orig(sMati,prism_part(part1)%gsmap,prism_part(part1)%gsmap, &
+                    trim(mapopt1),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+                 if (local_timers_on) call oasis_timer_stop('smatrdw_orig')
+              endif
+
+              ! extract the gridIDs from sMati, rows and cols are same in all sMati's here, so just use sMati(1)
+!              if (OASIS_debug > 15) then
+!                 nullify(gridID)
+!                 call mct_sMat_ExpGRowI(sMati(1), gridID, length=arrlen)
+!                 write(nulprt,*) subname,' gridID0r ',trim(mapopt),' ',trim(mapopt1)
+!                 write(nulprt,*) subname,' gridID1r ',size(gridID),arrlen, gsize
+!                 if (arrlen > 0) then
+!                    write(nulprt,*) subname,' gridID2r ',minval(gridID),maxval(gridID)
+!                    write(nulprt,*) subname,' gridID3r ',minval(gridID(1:arrlen)),maxval(gridID(1:arrlen))
+!                    write(nulprt,*) subname,' gridID4r ',gridID(1:10)
+!                 endif
+!                 deallocate(gridID)
+!                 nullify(gridID)
+!                 call mct_sMat_ExpGColI(sMati(1), gridID, length=arrlen)
+!                 write(nulprt,*) subname,' gridID0c ',trim(mapopt),' ',trim(mapopt1)
+!                 write(nulprt,*) subname,' gridID1c ',size(gridID),arrlen, gsize
+!                 if (arrlen > 0) then
+!                    write(nulprt,*) subname,' gridID2c ',minval(gridID),maxval(gridID)
+!                    write(nulprt,*) subname,' gridID3c ',minval(gridID(1:arrlen)),maxval(gridID(1:arrlen))
+!                    write(nulprt,*) subname,' gridID4c ',gridID(1:10)
+!                 endif
+!                 deallocate(gridID)
+!              endif
+
+              if (local_timers_on) call oasis_timer_start('smat_expg')
+              nullify(gridID)
+              if (mapopt1 == 'dst') then
+                 call mct_sMat_ExpGRowI(sMati(1), gridID, length=arrlen)
+              elseif (mapopt1 == 'src') then
+                 call mct_sMat_ExpGColI(sMati(1), gridID, length=arrlen)
+              else
+                 write(nulprt,*) subname,estr,'invalid mapopt = ',trim(mapopt)
+                 call oasis_abort(file=__FILE__,line=__LINE__)
+              endif
+              do n = 1,nwgts
+                 call mct_sMat_Clean(sMati(n))
+              enddo
+              deallocate(sMati)
+              if (local_timers_on) call oasis_timer_stop('smat_expg')
+
+              if (OASIS_debug > 15) then
+                 write(nulprt,*) subname,' gridID0 ',trim(mapopt),' ',trim(mapopt1)
+                 write(nulprt,*) subname,' gridID1 ',size(gridID),arrlen, gsize
+                 if (arrlen > 0) then
+                    write(nulprt,*) subname,' gridID2 ',minval(gridID),maxval(gridID)
+                    write(nulprt,*) subname,' gridID3 ',minval(gridID(1:arrlen)),maxval(gridID(1:arrlen))
+                    write(nulprt,*) subname,' gridID4 ',gridID(1:10)
+                 endif
+              endif
+
            endif
+
+!tcx, for testing only, part2decomp should be set by namcouple
+!  part2decomp = 'decomp_1d'
+           if (local_timers_on) call oasis_timer_start('part_create')
+           if (part2decomp == 'decomp_wghtfile') then
+              call oasis_part_create(part2,trim(part2decomp),gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local,gridID)
+              deallocate(gridID)
+           else
+              call oasis_part_create(part2,trim(part2decomp),gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local)
+           endif
+           if (local_timers_on) call oasis_timer_stop('part_create')
 
            if (pcpointer%getput == OASIS3_PUT) then
              !prism_mapper(mapID)%spart = part1   ! set above
@@ -1440,48 +1539,33 @@ CONTAINS
            spart = prism_mapper(mapID)%spart
            dpart = prism_mapper(mapID)%dpart
 
-           !--- cstring sets whether src or dst are rearranged in remap
-           !--- src = rearrange and map (bfb), dst = map and rearrange (partial sum)
-           if (prism_mapper(mapID)%opt == 'opt') then
-              if (prism_part(spart)%gsize > prism_part(dpart)%gsize) then
-                 cstring = 'dst'
-              else
-                 cstring = 'src'
-              endif
-           elseif (prism_mapper(mapID)%opt == 'bfb') then
-              cstring = 'src'
-           elseif (prism_mapper(mapID)%opt == 'sum') then
-              cstring = 'dst'
-           else
-              write(nulprt,*) subname,estr,'mapper opt invalid expect bfb or sum  =',trim(prism_mapper(mapID)%opt)
-              call oasis_abort()
-           endif
-           if (prism_mapper(mapID)%optval /= '' .and. &
-               prism_mapper(mapID)%optval /= trim(cstring)) then
-              write(nulprt,*) subname,estr,'mapper opt changed',&
-                              trim(prism_mapper(mapID)%optval),' ',trim(cstring)
-              call oasis_abort()
-           endif
-           prism_mapper(mapID)%optval = trim(cstring)
-           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4de')
-           if (local_timers_on) call oasis_timer_stop('cpl_setup_n4d')
-
-           !-------------------------------
-           ! smatreaddnc allocates sMati to nwgts
-           ! then instantiate an sMatP for each set of wgts
-           ! to support higher order mapping
-           !-------------------------------
            if (smatread_method == "ceg") then
               if (local_timers_on) call oasis_timer_start('smatrd_ceg')
               call oasis_map_smatreaddnc_ceg(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+                 trim(mapopt),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
               if (local_timers_on) call oasis_timer_stop('smatrd_ceg')
            else
               if (local_timers_on) call oasis_timer_start('smatrd_orig')
               call oasis_map_smatreaddnc_orig(sMati,prism_part(spart)%gsmap,prism_part(dpart)%gsmap, &
-                 trim(cstring),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
+                 trim(mapopt),trim(prism_mapper(mapID)%file),mpi_rank_local,mpi_comm_local,nwgts)
               if (local_timers_on) call oasis_timer_stop('smatrd_orig')
            endif
+
+           if (OASIS_Debug >= 15) then
+              write(nulprt,*) subname," DEBUG part_create part1 gsize",prism_part(part1)%gsize
+              do r1 = 1,min(prism_part(part1)%gsmap%ngseg,10)
+                 write(nulprt,*) subname," DEBUG part_create part1 info ",&
+                                 prism_part(part1)%gsmap%start(r1),prism_part(part1)%gsmap%length(r1),&
+                                 prism_part(part1)%gsmap%pe_loc(r1)
+              enddo
+
+              write(nulprt,*) subname," DEBUG part_create part2 gsize",prism_part(part2)%gsize
+              do r1 = 1,min(prism_part(part2)%gsmap%ngseg,10)
+                 write(nulprt,*) subname," DEBUG part_create part2 info ",prism_part(part2)%gsmap%start(r1),&
+                                 prism_part(part2)%gsmap%length(r1),prism_part(part2)%gsmap%pe_loc(r1)
+              enddo
+           endif
+
            if (local_timers_on) call oasis_timer_start('cpl_setup_sminit')
            prism_mapper(mapID)%nwgts = nwgts
            allocate(prism_mapper(mapID)%sMatP(nwgts))
@@ -1492,6 +1576,13 @@ CONTAINS
            enddo
            deallocate(sMati)
            if (local_timers_on) call oasis_timer_stop('cpl_setup_sminit')
+
+           if (local_timers_on) call oasis_timer_start('cpl_setup_smprint')
+           write(cstring,'(a1,i4.4,a1)') 'm',mapID,'-'
+           call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%xtoxprime,mpi_comm_local,nulprt,trim(cstring)//'smpx')
+           call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%yprimetoy,mpi_comm_local,nulprt,trim(cstring)//'smpy')
+           if (local_timers_on) call oasis_timer_stop('cpl_setup_smprint')
+
            if (local_timers_on) call oasis_timer_start('cpl_setup_n4e')
 
            lsize = mct_smat_gNumEl(prism_mapper(mapID)%sMatP(1)%Matrix,mpi_comm_local)
@@ -1562,7 +1653,7 @@ CONTAINS
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2 info ',part2,mapID,gsize,lsize
            write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2a',prism_part(part2)%gsmap%ngseg,&
                                         prism_part(part2)%gsmap%gsize
-           do n1 = 1,prism_part(part2)%gsmap%ngseg
+           do n1 = 1,min(prism_part(part2)%gsmap%ngseg,10)
               write(nulprt,'(1x,2a,4i12)') subname,' DEBUG ci:part2b',n1,prism_part(part2)%gsmap%start(n1),&
                                            prism_part(part2)%gsmap%length(n1),prism_part(part2)%gsmap%pe_loc(n1)
            enddo
@@ -1656,19 +1747,19 @@ CONTAINS
                  write(nulprt,*) subname," DEBUG ci:done initializing prism_router",&
                                  pcpointer%routerID
                  if (OASIS_debug >= 20) then
-                    do r1 = 1,prism_part(pcpointer%rpartID)%gsmap%ngseg
+                    do r1 = 1,min(prism_part(pcpointer%rpartID)%gsmap%ngseg,10)
                        write(nulprt,*) subname," DEBUG router gs1 info ",prism_part(pcpointer%rpartID)%gsmap%start(r1),&
                                        prism_part(pcpointer%rpartID)%gsmap%length(r1),prism_part(pcpointer%rpartID)%gsmap%pe_loc(r1)
                     enddo
-                    do r1 = 1,prism_part(pcpointer%partID)%gsmap%ngseg
+                    do r1 = 1,min(prism_part(pcpointer%partID)%gsmap%ngseg,10)
                        write(nulprt,*) subname," DEBUG router gs2 info ",prism_part(pcpointer%partID)%gsmap%start(r1),&
                                        prism_part(pcpointer%partID)%gsmap%length(r1),prism_part(pcpointer%partID)%gsmap%pe_loc(r1)
                     enddo
-                    do r1 = 1,prism_part(pcpntpair%rpartID)%gsmap%ngseg
+                    do r1 = 1,min(prism_part(pcpntpair%rpartID)%gsmap%ngseg,10)
                        write(nulprt,*) subname," DEBUG router gs3 info ",prism_part(pcpntpair%rpartID)%gsmap%start(r1),&
                                        prism_part(pcpntpair%rpartID)%gsmap%length(r1),prism_part(pcpntpair%rpartID)%gsmap%pe_loc(r1)
                     enddo
-                    do r1 = 1,prism_part(pcpntpair%partid)%gsmap%ngseg
+                    do r1 = 1,min(prism_part(pcpntpair%partid)%gsmap%ngseg,10)
                        write(nulprt,*) subname," DEBUG router gs4 info ",prism_part(pcpntpair%partid)%gsmap%start(r1),&
                                        prism_part(pcpntpair%partid)%gsmap%length(r1),prism_part(pcpntpair%partid)%gsmap%pe_loc(r1)
                     enddo
@@ -1880,7 +1971,7 @@ CONTAINS
   if (varnum > prism_var(varid)%num) then
      write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
      write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
-     call oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   if (prism_var(varid)%num > 1) then
@@ -1940,7 +2031,7 @@ CONTAINS
   if (varnum > prism_var(varid)%num) then
      write(nulprt,*) subname,estr,'invalid varnum varid = ',varid,trim(prism_var(varid)%name)
      write(nulprt,*) subname,estr,'invalid varnum = ',varnum,prism_var(varid)%num
-     call oasis_abort()
+     call oasis_abort(file=__FILE__,line=__LINE__)
   endif
 
   call oasis_debug_exit(subname)
@@ -1948,114 +2039,6 @@ CONTAINS
   END SUBROUTINE oasis_coupler_unbldvarname
 
 !------------------------------------------------------------
-! !BOP ===========================================================================
-!
-!> Sort a character array using a sort key.
-!
-! !DESCRIPTION: 
-!     Sort a character array and the associated array(s) based on a
-!     reasonably fast sort algorithm
-!
-! !INTERFACE:  -----------------------------------------------------------------
-
-subroutine cplsort(num, fld, sortkey)
-
-! !USES:
-
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-   integer,parameter :: CL = ic_lvar
-
-! !INPUT/OUTPUT PARAMETERS:
-
-   integer(IN),      intent(in)    :: num        !< size of array
-   character(len=CL),intent(inout) :: fld(:)     !< sort field
-   integer(IN)      ,intent(inout) :: sortkey(:) !< sortkey
-
-! !EOP
-
-   !--- local ---
-   integer(IN)    :: n1,n2
-   logical        :: stopnow
-   character(CL), pointer :: tmpfld(:)
-   integer(IN)  , pointer :: tmpkey(:)
-
-   !--- formats ---
-   character(*),parameter :: subName = '(cplsort) '
-
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
-
-!   call oasis_debug_enter(subname)
-
-   allocate(tmpfld((num+1)/2))
-   allocate(tmpkey((num+1)/2))
-   call MergeSort(num,fld,tmpfld,sortkey,tmpkey)
-   deallocate(tmpfld)
-   deallocate(tmpkey)
-    
-!   call oasis_debug_exit(subname)
-
-end subroutine cplsort
-
-!------------------------------------------------------------
-! !BOP ===========================================================================
-!
-!> Sort an integer array using a sort key.
-!
-! !DESCRIPTION: 
-!     Rearrange and integer array based on an input sortkey
-!
-! !INTERFACE:  -----------------------------------------------------------------
-
-subroutine cplsortkey(num, arr, sortkey)
-
-! !USES:
-
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-   integer,parameter :: CL = ic_lvar
-
-! !INPUT/OUTPUT PARAMETERS:
-
-   integer(IN),intent(in)    :: num        !< size of array
-   integer(IN),intent(inout) :: arr(:)     !< field to sort
-   integer(IN),intent(in)    :: sortkey(:) !< sortkey
-
-! !EOP
-
-   !--- local ---
-   integer(IN)    :: n1,n2
-   integer(IN), pointer :: tmparr(:)
-
-   !--- formats ---
-   character(*),parameter :: subName = '(cplsortkey) '
-
-!-------------------------------------------------------------------------------
-!
-!-------------------------------------------------------------------------------
-
-!   call oasis_debug_enter(subname)
-
-   if (num /= size(arr) .or. num /= size(sortkey)) then
-      WRITE(nulprt,*) subname,estr,'on size of input arrays :',num,size(arr),size(sortkey)
-      call oasis_abort()
-   endif
-
-   allocate(tmparr(num))
-   tmparr(1:num) = arr(1:num)
-   do n1 = 1,num
-      arr(n1) = tmparr(sortkey(n1))
-   enddo
-   deallocate(tmparr)
-    
-!   call oasis_debug_exit(subname)
-
-end subroutine cplsortkey
-
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
@@ -2157,104 +2140,6 @@ subroutine cplfind(num, fldlist, fld, ifind, nfind)
 !   call oasis_debug_exit(subname)
 
 end subroutine cplfind
-
-!------------------------------------------------------------
-
-!> Merge routine needed for mergesort
-
-subroutine Merge(A,X,NA,B,Y,NB,C,Z,NC)
- 
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-   integer,parameter :: CL = ic_lvar
-
-   integer, intent(in) :: NA,NB,NC         ! Normal usage: NA+NB = NC
-   character(CL), intent(inout) :: A(NA)        ! B overlays C(NA+1:NC)
-   integer(IN)  , intent(inout) :: X(NA)        ! B overlays C(NA+1:NC)
-   character(CL), intent(in)    :: B(NB)
-   integer(IN)  , intent(in)    :: Y(NB)
-   character(CL), intent(inout) :: C(NC)
-   integer(IN)  , intent(inout) :: Z(NC)
- 
-   integer :: I,J,K
-   character(*),parameter :: subName = '(Merge) '
- 
-!   write(nulprt,*) subname//' NA,NB,NC = ',NA,NB,NC
-
-   I = 1; J = 1; K = 1;
-   do while(I <= NA .and. J <= NB)
-      if (A(I) <= B(J)) then
-         C(K) = A(I)
-         Z(K) = X(I)
-         I = I+1
-      else
-         C(K) = B(J)
-         Z(K) = Y(J)
-         J = J+1
-      endif
-      K = K + 1
-   enddo
-   do while (I <= NA)
-      C(K) = A(I)
-      Z(K) = X(I)
-      I = I + 1
-      K = K + 1
-   enddo
-   return
- 
-end subroutine merge
-
-!------------------------------------------------------------
-
-!> Generic mergesort routine 
- 
-recursive subroutine MergeSort(N,A,T,S,Z)
- 
-   !--- local kinds ---
-   integer,parameter :: R8 = ip_double_p
-   integer,parameter :: IN = ip_i4_p
-   integer,parameter :: CL = ic_lvar
-
-   integer                          , intent(in)    :: N   ! size
-   character(CL), dimension(N)      , intent(inout) :: A   ! data to sort
-   character(CL), dimension((N+1)/2), intent(out)   :: T   ! data tmp
-   integer(IN)  , dimension(N)      , intent(inout) :: S   ! sortkey
-   integer(IN)  , dimension((N+1)/2), intent(out)   :: Z   ! sortkey tmp
- 
-   integer :: NA,NB
-   character(CL) :: V
-   integer(IN) :: Y
-   character(*),parameter :: subName = '(MergeSort) '
-
-!   write(nulprt,*) subname//' N = ',N
- 
-   if (N < 2) return
-   if (N == 2) then
-      if (A(1) > A(2)) then
-         V = A(1)
-         Y = S(1)
-         A(1) = A(2)
-         S(1) = S(2)
-         A(2) = V
-         S(2) = Y
-      endif
-      return
-   endif      
-   NA=(N+1)/2
-   NB=N-NA
- 
-   call MergeSort(NA,A,T,S,Z)
-   call MergeSort(NB,A(NA+1),T,S(NA+1),Z)
- 
-   if (A(NA) > A(NA+1)) then
-      T(1:NA)=A(1:NA)
-      Z(1:NA)=S(1:NA)
-      call Merge(T,Z,NA,A(NA+1),S(NA+1),NB,A,S,N)
-   endif
-   return
- 
-end subroutine MergeSort
 
 !===============================================================================
 
