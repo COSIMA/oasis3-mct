@@ -7,12 +7,15 @@
 \section{Compiling OASIS3-MCT}
 \label{subsec_compile}
 
-Compiling OASIS3-MCT libraries can be done in directory {\tt
-  oasis3-MCT/util/make\_dir} with Makefile {\tt TopMakefileOasis3}
+OASIS3-MCT is an MPI code. Compiling OASIS3-MCT libraries can be done
+in {\tt oasis3-MCT/util/make\_dir} with Makefile {\tt TopMakefileOasis3}
 which must include a header file {\tt make.{\it
     your\_platform}} specific to the compiling platform used and
-specified in {\tt oasis3-MCT/util/make\_dir/make.inc}.  One of the
-header files distributed with the release can by used as a template.
+specified in {\tt oasis3-MCT/util/make\_dir/make.inc}.  
+
+One of the
+header files distributed with the release can by used as a template
+in particular to see how to use MPI librairies and NetCDF librairies.
 The root of the OASIS3-MCT tree can be anywhere and must be set in the
 variable {\tt COUPLE} in the {\tt make.{\it your\_platform}} file.
 
