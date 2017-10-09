@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_realkinds.F90,v 1.6 2004-04-21 22:54:48 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -35,7 +35,7 @@
       integer,parameter :: DP = kind(1.D0)
 #endif
 
-!     Set the current default floating point precision 
+!     Set the current default floating point precision
       integer,parameter :: FP = DP
 
       integer,parameter :: kind_r4=kind(mpeuR4)

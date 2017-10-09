@@ -5,16 +5,11 @@
 
 
 
-#ifdef SYSDARWIN
- #include <sys/malloc.h>
-#else
- #include <malloc.h>
-#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include "listops.h"
 #include "listP.h"
- 
+
 /*
  * list management code
  *
@@ -46,7 +41,7 @@ static pListitem AP_listitem_malloc(void)
       perror("AP_listitem_malloc: malloc failure");
       abort();
     }
-  
+
   return(item);
 }
 
@@ -95,7 +90,7 @@ pListitem AP_listitem_prev(pListitem listitem)
 {
   return(listitem->prev);
 }
-  
+
 
 
 pListitem AP_listitem_next(pListitem listitem)
@@ -120,7 +115,7 @@ void *AP_listitem_data(pListitem listitem)
 
 /*
  * AP_list_new(void)
- * 
+ *
  * allocate an empty list return a pointer to it
  *
  */
@@ -180,7 +175,7 @@ void AP_list_free(pList list)
 	      list->count,count);
       abort();
     }
-  
+
   headcount--;
   free(list);
 }
@@ -191,7 +186,7 @@ void AP_list_free(pList list)
  * AP_list_size(list)
  *
  * return the number of items in an ilist
- * 
+ *
  */
 
 int AP_list_size(pList list)
@@ -263,7 +258,7 @@ pListitem AP_list_append(pList list, void *data)
 
   list->tail=new;
   (list->count)++;
-  
+
   return(new);
 }
 
@@ -312,7 +307,7 @@ void AP_list_delete_item(pList list, pListitem item)
     item->prev->next = item->next;
 
   /* set pointer of following listitem */
-	  
+
   if (item == list->tail)
     list->tail = item->prev;
   else
@@ -320,7 +315,7 @@ void AP_list_delete_item(pList list, pListitem item)
 
   AP_listitem_free(item);
   (list->count)--;
-}  
+}
 
 
 
@@ -357,7 +352,7 @@ int AP_list_tail(pList list, void **data)
 }
 
 
-     
+
 
 
 /*
@@ -377,7 +372,7 @@ void AP_list_print(char *str, pList list)
   cur=list->head;
   while(cur)
     {
-      printf("%d ",(int)cur->data);
+      printf("%d ",(long int)cur->data);
       cur=cur->next;
     }
 
@@ -404,7 +399,7 @@ void AP_list_revprint(char *str, pList list)
   cur=list->tail;
   while(cur)
     {
-      printf("%d ",(int)cur->data);
+      printf("%d ",(long int)cur->data);
       cur=cur->prev;
     }
 
@@ -491,7 +486,7 @@ int AP_list_next(pList list, void **data, void **temp)
     }
   else                                  /* First item */
     cur=list->head;
-  
+
   if (cur)
     {
       *temp=(void *)cur;
@@ -509,7 +504,7 @@ int AP_list_next(pList list, void **data, void **temp)
  * between NULL in the list, and the end of the list
  *
  */
- 
+
 void *AP_list_braindead_next(pList list, void **temp)
 {
   void *item;
@@ -557,11 +552,11 @@ pList AP_list_duplicate(pList list)
 
   if (prev)
     prev->next=NULL;
-  
+
   newlist->tail=prev;
   newlist->count=list->count;
   return(newlist);
-}  
+}
 
 
 
@@ -682,7 +677,7 @@ int main()
       printf("  Got item %d",(int)(AP_listitem_data(item)));
 
       next=AP_listitem_next(item);
-      
+
       if (i%2)
 	{
 	  AP_list_delete_item(list2,item);

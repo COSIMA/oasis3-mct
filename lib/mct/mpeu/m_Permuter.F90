@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_Permuter.F90,v 1.4 2004-04-21 22:54:45 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_Permuter - permute/unpermute
@@ -15,7 +15,7 @@
       implicit none
       private	! except
 
-      public :: permute	
+      public :: permute
       public :: unpermute
 
     interface permute; module procedure	&

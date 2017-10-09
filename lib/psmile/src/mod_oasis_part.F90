@@ -149,7 +149,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pcnt
    logical                  :: found
    character(len=ic_lvar2), pointer :: pname0(:),pname(:)
-   logical, parameter :: local_timers_on = .false.
+   logical, parameter :: local_timers_on = .true.
    character(len=*),parameter :: subname = '(oasis_part_setup)'
    !--------------------------------------------------------
 
@@ -279,7 +279,7 @@ CONTAINS
             endif
          enddo
          numel = nsegs
-     else
+      else
          write(nulprt,*) subname,estr,'part strategy unknown in def_part = ',kparal(CLIM_Strategy)
          write(nulprt,*) subname,estr,'strategy set in kparal array index ',CLIM_Strategy
          call oasis_abort(file=__FILE__,line=__LINE__)

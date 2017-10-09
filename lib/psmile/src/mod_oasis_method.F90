@@ -521,7 +521,7 @@ CONTAINS
    !------------------------
 
    ! Allocate timer memory based on maxvar
-   nt = 7*maxvar+30
+   nt = 7*maxvar+100
    call oasis_timer_init (trim(cdnam), trim(cdnam)//'.timers',nt)
    call oasis_timer_start('total')
    call oasis_timer_start('init_thru_enddef')
@@ -647,11 +647,21 @@ CONTAINS
    integer (kind=ip_intwp_p) :: lkinfo
    integer (kind=ip_intwp_p) :: icpl, ierr
    integer (kind=ip_intwp_p) :: newcomm
+   logical, parameter :: local_timers_on = .true.
    character(len=*),parameter :: subname = '(oasis_enddef)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
+
+   if (local_timers_on) then
+      call oasis_timer_start('oasis_enddef_barrier')
+      call MPI_BARRIER(mpi_comm_local, ierr)
+      call oasis_timer_stop('oasis_enddef_barrier')
+   endif
    
+   CALL oasis_timer_start ('oasis_enddef')
+   if (local_timers_on) call oasis_timer_start('oasis_enddef_prep')
+
    !------------------------
    !> * Check enddef called only once per task
    !------------------------
@@ -669,7 +679,6 @@ CONTAINS
 
    lkinfo = OASIS_OK
 
-   CALL oasis_timer_start ('oasis_enddef')
    IF (OASIS_debug >= 2)  THEN
        CALL oasis_mem_print(nulprt,subname//':start')
    ENDIF
@@ -688,7 +697,11 @@ CONTAINS
    !> * For active tasks only
    !------------------------
 
+   if (local_timers_on) call oasis_timer_stop('oasis_enddef_prep')
+
    if (mpi_comm_global /= MPI_COMM_NULL) then
+
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_prep2')
 
       !------------------------
       !>   * Update mpi_comm_global
@@ -726,29 +739,36 @@ CONTAINS
          CALL oasis_flush(nulprt)
       endif
 
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_prep2')
+
       !------------------------
       !>   * Reconcile partitions, call part_setup
       !--- generate gsmaps from partitions
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_part_setup')
       call oasis_part_setup()
       IF (OASIS_debug >= 2)  THEN
           CALL oasis_mem_print(nulprt,subname//':part_setup')
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_part_setup')
 
       !------------------------
       !>   * Reconcile variables, call var_setup
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_var_setup')
       call oasis_var_setup()
       IF (OASIS_debug >= 2)  THEN
           CALL oasis_mem_print(nulprt,subname//':var_setup')
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_var_setup')
 
       !------------------------
       !>   * Write grid info to files one model at a time
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_write2files')
       call oasis_mpi_barrier(mpi_comm_global)
       do n = 1,prism_amodels
          if (compid == n) then
@@ -759,21 +779,25 @@ CONTAINS
       IF (OASIS_debug >= 2)  THEN
           CALL oasis_mem_print(nulprt,subname//':write2files')
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_write2files')
 
       !------------------------
       !>   * MCT Initialization
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_mctworldinit')
       call mct_world_init(prism_amodels,mpi_comm_global,mpi_comm_local,compid)
       IF (OASIS_debug >= 2)  THEN
          WRITE(nulprt,*) subname, ' done mct_world_init '
          CALL oasis_flush(nulprt)
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_mctworldinit')
 
       !------------------------
       !>   * Initialize coupling via call to coupler_setup
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_coupler_setup')
       call oasis_coupler_setup()
       IF (OASIS_debug >= 2)  THEN
          WRITE(nulprt,*) subname, ' done prism_coupler_setup '
@@ -782,10 +806,13 @@ CONTAINS
       IF (OASIS_debug >= 2)  THEN
           CALL oasis_mem_print(nulprt,subname//':coupler_setup')
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_coupler_setup')
+
       !------------------------
       !>   * Call advance_init to initialize coupling fields from restarts
       !------------------------
 
+      if (local_timers_on) call oasis_timer_start('oasis_enddef_advance_init')
       call oasis_advance_init(lkinfo)
       IF (OASIS_debug >= 2)  THEN
          WRITE(nulprt,*) subname, ' done prism_advance_init '
@@ -794,11 +821,13 @@ CONTAINS
       IF (OASIS_debug >= 2)  THEN
           CALL oasis_mem_print(nulprt,subname//':advance_init')
       ENDIF
+      if (local_timers_on) call oasis_timer_stop('oasis_enddef_advance_init')
 
    endif   !  (mpi_comm_local /= MPI_COMM_NULL)
 
    !--- Force OASIS_OK here rather than anything else ---
 
+   if (local_timers_on) call oasis_timer_start('oasis_enddef_last')
    if (present(kinfo)) then
       kinfo = OASIS_OK
    endif
@@ -808,6 +837,7 @@ CONTAINS
    IF (OASIS_debug >= 2)  THEN
        CALL oasis_mem_print(nulprt,subname//':end')
    ENDIF
+   if (local_timers_on) call oasis_timer_stop('oasis_enddef_last')
 
    call oasis_debug_exit(subname)
 

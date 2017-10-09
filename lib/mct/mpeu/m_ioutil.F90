@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_ioutil.F90,v 1.16 2006-07-06 22:06:25 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -29,7 +29,7 @@
 ! 	16Jul96 - J. Guo	- (to do)
 ! 	02Apr97 - Jing Guo <guo@eramus> - finished the coding
 !	11Feb97 - Jing Guo <guo@thunder> - added luflush()
-!       08Nov01  - Jace A Mogill <mogill@cray.com>  FORTRAN only defines 
+!       08Nov01  - Jace A Mogill <mogill@cray.com>  FORTRAN only defines
 !                 99 units, three units below unit 10 are often used for
 !                 stdin, stdout, and stderr.  Be far more conservative
 !                 and stay within FORTRAN standard.

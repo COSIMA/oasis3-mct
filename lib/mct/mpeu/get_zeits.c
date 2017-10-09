@@ -1,8 +1,8 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS get_zeits.c,v 1.12 2012-01-31 19:42:07 jacob Exp
-! CVS MCT_2_8_0
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -17,7 +17,7 @@
 
 
 #include <sys/types.h>
-#ifndef NOTIMES 
+#ifndef NOTIMES
 #include <sys/times.h>
 #endif
 

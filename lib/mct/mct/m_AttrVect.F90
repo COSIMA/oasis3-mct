@@ -1,60 +1,60 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     Math and Computer Science Division, Argonne National Laboratory  !
 !-----------------------------------------------------------------------
-! CVS m_AttrVect.F90,v 1.86 2012-04-27 20:01:04 jacob Exp
-! CVS MCT_2_8_0 
+! CVS $Id$
+! CVS $Name$
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_AttrVect - Multi-field Storage
 !
 ! !DESCRIPTION:
 !
-! An {\em attribute vector} is a scheme for storing bundles of integer 
-! and real data vectors, indexed by the names of the fields stored in 
-! {\tt List} format (see the mpeu module {\tt m\_List} for more 
-! information about the {\tt List} datatype).  The ordering of the 
-! fieldnames in the integer and real attribute {\tt List} components 
-! ({\tt AttrVect\%iList} and {\tt AttrVect\%rList}, respectively) 
-! corresponds to the storage order of the attributes in their respective 
-! data buffers (the components {\tt AttrVect\%iAttr(:,:)} and 
-! {\tt AttrVect\%rAttr(:,:)}, respectively).   The organization of 
+! An {\em attribute vector} is a scheme for storing bundles of integer
+! and real data vectors, indexed by the names of the fields stored in
+! {\tt List} format (see the mpeu module {\tt m\_List} for more
+! information about the {\tt List} datatype).  The ordering of the
+! fieldnames in the integer and real attribute {\tt List} components
+! ({\tt AttrVect\%iList} and {\tt AttrVect\%rList}, respectively)
+! corresponds to the storage order of the attributes in their respective
+! data buffers (the components {\tt AttrVect\%iAttr(:,:)} and
+! {\tt AttrVect\%rAttr(:,:)}, respectively).   The organization of
 ! the fieldnames in {\tt List} format, along with the direct mapping
-! between {\tt List} items and locations in the data buffer, allows 
-! the user to have {\em random access} to the field data.  This 
-! approach also allows the user to set the number and the names of fields 
-! stored in an {\tt AttrVect} at run-time.  
+! between {\tt List} items and locations in the data buffer, allows
+! the user to have {\em random access} to the field data.  This
+! approach also allows the user to set the number and the names of fields
+! stored in an {\tt AttrVect} at run-time.
 !
-! The {\tt AttrVect} stores field data in a {\em pointwise} fashion 
-! (that is, the data are grouped so that all the integer or real data 
-! associated with an individual point are adjacent to each other in memory. 
-! This amounts to the having the integer and real field data arrays in 
-! the {\tt AttrVect} (the components {\tt AttrVect\%iAttr(:,:)} and 
+! The {\tt AttrVect} stores field data in a {\em pointwise} fashion
+! (that is, the data are grouped so that all the integer or real data
+! associated with an individual point are adjacent to each other in memory.
+! This amounts to the having the integer and real field data arrays in
+! the {\tt AttrVect} (the components {\tt AttrVect\%iAttr(:,:)} and
 ! {\tt AttrVect\%rAttr(:,:)}, respectively) having the attribute index
-! as the major (or fastest-varying) index.  A prime example of this is 
-! observational data input to a data assimilation system.  In the Model 
-! Coupling Toolkit, this datatype is the fundamental type for storing 
+! as the major (or fastest-varying) index.  A prime example of this is
+! observational data input to a data assimilation system.  In the Model
+! Coupling Toolkit, this datatype is the fundamental type for storing
 ! field data exchanged by component models, and forms a basis for other
-! MCT datatypes that encapsulate time accumulation/averaging buffers (the 
-! {\tt Accumulator} datatype defined in the module {\tt m\_Accumulator}), 
-! coordinate grid information (the {\tt GeneralGrid} datatype defined in 
+! MCT datatypes that encapsulate time accumulation/averaging buffers (the
+! {\tt Accumulator} datatype defined in the module {\tt m\_Accumulator}),
+! coordinate grid information (the {\tt GeneralGrid} datatype defined in
 ! the module {\tt m\_GeneralGrid}), and sparse interpolation matrices
-! (the {\tt SparseMatrix} datatype defined in the module 
+! (the {\tt SparseMatrix} datatype defined in the module
 ! {\tt m\_SparseMatrix}).
 !
-! The attribute vector is implemented in Fortran 90 using the 
-! {\tt AttrVect} derived type.  This module contains the definition 
+! The attribute vector is implemented in Fortran 90 using the
+! {\tt AttrVect} derived type.  This module contains the definition
 ! of the {\tt AttrVect}, and the numerous methods that service it.  There
-! are a number of initialization (creation) schemes, and a routine for 
-! zeroing out the elements of an {\tt AttrVect}.  There is a method 
-! to {\em clean} up allocated memory used by an {\tt AttrVect} 
-! (destruction).  There are numerous query methods that return:  the 
-! number of datapoints (or {\em length}; the numbers of integer and 
-! real attributes; the data buffer index of a given real or integer 
-! attribute; and return the lists of real and integer attributes.  There 
+! are a number of initialization (creation) schemes, and a routine for
+! zeroing out the elements of an {\tt AttrVect}.  There is a method
+! to {\em clean} up allocated memory used by an {\tt AttrVect}
+! (destruction).  There are numerous query methods that return:  the
+! number of datapoints (or {\em length}; the numbers of integer and
+! real attributes; the data buffer index of a given real or integer
+! attribute; and return the lists of real and integer attributes.  There
 ! also exist methods for exporting a given attribute as a one-dimensional
-! array and importing a given attribute from a one-dimensional array.  
-! There is a method for copying attributes from one {\tt AttrVect} to 
-! another.  There is also a method for cross-indexing the attributes in 
+! array and importing a given attribute from a one-dimensional array.
+! There is a method for copying attributes from one {\tt AttrVect} to
+! another.  There is also a method for cross-indexing the attributes in
 ! two {\tt AttrVect} variables.  In addition, there are methods that
 ! return those cross-indexed attributes along with some auxiliary data
 ! in a {\tt AVSharedIndicesOneType} or {\tt AVSharedIndices} structure.
@@ -101,7 +101,7 @@
        character*7 :: data_flag         ! data type flag (e.g., 'REAL' or 'INTEGER')
 
        ! arrays of indices to storage locations of shared attributes between the two
-       ! attribute vectors: 
+       ! attribute vectors:
        integer, dimension(:), pointer :: aVindices1
        integer, dimension(:), pointer :: aVindices2
     end type AVSharedIndicesOneType
@@ -110,7 +110,7 @@
        type(AVSharedIndicesOneType) :: shared_real     ! shared indices of type REAL
        type(AVSharedIndicesOneType) :: shared_integer  ! shared indices of type INTEGER
     end type AVSharedIndices
-       
+
 
 ! !PUBLIC MEMBER FUNCTIONS:
 
@@ -124,6 +124,8 @@
       public :: indexRA		! index the real attributes
       public :: getIList        ! return list of integer attributes
       public :: getRList        ! return list of real attributes
+      public :: getIListtoChar  ! return list of integer attributes as Char
+      public :: getRListtoChar  ! return list of real attributes as Char
       public :: exportIList     ! export INTEGER attibute List
       public :: exportRList     ! export REAL attibute List
       public :: exportIListToChar ! export INTEGER attibute List as Char
@@ -164,6 +166,8 @@
     interface indexRA; module procedure indexRA_; end interface
     interface getIList; module procedure getIList_; end interface
     interface getRList; module procedure getRList_; end interface
+    interface getIListToChar; module procedure getIListToChar_; end interface
+    interface getRListToChar; module procedure getRListToChar_; end interface
     interface exportIList; module procedure exportIList_; end interface
     interface exportRList; module procedure exportRList_; end interface
     interface exportIListToChar
@@ -198,7 +202,7 @@
     interface Unpermute ; module procedure Unpermute_ ; end interface
     interface SortPermute ; module procedure SortPermute_ ; end interface
     interface SharedAttrIndexList ; module procedure &
-        aVaVSharedAttrIndexList_ 
+        aVaVSharedAttrIndexList_
     end interface
     interface SharedIndices ; module procedure SharedIndices_ ; end interface
     interface SharedIndicesOneType ; module procedure SharedIndicesOneType_ ; end interface
@@ -210,12 +214,12 @@
 ! 10Oct00 - J.W. Larson <larson@mcs.anl.gov> - made getIList
 !           and getRList functions public and added appropriate
 !           interface definitions
-! 20Oct00 - J.W. Larson <larson@mcs.anl.gov> - added Sort, 
+! 20Oct00 - J.W. Larson <larson@mcs.anl.gov> - added Sort,
 !           Permute, and SortPermute functions.
 ! 09May01 - J.W. Larson <larson@mcs.anl.gov> - added initl_().
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - added routines 
-!           exportIattr(), exportRAttr(), importIAttr(), 
-!           and importRAttr().  Also cleaned up module and 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - added routines
+!           exportIattr(), exportRAttr(), importIAttr(),
+!           and importRAttr().  Also cleaned up module and
 !           routine prologues.
 ! 13Dec01 - J.W. Larson <larson@mcs.anl.gov> - made importIAttr()
 !           and importRAttr() public (bug fix).
@@ -240,6 +244,7 @@
 !           subroutines
 ! 10Apr12 - W.J. Sacks <sacks@ucar.edu> - modified AVSharedIndices code
 !           to be Fortran-90 compliant
+! 10Jan13 - T.Craig <tcraig@ucar.edu> - add getRListToChar and getIListToChar
 !EOP ___________________________________________________________________
 
   character(len=*),parameter :: myname='MCT::m_AttrVect'
@@ -253,25 +258,25 @@
 ! !IROUTINE: init_ - Initialize an AttrVect Given Attribute Lists and Length
 !
 ! !DESCRIPTION:
-! This routine creates an {\tt AttrVect} (the output argument {\tt aV}) 
-! using the optional input {\tt CHARACTER} arguments {\tt iList}, and 
+! This routine creates an {\tt AttrVect} (the output argument {\tt aV})
+! using the optional input {\tt CHARACTER} arguments {\tt iList}, and
 ! {\tt rList} to define its integer and real attributes, respectively.
-! The optional input {\tt INTEGER} argument {\tt lsize} defines the 
-! number of points for which we are storing attributes, or the 
-! {\em length} of {\tt aV}.  The expected form for the arguments 
+! The optional input {\tt INTEGER} argument {\tt lsize} defines the
+! number of points for which we are storing attributes, or the
+! {\em length} of {\tt aV}.  The expected form for the arguments
 ! {\tt iList} and {\tt rList} are colon-delimited strings where each
-! substring defines an attribute.  Suppose we wish to store {\tt N} 
-! observations that have the real attributes {\tt 'latitude'}, 
-! {\tt 'longitude'}, {\tt pressure}, {\tt 'u-wind'}, and 
-! {\tt 'v-wind'}.  Suppose we also wish to store the integer 
-! attributes {\tt 'hour'}, {\tt 'day'}, {\tt 'month'}, {\tt 'year'}, 
-! and {\tt 'data source'}.  This can be accomplished by invoking 
+! substring defines an attribute.  Suppose we wish to store {\tt N}
+! observations that have the real attributes {\tt 'latitude'},
+! {\tt 'longitude'}, {\tt pressure}, {\tt 'u-wind'}, and
+! {\tt 'v-wind'}.  Suppose we also wish to store the integer
+! attributes {\tt 'hour'}, {\tt 'day'}, {\tt 'month'}, {\tt 'year'},
+! and {\tt 'data source'}.  This can be accomplished by invoking
 ! {\tt init\_()} as follows:
-! \begin{verbatim} 
+! \begin{verbatim}
 ! call init_(aV, 'hour:day:month:year:data source', &
 !            'latitude:longitude:pressure:u-wind:v-wind', N)
-! \end{verbatim} 
-! The resulting {\tt AttrVect} {\tt aV} will have five integer 
+! \end{verbatim}
+! The resulting {\tt AttrVect} {\tt aV} will have five integer
 ! attributes, five real attributes, and length {\tt N}.
 !
 ! !INTERFACE:
@@ -288,13 +293,13 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       character(len=*), optional, intent(in)  :: iList
       character(len=*), optional, intent(in)  :: rList
       integer,          optional, intent(in)  :: lsize
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       type(AttrVect),             intent(out) :: aV
 
@@ -302,9 +307,9 @@
 ! 09Apr98 - Jing Guo <guo@thunder> - initial prototype/prolog/code
 ! 09Oct01 - J.W. Larson <larson@mcs.anl.gov> - added feature to
 !           nullify all pointers before usage.  This was done to
-!           accomodate behavior of the f90 ASSOCIATED intrinsic 
+!           accomodate behavior of the f90 ASSOCIATED intrinsic
 !           function on the AIX platform.
-! 07Dec01 - E.T. Ong <eong@mcs.anl.gov> - added support for 
+! 07Dec01 - E.T. Ong <eong@mcs.anl.gov> - added support for
 !           intialization with blank character strings for iList
 !           and rList
 !EOP ___________________________________________________________________
@@ -353,10 +358,10 @@
 !
 ! !IROUTINE: initv_ - Initialize One AttrVect from Another
 !
-! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument 
+! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument
 ! {\tt bV}, and uses its attribute list information to create an output
-! {\tt AttrVect} variable {\tt aV}.  The length of {\tt aV} is defined 
-! by the input {\tt INTEGER} argument {\tt lsize}.  
+! {\tt AttrVect} variable {\tt aV}.  The length of {\tt aV} is defined
+! by the input {\tt INTEGER} argument {\tt lsize}.
 !
 ! !INTERFACE:
 
@@ -365,7 +370,7 @@
 ! !USES:
 !
       use m_String, only : String,char
-      use m_String, only : String_clean => clean    
+      use m_String, only : String_clean => clean
       use m_List,   only : get
       use m_List,   only : List_nullify => nullify
       use m_die
@@ -373,12 +378,12 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),intent(in)  :: bV
       integer,       intent(in)  :: lsize
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       type(AttrVect),intent(out) :: aV
 
@@ -407,7 +412,7 @@
 
 	! Convert the two Lists to two Strings
 
-  if(.not.associated(bv%iList%bf) .and. & 
+  if(.not.associated(bv%iList%bf) .and. &
        .not.associated(bv%rList%bf)) then
      write(stderr,'(2a)')myname_, &
       'MCTERROR:  Trying to initialize a new AttrVect off an undefined AttrVect'
@@ -435,12 +440,12 @@
      call init_(aV,iList=char(iLStr),lsize=lsize)
   endif
 
-  if(associated(bv%iList%bf)) then  
-     call String_clean(iLStr)       
-  endif                             
-  if(associated(bv%rList%bf)) then  
-     call String_clean(rLStr)       
-  endif                             
+  if(associated(bv%iList%bf)) then
+     call String_clean(iLStr)
+  endif
+  if(associated(bv%rList%bf)) then
+     call String_clean(rLStr)
+  endif
 
  end subroutine initv_
 
@@ -450,21 +455,21 @@
 !
 ! !IROUTINE: initl_ - Initialize an AttrVect Using the List Type
 !
-! !DESCRIPTION:  This routine initializes an {\tt AttrVect} directly 
-! from input {\tt List} data type arguments {\tt iList} and {\tt rList} 
+! !DESCRIPTION:  This routine initializes an {\tt AttrVect} directly
+! from input {\tt List} data type arguments {\tt iList} and {\tt rList}
 ! (see the module {\tt m\_List} in mpeu for further details), and an
 ! input length {\tt lsize}.  The resulting {\tt AttrVect} is returned in
 ! the argument {\tt aV}.
 !
-! {\bf N.B.}:  If the user supplies an empty list for the arguments 
-! {\tt iList} ({\tt rList}), then {\tt aV} will be created only with 
-! {\tt REAL} ({\tt INTEGER}) attributes.  If both arguments {\tt iList} 
-! and {\tt rList} are empty, the routine will terminate execution and 
+! {\bf N.B.}:  If the user supplies an empty list for the arguments
+! {\tt iList} ({\tt rList}), then {\tt aV} will be created only with
+! {\tt REAL} ({\tt INTEGER}) attributes.  If both arguments {\tt iList}
+! and {\tt rList} are empty, the routine will terminate execution and
 ! report an error.
 !
-! {\bf N.B.}:  The outcome of this routine, {\tt aV} represents 
-! allocated memory.  When this {\tt AttrVect} is no longer needed, 
-! it must be deallocated by invoking the routine {\tt AttrVect\_clean()}.  
+! {\bf N.B.}:  The outcome of this routine, {\tt aV} represents
+! allocated memory.  When this {\tt AttrVect} is no longer needed,
+! it must be deallocated by invoking the routine {\tt AttrVect\_clean()}.
 ! Failure to do so will spawn a memory leak.
 !
 ! !INTERFACE:
@@ -487,7 +492,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(List),  intent(in)  :: iList
       type(List),  intent(in)  :: rList
@@ -502,8 +507,8 @@
 ! 08Aug01 - E.T. Ong <eong@mcs.anl.gov> - change list assignment(=)
 !           to list copy to avoid compiler errors with pgf90.
 ! 10Oct01 - J. Larson <larson@mcs.anl.gov> - Nullify all pointers
-!           in ouput AttrVect aV before initializing aV.  Also, 
-!           greater caution taken regarding validity of input 
+!           in ouput AttrVect aV before initializing aV.  Also,
+!           greater caution taken regarding validity of input
 !           arguments iList and rList.
 ! 15May08 - J. Larson <larson@mcs.anl.gov> - Simplify to use
 !           the init_ routine.  Better argument checking.
@@ -534,13 +539,13 @@
   else ! Then solely REAL or solely INTEGER attributes:
 
      if (List_nitem(iList) > 0) then ! solely INTEGER attributes
-                
+
         call init_(aV, iList=List_exportToChar(iList), lsize=lsize)
 
      endif ! if (List_nitem(iList) > 0) then...
 
      if (List_nitem(rList) > 0) then ! solely REAL attributes
-                
+
         call init_(aV, rList=List_exportToChar(rList), lsize=lsize)
 
      endif ! if (List_nitem(rList) > 0) then...
@@ -556,12 +561,12 @@
 ! !IROUTINE: clean_ - Deallocate Allocated Memory Structures of an AttrVect
 !
 ! !DESCRIPTION:
-! This routine deallocates the allocated memory structures of the 
-! input/output {\tt AttrVect} argument {\tt aV}.  This amounts to 
+! This routine deallocates the allocated memory structures of the
+! input/output {\tt AttrVect} argument {\tt aV}.  This amounts to
 ! cleaning the {\tt List} structures {\tt aV\%iList} and {\tt av\%rList},
-! and deallocating the arrays {\tt aV\%iAttr(:,:)} and 
-! {\tt aV\%rAttr(:,:)}.  The success (failure) of this operation is 
-! signified by a zero (non-zero) value of the optional {\tt INTEGER} 
+! and deallocating the arrays {\tt aV\%iAttr(:,:)} and
+! {\tt aV\%rAttr(:,:)}.  The success (failure) of this operation is
+! signified by a zero (non-zero) value of the optional {\tt INTEGER}
 ! output argument {\tt stat}.  If {\tt clean\_()} is invoked without
 ! supplying {\tt stat}, and any of the deallocation operations fail,
 ! the routine will terminate with an error message.
@@ -579,17 +584,17 @@
 
       implicit none
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),    intent(inout) :: aV
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       integer, optional, intent(out)   :: stat
 
 ! !REVISION HISTORY:
 ! 09Apr98 - Jing Guo <guo@thunder> - initial prototype/prolog/code
-! 10Oct01 - J. Larson <larson@mcs.anl.gov> - various fixes to 
+! 10Oct01 - J. Larson <larson@mcs.anl.gov> - various fixes to
 !           prevent deallocation of UNASSOCIATED pointers.
 ! 01Mar01 - E.T. Ong <eong@mcs.anl.gov> - removed dies to prevent
 !           crashes when cleaning uninitialized attrvects. Added
@@ -601,13 +606,13 @@
 
 	! Note that an undefined pointer may either crash the process
 	! or return either .true. or .false. to the associated() test.
-	! One should therefore avoid using the function on an 
+	! One should therefore avoid using the function on an
 	! undefined pointer.
 
         ! Clean up INTEGER attribute list:
 
   if(present(stat)) stat=0
-  
+
   if(associated(aV%iList%bf)) then
 
      if(present(stat)) then
@@ -651,7 +656,7 @@
      endif
 
   endif ! if(associated(aV%iAttr))...
-  
+
         ! Clean up REAL attributes:
 
   if(associated(aV%rAttr)) then
@@ -682,19 +687,19 @@
 ! !IROUTINE: lsize_ - Length of an AttrVect
 !
 ! !DESCRIPTION:
-! This function returns the number of elements, or {\em length} of the 
-! input {\tt AttrVect} argument {\tt aV}.  This function examines the 
-! length of the second dimension of the arrays {\tt aV\%iAttr(:,:)} 
+! This function returns the number of elements, or {\em length} of the
+! input {\tt AttrVect} argument {\tt aV}.  This function examines the
+! length of the second dimension of the arrays {\tt aV\%iAttr(:,:)}
 ! and {\tt aV\%rAttr(:,:)}.  If neither {\tt aV\%iAttr(:,:)} nor
 ! {\tt aV\%rAttr(:,:)} are associated, then ${\tt lsize\_(aV)} = 0$.
-! If {\tt aV\%iAttr(:,:)} is associated, but {\tt aV\%rAttr(:,:)} is 
-! not, then ${\tt lsize\_(aV)} = {\tt size(aV\%iAttr,2)}$. If 
-! {\tt aV\%iAttr(:,:)} is not associated, but {\tt aV\%rAttr(:,:)} is, 
-! then ${\tt lsize\_(aV)} = {\tt size(aV\%rAttr,2)}$. If both 
+! If {\tt aV\%iAttr(:,:)} is associated, but {\tt aV\%rAttr(:,:)} is
+! not, then ${\tt lsize\_(aV)} = {\tt size(aV\%iAttr,2)}$. If
+! {\tt aV\%iAttr(:,:)} is not associated, but {\tt aV\%rAttr(:,:)} is,
+! then ${\tt lsize\_(aV)} = {\tt size(aV\%rAttr,2)}$. If both
 ! {\tt aV\%iAttr(:,:)} and {\tt aV\%rAttr(:,:)} are associated, the
-! function {\tt lsize\_()} will do one of two things:  If 
-! ${\tt size(aV\%iAttr,2)} = {\tt size(aV\%rAttr,2)}$, this equal value 
-! will be returned.  If ${\tt size(aV\%iAttr,2)} \neq 
+! function {\tt lsize\_()} will do one of two things:  If
+! ${\tt size(aV\%iAttr,2)} = {\tt size(aV\%rAttr,2)}$, this equal value
+! will be returned.  If ${\tt size(aV\%iAttr,2)} \neq
 ! {\tt size(aV\%rAttr,2)}$, termination with an error message will occur.
 !
 ! !INTERFACE:
@@ -708,10 +713,10 @@
 
      use m_stdio, only : stderr
      use m_die
- 
+
      implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect), intent(in) :: aV
 
@@ -726,7 +731,7 @@
   integer :: iLength, rLength
 
 	! One should try to avoid using this function on an undefined
-	! or disassocated pointer.  However, it is understandable 
+	! or disassocated pointer.  However, it is understandable
 	! that an undefined or disassocated pointer has a size 0, if
 	! the associated() test sucesses.
 
@@ -772,12 +777,12 @@
 ! !IROUTINE: zero_ - Set AttrVect Field Data to Zero
 !
 ! !DESCRIPTION:
-! This routine sets all of the point values of the integer and real 
+! This routine sets all of the point values of the integer and real
 ! attributes of an the input/output {\tt AttrVect} argument {\tt aV}
-! to zero.  The default action is to set the values of all the real and 
-! integer attributes to zero.  The user may prevent the zeroing of the 
-! real (integer) attributes invoking {\tt zero\_()} with the optional 
-! {\tt LOGICAL} argument {\tt zeroReals} ({\tt zeroInts}) set with value 
+! to zero.  The default action is to set the values of all the real and
+! integer attributes to zero.  The user may prevent the zeroing of the
+! real (integer) attributes invoking {\tt zero\_()} with the optional
+! {\tt LOGICAL} argument {\tt zeroReals} ({\tt zeroInts}) set with value
 ! {\tt .FALSE.}
 !
 ! !INTERFACE:
@@ -792,15 +797,15 @@
 
      use m_List, only : List
      use m_List, only : List_allocated => allocated
- 
+
      implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
      logical, optional, intent(IN)    :: zeroReals
      logical, optional, intent(IN)    :: zeroInts
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
      type(AttrVect),    intent(INOUT) :: aV
 
@@ -839,15 +844,19 @@
 
   if(myZeroInts) then ! zero out INTEGER attributes
      if(List_allocated(aV%iList)) then
-!CDIR COLLAPSE
-        if(associated(aV%iAttr) .and. (nIAttr_(aV)>0)) aV%iAttr=0
+        if(associated(aV%iAttr) .and. (nIAttr_(aV)>0)) then
+!DIR$ COLLAPSE
+           aV%iAttr=0
+        endif
      endif
   endif
 
   if(myZeroReals) then ! zero out REAL attributes
      if(List_allocated(aV%rList)) then
-!CDIR COLLAPSE
-        if(associated(aV%rAttr) .and. (nRAttr_(aV)>0)) aV%rAttr=0._FP
+        if(associated(aV%rAttr) .and. (nRAttr_(aV)>0)) then
+!DIR$ COLLAPSE
+           aV%rAttr=0._FP
+        endif
      endif
   endif
 
@@ -860,7 +869,7 @@
 ! !IROUTINE: nIAttr_ - Return the Number of Integer Attributes
 !
 ! !DESCRIPTION:
-! This integer function returns the number of integer attributes 
+! This integer function returns the number of integer attributes
 ! present in the input {\tt AttrVect} argument {\tt aV}.
 !
 ! !INTERFACE:
@@ -873,7 +882,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),intent(in) :: aV
 
@@ -900,7 +909,7 @@
 ! !IROUTINE: nRAttr_ - Return the Number of Real Attributes
 !
 ! !DESCRIPTION:
-! This integer function returns the number of real attributes 
+! This integer function returns the number of real attributes
 ! present in the input {\tt AttrVect} argument {\tt aV}.
 
 ! !INTERFACE:
@@ -913,7 +922,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),intent(in) :: aV
 
@@ -940,9 +949,9 @@
 ! !IROUTINE: getIList_ - Retrieve the Name of a Numbered Integer Attribute
 !
 ! !DESCRIPTION:
-! This routine returns the name of the {\tt ith} integer attribute of 
-! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned 
-! in the output {\tt String} argument {\tt item} (see the mpeu module 
+! This routine returns the name of the {\tt ith} integer attribute of
+! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned
+! in the output {\tt String} argument {\tt item} (see the mpeu module
 ! {\tt m\_String} for more information regarding the {\tt String} type).
 !
 ! !INTERFACE:
@@ -956,12 +965,12 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       integer,     intent(in)  :: ith
       type(AttrVect),intent(in) :: aVect
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       type(String),intent(out) :: item
 
@@ -982,9 +991,9 @@
 ! !IROUTINE: getRList_ - Retrieve the Name of a Numbered Real Attribute
 !
 ! !DESCRIPTION:
-! This routine returns the name of the {\tt ith} real attribute of 
-! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned 
-! in the output {\tt String} argument {\tt item} (see the mpeu module 
+! This routine returns the name of the {\tt ith} real attribute of
+! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned
+! in the output {\tt String} argument {\tt item} (see the mpeu module
 ! {\tt m\_String} for more information regarding the {\tt String} type).
 !
 ! !INTERFACE:
@@ -998,12 +1007,12 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       integer,        intent(in)  :: ith
       type(AttrVect), intent(in)  :: aVect
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       type(String),   intent(out) :: item
 
@@ -1021,34 +1030,126 @@
 !     Math and Computer Science Division, Argonne National Laboratory  !
 !BOP -------------------------------------------------------------------
 !
+! !IROUTINE: getIListToChar_ - Retrieve the Name of a Numbered Integer Attribute
+!
+! !DESCRIPTION:
+! This routine returns the name of the {\tt ith} integer attribute of
+! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned
+! in the function {\tt char} argument.
+!
+! !INTERFACE:
+
+ function getIListToChar_(ith, aVect)
+!
+! !USES:
+!
+      use m_String, only : String
+      use m_String, only : String_ToChar => ToChar
+      use m_String, only : String_clean => clean
+      use m_List,   only : get
+
+      implicit none
+
+! !INPUT PARAMETERS:
+!
+      integer,     intent(in)  :: ith
+      type(AttrVect),intent(in) :: aVect
+
+! !OUTPUT PARAMETERS:
+!
+      character(len=size(aVect%iList%bf,1)) :: getIListToChar_
+
+! !REVISION HISTORY:
+! 10Jan13 - T. Craig <tcraig@ucar.edu> - initial prototype/prolog/code
+!EOP ___________________________________________________________________
+
+  type(String) :: item
+  character(len=*),parameter :: myname_=myname//'::getIListToChar_'
+
+  call get(item, ith, aVect%iList)
+  getIListToChar_ = String_toChar(item)
+  call String_clean(item)
+
+ end function getIListToChar_
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!     Math and Computer Science Division, Argonne National Laboratory  !
+!BOP -------------------------------------------------------------------
+!
+! !IROUTINE: getRListToChar_ - Retrieve the Name of a Numbered Integer Attribute
+!
+! !DESCRIPTION:
+! This routine returns the name of the {\tt ith} integer attribute of
+! the input {\tt AttrVect} argument {\tt aVect}.  The name is returned
+! in the function {\tt char} argument.
+!
+! !INTERFACE:
+
+ function getRListToChar_(ith, aVect)
+!
+! !USES:
+!
+      use m_String, only : String
+      use m_String, only : String_ToChar => ToChar
+      use m_String, only : String_clean => clean
+      use m_List,   only : get
+
+      implicit none
+
+! !INPUT PARAMETERS:
+!
+      integer,     intent(in)  :: ith
+      type(AttrVect),intent(in) :: aVect
+
+! !OUTPUT PARAMETERS:
+!
+      character(len=size(aVect%rList%bf,1)) :: getRListToChar_
+
+! !REVISION HISTORY:
+! 10Jan13 - T. Craig <tcraig@ucar.edu> - initial prototype/prolog/code
+!EOP ___________________________________________________________________
+
+  type(String) :: item
+  character(len=*),parameter :: myname_=myname//'::getRListToChar_'
+
+  call get(item, ith, aVect%rList)
+  getRListToChar_ = String_toChar(item)
+  call String_clean(item)
+
+ end function getRListToChar_
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!     Math and Computer Science Division, Argonne National Laboratory  !
+!BOP -------------------------------------------------------------------
+!
 ! !IROUTINE: indexIA_ - Index an Integer Attribute
 !
 ! !DESCRIPTION:
-! This function returns an {\tt INTEGER}, corresponding to the location 
-! of an integer attribute within the input {\tt AttrVect} argument 
+! This function returns an {\tt INTEGER}, corresponding to the location
+! of an integer attribute within the input {\tt AttrVect} argument
 ! {\tt aV}.  For example, suppose {\tt aV} has the following attributes
-! {\tt 'month'}, {\tt 'day'}, and {\tt 'year'}.  The array of integer 
-! values for the attribute {\tt 'day'}  is stored in 
+! {\tt 'month'}, {\tt 'day'}, and {\tt 'year'}.  The array of integer
+! values for the attribute {\tt 'day'}  is stored in
 !% \begin{verbatim}
 ! {\tt aV\%iAttr(indexIA\_(aV,'day'),:)}.
 !% \end{verbatim}
 ! If {\tt indexIA\_()} is unable to match {\tt item} to any of the integer
 ! attributes in {\tt aV}, the resulting value is zero which is equivalent
-! to an error.  The optional input {\tt CHARACTER} arguments {\tt perrWith} 
-! and {\tt dieWith} control how such errors are handled.  
+! to an error.  The optional input {\tt CHARACTER} arguments {\tt perrWith}
+! and {\tt dieWith} control how such errors are handled.
 ! \begin{enumerate}
-! \item if neither {\tt perrWith} nor {\tt dieWith} are present, 
+! \item if neither {\tt perrWith} nor {\tt dieWith} are present,
 ! {\tt indexIA\_()} terminates execution with an internally generated
 ! error message;
-! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error 
+! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error
 ! message is written to {\tt stderr} incorporating user-supplied traceback
 ! information stored in the argument {\tt perrWith};
 ! \item if {\tt perrWith} is present, but {\tt dieWith} is not, and
 ! {\tt perrWith} is equal to ``quiet'', no error message is written.
-! \item if {\tt dieWith} is present, execution terminates with an error 
+! \item if {\tt dieWith} is present, execution terminates with an error
 ! message written to {\tt stderr} that incorporates user-supplied traceback
-! information stored in the argument {\tt dieWith}; and 
-! \item if both {\tt perrWith} and {\tt dieWith} are present, execution 
+! information stored in the argument {\tt dieWith}; and
+! \item if both {\tt perrWith} and {\tt dieWith} are present, execution
 ! terminates with an error message using {\tt dieWith}, and the argument
 ! {\tt perrWith} is ignored.
 ! \end{enumerate}
@@ -1068,13 +1169,12 @@
       use m_String, only : String_ToChar => ToChar
 
       use m_List, only : index
-      use m_List,  only : List_exportToChar => exportToChar
 
       use m_TraceBack, only : GenTraceBackString
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),             intent(in) :: aV
       character(len=*),           intent(in) :: item
@@ -1110,14 +1210,10 @@
         ! do nothing
        else
         write(stderr,'(5a)') myname_, &
-             ':: FATAL--in list: "',trim(List_exportToChar(aV%iList))
-        write(stderr,'(5a)') myname_, &
              ':: ERROR--attribute not found: "',trim(item),'" ', &
              'Traceback:  ',String_ToChar(myTrace)
        endif
      else ! Shutdown
-        write(stderr,'(5a)') myname_, &
-             ':: FATAL--in list: "',trim(List_exportToChar(aV%iList))
 	write(stderr,'(5a)') myname_, &
 	     ':: FATAL--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)
@@ -1136,31 +1232,31 @@
 ! !IROUTINE: indexRA_ - Index a Real Attribute
 !
 ! !DESCRIPTION:
-! This function returns an {\tt INTEGER}, corresponding to the location 
-! of a real attribute within the input {\tt AttrVect} argument 
+! This function returns an {\tt INTEGER}, corresponding to the location
+! of a real attribute within the input {\tt AttrVect} argument
 ! {\tt aV}.  For example, suppose {\tt aV} has the following attributes
-! {\tt 'latitude'}, {\tt 'longitude'}, and {\tt 'pressure'}.  The array 
-! of real values for the attribute {\tt 'longitude'}  is stored in 
+! {\tt 'latitude'}, {\tt 'longitude'}, and {\tt 'pressure'}.  The array
+! of real values for the attribute {\tt 'longitude'}  is stored in
 !% \begin{verbatim}
 ! {\tt aV\%iAttr(indexRA\_(aV,'longitude'),:)}.
 !% \end{verbatim}
 ! If {\tt indexRA\_()} is unable to match {\tt item} to any of the real
 ! attributes in {\tt aV}, the resulting value is zero which is equivalent
-! to an error.  The optional input {\tt CHARACTER} arguments {\tt perrWith} 
-! and {\tt dieWith} control how such errors are handled.  
+! to an error.  The optional input {\tt CHARACTER} arguments {\tt perrWith}
+! and {\tt dieWith} control how such errors are handled.
 ! \begin{enumerate}
-! \item if neither {\tt perrWith} nor {\tt dieWith} are present, 
+! \item if neither {\tt perrWith} nor {\tt dieWith} are present,
 ! {\tt indexRA\_()} terminates execution with an internally generated
 ! error message;
-! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error 
+! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error
 ! message is written to {\tt stderr} incorporating user-supplied traceback
 ! information stored in the argument {\tt perrWith};
 ! \item if {\tt perrWith} is present, but {\tt dieWith} is not, and
 ! {\tt perrWith} is equal to ``quiet'', no error message is written.
-! \item if {\tt dieWith} is present, execution terminates with an error 
+! \item if {\tt dieWith} is present, execution terminates with an error
 ! message written to {\tt stderr} that incorporates user-supplied traceback
-! information stored in the argument {\tt dieWith}; and 
-! \item if both {\tt perrWith} and {\tt dieWith} are present, execution 
+! information stored in the argument {\tt dieWith}; and
+! \item if both {\tt perrWith} and {\tt dieWith} are present, execution
 ! terminates with an error message using {\tt dieWith}, and the argument
 ! {\tt perrWith} is ignored.
 ! \end{enumerate}
@@ -1175,7 +1271,6 @@
       use m_stdio,only : stderr
 
       use m_List, only : index
-      use m_List,  only : List_exportToChar => exportToChar
 
       use m_String, only : String
       use m_String, only : String_init => init
@@ -1186,7 +1281,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),             intent(in) :: aV
       character(len=*),           intent(in) :: item
@@ -1221,15 +1316,11 @@
        if (trim(perrWith).eq.'quiet') then
         ! do nothing
        else
-        write(stderr,'(5a)') myname_, &
-             ':: FATAL--in list: "',trim(List_exportToChar(aV%rList))
 	write(stderr,'(5a)') myname_, &
 	     ':: ERROR--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)
        endif
      else ! Shutdown if dieWith or no arguments present
-        write(stderr,'(5a)') myname_, &
-             ':: FATAL--in list: "',trim(List_exportToChar(aV%rList))
 	write(stderr,'(5a)') myname_, &
 	     ':: FATAL--attribute not found: "',trim(item),'" ', &
 	     'Traceback:  ',String_ToChar(myTrace)
@@ -1247,11 +1338,11 @@
 !
 ! !IROUTINE: appendIAttr_ - Append one or more attributes onto the INTEGER part of an AttrVect.
 !
-! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument 
+! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument
 ! {\tt aV}, and an input character string {\tt rList} and Appends {\tt rList}
 ! to the INTEGER part of {\tt aV}. The success (failure) of this operation is
-! signified by a zero (nonzero) value for the optional {\tt INTEGER} 
-! output argument {\tt status}.  
+! signified by a zero (nonzero) value for the optional {\tt INTEGER}
+! output argument {\tt status}.
 !
 ! !INTERFACE:
 
@@ -1271,15 +1362,15 @@
 
       implicit none
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),intent(inout)  :: aV
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       character(len=*), intent(in)  :: iList
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       integer,optional,intent(out)  :: status
 
@@ -1345,11 +1436,11 @@
 !
 ! !IROUTINE: appendRAttr_ - Append one or more attributes onto the REAL part of an AttrVect.
 !
-! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument 
+! !DESCRIPTION:  This routine takes an input {\tt AttrVect} argument
 ! {\tt aV}, and an input character string {\tt rList} and Appends {\tt rList}
 ! to the REAL part of {\tt aV}. The success (failure) of this operation is
-! signified by a zero (nonzero) value for the optional {\tt INTEGER} 
-! output argument {\tt status}.  
+! signified by a zero (nonzero) value for the optional {\tt INTEGER}
+! output argument {\tt status}.
 !
 ! !INTERFACE:
 
@@ -1369,15 +1460,15 @@
 
       implicit none
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),intent(inout)  :: aV
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       character(len=*), intent(in)  :: rList
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       integer,optional,intent(out)  :: status
 
@@ -1444,16 +1535,16 @@
 ! !IROUTINE: exportIList_ - Return INTEGER Attribute List
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the integer attribute list, and returns it as the {\tt List} output 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the integer attribute list, and returns it as the {\tt List} output
 ! argument {\tt outIList}.  The success (failure) of this operation is
-! signified by a zero (nonzero) value for the optional {\tt INTEGER} 
-! output argument {\tt status}.  
+! signified by a zero (nonzero) value for the optional {\tt INTEGER}
+! output argument {\tt status}.
 !
-! {\bf N.B.:}  This routine returns an allocated {\tt List} data 
-! structure ({\tt outIList}).  The user is responsible for deallocating 
-! this structure by invoking {\tt List\_clean()} (see the module 
-! {\tt m\_List} for details) once it is no longer needed.  Failure to 
+! {\bf N.B.:}  This routine returns an allocated {\tt List} data
+! structure ({\tt outIList}).  The user is responsible for deallocating
+! this structure by invoking {\tt List\_clean()} (see the module
+! {\tt m\_List} for details) once it is no longer needed.  Failure to
 ! do so will result in a memory leak.
 !
 ! !INTERFACE:
@@ -1473,11 +1564,11 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)  :: aV
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(List),                 intent(out) :: outIList
       integer,          optional, intent(out) :: status
@@ -1513,16 +1604,16 @@
 ! !IROUTINE: exportRList_ - Return REAL attribute List
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the real attribute list, and returns it as the {\tt List} output 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the real attribute list, and returns it as the {\tt List} output
 ! argument {\tt outRList}.  The success (failure) of this operation is
-! signified by a zero (nonzero) value for the optional {\tt INTEGER} 
+! signified by a zero (nonzero) value for the optional {\tt INTEGER}
 ! output argument {\tt status}.
 !
-! {\bf N.B.:}  This routine returns an allocated {\tt List} data 
-! structure ({\tt outRList}).  The user is responsible for deallocating 
-! this structure by invoking {\tt List\_clean()} (see the module 
-! {\tt m\_List} for details) once it is no longer needed.  Failure to 
+! {\bf N.B.:}  This routine returns an allocated {\tt List} data
+! structure ({\tt outRList}).  The user is responsible for deallocating
+! this structure by invoking {\tt List\_clean()} (see the module
+! {\tt m\_List} for details) once it is no longer needed.  Failure to
 ! do so will result in a memory leak.
 !
 ! !INTERFACE:
@@ -1542,11 +1633,11 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),           intent(in)  :: aV
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(List),               intent(out) :: outRList
       integer,        optional, intent(out) :: status
@@ -1582,14 +1673,14 @@
 ! !IROUTINE: exportIListToChar_ - Return AttrVect\%iList as CHARACTER
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the integer attribute list (see the mpeu module {\tt m\_List} for more 
-! information regarding the {\tt List} type), and returns it as a 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the integer attribute list (see the mpeu module {\tt m\_List} for more
+! information regarding the {\tt List} type), and returns it as a
 ! {\tt CHARACTER} suitable for printing.  An example of its usage is
 ! \begin{verbatim}
-!           write(stdout,'(1a)') exportIListToChar_(aV) 
+!           write(stdout,'(1a)') exportIListToChar_(aV)
 ! \end{verbatim}
-! which writes the contents of {\tt aV\%iList\%bf} to the Fortran device 
+! which writes the contents of {\tt aV\%iList\%bf} to the Fortran device
 ! {\tt stdout}.
 !
 ! !INTERFACE:
@@ -1610,11 +1701,11 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),       intent(in) :: aV
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       character(len=size(aV%iList%bf,1)) :: exportIListToChar_
 
@@ -1627,13 +1718,13 @@
 
   character(len=*),parameter :: myname_=myname//'::exportIListToChar_'
 
-  ! The following extraneous list copy avoids a bug in the 
+  ! The following extraneous list copy avoids a bug in the
   ! SGI MIPSpro Fortran 90 compiler version 7.30. and the
-  ! Sun Fortran 90 Workshop compiler 5.0. If this line is removed, 
+  ! Sun Fortran 90 Workshop compiler 5.0. If this line is removed,
   ! the following error will occur during compile time:
 
   ! Signal: Segmentation fault in IR->WHIRL Conversion phase.
-  ! "m_AttrVect.F90": Error: Signal Segmentation fault in phase IR->WHIRL 
+  ! "m_AttrVect.F90": Error: Signal Segmentation fault in phase IR->WHIRL
   ! Conversion -- processing aborted
   ! f90 ERROR:  /opt/MIPSpro/73/usr/lib32/cmplrs/mfef90 died due to signal 4
   ! f90 ERROR:  core dumped
@@ -1660,14 +1751,14 @@
 ! !IROUTINE: exportRListToChar_ - Return AttrVect\%rList as CHARACTER
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the real attribute list (see the mpeu module {\tt m\_List} for more 
-! information regarding the {\tt List} type), and returns it as a 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the real attribute list (see the mpeu module {\tt m\_List} for more
+! information regarding the {\tt List} type), and returns it as a
 ! {\tt CHARACTER} suitable for printing.  An example of its usage is
 ! \begin{verbatim}
-!           write(stdout,'(1a)') exportRListToChar_(aV) 
+!           write(stdout,'(1a)') exportRListToChar_(aV)
 ! \end{verbatim}
-! which writes the contents of {\tt aV\%rList\%bf} to the Fortran device 
+! which writes the contents of {\tt aV\%rList\%bf} to the Fortran device
 ! {\tt stdout}.
 !
 ! !INTERFACE:
@@ -1688,11 +1779,11 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),       intent(in) :: aV
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       character(len=size(aV%rList%bf,1)) :: exportRListToChar_
 
@@ -1705,13 +1796,13 @@
 
   character(len=*),parameter :: myname_=myname//'::exportRListToChar_'
 
-  ! The following extraneous list copy avoids a bug in the 
+  ! The following extraneous list copy avoids a bug in the
   ! SGI MIPSpro Fortran 90 compiler version 7.30. and the
-  ! Sun Fortran 90 Workshop compiler 5.0. If this line is removed, 
+  ! Sun Fortran 90 Workshop compiler 5.0. If this line is removed,
   ! the following error will occur during compile time:
 
   ! Signal: Segmentation fault in IR->WHIRL Conversion phase.
-  ! "m_AttrVect.F90": Error: Signal Segmentation fault in phase IR->WHIRL 
+  ! "m_AttrVect.F90": Error: Signal Segmentation fault in phase IR->WHIRL
   ! Conversion -- processing aborted
   ! f90 ERROR:  /opt/MIPSpro/73/usr/lib32/cmplrs/mfef90 died due to signal 4
   ! f90 ERROR:  core dumped
@@ -1738,32 +1829,32 @@
 ! !IROUTINE: exportIAttr_ - Return INTEGER Attribute as a Vector
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the integer attribute corresponding to the tag defined in the input 
-! {\tt CHARACTER} argument {\tt AttrTag}, and returns it in the 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the integer attribute corresponding to the tag defined in the input
+! {\tt CHARACTER} argument {\tt AttrTag}, and returns it in the
 ! {\tt INTEGER} output array {\tt outVect}, and its length in the output
-! {\tt INTEGER} argument {\tt lsize}.  The optional input {\tt CHARACTER} 
-! arguments {\tt perrWith} and {\tt dieWith} control how errors are 
-! handled.  
+! {\tt INTEGER} argument {\tt lsize}.  The optional input {\tt CHARACTER}
+! arguments {\tt perrWith} and {\tt dieWith} control how errors are
+! handled.
 ! \begin{enumerate}
-! \item if neither {\tt perrWith} nor {\tt dieWith} are present, 
+! \item if neither {\tt perrWith} nor {\tt dieWith} are present,
 ! {\tt exportIAttr\_()} terminates execution with an internally generated
 ! error message;
-! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error 
+! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error
 ! message is written to {\tt stderr} incorporating user-supplied traceback
 ! information stored in the argument {\tt perrWith};
-! \item if {\tt dieWith} is present, execution terminates with an error 
+! \item if {\tt dieWith} is present, execution terminates with an error
 ! message written to {\tt stderr} that incorporates user-supplied traceback
-! information stored in the argument {\tt dieWith}; and 
-! \item if both {\tt perrWith} and {\tt dieWith} are present, execution 
+! information stored in the argument {\tt dieWith}; and
+! \item if both {\tt perrWith} and {\tt dieWith} are present, execution
 ! terminates with an error message using {\tt dieWith}, and the argument
 ! {\tt perrWith} is ignored.
 ! \end{enumerate}
 !
-! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in 
+! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in
 ! the {\tt AttrVect} {\tt List} component {\tt aV\%iList}.
 !
-! {\bf N.B.:}  The flexibility of this routine regarding the pointer 
+! {\bf N.B.:}  The flexibility of this routine regarding the pointer
 ! association status of the output argument {\tt outVect} means the
 ! user must invoke this routine with care.  If the user wishes this
 ! routine to fill a pre-allocated array, then obviously this array
@@ -1773,8 +1864,8 @@
 ! must nullify this pointer) before this routine is invoked.
 !
 ! {\bf N.B.:}  If the user has relied on this routine to allocate memory
-! associated with the pointer {\tt outVect}, then the user is responsible 
-! for deallocating this array once it is no longer needed.  Failure to 
+! associated with the pointer {\tt outVect}, then the user is responsible
+! for deallocating this array once it is no longer needed.  Failure to
 ! do so will result in a memory leak.
 !
 ! !INTERFACE:
@@ -1796,22 +1887,22 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in) :: aV
       character(len=*),           intent(in) :: AttrTag
       character(len=*), optional, intent(in) :: perrWith
       character(len=*), optional, intent(in) :: dieWith
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       integer,      dimension(:), pointer     :: outVect
       integer,          optional, intent(out) :: lsize
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
-!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability 
+!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability
 !           to work with pre-allocated outVect.
 !
 !EOP ___________________________________________________________________
@@ -1855,7 +1946,7 @@
      if(ierr /= 0) then
 	write(stderr,'(2a,i8)') myname_, &
 	     ':: Error - allocate(outVect(...) failed. ierr = ',ierr
-	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)	
+	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)
 	call die(myname_)
      endif
   endif
@@ -1881,32 +1972,32 @@
 ! !IROUTINE: exportRAttrSP_ - Return REAL Attribute as a Pointer to Array
 !
 ! !DESCRIPTION:
-! This routine extracts from the input {\tt AttrVect} argument {\tt aV} 
-! the real attribute corresponding to the tag defined in the input 
-! {\tt CHARACTER} argument {\tt AttrTag}, and returns it in the 
+! This routine extracts from the input {\tt AttrVect} argument {\tt aV}
+! the real attribute corresponding to the tag defined in the input
+! {\tt CHARACTER} argument {\tt AttrTag}, and returns it in the
 ! {\tt REAL} output array {\tt outVect}, and its length in the output
-! {\tt INTEGER} argument {\tt lsize}.  The optional input {\tt CHARACTER} 
-! arguments {\tt perrWith} and {\tt dieWith} control how errors are 
-! handled.  
+! {\tt INTEGER} argument {\tt lsize}.  The optional input {\tt CHARACTER}
+! arguments {\tt perrWith} and {\tt dieWith} control how errors are
+! handled.
 ! \begin{enumerate}
-! \item if neither {\tt perrWith} nor {\tt dieWith} are present, 
+! \item if neither {\tt perrWith} nor {\tt dieWith} are present,
 ! {\tt exportRAttr\_()} terminates execution with an internally generated
 ! error message;
-! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error 
+! \item if {\tt perrWith} is present, but {\tt dieWith} is not, an error
 ! message is written to {\tt stderr} incorporating user-supplied traceback
 ! information stored in the argument {\tt perrWith};
-! \item if {\tt dieWith} is present, execution terminates with an error 
+! \item if {\tt dieWith} is present, execution terminates with an error
 ! message written to {\tt stderr} that incorporates user-supplied traceback
-! information stored in the argument {\tt dieWith}; and 
-! \item if both {\tt perrWith} and {\tt dieWith} are present, execution 
+! information stored in the argument {\tt dieWith}; and
+! \item if both {\tt perrWith} and {\tt dieWith} are present, execution
 ! terminates with an error message using {\tt dieWith}, and the argument
 ! {\tt perrWith} is ignored.
 ! \end{enumerate}
 !
-! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in 
+! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in
 ! the {\tt AttrVect} {\tt List} component {\tt aV\%iList}.
 !
-! {\bf N.B.:}  The flexibility of this routine regarding the pointer 
+! {\bf N.B.:}  The flexibility of this routine regarding the pointer
 ! association status of the output argument {\tt outVect} means the
 ! user must invoke this routine with care.  If the user wishes this
 ! routine to fill a pre-allocated array, then obviously this array
@@ -1916,8 +2007,8 @@
 ! must nullify this pointer) before this routine is invoked.
 !
 ! {\bf N.B.:}  If the user has relied on this routine to allocate memory
-! associated with the pointer {\tt outVect}, then the user is responsible 
-! for deallocating this array once it is no longer needed.  Failure to 
+! associated with the pointer {\tt outVect}, then the user is responsible
+! for deallocating this array once it is no longer needed.  Failure to
 ! do so will result in a memory leak.
 !
 ! !INTERFACE:
@@ -1940,22 +2031,22 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in) :: aV
       character(len=*),           intent(in) :: AttrTag
       character(len=*), optional, intent(in) :: perrWith
       character(len=*), optional, intent(in) :: dieWith
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       real(SP),        dimension(:),  pointer     :: outVect
       integer,          optional,     intent(out) :: lsize
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
-!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability 
+!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability
 !           to work with pre-allocated outVect.
 !
 !EOP ___________________________________________________________________
@@ -1999,7 +2090,7 @@
      if(ierr /= 0) then
 	write(stderr,'(2a,i8)') myname_, &
 	     ':: Error - allocate(outVect(...) failed. ierr = ',ierr
-	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)	
+	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)
 	call die(myname_)
      endif
   endif
@@ -2047,22 +2138,22 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in) :: aV
       character(len=*),           intent(in) :: AttrTag
       character(len=*), optional, intent(in) :: perrWith
       character(len=*), optional, intent(in) :: dieWith
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       real(DP),    dimension(:),  pointer     :: outVect
       integer,          optional, intent(out) :: lsize
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
-!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability 
+!  6May02 - J.W. Larson <larson@mcs.anl.gov> - added capability
 !           to work with pre-allocated outVect.
 !
 ! ______________________________________________________________________
@@ -2106,7 +2197,7 @@
      if(ierr /= 0) then
 	write(stderr,'(2a,i8)') myname_, &
 	     ':: Error - allocate(outVect(...) failed. ierr = ',ierr
-	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)	
+	write(stderr,'(2a)') 'Traceback:  ',String_ToChar(myTrace)
 	call die(myname_)
      endif
   endif
@@ -2132,14 +2223,14 @@
 ! !IROUTINE: importIAttr_ - Import INTEGER Vector as an Attribute
 !
 ! !DESCRIPTION:
-! This routine imports into the input/output {\tt AttrVect} argument 
-! {\tt aV} the integer attribute corresponding to the tag defined in the 
+! This routine imports into the input/output {\tt AttrVect} argument
+! {\tt aV} the integer attribute corresponding to the tag defined in the
 ! input {\tt CHARACTER} argument {\tt AttrTag}.  The data to be imported
-! is provided in the {\tt INTEGER} input array {\tt inVect}, and the 
-! number of entries to be imported in the optional input {\tt INTEGER} 
+! is provided in the {\tt INTEGER} input array {\tt inVect}, and the
+! number of entries to be imported in the optional input {\tt INTEGER}
 ! argument {\tt lsize}.
 !
-! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in 
+! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in
 ! the {\tt AttrVect} {\tt List} component {\tt aV\%iList}.
 !
 ! !INTERFACE:
@@ -2153,18 +2244,18 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       character(len=*),       intent(in)    :: AttrTag
       integer,  dimension(:), pointer       :: inVect
       integer,  optional,     intent(in)    :: lsize
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 
       type(AttrVect),         intent(inout) :: aV
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
 !
 !EOP ___________________________________________________________________
@@ -2219,13 +2310,13 @@
 ! !IROUTINE: importRAttrSP_ - Import REAL Vector as an Attribute
 !
 ! !DESCRIPTION:
-! This routine imports into the input/output {\tt AttrVect} argument 
-! {\tt aV} the real attribute corresponding to the tag defined in the 
+! This routine imports into the input/output {\tt AttrVect} argument
+! {\tt aV} the real attribute corresponding to the tag defined in the
 ! input {\tt CHARACTER} argument {\tt AttrTag}.  The data to be imported
-! is provided in the {\tt REAL} input array {\tt inVect}, and its 
+! is provided in the {\tt REAL} input array {\tt inVect}, and its
 ! length in the optional input {\tt INTEGER} argument {\tt lsize}.
 !
-! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in 
+! {\bf N.B.:}  This routine will fail if the {\tt AttrTag} is not in
 ! the {\tt AttrVect} {\tt List} component {\tt aV\%rList}.
 !
 ! !INTERFACE:
@@ -2239,20 +2330,20 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       character(len=*),   intent(in)    :: AttrTag
       real(SP), dimension(:), pointer   :: inVect
       integer, optional,  intent(in)    :: lsize
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 
       type(AttrVect),     intent(inout) :: aV
 
 
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
 !
 !EOP ___________________________________________________________________
@@ -2320,20 +2411,20 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       character(len=*),   intent(in)    :: AttrTag
       real(DP), dimension(:), pointer   :: inVect
       integer, optional,  intent(in)    :: lsize
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 
       type(AttrVect),     intent(inout) :: aV
 
 
 
 ! !REVISION HISTORY:
-! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow) 
+! 19Oct01 - J.W. Larson <larson@mcs.anl.gov> - initial (slow)
 !           prototype.
 !
 !EOP ___________________________________________________________________
@@ -2388,10 +2479,10 @@
 ! !IROUTINE: RCopy_ - Copy Real Attributes from One AttrVect to Another
 !
 ! !DESCRIPTION:
-! This routine copies from input argment {\tt aVin} into the output 
+! This routine copies from input argment {\tt aVin} into the output
 ! {\tt AttrVect} argument {\tt aVout} the shared real attributes.
 !
-! If the optional argument {\tt Vector} is present and true, the vector 
+! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.
 !
 ! If the optional argument {\tt sharedIndices} is present, it should be
@@ -2415,18 +2506,15 @@
       use m_die ,          only : die
       use m_stdio ,        only : stderr
 
-      use m_List,          only : GetSharedListIndices
-      use m_List,          only : GetIndices => get_indices
-
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)    :: aVin
-      logical, optional,          intent(in)    :: vector 
+      logical, optional,          intent(in)    :: vector
       type(AVSharedIndicesOneType), optional, intent(in) :: sharedIndices
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(AttrVect),             intent(inout) :: aVout
 
@@ -2440,8 +2528,7 @@
 
   integer :: i,j,ier       ! dummy variables
   integer :: aVsize        ! The lsize of aVin and aVout
-  integer :: num_inindices, num_outindices   ! Number of matching indices in aV
-  integer :: inxmin, outxmin, inx, outx      ! Index variables
+  integer :: inxmin, outxmin      ! Index variables
   logical :: usevector    ! true if vector flag is present and true.
   character*7 :: data_flag ! character variable used as data type flag
   type(AVSharedIndicesOneType) :: mySharedIndices  ! copied from sharedIndices, or
@@ -2495,27 +2582,24 @@
    if(vector) usevector = .true.
   endif
 
-  ! Start copying 
+  ! Start copying
 
   if(mySharedIndices%contiguous) then
 
+     outxmin=mySharedIndices%aVindices2(1)-1
+     inxmin=mySharedIndices%aVindices1(1)-1
      if(usevector) then
-        outxmin=mySharedIndices%aVindices2(1)-1
-        inxmin=mySharedIndices%aVindices1(1)-1
 !$OMP PARALLEL DO PRIVATE(i,j)
         do i=1,mySharedIndices%num_indices
 !CDIR SELECT(VECTOR)
-!DIR$ CONCURRENT
+!DIR$ IVDEP
            do j=1,aVsize
               aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)
            enddo
         enddo
      else
-        outxmin=mySharedIndices%aVindices2(1)-1
-        inxmin=mySharedIndices%aVindices1(1)-1
-!$OMP PARALLEL DO PRIVAtE(j,i)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
         do j=1,aVsize
-!DIR$ CONCURRENT
            do i=1,mySharedIndices%num_indices
               aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)
            enddo
@@ -2523,17 +2607,14 @@
      endif
 
   else
-          
-!$OMP PARALLEL DO PRIVATE(j,i,outx,inx) 
+
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
      do j=1,aVsize
-!DIR$ CONCURRENT
         do i=1,mySharedIndices%num_indices
-           outx=mySharedIndices%aVindices2(i)
-           inx=mySharedIndices%aVindices1(i)     
-           aVout%rAttr(outx,j) = aVin%rAttr(inx,j)
+           aVout%rAttr(mySharedIndices%aVindices2(i),j) = aVin%rAttr(mySharedIndices%aVindices1(i),j)
         enddo
      enddo
-        
+
   endif
 
 
@@ -2551,10 +2632,10 @@
 ! !IROUTINE: RCopyL_ - Copy Specific Real Attributes from One AttrVect to Another
 !
 ! !DESCRIPTION:
-! This routine copies from input argment {\tt aVin} into the output 
-! {\tt AttrVect} argument {\tt aVout} the real attributes specified in 
+! This routine copies from input argment {\tt aVin} into the output
+! {\tt AttrVect} argument {\tt aVout} the real attributes specified in
 ! input {\tt CHARACTER} argument {\tt rList}. The attributes can
-! be listed in any order.  
+! be listed in any order.
 !
 ! If any attributes in {\tt aVout} have different names but represent the
 ! the same quantity and should still be copied, you must provide a translation
@@ -2562,7 +2643,7 @@
 ! be identical in length to the {\tt rList} but with the correct {\tt aVout}
 ! name subsititued at the appropriate place.
 !
-! If the optional argument {\tt Vector} is present and true, the vector 
+! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.
 !
 ! {\bf N.B.:}  This routine will fail if the {\tt aVout} is not initialized or
@@ -2578,19 +2659,18 @@
       use m_die ,          only : die
       use m_stdio ,        only : stderr
 
-      use m_List,          only : GetSharedListIndices
       use m_List,          only : GetIndices => get_indices
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)    :: aVin
       character(len=*),           intent(in)    :: rList
       character(len=*), optional, intent(in)    :: TrList
-      logical, optional,          intent(in)    :: vector 
+      logical, optional,          intent(in)    :: vector
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(AttrVect),             intent(inout) :: aVout
 
@@ -2606,12 +2686,10 @@
   integer :: i,j,ier       ! dummy variables
   integer :: num_indices   ! Overlapping attribute index number
   integer :: aVsize        ! The lsize of aVin and aVout
-  integer :: num_inindices, num_outindices   ! Number of matching indices in aV
-  integer :: inxmin, outxmin, inx, outx      ! Index variables
+  integer :: inxmin, outxmin   ! Index variables
   logical :: TrListIsPresent   ! true if list argument is present
-  logical :: contiguous    ! true if index segments are contiguous in memory  
+  logical :: contiguous    ! true if index segments are contiguous in memory
   logical :: usevector    ! true if vector flag is present and true.
-  character*7 :: data_flag ! character variable used as data type flag
 
   ! Overlapping attribute index storage arrays:
   integer, dimension(:), pointer :: aVinindices, aVoutindices
@@ -2631,7 +2709,7 @@
 
   ! Index rList with the AttrVects
   call GetIndices(aVinindices,aVin%rList,trim(rList))
-	
+
 !  TrList is present if it is provided and its length>0
   TrListIsPresent = .false.
   if(present(TrList)) then
@@ -2659,7 +2737,7 @@
     if(ier/=0) call die(myname_,"deallocate(aVinindices...)",ier)
     return
   endif
- 
+
   ! check vector flag.
   usevector = .false.
   if (present(vector)) then
@@ -2669,48 +2747,48 @@
 ! Check if the indices are contiguous in memory for faster copy
   contiguous=.true.
   do i=2,num_indices
-     if(aVinindices(i) /= aVinindices(i-1)+1) contiguous = .false.
+     if(aVinindices(i) /= aVinindices(i-1)+1) then
+        contiguous = .false.
+        exit
+     endif
   enddo
   if(contiguous) then
      do i=2,num_indices
-         if(aVoutindices(i) /= aVoutindices(i-1)+1) contiguous=.false.
+        if(aVoutindices(i) /= aVoutindices(i-1)+1) then
+           contiguous=.false.
+           exit
+        endif
      enddo
   endif
 
 ! Start copying (arranged loop order optimized for xlf90)
   if(contiguous) then
 
+     outxmin=aVoutindices(1)-1
+     inxmin=aVinindices(1)-1
      if(usevector) then
-        outxmin=aVoutindices(1)-1
-        inxmin=aVinindices(1)-1
 !$OMP PARALLEL DO PRIVATE(i,j)
         do i=1,num_indices
-!DIR$ CONCURRENT
-	   do j=1,aVsize
-	     aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)       
-	   enddo
-	enddo
+!DIR$ IVDEP
+           do j=1,aVsize
+              aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)
+           enddo
+        enddo
      else
-        outxmin=aVoutindices(1)-1
-        inxmin=aVinindices(1)-1
-!$OMP PARALLEL DO PRIVATE(j,i)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
         do j=1,aVsize
-!DIR$ CONCURRENT
-	   do i=1,num_indices
-	      aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)       
-	   enddo
-	enddo
+           do i=1,num_indices
+              aVout%rAttr(outxmin+i,j) = aVin%rAttr(inxmin+i,j)
+           enddo
+        enddo
      endif
 
   else
 
-!$OMP PARALLEL DO PRIVATE(j,i,outx,inx)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
     do j=1,aVsize
-!DIR$ CONCURRENT
        do i=1,num_indices
-          outx=aVoutindices(i)
-          inx=aVinindices(i)     
-          aVout%rAttr(outx,j) = aVin%rAttr(inx,j)
+          aVout%rAttr(aVoutindices(i),j) = aVin%rAttr(aVinindices(i),j)
        enddo
     enddo
 
@@ -2728,10 +2806,10 @@
 ! !IROUTINE: ICopy_ - Copy Integer Attributes from One AttrVect to Another
 !
 ! !DESCRIPTION:
-! This routine copies from input argment {\tt aVin} into the output 
+! This routine copies from input argment {\tt aVin} into the output
 ! {\tt AttrVect} argument {\tt aVout} the shared integer attributes.
 !
-! If the optional argument {\tt Vector} is present and true, the vector 
+! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.
 !
 ! If the optional argument {\tt sharedIndices} is present, it should be
@@ -2755,18 +2833,15 @@
       use m_die ,          only : die
       use m_stdio ,        only : stderr
 
-      use m_List,          only : GetSharedListIndices
-      use m_List,          only : GetIndices => get_indices
-
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)    :: aVin
-      logical, optional,          intent(in)    :: vector 
+      logical, optional,          intent(in)    :: vector
       type(AVSharedIndicesOneType), optional, intent(in) :: sharedIndices
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(AttrVect),             intent(inout) :: aVout
 
@@ -2781,8 +2856,7 @@
 
   integer :: i,j,ier       ! dummy variables
   integer :: aVsize        ! The lsize of aVin and aVout
-  integer :: num_inindices, num_outindices   ! Number of matching indices in aV
-  integer :: inxmin, outxmin, inx, outx      ! Index variables
+  integer :: inxmin, outxmin      ! Index variables
   logical :: usevector    ! true if vector flag is present and true.
   character*7 :: data_flag ! character variable used as data type flag
   type(AVSharedIndicesOneType) :: mySharedIndices  ! copied from sharedIndices, or
@@ -2803,7 +2877,7 @@
   endif
 
   data_flag = 'INTEGER'
-  
+
   if (present(sharedIndices)) then
      ! do some error checking on sharedIndices
      if (.not. (associated(sharedIndices%aVindices1) .and. associated(sharedIndices%aVindices2))) then
@@ -2838,24 +2912,21 @@
 
 
   if(mySharedIndices%contiguous) then
-      
+
+     outxmin=mySharedIndices%aVindices2(1)-1
+     inxmin=mySharedIndices%aVindices1(1)-1
      if(usevector) then
-        outxmin=mySharedIndices%aVindices2(1)-1
-        inxmin=mySharedIndices%aVindices1(1)-1
 !$OMP PARALLEL DO PRIVATE(i,j)
         do i=1,mySharedIndices%num_indices
 !CDIR SELECT(VECTOR)
-!DIR$ CONCURRENT
+!DIR$ IVDEP
            do j=1,aVsize
               aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)
            enddo
         enddo
      else
-        outxmin=mySharedIndices%aVindices2(1)-1
-        inxmin=mySharedIndices%aVindices1(1)-1
-!$OMP PARALLEL DO PRIVATE(j,i)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
         do j=1,aVsize
-!DIR$ CONCURRENT
            do i=1,mySharedIndices%num_indices
               aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)
            enddo
@@ -2864,16 +2935,13 @@
 
   else
 
-!$OMP PARALLEL DO PRIVATE(j,i,outx,inx)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
      do j=1,aVsize
-!DIR$ CONCURRENT
         do i=1,mySharedIndices%num_indices
-           outx=mySharedIndices%aVindices2(i)
-           inx=mySharedIndices%aVindices1(i)     
-           aVout%iAttr(outx,j) = aVin%iAttr(inx,j)
+           aVout%iAttr(mySharedIndices%aVindices2(i),j) = aVin%iAttr(mySharedIndices%aVindices1(i),j)
         enddo
      enddo
-     
+
   endif
 
   if (clean_mySharedIndices) then
@@ -2890,10 +2958,10 @@
 ! !IROUTINE: ICopyL_ - Copy Specific Integer Attributes from One AttrVect to Another
 !
 ! !DESCRIPTION:
-! This routine copies from input argment {\tt aVin} into the output 
-! {\tt AttrVect} argument {\tt aVout} the integer attributes specified in 
+! This routine copies from input argment {\tt aVin} into the output
+! {\tt AttrVect} argument {\tt aVout} the integer attributes specified in
 ! input {\tt CHARACTER} argument {\tt iList}. The attributes can
-! be listed in any order. 
+! be listed in any order.
 !
 ! If any attributes in {\tt aVout} have different names but represent the
 ! the same quantity and should still be copied, you must provide a translation
@@ -2901,7 +2969,7 @@
 ! be identical in length to the {\tt iList} but with the correct {\tt aVout}
 ! name subsititued at the appropriate place.
 !
-! If the optional argument {\tt Vector} is present and true, the vector 
+! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.
 !
 ! {\bf N.B.:}  This routine will fail if the {\tt aVout} is not initialized or
@@ -2921,14 +2989,14 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)    :: aVin
       character(len=*)          , intent(in)    :: iList
       character(len=*), optional, intent(in)    :: TiList
-      logical, optional,          intent(in)    :: vector 
+      logical, optional,          intent(in)    :: vector
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(AttrVect),             intent(inout) :: aVout
 
@@ -2944,12 +3012,10 @@
   integer :: i,j,ier       ! dummy variables
   integer :: num_indices   ! Overlapping attribute index number
   integer :: aVsize        ! The lsize of aVin and aVout
-  integer :: num_inindices, num_outindices   ! Number of matching indices in aV
-  integer :: inxmin, outxmin, inx, outx      ! Index variables
+  integer :: inxmin, outxmin      ! Index variables
   logical :: TiListIsPresent     ! true if list argument is present
-  logical :: contiguous    ! true if index segments are contiguous in memory  
+  logical :: contiguous    ! true if index segments are contiguous in memory
   logical :: usevector    ! true if vector flag is present and true.
-  character*7 :: data_flag ! character variable used as data type flag
 
   ! Overlapping attribute index storage arrays:
   integer, dimension(:), pointer :: aVinindices, aVoutindices
@@ -3007,54 +3073,54 @@
 ! Check if the indices are contiguous in memory for faster copy
   contiguous=.true.
   do i=2,num_indices
-    if(aVinindices(i) /= aVinindices(i-1)+1) contiguous = .false.
+    if(aVinindices(i) /= aVinindices(i-1)+1) then
+       contiguous = .false.
+       exit
+    endif
   enddo
   if(contiguous) then
     do i=2,num_indices
-      if(aVoutindices(i) /= aVoutindices(i-1)+1) contiguous=.false.
+      if(aVoutindices(i) /= aVoutindices(i-1)+1) then
+         contiguous=.false.
+         exit
+      endif
     enddo
   endif
-	
+
 ! Start copying (arranged loop order optimized for xlf90)
   if(contiguous) then
 
+    outxmin=aVoutindices(1)-1
+    inxmin=aVinindices(1)-1
     if(usevector) then
-      outxmin=aVoutindices(1)-1
-      inxmin=aVinindices(1)-1
 !$OMP PARALLEL DO PRIVAtE(i,j)
       do i=1,num_indices
 !CDIR SELECT(VECTOR)
-!DIR$ CONCURRENT
+!DIR$ IVDEP
          do j=1,aVsize
-   	    aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)       
+            aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)
          enddo
       enddo
     else
-      outxmin=aVoutindices(1)-1
-      inxmin=aVinindices(1)-1
-!$OMP PARALLEL DO PRIVATE(j,i)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
       do j=1,aVsize
-!DIR$ CONCURRENT
          do i=1,num_indices
-   	    aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)       
+            aVout%iAttr(outxmin+i,j) = aVin%iAttr(inxmin+i,j)
          enddo
       enddo
     endif
 
   else
 
-!$OMP PARALLEL DO PRIVATE(j,i,outx,inx)
+!$OMP PARALLEL DO PRIVATE(j,i) COLLAPSE(2)
      do j=1,aVsize
-!DIR$ CONCURRENT
        do i=1,num_indices
-          outx=aVoutindices(i)
-          inx=aVinindices(i)     
-          aVout%iAttr(outx,j) = aVin%iAttr(inx,j)
+          aVout%iAttr(aVoutindices(i),j) = aVin%iAttr(aVinindices(i),j)
        enddo
      enddo
 
   endif
-                
+
   deallocate(aVinindices, aVoutindices, stat=ier)
   if(ier/=0) call die(myname_,"deallocate(aVinindices...)",ier)
 
@@ -3067,10 +3133,10 @@
 ! !IROUTINE: Copy_ - Copy Real and Integer Attributes from One AttrVect to Another
 !
 ! !DESCRIPTION:
-! This routine copies from input argment {\tt aVin} into the output 
-! {\tt AttrVect} argument {\tt aVout} the real and integer attributes specified in 
+! This routine copies from input argment {\tt aVin} into the output
+! {\tt AttrVect} argument {\tt aVout} the real and integer attributes specified in
 ! input {\tt CHARACTER} argument {\tt iList} and {\tt rList}. The attributes can
-! be listed in any order.  If neither {\tt iList} nor {\tt rList} are provided, 
+! be listed in any order.  If neither {\tt iList} nor {\tt rList} are provided,
 ! all attributes shared between {\tt aVin} and {\tt aVout} will be copied.
 !
 ! If any attributes in {\tt aVout} have different names but represent the
@@ -3084,7 +3150,7 @@
 ! attributes, use the {\tt RCopy} functions.  If you know you only want to
 ! copy integer attributes, use the {\tt ICopy} functions.
 !
-! If the optional argument {\tt Vector} is present and true, the vector 
+! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.
 !
 ! If the optional argument {\tt sharedIndices} is present, it should be
@@ -3111,22 +3177,19 @@
       use m_die ,          only : die, warn
       use m_stdio ,        only : stderr
 
-      use m_List,          only : GetSharedListIndices
-      use m_List,          only : GetIndices => get_indices
-
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(AttrVect),             intent(in)    :: aVin
       character(len=*), optional, intent(in)    :: iList
       character(len=*), optional, intent(in)    :: rList
       character(len=*), optional, intent(in)    :: TiList
       character(len=*), optional, intent(in)    :: TrList
-      logical, optional,          intent(in)    :: vector 
+      logical, optional,          intent(in)    :: vector
       type(AVSharedIndices), optional, intent(in) :: sharedIndices
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(AttrVect),             intent(inout) :: aVout
 
@@ -3137,8 +3200,8 @@
 !           if no attribute lists are specified.
 ! 30Sep02 - R. Jacob <jacob@mcs.anl.gov> - new argument order with all
 !           optional arguments last
-! 19Feb02 - E. Ong <eong@mcs.anl.gov> - new implementation using 
-!           new list function get_indices and faster memory copy  
+! 19Feb02 - E. Ong <eong@mcs.anl.gov> - new implementation using
+!           new list function get_indices and faster memory copy
 ! 28Oct03 - R. Jacob <jacob@mcs.anl.gov> - add optional vector
 !           argument to use vector-friendly code provided by Fujitsu
 ! 16Aug06 - R. Jacob <jacob@mcs.anl.gov> - split into 4 routines:
@@ -3155,9 +3218,8 @@
   integer :: num_inindices, num_outindices   ! Number of matching indices in aV
   integer :: inxmin, outxmin, inx, outx      ! Index variables
   logical :: TiListIsPresent, TrListIsPresent! true if list argument is present
-  logical :: contiguous    ! true if index segments are contiguous in memory  
+  logical :: contiguous    ! true if index segments are contiguous in memory
   logical :: usevector    ! true if vector flag is present and true.
-  character*7 :: data_flag ! character variable used as data type flag
 
   ! Overlapping attribute index storage arrays:
   integer, dimension(:), pointer :: aVinindices, aVoutindices
@@ -3180,48 +3242,48 @@
 
   ! Copy the listed real attributes
   if(present(rList)) then
-	! TrList is present if it is provided and its length>0
-	TrListIsPresent = .false.
-	if(present(TrList)) then
-	   if(len_trim(TrList) > 0) then
-	      TrListIsPresent = .true.
-	   endif
-	endif
+     ! TrList is present if it is provided and its length>0
+     TrListIsPresent = .false.
+     if(present(TrList)) then
+        if(len_trim(TrList) > 0) then
+           TrListIsPresent = .true.
+        endif
+     endif
 
-        if(present(sharedIndices)) then
-           call warn(myname_,'Use of sharedIndices not implemented in RCopyL; &
+     if(present(sharedIndices)) then
+        call warn(myname_,'Use of sharedIndices not implemented in RCopyL; &
                      &ignoring sharedIndices',1)
-        end if
+     endif
 
-	if(TrListIsPresent) then
-	   call RCopyL_(aVin,aVout,rList,TrList,vector=usevector)
-	else
-	   call RCopyL_(aVin,aVout,rList,vector=usevector)
-	endif
+     if(TrListIsPresent) then
+        call RCopyL_(aVin,aVout,rList,TrList,vector=usevector)
+     else
+        call RCopyL_(aVin,aVout,rList,vector=usevector)
+     endif
 
   endif   ! if(present(rList)
 
   !  Copy the listed integer attributes
   if(present(iList)) then
 
-	! TiList is present if its provided and its length>0
-	TiListIsPresent = .false.
-	if(present(TiList)) then
-	   if(len_trim(TiList) > 0) then
-	      TiListIsPresent = .true.
-	   endif
-	endif
+     ! TiList is present if its provided and its length>0
+     TiListIsPresent = .false.
+     if(present(TiList)) then
+        if(len_trim(TiList) > 0) then
+           TiListIsPresent = .true.
+        endif
+     endif
 
-        if(present(sharedIndices)) then
-           call warn(myname_,'Use of sharedIndices not implemented in ICopyL; &
+     if(present(sharedIndices)) then
+        call warn(myname_,'Use of sharedIndices not implemented in ICopyL; &
                      &ignoring sharedIndices',1)
-        end if
+     endif
 
-	if(TiListIsPresent) then
-	   call ICopyL_(aVin,aVout,iList,TiList,vector=usevector)
-	else
-	   call ICopyL_(aVin,aVout,iList,vector=usevector)
-	endif
+     if(TiListIsPresent) then
+        call ICopyL_(aVin,aVout,iList,TiList,vector=usevector)
+     else
+        call ICopyL_(aVin,aVout,iList,vector=usevector)
+     endif
 
   endif   ! if(present(iList))
 
@@ -3248,19 +3310,19 @@
 ! !IROUTINE: Sort_ - Use Attributes as Keys to Generate an Index Permutation
 !
 ! !DESCRIPTION:
-! The subroutine {\tt Sort\_()} uses a list of keys defined by the {\tt List} 
+! The subroutine {\tt Sort\_()} uses a list of keys defined by the {\tt List}
 ! {\tt key\_list}, searches for the appropriate integer or real attributes
-! referenced by the items in {\tt key\_list} ( that is, it identifies the 
-! appropriate entries in {aV\%iList} and {\tt aV\%rList}), and then 
+! referenced by the items in {\tt key\_list} ( that is, it identifies the
+! appropriate entries in {aV\%iList} and {\tt aV\%rList}), and then
 ! uses these keys to generate a permutation {\tt perm} that will put
 ! the entries of the attribute vector {\tt aV} in lexicographic order
 ! as defined by {\tt key\_list} (the ordering in {\tt key\_list} being from
 ! left to right.
 !
-! {\bf N.B.:}  This routine will fail if {\tt aV\%iList} and 
-! {\tt aV\%rList} share one or more common entries. 
+! {\bf N.B.:}  This routine will fail if {\tt aV\%iList} and
+! {\tt aV\%rList} share one or more common entries.
 !
-! {\bf N.B.:}  This routine will fail if one of the sorting keys presented is 
+! {\bf N.B.:}  This routine will fail if one of the sorting keys presented is
 ! not present in {\tt aV\%iList} nor {\tt aV\%rList}.
 !
 ! !INTERFACE:
@@ -3283,7 +3345,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(AttrVect),                  intent(in) :: aV
       type(List),                      intent(in) :: key_list
@@ -3291,7 +3353,7 @@
       character(len=*),      optional, intent(in) :: perrWith
       character(len=*),      optional, intent(in) :: dieWith
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 !
       integer, dimension(:),           pointer    :: perm
 
@@ -3301,7 +3363,7 @@
 ! 25Apr01 - R.L. Jacob <jacob@mcs.anl.gov> - add -1 to make a
 !           backwards loop go backwards
 ! 14Jun01 - J. Larson / E. Ong -- Fixed logic bug in REAL attribute
-!           sort (discovered by E. Ong), and cleaned up error / 
+!           sort (discovered by E. Ong), and cleaned up error /
 !           shutdown logic.
 !EOP ___________________________________________________________________
 
@@ -3319,7 +3381,7 @@
 
         ! key indices for av%rAttr and av%iAttr, respectively:
 
-  integer, dimension(:), allocatable :: rIndex, iIndex 
+  integer, dimension(:), allocatable :: rIndex, iIndex
 
         ! copy of descend argument
 
@@ -3341,7 +3403,7 @@
      if(ierr/=0) call die(myname_,"allocate(descend_copy)",ierr)
      descend_copy=descend
   endif
-     
+
 
         ! allocate and initialize rIndex and iIndex to
         ! zero (the null return values from the functions
@@ -3365,7 +3427,7 @@
 
         ! determine wheter this key refers to an
         ! integer or real attribute:
-! jwl commented out in favor of below code block unitl an error 
+! jwl commented out in favor of below code block unitl an error
 ! handling strategy is settled upon for indexIA_() and indexRA_().
 !     rIndex(n) = indexRA_(aV, String_tochar(key), dieWith=myname_)
 !     iIndex(n) = indexIA_(aV, String_tochar(key), dieWith=myname_)
@@ -3382,8 +3444,8 @@
      endif
 
         ! If both rIndex(n) and iIndex(n) are greater than
-        ! zero, then we have an integer attribute sharing 
-        ! the same name as a real attribute, and there is 
+        ! zero, then we have an integer attribute sharing
+        ! the same name as a real attribute, and there is
         ! no clear path as to which one is the sort key.
         ! This is a fatal error that triggers shutdown.
 
@@ -3437,7 +3499,7 @@
         ! Now we have the locations of the keys in the integer and
         ! real attribute storage areas aV%iAttr and aV%rAttr, respectively.
         ! our next step is to construct and initialize the permutation
-        ! array perm.  First step--determine the length of aV using 
+        ! array perm.  First step--determine the length of aV using
         ! lsize_():
 
   length = lsize_(aV)
@@ -3499,7 +3561,7 @@
 ! The subroutine {\tt Permute\_()} uses a a permutation {\tt perm} (which can
 ! be generated by the routine {\tt Sort\_()} in this module) to rearrange
 ! the entries in the attribute integer and real storage areas of the
-! input attribute vector {\tt aV}--{\tt aV\%iAttr} and {\tt aV\%rAttr}, 
+! input attribute vector {\tt aV}--{\tt aV\%iAttr} and {\tt aV\%rAttr},
 ! respectively.
 !
 ! !INTERFACE:
@@ -3514,13 +3576,13 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       integer, dimension(:),           intent(in)    :: perm
       character(len=*),      optional, intent(in)    :: perrWith
       character(len=*),      optional, intent(in)    :: dieWith
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),                  intent(inout) :: aV
 
@@ -3582,7 +3644,7 @@
 ! The subroutine {\tt Unpermute\_()} uses a a permutation {\tt perm} (which can
 ! be generated by the routine {\tt Sort\_()} in this module) to rearrange
 ! the entries in the attribute integer and real storage areas of the
-! input attribute vector {\tt aV}--{\tt aV\%iAttr} and {\tt aV\%rAttr}, 
+! input attribute vector {\tt aV}--{\tt aV\%iAttr} and {\tt aV\%rAttr},
 ! respectively.  This is meant to be called on an {\tt aV} that has already
 ! been permuted but it could also be used to perform the inverse operation
 ! implied by {\tt perm} on an unpermuted {\tt aV}.
@@ -3599,13 +3661,13 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       integer, dimension(:),           intent(in)    :: perm
       character(len=*),      optional, intent(in)    :: perrWith
       character(len=*),      optional, intent(in)    :: dieWith
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),                  intent(inout) :: aV
 
@@ -3665,9 +3727,9 @@
 !
 ! !DESCRIPTION:
 !
-! The subroutine {\tt SortPermute\_()} uses the routine {\tt Sort\_()} 
+! The subroutine {\tt SortPermute\_()} uses the routine {\tt Sort\_()}
 ! to create an index permutation {\tt perm} that will place the AttrVect
-! entries in the lexicographic order defined by the keys in the List 
+! entries in the lexicographic order defined by the keys in the List
 ! variable {\tt key\_list}.  This permutation is then used by the routine
 ! {\tt Permute\_()} to place the AttreVect entries in lexicographic order.
 !
@@ -3682,14 +3744,14 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
       type(List),                       intent(in)    :: key_list
       logical , dimension(:), optional, intent(in)    :: descend
       character(len=*),       optional, intent(in)    :: perrWith
       character(len=*),       optional, intent(in)    :: dieWith
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AttrVect),                   intent(inout) :: aV
 
@@ -3719,8 +3781,8 @@
 
   call Permute_(aV, perm, perrWith, dieWith)
 
-       ! Step Three:  deallocate temporary array used to 
-       ! store the index permutation (this was allocated 
+       ! Step Three:  deallocate temporary array used to
+       ! store the index permutation (this was allocated
        ! in the routine Sort_()
 
   deallocate(perm, stat=ierr)
@@ -3745,15 +3807,15 @@
 !
 ! !IROUTINE: aVaVSharedAttrIndexList_ - AttrVect shared attributes.
 !
-! !DESCRIPTION:  {\tt aVaVSharedAttrIndexList\_()} takes a pair of 
-! user-supplied {\tt AttrVect} variables {\tt aV1} and {\tt aV2}, 
+! !DESCRIPTION:  {\tt aVaVSharedAttrIndexList\_()} takes a pair of
+! user-supplied {\tt AttrVect} variables {\tt aV1} and {\tt aV2},
 ! and for choice of either {\tt REAL} or {\tt INTEGER} attributes (as
 ! specified literally in the input {\tt CHARACTER} argument {\tt attrib})
 ! returns the number of shared attributes {\tt NumShared}, and arrays of
 ! indices {\tt Indices1} and {\tt Indices2} to their storage locations
 ! in {\tt aV1} and {\tt aV2}, respectively.
 !
-! {\bf N.B.:}  This routine returns two allocated arrays---{\tt Indices1(:)} 
+! {\bf N.B.:}  This routine returns two allocated arrays---{\tt Indices1(:)}
 ! and {\tt Indices2(:)}---which must be deallocated once the user no longer
 ! needs them.  Failure to do this will create a memory leak.
 !
@@ -3772,13 +3834,13 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
-      type(AttrVect),        intent(in)  :: aV1   
+      type(AttrVect),        intent(in)  :: aV1
       type(AttrVect),        intent(in)  :: aV2
       character(len=*),      intent(in)  :: attrib
 
-! !OUTPUT PARAMETERS:   
+! !OUTPUT PARAMETERS:
 !
       integer,               intent(out) :: NumShared
       integer, dimension(:), pointer     :: Indices1
@@ -3792,7 +3854,7 @@
 
   integer :: ierr
 
-       ! Based on the value of the argument attrib, pass the 
+       ! Based on the value of the argument attrib, pass the
        ! appropriate pair of Lists for comparison...
 
   select case(trim(attrib))
@@ -3838,12 +3900,12 @@
 
     implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
-      type(AttrVect),        intent(in)  :: aV1   
+      type(AttrVect),        intent(in)  :: aV1
       type(AttrVect),        intent(in)  :: aV2
 
-! !INPUT/OUTPUT PARAMETERS:   
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AVSharedIndices), intent(inout) :: sharedIndices
 
@@ -3894,13 +3956,13 @@
 
     implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 !
-      type(AttrVect),        intent(in)  :: aV1   
+      type(AttrVect),        intent(in)  :: aV1
       type(AttrVect),        intent(in)  :: aV2
       character(len=*),      intent(in)  :: attrib
 
-! !INPUT/OUTPUT PARAMETERS:   
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AVSharedIndicesOneType), intent(inout) :: sharedIndices
 
@@ -3920,14 +3982,16 @@
   ! Check indices for contiguous segments in memory
   sharedIndices%contiguous=.true.
   do i=2,sharedIndices%num_indices
-     if(sharedIndices%aVindices1(i) /= sharedIndices%aVindices1(i-1)+1) then 
+     if(sharedIndices%aVindices1(i) /= sharedIndices%aVindices1(i-1)+1) then
         sharedIndices%contiguous = .false.
+        exit
      endif
   enddo
   if(sharedIndices%contiguous) then
      do i=2,sharedIndices%num_indices
         if(sharedIndices%aVindices2(i) /= sharedIndices%aVindices2(i-1)+1) then
            sharedIndices%contiguous=.false.
+           exit
         endif
      enddo
   endif
@@ -3958,7 +4022,7 @@
 
     implicit none
 
-! !INPUT/OUTPUT PARAMETERS:   
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AVSharedIndices), intent(inout) :: sharedIndices
 
@@ -4014,7 +4078,7 @@
 
     implicit none
 
-! !INPUT/OUTPUT PARAMETERS:   
+! !INPUT/OUTPUT PARAMETERS:
 !
       type(AVSharedIndicesOneType), intent(inout) :: sharedIndices
 
@@ -4032,7 +4096,7 @@
   if(present(stat)) stat=0
 
   if(associated(sharedIndices%aVindices1)) then
-     
+
      deallocate(sharedIndices%aVindices1,stat=ier)
 
      if (ier /= 0) then
@@ -4046,7 +4110,7 @@
   endif
 
   if(associated(sharedIndices%aVindices2)) then
-     
+
      deallocate(sharedIndices%aVindices2,stat=ier)
 
      if (ier /= 0) then
@@ -4057,8 +4121,8 @@
         endif
      endif
 
-  endif  
-        
+  endif
+
   ! Reset other components to default values
   sharedIndices%num_indices = 0
   sharedIndices%contiguous = .false.

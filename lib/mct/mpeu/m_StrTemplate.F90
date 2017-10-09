@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_StrTemplate.F90,v 1.6 2004-04-21 22:54:46 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_StrTemplate - A template formatting a string with variables
