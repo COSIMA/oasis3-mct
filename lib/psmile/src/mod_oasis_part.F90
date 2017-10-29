@@ -149,7 +149,7 @@ CONTAINS
    integer(kind=ip_intwp_p) :: pcnt
    logical                  :: found
    character(len=ic_lvar2), pointer :: pname0(:),pname(:)
-   logical, parameter :: local_timers_on = .true.
+   logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_part_setup)'
    !--------------------------------------------------------
 
@@ -347,7 +347,7 @@ CONTAINS
 
    if (local_timers_on) call oasis_timer_stop ('part_setup_initgsm')
    if (local_timers_on) call oasis_timer_stop('part_setup')
-      
+
    call oasis_debug_exit(subname)
 
  END SUBROUTINE oasis_part_setup
@@ -563,10 +563,10 @@ CONTAINS
      numel = 0
      if (gsrank >= 0) then
         numel = size(gridID)
-!        if (OASIS_debug >= 15) then
+        if (OASIS_debug >= 15) then
            write(nulprt,*) subname,' wgts1 ',numel
            write(nulprt,*) subname,' gridID ',minval(gridID),maxval(gridID)
-!        endif
+        endif
         do n = 1,numel
            if (gridID(n) > gsize) then
               write(nulprt,*) subname,estr,'gridID > gsize',gridID(n),gsize

@@ -138,7 +138,7 @@ MODULE mod_oasis_grid
 
   integer(kind=ip_intwp_p),public,save :: prism_ngrid = 0  !< counter for grids
   type(prism_grid_type),public,save :: prism_grid(mgrid)   !< array of grid datatypes
-
+  logical, parameter :: local_timers_on = .false.
 
 #ifdef use_netCDF
 #include <netcdf.inc>
@@ -162,7 +162,9 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
+    if (OASIS_debug >= 15) then
     do n = 1,prism_ngrid
        write(nulprt,*) ' '
        write(nulprt,*) subname,trim(prism_grid(n)%gridname),' size',prism_grid(n)%nx,prism_grid(n)%ny
@@ -196,7 +198,9 @@ CONTAINS
                                    size(prism_grid(n)%area,dim=1),size(prism_grid(n)%area,dim=2), &
                                    minval(prism_grid(n)%area),maxval(prism_grid(n)%area)
     enddo
+    endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_print_grid_data
@@ -216,6 +220,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' prism_ngrid = ',prism_ngrid
@@ -237,6 +242,7 @@ CONTAINS
     iwrite = 1   ! just set grids are needed always
     writing_grids_call=1
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_start_grids_writing
@@ -268,6 +274,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -304,6 +311,7 @@ CONTAINS
        endif
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_grid_r8
@@ -337,6 +345,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -370,6 +379,7 @@ CONTAINS
     deallocate(lon8)
     deallocate(lat8)
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_grid_r4
@@ -399,6 +409,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -426,6 +437,7 @@ CONTAINS
        endif
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_angle_r8
@@ -456,6 +468,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -481,6 +494,7 @@ CONTAINS
 
     deallocate(angle8)
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_angle_r4
@@ -513,6 +527,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -549,6 +564,7 @@ CONTAINS
        endif
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_corner_r8
@@ -582,6 +598,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -616,6 +633,7 @@ CONTAINS
     deallocate(clon8)
     deallocate(clat8)
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_corner_r4
@@ -646,6 +664,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -673,6 +692,7 @@ CONTAINS
        endif
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_mask
@@ -703,6 +723,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -730,6 +751,7 @@ CONTAINS
        endif
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_area_r8
@@ -761,6 +783,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' size = ',trim(cgrid),nx,ny
@@ -786,6 +809,7 @@ CONTAINS
 
     deallocate(area8)
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write_area_r4
@@ -804,6 +828,7 @@ CONTAINS
     character(len=*),parameter :: subname = '(oasis_terminate_grids_writing)'
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (OASIS_debug >= 15) then
        write(nulprt,*) subname,' prism_ngrid = ',prism_ngrid
@@ -817,6 +842,7 @@ CONTAINS
 ! moved to prism_method_enddef for synchronization
 !    call oasis_write2files()
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_terminate_grids_writing
@@ -857,18 +883,17 @@ CONTAINS
     logical                  :: found
     character(len=ic_med)   ,pointer :: gname0(:),gname(:)
     character(len=ic_lvar2) ,pointer :: pname0(:),pname(:)
-    logical, parameter :: local_timers_on = .false.
     character(len=*),parameter :: undefined_partname = '(UnDeFiNeD_PArtnaME)'
     character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
-    IF (local_timers_on) call oasis_timer_start('grid_write')
+    call oasis_timer_start('oasis_gridw')
 
     call oasis_mpi_bcast(writing_grids_call,mpi_comm_local,subname//'writing_grids_call')
     if (writing_grids_call .eq. 1) then
 
-    IF (local_timers_on) call oasis_timer_start('grid_write_reducelists')
+    if (local_timers_on) call oasis_timer_start('oasis_gridw_reducelists')
     allocate(gname0(prism_ngrid))
     allocate(pname0(prism_ngrid))
     do n = 1,prism_ngrid
@@ -886,12 +911,13 @@ CONTAINS
          linp2=pname0,lout2=pname,spval2=undefined_partname)
     deallocate(gname0)
     deallocate(pname0)
-    IF (local_timers_on) call oasis_timer_stop('grid_write_reducelists')
+    if (local_timers_on) call oasis_timer_stop('oasis_gridw_reducelists')
 
     !-------------------------------------
     !> * Check that a grid defined on a partitition is defined on all tasks on that partition.
     !-------------------------------------
 
+    if (local_timers_on) call oasis_timer_start('oasis_gridw_chkpart')
     do n = 1,gcnt
        if (pname(n) /= undefined_partname) then
           do p = 1,prism_npart
@@ -908,8 +934,9 @@ CONTAINS
           enddo
        endif
     enddo
+    if (local_timers_on) call oasis_timer_stop('oasis_gridw_chkpart')
 
-    if (local_timers_on) call oasis_timer_start('grid_write_writefiles')
+    if (local_timers_on) call oasis_timer_start('oasis_gridw_writefiles')
 
     !-------------------------------------
     !> * Write grid information
@@ -989,12 +1016,14 @@ CONTAINS
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.lon'
-           if (partid_grid) then
-             call oasis_grid_loc2glo(prism_grid(n)%lon,rglo,partid,0)
-           else
-             rglo = prism_grid(n)%lon
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               call oasis_grid_loc2glo(prism_grid(n)%lon,rglo,partid,0)
+             else
+               rglo = prism_grid(n)%lon
+             endif
+             if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
            endif
-           if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
 
            !-------------------------------------
            !>   * Gather latitudes if needed and write from root
@@ -1002,12 +1031,14 @@ CONTAINS
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.lat'
-           if (partid_grid) then
-             call oasis_grid_loc2glo(prism_grid(n)%lat,rglo,partid,0)
-           else
-             rglo = prism_grid(n)%lat
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               call oasis_grid_loc2glo(prism_grid(n)%lat,rglo,partid,0)
+             else
+               rglo = prism_grid(n)%lat
+             endif
+             if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
            endif
-           if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
          endif  ! grid_set
 
          if (prism_grid(n)%corner_set) then
@@ -1032,18 +1063,20 @@ CONTAINS
            allocate(r3glo(nx,ny,nc))
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.clo'
-           if (partid_grid) then
-             allocate(rloc(tnx,tny))
-             do n1 = 1,nc
-               rloc(:,:) = prism_grid(n)%clon(:,:,n1)
-               call oasis_grid_loc2glo(rloc,rglo,partid,0)
-               r3glo(:,:,n1) = rglo(:,:)
-             enddo
-             deallocate(rloc)
-           else
-             r3glo = prism_grid(n)%clon
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               allocate(rloc(tnx,tny))
+               do n1 = 1,nc
+                 rloc(:,:) = prism_grid(n)%clon(:,:,n1)
+                 call oasis_grid_loc2glo(rloc,rglo,partid,0)
+                 r3glo(:,:,n1) = rglo(:,:)
+               enddo
+               deallocate(rloc)
+             else
+               r3glo = prism_grid(n)%clon
+             endif
+             if (write_task) call oasis_io_write_3dgridfld_fromroot(filename,fldname,r3glo,nx,ny,nc)
            endif
-           if (write_task) call oasis_io_write_3dgridfld_fromroot(filename,fldname,r3glo,nx,ny,nc)
 
            !-------------------------------------
            !>   * Gather corner latitudes if needed and write from root
@@ -1051,18 +1084,20 @@ CONTAINS
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.cla'
-           if (partid_grid) then
-             allocate(rloc(tnx,tny))
-             do n1 = 1,nc
-               rloc(:,:) = prism_grid(n)%clat(:,:,n1)
-               call oasis_grid_loc2glo(rloc,rglo,partid,0)
-               r3glo(:,:,n1) = rglo(:,:)
-             enddo
-             deallocate(rloc)
-           else
-             r3glo = prism_grid(n)%clat
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               allocate(rloc(tnx,tny))
+               do n1 = 1,nc
+                 rloc(:,:) = prism_grid(n)%clat(:,:,n1)
+                 call oasis_grid_loc2glo(rloc,rglo,partid,0)
+                 r3glo(:,:,n1) = rglo(:,:)
+               enddo
+               deallocate(rloc)
+             else
+               r3glo = prism_grid(n)%clat
+             endif
+             if (write_task) call oasis_io_write_3dgridfld_fromroot(filename,fldname,r3glo,nx,ny,nc)
            endif
-           if (write_task) call oasis_io_write_3dgridfld_fromroot(filename,fldname,r3glo,nx,ny,nc)
            deallocate(r3glo)
          endif  ! corner_set
 
@@ -1084,12 +1119,14 @@ CONTAINS
 
            filename = 'areas.nc'
            fldname  = trim(cgrid)//'.srf'
-           if (partid_grid) then
-             call oasis_grid_loc2glo(prism_grid(n)%area,rglo,partid,0)
-           else
-             rglo = prism_grid(n)%area
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               call oasis_grid_loc2glo(prism_grid(n)%area,rglo,partid,0)
+             else
+               rglo = prism_grid(n)%area
+             endif
+             if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
            endif
-           if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
          endif  ! area_set
 
          if (prism_grid(n)%angle_set) then
@@ -1110,12 +1147,14 @@ CONTAINS
 
            filename = 'grids.nc'
            fldname  = trim(cgrid)//'.ang'
-           if (partid_grid) then
-             call oasis_grid_loc2glo(prism_grid(n)%lon,rglo,partid,0)
-           else
-             rglo = prism_grid(n)%angle
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             if (partid_grid) then
+               call oasis_grid_loc2glo(prism_grid(n)%lon,rglo,partid,0)
+             else
+               rglo = prism_grid(n)%angle
+             endif
+             if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
            endif
-           if (write_task) call oasis_io_write_2dgridfld_fromroot(filename,fldname,rglo,nx,ny)
          endif  ! angle_set
 
          if (prism_grid(n)%mask_set) then
@@ -1134,20 +1173,22 @@ CONTAINS
            !>   * Gather masks if needed and write from root
            !-------------------------------------
 
-           allocate(iglo(nx,ny))
            filename = 'masks.nc'
            fldname  = trim(cgrid)//'.msk'
-           if (partid_grid) then
-             allocate(rloc(tnx,tny))
-             rloc = prism_grid(n)%mask
-             call oasis_grid_loc2glo(rloc,rglo,partid,0)
-             iglo = nint(rglo)
-             deallocate(rloc)
-           else
-             iglo = prism_grid(n)%mask
+           if (.not.oasis_io_varexists(filename,fldname)) then
+             allocate(iglo(nx,ny))
+             if (partid_grid) then
+               allocate(rloc(tnx,tny))
+               rloc = prism_grid(n)%mask
+               call oasis_grid_loc2glo(rloc,rglo,partid,0)
+               iglo = nint(rglo)
+               deallocate(rloc)
+             else
+               iglo = prism_grid(n)%mask
+             endif
+             if (write_task) call oasis_io_write_2dgridint_fromroot(filename,fldname,iglo,nx,ny)
+             deallocate(iglo)
            endif
-           if (write_task) call oasis_io_write_2dgridint_fromroot(filename,fldname,iglo,nx,ny)
-           deallocate(iglo)
          endif ! mask_set
 
          deallocate(rglo)
@@ -1161,9 +1202,10 @@ CONTAINS
 
     deallocate(gname,pname)
 
-    if (local_timers_on) call oasis_timer_stop('grid_write_writefiles')
+    if (local_timers_on) call oasis_timer_stop('oasis_gridw_writefiles')
     endif ! writing_grids_call
-    IF (local_timers_on) call oasis_timer_stop('grid_write')
+
+    call oasis_timer_stop('oasis_gridw')
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_write2files
@@ -1188,6 +1230,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     gridID = -1
     do n = 1,prism_ngrid
@@ -1211,6 +1254,7 @@ CONTAINS
     prism_grid(gridID)%nx = nx
     prism_grid(gridID)%ny = ny
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_findgrid
@@ -1234,6 +1278,7 @@ CONTAINS
     !-------------------------------------------------
 
     call oasis_debug_enter(subname)
+    if (local_timers_on) call oasis_timer_start(trim(subname))
 
     if (prism_part(partid)%mpicom /= MPI_COMM_NULL) then
 
@@ -1268,6 +1313,7 @@ CONTAINS
 
     endif
 
+    if (local_timers_on) call oasis_timer_stop(trim(subname))
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_grid_loc2glo

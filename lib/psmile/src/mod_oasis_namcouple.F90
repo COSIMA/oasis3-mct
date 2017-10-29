@@ -809,7 +809,7 @@ SUBROUTINE inipar_alloc()
   ENDDO
 501 CONTINUE
 
-  WRITE(nulprt1,*) ' '
+  if (mpi_rank_global == 0) WRITE(nulprt1,*) ' '
 
   !* Get number of models involved in this simulation
 
@@ -1021,8 +1021,11 @@ SUBROUTINE inipar_alloc()
            ENDIF
        ENDIF
 
-       WRITE(nulprt1,*) subname,'field jf : ',jf,' lg_state(jf) : ',lg_state(jf)
-       WRITE(nulprt1,*) subname,'field jf : ',jf,' endflag : ',endflag
+       if (mpi_rank_global == 0) then
+           WRITE(nulprt1,*) subname,'field jf : ',jf,' lg_state(jf) : ',lg_state(jf)
+           WRITE(nulprt1,*) subname,'field jf : ',jf,' endflag : ',endflag
+       endif
+
         IF (lg_state(jf)) THEN
 !           IF (ig_total_ntrans(jf) .eq. 0) THEN
  !             WRITE(tmpstr1,*) 'If there is no analysis for the field',jf, &

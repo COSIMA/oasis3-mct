@@ -100,10 +100,10 @@ CONTAINS
    lg_mpiflag = .FALSE.
    CALL MPI_Initialized ( lg_mpiflag, ierr )
    IF ( .NOT. lg_mpiflag ) THEN
-      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
+      if (OASIS_debug >= 10) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
       CALL MPI_INIT ( ierr )
    else
-      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
+      if (OASIS_debug >= 10) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
    ENDIF
 
 ! Initial default for early part of init
@@ -433,11 +433,13 @@ CONTAINS
        WRITE(filename2,'(a,i2.2)') 'debug.notroot.',compid
        IF (mpi_rank_local == 0) THEN
            OPEN(nulprt,file=filename,status='REPLACE')
+           WRITE(nulprt,'(2a,2i8)') subname,' OASIS RUNNING '
            WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
            call oasis_flush(nulprt)
        ENDIF
        IF (mpi_rank_local == 1) THEN
            OPEN(nulprt,file=filename2,status='REPLACE')
+           WRITE(nulprt,'(2a,2i8)') subname,' OASIS RUNNING '
            WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
            CALL oasis_flush(nulprt)
        ENDIF
@@ -446,6 +448,7 @@ CONTAINS
 
        IF (mpi_rank_local > 1) THEN
            OPEN(nulprt,file=filename2,position='APPEND')
+           !WRITE(nulprt,'(2a,2i8)') subname,' OASIS RUNNING '
            !WRITE(nulprt,'(2a,2i8)') subname,' OPEN debug file for pe, unit :',mpi_rank_local,nulprt
            !CALL oasis_flush(nulprt)
        ENDIF
