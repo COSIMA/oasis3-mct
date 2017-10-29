@@ -188,7 +188,7 @@ CONTAINS
   integer(kind=ip_i4_p) ,pointer :: sortkey(:)
   character(len=ic_med) :: part2decomp   ! decomp_1d or decomp_wghtfile
   character(len=ic_med) :: smatread_method ! orig or ceg
-  logical, parameter :: local_timers_on = .true.
+  logical, parameter :: local_timers_on = .false.
 
   character(len=*),parameter :: subname = '(oasis_coupler_setup)'
 
@@ -207,7 +207,7 @@ CONTAINS
 
   part2decomp = nammapdec
   smatread_method = nammatxrd
-  if (OASIS_debug >= 1) then
+  if (OASIS_debug >= 2) then
      write(nulprt,*) subname,' part2decomp = ',trim(part2decomp)
      write(nulprt,*) subname,' smatread_method = ',trim(smatread_method)
   endif
@@ -1186,7 +1186,7 @@ CONTAINS
         do n1 = 1,nflds1
            nflds2 = nflds2 + prism_var(pcpointer%varid(n1))%num
         enddo
-        if (OASIS_debug >= 1) then
+        if (OASIS_debug >= 2) then
            write(nulprt,*) subname,' fldlist rebuild nflds1,nflds2 for ',trim(pcpointer%fldlist)
            write(nulprt,*) subname,' fldlist rebuild nflds1,nflds2 ',nflds1,nflds2
         endif
@@ -1195,7 +1195,7 @@ CONTAINS
            write(nulprt,*) subname,estr,'fldlist reset error in fld cnt = ',nflds1,nflds2
            call oasis_abort(file=__FILE__,line=__LINE__)
         else
-           if (OASIS_debug >= 1) then
+           if (OASIS_debug >= 2) then
               write(nulprt,*) subname,' fldlist rebuild nflds2 > nflds1 for ',trim(pcpointer%fldlist)
            endif
            allocate(varid1(nflds1))
@@ -1218,7 +1218,7 @@ CONTAINS
                  endif
                  call oasis_coupler_bldvarname(varid1(n1),n2,vname)
                  write(pcpointer%fldlist,'(a)') trim(pcpointer%fldlist)//trim(delim)//trim(vname)
-                 if (OASIS_debug >= 1) then
+                 if (OASIS_debug >= 2) then
                     write(nulprt,*) subname,' fldlist rebuild n1, n2 ',n1,n2,ncnt
                     write(nulprt,*) subname,' fldlist rebuild fldlist ',ncnt,trim(pcpointer%fldlist)
                     write(nulprt,*) subname,' fldlist rebuild varid ',ncnt,pcpointer%varid(ncnt)
@@ -1604,7 +1604,7 @@ CONTAINS
            deallocate(sMati)
            if (local_timers_on) call oasis_timer_stop('cpl_setup_n4sminit')
 
-           if (OASIS_debug >= 1) then
+           if (OASIS_debug >= 2) then
               if (local_timers_on) call oasis_timer_start('cpl_setup_n4smprint')
               write(cstring,'(a1,i4.4,a1)') 'm',mapID,'-'
               ! call mct_rearr_print(prism_mapper(mapID)%sMatP(1)%xtoxprime,mpi_comm_local,nulprt,trim(cstring)//'smpx')
