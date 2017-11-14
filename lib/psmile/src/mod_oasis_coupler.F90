@@ -1535,8 +1535,11 @@ CONTAINS
 
            endif
 
-!tcx, for testing only, part2decomp should be set by namcouple
-!  part2decomp = 'decomp_1d'
+            if (local_timers_on) then
+              call oasis_timer_start('cpl_setup_n4part_cr_barrier')
+              call MPI_BARRIER(mpi_comm_local, ierr)
+              call oasis_timer_stop('cpl_setup_n4part_cr_barrier')
+           endif
            if (local_timers_on) call oasis_timer_start('cpl_setup_n4part_create')
            if (part2decomp == 'decomp_wghtfile') then
               call oasis_part_create(part2,trim(part2decomp),gsize,nx,ny,gridname,prism_part(part1)%mpicom,mpi_comm_local,gridID)
@@ -1825,6 +1828,11 @@ CONTAINS
 
            if (local_timers_on) call oasis_timer_stop('cpl_setup_n4_sra')
         else
+           if (local_timers_on) then
+              call oasis_timer_start('cpl_setup_n4_srb_barrier')
+              call MPI_BARRIER(mpi_comm_local, ierr)
+              call oasis_timer_stop('cpl_setup_n4_srb_barrier')
+           endif
            if (local_timers_on) call oasis_timer_start('cpl_setup_n4_srb')
 
            call mct_router_init(pcpointer%comp,prism_part(pcpointer%rpartID)%gsmap, &

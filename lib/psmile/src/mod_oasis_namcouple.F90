@@ -29,10 +29,17 @@ MODULE mod_oasis_namcouple
   INTEGER (kind=ip_intwp_p),PARAMETER :: jpeighty = 5000 !< max number of characters to be read 
                                                          !< in each line of the file namcouple 
   CHARACTER(len=*),parameter :: rform = '(A5000)'        !< formatted line read format
+
   CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_1d'        ! decomp_wghtfile or decomp_1d
-!  CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_wghtfile'  ! decomp_wghtfile or decomp_1d
+!  CHARACTER(len=*),parameter :: nmapdec_default = 'decomp_wghtfile' ! decomp_wghtfile or decomp_1d
+
 ! CHARACTER(len=*),parameter :: nmatxrd_default = 'orig'   ! ceg or orig
   CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'    ! ceg or orig
+
+  CHARACTER(len=*),parameter :: nwgtopt_default = 'abort_on_bad_weights'         ! weights handling
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_weights'          ! weights handling
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_weights_silently' ! weights handling 
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'use_bad_weights'             ! weights handling
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
@@ -43,6 +50,7 @@ MODULE mod_oasis_namcouple
   LOGICAL                 ,public :: namnorest     !< namcouple allow no restarts
   CHARACTER(len=ic_med)   ,public :: nammapdec     !< namcouple map decomp value
   CHARACTER(len=ic_med)   ,public :: nammatxrd     !< namcouple matrix read option
+  CHARACTER(len=ic_med)   ,public :: namwgtopt     !< namcouple weights handling option
  
   CHARACTER(len=jpeighty) ,public,pointer :: namsrcfld(:)  !< list of src fields
   CHARACTER(len=jpeighty) ,public,pointer :: namdstfld(:)  !< list of dst fields
@@ -140,6 +148,7 @@ MODULE mod_oasis_namcouple
 !---- specify mapping decomp
   CHARACTER(len=ic_med) :: nmapdec
   CHARACTER(len=ic_med) :: nmatxrd
+  CHARACTER(len=ic_med) :: nwgtopt
 ! --- mod_string
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: numlab
   INTEGER (kind=ip_intwp_p),DIMENSION(:),ALLOCATABLE :: ig_numlab
@@ -278,15 +287,16 @@ MODULE mod_oasis_namcouple
     clprint  = '$NLOGPRT ', &
     clmapdec = '$NMAPDEC ', &
     clmatxrd = '$NMATXRD ', &
+    clwgtopt = '$NWGTOPT ', &
     clunit   = '$NUNITNO ', &
     clrest   = '$NNOREST ', &
     clcal    = '$CALTYPE ', &
     clend    = '$END     '
-  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 16
+  INTEGER (kind=ip_intwp_p),parameter :: nkeywords = 17
   CHARACTER*9, parameter :: keyword_list(nkeywords) = &
     (/clfield, clchan, clstring, clmod, cljob, cltime, clseq, &
      cldate, clhead, clprint, clmapdec, clmatxrd, clunit, clrest, &
-     clcal, clend /)
+     clcal, clend, clwgtopt /)
   CHARACTER*512 :: tmpstr1, tmpstr2, tmpstr3, tmpstr4
 
 
@@ -495,6 +505,7 @@ SUBROUTINE oasis_namcouple_init()
   namnorest = nnorest
   nammapdec = nmapdec
   nammatxrd = nmatxrd
+  namwgtopt = nwgtopt
   DO jf = 1,ig_final_nfield
      namsrcfld(jf) = cg_input_field(jf)
      namdstfld(jf) = cg_output_field(jf)
@@ -607,6 +618,7 @@ SUBROUTINE oasis_namcouple_init()
      WRITE(nulprt1,*) subname,'namnorest     ',namnorest
      WRITE(nulprt1,*) subname,'nammapdec     ',trim(nammapdec)
      WRITE(nulprt1,*) subname,'nammatxrd     ',trim(nammatxrd)
+     WRITE(nulprt1,*) subname,'namwgtopt     ',trim(namwgtopt)
      WRITE(nulprt1,*) ' '
      DO n = 1,nnamcpl
         WRITE(nulprt1,*) subname,n,'namsrcfld ',TRIM(namsrcfld(n))
@@ -1782,13 +1794,21 @@ SUBROUTINE inipar
      READ(nulin, FMT=rform) clline
      CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
-     nmapdec = clvari
      IF (ilen .LE. 0) THEN
         IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
            WRITE(nulprt1,*) ' Default value wght will be used '
            WRITE(nulprt1,*) ' '
            CALL oasis_flush(nulprt1)
+        ENDIF
+     ELSE
+        IF (trim(clvari) == 'decomp_1d'    .or. &
+            trim(clvari) == 'decomp_wghtfile') THEN
+           nmapdec = clvari
+        ELSE
+           CALL prtout('ERROR in namcouple '//trim(keyword)//' argument',jf,1)
+           WRITE(tmpstr1,*) 'ERROR in namcouple '//trim(keyword)//' argument '//TRIM(clvari)
+           CALL namcouple_abort(subname,__LINE__,tmpstr1)
         ENDIF
      ENDIF
   ENDIF   ! found
@@ -1808,13 +1828,21 @@ SUBROUTINE inipar
      READ(nulin, FMT=rform) clline
      CALL skip(clline, jpeighty, ios=ios)
      CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
-     nmatxrd = clvari
      IF (ilen .LE. 0) THEN
         IF (mpi_rank_global == 0) THEN
            WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
            WRITE(nulprt1,*) ' Default value wght will be used '
            WRITE(nulprt1,*) ' '
            CALL oasis_flush(nulprt1)
+        ENDIF
+     ELSE
+        IF (trim(clvari) == 'orig'    .or. &
+            trim(clvari) == 'ceg') THEN
+           nmatxrd = clvari
+        ELSE
+           CALL prtout('ERROR in namcouple '//trim(keyword)//' argument',jf,1)
+           WRITE(tmpstr1,*) 'ERROR in namcouple '//trim(keyword)//' argument '//TRIM(clvari)
+           CALL namcouple_abort(subname,__LINE__,tmpstr1)
         ENDIF
      ENDIF
   ENDIF   ! found
@@ -1823,6 +1851,42 @@ SUBROUTINE inipar
 
   IF (mpi_rank_global == 0) THEN
      write(nulprt1,*) ' The matxrd value is nmatxrd = ',trim(nmatxrd)
+  endif
+
+  !* Get the unit weights handling option
+
+  nwgtopt = nwgtopt_default
+  keyword = clwgtopt
+  CALL findkeyword (keyword, clline, found)
+  IF (found) THEN
+     READ(nulin, FMT=rform) clline
+     CALL skip(clline, jpeighty, ios=ios)
+     CALL parse (clline, clvari, 1, jpeighty, ilen, __LINE__)
+     IF (ilen .LE. 0) THEN
+        IF (mpi_rank_global == 0) THEN
+           WRITE(nulprt1,*) '        ***WARNING*** Nothing on input for '//trim(keyword)
+           WRITE(nulprt1,*) ' Default value wght will be used '
+           WRITE(nulprt1,*) ' '
+           CALL oasis_flush(nulprt1)
+        ENDIF
+     ELSE
+        IF (trim(clvari) == 'abort_on_bad_weights' .or. &
+            trim(clvari) == 'ignore_bad_weights' .or. &
+            trim(clvari) == 'ignore_bad_weights_silently' .or. &
+            trim(clvari) == 'use_bad_weights') THEN
+           nwgtopt = clvari
+        ELSE
+           CALL prtout('ERROR in namcouple '//trim(keyword)//' argument',jf,1)
+           WRITE(tmpstr1,*) 'ERROR in namcouple '//trim(keyword)//' argument '//TRIM(clvari)
+           CALL namcouple_abort(subname,__LINE__,tmpstr1)
+        ENDIF
+     ENDIF
+  ENDIF   ! found
+
+  !* Print out the wgtopt value
+
+  IF (mpi_rank_global == 0) THEN
+     write(nulprt1,*) ' The wgtopt value is nwgtopt = ',trim(nwgtopt)
   endif
 
   !* Get the unit min/max values
