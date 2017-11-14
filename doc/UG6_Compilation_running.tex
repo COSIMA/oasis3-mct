@@ -58,7 +58,7 @@ For double precision coupling field, there is no need anymore to promote REAL va
 \section{CPP keys}
 \label{subsec_cpp}
 
-The only CPP key coded in OASIS3-MCT and that can be specified in
+The first CPP key coded in OASIS3-MCT and that can be specified in
 {\tt CPPDEF} in {\tt make.{\it your\_platform}} file is {\tt
   TREAT\_OVERLAY} that ensures, in {\tt SCRIPR/CONSERV}
   remapping (see section \ref{subsec_interp}), that if two cells of
@@ -68,6 +68,10 @@ The only CPP key coded in OASIS3-MCT and that can be specified in
   the grid line with {\it i=imax}, it is the latter that must be masked;
   when this is not the case with the mask defined in {\it masks.nc},
   this CPP key forces these rules to be respected.
+
+The second CPP key coded in OASIS3-MCT and that {\bf must} be specified in
+{\tt CPPDEF} in {\tt make.{\it your\_platform}} file if you compile
+with {\bf PGF90} is {\tt \_\_NO\_16BYTE\_REALS}.
 
 %\item {\tt balance}: Add a MPI\_Wtime() function before and after
 %  mct\_isend (MPI put) and mct\_recv (MPI get) to calculate the time
