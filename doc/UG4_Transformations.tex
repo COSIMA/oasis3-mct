@@ -134,7 +134,13 @@ noted with the string UNUSED but not described.
   The {\tt MAPPING} keyword is used to specify an input file to be
   read and used for mapping (ie. regridding or interpolation); the
   {\tt MAPPING} file must follow the {\tt SCRIPR} format (see
-    section \ref{subsec_mapdata}). As for the other transformations and interpolations, different mappings can be specified for the different coupling fields.
+    section \ref{subsec_mapdata}). As for the other transformations
+    and interpolations, different mappings can be specified for the
+    different coupling fields.
+  In this case grids.nc, masks.nc and areas.nc
+  files are not needed, except if the post-procession global option
+  CONSERV is used in the namcouple. Then the user must provides the
+  areas.nc file.
  
   Since OASIS3-MCT\_2.0, {\tt MAPPING} can be used for higher order
   remapping. Up to 5 different sets of weights (see section
