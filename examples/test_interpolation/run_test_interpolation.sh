@@ -10,76 +10,70 @@ srcdir=`pwd`
 datadir=$srcdir/data_oasis3
 casename=`basename $srcdir`
 #
-## - Name of the executables
-    exe1=model1
-    exe2=model2
-#
 ############### User's section #######################################
+# Source and target grids
+SRC_GRID=lmdz # nogt ssea bggd icos
+TGT_GRID=torc # nogt ssea bggd icos
+# Interpolation = nn, bili, bicu, fracarea, fracnnei, fracarea2nd
+interp=bili
 #
 ## - Define architecture and coupler 
-arch=romulus_pgi_mpich   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
-                                    #crayXE6
+arch=romulus_pgi_mpich   
 #
-# - Define number of processes to run each executable
+# - Define number of processes to run each executable 
+#   The toy only runs in monoprocessor
     nproc_exe1=1
     nproc_exe2=1
 #
 ## - Define rundir
-if [ ${arch} == tioman_pgi_mpich ] || [ ${arch} == training_computer ] || [ ${arch} == romulus_pgi_mpich ]; then
+if [ ${arch} == romulus_pgi_mpich ]; then
     MPIRUN=/usr/local/pgi/linux86-64/14.6/mpi/mpich/bin/mpirun
     rundir=/wkdir/globc/${user}/OASIS3-MCT/oasis3-mct/examples/${casename}/work_${casename}
-elif [ ${arch} == tioman_intel_openmpi ]; then
-    MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
+elif [ ${arch} == training_computer ]; then
+    MPIRUN=/opt/intel/impi/5.1.3.210/bin64/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
-elif [ ${arch} == tioman_gfortran_mpich2 ]; then
-    MPIRUN=/usr/lib64/mpich2/bin
-    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+elif [ ${arch} == nemo_lenovo_gfortran_openmpi ]; then
+    MPIRUN=/data/softs/mpi/openmpi/1.8.4/bin/mpirun
+    rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
+elif [ ${arch} == nemo_lenovo_intel_impi ] || [ ${arch} == nemo_lenovo_intel_impi_openmp ]; then
+    MPIRUN=/data/softs/intel/impi/5.0.3.048/intel64/bin/mpirun
+    rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
+elif [ ${arch} == neptune_gfortran ]; then
+    rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
 elif [ ${arch} == napali ]; then
     PATH=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin:/usr/local/pgi/linux86-64/2011/bin:$PATH
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
     rundir=/data2/${user}/oasis3-mct_buildbot/examples/${casename}/work_${casename}
-elif [ ${arch} == corail ]; then
-rundir=/lustre/globc/${user}/oasis3-mct/examples/${casename}/work_${casename}
+elif [ ${arch} == beaufix ]; then
+# The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
+    rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == curie ]; then
     rundir=/ccc/work/cont005/pa0490/coquartl/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == jade ]; then
     rundir=/data/11coqu/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == neptune_gfortran ]; then
     rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
-elif [ ${arch} == ubuntu ]; then 
-  MPIRUN=mpirun
-  rundir=${HOME}/Devel/oasis3-mct/examples/${casename}/work_${casename}
-elif [ ${arch} == crayXE6 ]; then
-rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
-elif [ ${arch} == beaufix ]; then
-# The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
-    rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == ada ]; then
   MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
   rundir=/workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct/examples/tutorial/work_${casename}
-elif [ ${arch} == nemo_lenovo_gfortran_openmpi ]; then
-    MPIRUN=/data/softs/mpi/openmpi/1.8.4/bin/mpirun
-    rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
-elif [ ${arch} == nemo_lenovo_intel_impi ]; then
-    MPIRUN=/data/softs/intel/impi/5.0.3.048/intel64/bin/mpirun
-    rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
 fi
 #
 ############### End of user's section ################################
 #
-##- Define the name of the source grid and the target grid
-config=$datadir/name_grids.dat
-x=$(cut -d ' ' -f 1 < $config) 
-echo 'x:' $x
-SRC_GRID=`echo $x | cut -b 42-45`
-TGT_GRID=`echo $x | cut -b 94-97`
-echo 'Source grid :' $SRC_GRID
-echo 'Target grid :' $TGT_GRID
+### - Name of the executables
+    exe1=model1
+    exe2=model2
 #
-echo ''
+### - Define number of processes to run each executable
+###   The toy cannot be ran in parallel
+    nproc_exe1=1
+    nproc_exe2=1
+#
 echo '*****************************************************************'
 echo '*** '$casename' : '$run
 echo ''
+echo 'Source grid :' $SRC_GRID
+echo 'Target grid :' $TGT_GRID
 echo 'Rundir       :' $rundir
 echo 'Architecture :' $arch
 echo 'Host         : '$host
@@ -94,17 +88,34 @@ echo ''
 ### 1. Copy source example directory containing everything needed
 ###    into rundir
 
-\rm -fr $rundir
+\rm -fr $rundir/*
 mkdir -p $rundir
 
-cp -f $datadir/*nc  $rundir/.
-cp -f $datadir/*.jnl $rundir/.
-cp -f $datadir/*.dat $rundir/.
+ln -sf $datagrids/grids.nc  $rundir/grids.nc
+ln -sf $datagrids/masks.nc  $rundir/masks.nc
+ln -sf $datagrids/areas.nc  $rundir/areas.nc
 
 cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
 
-cp -f $datadir/namcouple $rundir/.
+cp -f $datadir/namcouple_${SRC_GRID}_${TGT_GRID}_${interp} $rundir/namcouple
+#
+# Grid source characteristics
+SRC_GRID_TYPE=`sed -n 26p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # source grid type
+SRC_GRID_PERIOD=`sed -n 23p $rundir/namcouple | tr -s ' ' | cut -d" " -f1` # "P" for periodic, "R" for non-periodic
+SRC_GRID_OVERLAP=`sed -n 23p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # Number of overlapping grid points for periodic grids
+cat <<EOF >> $rundir/name_grids.dat
+\$grid_source_characteristics
+cl_grd_src='$SRC_GRID'
+cl_remap='$interp'
+cl_type_src='$SRC_GRID_TYPE'
+cl_period_src='$SRC_GRID_PERIOD'
+il_overlap_src=$SRC_GRID_OVERLAP
+\$end
+\$grid_target_characteristics
+cl_grd_tgt='$TGT_GRID'
+\$end
+EOF
 #
 cd $rundir
 #
@@ -116,7 +127,7 @@ cd $rundir
 ### Linux
 ###---------------------------------------------------------------------
 
-if [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == napali ]; then
+if [ $arch == napali ]; then
 if [ $nproc_exe1 == 1 ]; then
    cat <<EOF >> $rundir/appl-linux.conf
 $host 0 $rundir/$exe1
@@ -147,34 +158,6 @@ elif [ $arch == tioman_gfortan_mpich2 ]; then
    cat <<EOF >> $rundir/mpd.hosts
 $host 0: $nproc_exe1
 $host 1: $nproc_exe2
-EOF
-
-###---------------------------------------------------------------------
-### CORAIL
-###---------------------------------------------------------------------
-elif [ $arch == corail ] ; then
-
-  cat <<EOF > $rundir/run_$casename.$arch
-# Nom du job
-#PBS -N ${casename}
-# Temps limite du job
-#PBS -l walltime=00:10:00
-# Nombre de processus
-#PBS -l select=1:mpiprocs=24:ncpus=24
-#PBS -l place=scatter:excl
-# adresse email a utiliser
-##PBS -M your_email
-# Mail envoye a la fin du job
-#PBS -m ae
-
-cd $rundir
-
-source /usr/local/bin/intelmpi.sh
-ulimit -s unlimited
-#
-#
-time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
-#
 EOF
 
 ###---------------------------------------------------------------------
@@ -231,11 +214,10 @@ time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
 
-elif [ $(uname -n) == nemo1 -o $(uname -n) == nemo2 ]; then
 ###---------------------------------------------------------------------
 ### NEMO_LENOVO_GFORTRAN_OPENMPI
 ###---------------------------------------------------------------------
-if [ $arch == nemo_lenovo_gfortran_openmpi ] ; then
+elif [ $arch == nemo_lenovo_gfortran_openmpi ] ; then
 
   (( nproc = $nproc_exe1 + $nproc_exe2 ))
 
@@ -293,7 +275,42 @@ module -s load compiler/intel/2015.2.164 mkl/2015.2.164 mpi/intelmpi/5.0.3.048
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
 #
 EOF
-fi
+
+###---------------------------------------------------------------------
+### NEMO_LENOVO_INTEL_IMPI_OPENMP sur un noeud de la machine
+###---------------------------------------------------------------------
+elif [ ${arch} == nemo_lenovo_intel_impi_openmp ]; then
+
+  (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+# Nom du job
+#SBATCH --job-name openmp
+# Temps limite du job
+#SBATCH --time=12:00:00
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Nombre de noeud
+#SBATCH -N 1
+# Nombre de process MPI par noeud = nombre de proc par noeud
+#SBATCH --ntasks-per-node=2
+# Nombre de thread openmp par proc MPI = nombre de coeur par proc
+#SBATCH --cpus-per-task=12
+#SBATCH --mail-user=coquart@cerfacs.fr
+#SBATCH --mail-type=END
+
+cd $rundir
+
+export KMP_STACKSIZE=1GB
+export I_MPI_PIN_DOMAIN=socket
+export KMP_AFFINITY=verbose,granularity=fine,compact
+export OMP_NUM_THREADS=1
+#
+
+time mpirun -genv I_MPI_DEBUG 5  -np 1 ./$exe1 : -np 1 ./$exe2 
+EOF
+
 
 ###---------------------------------------------------------------------
 ### CURIE (normal nodes)
@@ -353,47 +370,7 @@ time mpiexec -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
 EOF
 
 ###---------------------------------------------------------------------
-### CRAYXE6
-###---------------------------------------------------------------------
-elif [ $arch == crayXE6 ] ; then
-
- (( nproc = $nproc_exe1 + $nproc_exe2 ))
-
-d_aus=lm_aus.log       # Ausgabe- u. Fehlerdateien
-d_err=lm_fehler.log
-
-  cat <<EOF > $rundir/run_$casename.$arch
-#!/bin/ksh
-# Nom du job
-#PBS -N ${casename}
-# Temps limite du job
-#PBS -l walltime=00:10:00
-# Nombre de processus
-#PBS -l mppwidth=$nproc
-#PBS -l mppnppn=1
-#PBS -l mppdepth=1
-#PBS -o $d_aus 
-#PBS -e $d_err
-#
-cd $rundir
-#
-ulimit -c unlimited
-export LIBDWD_FORCE_CONTROLWORDS=1
-export LIBDWD_BITMAP_TYPE=ASCII
-#
-#export MPICH_GNI_DYNAMIC_CONN=disabled
-export MPICH_ENV_DISPLAY=1
-export MPICH_GNI_MAX_EAGER_MSG_SIZE=64000
-export MPICH_ABORT_ON_ERROR=1
-export MALLOC_MMAP_MAX_=0
-export MALLOC_TRIM_THRESHOLD_=-1
-#
-aprun -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
-#
-EOF
-
-###---------------------------------------------------------------------
-### ada
+### ADA
 ###---------------------------------------------------------------------
 elif [ $arch == ada ] ; then
 
@@ -443,53 +420,34 @@ fi
 ###
 ### 4. Execute the model
 
-if [ $arch == napali ]; then
-    echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
-elif [ $arch == tioman_pgi_mpich ] || [ $arch == training_computer ] || [ $arch == romulus_pgi_mpich ]; then
+if [ $arch == training_computer ] || [ $arch == romulus_pgi_mpich ]; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
-    echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-elif [ $arch == tioman_gfortran_mpich2 ] ; then
-    $MPIRUN/mpdboot -f mpd.hosts
-    $MPIRUN/mpiexec -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-# To use totalview : model load totalview
-#    $MPIRUN/mpiexec -tv -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err 
-    $MPIRUN/mpdallexit
-elif [ $arch == corail ]; then
-    echo 'Submitting the job to queue using qsub'
-    qsub -q submit $rundir/run_$casename.$arch
-    qstat | grep $user
-elif [ $arch == beaufix ]; then
+elif [ $(uname -n) == nemo1 ] || [ $(uname -n) == nemo2 ] || [ $(uname -n) == nemoglobc1 ] || [ $(uname -n) == nemoglobc2 ] || [ $(uname -n) == nemoglobc3 ] || [ $(
+uname -n) == nemoglobc4 ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
-    squeue -u $user
+    squeue -u $USER
 elif [ $arch == neptune_gfortran ]; then
     echo 'Submitting the job to queue using qsub'
     qsub $rundir/run_$casename.$arch
     qstat | grep $user
+elif [ $arch == napali ]; then
+    echo 'Executing the model using '$MPIRUN 
+    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
+elif [ $arch == beaufix ]; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $user
 elif [ $arch == curie ]; then
     ccc_msub $rundir/run_$casename.$arch
     ccc_mpp | grep $user
 elif [ $arch == jade ] ; then
     qsub $rundir/run_$casename.$arch
     qstat -awu $user
-elif [ $arch == crayXE6 ]; then
-    echo 'Submitting the job to queue using qsub'
-    chmod u+x $rundir/run_$casename.$arch
-    qsub $rundir/run_$casename.$arch
-    qstat
 elif [ $arch == ada ]; then
     echo 'Submitting the job to queue using llsubmit'
     llsubmit $rundir/run_$casename.$arch
-elif [ $(uname -n) == nemo1 ] || [ $(uname -n) == nemo2 ]; then
-    echo 'Submitting the job to queue using sbatch'
-    sbatch $rundir/run_$casename.$arch
-    squeue -u $USER
-elif [ $(uname -n) == nemoglobc1 ] || [ $(uname -n) == nemoglobc2 ]; then
-    (time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2) 2> log
 fi
 
 echo $casename 'is executed or submitted to queue.'
