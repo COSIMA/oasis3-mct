@@ -750,14 +750,14 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
       !>   * Each task keeps only the data required
       !----------------------------------------------------------------------------
 
-      if (namwgtopt == "abort_on_bad_weights") then
+      if (namwgtopt == "abort_on_bad_index") then
          abort_weight = .false.
          do m = 1,count(1)
             !--- check for bad weights
             if ((Rbuf(m) <= 0 .or. Rbuf(m) > nb .or. &
                  Cbuf(m) <= 0 .or. Cbuf(m) > na) &
 ! tcx weight = 0
-!                .and. (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) &
+                .and. (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) &
                ) then
                abort_weight = .true.
                WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
@@ -773,18 +773,18 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
 
       do m = 1,count(1)
          !--- check for bad weights
-         if ((namwgtopt(1:18) == "ignore_bad_weights") .and. &
+         if ((namwgtopt(1:16) == "ignore_bad_index") .and. &
              (Rbuf(m) <= 0 .or. Rbuf(m) > nb .or. &
               Cbuf(m) <= 0 .or. Cbuf(m) > na)) then
             mywt = .false.
 ! tcx weight = 0
-!            if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
-               if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_weights_silently") then
+            if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
+               if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_index_silently") then
                   WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
                      subname,wstr,'BAD weight found in '//trim(filename), &
                      m,'=id',Cbuf(m),'=src',Rbuf(m),'=dst',minval(Sbuf(:,m)),'=minS',maxval(Sbuf(:,m)),'=maxS'
                endif
-!            endif
+            endif
          elseif (newdom == 'src') then
             mywt = check_myindex(Rbuf(m),lsstart,lscount)
          elseif (newdom == 'dst') then
@@ -1354,14 +1354,14 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
          !>   * Determine offsets in the array
          !----------------------------------------------------------------------------
 
-         if (namwgtopt == "abort_on_bad_weights") then
+         if (namwgtopt == "abort_on_bad_index") then
             abort_weight = .false.
             do m = 1,count(1)
                !--- check for bad weights
                if ((RReadData(m) <= 0 .or. RReadData(m) > nb .or. &
                     CReadData(m) <= 0 .or. CReadData(m) > na) &
 ! tcx weight = 0
-!                   .and. (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) &
+                   .and. (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) &
                   ) then
                   abort_weight = .true.
                   WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
@@ -1377,18 +1377,18 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
 
          do m = 1,count(1)
             !--- check for bad weights
-            if ((namwgtopt(1:18) == "ignore_bad_weights") .and. &
+            if ((namwgtopt(1:16) == "ignore_bad_index") .and. &
                 (RReadData(m) <= 0 .or. RReadData(m) > nb .or. &
                  CReadData(m) <= 0 .or. CReadData(m) > na)) then
                pe = -11
 ! tcx weight = 0
-!               if (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) then
-                  if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_weights_silently") then
+               if (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) then
+                  if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_index_silently") then
                      WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
                         subname,wstr,'BAD weight found in '//trim(filename), &
                         m,'=id',CReadData(m),'=src',RReadData(m),'=dst',minval(SReadData(:,m)),'=minS',maxval(SReadData(:,m)),'=maxS'
                   endif
-!               endif
+               endif
             else if (newdom == 'src') then
                pe = get_cegindex(RReadData(m),lsstart,lscount,lspeloc)
             else if (newdom == 'dst') then

@@ -36,10 +36,10 @@ MODULE mod_oasis_namcouple
 ! CHARACTER(len=*),parameter :: nmatxrd_default = 'orig'   ! ceg or orig
   CHARACTER(len=*),parameter :: nmatxrd_default = 'ceg'    ! ceg or orig
 
-  CHARACTER(len=*),parameter :: nwgtopt_default = 'abort_on_bad_weights'         ! weights handling
-!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_weights'          ! weights handling
-!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_weights_silently' ! weights handling 
-!  CHARACTER(len=*),parameter :: nwgtopt_default = 'use_bad_weights'             ! weights handling
+  CHARACTER(len=*),parameter :: nwgtopt_default = 'abort_on_bad_index'         ! weights handling
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_index'          ! weights handling
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'ignore_bad_index_silently' ! weights handling 
+!  CHARACTER(len=*),parameter :: nwgtopt_default = 'use_bad_index'             ! weights handling
 
   INTEGER(kind=ip_i4_p)   ,public :: nnamcpl       !< number of namcouple inputs
   INTEGER(kind=ip_i4_p)   ,public :: namruntim     !< namcouple runtime
@@ -1870,10 +1870,10 @@ SUBROUTINE inipar
            CALL oasis_flush(nulprt1)
         ENDIF
      ELSE
-        IF (trim(clvari) == 'abort_on_bad_weights' .or. &
-            trim(clvari) == 'ignore_bad_weights' .or. &
-            trim(clvari) == 'ignore_bad_weights_silently' .or. &
-            trim(clvari) == 'use_bad_weights') THEN
+        IF (trim(clvari) == 'abort_on_bad_index' .or. &
+            trim(clvari) == 'ignore_bad_index' .or. &
+            trim(clvari) == 'ignore_bad_index_silently' .or. &
+            trim(clvari) == 'use_bad_index') THEN
            nwgtopt = clvari
         ELSE
            CALL prtout('ERROR in namcouple '//trim(keyword)//' argument',jf,1)
