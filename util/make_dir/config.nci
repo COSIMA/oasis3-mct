@@ -1,5 +1,11 @@
-module purge
-module load intel-fc/17.0.1.132
-module load intel-cc/17.0.1.132
-module load netcdf
-module load openmpi/1.10.2
+if ( -f ../../../../../modules.nci ) then
+    echo "Loading common modules via modules.nci"
+    source ../../../../../modules.nci
+else
+    echo "WARNING: modules.nci not found. Module versions might differ between model components."
+    module purge
+    module load intel-fc/17.0.1.132
+    module load intel-cc/17.0.1.132
+    module load netcdf
+    module load openmpi/1.10.2
+endif
