@@ -650,15 +650,22 @@ CONTAINS
    integer (kind=ip_intwp_p) :: lkinfo
    integer (kind=ip_intwp_p) :: icpl, ierr
    integer (kind=ip_intwp_p) :: newcomm
-   logical, parameter :: local_timers_on = .true.
+   logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_enddef)'
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
 
-   if (local_timers_on) then
+   if (.not. oasis_coupled) then
+      call oasis_debug_exit(subname)
+      return
+   endif
+
+   lkinfo = OASIS_OK
+
+   if (local_timers_on .and. mpi_comm_local /= MPI_COMM_NULL) then
       call oasis_timer_start('oasis_enddef_barrier')
-      call MPI_BARRIER(mpi_comm_local, ierr)
+      call oasis_mpi_barrier(mpi_comm_local, subname)
       call oasis_timer_stop('oasis_enddef_barrier')
    endif
    
@@ -674,13 +681,6 @@ CONTAINS
        call oasis_abort(file=__FILE__,line=__LINE__)
    endif
    enddef_called = .true.
-
-   if (.not. oasis_coupled) then
-      call oasis_debug_exit(subname)
-      return
-   endif
-
-   lkinfo = OASIS_OK
 
    IF (OASIS_debug >= 2)  THEN
        CALL oasis_mem_print(nulprt,subname//':start')

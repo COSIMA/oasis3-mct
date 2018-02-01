@@ -44,6 +44,7 @@ MODULE mod_oasis_reprosum
 #endif
    use mod_oasis_data,  only: nulprt
    use mod_oasis_sys,   only: oasis_abort, estr
+   use mod_oasis_mpi,   only: oasis_mpi_barrier
    use mod_oasis_timer, only: oasis_timer_start, oasis_timer_stop
 
 !-----------------------------------------------------------------------
@@ -417,7 +418,7 @@ MODULE mod_oasis_reprosum
 
       if (detailed_timing) then
          call oasis_timer_start('oasis_reprosum_prebarrier')
-         call MPI_BARRIER(mpi_comm,ierr)
+         call oasis_mpi_barrier(mpi_comm,subname)
          call oasis_timer_stop ('oasis_reprosum_prebarrier')
       endif
 
@@ -679,7 +680,7 @@ MODULE mod_oasis_reprosum
 
             if (detailed_timing) then
                call oasis_timer_start('oasis_nonreprosum_prebarrier')
-               call MPI_BARRIER(mpi_comm,ierr)
+               call oasis_mpi_barrier(mpi_comm,subname)
                call oasis_timer_stop ('oasis_nonreprosum_prebarrier')
             endif
 
