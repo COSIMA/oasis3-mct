@@ -176,7 +176,8 @@ noted with the string UNUSED but not described.
     likely to run faster. Usually, partial sums will be used if the
     source grid has a higher resolution than the target grid as this
     should reduce the overall communication (e.g. for conservative
-    remapping).
+    remapping).\\
+    By default \$MAPSTRATEGY = bfb.
 
   \end{itemize}
 
@@ -632,7 +633,8 @@ noted with the string UNUSED but not described.
 \item The {\tt bfb} option enforces a bit-for-bit transformation regardless
   of the component grid decomposition or number of processes. It is currently using the {\tt reprosum} option.
 \item The {\tt opt} option carries out the global sum using the fastest algorithm generally available.  Currently,
-  this is set to {\tt lsum8}.
+  this is set to {\tt lsum8}. \\
+ By default CONSOPT = bfb = reprosum.
 \end{itemize}
   \end{itemize}
 
