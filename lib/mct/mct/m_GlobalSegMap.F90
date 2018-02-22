@@ -1,28 +1,28 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !    Math and Computer Science Division, Argonne National Laboratory   !
 !-----------------------------------------------------------------------
-! CVS m_GlobalSegMap.F90,v 1.56 2009-03-17 16:51:49 jacob Exp
-! CVS MCT_2_8_0 
+! CVS $Id: m_GlobalSegMap.F90,v 1.56 2009-03-17 16:51:49 jacob Exp $
+! CVS $Name:  $
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_GlobalSegMap - a nontrivial 1-D decomposition of an array.
 !
 ! !DESCRIPTION:
-! Consider the problem of the 1-dimensional decomposition of an array 
-! across multiple processes.  If each process owns only one contiguous 
-! segment, then the {\tt GlobalMap} (see {\tt m\_GlobalMap} or details) 
-! is sufficient to describe the decomposition.  If, however, each  
-! process owns multiple, non-adjacent segments of the array, a more 
-! sophisticated approach is needed.   The {\tt GlobalSegMap} data type 
+! Consider the problem of the 1-dimensional decomposition of an array
+! across multiple processes.  If each process owns only one contiguous
+! segment, then the {\tt GlobalMap} (see {\tt m\_GlobalMap} or details)
+! is sufficient to describe the decomposition.  If, however, each
+! process owns multiple, non-adjacent segments of the array, a more
+! sophisticated approach is needed.   The {\tt GlobalSegMap} data type
 ! allows one to describe a one-dimensional decomposition of an array
 ! with each process owning multiple, non-adjacent segments of the array.
 !
 ! In the current implementation of the {\tt GlobalSegMap}, there is no
-! santity check to guarantee that 
-!$${\tt GlobalSegMap\%gsize} = \sum_{{\tt i}=1}^{\tt ngseg} 
+! santity check to guarantee that
+!$${\tt GlobalSegMap\%gsize} = \sum_{{\tt i}=1}^{\tt ngseg}
 ! {\tt GlobalSegMap\%length(i)} . $$
 ! The reason we have not implemented such a check is to allow the user
-! to use the {\tt GlobalSegMap} type to support decompositions of both 
+! to use the {\tt GlobalSegMap} type to support decompositions of both
 ! {\em haloed} and {\em masked} data.
 !
 ! !INTERFACE:
@@ -45,12 +45,12 @@
       public :: ProcessStorage  ! Return local storage on a given process.
       public :: OrderedPoints   ! Return grid points of a given process in
                                 ! MCT-assumed order.
-      public :: lsize           ! Return local--that is, on-process--storage 
+      public :: lsize           ! Return local--that is, on-process--storage
                                 ! size (incl. halos)
       public :: ngseg           ! Return global number of segments
       public :: nlseg           ! Return local number of segments
       public :: max_nlseg       ! Return max local number of segments
-      public :: active_pes      ! Return number of pes with at least 1 
+      public :: active_pes      ! Return number of pes with at least 1
                                 ! datum, and if requested, a list of them.
       public :: peLocs          ! Given an input list of point indices,
                                 ! return its (unique) process ID.
@@ -59,7 +59,7 @@
       public :: Sort            ! compute index permutation to re-order
                                 ! GlobalSegMap%start, GlobalSegMap%length,
                                 ! and GlobalSegMap%pe_loc
-      public :: Permute         ! apply index permutation to re-order 
+      public :: Permute         ! apply index permutation to re-order
                                 ! GlobalSegMap%start, GlobalSegMap%length,
                                 ! and GlobalSegMap%pe_loc
       public :: SortPermute     ! compute index permutation and apply it to
@@ -69,6 +69,7 @@
       public :: increasing      ! Are the indices for each pe strictly
                                 ! increasing?
       public :: copy            ! Copy the gsmap
+      public :: print           ! Print the contents of the GSMap
 
 ! !PUBLIC TYPES:
 
@@ -118,24 +119,28 @@
     end interface
     interface Sort ; module procedure Sort_ ; end interface
     interface Permute ; module procedure &
-	PermuteInPlace_ 
+	PermuteInPlace_
     end interface
     interface SortPermute ; module procedure &
-	SortPermuteInPlace_ 
+	SortPermuteInPlace_
     end interface
     interface increasing ; module procedure increasing_ ; end interface
     interface copy ; module procedure copy_ ; end interface
+    interface print ; module procedure &
+          print_ ,&
+	  printFromRootnp_
+    end interface
 
 
 ! !REVISION HISTORY:
 ! 	28Sep00 - J.W. Larson <larson@mcs.anl.gov> - initial prototype
 ! 	26Jan01 - J.W. Larson <larson@mcs.anl.gov> - replaced the component
 !                 GlobalSegMap%comm with GlobalSegMap%comp_id.
-! 	06Feb01 - J.W. Larson <larson@mcs.anl.gov> - removed the 
-!                 GlobalSegMap%lsize component.  Also, added the 
+! 	06Feb01 - J.W. Larson <larson@mcs.anl.gov> - removed the
+!                 GlobalSegMap%lsize component.  Also, added the
 !                 GlobalStorage query function.
 ! 	24Feb01 - J.W. Larson <larson@mcs.anl.gov> - Added the replicated
-!                 initialization routines initp_() and initp1(). 
+!                 initialization routines initp_() and initp1().
 ! 	25Feb01 - J.W. Larson <larson@mcs.anl.gov> - Added the routine
 !                 ProcessStorage_().
 ! 	18Apr01 - J.W. Larson <larson@mcs.anl.gov> - Added the routine
@@ -144,8 +149,8 @@
 !                 OrderedPoints_().
 !       03Aug01 - E. Ong <eong@mcs.anl.gov> - In initd_, call initr_
 !                 with actual shaped arguments on non-root processes to satisfy
-!                 F90 standard. See comments in initd.          
-! 	18Oct01 - J.W. Larson <larson@mcs.anl.gov> - Added the routine 
+!                 F90 standard. See comments in initd.
+! 	18Oct01 - J.W. Larson <larson@mcs.anl.gov> - Added the routine
 !                 bcast(), and also cleaned up prologues.
 !EOP ___________________________________________________________________
 
@@ -160,17 +165,17 @@
 ! !IROUTINE: initd_ - define the map from distributed data
 !
 ! !DESCRIPTION:
-! This routine takes the {\em scattered} input {\tt INTEGER} arrays 
+! This routine takes the {\em scattered} input {\tt INTEGER} arrays
 ! {\tt start}, {\tt length}, and {\tt pe\_loc}, gathers these data to
 ! the {\tt root} process, and from them creates a {\em global} set of
-! segment information for the output {\tt GlobalSegMap} argument 
-! {\tt GSMap}.  The input {\tt INTEGER} arguments {\tt comp\_id}, 
-! {\tt gsize} provide the {\tt GlobalSegMap} component ID number and 
-! global grid size, respectively.  The input argument {\tt my\_comm} is 
+! segment information for the output {\tt GlobalSegMap} argument
+! {\tt GSMap}.  The input {\tt INTEGER} arguments {\tt comp\_id},
+! {\tt gsize} provide the {\tt GlobalSegMap} component ID number and
+! global grid size, respectively.  The input argument {\tt my\_comm} is
 ! the F90 {\tt INTEGER} handle for the MPI communicator.  If the input
 ! arrays are overdimensioned, optional argument {\em numel} can be
 ! used to specify how many elements should be used.
-! 
+!
 !
 ! !INTERFACE:
 
@@ -189,7 +194,7 @@
 
 ! !INPUT PARAMETERS:
 
-      integer,dimension(:),intent(in) :: start          ! segment local start 
+      integer,dimension(:),intent(in) :: start          ! segment local start
                                                         ! indices
       integer,dimension(:),intent(in) :: length         ! segment local lengths
       integer,intent(in)              :: root           ! root on my_com
@@ -198,7 +203,7 @@
       integer,dimension(:), pointer, optional :: pe_loc ! process location
       integer,intent(in), optional    :: gsize          ! global vector size
                                                         ! (optional).  It can
-                                                        ! be computed by this 
+                                                        ! be computed by this
                                                         ! routine if no haloing
                                                         ! is assumed.
       integer,intent(in), optional    :: numel          ! specify number of elements
@@ -211,16 +216,16 @@
 ! !REVISION HISTORY:
 ! 	29Sep00 - J.W. Larson <larson@mcs.anl.gov> - initial prototype
 ! 	14Nov00 - J.W. Larson <larson@mcs.anl.gov> - final working version
-! 	09Jan01 - J.W. Larson <larson@mcs.anl.gov> - repaired:  a subtle 
-!                 bug concerning the usage of the argument pe_loc (result 
-!                 was the new pointer variable my_pe_loc); a mistake in 
+! 	09Jan01 - J.W. Larson <larson@mcs.anl.gov> - repaired:  a subtle
+!                 bug concerning the usage of the argument pe_loc (result
+!                 was the new pointer variable my_pe_loc); a mistake in
 !                 the tag arguments to MPI_IRECV; a bug in the declaration
 !                 of the array status used by MPI_WAITALL.
-! 	26Jan01 - J.W. Larson <larson@mcs.anl.gov> - replaced optional 
+! 	26Jan01 - J.W. Larson <larson@mcs.anl.gov> - replaced optional
 !                 argument gsm_comm with required argument comp_id.
 !       23Sep02 - Add optional argument numel to allow start, length
 !                 arrays to be overdimensioned.
-!       31Jan09 - P.H. Worley <worleyph@ornl.gov> - replaced irecv/send/waitall 
+!       31Jan09 - P.H. Worley <worleyph@ornl.gov> - replaced irecv/send/waitall
 !                 logic with calls to flow controlled gather routines
 !EOP ___________________________________________________________________
 
@@ -232,7 +237,7 @@
 
         ! arrays allocated on the root to which data are gathered
   integer, dimension(:), allocatable :: root_start, root_length, root_pe_loc
-        ! arrays allocated on the root to coordinate gathering of 
+        ! arrays allocated on the root to coordinate gathering of
         ! data and non-blocking receives by the root
   integer, dimension(:), allocatable :: counts, displs
         ! data and non-blocking receives by the root
@@ -259,7 +264,7 @@
      endif
   endif
 
-        ! Store in the variable nlseg the local size 
+        ! Store in the variable nlseg the local size
         ! array start(:)
 
   if(present(numel)) then
@@ -269,7 +274,7 @@
   endif
 
         ! If the argument pe_loc is not present, then we are
-        ! initializing the GlobalSegMap on the communicator 
+        ! initializing the GlobalSegMap on the communicator
         ! my_comm.  We will need pe_loc to be allocated and
         ! with local size given by the input value of nlseg,
         ! and then initialize it with the local process id myID.
@@ -290,12 +295,12 @@
 
   if(myID == root) then
      allocate(counts(0:npes-1), displs(0:npes-1), stat=ier)
-     if (ier /= 0) then  
+     if (ier /= 0) then
 	call die(myname_, 'allocate(counts,...',ier)
      endif
   else
      allocate(counts(1), displs(1), stat=ier)
-     if (ier /= 0) then  
+     if (ier /= 0) then
 	call die(myname_, 'allocate(counts,...',ier)
      endif
   endif
@@ -327,13 +332,13 @@
         ! and root_length.  If the argument pe_loc is present,
         ! allocate root_pe_loc, too.
 
-        ! Non-root processes call initr_ with root_start, root_length, 
-        ! and root_pe_loc, although these arguments are not used in the 
+        ! Non-root processes call initr_ with root_start, root_length,
+        ! and root_pe_loc, although these arguments are not used in the
         ! subroutine. Since these correspond to dummy shaped array arguments
-        ! in initr_, the Fortran 90 standard dictates that the actual 
-        ! arguments must contain complete shape information. Therefore, 
+        ! in initr_, the Fortran 90 standard dictates that the actual
+        ! arguments must contain complete shape information. Therefore,
         ! these array arguments must be allocated on all processes.
-  
+
   if(myID == root) then
 
      allocate(root_start(ngseg), root_length(ngseg), &
@@ -352,24 +357,24 @@
 
   endif
 
-        ! Now, each process sends its values of start(:) to fill in 
+        ! Now, each process sends its values of start(:) to fill in
         ! the appropriate portion of root_start(:y) on the root.
 
   call fc_gatherv_int(start, nlseg, MP_INTEGER, &
                       root_start, counts, displs, MP_INTEGER, &
                       root, my_comm)
 
-        ! Next, each process sends its values of length(:) to fill in 
+        ! Next, each process sends its values of length(:) to fill in
         ! the appropriate portion of root_length(:) on the root.
 
   call fc_gatherv_int(length, nlseg, MP_INTEGER, &
                       root_length, counts, displs, MP_INTEGER, &
                       root, my_comm)
 
-        ! Finally, if the argument pe_loc is present, each process sends 
-        ! its values of pe_loc(:) to fill in the appropriate portion of 
-        ! root_pe_loc(:) on the root.  
-   
+        ! Finally, if the argument pe_loc is present, each process sends
+        ! its values of pe_loc(:) to fill in the appropriate portion of
+        ! root_pe_loc(:) on the root.
+
   call fc_gatherv_int(my_pe_loc, nlseg, MP_INTEGER, &
                       root_pe_loc, counts, displs, MP_INTEGER, &
                       root, my_comm)
@@ -391,7 +396,7 @@
         ! Clean up the array pe_loc(:) if it was allocated
 
   if(present(pe_loc)) then
-     nullify(my_pe_loc) 
+     nullify(my_pe_loc)
   else
      deallocate(my_pe_loc, stat=ier)
      if(ier /= 0) call die(myname_, 'deallocate(my_pe_loc)', ier)
@@ -420,14 +425,14 @@
 ! !IROUTINE: initr_ initialize the map from the root
 !
 ! !DESCRIPTION:
-! This routine takes the input {\tt INTEGER} arrays {\tt start}, 
-! {\tt length}, and {\tt pe\_loc} (all valid only on the {\tt root} 
-! process), and from them creates a {\em global} set of segment 
-! information for the output {\tt GlobalSegMap} argument 
-! {\tt GSMap}.  The input {\tt INTEGER} arguments {\tt ngseg}, 
-! {\tt comp\_id}, {\tt gsize} (again, valid only on the {\tt root} 
-! process) provide the {\tt GlobalSegMap} global segment count, component 
-! ID number, and global grid size, respectively.  The input argument 
+! This routine takes the input {\tt INTEGER} arrays {\tt start},
+! {\tt length}, and {\tt pe\_loc} (all valid only on the {\tt root}
+! process), and from them creates a {\em global} set of segment
+! information for the output {\tt GlobalSegMap} argument
+! {\tt GSMap}.  The input {\tt INTEGER} arguments {\tt ngseg},
+! {\tt comp\_id}, {\tt gsize} (again, valid only on the {\tt root}
+! process) provide the {\tt GlobalSegMap} global segment count, component
+! ID number, and global grid size, respectively.  The input argument
 ! {\tt my\_comm} is the F90 {\tt INTEGER} handle for the MPI communicator.
 !
 ! !INTERFACE:
@@ -440,13 +445,13 @@
       use m_mpif90
       use m_die
       use m_stdio
- 
+
       implicit none
 
 ! !INPUT PARAMETERS:
 
       integer, intent(in)             :: ngseg   ! no. of global segments
-      integer,dimension(:),intent(in) :: start   ! segment local start index 
+      integer,dimension(:),intent(in) :: start   ! segment local start index
       integer,dimension(:),intent(in) :: length  ! the distributed sizes
       integer,dimension(:),intent(in) :: pe_loc  ! process location
       integer,intent(in)              :: root    ! root on my_com
@@ -454,7 +459,7 @@
       integer,intent(in)              :: comp_id ! component id number
       integer,intent(in), optional    :: gsize   ! global vector size
                                                  ! (optional).  It can
-                                                 ! be computed by this 
+                                                 ! be computed by this
                                                  ! routine if no haloing
                                                  ! is assumed.
 
@@ -468,9 +473,9 @@
 ! 	10Jan01 - J.W. Larson <larson@mcs.anl.gov> - minor bug fix
 ! 	12Jan01 - J.W. Larson <larson@mcs.anl.gov> - minor bug fix regarding
 !                                                    disparities in ngseg on
-!                                                    the root and other 
+!                                                    the root and other
 !                                                    processes
-! 	26Jan01 - J.W. Larson <larson@mcs.anl.gov> - replaced optional 
+! 	26Jan01 - J.W. Larson <larson@mcs.anl.gov> - replaced optional
 !                 argument gsm_comm with required argument comp_id.
 !EOP ___________________________________________________________________
 
@@ -484,7 +489,7 @@
 
         ! Argument checking:  check to make sure the arrays
         ! start, length, and pe_loc each have ngseg elements.
-        ! If not, stop with an error.  This is done on the 
+        ! If not, stop with an error.  This is done on the
         ! root process since it owns the initialization data.
 
   if(myID == root) then
@@ -542,7 +547,7 @@
 #endif
 
         ! On the root process, initialize GSMap%start(:), GSMap%length(:),
-        ! and GSMap%pe_loc(:) with the data contained in start(:), 
+        ! and GSMap%pe_loc(:) with the data contained in start(:),
         ! length(:) and pe_loc(:), respectively
 
   if(myID == root) then
@@ -595,9 +600,9 @@
 ! !DESCRIPTION:
 !
 ! The routine {\tt initp\_()} takes the input {\em replicated} arguments
-! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, {\tt start(:)}, 
+! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, {\tt start(:)},
 ! {\tt length(:)}, and {\tt pe\_loc(:)}, and uses them to initialize an
-! output {\tt GlobalSegMap} {\tt GSMap}.  This routine operates on the 
+! output {\tt GlobalSegMap} {\tt GSMap}.  This routine operates on the
 ! assumption that these data are replicated across the communicator on
 ! which the {\tt GlobalSegMap} is being created.
 !
@@ -614,12 +619,12 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       integer,intent(in)              :: comp_id ! component model ID
       integer,intent(in)              :: ngseg   ! global number of segments
       integer,intent(in)              :: gsize   ! global vector size
-      integer,dimension(:),intent(in) :: start   ! segment local start index 
+      integer,dimension(:),intent(in) :: start   ! segment local start index
       integer,dimension(:),intent(in) :: length  ! the distributed sizes
       integer,dimension(:),intent(in) :: pe_loc  ! process location
 
@@ -653,7 +658,7 @@
      call die(myname_,'non-positive value of ngseg',ngseg)
   endif
 
-       ! Are the arrays start(:), length(:), and pe_loc(:) the 
+       ! Are the arrays start(:), length(:), and pe_loc(:) the
        !correct size?
 
   if(size(start) /= ngseg) then
@@ -673,7 +678,7 @@
   if (ierr /= 0) then
      call die(myname_,'allocate(GSMap%start...',ngseg)
   endif
-       
+
        ! Assign the components of GSMap:
 
   GSMap%comp_id = comp_id
@@ -686,7 +691,7 @@
      GSMap%pe_loc(n) = pe_loc(n)
   end do
 
-  end subroutine initp_     
+  end subroutine initp_
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !    Math and Computer Science Division, Argonne National Laboratory   !
@@ -697,9 +702,9 @@
 ! !DESCRIPTION:
 !
 ! The routine {\tt initp1\_()} takes the input {\em replicated} arguments
-! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, and {\tt all\_arrays(:)}, 
-! and uses them to initialize an output {\tt GlobalSegMap} {\tt GSMap}.  
-! This routine operates on the assumption that these data are replicated 
+! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, and {\tt all\_arrays(:)},
+! and uses them to initialize an output {\tt GlobalSegMap} {\tt GSMap}.
+! This routine operates on the assumption that these data are replicated
 ! across the communicator on which the {\tt GlobalSegMap} is being created.
 ! The input array {\tt all\_arrays(:)} should be of length {\tt 2 * ngseg},
 ! and is packed so that
@@ -720,7 +725,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       integer,intent(in)              :: comp_id    ! component model ID
       integer,intent(in)              :: ngseg      ! global no. of segments
@@ -773,7 +778,7 @@
   if (ierr /= 0) then
      call die(myname_,'allocate(GSMap%start...',ngseg)
   endif
-       
+
        ! Assign the components of GSMap:
 
   GSMap%comp_id = comp_id
@@ -786,7 +791,7 @@
      GSMap%pe_loc(n) = all_arrays(2*ngseg + n)
   end do
 
-  end subroutine initp1_     
+  end subroutine initp1_
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !    Math and Computer Science Division, Argonne National Laboratory   !
@@ -797,11 +802,11 @@
 ! !DESCRIPTION:
 !
 ! The routine {\tt initp0\_()} takes the input {\em replicated} arguments
-! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, and uses them perform null 
-! construction of the output {\tt GlobalSegMap} {\tt GSMap}.  This is a 
-! null constructor in the sense that we are not filling in the segment 
-! information arrays.  This routine operates on the assumption that these 
-! data are replicated across the communicator on which the 
+! {\tt comp\_id}, {\tt ngseg}, {\tt gsize}, and uses them perform null
+! construction of the output {\tt GlobalSegMap} {\tt GSMap}.  This is a
+! null constructor in the sense that we are not filling in the segment
+! information arrays.  This routine operates on the assumption that these
+! data are replicated across the communicator on which the
 ! {\tt GlobalSegMap} is being created.
 !
 ! !INTERFACE:
@@ -816,7 +821,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       integer,intent(in)              :: comp_id ! component model ID
       integer,intent(in)              :: ngseg   ! global number of segments
@@ -863,11 +868,11 @@
 !
 ! !DESCRIPTION:
 !
-! The routine {\tt init\_index\_()} takes a local array of indices 
-! {\tt lindx} and uses them to create a {\tt GlobalSegMap}.  
-! {\tt lindx} is parsed to determine the lengths of the runs, and 
-! then a call is made to {\tt initd\_}.  The optional argument 
-! {\tt lsize} can be used if only the first {\tt lsize} number 
+! The routine {\tt init\_index\_()} takes a local array of indices
+! {\tt lindx} and uses them to create a {\tt GlobalSegMap}.
+! {\tt lindx} is parsed to determine the lengths of the runs, and
+! then a call is made to {\tt initd\_}.  The optional argument
+! {\tt lsize} can be used if only the first {\tt lsize} number
 ! of elements of {\tt lindx} are valid.  The optional argument
 ! {\tt gsize} is used to specify the global number of unique points
 ! if this can not be determined from the collective {\tt lindx}.
@@ -889,7 +894,7 @@
   use m_die
   implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
      integer , dimension(:),intent(in) :: lindx   ! index buffer
      integer , intent(in) :: my_comm         ! mpi communicator group (mine)
@@ -901,7 +906,7 @@
 ! !OUTPUT PARAMETERS:
 
      type(GlobalSegMap),intent(out) :: GSMap ! Output GlobalSegMap
-     
+
 
 ! !REVISION HISTORY:
 !       30Jul02 - T. Craig - initial version in cpl6.
@@ -917,10 +922,10 @@
 
      integer             :: i,j,k,n      ! generic indicies
      integer             :: nseg         ! counts number of segments for GSMap
-     integer,allocatable :: start(:)     ! used to init GSMap 
-     integer,allocatable :: count(:)     ! used to init GSMap 
+     integer,allocatable :: start(:)     ! used to init GSMap
+     integer,allocatable :: count(:)     ! used to init GSMap
      integer,parameter   :: pid0=0       ! mpi process id for root pe
-     integer,parameter   :: debug=0      ! 
+     integer,parameter   :: debug=0      !
 
      integer rank,ierr
      integer mysize
@@ -937,17 +942,17 @@
 
 !!
 !! Special case if this processor doesn't have any data indices
-!! 
+!!
    if (mysize==0) then
      allocate(start(0),count(0),stat=ierr)
      if(ierr/=0) call die(myname_,'allocate(start,count)',ierr)
-    
+
      nseg=0
    else
 
      call MPI_COMM_RANK(my_comm,rank, ierr)
 
-     ! compute segment's start indicies and length counts 
+     ! compute segment's start indicies and length counts
 
      ! first pass - count how many runs of consecutive numbers
 
@@ -1001,7 +1006,7 @@
 
       deallocate(start, count, stat=ierr)
       if(ierr/=0) call warn(myname_,'deallocate(start,count)',ierr)
-      
+
 
    end subroutine init_index_
 
@@ -1029,15 +1034,15 @@
       use m_die
 
       implicit none
- 
-! !INPUT/OUTPUT PARAMETERS: 
+
+! !INPUT/OUTPUT PARAMETERS:
 
       type(GlobalSegMap), intent(inout) :: GSMap
       integer, optional,  intent(out)   :: stat
 
 ! !REVISION HISTORY:
 ! 	29Sep00 - J.W. Larson <larson@mcs.anl.gov> - initial prototype
-!       01Mar02 - E.T. Ong <eong@mcs.anl.gov> - added stat argument. 
+!       01Mar02 - E.T. Ong <eong@mcs.anl.gov> - added stat argument.
 !                 Removed dies to prevent crashing.
 !EOP ___________________________________________________________________
 
@@ -1045,7 +1050,7 @@
   integer :: ier
 
 #ifdef MALL_ON
-  
+
   if( (associated(GSMap%start) .and. associated(GSMap%length)) &
        .and. associated(GSMap%pe_loc) )
      call mall_co(size(transfer(GSMap%start,(/1/))),myname_)
@@ -1086,7 +1091,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: GSMap
 
@@ -1107,9 +1112,9 @@
 ! !IROUTINE: nlseg_ - Return the local number of segments from the map
 !
 ! !DESCRIPTION:
-! The function {\tt nlseg\_()} returns the number of vector segments 
-! in the {\tt GlobalSegMap} argument {\tt GSMap} that reside on the 
-! process specified by the input argument {\tt pID}.  This is the 
+! The function {\tt nlseg\_()} returns the number of vector segments
+! in the {\tt GlobalSegMap} argument {\tt GSMap} that reside on the
+! process specified by the input argument {\tt pID}.  This is the
 ! number of entries {\tt GSMap\%pe\_loc} whose value equals {\tt pID}.
 !
 ! !INTERFACE:
@@ -1118,7 +1123,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: GSMap
       integer,           intent(in) :: pID
@@ -1162,9 +1167,9 @@
 ! !IROUTINE: max_nlseg_ - Return the max number of segments over all procs
 !
 ! !DESCRIPTION:
-! The function {\tt max\_nlseg\_()} returns the maximum number 
+! The function {\tt max\_nlseg\_()} returns the maximum number
 ! over all processors of the vector
-! segments in the {\tt GlobalSegMap} argument {\tt gsap} 
+! segments in the {\tt GlobalSegMap} argument {\tt gsap}
 ! E.g. max\_p(nlseg(gsmap,p)) but computed more efficiently
 !
 ! !INTERFACE:
@@ -1181,7 +1186,7 @@
 
         implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
         type(GlobalSegMap), intent(in) :: gsmap
 
@@ -1266,7 +1271,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: GSMap
 
@@ -1297,7 +1302,7 @@
 ! !IROUTINE: gsize_ - Return the global vector size from the GlobalSegMap.
 !
 ! !DESCRIPTION:
-! The function {\tt gsize\_()} takes the input {\tt GlobalSegMap} 
+! The function {\tt gsize\_()} takes the input {\tt GlobalSegMap}
 ! arguement {\tt GSMap} and returns the global vector length stored
 ! in {\tt GlobalSegMap\%gsize}.
 !
@@ -1307,7 +1312,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: GSMap
 
@@ -1328,12 +1333,12 @@
 ! !IROUTINE: GlobalStorage_ - Return global storage space required.
 !
 ! !DESCRIPTION:
-! The function {\tt GlobalStorage\_()} takes the input {\tt GlobalSegMap} 
-! arguement {\tt GSMap} and returns the global storage space required 
-! ({\em i.e.}, the vector length) to hold all the data specified by 
+! The function {\tt GlobalStorage\_()} takes the input {\tt GlobalSegMap}
+! arguement {\tt GSMap} and returns the global storage space required
+! ({\em i.e.}, the vector length) to hold all the data specified by
 ! {\tt GSMap}.
 !
-! {\bf N.B.:  } If {\tt GSMap} contains halo or masked points, the value 
+! {\bf N.B.:  } If {\tt GSMap} contains halo or masked points, the value
 ! by {\tt GlobalStorage\_()} may differ from {\tt GSMap\%gsize}.
 !
 ! !INTERFACE:
@@ -1380,9 +1385,9 @@
 ! !IROUTINE: ProcessStorage_ - Number of points on a given process.
 !
 ! !DESCRIPTION:
-! The function {\tt ProcessStorage\_()} takes the input {\tt GlobalSegMap} 
+! The function {\tt ProcessStorage\_()} takes the input {\tt GlobalSegMap}
 ! arguement {\tt GSMap} and returns the storage space required by process
-! {\tt PEno} ({\em i.e.}, the vector length) to hold all the data specified 
+! {\tt PEno} ({\em i.e.}, the vector length) to hold all the data specified
 ! by {\tt GSMap}.
 !
 ! !INTERFACE:
@@ -1433,7 +1438,7 @@
 !				returned in the assumed MCT order.
 !
 ! !DESCRIPTION:
-! The function {\tt OrderedPoints\_()} takes the input {\tt GlobalSegMap} 
+! The function {\tt OrderedPoints\_()} takes the input {\tt GlobalSegMap}
 ! arguement {\tt GSMap} and returns a vector of the points owned by
 ! {\tt PEno}.  {\tt Points} is allocated here.  The calling process
 ! is responsible for deallocating the space.
@@ -1506,8 +1511,8 @@
 ! !DESCRIPTION:
 ! This function returns the number of points owned by the local process,
 ! as defined by the input {\tt GlobalSegMap} argument {\tt GSMap}.  The
-! local process ID is determined through use of the input {\tt INTEGER} 
-! argument {\tt comm}, which is the Fortran handle for the MPI 
+! local process ID is determined through use of the input {\tt INTEGER}
+! argument {\tt comm}, which is the Fortran handle for the MPI
 ! communicator.
 !
 ! !INTERFACE:
@@ -1568,12 +1573,12 @@
 !    Math and Computer Science Division, Argonne National Laboratory   !
 !BOP -------------------------------------------------------------------
 !
-! !IROUTINE: rank1_ - rank which process owns a datum with given global 
+! !IROUTINE: rank1_ - rank which process owns a datum with given global
 ! index.
 !
 ! !DESCRIPTION:
 ! This routine assumes that there is one process that owns the datum with
-! a given global index.  It should not be used when the input 
+! a given global index.  It should not be used when the input
 ! {\tt GlobalSegMap} argument {\tt GSMap} has been built to incorporate
 ! halo points.
 !
@@ -1600,7 +1605,7 @@
   integer :: i,ilc,ile
 
         ! Initially, set the rank to -1 (invalid).
-  rank=-1	
+  rank=-1
 
   do i=1,size(GSMap%start)
     ilc = GSMap%start(i)
@@ -1620,15 +1625,15 @@
 !    Math and Computer Science Division, Argonne National Laboratory   !
 !BOP -------------------------------------------------------------------
 !
-! !IROUTINE: rankm_ - rank which processes own a datum with given global 
+! !IROUTINE: rankm_ - rank which processes own a datum with given global
 ! index.
 !
 ! !DESCRIPTION:
-! This routine assumes that there may be more than one process that owns 
-! the datum with a given global index.  This routine should  be used when 
-! the input {\tt GlobalSegMap} argument {\tt GSMap} has been built to 
-! incorporate ! halo points.  {\em Nota Bene}:  The output array {\tt rank} 
-! is allocated in this routine and must be deallocated by the routine calling 
+! This routine assumes that there may be more than one process that owns
+! the datum with a given global index.  This routine should  be used when
+! the input {\tt GlobalSegMap} argument {\tt GSMap} has been built to
+! incorporate ! halo points.  {\em Nota Bene}:  The output array {\tt rank}
+! is allocated in this routine and must be deallocated by the routine calling
 ! {\tt rankm\_()}.  Failure to do so could result in a memory leak.
 !
 ! !INTERFACE:
@@ -1646,7 +1651,7 @@
 
       integer,            intent(out) :: num_loc ! the number of processes
                                                  ! which own element i_g
-      integer, dimension(:), pointer  :: rank    ! the process(es) on which 
+      integer, dimension(:), pointer  :: rank    ! the process(es) on which
                                                  ! element i_g resides
 ! !REVISION HISTORY:
 ! 	29Sep00 - J.W. Larson <larson@mcs.anl.gov> - initial prototype
@@ -1655,7 +1660,7 @@
   character(len=*),parameter :: myname_=myname//'::rankm_'
   integer :: i, ilc, ile, ier, n
 
-        ! First sweep:  determine the number of processes num_loc 
+        ! First sweep:  determine the number of processes num_loc
         ! that own the given datum:
 
   num_loc = 0
@@ -1720,9 +1725,9 @@
 ! !DESCRIPTION:
 ! This routine scans the pe location list of the input {\tt GlobalSegMap}
 ! {\tt GSMap\%pe\_loc(:)}, and counts the number of pe locations that
-! own at least one datum.  This value is returned in the {\tt INTEGER} 
+! own at least one datum.  This value is returned in the {\tt INTEGER}
 ! argument {\tt n\_active}.  If the optional {\tt INTEGER} array argument
-! {\tt list} is included in the call, a sorted list (in ascending order) of 
+! {\tt list} is included in the call, a sorted list (in ascending order) of
 ! the active processes will be returned.
 !
 ! {\bf N.B.:} If {\tt active\_pes\_()} is invoked with the optional argument
@@ -1737,17 +1742,14 @@
 ! !USES:
 !
       use m_die ,          only : die
-      use m_SortingTools , only : IndexSet
-      use m_SortingTools , only : IndexSort
-      use m_SortingTools , only : Permute
 
       implicit none
 
 ! !INPUT PARAMETERS:
 
-      type(GlobalSegMap),    intent(in)        :: GSMap 
+      type(GlobalSegMap),    intent(in)        :: GSMap
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       integer,               intent(out)       :: n_active
       integer, dimension(:), pointer, optional :: pe_list
@@ -1759,22 +1761,25 @@
   character(len=*),parameter :: myname_=myname//'::active_pes_'
 
   integer :: count, i, n, ngseg, ierr
-  logical :: new
-  integer, dimension(:), allocatable :: temp_list
-  integer, dimension(:), allocatable :: perm
+  integer :: max_activepe, p
+  logical, dimension(:), allocatable :: process_list
 
         ! retrieve total number of segments in the map:
 
   ngseg = ngseg_(GSMap)
 
+        ! retrieve maximum active process id in the map:
+
+  max_activepe = maxval(GSMap%pe_loc(:))
+
         ! allocate workspace to tally process id list:
 
-  allocate(temp_list(ngseg), stat=ierr)
-  if(ierr /= 0) call die(myname_,'allocate(temp_list...',ierr)
- 
-        ! initialize temp_list to -1 (which can never be a process id)
+  allocate(process_list(0:max_activepe), stat=ierr)
+  if(ierr /= 0) call die(myname_,'allocate(process_list)',ierr)
 
-  temp_list = -1
+        ! initialize process_list to false (i.e. no active pes)
+
+  process_list = .false.
 
         ! initialize the distinct active process count:
 
@@ -1785,25 +1790,10 @@
   do n=1,ngseg
      if(GSMap%pe_loc(n) >= 0) then ! a legitimate pe_location
 
-	! assume initially that GSMap%pe_loc(n) is a process id previously
-        ! not encountered
-
-	new = .true.
-
-	! test this proposition against the growing list of distinct
-        ! process ids stored in temp_list(:)
-
-	do i=1, count
-	   if(GSMap%pe_loc(n) == temp_list(i)) new = .false.
-	end do
-
-        ! If GSMap%pe_loc(n) represents a previously unencountered 
-        ! process id, increment the count, and add this id to the list
-
-	if(new) then
-	   count = count + 1
-	   temp_list(count) = GSMap%pe_loc(n)
-	endif
+        if (.not. process_list(GSMap%pe_loc(n))) then
+           process_list(GSMap%pe_loc(n)) = .true.
+           count = count + 1
+        endif
 
      else  ! a negative entry in GSMap%pe_loc(n)
 	ierr = 2
@@ -1812,41 +1802,37 @@
   end do
 
         ! If the argument pe_list is present, we must allocate this
-        ! array, fill it, and sort it
+        ! array and fill it
 
   if(present(pe_list)) then
 
-        ! allocate pe_list and permutation array perm
+        ! allocate pe_list
 
-     allocate(pe_list(count), perm(count), stat=ierr)
+     allocate(pe_list(count), stat=ierr)
      if (ierr /= 0) then
-	call die(myname_,'allocate(pe_list...',ierr)
+	call die(myname_,'allocate(pe_list)',ierr)
      endif
 
-     do n=1,count
-	pe_list(n) = temp_list(n)
-     end do
+     i = 0
+     do p=0,max_activepe
+        if (process_list(p)) then
+           i = i+1
+           if (i > count) exit
+           pe_list(i) = p
+        endif
+     enddo
 
-        ! sorting and permutation...
-
-     call IndexSet(perm)
-     call IndexSort(count, perm, pe_list, descend=.false.)
-     call Permute(pe_list, perm, count)
-
-        ! deallocate permutation array...
-
-     deallocate(perm, stat=ierr)
-     if (ierr /= 0) then
-	call die(myname_,'deallocate(perm)',ierr)
+     if (i > count) then
+       call die(myname_,'pe_list fill error',count)
      endif
 
   endif ! if(present(pe_list))...
 
-        ! deallocate work array temp_list...
+        ! deallocate work array process_list...
 
-  deallocate(temp_list, stat=ierr)
+  deallocate(process_list, stat=ierr)
   if (ierr /= 0) then
-     call die(myname_,'deallocate(temp_list)',ierr)
+     call die(myname_,'deallocate(process_list)',ierr)
   endif
 
         ! finally, store the active process count in output variable
@@ -1864,16 +1850,16 @@
 ! index.
 !
 ! !DESCRIPTION:
-! This routine takes an input {\tt INTEGER} array of point indices 
-! {\tt points(:)}, compares them with an input {\tt GlobalSegMap} 
-! {\tt pointGSMap}, and returns the {\em unique} process ID location 
+! This routine takes an input {\tt INTEGER} array of point indices
+! {\tt points(:)}, compares them with an input {\tt GlobalSegMap}
+! {\tt pointGSMap}, and returns the {\em unique} process ID location
 ! for each point.  Note the emphasize on unique.  The assumption here
 ! (which is tested) is that {\tt pointGSMap} is not haloed.  The process
 ! ID locations for the points is returned in the array {\tt pe\_locs(:)}.
 !
-! {\bf N.B.:} The test of {\tt pointGSMap} for halo points, and the 
+! {\bf N.B.:} The test of {\tt pointGSMap} for halo points, and the
 ! subsequent search for the process ID for each point is very slow.  This
-! first version of the routine is serial.  A parallel version of this 
+! first version of the routine is serial.  A parallel version of this
 ! routine will need to be developed.
 !
 ! !INTERFACE:
@@ -1888,24 +1874,46 @@
 
 ! !INPUT PARAMETERS:
 
-      type(GlobalSegMap),    intent(in)   :: pointGSMap 
+      type(GlobalSegMap),    intent(in)   :: pointGSMap
       integer,               intent(in)   :: npoints
       integer, dimension(:), intent(in)   :: points
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       integer, dimension(:), intent(out)  :: pe_locs
 
 ! !REVISION HISTORY:
 ! 	18Apr01 - J.W. Larson <larson@mcs.anl.gov> - initial version.
+!       18Oct16 - P. Worley <worleyph@gmail.com> - added algorithm options:
+!                 new default changes complexity from O(npoints*ngseg) to
+!                 O(gsize + ngseg) (worst case), and much better in current
+!                 usage. Worst case memory requirements are O(gsize), but
+!                 not seen in current usage. Other new algorithm is a little
+!                 slower in practice, and worst case memory requirement is
+!                 O(ngseg), which is also not seen in current usage.
+!                 Original algorithm is recovered if compiled with
+!                 LOW_MEMORY_PELOCS defined. Otherwise nondefault new
+!                 algorithm is enabled if compiled with MEDIUM_MEMORY_PELOCS
+!                 defined.
 !EOP ___________________________________________________________________
 
   character(len=*),parameter :: myname_=myname//'::peLocs_'
   integer :: ierr
   integer :: iseg, ngseg, ipoint
   integer :: lower_index, upper_index
+  integer :: min_points_index, max_points_index
+#if defined MEDIUM_MEMORY_PELOCS
+  integer :: ifseg, nfseg
+  integer, dimension(:), allocatable :: feasible_seg
+#else
+  integer, dimension(:), allocatable :: pindices_to_pes
+#endif
 
 ! Input argument checks:
+
+  if (npoints < 1) then
+     return
+  endif
 
   if(size(points) < npoints) then
      ierr = size(points)
@@ -1922,27 +1930,164 @@
      call die(myname_,'input pointGSMap haloed--not valid',ierr)
   endif
 
-! Brute-force indexing...no assumptions regarding sorting of points(:) 
+! Brute-force indexing...no assumptions regarding sorting of points(:)
 ! or pointGSMap%start(:)
 
 ! Number of segments in pointGSMap:
 
   ngseg = ngseg_(pointGSMap)
 
+#if defined LOW_MEMORY_PELOCS
+
   do ipoint=1,npoints ! loop over points
 
      do iseg=1,ngseg  ! loop over segments
 
-	lower_index = pointGSMap%start(iseg)
-	upper_index = lower_index + pointGSMap%length(iseg) - 1
+        lower_index = pointGSMap%start(iseg)
+        upper_index = lower_index + pointGSMap%length(iseg) - 1
 
-	if((points(ipoint) >= lower_index) .and. &
-	     (points(ipoint) <= upper_index)) then
-	   pe_locs(ipoint) = pointGSMap%pe_loc(iseg)
-	endif
-     
+        if((points(ipoint) >= lower_index) .and. &
+           (points(ipoint) <= upper_index)) then
+           pe_locs(ipoint) = pointGSMap%pe_loc(iseg)
+
+           exit
+
+        endif
+
      end do ! do iseg=1, ngseg
+
   end do ! do ipoint=1,npoints
+
+#elif defined MEDIUM_MEMORY_PELOCS
+
+! Determine index range for points vector
+  max_points_index = 0
+  min_points_index = pointGSMap%gsize + 1
+  do ipoint=1,npoints ! loop over points
+
+     max_points_index = max(points(ipoint), max_points_index)
+     min_points_index = min(points(ipoint), min_points_index)
+
+  end do ! do ipoint=1,npoints
+
+! Determine number of segments that need to be examined
+  nfseg = 0
+  do iseg=1,ngseg  ! loop over segments
+
+     lower_index = pointGSMap%start(iseg)
+     upper_index = lower_index + pointGSMap%length(iseg) - 1
+
+     if ((lower_index <= max_points_index) .and. &
+         (upper_index >= min_points_index)       ) then
+
+        nfseg = nfseg + 1
+
+     endif
+
+  end do ! do iseg=1, ngseg
+
+  if(nfseg < 1) then
+     ierr = nfseg
+     call die(myname_,'no feasible segments',ierr)
+  endif
+
+  ! Allocate temporary array
+  allocate(feasible_seg(nfseg), stat=ierr)
+  if (ierr /= 0) then
+     call die(myname_,'allocate(feasible_seg)',ierr)
+  endif
+
+  ! Determine segments that need to be examined
+  feasible_seg(:) = 1
+  nfseg = 0
+  do iseg=1,ngseg  ! loop over segments
+
+     lower_index = pointGSMap%start(iseg)
+     upper_index = lower_index + pointGSMap%length(iseg) - 1
+
+     if ((lower_index <= max_points_index) .and. &
+         (upper_index >= min_points_index)       ) then
+
+        nfseg = nfseg + 1
+        feasible_seg(nfseg) = iseg
+
+     endif
+
+  end do ! do iseg=1, ngseg
+
+  ! Calculate map from local points to pes
+  do ipoint=1,npoints ! loop over points
+
+     do ifseg=1,nfseg  ! loop over feasible segments
+
+        iseg = feasible_seg(ifseg)
+        lower_index = pointGSMap%start(iseg)
+        upper_index = lower_index + pointGSMap%length(iseg) - 1
+
+        if((points(ipoint) >= lower_index) .and. &
+           (points(ipoint) <= upper_index)       ) then
+           pe_locs(ipoint) = pointGSMap%pe_loc(iseg)
+           exit
+        endif
+
+     end do ! do ifseg=1,nfseg
+  end do ! do ipoint=1,npoints
+
+  ! Clean up
+  deallocate(feasible_seg, stat=ierr)
+  if (ierr /= 0) then
+     call die(myname_,'deallocate(feasible_seg)',ierr)
+  endif
+
+#else
+
+! Determine index range for points assigned to points vector
+  max_points_index = 0
+  min_points_index = pointGSMap%gsize + 1
+  do ipoint=1,npoints ! loop over points
+
+     max_points_index = max(points(ipoint), max_points_index)
+     min_points_index = min(points(ipoint), min_points_index)
+
+  end do ! do ipoint=1,npoints
+
+! Allocate temporary array
+  allocate(pindices_to_pes(min_points_index:max_points_index), stat=ierr)
+  if (ierr /= 0) then
+     call die(myname_,'allocate(pindices_to_pes)',ierr)
+  endif
+
+! Calculate map from (global) point indices to pes
+  do iseg=1,ngseg  ! loop over segments
+
+     lower_index = pointGSMap%start(iseg)
+     upper_index = lower_index + pointGSMap%length(iseg) - 1
+
+     lower_index = max(lower_index, min_points_index)
+     upper_index = min(upper_index, max_points_index)
+
+     if (lower_index <= upper_index) then
+        do ipoint=lower_index,upper_index
+           pindices_to_pes(ipoint) = pointGSMap%pe_loc(iseg)
+        enddo
+     endif
+
+  end do ! do iseg=1, ngseg
+
+! Calculate map from local point indices to pes
+  do ipoint=1,npoints ! loop over points
+
+     pe_locs(ipoint) = pindices_to_pes(points(ipoint))
+
+  end do ! do ipoint=1,npoints
+
+! Clean up
+  deallocate(pindices_to_pes, stat=ierr)
+  if (ierr /= 0) then
+     call die(myname_,'deallocate(pindices_to_pes)',ierr)
+  endif
+
+#endif
 
  end subroutine peLocs_
 
@@ -1955,28 +2100,28 @@
 !
 ! !DESCRIPTION:
 ! This {\tt LOGICAL} function tests the input {\tt GlobalSegMap}
-! {\tt GSMap} for the presence of halo points.  Halo points are points 
-! that appear in more than one segment of a {\tt GlobalSegMap}.  If 
-! {\em any} halo point is found, the function {\tt haloed\_()} returns 
-! immediately with value {\tt .TRUE.}  If, after an exhaustive search 
-! of the map has been completed, no halo points are found, the function 
+! {\tt GSMap} for the presence of halo points.  Halo points are points
+! that appear in more than one segment of a {\tt GlobalSegMap}.  If
+! {\em any} halo point is found, the function {\tt haloed\_()} returns
+! immediately with value {\tt .TRUE.}  If, after an exhaustive search
+! of the map has been completed, no halo points are found, the function
 ! {\tt haloed\_()} returns with value {\tt .FALSE.}
 !
 ! The search algorithm is:
 !
 ! \begin{enumerate}
-! \item Extract the segment start and length information from 
+! \item Extract the segment start and length information from
 ! {\tt GSMap\%start} and {\tt GSMap\%length} into the temporary
 ! arrays {\tt start(:)} and {\tt length(:)}.
 ! \item Sort these arrays in {\em ascending order} keyed by {\tt start}.
-! \item Scan the arrays {\tt start} and{\tt length}.  A halo point is 
-! present if for at least one value of the index 
+! \item Scan the arrays {\tt start} and{\tt length}.  A halo point is
+! present if for at least one value of the index
 ! $1 \leq {\tt n} \leq {\tt GSMap\%ngseg}$
 ! $${\tt start(n)} + {\tt length(n)} - 1 \geq {\tt start(n+1)}$$.
 ! \end{enumerate}
 !
-! {\bf N.B.:} Beware that the search for halo points is potentially 
-! expensive.  
+! {\bf N.B.:} Beware that the search for halo points is potentially
+! expensive.
 !
 ! !INTERFACE:
 
@@ -1993,7 +2138,7 @@
 
  ! !INPUT PARAMETERS:
 
-     type(GlobalSegMap), intent(in)           :: GSMap 
+     type(GlobalSegMap), intent(in)           :: GSMap
 
 ! !REVISION HISTORY:
 ! 	08Feb01 - J.W. Larson <larson@mcs.anl.gov> - initial version.
@@ -2010,7 +2155,7 @@
 
   integer :: n, ngseg
 
-! Temporary storage for GSMap%start, GSMap%length, and index 
+! Temporary storage for GSMap%start, GSMap%length, and index
 ! permutation array:
 
   integer, dimension(:), allocatable :: start, length, perm
@@ -2046,7 +2191,7 @@
 
   call IndexSort(ngseg, perm, start, descend=.false.)
 
-       ! Permute the data so the entries of start(:) are now in 
+       ! Permute the data so the entries of start(:) are now in
        ! ascending order:
 
   call Permute(start,perm,ngseg)
@@ -2094,8 +2239,8 @@
 ! !IROUTINE: Sort_ - generate index permutation for GlobalSegMap.
 !
 ! !DESCRIPTION:
-! {\tt Sort\_()} uses the supplied keys {\tt key1} and {\tt key2} to 
-! generate a permutation {\tt perm} that will put the entries of the 
+! {\tt Sort\_()} uses the supplied keys {\tt key1} and {\tt key2} to
+! generate a permutation {\tt perm} that will put the entries of the
 ! components {\tt GlobalSegMap\%start}, {\tt GlobalSegMap\%length} and
 ! {\tt GlobalSegMap\%pe\_loc} in {\em ascending} lexicographic order.
 !
@@ -2165,7 +2310,7 @@
         ! Initialize perm(i)=i, for i=1,length
 
   call IndexSet(perm)
- 
+
         ! Index permutation is achieved by successive calls to IndexSort(),
         ! with the keys supplied one at a time in the order reversed from
         ! the desired sort order.
@@ -2188,7 +2333,7 @@
 ! !IROUTINE: PermuteInPlace_ - apply index permutation to GlobalSegMap.
 !
 ! !DESCRIPTION:
-! {\tt PermuteInPlace\_()} uses a supplied index permutation {\tt perm} 
+! {\tt PermuteInPlace\_()} uses a supplied index permutation {\tt perm}
 ! to re-order {\tt GlobalSegMap\%start}, {\tt GlobalSegMap\%length} and
 ! {\tt GlobalSegMap\%pe\_loc}.
 !
@@ -2207,7 +2352,7 @@
 
       integer, dimension(:), intent(in) :: perm
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 
       type(GlobalSegMap), intent(inout) :: GSMap
 
@@ -2250,7 +2395,7 @@
 ! !IROUTINE: SortPermuteInPlace_ - Sort in-place GlobalSegMap components.
 !
 ! !DESCRIPTION:
-! {\tt SortPermuteInPlace\_()} uses a the supplied key(s) to generate 
+! {\tt SortPermuteInPlace\_()} uses a the supplied key(s) to generate
 ! and apply an index permutation that will place the {\tt GlobalSegMap}
 ! components {\tt GlobalSegMap\%start}, {\tt GlobalSegMap\%length} and
 ! {\tt GlobalSegMap\%pe\_loc} in lexicographic order.
@@ -2265,12 +2410,12 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       integer, dimension(:), intent(in)           :: key1
       integer, dimension(:), intent(in), optional :: key2
 
-! !INPUT/OUTPUT PARAMETERS: 
+! !INPUT/OUTPUT PARAMETERS:
 
       type(GlobalSegMap),    intent(inout)        :: GSMap
 
@@ -2305,7 +2450,7 @@
      endif
   endif
 
-        ! Generate desired index permutation:      
+        ! Generate desired index permutation:
 
   if(present(key2)) then
      call Sort_(GSMap, key1, key2, perm)
@@ -2313,7 +2458,7 @@
      call Sort_(GSMap, key1=key1, perm=perm)
   endif
 
-        ! Apply index permutation:      
+        ! Apply index permutation:
 
   call PermuteInPlace_(GSMap, perm)
 
@@ -2334,7 +2479,7 @@
 !
 ! !DESCRIPTION:
 ! The function {\tt increasing\_()} returns .TRUE. if each proc's
-! indices in the {\tt GlobalSegMap} argument {\tt GSMap} have 
+! indices in the {\tt GlobalSegMap} argument {\tt GSMap} have
 ! strictly increasing indices.  I.e. the proc's segments have indices
 ! in ascending order and are non-overlapping.
 !
@@ -2348,7 +2493,7 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: gsmap
 
@@ -2411,11 +2556,11 @@
 
       implicit none
 
-! !INPUT PARAMETERS: 
+! !INPUT PARAMETERS:
 
       type(GlobalSegMap),intent(in) :: src
 
-! !OUTPUT PARAMETERS: 
+! !OUTPUT PARAMETERS:
 
       type(GlobalSegMap),intent(out) :: dest
 
@@ -2429,6 +2574,94 @@
                  src%start, src%length, src%pe_loc )
 
   end subroutine copy_
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!    Math and Computer Science Division, Argonne National Laboratory   !
+!BOP -------------------------------------------------------------------
+!
+! !IROUTINE: print_ - Print GSMap info
+!
+! !DESCRIPTION:
+! Print out contents of GSMAP on unit number 'lun'
+!
+! !INTERFACE:
+
+    subroutine print_(gsmap,lun)
+!
+! !USES:
+!
+      use m_die
+
+      implicit none
+
+!INPUT/OUTPUT PARAMETERS:
+      type(GlobalSegMap),      intent(in) :: gsmap
+      integer, intent(in)           :: lun
+
+! !REVISION HISTORY:
+! 06Jul12 - R. Jacob <jacob@mcs.anl.gov> - initial version
+!EOP ___________________________________________________________________
+
+
+    integer n
+    character(len=*),parameter :: myname_=myname//'::print_'
+
+    write(lun,*) gsmap%comp_id
+    write(lun,*) gsmap%ngseg
+    write(lun,*) gsmap%gsize
+    do n=1,gsmap%ngseg
+        write(lun,*) gsmap%start(n),gsmap%length(n),gsmap%pe_loc(n)
+    end do
+
+  end subroutine print_
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!    Math and Computer Science Division, Argonne National Laboratory   !
+!BOP -------------------------------------------------------------------
+!
+! !IROUTINE: printFromRoot_ - Print GSMap info
+!
+! !DESCRIPTION:
+! Print out contents of GSMAP on unit number 'lun'
+!
+! !INTERFACE:
+
+    subroutine printFromRootnp_(gsmap,mycomm,lun)
+!
+! !USES:
+!
+      use m_MCTWorld,      only : printnp
+      use m_die
+      use m_mpif90
+
+      implicit none
+
+!INPUT/OUTPUT PARAMETERS:
+      type(GlobalSegMap),      intent(in) :: gsmap
+      integer, intent(in)           :: mycomm
+      integer, intent(in)           :: lun
+
+! !REVISION HISTORY:
+! 06Jul12 - R. Jacob <jacob@mcs.anl.gov> - initial version
+!EOP ___________________________________________________________________
+
+
+    integer myrank
+    integer ier
+    character(len=*),parameter :: myname_=myname//'::print_'
+
+    call MP_comm_rank(mycomm,myrank,ier)
+    if(ier/=0) call MP_perr_die(myname_,'MP_comm_rank',ier)
+
+    if (myrank == 0) then
+      call printnp(gsmap%comp_id,lun)
+      call print_(gsmap,lun)
+    endif
+
+  end subroutine printFromRootnp_
+
+
+
 
  end module m_GlobalSegMap
 

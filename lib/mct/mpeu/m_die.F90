@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_die.F90,v 1.4 2004-04-21 22:54:47 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -385,7 +385,7 @@ end subroutine MPdie2_
 !	before	- Tom Clune
 !		- Created for MPI PSAS implementation as a separate
 !		  module
-! 	19Jan01	- J. Larson <larson@mcs.anl.gov> - removed nested 
+! 	19Jan01	- J. Larson <larson@mcs.anl.gov> - removed nested
 !                 single/double/single quotes in the second argument
 !                 to the call to perr1_().  This was done for the pgf90
 !                 port.

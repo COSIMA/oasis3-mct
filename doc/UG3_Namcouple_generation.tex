@@ -78,6 +78,9 @@ chemistry (also running on grid {\tt atmo}), and one field SOALBEDO is read from
  $NMATXRD
    ceg
 #
+ $NWGTOPT
+   ignore_bad_index
+#
  $SEQMODE
  $CHANNEL
  $JOBNAME
@@ -244,6 +247,35 @@ load balance. More information can be found in the README file in {\tt
   each pe are sent.  The orig method sends much more data but is more parallel.  The ceg
   method does most of the work on the root pe but less data is communicated.  The default
   is ceg.
+
+\item {\tt \$NWGTOPT}: Optional; on the line below this keyword is a character string
+  that indicates how to handle bad interpolation weights.  There are four options, 
+  abort\_on\_bad\_index, ignore\_bad\_index, ignore\_bad\_index\_silently, and
+  use\_bad\_index.  Bad weights are defined as weights in the mapping file where either 
+  the source or destination index are out of bounds relative to the number of gridcells
+  in the grid.  In that case, the weight is referencing a gridcell that does not physically
+  exist.  Note that an index equal to zero will not be considered as a bad index if the associated weight 
+  is also zero. There are other situations where the value of the actual mapping weight is 
+  scientifically incorrect, but this is not easy to detect and is not dealt with in OASIS3-MCT.
+  \begin{itemize}
+  \item abort\_on\_bad\_index will write error messages to the log files and abort if a bad weight
+  index is detected. This is the default option. 
+  \item ignore\_bad\_index will write an error message and then remove bad
+  weights internally before continuing.  
+  \item ignore\_bad\_index\_silently will remove bad weights and continue without writing an error
+  message.  
+  \item use\_bad\_index will attempt to keep bad weights in the interpolation computation, 
+  but this can result in memory corruption, silent dropping of weights, and incorrect results
+  and is not recommended. 
+  \end{itemize} 
+
+  Note that the ability to check mapping files at runtime in OASIS3-MCT is limited.  It is always
+  recommended that mapping files be analyzed offline before long production runs are carried out.
+  Checks can be done to make sure the source and destination indices are valid, that weights values
+  are reasonable (for instance, between 0 and 1, although this will depend on the mapping method),
+  and that the sum of weights on the destination cells are reasonable (for instance, 1, in many cases).
+  In addition, offline tests can be run with analytical functions to verify conservation, gradient 
+  preserving features and other characteristics associated with the particular mapping approach.
 
 \item {\tt \$NNOREST}: Optional; on the line below this keyword is a character
   string that can override the requirement that restart files must exist

@@ -279,7 +279,7 @@ CONTAINS
             endif
          enddo
          numel = nsegs
-     else
+      else
          write(nulprt,*) subname,estr,'part strategy unknown in def_part = ',kparal(CLIM_Strategy)
          write(nulprt,*) subname,estr,'strategy set in kparal array index ',CLIM_Strategy
          call oasis_abort(file=__FILE__,line=__LINE__)
@@ -347,7 +347,7 @@ CONTAINS
 
    if (local_timers_on) call oasis_timer_stop ('part_setup_initgsm')
    if (local_timers_on) call oasis_timer_stop('part_setup')
-      
+
    call oasis_debug_exit(subname)
 
  END SUBROUTINE oasis_part_setup
@@ -562,21 +562,23 @@ CONTAINS
      llist = -1
      numel = 0
      if (gsrank >= 0) then
-        numel = size(gridID)
-!        if (OASIS_debug >= 15) then
-           write(nulprt,*) subname,' wgts1 ',numel
+        if (OASIS_debug >= 15) then
+           write(nulprt,*) subname,' wgts1 ',size(gridID)
            write(nulprt,*) subname,' gridID ',minval(gridID),maxval(gridID)
-!        endif
-        do n = 1,numel
-           if (gridID(n) > gsize) then
-              write(nulprt,*) subname,estr,'gridID > gsize',gridID(n),gsize
-              call oasis_abort(file=__FILE__,line=__LINE__)
-           elseif (gridID(n) > 0) then
+        endif
+        do n = 1,size(gridID)
+           if (gridID(n) > 0 .and. gridID(n) <= gsize) then
+              numel = numel + 1
               llist(gridID(n)) = gsrank
-           else
-              write(nulprt,*) subname,estr,'gridID <= 0',gridID(n),gsize
-              call oasis_abort(file=__FILE__,line=__LINE__)
-           endif
+!           elseif (gridID(n) > gsize) then
+! tcraig, allow > gsize and ignore it, errors trapped/ignored in map read
+!              write(nulprt,*) subname,estr,'gridID > gsize',gridID(n),gsize
+!              call oasis_abort(file=__FILE__,line=__LINE__)
+!           else
+! tcraig, allow <= 0 and ignore it, errors trapped/ignored in map read
+!              write(nulprt,*) subname,estr,'gridID <= 0',gridID(n),gsize
+!              call oasis_abort(file=__FILE__,line=__LINE__)
+          endif
         enddo
 
         ! this computes the max MPI rank that includes the gridcell

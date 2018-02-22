@@ -17,6 +17,7 @@ MODULE mod_oasis_io
    private
 
    !--- interfaces ---
+   public :: oasis_io_varexists
    public :: oasis_io_read_avfld
    public :: oasis_io_read_avfile
    public :: oasis_io_write_avfile
@@ -32,6 +33,42 @@ MODULE mod_oasis_io
 !===========================================================================
 CONTAINS
 !===========================================================================
+
+!===============================================================================
+
+!> Checks whether the var fldname is in the file 
+
+logical function oasis_io_varexists(filename,fldname)
+
+   implicit none
+
+   character(len=*), intent(in) :: filename   !< filename
+   character(len=*), intent(in) :: fldname    !< fldname
+
+   !--- local ---
+   logical :: exists               ! file exist flag
+   integer(ip_i4_p) :: ncid        ! netcf file id
+   integer(ip_i4_p) :: varid       ! netcf variable id
+   integer(ip_i4_p) :: status      ! error code
+   character(len=*),parameter :: subname = '(oasis_io_varexists)'
+
+!-------------------------------------------------------------------------------
+   call oasis_debug_enter(subname)
+
+   oasis_io_varexists = .false.
+   inquire(file=trim(filename),exist=exists)
+   if (exists) then
+      status = nf90_open(filename,NF90_NOWRITE,ncid)
+      status = nf90_inq_varid(ncid,trim(fldname),varid)
+      if (status == nf90_noerr) then
+         oasis_io_varexists = .true.
+      endif
+      status = nf90_close(ncid)
+   endif
+
+   call oasis_debug_exit(subname)
+
+end function oasis_io_varexists
 
 !===============================================================================
 

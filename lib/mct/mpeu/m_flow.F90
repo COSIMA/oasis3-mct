@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_flow.F90,v 1.3 2004-04-21 22:54:47 jacob Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -141,11 +141,11 @@ end subroutine co_
 
   if(mxdep == 0 .and. iname == -1) return
 
-  WRITE(lu,'(2a,i4)',advance='no') myname,': depth =',mxdep
+  write(lu,'(2a,i4)',advance='no') myname,': depth =',mxdep
 
   if(.not.balanced .or. iname < -1) then
 
-    WRITE(lu,'(4a)',advance='no') 		&
+    write(lu,'(4a)',advance='no') &
 	', ci/co unbalanced at ',trim(ciname),'/',trim(coname)
 
     write(lu,'(a,i4)') ', level =',iname+1

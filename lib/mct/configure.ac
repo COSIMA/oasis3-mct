@@ -49,13 +49,14 @@ AC_ARG_VAR(FCFLAGS,User-defined Fortran compiler flags)
 AC_ARG_VAR(PROGFCFLAGS,User-defined Fortran compiler flags for example programs)
 AC_ARG_VAR(CFLAGS,Customized C source compilation flags)
 AC_ARG_VAR(DEBUG,Fortran compiler flag for generating symbolic debugging information)
-AC_ARG_VAR(OPT,Fortran compiler flag for optimization level) 
+AC_ARG_VAR(OPT,Fortran compiler flag for optimization level)
 AC_ARG_VAR(REAL8,[Fortran compiler flag for setting the default REAL size to REAL(KIND=8)])
 AC_ARG_VAR(BIT64,Fortran compiler flag for generating 64-bit objects)
 AC_ARG_VAR(ENDIAN,Fortran compiler flag for converting big-endian to little-endian)
 AC_ARG_VAR(INCLUDEFLAG,Fortran compiler flag for specifying module search path)
 AC_ARG_VAR(INCLUDEPATH,Additional library and module paths with INCLUDEFLAG)
 AC_ARG_VAR(AR,Archive command)
+AC_ARG_VAR(RANLIB,Archive index update command)
 AC_ARG_VAR(BABELROOT,Root directory of your Babel installation. i.e.: $BABELROOT/bin/babel $BABELROOT/lib/libsidl.so)
 AC_ARG_VAR(COMPILER_ROOT,Root directory of your FORTRAN compiler)
 AC_ARG_VAR(FORT_SIZE, Number of bits in Fortran real and double kind)
@@ -81,14 +82,14 @@ ES="NO"
 if echo $osname | grep -i esos >/dev/null 2>&1; then
    ES="YES"
 fi
-if echo $osname | grep -i hp-ux >/dev/null 2>&1; then   
-   if test "$ac_hostname" = "moon"; then 
+if echo $osname | grep -i hp-ux >/dev/null 2>&1; then
+   if test "$ac_hostname" = "moon"; then
       ES="YES"
       # TELLS CONFIGURE NOT TO RUN ANY TESTS THAT REQUIRE EXECUTION
       cross_compiling="yes"
    fi
 fi
-if test "$ES" = "YES"; then   
+if test "$ES" = "YES"; then
    echo "Using preset configuration values for the Earth Simulator"
    if test -z "$CC"; then
       CC="escc"
@@ -110,7 +111,7 @@ if test "$ES" = "YES"; then
    fi
    if test -z "$OPT"; then
       OPT="-C vopt"
-   fi      
+   fi
    if test -z "$CPPDEFS"; then
       CPPDEFS="-DESVEC"
    fi
@@ -118,7 +119,7 @@ fi
 
 # Check if we are on the ANL BG/P
 
-if echo $fullhostname | egrep -q '.\.(challenger|intrepid)\.alcf\.anl\.gov' 
+if echo $fullhostname | egrep -q '.\.(challenger|intrepid)\.alcf\.anl\.gov'
   then if test -z "$FC"; then
          FC=bgxlf90_r
        fi
@@ -142,7 +143,7 @@ AC_C_BIGENDIAN
 
 # CHECK FOR THE FORTRAN COMPILER
 # RLJ- specify the order, include PathScale and do not search for F77
-AC_PROG_FC([xlf95 pgf95 ifort gfortran pathf95 ftn lf95 f95 fort ifc efc g95 xlf90 pgf90 pathf90 epcf90 pghpf])
+AC_PROG_FC([nagfor xlf95 pgf95 ifort gfortran pathf95 ftn lf95 f95 fort ifc efc g95 xlf90 pgf90 pathf90 epcf90 pghpf])
 
 # CHECK FOR MPI LIBRARIES
 AC_LANG_PUSH(Fortran)
@@ -169,7 +170,7 @@ if test -n "$DONOTCHECKMPI"; then
    if test -z "$FORT_SIZE"; then
       FORT_SIZE="real4double8"
       echo "FORT_SIZE IS PRESET TO $FORT_SIZE"
-   fi   
+   fi
    abs_top_builddir=`pwd`
    MPISERPATH=$abs_top_builddir/mpi-serial
    AC_SUBST(MPISERPATH)
@@ -200,7 +201,7 @@ FC="$FC"
 
 AC_COMPILE_IFELSE(
   [       subroutine oof()
-             return 
+             return
           end], [],
   [AC_MSG_WARN([$FC FAILED TO COMPILE FILENAME EXTENSION $ac_ext])
   ])
@@ -234,7 +235,7 @@ OLDFC="$FC"
 defineflag="-Daardvark"
 if test "$OLDFC" = "xlf90"; then
    defineflag="-WF,-Daardvark"
-fi   
+fi
 if test "$OLDFC" = "frt"; then
    defineflag="-Wp,-Daardvark"
 fi
@@ -312,19 +313,19 @@ elif echo $FC | grep pgf >/dev/null 2>&1; then
    CPRDEF="PGI"
    if test -z "$REAL8"; then
       REAL8="-r8"
-   fi  
+   fi
    if test -z "$BIT64"; then
       BIT64="-pc 64"
-   fi  
+   fi
    if test "$FCFLAGS" = "$DEFFCFLAGS"; then
       FCFLAGS=""
-   fi  
+   fi
    if test -z "$ENDIAN"; then
       ENDIAN="-byteswapio"
-   fi  
+   fi
    if test -z "$OPT"; then
       OPT="-O2"
-   fi  
+   fi
    if test -z "$DEBUG"; then
       DEBUG="-g"
    fi
@@ -335,16 +336,16 @@ elif echo $FC | grep ftn >/dev/null 2>&1; then
    SYSDEF="CNLINUX"
    if test -z "$REAL8"; then
       REAL8="-r8"
-   fi  
+   fi
    if test -z "$BIT64"; then
       BIT64="-pc 64"
-   fi  
+   fi
    if test "$FCFLAGS" = "$DEFFCFLAGS"; then
       FCFLAGS=""
-   fi  
+   fi
    if test -z "$ENDIAN"; then
       ENDIAN="-byteswapio"
-   fi  
+   fi
    if test -z "$OPT"; then
       OPT="-O2"
    fi
@@ -357,10 +358,10 @@ elif echo $FC | grep ifort >/dev/null 2>&1; then
    CPRDEF="INTEL"
    if test -z "$REAL8"; then
       REAL8="-r8"
-   fi  
+   fi
    if test "$FCFLAGS" = "$DEFFCFLAGS"; then
       FCFLAGS="-w -ftz"
-   fi  
+   fi
    if test -z "$PROGFCFLAGS"; then
       PROGFCFLAGS="-assume byterecl"
    fi
@@ -382,12 +383,30 @@ elif echo $FC | grep gfortran >/dev/null 2>&1; then
 # For gfortran, default flags are different
    if test "$FCFLAGS" = "-g -O2"; then
       FCFLAGS=""
-   fi  
+   fi
    if test -z "$DEBUG"; then
       DEBUG="-g"
    fi
    if test -z "$OPT"; then
       OPT="-O2"
+   fi
+elif echo $ac_fc_version_output | grep -i nag >/dev/null 2>&1; then
+   echo "Fortran Compiler is NAG"
+   CPRDEF="NAG"
+   if test -z "$REAL8"; then
+      REAL8="-r8"
+   fi
+   if test "$FCFLAGS" = "$DEFFCFLAGS"; then
+      FCFLAGS="-wmismatch=mpi_send,mpi_recv,mpi_bcast,mpi_allreduce,mpi_reduce,mpi_gatherv,mpi_gather,mpi_rsend,mpi_irecv,mpi_isend,mpi_scatterv,mpi_alltoallv -dusty"
+   fi
+   if test -z "$ENDIAN"; then
+      ENDIAN="-convert=BIG_IEEE"
+   fi
+   if test -z "$OPT"; then
+      OPT="-O2"
+   fi
+   if test -z "$DEBUG"; then
+      DEBUG="-g"
    fi
 ###########################################################
 # the compiler flags below have not been verified recently
@@ -442,15 +461,6 @@ elif echo $FC | grep pathf90 >/dev/null 2>&1; then
    fi
    if test -z "$BIT64"; then
       BIT64="-m64"
-   fi
-   if test -z "$OPT"; then
-      OPT="-O2"
-   fi
-elif echo $ac_fc_version_output | grep -i nag >/dev/null 2>&1; then
-   echo "Fortran Compiler is NAG"
-   CPRDEF="NAG"
-   if test -z "$F90FLAGS"; then
-      F90FLAGS="-dusty -kind=byte"
    fi
    if test -z "$OPT"; then
       OPT="-O2"
@@ -555,9 +565,20 @@ if test -z "$INCLUDEFLAG"; then
    INCLUDEFLAG="-I"
 fi
 
-# ARCHIVE COMMAND SIMILAR ACROSS ALL PLATFORMS 
+# ARCHIVE COMMAND SIMILAR ACROSS ALL PLATFORMS
 if test -z "$AR"; then
    AR="ar cq"
+fi
+
+# RANLIB
+if test -z "$RANLIB"; then
+    # Necessary on Darwin to deal with common symbols (particularly when
+    # using ifort).
+    if test "$SYSDEF"x = DARWINx; then
+        RANLIB="ranlib -c"
+    else
+        AC_PROG_RANLIB
+    fi
 fi
 
 echo
@@ -567,10 +588,15 @@ echo Output Variables: {CC=$CC} {CFLAGS=$CFLAGS} \
 {BIT64=$BIT64} {ENDIAN=$ENDIAN} {MPIFC=$MPIFC} \
 {MPILIBS=$MPILIBS} {MPIHEADER=$MPIHEADER}  \
 {INCLUDEFLAG=$INCLUDEFLAG} {INCLUDEPATH=$INCLUDEPATH} \
-{AR=$AR} {BABELROOT=$BABELROOT} {COMPILER_ROOT=$COMPILER_ROOT} \
+{AR=$AR} {RANLIB=$RANLIB} {BABELROOT=$BABELROOT} {COMPILER_ROOT=$COMPILER_ROOT} \
 {PYTHON=$PYTHON} {PYTHONOPTS=$PYTHONOPTS} {FORT_SIZE=$FORT_SIZE} {prefix=$prefix} \
 {SRCDIR=$SRCDIR} {FC_DEFINE=$FC_DEFINE}
 echo
+
+if test -n "$DONOTCHECKMPI"; then
+   echo "MPISERIAL ENABLED: CONFIGURING mpi-serial"
+   AC_CONFIG_SUBDIRS(mpi-serial)
+fi
 
 AC_OUTPUT
 

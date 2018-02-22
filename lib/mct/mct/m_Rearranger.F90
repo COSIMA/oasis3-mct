@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !    Math and Computer Science Division, Argonne National Laboratory   !
 !-----------------------------------------------------------------------
-! CVS m_Rearranger.F90,v 1.33 2009-09-17 18:42:07 mickelso Exp
-! CVS MCT_2_8_0
+! CVS $Id$
+! CVS $Name$
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_Rearranger -- Remaps an AttrVect within a group of processes
@@ -22,7 +22,7 @@
 !
 ! !SEE ALSO:
 !  m_Transfer
-! 
+!
 !
 ! !INTERFACE:
 
@@ -45,7 +45,7 @@
 #ifdef SEQUENCE
          sequence
 #endif
-         private 
+         private
          type(Router) :: SendRouter
          type(Router) :: RecvRouter
          integer,dimension(:,:),pointer :: LocalPack
@@ -115,14 +115,14 @@
    use m_GlobalSegMap, only : GlobalSegMap
    use m_GlobalSegMap, only : GSMap_lsize => lsize
    use m_GlobalSegMap, only : GSMap_increasing => increasing
-   use m_Router,       only : Router     
+   use m_Router,       only : Router
    use m_Router,       only : Router_init => init
    use m_mpif90
    use m_die
    use m_stdio
 
    implicit none
-  
+
 ! !INPUT PARAMETERS:
 !
    type(GlobalSegMap), intent(in)            :: SourceGSMap, TargetGSMap
@@ -157,8 +157,8 @@
    if(ier/=0) call MP_perr_die(myname_,'MP_comm_size',ier)
 
    ! SANITY CHECK: Make sure that if SendRouter is sending to self, then,
-   ! by definition, RecvRouter is also receiving from self. If this is not 
-   ! true, then write to stderr and die. 
+   ! by definition, RecvRouter is also receiving from self. If this is not
+   ! true, then write to stderr and die.
 
    call MP_comm_rank(ThisMCTWorld%MCT_comm,myPid,ier)
    if(ier/=0) call MP_perr_die(myname_,'MP_comm_rank',ier)
@@ -185,8 +185,8 @@
    endif
 
 
-   ! If not sending to nor receiving from own processor then initialize 
-   ! the rearranger so that no local copy can be made. Then end the routine. 
+   ! If not sending to nor receiving from own processor then initialize
+   ! the rearranger so that no local copy can be made. Then end the routine.
 
    if( .not. (SendingToMyself.or.ReceivingFromMyself) ) then
       nullify(OutRearranger%LocalPack)
@@ -196,9 +196,9 @@
    endif
 
 
-   ! Start the process of Router modification: Router information for 
-   ! the local processor is extracted out and put into the local copy 
-   ! structure- Rearranger%LocalPack. Router structures are then reassigned 
+   ! Start the process of Router modification: Router information for
+   ! the local processor is extracted out and put into the local copy
+   ! structure- Rearranger%LocalPack. Router structures are then reassigned
    ! to exclude the local copy information.
 
 
@@ -209,7 +209,7 @@
    temp_nprocs = OutRearranger%SendRouter%nprocs-1
    maxsegcount = SIZE(OutRearranger%SendRouter%seg_starts,2)
 
-   ! Allocate temporary Router structures to be used for modifying SendRouter 
+   ! Allocate temporary Router structures to be used for modifying SendRouter
    nullify(temp_seg_starts,temp_seg_lengths,temp_pe_list, &
            temp_numsegs,temp_locsize)
    allocate(temp_seg_starts(temp_nprocs,maxsegcount), &
@@ -223,11 +223,11 @@
    procindex=0
    nullify(OutRearranger%LocalPack)
 
-   ! Start assigning Rearranger copy structures and  
+   ! Start assigning Rearranger copy structures and
    ! non-local Router components
    do i=1,OutRearranger%SendRouter%nprocs
 
-      ! Gather local copy information 
+      ! Gather local copy information
       if(OutRearranger%SendRouter%pe_list(i) == myPid) then
 
 	 ! Allocate Rearranger copy structure
@@ -281,7 +281,7 @@
 	    OutRearranger%SendRouter%num_segs(temp_nprocs), &
             OutRearranger%SendRouter%locsize(temp_nprocs),stat=ier)
    if(ier/=0) call die(myname_, &
-                   'allocate(OutRearranger%SendRouter%seg_starts...)',ier)      
+                   'allocate(OutRearranger%SendRouter%seg_starts...)',ier)
 
    ! Copy back in the spliced router information
    OutRearranger%SendRouter%nprocs = temp_nprocs
@@ -299,7 +299,7 @@
 
    deallocate(temp_seg_starts,temp_seg_lengths,temp_pe_list, &
               temp_numsegs,temp_locsize,stat=ier)
-   if(ier/=0) call die(myname_,'deallocate(temp_seg_starts...)',ier)      
+   if(ier/=0) call die(myname_,'deallocate(temp_seg_starts...)',ier)
 
 
    ! :::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -322,11 +322,11 @@
    temp_maxsize=0
    procindex = 0
 
-   ! Start assigning Rearranger copy structures and  
+   ! Start assigning Rearranger copy structures and
    ! non-local Router components
    do i=1,OutRearranger%RecvRouter%nprocs
 
-      ! Gather local copy information 
+      ! Gather local copy information
       if(OutRearranger%RecvRouter%pe_list(i) == myPid) then
 
 	 ! Senity Check for Router%locsize
@@ -348,7 +348,7 @@
 	       OutRearranger%LocalPack(1,m) = trg_seg_start+len
 	    enddo
 	 enddo
-	 
+
       else
 
 	 ! Gather non-local Router information
@@ -384,7 +384,7 @@
 	    OutRearranger%RecvRouter%num_segs(temp_nprocs), &
             OutRearranger%RecvRouter%locsize(temp_nprocs),stat=ier)
    if(ier/=0) call die(myname_, &
-                   'allocate(OutRearranger%RecvRouter%seg_starts...)',ier)      
+                   'allocate(OutRearranger%RecvRouter%seg_starts...)',ier)
 
     ! Copy back in the spliced router information
    OutRearranger%RecvRouter%nprocs = temp_nprocs
@@ -403,7 +403,7 @@
    deallocate(temp_seg_starts,temp_seg_lengths,temp_pe_list, &
               temp_numsegs,temp_locsize,stat=ier)
    if(ier/=0) call die(myname_,'deallocate(temp_seg_starts...)',ier)
-   
+
    endif
 
  end subroutine init_
@@ -415,8 +415,8 @@
 ! !IROUTINE: clean_ - Clean a Rearranger
 !
 ! !DESCRIPTION:
-! This routine deallocates allocated memory associated with the 
-! input/output {\tt Rearranger} argument {\tt ReArr}.  The success 
+! This routine deallocates allocated memory associated with the
+! input/output {\tt Rearranger} argument {\tt ReArr}.  The success
 ! (failure) of this operation is reported in the zero (nonzero) value of
 ! the optional output {\tt INTEGER} argument {\tt status}.
 !
@@ -427,14 +427,14 @@
 !
 ! !USES:
 !
-   use m_Router,only : Router     
+   use m_Router,only : Router
    use m_Router,only : Router_clean => clean
    use m_mpif90
    use m_die
    use m_stdio
 
    implicit none
-  
+
 ! !INPUT/OUTPUT PARAMETERS:
 !
    type(Rearranger),    intent(inout)           :: ReArr
@@ -442,7 +442,7 @@
 ! !OUTPUT PARAMETERS:
 !
    integer, optional,   intent(out)             :: status
-   
+
 ! !REVISION HISTORY:
 ! 31Jan02 - E.T. Ong <eong@mcs.anl.gov> - initial prototype
 ! 20Mar02 - E.T. Ong <eong@mcs.anl.gov> - working code
@@ -501,13 +501,13 @@
 !
 ! !IROUTINE: rearrange_ - Rearrange data between two Attribute Vectors
 !
-! !DESCRIPTION: 
+! !DESCRIPTION:
 ! This subroutine will take data in the {\tt SourceAv} Attribute
 ! Vector and rearrange it to match the GlobalSegMap used to define
 ! the {\tt TargetAv} Attribute Vector using the Rearrnger
 ! {\tt InRearranger}.
 !
-! The optional argument {\tt Tag} can be used to set the tag value used in 
+! The optional argument {\tt Tag} can be used to set the tag value used in
 ! the rearrangement.  DefaultTag will be used otherwise.
 !
 ! If the optional argument {\tt Sum} is present and true, data for the same
@@ -531,7 +531,8 @@
 !
 ! !INTERFACE:
 
- subroutine rearrange_(SourceAVin,TargetAV,InRearranger,Tag,Sum,Vector,AlltoAll)
+ subroutine rearrange_(SourceAVin,TargetAV,InRearranger,Tag,Sum,&
+                       Vector,AlltoAll,HandShake,ISend,MaxReq)
 
 !
 ! !USES:
@@ -547,18 +548,19 @@
    use m_AttrVect,  only : AttrVect_zero => zero
    use m_AttrVect,  only : nIAttr,nRAttr
    use m_AttrVect,  only : Permute,Unpermute
-   use m_Router,    only : Router     
+   use m_Router,    only : Router
+   use m_SPMDutils, only : m_swapm_int, m_swapm_FP
    use m_realkinds, only : FP
    use m_mpif90
    use m_die
    use m_stdio
 
    implicit none
-  
+
 ! !INPUT/OUTPUT PARAMETERS:
 !
    type(AttrVect),             intent(inout)   :: TargetAV
-   
+
 ! !INPUT PARAMETERS:
 !
    type(AttrVect),   target,   intent(in)      :: SourceAVin
@@ -567,6 +569,9 @@
    logical,          optional, intent(in)      :: Sum
    logical,          optional, intent(in)      :: Vector
    logical,          optional, intent(in)      :: AlltoAll
+   logical,          optional, intent(in)      :: HandShake
+   logical,          optional, intent(in)      :: ISend
+   integer,          optional, intent(in)      :: MaxReq
 
 ! !REVISION HISTORY:
 ! 31Jan02 - E.T. Ong <eong@mcs.anl.gov> - initial prototype
@@ -575,12 +580,14 @@
 ! 29Oct03 - R. Jacob <jacob@mcs.anl.gov> - add optional argument vector
 !           to control use of vector-friendly mods provided by Fujitsu.
 ! 30Mar06 - P. Worley <worleyph@ornl.gov> - added alltoall option and
-!           reordered send/receive order to improve communication 
+!           reordered send/receive order to improve communication
 !           performance.  Also remove replace allocated arrays with
 !           automatic.
 ! 14Oct06 - R. Jacob <jacob@mcs.anl.gov> - check value of Sum argument.
 ! 25Jan08 - R. Jacob <jacob@mcs.anl.gov> - Permute/unpermute if the internal
 !           routers permarr is defined.
+! 29Sep16 - P. Worley <worleyph@gmail.com> - added swapm variant of
+!           alltoall option
 !EOP ___________________________________________________________________
 
   character(len=*),parameter :: myname_=myname//'::Rearrange_'
@@ -591,11 +598,11 @@
   integer ::    mp_Type_rp
   integer ::    mytag
   integer ::    ISendSize, RSendSize, IRecvSize, RRecvSize
-  logical ::    usevector, usealltoall
+  logical ::    usevector, usealltoall, useswapm
   logical ::    DoSum
   logical ::    Sendunordered
   logical ::    Recvunordered
-  real(FP) ::  realtyp
+  real(FP)::    realtyp
 !-----------------------------------------------------------------------
 
    ! DECLARE STRUCTURES FOR MPI ARGUMENTS.
@@ -633,6 +640,10 @@
    integer,dimension(:),allocatable  :: IRecvBuf
    real(FP),dimension(:),allocatable :: RRecvBuf
 
+   ! declare arrays to hold MPI data types for m_swapm_XXX calls
+   integer :: ITypes(0:max_nprocs-1)
+   integer :: RTypes(0:max_nprocs-1)
+
    ! Structure to hold MPI request information for sends
    integer :: send_ireqs(max_nprocs)
    integer :: send_rreqs(max_nprocs)
@@ -641,11 +652,11 @@
    integer :: recv_ireqs(max_nprocs)
    integer :: recv_rreqs(max_nprocs)
 
-   ! Structure to hold MPI status information for sends 
+   ! Structure to hold MPI status information for sends
    integer :: send_istatus(MP_STATUS_SIZE,max_nprocs)
    integer :: send_rstatus(MP_STATUS_SIZE,max_nprocs)
 
-   ! Structure to hold MPI status information for sends 
+   ! Structure to hold MPI status information for sends
    integer :: recv_istatus(MP_STATUS_SIZE,max_nprocs)
    integer :: recv_rstatus(MP_STATUS_SIZE,max_nprocs)
 
@@ -654,23 +665,33 @@
    type(AttrVect),pointer :: SourceAv
    type(AttrVect),target  :: SourceAvtmp
 
+   ! local swapm protocol variables and defaults
+   logical,parameter :: DEF_SWAPM_HS     = .true.
+   logical swapm_hs
+
+   logical,parameter :: DEF_SWAPM_ISEND  = .false.
+   logical swapm_isend
+
+   integer,parameter :: DEF_SWAPM_MAXREQ = 512
+   integer swapm_maxreq
+
 !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
    Sendunordered=associated(InRearranger%SendRouter%permarr)
    Recvunordered=associated(InRearranger%RecvRouter%permarr)
 
-   if(Sendunordered) then 
-      call AttrVect_init(SourceAvtmp,SourceAvin,AttrVect_lsize(SourceAvin))    
+   if(Sendunordered) then
+      call AttrVect_init(SourceAvtmp,SourceAvin,AttrVect_lsize(SourceAvin))
       call AttrVect_copy(SourceAvin, SourceAvtmp)
       call Permute(SourceAvtmp,InRearranger%SendRouter%permarr)
       SourceAv => SourceAvtmp
    else
       SourceAv => SourceAvin
    endif
-   
+
    if(Recvunordered) call Permute(TargetAv,InRearranger%RecvRouter%permarr)
 
-   ! CHECK ARGUMENTS 
+   ! CHECK ARGUMENTS
 
    ! Check the size of the Source AttrVect
    if(InRearranger%SendRouter%lAvsize /= AttrVect_lsize(SourceAV)) then
@@ -686,7 +707,7 @@
 	        "AttrVect_lsize(TargetAV)", AttrVect_lsize(TargetAV))
    endif
 
-   ! Check the number of integer attributes 
+   ! Check the number of integer attributes
    if(nIAttr(SourceAV) /= nIAttr(TargetAV)) then
       call warn(myname_, &
                 "Number of attributes in SourceAV and TargetAV do not match")
@@ -708,8 +729,44 @@
    endif
 
    usealltoall=.false.
-   if(present(Alltoall)) then
-    if(Alltoall) usealltoall=.true.
+   if(present(AlltoAll)) then
+    if(AlltoAll) usealltoall=.true.
+   endif
+!pw++
+   ! forcing use of alltoall protocol until additional tuning
+   ! capabilities are added to calling routines
+!pw   usealltoall=.true.
+!pw--
+
+   useswapm=.false.
+   if (usealltoall) then
+    ! if any swapm-related optional parameters are present,
+    ! enable swapm variant of alltoall
+
+    swapm_hs = DEF_SWAPM_HS
+    if(present(HandShake)) then
+     if(HandShake) swapm_hs=.true.
+     useswapm=.true.
+    endif
+
+    swapm_isend = DEF_SWAPM_ISEND
+    if(present(ISend)) then
+     if(ISend) swapm_isend=.true.
+     useswapm=.true.
+    endif
+
+    swapm_maxreq = DEF_SWAPM_MAXREQ
+    if(present(MaxReq)) then
+     swapm_maxreq=MaxReq
+     useswapm=.true.
+    endif
+
+!pw++
+    ! forcing use of swapm variant of alltoall protocol
+    ! until additional tuning capabilities are added to
+    ! calling routines
+!pw    useswapm=.true.
+!pw--
    endif
 
    DoSum=.false.
@@ -747,7 +804,7 @@
            ISendLoc(proc) = ISendSize
            ISendSize = ISendSize + SendRout%locsize(proc)*numi
 	enddo
-        ISendSize = ISendSize - 1        
+        ISendSize = ISendSize - 1
 	allocate(ISendBuf(ISendSize),stat=ier)
 	if(ier/=0) call die(myname_,'allocate(ISendBuf)',ier)
 
@@ -762,7 +819,7 @@
            RSendLoc(proc) = RSendSize
            RSendSize = RSendSize + SendRout%locsize(proc)*numr
 	enddo
-        RSendSize = RSendSize - 1        
+        RSendSize = RSendSize - 1
 	allocate(RSendBuf(RSendSize),stat=ier)
 	if(ier/=0) call die(myname_,'allocate(RSendBuf)',ier)
 
@@ -783,7 +840,7 @@
            IRecvLoc(proc) = IRecvSize
            IRecvSize = IRecvSize + RecvRout%locsize(proc)*numi
 	enddo
-        IRecvSize = IRecvSize - 1        
+        IRecvSize = IRecvSize - 1
 	allocate(IRecvBuf(IRecvSize),stat=ier)
 	if(ier/=0) call die(myname_,'allocate(IRecvBuf)',ier)
 
@@ -798,7 +855,7 @@
            RRecvLoc(proc) = RRecvSize
            RRecvSize = RRecvSize + RecvRout%locsize(proc)*numr
 	enddo
-        RRecvSize = RRecvSize - 1        
+        RRecvSize = RRecvSize - 1
 	allocate(RRecvBuf(RRecvSize),stat=ier)
 	if(ier/=0) call die(myname_,'allocate(RRecvBuf)',ier)
 
@@ -855,8 +912,12 @@
            RRdispls(pe)  = RRecvLoc(proc) - 1
         endif
      enddo
+
+     ! SET MPI DATA TYPES
+     ITypes(:) = MP_INTEGER
+     RTypes(:) = mp_Type_rp
   endif
-  
+
 !::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 if (usealltoall) then
 
@@ -889,7 +950,7 @@ else
   do pe_shift = 1,max_pe
    proc = RecvList(mod(myPid+pe_shift,max_pe))
     if (proc .ne. -1) then
-    
+
      ! receive the integer data
      if(numi .ge. 1) then
 
@@ -954,7 +1015,7 @@ else
   do pe_shift = max_pe,1,-1
    proc = SendList(mod(myPid+pe_shift,max_pe))
     if (proc .ne. -1) then
-    
+
      if( SendRout%num_segs(proc) > 1 ) then
 
 	j=0
@@ -1045,7 +1106,7 @@ endif  ! end of else for if(usealltoall)
   ! LOAD THE LOCAL PIECES OF THE INTEGER AND REAL VECTOR
 
   if(usevector) then
-!$OMP PARALLEL DO PRIVATE(IAttrIndex,localindex,TrgVectIndex,SrcVectIndex)    
+!$OMP PARALLEL DO PRIVATE(IAttrIndex,localindex,TrgVectIndex,SrcVectIndex)
      do IAttrIndex=1,numi
 !CDIR SELECT(VECTOR)
 !DIR$ CONCURRENT
@@ -1090,6 +1151,26 @@ endif  ! end of else for if(usealltoall)
 
 if (usealltoall) then
 
+ if (useswapm) then
+
+  if (numi .ge. 1) then
+     call m_swapm_int(max_pe, myPid,                                    &
+                      ISendBuf, ISendSize, ISendCnts, ISdispls, ITypes, &
+                      IRecvBuf, IRecvSize, IRecvCnts, IRdispls, ITypes, &
+                      ThisMCTWorld%MCT_comm,                            &
+                      swapm_hs, swapm_isend, swapm_maxreq               )
+  endif
+
+  if (numr .ge. 1) then
+     call m_swapm_FP (max_pe, myPid,                                    &
+                      RSendBuf, RSendSize, RSendCnts, RSdispls, RTypes, &
+                      RRecvBuf, RRecvSize, RRecvCnts, RRdispls, RTypes, &
+                      ThisMCTWorld%MCT_comm,                            &
+                      swapm_hs, swapm_isend, swapm_maxreq               )
+  endif
+
+ else
+
   if (numi .ge. 1) then
      call MPI_Alltoallv(ISendBuf, ISendCnts, ISdispls, MP_INTEGER, &
                         IRecvBuf, IRecvCnts, IRdispls, MP_INTEGER, &
@@ -1101,6 +1182,8 @@ if (usealltoall) then
                         RRecvBuf, RRecvCnts, RRdispls, mp_Type_rp, &
                         ThisMCTWorld%MCT_comm,ier)
   endif
+
+ endif
 
 else
 
@@ -1159,7 +1242,7 @@ endif
 		 enddo
 	      enddo
 	   enddo
-	   
+
 	else
 
 	   if (( RecvRout%num_segs(proc) > 1 ) .or. (usealltoall)) then
@@ -1176,7 +1259,7 @@ endif
 		    enddo
 		 enddo
 	      enddo
-	
+
 	   endif
 
 	endif ! end of if DoSum
@@ -1211,7 +1294,7 @@ endif
 		 enddo
 	      enddo
 	   enddo
-	   
+
 	else
 
 	   if (( RecvRout%num_segs(proc) > 1 ) .or. (usealltoall)) then
@@ -1228,7 +1311,7 @@ endif
 		    enddo
 		 enddo
 	      enddo
-	   
+
 	   endif
 
 	endif  ! end if DoSum
@@ -1304,13 +1387,13 @@ endif
 ! !IROUTINE: print_ - Print rearranger communication info
 !
 ! !DESCRIPTION:
-! Print out communication info for both routers in a 
+! Print out communication info for both routers in a
 ! rearranger.  Print out on unit number 'lun'
 ! e.g. (source,destination,length)
 !
 ! !INTERFACE:
 
-    subroutine print_(rearr,mycomm,lun,string)
+    subroutine print_(rearr,mycomm,lun)
 !
 ! !USES:
 !
@@ -1323,20 +1406,14 @@ endif
       type(Rearranger),      intent(in) :: rearr
       integer, intent(in)           :: mycomm
       integer, intent(in)           :: lun
-      character(len=*),intent(in),optional :: string
 
 ! !REVISION HISTORY:
 ! 27Jul07 - R. Loy <rloy@mcs.anl.gov>  initial version
 !EOP ___________________________________________________________________
 
 
-      if (present(string)) then
-         call router_print(rearr%SendRouter,mycomm,lun,string//':S')
-         call router_print(rearr%RecvRouter,mycomm,lun,string//':R')
-      else
-         call router_print(rearr%SendRouter,mycomm,lun)
-         call router_print(rearr%RecvRouter,mycomm,lun)
-      endif
+      call router_print(rearr%SendRouter,mycomm,lun)
+      call router_print(rearr%RecvRouter,mycomm,lun)
 
   end subroutine print_
 

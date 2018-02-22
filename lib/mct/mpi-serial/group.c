@@ -39,12 +39,19 @@ int MPI_Group_incl(MPI_Group group, int n, int *ranks, MPI_Group *newgroup)
 /*********/
 
 
+/* MPI_Group_range_incl
+ * Include a strided range of ranks in a group.  For one processor, if
+ * "0" is included in any of these ranges, it can only be the first rank.
+ * Thus, if rank 0 is specified, include it, otherwise use GROUP_NULL
+ */
+
+
 FC_FUNC( mpi_group_range_incl, MPI_GROUP_RANGE_INCL )
      (int *group, int *n, int ranges[][3], int *newgroup, int *ierror)
 {
   *ierror= MPI_Group_range_incl(*group, *n, ranges, newgroup);
 }
-  
+
 
 int MPI_Group_range_incl(MPI_Group group, int n, int ranges[][3],
 			 MPI_Group *newgroup)
@@ -93,7 +100,7 @@ int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group *newgroup)
       fprintf(stderr,"MPI_Group_union: null group passed in\n");
       abort();
     }
-  
+
   if (group1==MPI_GROUP_ONE || group2==MPI_GROUP_ONE)
     *newgroup=MPI_GROUP_ONE;
   else
@@ -124,7 +131,7 @@ int MPI_Group_intersection(MPI_Group group1, MPI_Group group2,
       fprintf(stderr,"MPI_Group_intersection: null group passed in\n");
       abort();
     }
-  
+
   if (group1==MPI_GROUP_ONE && group2==MPI_GROUP_ONE)
     *newgroup=MPI_GROUP_ONE;
   else
@@ -156,7 +163,7 @@ int MPI_Group_difference(MPI_Group group1, MPI_Group group2,
       fprintf(stderr,"MPI_Group_intersection: null group passed in\n");
       abort();
     }
-  
+
   if (group1==MPI_GROUP_EMPTY || group2==MPI_GROUP_ONE)
     *newgroup=MPI_GROUP_EMPTY;
   else
@@ -215,7 +222,7 @@ int MPI_Group_translate_ranks(MPI_Group group1, int n, int *ranks1,
     {
       fprintf(stderr,"MPI_Group_translate_ranks: empty input group\n");
       abort();
-    }    
+    }
 
   for (i=0; i<n; i++)
     {
@@ -231,7 +238,7 @@ int MPI_Group_translate_ranks(MPI_Group group1, int n, int *ranks1,
       else
 	ranks2[i]=MPI_UNDEFINED;
     }
-      
+
 
   return(MPI_SUCCESS);
 

@@ -361,14 +361,28 @@ module mod_oasis_timer
             ! gathering of timer values on root process
 
 ! tcraig, causes memory failure on corail for some reason
-!            call MPI_Gather(sum_ctime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_ctime_global_tmp(1,1), &
-!                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
-!            call MPI_Gather(sum_wtime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_wtime_global_tmp(1,1), &
-!                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
-!            call MPI_Gather(count(1), ntimermax, MPI_INTEGER, count_global_tmp(1,1), &
-!                            ntimermax, MPI_INTEGER, root, mpi_comm_local, ierror)
+#if (1 == 0) 
+            allocate(carr(ntimermax))
+            do n = 1,ntimermax
+              carr(n) = timer(n)%label
+            enddo
+            call MPI_BARRIER(mpi_comm_local, ierror)
+            call MPI_Gather(carr(1), ntimermax, MPI_CHARACTER, label_global_tmp(1,1), &
+                             ntimermax, MPI_CHARACTER, root, mpi_comm_local, ierror)
+            call MPI_BARRIER(mpi_comm_local, ierror)
+            call MPI_Gather(sum_ctime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_ctime_global_tmp(1,1), &
+                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
+            call MPI_BARRIER(mpi_comm_local, ierror)
+            call MPI_Gather(sum_wtime(1), ntimermax, MPI_DOUBLE_PRECISION, sum_wtime_global_tmp(1,1), &
+                            ntimermax, MPI_DOUBLE_PRECISION, root, mpi_comm_local, ierror)
+            call MPI_BARRIER(mpi_comm_local, ierror)
+            call MPI_Gather(timer_count(1), ntimermax, MPI_INTEGER, count_global_tmp(1,1), &
+                            ntimermax, MPI_INTEGER, root, mpi_comm_local, ierror)
+            deallocate(carr)
+#endif
 
 ! tcraig, this doesn't work either
+#if (1 == 0) 
 !            allocate(rarr(ntimermax),stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'allocate error rarr'
 !            rarr(1:ntimermax) = sum_ctime(1:ntimermax)
@@ -384,8 +398,10 @@ module mod_oasis_timer
 !            call MPI_Gather(iarr,ntimermax,MPI_INTEGER,count_global_tmp,ntimermax,MPI_INTEGER,root,mpi_comm_local,ierror)
 !            deallocate(iarr,stat=ierror)
 !            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'deallocate error iarr'
+#endif
 
 ! tcraig this works but requires lots of gather calls, could be better
+#if (1 == 1) 
             allocate(rarr(mpi_size_local),iarr(mpi_size_local),carr(mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',wstr,'allocate error rarr'
@@ -393,6 +409,7 @@ module mod_oasis_timer
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
+               call MPI_BARRIER(mpi_comm_local, ierror)
                call MPI_Gather(cval,len(cval),MPI_CHARACTER,carr(1),len(cval),&
                                MPI_CHARACTER,root,mpi_comm_local,ierror)
                if (mpi_rank_local == root) then
@@ -402,6 +419,7 @@ module mod_oasis_timer
                endif
 
                rval = sum_ctime(n)
+               call MPI_BARRIER(mpi_comm_local, ierror)
                call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
                                root,mpi_comm_local,ierror)
                if (mpi_rank_local == root) then
@@ -409,6 +427,7 @@ module mod_oasis_timer
                endif
 
                rval = sum_wtime(n)
+               call MPI_BARRIER(mpi_comm_local, ierror)
                call MPI_Gather(rval,1,MPI_DOUBLE_PRECISION,rarr(1),1,MPI_DOUBLE_PRECISION,&
                                root,mpi_comm_local,ierror)
                if (mpi_rank_local == root) then
@@ -416,6 +435,7 @@ module mod_oasis_timer
                endif
 
                ival = timer_count(n)
+               call MPI_BARRIER(mpi_comm_local, ierror)
                call MPI_Gather(ival,1,MPI_INTEGER,iarr(1),1,MPI_INTEGER,root,&
                                mpi_comm_local,ierror)
                if (mpi_rank_local == root) then
@@ -425,6 +445,7 @@ module mod_oasis_timer
             deallocate(rarr,iarr,carr,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
                mpi_rank_local,':',wstr,'deallocate error rarr'
+#endif
 
             ! now sort all the timers out by names
 
@@ -649,7 +670,6 @@ module mod_oasis_timer
                mpi_rank_local,':',wstr,'deallocate error label_list'
 
          endif ! (mpi_rank_local == root)
-
 
       end subroutine oasis_timer_print
 

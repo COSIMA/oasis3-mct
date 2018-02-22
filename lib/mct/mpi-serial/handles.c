@@ -6,7 +6,7 @@
 
 
 #include "mpiP.h"
-
+#include "type.h"
 /*
  * handles.c
  *
@@ -14,13 +14,13 @@
  * based on code from mpich-1.x/ptrcvt.c
  * --> simplified and store item directly in the struct
  * rather than as pointer to separately allocated object.
- * 
+ *
  * CAVEAT:
- * as in mpich-1, storage will grow as needed and will 
+ * as in mpich-1, storage will grow as needed and will
  * remain at the high water mark since it is likely that
  * the user code will repeat the use.
  *
- */ 
+ */
 
 
 typedef struct _Handleitem
@@ -33,6 +33,7 @@ typedef struct _Handleitem
     void *anything;           /* At least size of void *  */
     Comm comm;
     Req req;
+    Datatype* type;
 
   } data;
 
@@ -86,7 +87,7 @@ void *mpi_malloc(int size)
       fprintf(stderr,"mpi_malloc: failed to allocate %d bytes\n",size);
       abort();
     }
-      
+
   return(ret);
 }
 
@@ -150,7 +151,7 @@ static void init_handles(void)
 
   for (i=1; i<MAX_BLOCKS; i++)
     blocks[i]=NULL;
-  
+
 
   need_to_init=0;
 }
@@ -243,8 +244,6 @@ static void verify_handle(int handle, int block, int index)
     }
 }
 
-
-
 void *mpi_handle_to_ptr(int handle)
 {
   int block;
@@ -289,7 +288,7 @@ void mpi_free_handle(int handle)
 #ifdef CHECKS
   verify_handle(handle,block,index);
 #endif
-  
+
   item=&(blocks[block][index]);
 
 #ifdef CHECKS

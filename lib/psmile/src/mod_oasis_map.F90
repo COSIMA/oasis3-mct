@@ -66,7 +66,7 @@ MODULE mod_oasis_map
   integer,private,allocatable :: Cnew(:),Cold(:)  ! ints
 
   logical, parameter :: local_timers_on = .false.
-  logical, parameter :: remove_bad_weights = .false.
+
 !------------------------------------------------------------
 CONTAINS
 !------------------------------------------------------------
@@ -419,6 +419,7 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
    integer           :: nread   ! number of reads 
    logical           :: mywt    ! does this weight belong on my pe
    integer           :: dims(2) 
+   logical           :: abort_weight ! flag if bad weight found
 
    !--- buffers for i/o ---
    real(R8)   ,allocatable :: rtemp(:) ! real temporary
@@ -749,17 +750,40 @@ subroutine oasis_map_sMatReaddnc_orig(sMat,SgsMap,DgsMap,newdom, &
       !>   * Each task keeps only the data required
       !----------------------------------------------------------------------------
 
+      if (namwgtopt == "abort_on_bad_index") then
+         abort_weight = .false.
+         do m = 1,count(1)
+            !--- check for bad weights
+            if ((Rbuf(m) <= 0 .or. Rbuf(m) > nb .or. &
+                 Cbuf(m) <= 0 .or. Cbuf(m) > na) &
+! tcx weight = 0
+                .and. (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) &
+               ) then
+               abort_weight = .true.
+               WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
+                  subname,wstr,'BAD weight found in '//trim(filename), &
+                  m,'=id',Cbuf(m),'=src',Rbuf(m),'=dst',minval(Sbuf(:,m)),'=minS',maxval(Sbuf(:,m)),'=maxS'
+            endif
+         enddo
+         if (abort_weight) then
+            WRITE(nulprt,*) subname,wstr,'BAD weight found, aborting'
+            call oasis_abort(file=__FILE__,line=__LINE__)
+         endif
+      endif
+
       do m = 1,count(1)
-         !--- should this weight be on my pe
-         if (remove_bad_weights .and. &
-             (Rbuf(m) <= 0 .or. Rbuf(m) >= nb .or. &
-              Cbuf(m) <= 0 .or. Cbuf(m) >= na)) then
+         !--- check for bad weights
+         if ((namwgtopt(1:16) == "ignore_bad_index") .and. &
+             (Rbuf(m) <= 0 .or. Rbuf(m) > nb .or. &
+              Cbuf(m) <= 0 .or. Cbuf(m) > na)) then
+            mywt = .false.
+! tcx weight = 0
             if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
-               WRITE(nulprt,*) subname,wstr,'BAD weight found',Cbuf(m),Rbuf(m),minval(Sbuf(:,m)),maxval(Sbuf(:,m))
-!tcx               call oasis_abort(file=__FILE__,line=__LINE__)
-               mywt = .false.
-            else
-               mywt = .false.
+               if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_index_silently") then
+                  WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
+                     subname,wstr,'BAD weight found in '//trim(filename), &
+                     m,'=id',Cbuf(m),'=src',Rbuf(m),'=dst',minval(Sbuf(:,m)),'=minS',maxval(Sbuf(:,m)),'=maxS'
+               endif
             endif
          elseif (newdom == 'src') then
             mywt = check_myindex(Rbuf(m),lsstart,lscount)
@@ -944,6 +968,7 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
    integer           :: nread   ! number of reads 
    logical           :: mywt    ! does this weight belong on my pe
    integer           :: dims(2) 
+   logical           :: abort_weight ! flag if bad weight found
 
    !--- buffers for i/o ---
    real(R8)   ,allocatable :: rtemp(:) ! real temporary
@@ -1329,17 +1354,40 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
          !>   * Determine offsets in the array
          !----------------------------------------------------------------------------
 
+         if (namwgtopt == "abort_on_bad_index") then
+            abort_weight = .false.
+            do m = 1,count(1)
+               !--- check for bad weights
+               if ((RReadData(m) <= 0 .or. RReadData(m) > nb .or. &
+                    CReadData(m) <= 0 .or. CReadData(m) > na) &
+! tcx weight = 0
+                   .and. (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) &
+                  ) then
+                  abort_weight = .true.
+                  WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
+                     subname,wstr,'BAD weight found in '//trim(filename), &
+                     m,'=id',CReadData(m),'=src',RReadData(m),'=dst',minval(SReadData(:,m)),'=minS',maxval(SReadData(:,m)),'=maxS'
+               endif
+            enddo
+            if (abort_weight) then
+               WRITE(nulprt,*) subname,wstr,'BAD weight found, aborting'
+               call oasis_abort(file=__FILE__,line=__LINE__)
+            endif
+         endif
+
          do m = 1,count(1)
-            !--- which process owns this point?
-            if (remove_bad_weights .and. &
-                (RReadData(m) <= 0 .or. RReadData(m) >= nb .or. &
-                 CReadData(m) <= 0 .or. CReadData(m) >= na)) then
-               if (minval(Sbuf(:,m)) /= 0._R8 .or. maxval(Sbuf(:,m)) /= 0._R8) then
-                  WRITE(nulprt,*) subname,wstr,'BAD weight found',Cbuf(m),Rbuf(m),minval(Sbuf(:,m)),maxval(Sbuf(:,m))
-!tcx                  call oasis_abort(file=__FILE__,line=__LINE__)
-                  pe = -11
-               else
-                  pe = -11
+            !--- check for bad weights
+            if ((namwgtopt(1:16) == "ignore_bad_index") .and. &
+                (RReadData(m) <= 0 .or. RReadData(m) > nb .or. &
+                 CReadData(m) <= 0 .or. CReadData(m) > na)) then
+               pe = -11
+! tcx weight = 0
+               if (minval(SReadData(:,m)) /= 0._R8 .or. maxval(SReadData(:,m)) /= 0._R8) then
+                  if (OASIS_debug >= 2 .and. namwgtopt /= "ignore_bad_index_silently") then
+                     WRITE(nulprt,'(3A,I12,A,I12,A,I12,A,G13.7,A,G13.7,A)') &
+                        subname,wstr,'BAD weight found in '//trim(filename), &
+                        m,'=id',CReadData(m),'=src',RReadData(m),'=dst',minval(SReadData(:,m)),'=minS',maxval(SReadData(:,m)),'=maxS'
+                  endif
                endif
             else if (newdom == 'src') then
                pe = get_cegindex(RReadData(m),lsstart,lscount,lspeloc)
@@ -1352,7 +1400,8 @@ subroutine oasis_map_sMatReaddnc_ceg(sMat,SgsMap,DgsMap,newdom, &
             if (pe == -11) then
                ! skip it, understood, get_cegindex will error with -99
             elseif (pe+1 < 1 .or. pe+1  > mpi_size_local) then
-               write(nulprt,*) subname,wstr,'get_cegindex search error', m,count(1),CReadData(m),RReadData(m),SReadData(:,m)
+               ! skip this case too
+               ! write(nulprt,*) subname,wstr,'get_cegindex search error', m,count(1),CReadData(m),RReadData(m),SReadData(:,m)
             else
                cntrs(pe+1) = cntrs(pe+1) + 1  ! Note incrementing 1->noprocs rather than 0->noprocs-1
             endif

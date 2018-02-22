@@ -1,2 +1,0 @@
-O3DIR = ../..
-include $(O3DIR)/util/make_dir/make.inc

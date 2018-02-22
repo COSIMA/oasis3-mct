@@ -58,6 +58,7 @@ C***********************************************************************
       use grids         ! module containing grid info
       use remap_vars    ! module containing remap info
       USE mod_oasis_flush
+!$    USE OMP_LIB
 
       implicit none
 
@@ -129,6 +130,7 @@ C***********************************************************************
       real (kind=dbl_kind) :: dl_test
 
       integer (kind=int_kind) :: src_addnn, il_debug_add
+      integer (kind=int_kind) :: iunm
 !-----------------------------------------------------------------------
 !
       IF (nlogprt .GE. 2) THEN
@@ -166,10 +168,20 @@ C***********************************************************************
       !***
       !*** loop over destination grid 
       !***
+         iunm=0
+!$OMP PARALLEL DEFAULT(FIRSTPRIVATE) 
+!$   & SHARED(coslat,coslon,sinlat,sinlon) 
+        !$OMP DO SCHEDULE(RUNTIME)
+      do dst_add = 1, grid2_size
 
-      grid_loop1: do dst_add = 1, grid2_size
 
-        if (.not. grid2_mask(dst_add)) cycle grid_loop1
+        iunm = iunm + 1
+
+        if (grid2_mask(dst_add)) THEN
+
+!EM      grid_loop1: do dst_add = 1, grid2_size
+
+!EM        if (.not. grid2_mask(dst_add)) cycle grid_loop1
 
         coslat_dst = cos(grid2_center_lat(dst_add))
         coslon_dst = cos(grid2_center_lon(dst_add))
@@ -248,7 +260,7 @@ C***********************************************************************
                 WRITE(nulou,*) 
      & 'Using the nearest non-masked neighbour because all 4 
      &  surrounding source points are masked for target point ',dst_add
-                CALL OASIS_FLUSH_SCRIP(nulou)
+!                CALL OASIS_FLUSH_SCRIP(nulou)
             ENDIF
             wgtstmp(1) = 1.
             grid2_frac(dst_add) = one
@@ -256,7 +268,14 @@ C***********************************************************************
         ENDIF
         endif
 
-      end do grid_loop1
+        ! unmasked target grid point
+        endif
+ 
+      end do
+      !$OMP END DO
+!$OMP END PARALLEL
+
+!EM      end do grid_loop1
 
       deallocate (coslat, coslon, sinlat, sinlon)
 
@@ -514,6 +533,7 @@ C***********************************************************************
       select case (nmap)
       case(1)
 
+       !$OMP CRITICAL
         num_links_map1  = num_links_map1 + 1
 
         if (num_links_map1 > max_links_map1) 
@@ -522,6 +542,7 @@ C***********************************************************************
         grid1_add_map1(num_links_map1) = add1
         grid2_add_map1(num_links_map1) = add2
         wts_map1    (:,num_links_map1) = weights
+       !$OMP END CRITICAL
 
       case(2)
 

@@ -1,8 +1,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !       NASA/GSFC, Data Assimilation Office, Code 910.3, GEOS/DAS      !
 !-----------------------------------------------------------------------
-! CVS m_dropdead.F90,v 1.4 2007-01-10 03:04:46 rloy Exp
-! CVS MCT_2_8_0  
+! CVS $Id$
+! CVS $Name$
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -55,7 +55,7 @@ contains
 ! !REVISION HISTORY:
 ! 	20Feb97 - Jing Guo <guo@eramus> - defined template
 !       09Jan07 - R. Loy <rloy@mcs.anl.gov> - check for initialized, add
-!                 options for abort 
+!                 options for abort
 !
 !EOP
 !_______________________________________________________________________
@@ -92,7 +92,11 @@ contains
     write(stderr,'(5a)') 'unknown rank .',myname_,	&
       ': from ',trim(where),'()'
 
+#ifdef ENABLE_UNIX_ABORT
     call abort
+#else
+    stop
+#endif
 
   endif
 
@@ -127,7 +131,7 @@ end subroutine die_
 ! !REVISION HISTORY:
 ! 	20Feb97 - Jing Guo <guo@eramus> - defined template
 !       09Jan07 - R. Loy <rloy@mcs.anl.gov> - check for initialized, add
-!                 options for abort 
+!                 options for abort
 !
 !EOP
 !_______________________________________________________________________
@@ -172,7 +176,12 @@ end subroutine die_
       ', line ',trim(adjustl(lineno)),	&
       ' of file ',fnam
 
+#ifdef ENABLE_UNIX_ABORT
     call abort
+#else
+    stop
+#endif
+
   endif
 
 

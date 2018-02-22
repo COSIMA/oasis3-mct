@@ -91,11 +91,7 @@ END SUBROUTINE read_dimgrid
                         gridlon,gridlat)
   !**************************************************************************************
   !
-#ifdef NO_USE_DOUBLE_PRECISION
-  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif defined USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
-#endif
   !
   INTEGER                  :: i,j,k,w_unit,FILE_Debug
   !
@@ -225,11 +221,7 @@ END SUBROUTINE read_mask
                         gridsrf)
   !****************************************************************************************
   !
-#ifdef NO_USE_DOUBLE_PRECISION
-  INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif defined USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
-#endif
   !
   INTEGER                  :: i,j,k,w_unit,FILE_Debug
   !

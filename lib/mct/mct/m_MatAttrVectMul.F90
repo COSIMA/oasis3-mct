@@ -1,29 +1,29 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !     Math + Computer Science Division / Argonne National Laboratory   !
 !-----------------------------------------------------------------------
-! CVS m_MatAttrVectMul.F90,v 1.30 2008-01-11 22:54:04 jacob Exp
-! CVS MCT_2_8_0 
+! CVS $Id$
+! CVS $Name$
 !BOP -------------------------------------------------------------------
 !
 ! !MODULE: m_MatAttrVectMul - Sparse Matrix AttrVect Multipication.
 !
 ! !DESCRIPTION:
 !
-! This module contains routines supporting the sparse matrix-vector 
+! This module contains routines supporting the sparse matrix-vector
 ! multiplication
 ! $${\bf y} = {\bf M} {\bf x},$$
-! where the vectors {\bf x} and {\bf y} are stored using the MCT 
-! {\tt AttrVect} datatype, and {\bf M} is stored using either the MCT 
-! {\tt SparseMatrix} or {\tt SparseMatrixPlus} type.  The {\tt SparseMatrix} 
-! type is used to represent {\bf M} if the multiplication process is 
+! where the vectors {\bf x} and {\bf y} are stored using the MCT
+! {\tt AttrVect} datatype, and {\bf M} is stored using either the MCT
+! {\tt SparseMatrix} or {\tt SparseMatrixPlus} type.  The {\tt SparseMatrix}
+! type is used to represent {\bf M} if the multiplication process is
 ! purely data-local (e.g., in a global address space, or if the process
-! has been rendered embarrasingly parallel by earlier or subsequent 
-! vector data redistributions).  If the multiplication process is to 
+! has been rendered embarrasingly parallel by earlier or subsequent
+! vector data redistributions).  If the multiplication process is to
 ! be explicitly distributed-memory parallel, then the {\tt SparseMatrixPlus}
 ! type is used to store the elements of {\bf M} and all information needed
 ! to coordinate data redistribution and reduction of partial sums.
 !
-! {\bf N.B.:} The matrix-vector multiplication routines in this module 
+! {\bf N.B.:} The matrix-vector multiplication routines in this module
 ! process only the {\bf real} attributes of the {\tt AttrVect} arguments
 ! corresponding to {\bf x} and {\bf y}.  They ignore the integer attributes.
 !
@@ -43,9 +43,9 @@
 
 ! !SEE ALSO:
 ! The MCT module m_AttrVect for more information about the AttrVect type.
-! The MCT module m_SparseMatrix for more information about the SparseMatrix 
+! The MCT module m_SparseMatrix for more information about the SparseMatrix
 ! type.
-! The MCT module m_SparseMatrixPlus for more details about the master class 
+! The MCT module m_SparseMatrixPlus for more details about the master class
 ! for parallel sparse matrix-vector multiplication, the SparseMatrixPlus.
 
 ! !REVISION HISTORY:
@@ -67,25 +67,25 @@
 !
 ! !DESCRIPTION:
 !
-! The sparse matrix-vector multiplication routine {\tt sMatAvMult\_DataLocal\_()} 
-! operates on the assumption of total data locality, which is equivalent 
+! The sparse matrix-vector multiplication routine {\tt sMatAvMult\_DataLocal\_()}
+! operates on the assumption of total data locality, which is equivalent
 ! to the following two conditions:
 ! \begin{enumerate}
-! \item The input {\tt AttrVect} {\tt xAV} contains all the values referenced 
-! by the local column indices stored in the input {\tt SparsMatrix} argument 
+! \item The input {\tt AttrVect} {\tt xAV} contains all the values referenced
+! by the local column indices stored in the input {\tt SparsMatrix} argument
 ! {\tt sMat}; and
-! \item The output {\tt AttrVect} {\tt yAV} contains all the values referenced 
-! by the local row indices stored in the input {\tt SparsMatrix} argument 
+! \item The output {\tt AttrVect} {\tt yAV} contains all the values referenced
+! by the local row indices stored in the input {\tt SparsMatrix} argument
 ! {\tt sMat}.
 ! \end{enumerate}
-! By default, the multiplication occurs for each of the common {\tt REAL} attributes 
-! shared by {\tt xAV} and {\tt yAV}.  This routine is capable of 
+! By default, the multiplication occurs for each of the common {\tt REAL} attributes
+! shared by {\tt xAV} and {\tt yAV}.  This routine is capable of
 ! cross-indexing the attributes and performing the necessary multiplications.
 !
 ! If the optional argument {\tt rList} is present, only the attributes listed will
 ! be multiplied.  If the attributes have different names in {\tt yAV}, the optional
 ! {\tt TrList} argument can be used to provide the translation.
-! 
+!
 ! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.  It
 ! will also cause the vector parts of {\\ sMat} to be initialized if they
@@ -97,7 +97,7 @@
 !
 ! !USES:
 !
-      use m_realkinds, only : FP 
+      use m_realkinds, only : FP
       use m_stdio,     only : stderr
       use m_die,       only : MP_perr_die, die, warn
 
@@ -108,7 +108,6 @@
       use m_AttrVect, only : AttrVect
       use m_AttrVect, only : AttrVect_lsize => lsize
       use m_AttrVect, only : AttrVect_zero => zero
-      use m_AttrVect, only : AttrVect_nRAttr => nRAttr
       use m_AttrVect, only : AttrVect_indexRA => indexRA
       use m_AttrVect, only : SharedAttrIndexList
 
@@ -145,7 +144,7 @@
 ! 10Oct01 - J. Larson <larson@mcs.anl.gov> - Added optional LOGICAL
 !           input argument InterpInts to make application of the
 !           multiply to INTEGER attributes optional
-! 15Oct01 - J. Larson <larson@mcs.anl.gov> - Added feature to 
+! 15Oct01 - J. Larson <larson@mcs.anl.gov> - Added feature to
 !           detect when attribute lists are identical, and cross-
 !           indexing of attributes is not needed.
 ! 29Nov01 - E.T. Ong <eong@mcs.anl.gov> - Removed MP_PERR_DIE if
@@ -187,6 +186,7 @@
 ! logical flag
   logical :: usevector,TrListIsPresent,rListIsPresent
   logical :: contiguous,ycontiguous
+
 
   usevector = .false.
   if(present(Vector)) then
@@ -237,11 +237,11 @@
             call SparseMatrix_vecinit(sMat)
        endif
 
-!DIR$ CONCURRENT
+!DIR$ IVDEP
        do m=1,num_indices
           do l=1,sMat%tbl_end
 !CDIR NOLOOPCHG
-!DIR$ CONCURRENT
+!DIR$ IVDEP
              do i=sMat%row_s(l),sMat%row_e(l)
                col = sMat%tcol(i,l)
                wgt = sMat%twgt(i,l)
@@ -250,7 +250,7 @@
              enddo
           enddo
        enddo
- 
+
      else
 
        do n=1,num_elements
@@ -261,7 +261,7 @@
 
          ! loop over attributes being regridded.
 
-!DIR$ CONCURRENT
+!DIR$ IVDEP
 	  do m=1,num_indices
 
 	     yAV%rAttr(m,row) = yAV%rAttr(m,row) + wgt * xAV%rAttr(m,col)
@@ -282,9 +282,9 @@
        call GetIndices(yAVindices,yAV%rList,trim(TrList))
 
        if(size(xAVindices) /= size(yAVindices)) then
-         call die(myname_,"Arguments rList and TrList do not& 
-             &contain the same number of items") 
-       endif   
+         call die(myname_,"Arguments rList and TrList do not&
+             &contain the same number of items")
+       endif
 
      else
        call GetIndices(yAVindices,yAV%rList,trim(rList))
@@ -293,10 +293,10 @@
      num_indices=size(yAVindices)
 
      ! nothing to do if num_indices <=0
-     if (num_indices <= 0) then 
+     if (num_indices <= 0) then
        deallocate(xaVindices, yAVindices, stat=ier)
        if(ier/=0) call die(myname_,"deallocate(xAVindices...)",ier)
-       return  
+       return
      endif
 
    else
@@ -318,15 +318,19 @@
    contiguous=.true.
    ycontiguous=.true.
    do i=2,num_indices
-      if(xaVindices(i) /= xAVindices(i-1)+1) contiguous = .false. 
+      if(xaVindices(i) /= xAVindices(i-1)+1) then
+         contiguous = .false.
+         exit
+      endif
    enddo
    if(contiguous) then
       do i=2,num_indices
           if(yAVindices(i) /= yAVindices(i-1)+1) then
 	    contiguous=.false.
             ycontiguous=.false.
+            exit
           endif
-      enddo   
+      enddo
    endif
 
        ! zero the right parts of the output AttributeVector
@@ -335,6 +339,7 @@
 
    if(ycontiguous) then
      outxmin=yaVindices(1)-1
+!dir$ collapse
      do j=1,ysize
        do i=1,numav
          yAV%rAttr(outxmin+i,j)=0._FP
@@ -360,14 +365,13 @@
 	wgt = sMat%data%rAttr(iwgt,n)
 
        ! loop over attributes being regridded.
-!DIR$ CONCURRENT
+!DIR$ IVDEP
   	do m=1,num_indices
 	    yAV%rAttr(outxmin+m,row) = &
 	       yAV%rAttr(outxmin+m,row) + &
 	       wgt * xAV%rAttr(inxmin+m,col)
         end do ! m=1,num_indices
      end do ! n=1,num_elements
-
    else
      do n=1,num_elements
 
@@ -376,7 +380,7 @@
 	wgt = sMat%data%rAttr(iwgt,n)
 
        ! loop over attributes being regridded.
-!DIR$ CONCURRENT
+!DIR$ IVDEP
   	do m=1,num_indices
 	    yAV%rAttr(yAVindices(m),row) = &
 	       yAV%rAttr(yAVindices(m),row) + &
@@ -401,22 +405,22 @@
 ! !IROUTINE: sMatAvMult_SMPlus_ - Parallel Multiply Using SparseMatrixPlus
 !
 ! !DESCRIPTION:
-! This routine performs distributed parallel sparse matrix-vector 
+! This routine performs distributed parallel sparse matrix-vector
 ! multiplication ${\bf y} = {\bf M} {\bf x}$, where {\bf y} and
 ! {\bf x} are represented by the {\tt AttrVect} arguments {\tt yAV} and
-! {\tt xAV}, respectively.  The matrix {\bf M} is stored in the input 
-! {\tt SparseMatrixPlus} argument {\tt sMatPlus}, which also contains 
-! all the information needed to coordinate the communications required to 
-! gather intermediate vectors used in the multiplication process, and to 
+! {\tt xAV}, respectively.  The matrix {\bf M} is stored in the input
+! {\tt SparseMatrixPlus} argument {\tt sMatPlus}, which also contains
+! all the information needed to coordinate the communications required to
+! gather intermediate vectors used in the multiplication process, and to
 ! reduce partial sums as needed.
-! By default, the multiplication occurs for each of the common {\tt REAL} attributes 
-! shared by {\tt xAV} and {\tt yAV}.  This routine is capable of 
+! By default, the multiplication occurs for each of the common {\tt REAL} attributes
+! shared by {\tt xAV} and {\tt yAV}.  This routine is capable of
 ! cross-indexing the attributes and performing the necessary multiplications.
 !
 ! If the optional argument {\tt rList} is present, only the attributes listed will
 ! be multiplied.  If the attributes have different names in {\tt yAV}, the optional
 ! {\tt TrList} argument can be used to provide the translation.
-! 
+!
 ! If the optional argument {\tt Vector} is present and true, the vector
 ! architecture-friendly portions of this routine will be invoked.  It
 ! will also cause the vector parts of {\tt sMatPlus} to be initialized if they
@@ -466,7 +470,7 @@
 
 ! !SEE ALSO:
 ! The MCT module m_AttrVect for more information about the AttrVect type.
-! The MCT module m_SparseMatrixPlus for more information about the 
+! The MCT module m_SparseMatrixPlus for more information about the
 ! SparseMatrixPlus type.
 
 ! !REVISION HISTORY:
@@ -508,7 +512,8 @@
      call AttrVect_zero(xPrimeAV)
        ! Rearrange data from x to get x'
      call Rearrange(xAV, xPrimeAV, sMatPlus%XToXPrime, &
-                    sMatPlus%Tag ,vector=usevector)
+                    tag=sMatPlus%Tag, vector=usevector,&
+                    alltoall=.true., handshake=.true.  )
 
        ! Perform perfectly data-local multiply y = Mx'
      if (present(TrList).and.present(rList)) then
@@ -551,16 +556,18 @@
         call sMatAvMult_DataLocal_(xAV, sMatPlus%Matrix, yPrimeAV, &
 	       Vector=usevector)
      endif
-     
+
        ! Rearrange/reduce partial sums in y' to get y
      if (present(TrList).or.present(rList)) then
-       call Rearrange(yPrimeAV, yAVre, sMatPlus%YPrimeToY, sMatPlus%Tag, &
-                    .TRUE., Vector=usevector)
+       call Rearrange(yPrimeAV, yAVre, sMatPlus%YPrimeToY,            &
+                      tag=sMatPlus%Tag, sum=.TRUE., Vector=usevector, &
+                      alltoall=.true., handshake=.true.               )
        call AttrVect_Rcopy(yAVre,yAV,vector=usevector)
        call AttrVect_clean(yAVre, ierr)
      else
-       call Rearrange(yPrimeAV, yAV, sMatPlus%YPrimeToY, sMatPlus%Tag, &
-                    .TRUE., Vector=usevector)
+       call Rearrange(yPrimeAV, yAV, sMatPlus%YPrimeToY,              &
+                      tag=sMatPlus%Tag, sum=.TRUE., Vector=usevector, &
+                      alltoall=.true., handshake=.true.               )
      endif
        ! Clean up space occupied by y'
      call AttrVect_clean(yPrimeAV, ierr)
@@ -586,8 +593,9 @@
      endif
 
        ! Rearrange data from x to get x'
-     call Rearrange(xAV, xPrimeAV, sMatPlus%XToXPrime, sMatPlus%Tag, &
-                       Vector=usevector)
+     call Rearrange(xAV, xPrimeAV, sMatPlus%XToXPrime,  &
+                    tag=sMatPlus%Tag, Vector=usevector, &
+                    alltoall=.true., handshake=.true.   )
 
        ! Perform perfectly data-local multiply y' = Mx'
      if (present(TrList).and.present(rList)) then
@@ -603,13 +611,15 @@
 
        ! Rearrange/reduce partial sums in y' to get y
      if (present(TrList).or.present(rList)) then
-       call Rearrange(yPrimeAV, yAVre, sMatPlus%YPrimeToY, sMatPlus%Tag, &
-                    .TRUE., Vector=usevector)
+       call Rearrange(yPrimeAV, yAVre, sMatPlus%YPrimeToY,            &
+                      tag=sMatPlus%Tag, sum=.TRUE., Vector=usevector, &
+                      alltoall=.true., handshake=.true.               )
        call AttrVect_Rcopy(yAVre,yAV,vector=usevector)
        call AttrVect_clean(yAVre, ierr)
      else
-       call Rearrange(yPrimeAV, yAV, sMatPlus%YPrimeToY, sMatPlus%Tag, &
-                    .TRUE., Vector=usevector)
+       call Rearrange(yPrimeAV, yAV, sMatPlus%YPrimeToY,              &
+                      tag=sMatPlus%Tag, sum=.TRUE., Vector=usevector, &
+                      alltoall=.true., handshake=.true.               )
      endif
 
        ! Clean up space occupied by x'

@@ -4,21 +4,21 @@
 
     Model Coupling Toolkit (MCT)
 
-    Jay Larson
     Robert Jacob
+    Jay Larson
     Everest Ong
     Ray Loy
-	
+
     For more information, see http://www.mcs.anl.gov/mct
 
     See MCT/COPYRIGHT for license.
 
 ######################################################################
 
-  This is version 2.8 of the Model Coupling Toolkit (MCT).
+  This is version 2.9 of the Model Coupling Toolkit (MCT).
 
   Our purpose in creating this toolkit is to support the construction
-  of highly portable and extensible high-performance couplers 
+  of highly portable and extensible high-performance couplers
   for distributed memory parallel coupled models.
 
 ######################################################################
@@ -33,7 +33,7 @@
   mct/     -- Source code for the Model Coupling Toolkit.
 
   mpeu/    -- Source code for the message-passing environment utilities
-              library (MPEU), which provides support for MCT 
+              library (MPEU), which provides support for MCT
 
   mpi-serial/  -- Source code for optional mpi replacement library.
 
@@ -52,13 +52,14 @@ Optional Contents available
 
   babel/   -- multi language interface for MCT using BABEL.
               See babel/README for more information.
+	      NO LONGER SUPPORTED
 
 ######################################################################
   REQUIREMENTS:
 
   Building MCT requires a Fortran90 compiler.
 
-  An MPI library is now optional.  To compile without MPI, add
+  A full MPI library is now optional.  To compile without MPI, add
   --enable-mpiserial to the configure command below.  Note that
   not all the examples will work without MPI.  See mpi-serial/README
   for more information.
@@ -78,7 +79,7 @@ Optional Contents available
   NEC
   Fujitsu
 
-  Running some of the examples requires a parallel platform.
+  Running some of the examples requires a full MPI installation with mpirun
   Memory requirements are modest.
 
 ######################################################################
@@ -99,7 +100,7 @@ Optional Contents available
   for another.
 
   Example: If configure has trouble finding the correct F90 compiler:
-    > ./configure FC=pgf90. 
+    > ./configure FC=pgf90.
 
   You can also direct configure through environment variables:
     > setenv FC xlf90
@@ -112,12 +113,8 @@ Optional Contents available
   configure command)
 
   PLATFORM NOTES:
-  On a BlueGene/P, use:
+  On a BlueGene, use:
   >  ./configure FC=bgxlf90_r CC=mpixlc_r MPIFC=mpixlf90_r (can also use versions without _r)
-  At ALCF, one can just type "./configure".
-
-  On the Cray X* (e.g. jaguar) use:
-  > ./configure --host=Linux FC=ftn MPIFC=ftn 
 
 ######################################################################
   INSTALLATION INSTRUCTIONS:
@@ -126,7 +123,7 @@ Optional Contents available
   and the *lib.a files to /usr/lib.   To override these choices, use
   "-prefix" when running configure:
        > ./configure --prefix=/home/$USER
-  With the above option, "make install" will place .mod's in /home/$USER/include 
+  With the above option, "make install" will place .mod's in /home/$USER/include
   and *lib.a's in /home/$USER/lib
 
 ######################################################################
@@ -143,15 +140,11 @@ Optional Contents available
 
 ######################################################################
 
-  Both MCT and MPEU source code are self-documenting.  All modules 
-  and routines contain prologues that can be extracted and processed 
+  Both MCT and MPEU source code are self-documenting.  All modules
+  and routines contain prologues that can be extracted and processed
   into LaTeX source code by the public-domain tool ProTeX.  ProTeX is
-  available by anonymous ftp from:
-
-     Software:
-      ftp://dao.gsfc.nasa.gov/pub/papers/sawyer/protex1.4.tar.Z 
-     Documentation:
-      ftp://dao.gsfc.nasa.gov/pub/office_notes/on9711r0.ps.Z 
+  included in the MCT source and available from:
+  http://gmao.gsfc.nasa.gov/software/protex/
 
   You can build the documentation with protex and latex by following
   the directions in the doc directory.
@@ -198,9 +191,8 @@ Optional Contents available
   30 Nov, 2010 -- version 2.7.2 (released only in CESM1.0.3)
   25 Jan, 2011 -- version 2.7.3 (not released)
   07 Mar, 2012 -- version 2.7.4 (not released)
-  30 Apr, 2012 -- version 2.8.0 
-
-
-Tag MCT_2_8_0
-README,v 1.49 2012-04-27 21:52:58 jacob Exp
-
+  30 Apr, 2012 -- version 2.8.0
+  05 Jul, 2012 -- version 2.8.1 (not released)
+  12 Sep, 2012 -- version 2.8.2 (not released)
+  16 Dec, 2012 -- version 2.8.3
+  19 Jun, 2015 -- version 2.9.0
