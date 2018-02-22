@@ -653,7 +653,9 @@ C
             if (n == 1) cross_product_last = cross_product
             if (cross_product*cross_product_last < zero) 
      &          exit corner_loop
-            if (cross_product.ne.0) cross_product_last = cross_product
+            if (cross_product.ne.0) THEN
+               cross_product_last = cross_product
+            endif
 
           end do corner_loop
 
