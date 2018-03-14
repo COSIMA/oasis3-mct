@@ -88,6 +88,7 @@ MODULE mod_oasis_coupler
      real(kind=ip_double_p):: rcvadd   !< receive field addition term
      !--- time varying info ---
      integer(kind=ip_i4_p) :: ltime    !< time at last coupling
+     integer(kind=ip_i4_p) :: ctime    !< time at last call
      integer(kind=ip_i4_p),pointer :: avcnt(:)  !< counter for averaging
      integer(kind=ip_i4_p),pointer :: status(:) !< status of variables in coupler
   end type prism_coupler_type
@@ -100,8 +101,6 @@ MODULE mod_oasis_coupler
   type(prism_coupler_type),public, pointer :: prism_coupler_put(:)  !< prism_coupler put array
   type(prism_coupler_type),public, pointer :: prism_coupler_get(:)  !< prism_coupler get array
 
-  integer(kind=ip_i4_p)   ,public :: lcouplerid    !< last coupler id
-  integer(kind=ip_i4_p)   ,public :: lcouplertime  !< last coupler time 
   integer(kind=ip_i4_p)   ,public :: lastseq       !< last coupler sequence
   integer(kind=ip_i4_p)   ,public :: lastseqtime   !< last coupler sequence time
   logical                 ,public :: allow_no_restart  !< flag to allow no restart files at startup
@@ -277,6 +276,7 @@ CONTAINS
      pcpointer%trans   = ip_instant
      pcpointer%conserv = ip_cnone
      pcpointer%ltime   = ispval
+     pcpointer%ctime   = ispval
      pcpointer%snddiag = .false.
      pcpointer%rcvdiag = .false.
      pcpointer%sndmult = 1.0_ip_double_p
@@ -286,8 +286,6 @@ CONTAINS
   enddo  ! npc
   enddo  ! nc
 
-  lcouplerid   = ispval
-  lcouplertime = ispval
   lastseq      = ispval
   lastseqtime  = ispval
 
