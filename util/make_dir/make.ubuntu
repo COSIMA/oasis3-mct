@@ -42,6 +42,7 @@ FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
 CCFLAGS_1   = 
 LDFLAGS     = 
+MCT_FCFLAGS =
 #
 ###################
 #
