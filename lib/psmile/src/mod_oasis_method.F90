@@ -40,10 +40,9 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
-
 !> OASIS user init method
 
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld,runtime)
 
    !> * This is COLLECTIVE, all pes must call
 
@@ -54,6 +53,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
    integer (kind=ip_intwp_p),intent(in)   ,optional :: commworld  !< user defined mpi_comm_world to use in oasis
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -165,6 +165,10 @@ CONTAINS
 
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
+
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    !------------------------
    !> * Check if NFIELDS=0, there is no coupling.
