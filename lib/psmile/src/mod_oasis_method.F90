@@ -40,7 +40,7 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,runtime)
 
    ! This is COLLECTIVE, all pes must call
 
@@ -49,6 +49,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(out)   :: mynummod     
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -126,6 +127,11 @@ CONTAINS
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
+
+   ! Override runtime in namecouple
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    ! If NFIELDS=0 there is no coupling
    ! No information must be written in the debug files as
