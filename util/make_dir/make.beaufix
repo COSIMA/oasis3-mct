@@ -33,15 +33,15 @@ F90         = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
-CC          = $(MPIBIN)/mpiicc -I$(MPI_INCLUDE)
+CC          = $(MPIBIN)/mpicc -I$(MPI_INCLUDE)
 LD          = $(MPIBIN)/mpiifort $(MPILIB)
 AR          = ar
 ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
-CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+CCPPDEF   = -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 

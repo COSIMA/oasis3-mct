@@ -1,0 +1,14 @@
+<model name="coria_anymachine_ssh" title="Coria, Code execution on any ssh machine" >
+    <param name="login" title="Login" type="ascii"  default="login"/>
+    <param name="machine" title="Machine" type="ascii" default="cobra" />
+    <param name="directory" title="working directory" type="ascii" default="~" />
+    <param name="nbprocs" title="Procs number" type="integer" default="1" />
+    <desc>
+        This plugin is for Coria only
+         Check that you can log on the distant machnine without password!!!
+[]
+[logo=plugin_ssh;caption=execution through ssh ]
+[]
+[logo=coria;caption=Coria only]
+</desc>
+    </model>

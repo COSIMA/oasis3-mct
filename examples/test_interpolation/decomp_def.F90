@@ -1,8 +1,7 @@
 !****************************************************************************************
-SUBROUTINE decomp_def(id_part_id,id_paral,id_size,id_im,id_jm,id_rank,id_npes,id_unit)
+SUBROUTINE decomp_def(id_paral,id_size,id_im,id_jm,id_rank,id_npes,id_unit)
   !
   IMPLICIT NONE
-  INTEGER, INTENT(out) :: id_part_id    ! Local partition ID
   INTEGER, DIMENSION(id_size), INTENT(out) :: id_paral(id_size)    
   INTEGER, INTENT(in)  :: id_size
   INTEGER, INTENT(in)  :: id_im       ! Grid dimension in i

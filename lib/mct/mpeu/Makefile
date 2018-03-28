@@ -18,7 +18,6 @@ SRCS_F90	= m_IndexBin_char.F90		\
 		  m_List.F90			\
 		  m_MergeSorts.F90		\
 		  m_Filename.F90		\
-		  m_ErrorHandler.F90		\
 		  m_FcComms.F90                 \
 		  m_Permuter.F90		\
 		  m_SortingTools.F90		\
@@ -89,7 +88,6 @@ m_IndexBin_logical.o: m_die.o m_stdio.o
 m_List.o: m_String.o m_die.o m_mall.o
 m_MergeSorts.o: m_die.o m_realkinds.o m_stdio.o
 m_Filename.o:
-m_ErrorHandler.o: m_mpif90.o
 m_Permuter.o: m_die.o m_realkinds.o
 m_SortingTools.o: m_IndexBin_char.o m_IndexBin_integer.o m_IndexBin_logical.o m_MergeSorts.o m_Permuter.o m_rankMerge.o
 m_String.o: m_die.o m_mall.o m_mpif90.o

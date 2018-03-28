@@ -1,0 +1,183 @@
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type}{\section{mod\+\_\+oasis\+\_\+map\+:\+:prism\+\_\+mapper\+\_\+type Type Reference}
+\label{structmod__oasis__map_1_1prism__mapper__type}\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+}
+
+
+Mapper data for interpolating data between grids.  
+
+
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(mct\+\_\+smatp), dimension(\+:), \\*
+pointer \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a46e59a2d0c41fc11532e14ef413522f1}{smatp}
+\begin{DoxyCompactList}\small\item\em stores mapping data such as weights \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a90bcd6831549c027de72dbba1daa0939}{nwgts}
+\begin{DoxyCompactList}\small\item\em number of weights in weights file \end{DoxyCompactList}\item 
+character(len=ic\+\_\+long) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a10ad0d8412afdfa993728ac63e117e9e}{file}
+\begin{DoxyCompactList}\small\item\em file to read/write \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a37a969cc8b9d9234e6e99c6d3ef144ad}{loc}
+\begin{DoxyCompactList}\small\item\em location setting, src or dst model \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a3b10832f360b8f2061807dfdec6be493}{opt}
+\begin{DoxyCompactList}\small\item\em optimization setting, bfb, sum, or opt \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_ad1516b48d26a0cf57a3c61c58298aa09}{optval}
+\begin{DoxyCompactList}\small\item\em mct map setting, src or dst, derived from opt \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__map_1_1prism__mapper__type_aebd50312a6d63fb217231d7cb43cdf65}{init}
+\begin{DoxyCompactList}\small\item\em flag indicating initialization complete \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a26d7374d018e7d5b5b87d91eef9e02a9}{spart}
+\begin{DoxyCompactList}\small\item\em src partition \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a8a597bf1362ebd82c03fdd6ac887620e}{dpart}
+\begin{DoxyCompactList}\small\item\em dst partition \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a270d69de9108f210fedbc3871d8a7a15}{avred}
+\begin{DoxyCompactList}\small\item\em flag indicating A\+V\+\_\+ms, A\+V\+\_\+md data has been read \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a428a70b5f90d592638e1eaf55c56baae}{av\+\_\+ms}
+\begin{DoxyCompactList}\small\item\em stores data for C\+O\+N\+S\+E\+R\+V for src such as mask and area \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__map_1_1prism__mapper__type_a3ff54ff3819cd06df5d6a9f9d993cb21}{av\+\_\+md}
+\begin{DoxyCompactList}\small\item\em stores data for C\+O\+N\+S\+E\+R\+V for dst such as mask and area \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Mapper data for interpolating data between grids. 
+
+Definition at line 35 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a3ff54ff3819cd06df5d6a9f9d993cb21}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!av\+\_\+md@{av\+\_\+md}}
+\index{av\+\_\+md@{av\+\_\+md}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{av\+\_\+md}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::av\+\_\+md\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a3ff54ff3819cd06df5d6a9f9d993cb21}
+
+
+stores data for C\+O\+N\+S\+E\+R\+V for dst such as mask and area 
+
+
+
+Definition at line 48 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a428a70b5f90d592638e1eaf55c56baae}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!av\+\_\+ms@{av\+\_\+ms}}
+\index{av\+\_\+ms@{av\+\_\+ms}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{av\+\_\+ms}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::av\+\_\+ms\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a428a70b5f90d592638e1eaf55c56baae}
+
+
+stores data for C\+O\+N\+S\+E\+R\+V for src such as mask and area 
+
+
+
+Definition at line 47 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a270d69de9108f210fedbc3871d8a7a15}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!avred@{avred}}
+\index{avred@{avred}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{avred}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::avred\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a270d69de9108f210fedbc3871d8a7a15}
+
+
+flag indicating A\+V\+\_\+ms, A\+V\+\_\+md data has been read 
+
+
+
+Definition at line 46 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a8a597bf1362ebd82c03fdd6ac887620e}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!dpart@{dpart}}
+\index{dpart@{dpart}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{dpart}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::dpart\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a8a597bf1362ebd82c03fdd6ac887620e}
+
+
+dst partition 
+
+
+
+Definition at line 45 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a10ad0d8412afdfa993728ac63e117e9e}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!file@{file}}
+\index{file@{file}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+long) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::file\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a10ad0d8412afdfa993728ac63e117e9e}
+
+
+file to read/write 
+
+
+
+Definition at line 39 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_aebd50312a6d63fb217231d7cb43cdf65}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!init@{init}}
+\index{init@{init}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::init\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_aebd50312a6d63fb217231d7cb43cdf65}
+
+
+flag indicating initialization complete 
+
+
+
+Definition at line 43 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a37a969cc8b9d9234e6e99c6d3ef144ad}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!loc@{loc}}
+\index{loc@{loc}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{loc}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::loc\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a37a969cc8b9d9234e6e99c6d3ef144ad}
+
+
+location setting, src or dst model 
+
+
+
+Definition at line 40 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a90bcd6831549c027de72dbba1daa0939}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!nwgts@{nwgts}}
+\index{nwgts@{nwgts}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{nwgts}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::nwgts\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a90bcd6831549c027de72dbba1daa0939}
+
+
+number of weights in weights file 
+
+
+
+Definition at line 38 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a3b10832f360b8f2061807dfdec6be493}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!opt@{opt}}
+\index{opt@{opt}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{opt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::opt\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a3b10832f360b8f2061807dfdec6be493}
+
+
+optimization setting, bfb, sum, or opt 
+
+
+
+Definition at line 41 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_ad1516b48d26a0cf57a3c61c58298aa09}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!optval@{optval}}
+\index{optval@{optval}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{optval}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::optval\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_ad1516b48d26a0cf57a3c61c58298aa09}
+
+
+mct map setting, src or dst, derived from opt 
+
+
+
+Definition at line 42 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a46e59a2d0c41fc11532e14ef413522f1}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!smatp@{smatp}}
+\index{smatp@{smatp}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{smatp}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+smatp), dimension(\+:), pointer mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::smatp\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a46e59a2d0c41fc11532e14ef413522f1}
+
+
+stores mapping data such as weights 
+
+
+
+Definition at line 37 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{structmod__oasis__map_1_1prism__mapper__type_a26d7374d018e7d5b5b87d91eef9e02a9}{\index{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}!spart@{spart}}
+\index{spart@{spart}!mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type@{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}}
+\subsubsection[{spart}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type\+::spart\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__map_1_1prism__mapper__type_a26d7374d018e7d5b5b87d91eef9e02a9}
+
+
+src partition 
+
+
+
+Definition at line 44 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+
+
+The documentation for this type was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__map_8_f90}{mod\+\_\+oasis\+\_\+map.\+F90}\end{DoxyCompactItemize}

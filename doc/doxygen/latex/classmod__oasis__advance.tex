@@ -1,0 +1,274 @@
+\hypertarget{classmod__oasis__advance}{\section{mod\+\_\+oasis\+\_\+advance Module Reference}
+\label{classmod__oasis__advance}\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+}
+
+
+Advances the O\+A\+S\+I\+S coupling.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__advance_a480bfe5b333300c1084af8f9c239a81d}{oasis\+\_\+advance\+\_\+init} (kinfo)
+\begin{DoxyCompactList}\small\item\em Initializes the O\+A\+S\+I\+S fields. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__advance_acd7e5c23cf8f8b5fa7fe3cc59768cb09}{oasis\+\_\+advance\+\_\+run} (mop, varid, msec, kinfo, nff, namid, array1din, array1dout, array2dout, readrest, a2on, array2, a3on, array3, a4on, array4, a5on, array5)
+\begin{DoxyCompactList}\small\item\em Advances the O\+A\+S\+I\+S coupling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__advance_a4692a2d1d0024523b61675947d4f3a4d}{oasis\+\_\+advance\+\_\+map} (av1, avd, mapper, conserv, consbfb, avon, av2, av3, av4, av5)
+\begin{DoxyCompactList}\small\item\em Provides interpolation functionality. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__advance_a936f1af2fa561d57672d5c09a528cf46}{oasis\+\_\+advance\+\_\+avsum} (av, sum, gsmap, mpicom, mask, wts, consbfb)
+\begin{DoxyCompactList}\small\item\em A generic method for summing fields in an attribute vector. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__advance_af611b26fe4601ded488fd5d3c03b12a2}{oasis\+\_\+advance\+\_\+avdiag} (av, mpicom, mask, wts)
+\begin{DoxyCompactList}\small\item\em A generic method for writing the global sums of fields in an attribute vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Advances the O\+A\+S\+I\+S coupling. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__advance_af611b26fe4601ded488fd5d3c03b12a2}{\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}!oasis\+\_\+advance\+\_\+avdiag@{oasis\+\_\+advance\+\_\+avdiag}}
+\index{oasis\+\_\+advance\+\_\+avdiag@{oasis\+\_\+advance\+\_\+avdiag}!mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+\subsubsection[{oasis\+\_\+advance\+\_\+avdiag}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+avdiag (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+avect), intent(in)}]{av, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in), optional}]{mask, }
+\item[{real(kind=ip\+\_\+r8\+\_\+p), dimension(\+:), intent(in), optional}]{wts}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__advance_af611b26fe4601ded488fd5d3c03b12a2}
+
+
+A generic method for writing the global sums of fields in an attribute vector. 
+
+
+
+Definition at line 1878 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+\hypertarget{classmod__oasis__advance_a936f1af2fa561d57672d5c09a528cf46}{\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}!oasis\+\_\+advance\+\_\+avsum@{oasis\+\_\+advance\+\_\+avsum}}
+\index{oasis\+\_\+advance\+\_\+avsum@{oasis\+\_\+advance\+\_\+avsum}!mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+\subsubsection[{oasis\+\_\+advance\+\_\+avsum}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+avsum (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+avect), intent(in)}]{av, }
+\item[{real(kind=ip\+\_\+r8\+\_\+p), dimension(\+:), intent(inout)}]{sum, }
+\item[{type(mct\+\_\+gsmap), intent(in)}]{gsmap, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in), optional}]{mask, }
+\item[{real(kind=ip\+\_\+r8\+\_\+p), dimension(\+:), intent(in), optional}]{wts, }
+\item[{logical, intent(in), optional}]{consbfb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__advance_a936f1af2fa561d57672d5c09a528cf46}
+
+
+A generic method for summing fields in an attribute vector. 
+
+
+
+Definition at line 1776 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+\hypertarget{classmod__oasis__advance_a480bfe5b333300c1084af8f9c239a81d}{\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}!oasis\+\_\+advance\+\_\+init@{oasis\+\_\+advance\+\_\+init}}
+\index{oasis\+\_\+advance\+\_\+init@{oasis\+\_\+advance\+\_\+init}!mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+\subsubsection[{oasis\+\_\+advance\+\_\+init}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(inout)}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__advance_a480bfe5b333300c1084af8f9c239a81d}
+
+
+Initializes the O\+A\+S\+I\+S fields. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em kinfo} & status, not used \\
+\hline
+\end{DoxyParams}
+oasis\+\_\+advance\+\_\+init does the following
+\begin{DoxyItemize}
+\item Aborts if it's called from non-\/active tasks
+\item Loop over all coupler connections, Loop over get and put connections, For valid connections
+\begin{DoxyItemize}
+\item Checks that lag is reasonable
+\item For put fields that need to read a restart file because of a lag, call oasis\+\_\+advance\+\_\+run and read in the restart file. Set readrest to true in oasis\+\_\+advance\+\_\+run to indicate it's called from init.
+\end{DoxyItemize}
+\item Loop over all coupler connections, Loop over get and put connections, For valid connections
+\begin{DoxyItemize}
+\item Read restart for L\+O\+C\+T\+R\+A\+N\+S fields. Do after restart and advance above because prism\+\_\+advance\+\_\+run fills in the avect with the array info 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 33 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+\hypertarget{classmod__oasis__advance_a4692a2d1d0024523b61675947d4f3a4d}{\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}!oasis\+\_\+advance\+\_\+map@{oasis\+\_\+advance\+\_\+map}}
+\index{oasis\+\_\+advance\+\_\+map@{oasis\+\_\+advance\+\_\+map}!mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+\subsubsection[{oasis\+\_\+advance\+\_\+map}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+map (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+avect), intent(in)}]{av1, }
+\item[{type(mct\+\_\+avect), intent(inout)}]{avd, }
+\item[{type(prism\+\_\+mapper\+\_\+type), intent(inout)}]{mapper, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in), optional}]{conserv, }
+\item[{logical, intent(in), optional}]{consbfb, }
+\item[{logical, dimension(\+:), intent(in), optional}]{avon, }
+\item[{type(mct\+\_\+avect), intent(in), optional}]{av2, }
+\item[{type(mct\+\_\+avect), intent(in), optional}]{av3, }
+\item[{type(mct\+\_\+avect), intent(in), optional}]{av4, }
+\item[{type(mct\+\_\+avect), intent(in), optional}]{av5}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__advance_a4692a2d1d0024523b61675947d4f3a4d}
+
+
+Provides interpolation functionality. 
+
+Maps (regrids, interpolates) data from av1 to avd. av2-\/av5 are for higher order mapping (hot).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em av1} & source av\\
+\hline
+\mbox{\tt in,out}  & {\em avd} & dst av\\
+\hline
+\mbox{\tt in,out}  & {\em mapper} & prism\+\_\+mapper\\
+\hline
+\mbox{\tt in}  & {\em conserv} & conserv flag\\
+\hline
+\mbox{\tt in}  & {\em consbfb} & conserv bfb option\\
+\hline
+\mbox{\tt in}  & {\em avon} & which source hot are on\\
+\hline
+\mbox{\tt in}  & {\em av2} & source av2 hot\\
+\hline
+\mbox{\tt in}  & {\em av3} & source av3 hot\\
+\hline
+\mbox{\tt in}  & {\em av4} & source av4 hot\\
+\hline
+\mbox{\tt in}  & {\em av5} & source av5 hot \\
+\hline
+\end{DoxyParams}
+oasis\+\_\+advance\+\_\+map does the following
+\begin{DoxyItemize}
+\item check for conservation flags
+\item check for higher order terms
+\item check consistency between weights and coupling terms
+\item run mct sparse matrix mapper on data and separately on hot as needed
+\item enforce conservation 
+\end{DoxyItemize}
+
+Definition at line 1475 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+\hypertarget{classmod__oasis__advance_acd7e5c23cf8f8b5fa7fe3cc59768cb09}{\index{mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}!oasis\+\_\+advance\+\_\+run@{oasis\+\_\+advance\+\_\+run}}
+\index{oasis\+\_\+advance\+\_\+run@{oasis\+\_\+advance\+\_\+run}!mod\+\_\+oasis\+\_\+advance@{mod\+\_\+oasis\+\_\+advance}}
+\subsubsection[{oasis\+\_\+advance\+\_\+run}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+run (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{mop, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{varid, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{msec, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(inout)}]{kinfo, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), optional}]{nff, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), optional}]{namid, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array1din, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array1dout, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:,\+:), optional}]{array2dout, }
+\item[{logical, optional}]{readrest, }
+\item[{logical, optional}]{a2on, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array2, }
+\item[{logical, optional}]{a3on, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array3, }
+\item[{logical, optional}]{a4on, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array4, }
+\item[{logical, optional}]{a5on, }
+\item[{real (kind=ip\+\_\+r8\+\_\+p), dimension(\+:), optional}]{array5}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__advance_acd7e5c23cf8f8b5fa7fe3cc59768cb09}
+
+
+Advances the O\+A\+S\+I\+S coupling. 
+
+Only one from array1din, array1dout, or array2dout can be passed in. readrest is set to true when called by the oasis\+\_\+advance\+\_\+init method. Arrays 2 to 5 are for the higher order terms (hot)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mop} & O\+A\+S\+I\+S\+\_\+\+Out or O\+A\+S\+I\+S\+\_\+\+In\\
+\hline
+\mbox{\tt in}  & {\em varid} & prism\+\_\+var id\\
+\hline
+\mbox{\tt in}  & {\em msec} & model time\\
+\hline
+\mbox{\tt in,out}  & {\em kinfo} & status\\
+\hline
+ & {\em nff} & specify particular field for restart\\
+\hline
+ & {\em namid} & only do this namcouple method for restart\\
+\hline
+ & {\em array1din} & 1\+D put data\\
+\hline
+ & {\em array1dout} & 1\+D get data\\
+\hline
+ & {\em array2dout} & 2\+D get data\\
+\hline
+ & {\em readrest} & special flag to indicate this is called from the advance\+\_\+init\\
+\hline
+ & {\em a2on} & logical for array2\\
+\hline
+ & {\em array2} & hot put data\\
+\hline
+ & {\em a3on} & logical for array3\\
+\hline
+ & {\em array3} & hot put data\\
+\hline
+ & {\em a4on} & logical for array4\\
+\hline
+ & {\em array4} & hot put data\\
+\hline
+ & {\em a5on} & logical for array5\\
+\hline
+ & {\em array5} & hot put data \\
+\hline
+\end{DoxyParams}
+oasis\+\_\+advance\+\_\+run does the following
+\begin{DoxyItemize}
+\item Aborts if it's called from non-\/active tasks
+\item Verify field (var) is either In or Out
+\item Loop over all the couplers associated with this var
+\begin{DoxyItemize}
+\item check this prism\+\_\+coupler is valid
+\item check again that model op matches coupler op
+\item set a bunch of local variables
+\item check that lag is reasonable
+\item read restart for call from init phase
+\item compute lag time, only on put side
+\item set time\+\_\+now, is it a coupling period?
+\item check that model hasn't gone past maxtime
+\item check that model isn't going backwards
+\item check that variable didn't miss a coupling period
+\item check that prior sequences weren't missed at this step for get (recv) operation.
+\item compute field index and check sizes
+\item check for higher order coupling fields and get everything ready
+\item update avect1-\/5 on put side and apply appropriate transform
+\item if its coupling time, set status of this var to ready
+\item decide if it's time to communicate based on time
+\item If it's time to communicate
+\begin{DoxyItemize}
+\item check again that time is correct
+\item average as needed for some transforms
+\item write to restart file if put and at the end of the run, turn off communication
+\item map and communicate operations
+\item write to output files if output is turned on
+\item set avcnt, avect1, ltime, and status
+\end{DoxyItemize}
+\item at the end of the run only, save fields associated with non-\/instant loctrans operations to restart files
+\item G\+E\+T only, unpack avect1 if it's newly received
+\item always remember last id and last coupler time 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 282 of file mod\+\_\+oasis\+\_\+advance.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__advance_8_f90}{mod\+\_\+oasis\+\_\+advance.\+F90}\end{DoxyCompactItemize}

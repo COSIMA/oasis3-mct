@@ -1,0 +1,81 @@
+============================================================================================
+The OASISGUI is an application of the software OPENTEA developped at CERFACS in the CFD group
+by Antoine Dauptain.
+Below are the instructions to run oasisgui to create the configuration file namcouple of 
+OASIS3-MCT on a Linux computer.
+============================================================================================
+In the directory oasisgui you have different directories:
+- examples_xml_namcouple : two examples of xml files and their corresponding namcouple files
+- opentea: sources of the software
+- library: applications developped using OPENTEA (typically OASIS3-MCT application)
+- XDRpy: main generic python tools for OPENTEA interface
+and you have different files:
+- gittag: reference under git repository
+- myconfig.xml: my configuration file
+- README: explanations
+
+
+####
+If you use a MAC to log on the X11 terminal where the GUI will be executed, you must
+modify the X11/OSX Focus correction putting <focusCorrection value="1"/> in
+your configuration "myconfig.xml" file.
+You can also use the menu "Config" directly in the software to modify the file
+"myconfig.xml" but the new parameters will be activated only after closing and re-launching the GUI.
+
+####
+Before launching opentea, you must make sure that wish (based on tcl/tk version 8.5 or later) and 
+Python (version 2.6 or later) are installed on your platform and that they are configured to run opentea.
+- to have the version of Python : >python -V
+- to have the version of tcl/tk : >echo "puts [info tclversion]" | tclsh 
+
+Your PYTHONPATH must include the $dir/oasis3-mct/util/oasisgui/XDRpy directory 
+("dir" is the repository where is located oasis3-mct on your computer):
+In your .cshrc you must add :
+----------------------------------------------------------
+setenv OASISGUIHOME $dir/oasis3-mct/util/oasisgui
+if ($?PYTHONPATH) then
+   setenv PYTHONPATH $OASISGUIHOME/XDRpy:$PYTHONPATH
+else
+   setenv PYTHONPATH $OASISGUIHOME/XDRpy
+endif
+----------------------------------------------------------
+In your .bashrc you must add :
+----------------------------------------------------------
+export OASISGUIHOME=$dir/oasis3-mct/util/oasisgui
+if [ "x${PYTHONPATH}" == "x" ]
+then
+export PYTHONPATH=$OASISGUIHOME/XDRpy
+else
+export PYTHONPATH=$OASISGUIHOME/XDRpy:$PYTHONPATH
+fi
+----------------------------------------------------------
+
+
+####
+To be able to launch easily opentea using the command wish, you should also create the 
+alias "oasisgui" to launch the software:
+---------------------------------------------
+in ksh :
+alias oasisgui 'wish $OASISGUIHOME/opentea/opentea.tcl -config $OASISGUIHOME/myconfig.xml -code oasis3-mct &'
+---------------------------------------------
+in bash :
+alias oasisgui='wish $OASISGUIHOME/opentea/opentea.tcl -config $OASISGUIHOME/myconfig.xml -code oasis3-mct &'
+---------------------------------------------
+
+
+#####
+Once you have launch oasisgui, you must fill up the different tabs from the left
+to the right. Each window must be validated (button "process" on the bottom on the 
+right in the window). 
+An orange bullet in the tab means that no information was stored yet in the window, 
+a red bullet in the tab means that there is an error in the window and a green bullet 
+in the tab means that the data entered in the window has been processed and is correct. 
+Some documentation about the meaning of the variables is available in the different windows,
+ by clicking on the different blue bullets ("Learn more").
+Validated data are progressively stored in an xml file when filling the GUI. This file 
+must be explicitely saved when leaving the GUI (you will be automatically asked for this).
+Once you saved your xml data, you can reload your xml file using the (File/Load as new) menu at 
+the left top of the GUI. Do not use the (File/Load as part) menu.
+The configuration file namcouple of OASIS3-MCT will be saved, when ALL THE TABS will 
+be validated, in the repository where you saved your xml file, in a subdirectory named
+after your xml file.

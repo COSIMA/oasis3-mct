@@ -84,6 +84,8 @@ C***********************************************************************
 
       integer (kind=int_kind), dimension(:), allocatable, save :: 
      &        srch_add       ! global address of cells in srch arrays
+      logical (kind=log_kind), dimension(:), allocatable, save :: 
+     &        msk_srch_add       ! masks of cells in srch arrays
 
       real (kind=dbl_kind), parameter :: 
      &     north_thresh = 1.45_dbl_kind, ! threshold for coord transf.
@@ -127,7 +129,8 @@ C***********************************************************************
      &        corner,     ! corner of cell that segment starts from
      &        next_corn,  ! corner of cell that segment ends on
      &        num_subseg, ! number of subsegments 
-     &        overunit
+     &        overunit,
+     &        ifix_grid
 
       logical (kind=log_kind) :: 
      &        lcoinc,  ! flag for coincident segments
@@ -161,6 +164,8 @@ C***********************************************************************
          WRITE (UNIT = nulou,FMT = *)'Entering routine remap_conserv'
          CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
+
+      weights = 0.
 !
 !-----------------------------------------------------------------------
 !
@@ -270,6 +275,7 @@ C***********************************************************************
       ENDIF
 !
       ll_debug = .false.
+      ifix_grid=6975
       do grid1_add = 1,grid1_size
         IF (ll_debug) THEN 
             WRITE(88,*) 'grid1_add=', grid1_add
@@ -312,7 +318,7 @@ C***********************************************************************
         !***
         !*** create search arrays
         !***
-        allocate(srch_add(num_srch_cells),
+        allocate(srch_add(num_srch_cells), 
      &           srch_corner_lat(grid2_corners,num_srch_cells),
      &           srch_corner_lon(grid2_corners,num_srch_cells))
 
@@ -567,16 +573,6 @@ C***********************************************************************
      $                      grid2_frac(grid2_overlap(grid2_add)) +
      $                      weights(num_wts+1)
 #endif
-                    else if (lfracnnei) THEN
-                        weights = 0  
-                        call store_link_cnsrv(grid1_add, 
-     $                      grid2_add, weights)
-
-                        IF (ll_debug) THEN
-           WRITE(88,*) '      after store_link_cnsrv fracnnei1'
-           WRITE(88,1122) grid1_add, grid2_add,beglon, beglat,
-     &   intrsct_lon,intrsct_lat,weights(1)
-                        ENDIF
                     endif
                  endif
 
@@ -608,7 +604,8 @@ C***********************************************************************
         !*** finished with this cell: deallocate search array and
         !*** start on next cell
 
-        deallocate(srch_add, srch_corner_lat, srch_corner_lon)
+        deallocate(srch_add, srch_corner_lat, 
+     & srch_corner_lon)
 
       end do
 
@@ -630,8 +627,8 @@ C***********************************************************************
           CALL OASIS_FLUSH_SCRIP(nulou)
       ENDIF
       do grid2_add = 1,grid2_size
-        IF (ll_debug) THEN 
-            WRITE(88,*) 'grid2_add=', grid2_add
+        IF (ll_debug .and. grid2_add == ifix_grid ) THEN 
+            WRITE(98,*) 'grid2_add=', grid2_add
             CALL OASIS_FLUSH_SCRIP(88)
         ENDIF
         !***
@@ -667,7 +664,7 @@ C***********************************************************************
           if (srch_mask(grid1_add)) num_srch_cells = num_srch_cells+1
         end DO
 
-        allocate(srch_add(num_srch_cells),
+        allocate(srch_add(num_srch_cells),msk_srch_add(num_srch_cells),
      &           srch_corner_lat(grid1_corners,num_srch_cells),
      &           srch_corner_lon(grid1_corners,num_srch_cells))
 
@@ -676,30 +673,34 @@ C***********************************************************************
           if (srch_mask(grid1_add)) then
             n = n+1
             srch_add(n) = grid1_add
+            IF (ll_debug) THEN
+               msk_srch_add(n) = srch_mask(grid1_add)
+            ENDIF
             srch_corner_lat(:,n) = grid1_corner_lat(:,grid1_add)
             srch_corner_lon(:,n) = grid1_corner_lon(:,grid1_add)
           endif
         end do gather2
         call timer_stop(5)
-        IF (ll_debug) THEN
-            WRITE(88,*)'    '
-            WRITE(88,*)'  ** Grid2 cell and associated search cells **'
+        IF (ll_debug .and. grid2_add == ifix_grid) THEN
+            WRITE(98,*)'    '
+            WRITE(98,*)'  ** Grid2 cell and associated search cells **'
             DO corner = 1,grid2_corners 
-              WRITE(88,1131) corner, 
+              WRITE(98,1131) corner, 
      &            grid2_corner_lon(corner,grid2_add), 
      &            grid2_corner_lat(corner,grid2_add)
             ENDDO
-            WRITE(88,*) '  num_srch_cells=', num_srch_cells
-            WRITE(88,*) '    '
-            WRITE(88,*) '  srch_add(:)=', srch_add(:)
+            WRITE(98,*) '  num_srch_cells=', num_srch_cells
+            WRITE(98,*) '    '
+            WRITE(98,*) '  srch_add(:)=', srch_add(:)
+            WRITE(98,*) '  msk_srch_add(:)=', msk_srch_add(:)
             DO n=1, num_srch_cells
               DO corner = 1,grid2_corners
-                WRITE(88,1132) n, srch_corner_lon(corner,n),
+                WRITE(98,1132) n, srch_corner_lon(corner,n),
      &            srch_corner_lat(corner,n)
               END DO
             END DO
-            WRITE(88,*)'    ***************************************'
-            WRITE(88,*)'    '
+            WRITE(98,*)'    ***************************************'
+            WRITE(98,*)'    '
         ENDIF
  1131 format ('   grid2 corner, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)
  1132 format ('     srch cell, lon, lat = ', I8, 2X, F12.4, 2X, F12.4)  
@@ -735,8 +736,8 @@ C***********************************************************************
             endlat = grid2_corner_lat(corner,grid2_add)
             endlon = grid2_corner_lon(corner,grid2_add)
             lrevers = .true.
-            IF (ll_debug) 
-     $          WRITE(88, *) ' sweep2 LREVERS TRUE'
+            IF (ll_debug .and. grid2_add == ifix_grid) 
+     $          WRITE(98, *) ' sweep2 LREVERS TRUE'
           endif
           begseg(1) = beglat
           begseg(2) = beglon
@@ -747,12 +748,12 @@ C***********************************************************************
           !*** since the line integral contribution will be zero.
           !***
 
-          IF (ll_debug) THEN
+          IF (ll_debug .and. grid2_add == ifix_grid) THEN
               IF (endlon .eq. beglon) THEN
-                  WRITE(88,1113) beglon, beglat 
-                  WRITE(88,1114) endlon, endlat
-                  WRITE(88, *)'  sweep2 endlon == beglon; skip segment'
-                  WRITE(88,*) '             '
+                  WRITE(98,1113) beglon, beglat 
+                  WRITE(98,1114) endlon, endlat
+                  WRITE(98, *)'  sweep2 endlon == beglon; skip segment'
+                  WRITE(98,*) '             '
               ENDIF
           ENDIF
           if (endlon /= beglon) then
@@ -788,21 +789,21 @@ C***********************************************************************
             !***
 
             call timer_start(6)
-            IF (ll_debug) THEN
-                WRITE(88,1115) beglon, beglat 
-                WRITE(88,1116) endlon, endlat
-                WRITE(88,*) '             '
+            IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                WRITE(98,1115) beglon, beglat 
+                WRITE(98,1116) endlon, endlat
+                WRITE(98,*) '             '
             ENDIF
             call intersection(grid1_add,intrsct_lat,intrsct_lon,lcoinc,
      &                        beglat, beglon, endlat, endlon, begseg,
      &                        lbegin, lrevers)
-            IF (ll_debug) THEN
-                WRITE(88,*) ' After call intersection, grid1_add',
+            IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                WRITE(98,*) ' After call intersection, grid1_add',
      &              grid1_add
-                WRITE(88,1117) beglon, beglat 
-                WRITE(88,1118) endlon, endlat
-                WRITE(88,1119) intrsct_lon, intrsct_lat
-                WRITE(88,*) '   '
+                WRITE(98,1117) beglon, beglat 
+                WRITE(98,1118) endlon, endlat
+                WRITE(98,1119) intrsct_lon, intrsct_lat
+                WRITE(98,*) '   '
             ENDIF
 
             call timer_stop(6)
@@ -819,10 +820,10 @@ C***********************************************************************
      &                         grid1_center_lon(grid1_add),
      &                         grid2_center_lon(grid2_add))
 
-              IF (ll_debug) THEN
-                  WRITE(88,*) '  A2) WEIGHTS for this subsegment =',
+              IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                  WRITE(98,*) '  A2) WEIGHTS for this subsegment =',
      &                weights(1)
-                  WRITE(88,*) '     ' 
+                  WRITE(98,*) '     ' 
               ENDIF
             else
               call line_integral(weights, num_wts,
@@ -830,20 +831,20 @@ C***********************************************************************
      &                         grid2_center_lon(grid2_add),
      &                         grid2_center_lon(grid2_add))
  
-             IF (ll_debug) THEN
-                 WRITE(88,*) '  B2) WEIGHTS for this subsegment =',
+             IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                 WRITE(98,*) '  B2) WEIGHTS for this subsegment =',
      &                weights(1)
-                  WRITE(88,*) '     ' 
+                  WRITE(98,*) '     ' 
               ENDIF
            endif
             call timer_stop(7)
 
             if (lrevers) then
               weights = -weights
-              IF (ll_debug) THEN
-                WRITE(88,*) '  LREVERS; WEIGHTS for this subsegment =',
+              IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                WRITE(98,*) '  LREVERS; WEIGHTS for this subsegment =',
      &              weights(1)
-                WRITE(88,*) '     '
+                WRITE(98,*) '     '
               ENDIF
             endif
             !***
@@ -854,17 +855,17 @@ C***********************************************************************
             !*** the grid1 mask is the master mask
             !***
 
-            IF (ll_debug .and. lcoinc)
-     &          WRITE(88,*) '  LCOINC is TRUE; weight not stored'
+            IF (ll_debug .and. lcoinc .and. grid2_add == ifix_grid)
+     &          WRITE(98,*) '  LCOINC is TRUE; weight not stored'
 
             if (.not. lcoinc .and. grid1_add /= 0) then
               if (grid1_mask(grid1_add)) then
                   call timer_start(8)
                   call store_link_cnsrv(grid1_add, grid2_add, weights)
 
-                   IF (ll_debug) THEN
-                   WRITE(88,*) '      after store_link_cnsrv norm2'
-                   WRITE(88,1120) grid1_add, grid2_add,beglon, beglat,
+                   IF (ll_debug .and. grid2_add == ifix_grid) THEN
+                   WRITE(98,*) '      after store_link_cnsrv norm2'
+                   WRITE(98,1120) grid1_add, grid2_add,beglon, beglat,
      &   intrsct_lon,intrsct_lat,weights(1)
                    ENDIF
                   call timer_stop(8)
@@ -872,14 +873,6 @@ C***********************************************************************
      &                                  weights(1)
                   grid2_frac(grid2_add) = grid2_frac(grid2_add) + 
      &                                  weights(num_wts+1)
-              else if (lfracnnei) THEN
-                  weights = 0  
-                  call store_link_cnsrv(grid1_add, grid2_add, weights)
-                        IF (ll_debug) THEN
-           WRITE(88,*) '      after store_link_cnsrv fracnnei2'
-           WRITE(88,1122) grid1_add, grid2_add,beglon, beglat,
-     &   intrsct_lon,intrsct_lat,weights(1)
-                        ENDIF
               endif
 
             endif
@@ -912,7 +905,8 @@ C***********************************************************************
         !*** finished with this cell: deallocate search array and
         !*** start on next cell
 
-        deallocate(srch_add, srch_corner_lat, srch_corner_lon)
+        deallocate(srch_add, msk_srch_add, srch_corner_lat, 
+     &             srch_corner_lon)
 
       end do
 

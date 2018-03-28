@@ -1,0 +1,182 @@
+\hypertarget{classmod__oasis__var}{\section{mod\+\_\+oasis\+\_\+var Module Reference}
+\label{classmod__oasis__var}\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+}
+
+
+O\+A\+S\+I\+S variable data and methods.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structmod__oasis__var_1_1prism__var__type}{prism\+\_\+var\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Model variable data for model coupling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__var_a7d16403015304fadc15624773f87d2a0}{oasis\+\_\+def\+\_\+var} (id\+\_\+nports, cdport, id\+\_\+part, id\+\_\+var\+\_\+nodims, kinout, id\+\_\+var\+\_\+shape, ktype, kinfo)
+\begin{DoxyCompactList}\small\item\em The O\+A\+S\+I\+S user interface to define variables. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__var_ab33b7fbec62bcfd15e9cd7f912f71035}{oasis\+\_\+var\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Synchronize variables across all tasks, called at oasis enddef. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), public \hyperlink{classmod__oasis__var_a151c4be67882fc8d02f66e4a1822b692}{maxvar}
+\begin{DoxyCompactList}\small\item\em number of potential variables, derived from namcouple input \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+parameter, public \hyperlink{classmod__oasis__var_a687d6dce16699f36ae3a67accfdba3a9}{mvarcpl} = 10
+\begin{DoxyCompactList}\small\item\em max namcouples per variable \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), public \hyperlink{classmod__oasis__var_a095f8ad84e6afbcbe1744d4a9f924e08}{prism\+\_\+nvar} = 0
+\begin{DoxyCompactList}\small\item\em number of variables defined \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__var_1_1prism__var__type}{prism\+\_\+var\+\_\+type}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__var_ae66c490437c2960d795fbd3d2c773a0a}{prism\+\_\+var}
+\begin{DoxyCompactList}\small\item\em list of defined variables \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__var_aa780f62e9eded0a55d0077a990bf2443}{oasis\+\_\+var\+\_\+zero} (\hyperlink{classmod__oasis__var_ae66c490437c2960d795fbd3d2c773a0a}{prism\+\_\+var})
+\begin{DoxyCompactList}\small\item\em Zero variable information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+O\+A\+S\+I\+S variable data and methods. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__var_a7d16403015304fadc15624773f87d2a0}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!oasis\+\_\+def\+\_\+var@{oasis\+\_\+def\+\_\+var}}
+\index{oasis\+\_\+def\+\_\+var@{oasis\+\_\+def\+\_\+var}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{oasis\+\_\+def\+\_\+var}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+def\+\_\+var (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out)}]{id\+\_\+nports, }
+\item[{character(len=$\ast$), intent(in)}]{cdport, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{id\+\_\+part, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), dimension(2), intent(in)}]{id\+\_\+var\+\_\+nodims, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{kinout, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), dimension(2$\ast$id\+\_\+var\+\_\+nodims(1)), intent(in)}]{id\+\_\+var\+\_\+shape, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{ktype, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(out), optional}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__var_a7d16403015304fadc15624773f87d2a0}
+
+
+The O\+A\+S\+I\+S user interface to define variables. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em id\+\_\+nports} & coupling field I\+D\\
+\hline
+\mbox{\tt in}  & {\em cdport} & field name as in namcouple\\
+\hline
+\mbox{\tt in}  & {\em id\+\_\+part} & partition I\+D\\
+\hline
+\mbox{\tt in}  & {\em id\+\_\+var\+\_\+nodims} & rank and number of bundles\\
+\hline
+\mbox{\tt in}  & {\em kinout} & input or output flag\\
+\hline
+\mbox{\tt in}  & {\em id\+\_\+var\+\_\+shape} & size of field\\
+\hline
+\mbox{\tt in}  & {\em ktype} & type of coupling field\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check len of incoming variable name
+\item Search for field in namcouple field lists
+\item Return if field not found in namcouple
+\item Abort if field already defined
+\item Increment the variable and store the values
+\item Write some diagnostics 
+\end{DoxyItemize}
+
+Definition at line 49 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{classmod__oasis__var_ab33b7fbec62bcfd15e9cd7f912f71035}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!oasis\+\_\+var\+\_\+setup@{oasis\+\_\+var\+\_\+setup}}
+\index{oasis\+\_\+var\+\_\+setup@{oasis\+\_\+var\+\_\+setup}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{oasis\+\_\+var\+\_\+setup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+var\+\_\+setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__var_ab33b7fbec62bcfd15e9cd7f912f71035}
+
+
+Synchronize variables across all tasks, called at oasis enddef. 
+
+
+\begin{DoxyItemize}
+\item Initialize variables on tasks where they are not previously defined. 
+\end{DoxyItemize}
+
+Definition at line 184 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{classmod__oasis__var_aa780f62e9eded0a55d0077a990bf2443}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!oasis\+\_\+var\+\_\+zero@{oasis\+\_\+var\+\_\+zero}}
+\index{oasis\+\_\+var\+\_\+zero@{oasis\+\_\+var\+\_\+zero}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{oasis\+\_\+var\+\_\+zero}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+var\+\_\+zero (
+\begin{DoxyParamCaption}
+\item[{type({\bf prism\+\_\+var\+\_\+type}), intent(inout)}]{prism\+\_\+var}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__var_aa780f62e9eded0a55d0077a990bf2443}
+
+
+Zero variable information. 
+
+
+
+Definition at line 295 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__var_a151c4be67882fc8d02f66e4a1822b692}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!maxvar@{maxvar}}
+\index{maxvar@{maxvar}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{maxvar}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), public mod\+\_\+oasis\+\_\+var\+::maxvar}}\label{classmod__oasis__var_a151c4be67882fc8d02f66e4a1822b692}
+
+
+number of potential variables, derived from namcouple input 
+
+
+
+Definition at line 24 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{classmod__oasis__var_a687d6dce16699f36ae3a67accfdba3a9}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!mvarcpl@{mvarcpl}}
+\index{mvarcpl@{mvarcpl}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{mvarcpl}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), parameter, public mod\+\_\+oasis\+\_\+var\+::mvarcpl = 10}}\label{classmod__oasis__var_a687d6dce16699f36ae3a67accfdba3a9}
+
+
+max namcouples per variable 
+
+
+
+Definition at line 25 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{classmod__oasis__var_a095f8ad84e6afbcbe1744d4a9f924e08}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!prism\+\_\+nvar@{prism\+\_\+nvar}}
+\index{prism\+\_\+nvar@{prism\+\_\+nvar}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{prism\+\_\+nvar}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), public mod\+\_\+oasis\+\_\+var\+::prism\+\_\+nvar = 0}}\label{classmod__oasis__var_a095f8ad84e6afbcbe1744d4a9f924e08}
+
+
+number of variables defined 
+
+
+
+Definition at line 40 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+\hypertarget{classmod__oasis__var_ae66c490437c2960d795fbd3d2c773a0a}{\index{mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}!prism\+\_\+var@{prism\+\_\+var}}
+\index{prism\+\_\+var@{prism\+\_\+var}!mod\+\_\+oasis\+\_\+var@{mod\+\_\+oasis\+\_\+var}}
+\subsubsection[{prism\+\_\+var}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+var\+\_\+type}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var}}\label{classmod__oasis__var_ae66c490437c2960d795fbd3d2c773a0a}
+
+
+list of defined variables 
+
+
+
+Definition at line 41 of file mod\+\_\+oasis\+\_\+var.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__var_8_f90}{mod\+\_\+oasis\+\_\+var.\+F90}\end{DoxyCompactItemize}

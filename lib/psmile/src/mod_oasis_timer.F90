@@ -6,8 +6,10 @@
 !
 ! !DESCRIPTION:
 !
-! Module oasis_timer contains functionallity, which can be used to
-! measure the time consumed in specific parts of the code.
+!> Performance timer methods
+!
+!>  This is used to measure the time consumed in specific parts of the code.
+!>  Timers are defined by character strings that are stored in an internal datatype.
 !
 ! Available routines:
 !  oasis_timer_init         allocates timers
@@ -39,7 +41,6 @@ module mod_oasis_timer
    use mod_oasis_kinds
    use mod_oasis_data
    use mod_oasis_sys
-   use mod_oasis_mpi
 
    implicit none
    private
@@ -54,7 +55,9 @@ module mod_oasis_timer
 
    ! name of the time statistics file
    character (len=ic_med) :: file_name
+   character (len=ic_med) :: file_hold
 
+   !> Storage for timer data
    type timer_details
       ! label of timer
       character (len=ic_med) :: label
@@ -72,9 +75,9 @@ module mod_oasis_timer
    DOUBLE PRECISION, POINTER     :: sum_wtime(:)       ! because they are later used in an mpi call
    INTEGER, POINTER              :: TIMER_COUNT(:)     ! number of calls
 
-   integer :: ntimer
+   INTEGER(kind=ip_intwp_p) :: ntimer
 
-   integer :: output_unit = 901
+   INTEGER(kind=ip_intwp_p) :: output_unit = 901
    logical,save :: single_timer_header
    character(len=1),parameter :: t_stopped = ' '
    character(len=1),parameter :: t_running = '*'
@@ -83,19 +86,21 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Initializes the timer methods, called once in an application
+
       subroutine oasis_timer_init (app, file, nt)
 
          implicit none
 
-         character (len=*), intent (in)   :: app
-         character (len=*), intent (in)   :: file
-         integer          , intent (in)   :: nt
+         character (len=*), intent (in)   :: app  !< name of application
+         character (len=*), intent (in)   :: file !< output filename
+         integer          , intent (in)   :: nt   !< number of timers
 
          integer :: ierror,n
-         character(len=*),parameter :: subname = 'oasis_timer_init'
+         character(len=*),parameter :: subname = '(oasis_timer_init)'
 
          app_name  = trim (app)
-         file_name = trim (file)
+         file_hold = trim (file)
 
          mtimer = nt
          ALLOCATE(timer(mtimer))
@@ -117,37 +122,25 @@ module mod_oasis_timer
             timer_count(n)       = 0
          enddo
 
-         IF ((TIMER_debug == 1) .AND. (mpi_rank_local == 0)) TIMER_Debug=2
-
-         IF (TIMER_Debug >= 2) THEN
-
-                 CALL oasis_unitget(output_unit)
-                 WRITE(file_name,'(a,i4.4)') TRIM(file)//'_',mpi_rank_local
-
-                 OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
-                    status="UNKNOWN")
-                 WRITE(output_unit,*) ''
-                 CLOSE(output_unit)
-
-         ENDIF
-
          single_timer_header = .false.
 
       end subroutine oasis_timer_init
 
 ! --------------------------------------------------------------------------------
 
+!> Start a timer
+
       subroutine oasis_timer_start (timer_label, barrier)
 
          implicit none
 
-         character(len=*), intent (in) :: timer_label
-         logical, intent (in), optional :: barrier
+         character(len=*),  intent (in) :: timer_label !< timer name
+         logical, intent (in), optional :: barrier     !< flag to barrier this timer
 
-         integer :: ierr
-         integer :: timer_id
+         INTEGER(kind=ip_intwp_p) :: ierr
+         INTEGER(kind=ip_intwp_p) :: timer_id
          real :: cpu_time_arg
-         character(len=*),parameter :: subname = 'oasis_timer_start'
+         character(len=*),parameter :: subname = '(oasis_timer_start)'
 
          IF (TIMER_Debug >=1) THEN
          call oasis_timer_c2i(timer_label,timer_id)
@@ -156,11 +149,9 @@ module mod_oasis_timer
             timer_id = ntimer
             timer(timer_id)%label = trim(timer_label)
             IF (ntimer+1 > mtimer) THEN
-                WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-                WRITE(nulprt,*) subname,' WARNING timer number exceeded' 
-                WRITE(nulprt,*) subname,' Increase mtimer in mod_oasis_method'
-                CALL oasis_flush(nulprt)
-                CALL oasis_abort_noarg()
+                WRITE(nulprt,*) subname,estr,'Timer number exceeded' 
+                WRITE(nulprt,*) subname,estr,'Increase nt oasis_timer_init interface'
+                CALL oasis_abort()
             ENDIF
          endif
 
@@ -181,18 +172,21 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Stop a timer
+
       subroutine oasis_timer_stop (timer_label)
 
-         character(len=*), intent (in) :: timer_label
+         character(len=*), intent (in) :: timer_label  !< timer name
+
          real :: cpu_time_arg
-         integer :: timer_id
-         character(len=*),parameter :: subname = 'oasis_timer_stop'
+         INTEGER(kind=ip_intwp_p) :: timer_id
+         character(len=*),parameter :: subname = '(oasis_timer_stop)'
 
          IF (TIMER_Debug >=1) THEN
          call oasis_timer_c2i(timer_label,timer_id)
          if (timer_id < 0) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-             WRITE(nulprt,*) subname,' WARNING: timer_label does not exist ',&
+             WRITE(nulprt,*) subname,wstr,'timer_label does not exist ',&
                              TRIM(timer_label)
              CALL oasis_flush(nulprt)
              RETURN
@@ -200,7 +194,7 @@ module mod_oasis_timer
 
          if (timer(timer_id)%runflag == t_stopped) then
              WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-             WRITE(nulprt,*) subname,' WARNING timer_id ',timer_id,' not started'
+             WRITE(nulprt,*) subname,wstr,'timer_id: ',trim(timer_label),' : not started'
              CALL oasis_flush(nulprt)
              RETURN
          endif
@@ -222,41 +216,57 @@ module mod_oasis_timer
 
 ! --------------------------------------------------------------------------------
 
+!> Print timers
+
       subroutine oasis_timer_print(timer_label)
 
          implicit none
 
-         character(len=*), optional, intent(in) :: timer_label
+         character(len=*), optional, intent(in) :: timer_label !< if unset, print all timers
 
-         integer :: timer_id
+         INTEGER(kind=ip_intwp_p) :: timer_id
          real, allocatable             :: sum_ctime_global_tmp(:,:)
          double precision, allocatable :: sum_wtime_global_tmp(:,:)
-         integer, allocatable          :: count_global_tmp(:,:)
+         INTEGER(kind=ip_intwp_p), allocatable          :: count_global_tmp(:,:)
          character(len=ic_med), allocatable :: label_global_tmp(:,:)
          real, allocatable             :: sum_ctime_global(:,:)
          double precision, allocatable :: sum_wtime_global(:,:)
-         integer, allocatable          :: count_global(:,:)
+         INTEGER(kind=ip_intwp_p), allocatable          :: count_global(:,:)
          double precision, allocatable :: rarr(:)
-         integer, allocatable          :: iarr(:)
+         INTEGER(kind=ip_intwp_p), allocatable          :: iarr(:)
          character(len=ic_med), allocatable :: carr(:)
          character(len=ic_med), allocatable :: label_list(:)
          double precision   :: rval
-         integer            :: ival
+         INTEGER(kind=ip_intwp_p)            :: ival
          character(len=ic_med) :: cval
          logical            :: onetimer
          logical            :: found
-         integer, parameter :: root = 0
-         integer            :: k, n, m
-         integer            :: nlabels
-         integer            :: ierror
-         integer            :: ntimermax
-         integer            :: pe1,pe2
-         integer            :: minpe,maxpe,mcnt
+         INTEGER(kind=ip_intwp_p), parameter :: root = 0
+         INTEGER(kind=ip_intwp_p)            :: k, n, m
+         INTEGER(kind=ip_intwp_p)            :: nlabels
+         INTEGER(kind=ip_intwp_p)          :: ierror
+         INTEGER(kind=ip_intwp_p)            :: ntimermax
+         INTEGER(kind=ip_intwp_p)            :: pe1,pe2
+         INTEGER(kind=ip_intwp_p)            :: minpe,maxpe,mcnt
          double precision   :: mintime,maxtime,meantime
-         character(len=*),parameter :: subname = 'oasis_timer_print'
+         character(len=*),parameter :: subname = '(oasis_timer_print)'
 
          IF (TIMER_Debug < 1) then
             return
+         ENDIF
+
+         IF ((TIMER_debug == 1) .AND. (mpi_rank_local == 0)) TIMER_Debug=2
+
+         IF (TIMER_Debug >= 2) THEN
+
+            CALL oasis_unitget(output_unit)
+            WRITE(file_name,'(a,i4.4)') TRIM(file_hold)//'_',mpi_rank_local
+
+            OPEN(output_unit, file=TRIM(file_name), form="FORMATTED", &
+                 status="UNKNOWN")
+            WRITE(output_unit,*) ''
+            CLOSE(output_unit)
+
          ENDIF
 
          onetimer = .false.
@@ -266,7 +276,7 @@ module mod_oasis_timer
             if (timer_id < 1) then
                 WRITE(nulprt,*) subname,' model :',compid,&
                                 ' proc :',mpi_rank_local
-                WRITE(nulprt,*) subname,' WARNING: invalid timer_label',&
+                WRITE(nulprt,*) subname,wstr,'invalid timer_label',&
                                 TRIM(timer_label)
                 CALL oasis_flush(nulprt)
                 RETURN
@@ -330,18 +340,18 @@ module mod_oasis_timer
 !-----------------------------------------------------
          if (mpi_size_local > 0) then
 
-            call oasis_mpi_max(ntimer,ntimermax,mpi_comm_local,string='ntimer',all=.true.)
+            call MPI_ALLREDUCE(ntimer,ntimermax,1,MPI_INTEGER,MPI_MAX,mpi_comm_local,ierror)
 
             allocate (sum_ctime_global_tmp(ntimermax, mpi_size_local), &
                       sum_wtime_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             IF ( ierror /= 0 ) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error sum_global_tmp'
+               mpi_rank_local,':',wstr,'allocate error sum_global_tmp'
             allocate (count_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error count_global_tmp'
+               mpi_rank_local,':',wstr,'allocate error count_global_tmp'
             allocate (label_global_tmp(ntimermax, mpi_size_local), stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error label_global_tmp'
+               mpi_rank_local,':',wstr,'allocate error label_global_tmp'
 
             sum_ctime_global_tmp = 0.0
             sum_wtime_global_tmp = 0.0
@@ -360,25 +370,26 @@ module mod_oasis_timer
 
 ! tcraig, this doesn't work either
 !            allocate(rarr(ntimermax),stat=ierror)
-!            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error rarr'
+!            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'allocate error rarr'
 !            rarr(1:ntimermax) = sum_ctime(1:ntimermax)
 !            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_ctime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,mpi_comm_local,ierror)
 !            rarr(1:ntimermax) = sum_wtime(1:ntimermax)
 !            call MPI_Gather(rarr,ntimermax,MPI_DOUBLE_PRECISION,sum_wtime_global_tmp,ntimermax,MPI_DOUBLE_PRECISION,root,mpi_comm_local,ierror)
 !            deallocate(rarr,stat=ierror)
-!            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error rarr'
+!            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'deallocate error rarr'
 !
 !            allocate(iarr(ntimermax),stat=ierror)
-!            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: allocate error iarr'
+!            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'allocate error iarr'
 !            iarr(1:ntimermax) = count(1:ntimermax)
 !            call MPI_Gather(iarr,ntimermax,MPI_INTEGER,count_global_tmp,ntimermax,MPI_INTEGER,root,mpi_comm_local,ierror)
 !            deallocate(iarr,stat=ierror)
-!            if ( ierror /= 0 ) write(nulprt,*) subname,' WARNING: deallocate error iarr'
+!            if ( ierror /= 0 ) write(nulprt,*) subname,wstr,'deallocate error iarr'
 
 ! tcraig this works but requires lots of gather calls, could be better
             allocate(rarr(mpi_size_local),iarr(mpi_size_local),carr(mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error rarr'
+               mpi_rank_local,':',wstr,'allocate error rarr'
+
             do n = 1,ntimermax
                cval = timer(n)%label
                carr(:) = ' '
@@ -413,21 +424,24 @@ module mod_oasis_timer
             enddo
             deallocate(rarr,iarr,carr,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error rarr'
+               mpi_rank_local,':',wstr,'deallocate error rarr'
 
             ! now sort all the timers out by names
 
             allocate(carr(ntimermax*mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error carr'
+               mpi_rank_local,':',wstr,'allocate error carr'
             nlabels = 0
             do n = 1,ntimermax
             do m = 1,mpi_size_local
                found = .false.
-               do k = 1,nlabels
-                  if (trim(label_global_tmp(n,m)) == trim(carr(k))) found = .true.
-                  if (trim(label_global_tmp(n,m)) == '') found = .false.
-               enddo
+               if (trim(label_global_tmp(n,m)) == '') then
+                  found = .true.
+               else
+                  do k = 1,nlabels
+                     if (trim(label_global_tmp(n,m)) == trim(carr(k))) found = .true.
+                  enddo
+               endif
                if (.not.found) then
                   nlabels = nlabels + 1
                   carr(nlabels) = trim(label_global_tmp(n,m))
@@ -437,22 +451,22 @@ module mod_oasis_timer
 
             allocate(label_list(nlabels),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error label_list'
+               mpi_rank_local,':',wstr,'allocate error label_list'
             do k = 1,nlabels
                label_list(k) = trim(carr(k))
             enddo
             deallocate(carr,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error carr'
+               mpi_rank_local,':',wstr,'deallocate error carr'
             allocate(sum_ctime_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error sum_ctime_global'
+               mpi_rank_local,':',wstr,'allocate error sum_ctime_global'
             allocate(sum_wtime_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error sum_wtime_global'
+               mpi_rank_local,':',wstr,'allocate error sum_wtime_global'
             allocate(count_global(nlabels,mpi_size_local),stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: allocate error count_global'
+               mpi_rank_local,':',wstr,'allocate error count_global'
 
             sum_ctime_global = 0
             sum_wtime_global = 0
@@ -472,16 +486,16 @@ module mod_oasis_timer
 
             deallocate(label_global_tmp,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error label_global_tmp'
+               mpi_rank_local,':',wstr,'deallocate error label_global_tmp'
             deallocate(sum_ctime_global_tmp,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global_tmp'
+               mpi_rank_local,':',wstr,'deallocate error sum_ctime_global_tmp'
             deallocate(sum_wtime_global_tmp,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global_tmp'
+               mpi_rank_local,':',wstr,'deallocate error sum_wtime_global_tmp'
             deallocate(count_global_tmp,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error count_global'
+               mpi_rank_local,':',wstr,'deallocate error count_global'
 
          endif ! (mpi_size_local > 1)
 
@@ -504,7 +518,7 @@ module mod_oasis_timer
                enddo
                if (n < 1) then
                   write(nulprt,*) subname,' model :',compid,' proc :',&
-                  mpi_rank_local,':',' WARNING: invalid timer_label',trim(timer_label)
+                  mpi_rank_local,':',wstr,'invalid timer_label',trim(timer_label)
                   CALL oasis_flush(nulprt)
                   return
                endif
@@ -560,12 +574,14 @@ module mod_oasis_timer
                         endif
                      endif
                   enddo
-                  if (mcnt > 0) meantime = meantime / float(mcnt)
-                  WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
-                     n, label_list(n), timer(n)%runflag, &
-                     sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
-                     sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
-                     meantime
+                  if (mcnt > 0) then
+                     meantime = meantime / float(mcnt)
+                     WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
+                        n, label_list(n), timer(n)%runflag, &
+                        sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
+                        sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
+                        meantime
+                  endif
                ENDDO
 
                IF (TIMER_Debug >= 3) THEN
@@ -621,16 +637,16 @@ module mod_oasis_timer
 
             deallocate (sum_ctime_global, stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error sum_ctime_global'
+               mpi_rank_local,':',wstr,'deallocate error sum_ctime_global'
             deallocate (sum_wtime_global, stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error sum_wtime_global'
+               mpi_rank_local,':',wstr,'deallocate error sum_wtime_global'
             deallocate (count_global,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error count_global'
+               mpi_rank_local,':',wstr,'deallocate error count_global'
             deallocate (label_list,stat=ierror)
             if ( ierror /= 0 ) write(nulprt,*) subname,' model :',compid,' proc :',&
-               mpi_rank_local,':',' WARNING: deallocate error label_list'
+               mpi_rank_local,':',wstr,'deallocate error label_list'
 
          endif ! (mpi_rank_local == root)
 
@@ -638,10 +654,13 @@ module mod_oasis_timer
       end subroutine oasis_timer_print
 
 ! --------------------------------------------------------------------------------
+
+!> Convert a timer name to the timer id number
+
       subroutine oasis_timer_c2i(tname,tid)
 
-         character(len=*),intent(in)  :: tname
-         integer         ,intent(out) :: tid
+         character(len=*),intent(in)  :: tname  !< timer name
+         integer         ,intent(out) :: tid    !< timer id
 
          integer :: n
 

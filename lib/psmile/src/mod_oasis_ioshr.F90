@@ -1,3 +1,6 @@
+
+!> IO interfaces based on pio (not supported yet)
+
 !===============================================================================
 !BOP ===========================================================================
 !
@@ -189,7 +192,7 @@ contains
      else if ( typename .eq. 'NOTHING') then
         iotype = defaulttype
      else
-        write(nulprt,*) 'mod_oasis_ioshr: WARNING Bad io_type argument - using iotype_netcdf'
+        write(nulprt,*) subname,wstr,'Bad io_type argument - using iotype_netcdf'
         iotype=pio_iotype_netcdf
      end if
   end subroutine getiotypefromname
@@ -391,8 +394,8 @@ subroutine oasis_ioshr_wopen(filename,clobber,cdf64)
        endif
     elseif (trim(wfilename) /= trim(filename)) then
        ! filename is open, better match open filename
-       if(pio_iam==0) write(nulprt,*) subname,' different file currently open ',trim(filename)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'different file currently open ',trim(filename)
+       call oasis_abort()
     else
        ! filename is already open, just return
     endif
@@ -435,8 +438,8 @@ subroutine oasis_ioshr_close(filename)
        call pio_closefile(pio_file)
     else
        ! different filename is open, abort
-       if(pio_iam==0) write(nulprt,*) subname,' different file currently open ',trim(filename)
-       call oasis_abortnoarg()
+       write(nulprt,*) subname,estr,'different file currently open ',trim(filename)
+       call oasis_abort()
     endif
 
     wfilename = ''
@@ -484,9 +487,8 @@ character(len=10) function oasis_ioshr_date2yyyymmdd (date)
 !-------------------------------------------------------------------------------
 
    if (date < 0) then
-       WRITE (nulprt,*)  subname,' abort by model ',compid
-       WRITE(nulprt,*) subname,' ERROR: oasis_ioshr_date2yyyymmdd: negative date not allowed'
-       CALL oasis_abort_noarg()
+       WRITE(nulprt,*) subname,estr,'oasis_ioshr_date2yyyymmdd: negative date not allowed'
+       CALL oasis_abort()
    end if
 
    year  = date / 10000
@@ -517,9 +519,8 @@ character(len=8) function oasis_ioshr_sec2hms (seconds)
 !-------------------------------------------------------------------------------
 
    if (seconds < 0 .or. seconds > 86400) then
-       WRITE (nulprt,*)  subname,' abort by model ',compid
-       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad input seconds:', seconds
-       CALL oasis_abort_noarg()
+       WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad input seconds:', seconds
+       CALL oasis_abort()
    end if
 
    hours   = seconds / 3600
@@ -527,15 +528,13 @@ character(len=8) function oasis_ioshr_sec2hms (seconds)
    secs    = (seconds - hours*3600 - minutes*60)
 
    if (minutes < 0 .or. minutes > 60) then
-       WRITE (nulprt,*)  subname,' abort by model ',compid
-       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad minutes = ',minutes
-       CALL oasis_abort_noarg()
+       WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad minutes = ',minutes
+       CALL oasis_abort()
    end if
 
    if (secs < 0 .or. secs > 60) then
-       WRITE (nulprt,*)  subname,' abort by model ',compid
-       WRITE(nulprt,*) subname,'oasis_ioshr_sec2hms: bad secs = ',secs
-       CALL oasis_abort_noarg()
+       WRITE(nulprt,*) subname,estr,'oasis_ioshr_sec2hms: bad secs = ',secs
+       CALL oasis_abort()
    end if
 
    write(oasis_ioshr_sec2hms,80) hours, minutes, secs
@@ -632,9 +631,8 @@ end function oasis_ioshr_sec2hms
 	
     nf = mct_aVect_nRattr(AV)
     if (nf < 1) then
-       WRITE (nulprt,*)  subname,' abort by model ',compid
-       write(nulprt,*) subname,' ERROR: nf = ',nf,trim(dname)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'nf = ',nf,trim(dname)
+       call oasis_abort()
     endif
 
     if (present(nx)) then
@@ -644,9 +642,8 @@ end function oasis_ioshr_sec2hms
        if (ny /= 0) lny = ny
     endif
     if (lnx*lny /= ng) then
-       if(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
-       if(pio_iam==0) write(nulprt,*) subname,' ERROR: grid2d size not consistent ',ng,lnx,lny,trim(dname)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'grid2d size not consistent ',ng,lnx,lny,trim(dname)
+       call oasis_abort()
     endif
 
     if (lwhead) then
@@ -1220,9 +1217,8 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-       if(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
-       if(pio_iam==0) write(nulprt,*) subname,' ERROR: file invalid ',trim(filename),' ',trim(dname)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'file invalid ',trim(filename),' ',trim(dname)
+       call oasis_abort()
     endif
 
     do k = 1,nf
@@ -1244,18 +1240,17 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
              end if
              ng = lnx * lny
              if (ng /= mct_gsmap_gsize(gsmap)) then
-                 IF (pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
-                 IF (pio_iam==0) WRITE(nulprt,*) subname,' ERROR: dimensions do not match',&
+                 WRITE(nulprt,*) subname,estr,'dimensions do not match',&
                      lnx,lny,mct_gsmap_gsize(gsmap)
-                 CALL oasis_abort_noarg()
+                 CALL oasis_abort()
              end if
              call pio_initdecomp(pio_iosystem, pio_double, (/lnx,lny/), dof, iodesc)
              deallocate(dof)
           end if
           call pio_read_darray(pioid,varid,iodesc, av%rattr(k,:), rcode)
        else
-          write(nulprt,*)'oasis_ioshr_readav warning: field ',trim(itemc),' is not on restart file'
-          write(nulprt,*)'for backwards compatibility will set it to 0'
+          write(nulprt,*) subname,wstr,'field ',trim(itemc),' is not on restart file'
+          write(nulprt,*) subname,wstr,'for backwards compatibility will set it to 0'
           av%rattr(k,:) = 0.0_r8
        end if
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
@@ -1351,9 +1346,8 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-        IF(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
-        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort()
     endif
 
     name1 = trim(dname)
@@ -1446,9 +1440,8 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-        IF(pio_iam==0) WRITE (nulprt,*)  subname,' abort by model ',compid
-        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort()
     endif
 
     name1 = trim(dname)
@@ -1505,9 +1498,8 @@ subroutine oasis_ioshr_write_time(filename,time_units,time_cal,time_val,nt,whead
        rcode = pio_get_att(pioid,pio_global,"file_version",lversion)
        call pio_seterrorhandling(pioid,PIO_INTERNAL_ERROR)
     else
-        IF(pio_iam==0)WRITE (nulprt,*)  subname,' abort by model ',compid
-        IF(pio_iam==0) WRITE(nulprt,*) subname,' ERROR: file invalid ',TRIM(filename),' ',TRIM(dname)
-        CALL oasis_abort_noarg()
+        WRITE(nulprt,*) subname,estr,'file invalid ',TRIM(filename),' ',TRIM(dname)
+        CALL oasis_abort()
     endif
 
     name1 = trim(dname)

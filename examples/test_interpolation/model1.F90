@@ -218,7 +218,7 @@ PROGRAM model1
       CALL FLUSH(w_unit)
   ENDIF
   !
-  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
       CALL FLUSH(w_unit)

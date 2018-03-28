@@ -1,0 +1,94 @@
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__area}{\section{mod\+\_\+oasis\+\_\+grid\+:\+:oasis\+\_\+write\+\_\+area Interface Reference}
+\label{interfacemod__oasis__grid_1_1oasis__write__area}\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area}}
+}
+
+
+Generic interface to support writing 4 or 8 byte reals.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__area_af355601b9ced09ab6bf152fada2d6d79}{oasis\+\_\+write\+\_\+area\+\_\+r4} (cgrid, nx, ny, area, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set area values for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__area_a52b5ad6f028f6710ae4c17da1062dab4}{oasis\+\_\+write\+\_\+area\+\_\+r8} (cgrid, nx, ny, area, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set area values for 8 byte reals. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic interface to support writing 4 or 8 byte reals. 
+
+Definition at line 103 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__area_af355601b9ced09ab6bf152fada2d6d79}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area}!oasis\+\_\+write\+\_\+area\+\_\+r4@{oasis\+\_\+write\+\_\+area\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+area\+\_\+r4@{oasis\+\_\+write\+\_\+area\+\_\+r4}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area}}
+\subsubsection[{oasis\+\_\+write\+\_\+area\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area\+::oasis\+\_\+write\+\_\+area\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{area, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__area_af355601b9ced09ab6bf152fada2d6d79}
+
+
+User interface to set area values for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em area} & areas\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 741 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__area_a52b5ad6f028f6710ae4c17da1062dab4}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area}!oasis\+\_\+write\+\_\+area\+\_\+r8@{oasis\+\_\+write\+\_\+area\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+area\+\_\+r8@{oasis\+\_\+write\+\_\+area\+\_\+r8}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area}}
+\subsubsection[{oasis\+\_\+write\+\_\+area\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area\+::oasis\+\_\+write\+\_\+area\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{area, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__area_a52b5ad6f028f6710ae4c17da1062dab4}
+
+
+User interface to set area values for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em area} & areas\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 684 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

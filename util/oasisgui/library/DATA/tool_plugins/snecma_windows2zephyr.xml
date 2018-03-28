@@ -1,0 +1,13 @@
+<model name="snecma_windows2zephyr" title="Execution windows vers le robot zephyr" >
+<desc>
+    Ce profil est a l'usage de Safran Villaroche. Il permet de lancer des outils UNIX lors d'une execution de C3Sm sur Windows.
+    Les scripts shell avec une extension ".todo" seront executes par un robot pouvant tourner sur Zephyr 
+    
+    [item= Assurez vous que le robot est actif aupres du garant C3Sm de votre site.]
+    [item= Assurez vous que votre projets est construit sur le disque \\Windata]
+    []
+    [logo=plugin_robot;caption=execution par robot]
+    []
+    [logo=snecma;caption=Uniquement pour Snecma]
+</desc>
+</model>

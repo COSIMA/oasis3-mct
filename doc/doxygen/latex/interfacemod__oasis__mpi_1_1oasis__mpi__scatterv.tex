@@ -1,0 +1,71 @@
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+scatterv Interface Reference}
+\label{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv}}
+}
+
+
+Generic interfaces into an M\+P\+I vector scatter.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv_a3fcba01cf7b4de3c6c05fa8999f5c00d}{oasis\+\_\+mpi\+\_\+scattervr1} (locarr, loc\+Size, glob1\+Darr, glob\+Size, displs, rootid, comm, string)
+\begin{DoxyCompactList}\small\item\em Scatter a vector of global data from a rootid. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic interfaces into an M\+P\+I vector scatter. 
+
+Definition at line 83 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv_a3fcba01cf7b4de3c6c05fa8999f5c00d}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv}!oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}}
+\index{oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+scattervr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv\+::oasis\+\_\+mpi\+\_\+scattervr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{locarr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{loc\+Size, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{glob1\+Darr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{glob\+Size, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{displs, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv_a3fcba01cf7b4de3c6c05fa8999f5c00d}
+
+
+Scatter a vector of global data from a rootid. 
+
+This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{oasis\+\_\+mpi\+\_\+gathscatvinit} routine and uses that information to scatter glob1\+Darr on processor rootid in communicator comm to locarr on other processors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em locarr} & Local array\\
+\hline
+\mbox{\tt in}  & {\em glob1darr} & Global 1\+D array to send from\\
+\hline
+\mbox{\tt in}  & {\em locsize} & Number to receive this P\+E\\
+\hline
+\mbox{\tt in}  & {\em globsize} & Number to send to each P\+E\\
+\hline
+\mbox{\tt in}  & {\em displs} & Displacements for send\\
+\hline
+\mbox{\tt in}  & {\em rootid} & M\+P\+I task to scatter on\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1183 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

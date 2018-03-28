@@ -1,0 +1,308 @@
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum}{\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+sum Interface Reference}
+\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum}\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+}
+
+
+Generic overloaded interface into M\+P\+I sum reduction.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_ace0332192a77ef918fa53fa5087386cc}{oasis\+\_\+mpi\+\_\+sumi0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global Sum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a98942ad26b72d6ff96fd8631ec70a5ce}{oasis\+\_\+mpi\+\_\+sumi1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a8d3b0d2544f1f360d83076b3d6dfe9e9}{oasis\+\_\+mpi\+\_\+sumb0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar 8 byte integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_af53d904fe38089eb567660f0d4f89fb0}{oasis\+\_\+mpi\+\_\+sumb1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D 8 byte integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_aef927bb26681ca81b005940fad26d27f}{oasis\+\_\+mpi\+\_\+sumr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a509c6561bf7677ca44df5727ec7af8bf}{oasis\+\_\+mpi\+\_\+sumr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a45b443ca4b94c71ad7be5e6b653d8b1f}{oasis\+\_\+mpi\+\_\+sumr2} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 2\+D array of global sums for an array of 2\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a31d24332ccc66502fcb78e5f69d19c45}{oasis\+\_\+mpi\+\_\+sumr3} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 3\+D array of global sums for an array of 3\+D doubles. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic overloaded interface into M\+P\+I sum reduction. 
+
+Definition at line 88 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a8d3b0d2544f1f360d83076b3d6dfe9e9}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}}
+\index{oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumb0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumb0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i8\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i8\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a8d3b0d2544f1f360d83076b3d6dfe9e9}
+
+
+Compute a global sum for a scalar 8 byte integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1357 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_af53d904fe38089eb567660f0d4f89fb0}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}}
+\index{oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumb1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumb1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i8\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i8\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_af53d904fe38089eb567660f0d4f89fb0}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D 8 byte integers. 
+
+This sums an array of local integers to an array of summed integers. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1423 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_ace0332192a77ef918fa53fa5087386cc}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}}
+\index{oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumi0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumi0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_ace0332192a77ef918fa53fa5087386cc}
+
+
+Compute a global Sum for a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1228 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a98942ad26b72d6ff96fd8631ec70a5ce}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}}
+\index{oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumi1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumi1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a98942ad26b72d6ff96fd8631ec70a5ce}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D integers. 
+
+This sums an array of local integers to an array of summed integers. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1294 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_aef927bb26681ca81b005940fad26d27f}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}}
+\index{oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_aef927bb26681ca81b005940fad26d27f}
+
+
+Compute a global sum for a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1486 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a509c6561bf7677ca44df5727ec7af8bf}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}}
+\index{oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a509c6561bf7677ca44df5727ec7af8bf}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1552 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a45b443ca4b94c71ad7be5e6b653d8b1f}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}}
+\index{oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumr2 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a45b443ca4b94c71ad7be5e6b653d8b1f}
+
+
+Compute a 2\+D array of global sums for an array of 2\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1618 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a31d24332ccc66502fcb78e5f69d19c45}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}!oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}}
+\index{oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr3}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum\+::oasis\+\_\+mpi\+\_\+sumr3 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__sum_a31d24332ccc66502fcb78e5f69d19c45}
+
+
+Compute a 3\+D array of global sums for an array of 3\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1684 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

@@ -1,0 +1,105 @@
+<model name="intro" title="OASIS3-MCT coupler" layout="flat">
+    <desc> 
+        [image=header_final.gif]
+        OASIS3-MCT coupler Graphical User Interface
+    </desc>
+    <docu>
+
+
+The OASIS coupler, is a software allowing synchronized exchanges of coupling information between numerical codes 
+representing different components of the climate system. Current OASIS developers are CERFACS (Toulouse, France) 
+and Centre National de la Recherche Scientifique (Paris, France). []
+
+OASIS3-MCT, the new version of the OASIS coupler interfaced with the Model Coupling Toolkit (MCT) from the Argonne National 
+Laboratory, offers today a fully parallel implementation of coupling field regridding and exchange. Low-intrusiveness, portability 
+and flexibility are OASIS3-MCT key design concepts as for all previous OASIS versions. An important difference with respect 
+to previous OASIS3.3 is that there is no separate coupler executable: OASIS3-MCT is a coupling library that 
+needs to be linked to the component models, to interpolate and exchange the coupling 
+fields between these components. []
+
+
+OASIS3-MCT supports coupling of general two-dimensional fields. Unstructured grids and 3D grids are also supported 
+using a one dimension representation of the two or three dimensional structures. Thanks to MCT, all transformations, including 
+regridding, are executed in parallel on the set of source or target component processes and all coupling exchanges are now 
+executed in parallel directly between the components via Message Passing Interface (MPI). OASIS3-MCT also supports file I/O 
+using NetCDF, allowing an easy switch between the coupled and forced modes. In the current version, the implementation of this 
+functionality is however non parallel with the reading/writing of the fields performed only by the master process of the model. []
+
+
+In spite of the significant changes in underlying implementation, usage of OASIS3-MCT in the component code has largely 
+remained unchanged with respect to OASIS3.3. To communicate with another model, or to perform I/O actions, a component 
+model needs to include a few specific calls to the OASIS3-MCT coupling library, using the same API as in OASIS3.3. The 
+configuration file (namcouple) is also largely unchanged relative to OASIS3, although few options are either not used 
+or not supported. []
+
+
+The scalability tests done with OASIS3-MCT at high number of cores and the fact that it supports unstructured grids allow 
+us to conclude that this coupler offers today a fully parallel and efficient coupling solution answering the short and mid 
+term needs of the European climate modelling community. []
+
+
+More information can be found on the OASIS web site: https://oasis.enes.org
+    </docu>
+</model>
+
+<model name="generaldesc" title="Generalities on the GUI" layout="flat">
+    <desc> Generalities on the Graphical User Interface : []
+[section=Generalities] []
+This GUI was developed to create the configuration file (namcouple) of OASIS3-MCT.
+The configuration file contains all user defined information necessary to configure a
+particular coupled run. The first part of the file is devoted to general parameters
+such as the runtime or the level of debugging.
+The second part gathers specific information
+on each coupling (or I/O) field, e.g. their coupling period, the list of transformations
+or interpolations to be performed by OASIS3-MCT.
+All these informations will be defined step by step through this interface to finally be
+written in the configuration file by the GUI (processing the last tab "Config"). []
+   </desc>
+</model>
+
+<model name="guidesc" title="Decription of the GUI" layout="flat">
+    <desc> Short description of the Graphical User Interface : []
+
+[section=Usage]
+All windows defined by the different tabs below the OASIS logo
+must be filled up, from the left to the right. When all data of a window is 
+defined, the window must be validated by clicking on button "Process"
+at the bottom right. If the information provided in the window is correct, the corresponding
+orange (?) bullet becomes green in the tab. An orange (?) bullet in the tab means that 
+no information was stored yet in the window or that the information was not yet validated,
+a red (X) bullet in the tab means that there is an error in the window, 
+and, as already explained, a green (v) bullet in the tab means that
+the data entered in the window is correct.
+If there is a problem in a tab (red (X) bullet), an error message giving more
+information is printed in the bottom window of the GUI.
+If you want to close the GUI (File/Quit) before the proper creation of the configuration file in the last tab, it
+is possible to save the information entered in an xml file. You can reload your xml file
+using the (File/Load as new) menu at the left top of the GUI (do not use the (File/Load as part) menu).
+Some documentation about the data to be provided by the user in the different windows is available by clicking on the 
+different blue bullets (?) entitled "Learn more".[]
+The first parameters to enter, in the tab "Gen", will be the simulation length, the debugging
+level and the timing information printed by OASIS3-MCT.
+If grouped fields have to be defined (i.e. fields using the same configuration settings sent in a single communication) 
+the "Enable grouped field" must be activated.
+In this case a new tab "Group" will appear to define the different groups.
+Then the grid characteristics of the coupling fields in
+the "Grids" window, and the different names of the coupling fields (before and after transformations), grouped or not,
+in the tab "Fld Name".[] 
+Finally all characteristics and transformations associated to each coupling field (or grouped fields) have to be defined step 
+by step in the following windows. 
+If the first four tabs "Main", "Gen", “Grids” and "Fld Names" are not filled up and processed before the others, 
+it will not be possible to enter information about the coupling fields in the following windows.[] 
+At some point when filling the GUI or when closing it, the data of the GUI must be saved in an xml file which name
+is chosen by the user.
+A summary of the transformations chosen for the coupling fields will be printed when processing
+the tab "Sum".
+The  final configuration text file will be created and printed in the last window "Config" when processing it, only if
+WHEN ALL THE TABS ARE VALIDATED  (in a directory named after the name of the xml file, see the README file). [] 
+
+[section=Documentation]
+Some documentation is available by clicking on the different blue bullets (?).
+It is also possible to get all the OASIS3-MCT documentation in an html format by using the functionality
+(File/General help) located at the left top of the GUI.
+    </desc>
+</model>
+

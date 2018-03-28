@@ -1,0 +1,186 @@
+\hypertarget{classmod__oasis__method}{\section{mod\+\_\+oasis\+\_\+method Module Reference}
+\label{classmod__oasis__method}\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+}
+
+
+High level O\+A\+S\+I\+S user interfaces.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__method_a9d642dd3ca229a1b957bc3c92b33c356}{oasis\+\_\+init\+\_\+comp} (mynummod, cdnam, kinfo, coupled)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user init method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{oasis\+\_\+terminate} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user finalize method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{oasis\+\_\+enddef} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S user interface specifying the O\+A\+S\+I\+S definition phase is complete. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}{mod\+\_\+oasis\+\_\+setrootglobal} ()
+\begin{DoxyCompactList}\small\item\em Local method to compute each models' global task ids, exists for reuse in enddef. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{debug} =1
+\item 
+logical, save \hyperlink{classmod__oasis__method_a2d387aae5e884be0aa69d640a7d3b49f}{lg\+\_\+mpiflag}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+High level O\+A\+S\+I\+S user interfaces. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!mod\+\_\+oasis\+\_\+setrootglobal@{mod\+\_\+oasis\+\_\+setrootglobal}}
+\index{mod\+\_\+oasis\+\_\+setrootglobal@{mod\+\_\+oasis\+\_\+setrootglobal}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{mod\+\_\+oasis\+\_\+setrootglobal}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+method\+::mod\+\_\+oasis\+\_\+setrootglobal (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}
+
+
+Local method to compute each models' global task ids, exists for reuse in enddef. 
+
+
+
+Definition at line 783 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\hypertarget{classmod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+enddef@{oasis\+\_\+enddef}}
+\index{oasis\+\_\+enddef@{oasis\+\_\+enddef}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{oasis\+\_\+enddef}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+enddef (
+\begin{DoxyParamCaption}
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}
+
+
+O\+A\+S\+I\+S user interface specifying the O\+A\+S\+I\+S definition phase is complete. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check enddef called only once per task
+\item Reset mpi\+\_\+comm\+\_\+global because active tasks might have been excluded
+\item For active tasks only
+\begin{DoxyItemize}
+\item Update mpi\+\_\+comm\+\_\+global
+\item Update mpi\+\_\+root\+\_\+global
+\item Document
+\item Reconcile partitions, call part\+\_\+setup
+\item Reconcile variables, call var\+\_\+setup
+\item Write grid info to files one model at a time
+\item M\+C\+T Initialization
+\item Initialize coupling via call to coupler\+\_\+setup
+\item Call advance\+\_\+init to initialize coupling fields from restarts 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 618 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\hypertarget{classmod__oasis__method_a9d642dd3ca229a1b957bc3c92b33c356}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}}
+\index{oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{oasis\+\_\+init\+\_\+comp}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+init\+\_\+comp (
+\begin{DoxyParamCaption}
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{mynummod, }
+\item[{character(len=$\ast$), intent(in)}]{cdnam, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo, }
+\item[{logical, intent(in), optional}]{coupled}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__method_a9d642dd3ca229a1b957bc3c92b33c356}
+
+
+O\+A\+S\+I\+S user init method. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em mynummod} & $\ast$ This is C\+O\+L\+L\+E\+C\+T\+I\+V\+E, all pes must call\\
+\hline
+\mbox{\tt out}  & {\em mynummod} & component model I\+D\\
+\hline
+\mbox{\tt in}  & {\em cdnam} & model name\\
+\hline
+\mbox{\tt in,out}  & {\em kinfo} & return code\\
+\hline
+\mbox{\tt in}  & {\em coupled} & flag to specify whether this component is coupled in oasis \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Initialize M\+P\+I
+\item Set initial output file, need mpi\+\_\+rank\+\_\+world
+\item Initialize namcouple. First on rank 0 to write error messages then on all other ranks. All tasks will read the namcouple file independently.
+\item Check if N\+F\+I\+E\+L\+D\+S=0, there is no coupling.
+\item Determine the total number of coupling fields from namcouple. Set maxvar parameter and allocate prism\+\_\+var.
+\item Store all the names of the fields exchanged in the namcouple
+\item Gather model names from all tasks to generate active model list on all tasks.
+\item Broadcast the model list to all M\+P\+I tasks
+\item Compute compid
+\item Re-\/\+Set M\+P\+I info based on active model tasks
+\item Reset debug levels
+\item Open log files
+\item Set mpi\+\_\+root\+\_\+global
+\item Memory Initialization
+\item Timer Initialization
+\item Diagnostics 
+\end{DoxyItemize}
+
+Definition at line 44 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\hypertarget{classmod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+terminate@{oasis\+\_\+terminate}}
+\index{oasis\+\_\+terminate@{oasis\+\_\+terminate}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{oasis\+\_\+terminate}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+terminate (
+\begin{DoxyParamCaption}
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}
+
+
+O\+A\+S\+I\+S user finalize method. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Print timer information
+\item Call M\+P\+I finalize
+\item Write S\+U\+C\+C\+E\+S\+S\+F\+U\+L R\+U\+N 
+\end{DoxyItemize}
+
+Definition at line 555 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!debug@{debug}}
+\index{debug@{debug}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{debug}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+method\+::debug =1\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__method_a390290b92b6af57b2732cb7521532f1c}
+
+
+Definition at line 34 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\hypertarget{classmod__oasis__method_a2d387aae5e884be0aa69d640a7d3b49f}{\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!lg\+\_\+mpiflag@{lg\+\_\+mpiflag}}
+\index{lg\+\_\+mpiflag@{lg\+\_\+mpiflag}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection[{lg\+\_\+mpiflag}]{\setlength{\rightskip}{0pt plus 5cm}logical, save mod\+\_\+oasis\+\_\+method\+::lg\+\_\+mpiflag\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__method_a2d387aae5e884be0aa69d640a7d3b49f}
+
+
+Definition at line 36 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__method_8_f90}{mod\+\_\+oasis\+\_\+method.\+F90}\end{DoxyCompactItemize}

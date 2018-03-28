@@ -7,14 +7,20 @@
 \section{Compiling OASIS3-MCT}
 \label{subsec_compile}
 
-Compiling OASIS3-MCT libraries can be done in directory {\tt
-  oasis3-MCT/util/make\_dir} with Makefile \\ {\tt TopMakefileOasis3}
-which must be completed with a header file {\tt make.{\it
+OASIS3-MCT is an MPI code. Compiling OASIS3-MCT libraries can be done
+in {\tt oasis3-MCT/util/make\_dir} with Makefile {\tt TopMakefileOasis3}
+which must include a header file {\tt make.{\it
     your\_platform}} specific to the compiling platform used and
-specified in {\tt oasis3-MCT/util/make\_dir/make.inc}.  One of the
-header files distributed with the release can by used as a template.
+specified in {\tt oasis3-MCT/util/make\_dir/make.inc}.  
+
+One of the
+header files distributed with the release can by used as a template
+in particular to see how to use MPI librairies and NetCDF librairies.
 The root of the OASIS3-MCT tree can be anywhere and must be set in the
 variable {\tt COUPLE} in the {\tt make.{\it your\_platform}} file.
+
+The coupled models must be compiled with the same libraries as the ones
+used to compile OASIS3-MCT.
 
 The following commands are available:
 
@@ -39,12 +45,11 @@ During compilation, a new compiling directory, defined by variable
 libraries are found in the compiling directory in {\tt /lib} and
 object and module files in {\tt /build}. 
 
-If module {\tt mod\_oasis} is used in the
-models, it is enough to include the path of the psmile objects and
-modules ({\tt \$ARCHDIR/build/lib/psmile.MPI1}) for the compilation and to use the psmile library {\tt \$ARCHDIR/lib/libpsmile.MPI1.a} when
-linking. If module {\tt mod\_prism} is used in the models, it is necessary to
+To interface  a component code with OASIS3-MCT and use the module {\tt mod\_oasis} (see section \ref{subsubsec_Use}), it is enough to include the path of the psmile objects and
+modules ({\tt \$ARCHDIR/build/lib/psmile.MPI1}) during the compilation and to use the psmile library {\tt \$ARCHDIR/lib/libpsmile.MPI1.a} when
+linking\footnote{If module {\tt mod\_prism} is used in the models, it is necessary to
 include the path of the psmile and of the mct objects and modules for
-the compilation (i.e. {\tt \$ARCHDIR/build/lib/psmile.MPI1} and {\tt /mct} and to use both the psmile and mct libraries {\tt \$ARCHDIR/lib/libpsmile.MPI1.a} and {\tt libmct.a} and {\tt libmpeu.a} when linking.
+the compilation (i.e. {\tt \$ARCHDIR/build/lib/psmile.MPI1} and {\tt /mct} and to use both the psmile and mct libraries {\tt \$ARCHDIR/lib/libpsmile.MPI1.a} and {\tt libmct.a} and {\tt libmpeu.a} when linking.}.
 
 Exchange of coupling fields in single and double precision is now supported directly through the interface 
 (see section \ref{subsubsec_Declaration}), even if all real variables are now treated in double precision internally.
@@ -53,47 +58,60 @@ For double precision coupling field, there is no need anymore to promote REAL va
 \section{CPP keys}
 \label{subsec_cpp}
 
-The following CPP keys are coded in OASIS3-MCT and can be specified in
-{\tt CPPDEF} in {\tt make.{\it your\_platform}} file.
-
-\begin{itemize}
-
-\item {\tt TREAT\_OVERLAY}: To ensure, in {\tt SCRIPR/CONSERV}
+The only CPP key coded in OASIS3-MCT and that can be specified in
+{\tt CPPDEF} in {\tt make.{\it your\_platform}} file is {\tt
+  TREAT\_OVERLAY} that ensures, in {\tt SCRIPR/CONSERV}
   remapping (see section \ref{subsec_interp}), that if two cells of
-  the source grid overlay, at least the one with the greater numerical
-  index is masked (they also can be both masked); this is mandatory
+  the source grid overlay and none is masked a priori, the one with the greater numerical
+  index will not be considered (they also can be both masked); this is mandatory
   for this remapping. For example, if the grid line with {\it i=1} overlaps
   the grid line with {\it i=imax}, it is the latter that must be masked;
   when this is not the case with the mask defined in {\it masks.nc},
   this CPP key forces these rules to be respected.
 
-\item {\tt balance}: Add a MPI\_Wtime() function before and after
-  mct\_isend (MPI put) and mct\_recv (MPI get) to calculate the time
-  of the send and receive of a coupling field. This option can be used
-  to produce timestamps in OASIS3-MCT debug files. During a post-processing
-  phase, this information can be used to perform an analysis of the
-  coupled components load (un)balance; specific tools have been
-  developed to do this and will be released with a further version of
-  OASIS3-MCT. {\bf This option is temporarily not recommended as it was observed that
-  it was increasing the simulation time of coupled models on
-  the PRACE computer MareNostrum.}
-
-\end{itemize}
+%\item {\tt balance}: Add a MPI\_Wtime() function before and after
+%  mct\_isend (MPI put) and mct\_recv (MPI get) to calculate the time
+%  of the send and receive of a coupling field. This option can be used
+%  to produce timestamps in OASIS3-MCT debug files. During a post-processing
+%  phase, this information can be used to perform an analysis of the
+%  coupled components load (un)balance; specific tools have been
+%  developed to do this and will be released with a further version of
+%  OASIS3-MCT. {\bf This option is temporarily not recommended as it was observed that
+%  it was increasing the simulation time of coupled models on
+%  the PRACE computer MareNostrum.}
 
 \section{Running OASIS3-MCT}
 \label{subsec_running}
 
-Examples of running environement are provided with the sources. For
-more details, see the instructions on OASIS web site at
-{\tt https://verc.enes.org/oasis/oasis-dedicated-user-support-1/} {\tt user-toys/tutorial-and-test\_interpolation-of-oasis3-mct-1}.
-.
+Examples of running environments are provided with the sources. See also the instructions on OASIS web site at
+{\tt
+  https://verc.enes.org/oasis/oasis-dedicated-user-support-1/user-toys}
+for more details.
 
 \subsection{The tutorial toy model}
 \label{subsec_tutorial}
 
-A practical example on how to run OASIS3-MCT and running it in a
-coupled system is provided in {\tt oasis3-mct/examples/tutorial}. See also the document {\tt tutorial\_oasis3-mct.pdf} there in for
-more details,
+A practical example  is provided in {\tt
+  oasis3-mct/examples/tutorial} reproducing the coupling between two
+simple codes, model1 and model2, with OASIS3-MCT. 
+
+See
+the document {\tt tutorial.pdf} there in and the on-line
+tutorial at \\
+{\tt
+  https://verc.enes.org/oasis/oasis-dedicated-user-support-1/user-toys}
+
+{\tt
+ /tutorial-and-test\_interpolation-of-oasis3-mct-1}
+for more details.
+
+\subsection{The test\_1bin\_ocnice toy model}
+\label{subsec_1bin_ocnice}
+
+Another practical example on how to use OASIS3-MCT is provided in \\ {\tt oasis3-mct/examples/test\_1bin\_ocnice}. 
+This toy model reproduces the coupling between 5 sub-components within
+the “ocnice” executable. See
+the document {\tt test\_1bin\_ocnice.pdf} there in for more details.
 
 \subsection{The test\_interpolation environment}
 \label{subsec_testinterpolation}
@@ -102,7 +120,7 @@ This environment available with the sources in {\tt
   oasis3-mct/examples/test\_interpolation} allows the user to test the
 quality of the interpolations and transformations between his source
 and target grids by calculating the error of interpolation on the
-target grid. For more details, see also the document {\tt test\_interpolation\_oasis3-mct.pdf} there in.
+target grid. For more details, see also the document {\tt test\_interpolation.pdf} there in.
 
 \section{Debugging}
 \label{subsec_debug}
@@ -115,20 +133,21 @@ increasing the {\tt \$NLOGPRT} value in your {\it namcouple} (see also section
 
 Different outputs are written depending on {\tt \$NLOGPRT} value:
 \begin{itemize}
-\item {0} : one file debug.root.xx is open by the master process of
-  each model and one file debug\_notroot.xx is open for all the other
+\item {0} : production mode. One file debug.root.xx is opened by the master process of
+  each model and one file debug\_notroot.xx is opened for all the other
   processes of each model to write only error information if an error
   occurs.
-\item {1} : one file debug.root.xx is open by the master process of
-  each model to write information equivalent to level 10 (see below);
-  one file debug\_notroot.xx is open for all the other processes of
+\item {1} : one file debug.root.xx is opened by the master process of
+  each model to write information equivalent to level 10 (see below)
+  and also to write memory usage information;
+  one file debug\_notroot.xx is opened for all the other processes of
   each model to write only error information if an error occurs.
-\item {2} : one file debug.xx.xxxxxx is open by each process of each
-  model to write normal production diagnostics.
+\item {2} : one file debug.xx.xxxxxx is opened by each process of each
+  model to write normal production diagnostics .
 \item {5} : as for 2 with in addition some initial debug info.
 \item {10} : as for 5 with in addition the routine calling tree.
 \item {12} : as for 10 with in addition some routine calling notes.
-\item {15} : as for 12 with even more debug diagnostics.
+\item {15} : as for 12 with even more debug diagnostics and memory usage information.
 \item {20} : as for 15 with in addition some extra runtime analysis.
 \item {30} : full debug information.
 \end{itemize}
@@ -157,31 +176,40 @@ depending on TIMER\_Debug value :
   all the results for each process.
 \end{itemize}
 
+Note that TIMER\_Debug can also be set to -1 to activate the {\it lucia}
+tool that can be used to perform an analysis of the coupled components
+load balance. More information can be found in the README file in {\tt
+  oasis3-mct/util/lucia} directory and report mentioned therein.
+ 
 The time given for each timer is calculated by the difference between
 calls to {\tt oasis\_timer\_start()} and {\tt oasis\_timer\_stop()}
 and is the accumulated time over the entire run. Here is an overview
 of the meaning of the different timers as implemented by default.
+\footnote{Many other measures can be obtained by defining the logical
+{\tt local\_timer} XXXX as {\tt .true.} in different routines or by
+implementing other timers. Of course, OASIS3\_MCT and the model code
+would then have to be recompiled.}
 
 \begin{itemize}
-\item {'total after init'} : total time of the simulation, implemented
+
+\item {'total'} : total time of the simulation, implemented
   in {\tt mod\_oasis\_method}, i.e. between the end of {\tt
-    oasis\_init\_comp} and the call to {\tt mpi\_barrier} and {\tt
+    oasis\_init\_comp} and the {\tt
     mpi\_finalize} in routine {\tt oasis\_terminate}.
-\item {'map definition'} : time spent in {\tt mct\_gsmap\_init} in
-  routine {\tt oasis\_def\_partition}; this routine defines the
-  patterns of communication between the source and target processes.
-\item {'cpl\_setup'} :time spent in {\tt oasis\_coupler\_setup}, which
-  sets up additional coupling aspects related to {\tt
-    oasis\_method\_enddef}.
-\item {'cpl\_smatrd'} : time spent in {\tt
-    oasis\_coupler\_smatreaddnc} in {\tt mod\_oasis\_coupler} (routine
-  {\tt oasis\_coupler\_setup}); this routine performs a distributed
-  read of a NetCDF SCRIP file and returns weights in a distributed
-  SparseMatrix, and calls {\tt mct\_sMatP\_Init} which initialises the
-  sparse matrix vector multiplication.
-\item {'oasis\_advance\_init()'} : time spent in {\tt
-    oasis\_advance\_init}, which handles reading of initial coupling
-  restart and communication of data for fields with positive lags.
+
+\item {'init\_thru\_enddef'} : time between the end of {\tt
+    oasis\_init\_comp} and the end of {\tt oasis\_enddef}, implemented
+  in {\tt mod\_oasis\_method}.
+
+\item {'part\_definition'} : time spent in routine {\tt oasis\_def\_partition}.
+
+\item {'oasis\_enddef'} : time spent in 
+  routine {\tt oasis\_enddef}; this routine performs basically all the
+  important steps to initialize the coupling exchanges, e.g. the
+  internal management of the partition and variable definition, the
+  definition of the patterns of communication between the source and
+  target processes, the reading of the regridding weight-and-address
+  file and the initialisation of the sparse matrix vector multiplication.
 \item {'grcv\_00x'} : time spent in the reception of field x in {\tt
     mct\_recv} (including communication and possible waiting time
   linked to unbalance of components).
@@ -200,5 +228,11 @@ of the meaning of the different timers as implemented by default.
 \item {'psnd\_00x'} : time spent in routine {\tt oasis\_advance\_run}
   for sending field x (i.e. including call to {\tt mct\_waitsend} and
   {\tt mct\_isend}).
+\item {'wtrn\_00x'} : time spent in routine {\tt oasis\_advance\_run}
+  to write fields associated with non-instant loctrans operations to
+  restart files  (see section \ref{subsec_restartdata} for details).
+\item {'wrst\_00x'} : time spent in routine {\tt oasis\_advance\_run}
+  to write fields to
+  restart files (see section \ref{subsec_restartdata} for details).
 \end{itemize}
 

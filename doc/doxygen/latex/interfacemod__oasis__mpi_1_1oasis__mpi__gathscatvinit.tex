@@ -1,0 +1,68 @@
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+gathscatvinit Interface Reference}
+\label{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit}}
+}
+
+
+Generic interface to oasis\+\_\+mpi\+\_\+gath\+Scat\+V\+Init.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit_a15fc3df477e1fa561fcee17ed718bff8}{oasis\+\_\+mpi\+\_\+gathscatvinitr1} (comm, rootid, loc\+Arr, glob1\+D\+Arr, glob\+Size, displs, string)
+\begin{DoxyCompactList}\small\item\em Initialize variables for \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic interface to oasis\+\_\+mpi\+\_\+gath\+Scat\+V\+Init. 
+
+Definition at line 73 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit_a15fc3df477e1fa561fcee17ed718bff8}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit}!oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}}
+\index{oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+gathscatvinitr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit\+::oasis\+\_\+mpi\+\_\+gathscatvinitr1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{loc\+Arr, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), pointer}]{glob1\+D\+Arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), pointer}]{glob\+Size, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), pointer}]{displs, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit_a15fc3df477e1fa561fcee17ed718bff8}
+
+
+Initialize variables for \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}. 
+
+This method initializes glob1\+D\+Arr, glob\+Size, and displs for use in the \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv} routines. loc\+Arr is the distributed array to gather from or scatter to.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em rootid} & M\+P\+I task to gather/scatter on\\
+\hline
+\mbox{\tt in}  & {\em locarr} & Local array of distributed data\\
+\hline
+ & {\em glob1darr} & Global 1\+D array of gathered data\\
+\hline
+ & {\em globsize} & Size of each distributed piece\\
+\hline
+ & {\em displs} & Displacements for receive\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1040 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

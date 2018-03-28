@@ -1,0 +1,20 @@
+<model name="unix_curie" title="Cerfacs, code execution by SSH to CCRT" >
+    <choice name="machinecea" default="curie" >
+        <option value="curie" />
+        <option value="airain" />
+    </choice>
+    <param name="login" title="Login" type="ascii" />
+    <param name="nbprocs" title="Procs number" type="integer" default="1" />
+    <param name="timelimit" title="Time limit (s)" type="integer" default="3600" />
+    <param name="distantdir" title="Distant directory" type="ascii" />
+     <desc>
+        This plugin is for Cerfacs only
+        It allows to execute a code on a CCRT from an external computer, or from the Cerfacs NFS system.
+        []
+        Check that you can log on the distant machine without password!!!
+        []
+        [logo=plugin_ssh;caption=execution through ssh ]
+        []
+        [logo=cerfacs;caption=Cerfacs only]
+    </desc>
+</model>

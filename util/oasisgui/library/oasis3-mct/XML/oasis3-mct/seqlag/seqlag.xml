@@ -1,0 +1,186 @@
+<model name="defineseqlag" title="LAGSEQ" layout="flat">
+    <desc>
+Please enter the LAG and the sequence (SEQ), if any, for 
+the different coupling fields, selecting the different rows available.
+The LAG is useless for INPUT and OUTPUT fields.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+    </desc>
+</model>
+<model name="defseqlag" title="LAG-SEQ" layout="flat">
+    <multiple name="seqlag" title="Definition the LAG and the Sequence" require="field_names_list" custom_label="Fields">
+      <xor name="lag" title="LAG" default="lag_off">
+            <model name="lag_off" title="NO LAG">
+	     <desc> No LAG is defined.
+             </desc>
+            </model>
+            <model name="lag_on" title="LAG">
+	      <param name="lag_fld" title="Lag (integer)" type="double" />
+            </model>
+      </xor>
+      <xor name="seq" title="SEQUENCE" default="seq_off">
+            <model name="seq_off" title="NO SEQ">
+	     <desc> No sequence is defined.
+             </desc>
+            </model>
+            <model name="seq_on" title="SEQ">
+	      <param name="seq_fld" title="Sequence (integer)" type="integer" />
+            </model>
+      </xor>
+    </multiple> 
+    <docu> 
+
+[section=LAG]
+With LAG>0 for coupling fields in the namcouple (LAG must be equal to the time step of the source model), 
+models read their data at t=0 in their restart files 
+and write a restart file at the end of the simulation for the next run. This configuration is the one that is 
+usually used in the real coupled models.
+
+Defining LAG=dt (time step of the model) implies that there will be a shift in time between the oasis_put and the oasis_get. 
+If tCPL is the coupling time, the oasis_put done at tCPL + LAG will match the oasis_get done at tCPL.
+
+More information is available section 2.10.1 in the User Guide.
+
+[section=SEQ]
+The order of coupling operations in the system is determined solely by the order of calls to send (put) and
+receive (get) data in the models in conjunction with the setting of the lag in the namcouple.
+Data that is received (get) is always blocking while data that is sent (put) is non-blocking with respect to the model
+making that call. It is possible to deadlock the system if the relative orders of puts and gets in different
+models are not compatible. The SEQ option can be used to avoid such deadlock.
+
+More information is available section 2.10.2 in the User Guide.
+<docuold>
+[section=Generalities]
+Using the OASIS3-MCT coupling library, the user has full flexibility to reproduce different coupling algorithms. In 
+the components, the sending and receiving routines, respectively oasis_put and oasis_get, can be called at each model timestep, 
+with the appropriate date argument giving the actual time (at the beginning of the timestep), expressed in number of 
+seconds since the start of the run or in any other time units, as long as the same are used in all models and 
+in the configuration file. This date argument is automatically analysed by the coupling library and depending on the coupling 
+period and the lag (LAG) chosen by the user for each coupling field in the configuration file, different 
+coupling algorithms can be reproduced without modifying the component model codes themselves. []
+
+With OASIS3-MCT, the SEQ index is no longer needed in the configuration file to specify the sequencing order of different 
+coupling fields. The sequence (SEQ) index now provides the coupling layer with an ability to detect 
+a deadlock before it happens and exit. []
+
+[section=The LAG concept]
+The lag (LAG) value tells the coupler to modify the time at which that data is sent (put) by the amount of the lag. The lag 
+must be expressed in the time unit used (that must be the same in the models and in the configuration file and can be positive or negative 
+but should never be larger (in absolute magnitude) than the coupling period of any field due to problems with restartability 
+and dead-locking. When a component model calls a oasis_put, the value of the lag is automatically added to the value of the 
+date argument and the ``put'' is actually performed when the sum date+lag is a coupling time; in the target component, this 
+``put'' will match a oasis_get for which the date argument is the same coupling time. The lag only shifts the time data is sent. 
+It cannot be used to shift the time data is received yet. []
+
+When the lag is positive, a restart file must be available to initiate the coupling and in those cases, the restart file is 
+then updated at the end of the run. A positive lag acts like a send occurred before the model started. In fact, for a field 
+with positive lag, the source component model automatically reads the field in the restart file during the coupling initialization 
+phase (below the oasis_enddef) and send the data to match the oasis_get performed at time=0 in the target component model. 
+The final coupling data on the source side will then be automatically written to the restart file for use in the next run. []
+
+When there is a lag, the first and last instance of the source field in the debug netCDF file (EXPOUT fields) always correspond 
+respectively to the field read from and written to the restart file.
+
+On the figures below, short black arrows correspond to oasis_put or oasis_get called in the component model that 
+do not lead to any ``put'' or receiving action; long black arrows correspond to oasis_put or oasis_get called in the component 
+models that do actually lead to a ``put'' or ``get'' action; long red arrows correspond to oasis_put or oasis_get called in 
+the component models that lead to a reading or writing of the coupling field from or to a coupling restart file.
+
+
+[item=LAG concept first example:]
+
+
+A first coupling algorithm, exploiting the LAG concept, is illustrated on figure 1. []
+
+[image=fig_lag_concept_1.gif;caption=Figure 1: LAG concept first example] []
+
+During a coupling timestep, model A receives F_2 and then sends F_1; its timestep length is 4. During a coupling timestep, model B receives F_1 
+and then sends F_2; its timestep length is 6. F_1 and F_2 coupling periods are respectively 12 and 24. If F_1/F_2 ``put" action by model A/B 
+was used at a coupling timestep to match the model B/A ``get" action, a deadlock would occur as both models would be initially 
+waiting on a ``get" action. To prevent this, F_1 and F_2 produced at the timestep before have to be used to match respectively the model 
+B and model A ``get" actions. []
+
+This implies that a lag of respectively 4 and 6 seconds must be defined for F_1 and F_2. For F_1, the oasis_put performed at time 8 
+and 20 by model A will then lead to ``put" actions (as 8 + 4 = 12 and 20 + 4 = 24 which are coupling periods) that match the 
+``get" actions performed at times 12 and 24 below the oasis_get called by model B. For F_2, the oasis_put performed at time 18 
+by model B then leads to a ``put" action (as 18 + 6 = 24 which is a coupling period) that matches the ``get" action performed i
+at time 24 below the oasis_get called by model A. []
+
+At the beginning of the run, as their LAG index is greater than 0, the first oasis_get of F_1 and F_2 will automatically be fulfilled 
+with fields read from their respective coupling restart files. The user therefore has to create those coupling restart files before 
+the first run in the experiment. At the end of the run, F_1 having a lag greater than 0, is automatically written to its coupling 
+restart file below the last F_1 oasis_put as the date+lag equals the total run time. The analogue is true for F_2. These values 
+will automatically be read in at the beginning of the next run below the respective oasis_get. []
+
+
+[item=LAG concept second example:]
+
+A second coupling algorithm exploiting the LAG concept is illustrated on figure 2. During its timestep, model A receives F_2, sends 
+F_3 and then F_1; its timestep length is 6. During its timestep, model B receives F_1, receives F_3 and then sends F_2; its timestep 
+length is also 6. F_1, F_2 and F_3 coupling periods are both supposed to be equal to 12. []
+
+
+[image=fig_lag_concept_2.gif;caption=Figure 2: LAG concept second example] []
+
+
+For F_1 and F_2 the situation is similar to the first example. If F_1/F_2 ``put" action by model A/B was used at a coupling timestep 
+to match the model B/A ``get" action, a deadlock would occur as both models would be waiting on a ``get" action. To prevent this, F_1 and 
+F_2 produced at the timestep before have to be used to match the model A and model B ``get" actions, which means that a lag of 6 must 
+be defined for both F_1 and F_2. For both coupling fields, the oasis_put performed at times 6 and 18 by the source model then 
+lead to ``put" actions (as 6 + 6 = 12 and 18 + 6 = 24 which are coupling periods) that match the ``get" action performed at time 
+12 and 24 below the oasis_get called by the target model. []
+
+For F_3, sent by model A and received by model B, no lag needs to be defined: the coupling field produced by model A at the 
+coupling timestep can be ``consumed'' by model B without causing a deadlock situation. []
+
+As in the first example, the oasis_get performed at the beginning of the run for F_1 and F_2, will automatically receive data 
+read from their coupling restart files, and the last oasis_put performed at the end of the run automatically write them to 
+their coupling restart file. For F_3, no coupling restart file is needed nor used as at each coupling period the coupling 
+field produced by model A can be directly ``consumed'' by model B. []
+
+We see here how the introduction of appropriate LAG indices results in receiving in the target model the coupling fields 
+produced by the source model the timestep before; this is, in some coupling configurations, essential to avoid deadlock situations. [] 
+
+
+[section=The sequence concept]
+The order of coupling operations in the system is determined solely by the order of calls to send (put) and receive (get) 
+data in the models in conjunction with the setting of the lag in the configuration file. Data that is received (get) is always 
+blocking while data that is sent (put) is non-blocking with respect to the model making that call. It is possible to 
+deadlock the system if the relative orders of puts and gets in different models are not compatible. []
+
+With OASIS3-MCT, the sequence (SEQ) index in the configuration file now provides the coupling layer with an ability to detect 
+a deadlock before it happens and exit. It does this by tracking the order of get and put calls in models compared to the SEQ 
+specified in the configuration file. If there are any inconsistencies, the model will abort gracefully with a useable error message 
+before the system deadlocks. If there are any coupling dependencies in the system, use of the SEQ index is recommended for 
+diagnosis but has no impact on the ultimate solution and is NOT required. []
+
+Take the following two examples. In both examples, there are two models, each ``put'' a field to the other at every coupling 
+period without any lags. In the first case, there is no dependency and each model sends (puts) the data first and then 
+receives the data second at each timestep. []
+
+
+[image=fig_seq_1.gif;caption=Figure 3: SEQ concept first example] []
+
+
+The put from model1 for fld1 is received by the get in model2 and the put from model2 for fld2 is received by the get in 
+model1. In this case, there is no sequencing dependency and the value of SEQ must be identical (or unset) in the configuration file 
+description of the fld1 and fld2 coupling. If SEQ is set to 1 for fld1 and 2 for fld2 in this case, then the model will 
+abort because at runtime, the coupling will detect, in model 2, that fld2 was sent before fld1 was received which is out 
+of sequence as defined by the SEQ settings.[]
+
+In the next example, there is a dependency in the sequencing. []
+
+
+[image=fig_seq_2.gif;caption=Figure 4: SEQ concept second example] []
+
+
+In model2, fld2 depends on fld1. If this dependency is known, then there is a benefit in using SEQ=1 for fld1 and SEQ=2 
+for fld2. At runtime, if the sequencings of both model1 and model2 do not match the above diagram, the model will abort 
+gracefully. For instance, if model2 has the dependency shown above but model1 does not have consistent ordering of the 
+put and get as required by model2, then if SEQ is unused, the model will deadlock and hang. If SEQ is set properly, 
+the coupling layer will detect that the required sequence has not been followed and will exit gracefully with an error message. []
+
+Again, the SEQ namecouple setting is only diagnostic and is not required. 
+</docuold>
+    </docu>
+</model>

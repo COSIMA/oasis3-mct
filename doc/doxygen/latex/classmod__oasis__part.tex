@@ -1,0 +1,243 @@
+\hypertarget{classmod__oasis__part}{\section{mod\+\_\+oasis\+\_\+part Module Reference}
+\label{classmod__oasis__part}\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+}
+
+
+O\+A\+S\+I\+S partition data and methods.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structmod__oasis__part_1_1prism__part__type}{prism\+\_\+part\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Partition (decomposition) data for variables. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__part_af070605328f2b705735d7fbf8b838ff4}{oasis\+\_\+def\+\_\+partition} (id\+\_\+part, kparal, kinfo, ig\+\_\+size, name)
+\begin{DoxyCompactList}\small\item\em The O\+A\+S\+I\+S user interface to define partitions. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__part_a80f66cc0ce5857aa53d070861f05b521}{oasis\+\_\+part\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Synchronize partitions across all tasks, called at oasis enddef. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__part_a441af70f9f13c8e72575f00f3ddcc49c}{oasis\+\_\+part\+\_\+create} (id\+\_\+part, T\+Y\+P\+E, gsize, nx, ny, gridname, gscomm, mpicom)
+\begin{DoxyCompactList}\small\item\em Create a new partition internally, needed for mapping. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), public \hyperlink{classmod__oasis__part_ac8340e63b159a9786ad8fffabd1d47f8}{prism\+\_\+npart} = 0
+\begin{DoxyCompactList}\small\item\em number of partitions defined \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__part_1_1prism__part__type}{prism\+\_\+part\+\_\+type}), \\*
+dimension(\hyperlink{classmod__oasis__part_ab68d087792db0351181c9a97025d793b}{mpart}), public \hyperlink{classmod__oasis__part_a326ce52f630ba7e71905af864a6cb2dc}{prism\+\_\+part}
+\begin{DoxyCompactList}\small\item\em list of defined partitions \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__part_a17c747bc29d25b558df42524bd63ac90}{oasis\+\_\+part\+\_\+zero} (s\+\_\+prism\+\_\+part)
+\begin{DoxyCompactList}\small\item\em Zero partition information. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__part_a12edb4b0248a3f562fe5f6e16eede06a}{oasis\+\_\+part\+\_\+write} (s\+\_\+prism\+\_\+part, npart)
+\begin{DoxyCompactList}\small\item\em Print parition information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__part_ab68d087792db0351181c9a97025d793b}{mpart} = 100
+\begin{DoxyCompactList}\small\item\em maximum number of partitions allowed \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__part_a8cee930f023feb7bcad4a0cab0b490a1}{part\+\_\+name\+\_\+cnt} = 0
+\begin{DoxyCompactList}\small\item\em used to define partition names internally \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+O\+A\+S\+I\+S partition data and methods. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__part_af070605328f2b705735d7fbf8b838ff4}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+def\+\_\+partition@{oasis\+\_\+def\+\_\+partition}}
+\index{oasis\+\_\+def\+\_\+partition@{oasis\+\_\+def\+\_\+partition}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{oasis\+\_\+def\+\_\+partition}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+def\+\_\+partition (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{id\+\_\+part, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), intent(in)}]{kparal, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out), optional}]{kinfo, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{ig\+\_\+size, }
+\item[{character(len=$\ast$), intent(in), optional}]{name}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__part_af070605328f2b705735d7fbf8b838ff4}
+
+
+The O\+A\+S\+I\+S user interface to define partitions. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em id\+\_\+part} & partition id\\
+\hline
+\mbox{\tt in}  & {\em kparal} & decomposition information\\
+\hline
+\mbox{\tt out}  & {\em kinfo} & return code\\
+\hline
+\mbox{\tt in}  & {\em ig\+\_\+size} & total size of partition\\
+\hline
+\mbox{\tt in}  & {\em name} & name of partition \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Increment partition number and store user values 
+\end{DoxyItemize}
+
+Definition at line 58 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a441af70f9f13c8e72575f00f3ddcc49c}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+create@{oasis\+\_\+part\+\_\+create}}
+\index{oasis\+\_\+part\+\_\+create@{oasis\+\_\+part\+\_\+create}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{oasis\+\_\+part\+\_\+create}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+create (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{id\+\_\+part, }
+\item[{character(len=$\ast$), intent(in)}]{T\+Y\+P\+E, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{gsize, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{nx, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{ny, }
+\item[{character(len=$\ast$), intent(in)}]{gridname, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{gscomm, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{mpicom}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__part_a441af70f9f13c8e72575f00f3ddcc49c}
+
+
+Create a new partition internally, needed for mapping. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em id\+\_\+part} & partition id\\
+\hline
+\mbox{\tt in}  & {\em type} & type of decomposition specified\\
+\hline
+\mbox{\tt in}  & {\em gsize} & global size of grid\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em gridname} & grid name\\
+\hline
+\mbox{\tt in}  & {\em gscomm} & global seg map communicator\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & local mpi comm \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check if an existing gsmap can be reused
+\item Check that all tasks agree and if so, return with that partition id
+\item Instantiate a decomposition based on gsize and type
+\begin{DoxyItemize}
+\item Create a new partition and set values
+\item Initialize the partition gsmap and pgsmap 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 421 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a80f66cc0ce5857aa53d070861f05b521}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+setup@{oasis\+\_\+part\+\_\+setup}}
+\index{oasis\+\_\+part\+\_\+setup@{oasis\+\_\+part\+\_\+setup}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{oasis\+\_\+part\+\_\+setup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__part_a80f66cc0ce5857aa53d070861f05b521}
+
+
+Synchronize partitions across all tasks, called at oasis enddef. 
+
+
+\begin{DoxyItemize}
+\item Generate reduced partname list
+\item Define all partitions on all tasks
+\item Convert kparal information to data for the gsmap
+\item Initialize the local gsmap and partition gsmap 
+\end{DoxyItemize}
+
+Definition at line 140 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a12edb4b0248a3f562fe5f6e16eede06a}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+write@{oasis\+\_\+part\+\_\+write}}
+\index{oasis\+\_\+part\+\_\+write@{oasis\+\_\+part\+\_\+write}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{oasis\+\_\+part\+\_\+write}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{type({\bf prism\+\_\+part\+\_\+type}), intent(in)}]{s\+\_\+prism\+\_\+part, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{npart}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__part_a12edb4b0248a3f562fe5f6e16eede06a}
+
+
+Print parition information. 
+
+
+
+Definition at line 380 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a17c747bc29d25b558df42524bd63ac90}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!oasis\+\_\+part\+\_\+zero@{oasis\+\_\+part\+\_\+zero}}
+\index{oasis\+\_\+part\+\_\+zero@{oasis\+\_\+part\+\_\+zero}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{oasis\+\_\+part\+\_\+zero}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+zero (
+\begin{DoxyParamCaption}
+\item[{type({\bf prism\+\_\+part\+\_\+type}), intent(inout)}]{s\+\_\+prism\+\_\+part}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__part_a17c747bc29d25b558df42524bd63ac90}
+
+
+Zero partition information. 
+
+
+
+Definition at line 352 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__part_ab68d087792db0351181c9a97025d793b}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!mpart@{mpart}}
+\index{mpart@{mpart}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{mpart}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+part\+::mpart = 100\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__part_ab68d087792db0351181c9a97025d793b}
+
+
+maximum number of partitions allowed 
+
+
+
+Definition at line 26 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a8cee930f023feb7bcad4a0cab0b490a1}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!part\+\_\+name\+\_\+cnt@{part\+\_\+name\+\_\+cnt}}
+\index{part\+\_\+name\+\_\+cnt@{part\+\_\+name\+\_\+cnt}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{part\+\_\+name\+\_\+cnt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+part\+::part\+\_\+name\+\_\+cnt = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__part_a8cee930f023feb7bcad4a0cab0b490a1}
+
+
+used to define partition names internally 
+
+
+
+Definition at line 50 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_ac8340e63b159a9786ad8fffabd1d47f8}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!prism\+\_\+npart@{prism\+\_\+npart}}
+\index{prism\+\_\+npart@{prism\+\_\+npart}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{prism\+\_\+npart}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), public mod\+\_\+oasis\+\_\+part\+::prism\+\_\+npart = 0}}\label{classmod__oasis__part_ac8340e63b159a9786ad8fffabd1d47f8}
+
+
+number of partitions defined 
+
+
+
+Definition at line 45 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+\hypertarget{classmod__oasis__part_a326ce52f630ba7e71905af864a6cb2dc}{\index{mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}!prism\+\_\+part@{prism\+\_\+part}}
+\index{prism\+\_\+part@{prism\+\_\+part}!mod\+\_\+oasis\+\_\+part@{mod\+\_\+oasis\+\_\+part}}
+\subsubsection[{prism\+\_\+part}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+part\+\_\+type}), dimension({\bf mpart}), public mod\+\_\+oasis\+\_\+part\+::prism\+\_\+part}}\label{classmod__oasis__part_a326ce52f630ba7e71905af864a6cb2dc}
+
+
+list of defined partitions 
+
+
+
+Definition at line 46 of file mod\+\_\+oasis\+\_\+part.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__part_8_f90}{mod\+\_\+oasis\+\_\+part.\+F90}\end{DoxyCompactItemize}

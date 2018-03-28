@@ -37,8 +37,8 @@ ARFLAGS   = r
 #
 # compiler options and cpp keys
 # 
-CPPDEF    = -WF,-Duse_netCDF -WF,-Duse_comm_$(CHAN) -WF,-D__VERBOSE -WF,-DTREAT_OVERLAY
-CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -WF,-Duse_comm_$(CHAN) -WF,-D__VERBOSE -WF,-DTREAT_OVERLAY
+CCPPDEF   = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 COMFLAGS  =  -Q -qarch=auto -qtune=auto -qcache=auto -qfloat=fltint -qzerosize -qlargepage -qmaxmem=-1 -q64 -O3 -qstrict -qextname
 F90FLAGS_1  = -qsuffix=cpp=F90 $(COMFLAGS) 

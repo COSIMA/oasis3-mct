@@ -90,8 +90,8 @@ PROGRAM model2
   !
   ! Global array to plot the error by proc 0 and calculate min and max
   REAL (kind=wp), POINTER       :: global_error(:)
-  INTEGER, POINTER              :: global_shapes(:,:)
-  INTEGER, POINTER              :: displs(:),rcounts(:)
+  INTEGER, POINTER              :: global_shapes_2D(:,:)
+  INTEGER, POINTER              :: displs(:),rcounts(:),global_shapes(:)
   !
   ! Min and Max of the error of interpolation
   REAL (kind=wp)             :: min,max
@@ -228,7 +228,7 @@ PROGRAM model2
       CALL FLUSH(w_unit)
   ENDIF
   !
-  CALL decomp_def (part_id,il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
       CALL FLUSH(w_unit)
@@ -281,6 +281,11 @@ PROGRAM model2
       CALL oasis_abort(comp_id,comp_name,'Problem at line 281')
   ENDIF
   !
+  IF (FILE_Debug >= 2) THEN
+      WRITE(w_unit,*) 'After oasis_enddef'
+      CALL FLUSH(w_unit)
+  ENDIF
+  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! RECEIVE ARRAYS AND CALCULATE THE ERROR 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -321,6 +326,7 @@ PROGRAM model2
   CALL oasis_get(var_id,itap_sec, field_recv, ierror)
   IF (FILE_Debug >= 2) THEN
       WRITE(w_unit,*) 'tcx recvf1 ',itap_sec,MINVAL(field_recv),MAXVAL(field_recv)
+      CALL FLUSH(w_unit)
   ENDIF
   IF ( ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
       WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
@@ -329,11 +335,16 @@ PROGRAM model2
   !
   !
   IF (FILE_Debug >= 2) THEN
-      WRITE (w_unit,*) 'Calculate the error of interpolation'
+      WRITE (w_unit,*) 'Calculate the error of interpolation only if npes = 1'
       CALL FLUSH(w_unit)
   ENDIF
   !
+  IF (npes == 1) THEN
+  !
   error=err_msk
+  !
+  ALLOCATE(global_error(ntot), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_error'
   !
   WHERE (RESHAPE(gg_mask(indi_beg:indi_end,indj_beg:indj_end),(/ var_sh(2), var_sh(4) /)) == 0)
       error = ABS(((field_ana - field_recv)/field_recv))*100
@@ -343,75 +354,17 @@ PROGRAM model2
   !!!!!!!!!!!!!!!!!!!!!!! Write the error and the field in a NetCDF file by proc 0 !!!!!!!!!!!!!!!!!!!!
   ! field_recv is 0 on masked points => put error = err_msk on these points
   !
-  IF (mype == 0) THEN
-      !
-      ALLOCATE(global_error(ntot),STAT=ierror )
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_error'
-      ALLOCATE(global_shapes(4,npes),STAT=ierror )
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating global_shapes'
-      ALLOCATE(displs(npes),STAT=ierror )
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating displs'
-      ALLOCATE(rcounts(npes),STAT=ierror )
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating rcounts'
-      !  
-      global_error=0.
-      global_shapes=0
-      displs=0
-      rcounts=0
-      !
-  ENDIF
-  !      
   !
-  CALL MPI_GATHER(var_sh,4,MPI_INTEGER,global_shapes,4,MPI_INTEGER,0,localComm,ierror)
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting shapes'
-  IF (mype == 0) THEN
-      IF (FILE_Debug >= 2) THEN
-          WRITE (w_unit,*) 'Shapes of all the processes :',global_shapes
-          CALL FLUSH(w_unit)
-      ENDIF
-  ENDIF
-      !
-  IF (mype == 0) THEN
-      displs(1)=0
-      DO i=2,npes
-        displs(i) = displs(i-1) + global_shapes(2,i-1) * global_shapes(4,i-1)
-      ENDDO
-      DO i=1,npes
-        rcounts(i) = global_shapes(2,i) * global_shapes(4,i)
-      ENDDO
-      !
-      IF (FILE_Debug >= 2) THEN
-          WRITE(w_unit,*) 'displs :', displs
-          WRITE(w_unit,*) 'rcounts :', rcounts
-          CALL FLUSH(w_unit)
-      ENDIF
-  ENDIF
-      !
-#ifdef NO_USE_DOUBLE_PRECISION
-      CALL MPI_gatherv(error, var_sh(2)*var_sh(4),MPI_REAL,&
-                       global_error,rcounts,displs,MPI_REAL,0,localComm,ierror)
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
-      !
-#elif defined USE_DOUBLE_PRECISION
-      CALL MPI_gatherv(error, var_sh(2)*var_sh(4),MPI_REAL8,&
-                       global_error,rcounts,displs,MPI_REAL8,0,localComm,ierror)
-      IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error collecting errors'
-      !
-#endif
-      !
-  IF (mype == 0) THEN
-      !
-      data_filename='error.nc'
-      field_name='error'
-      CALL write_field(nlon,nlat, &
+  !
+  data_filename='error.nc'
+  field_name='error'
+  CALL write_field(nlon,nlat, &
                        data_filename, field_name,  &
                        w_unit, FILE_Debug, &
-                       gg_lon, gg_lat, global_error)
-  ENDIF
+                       gg_lon, gg_lat, error)
   !
   !!!!!!!!!!!!!!!!!!!! Min and Max of the error on non masked points calculated by proc 0 !!!!!!!!!!!!!!!!
   !
-  IF (mype == 0) THEN
       ic_msk=0
       DO i=1,nlon
         DO j=1,nlat
@@ -457,7 +410,10 @@ PROGRAM model2
           WRITE(w_unit,*) 'End calculation of stat on the error'
           CALL FLUSH(w_unit)
       ENDIF
-  ENDIF
+   ELSE
+     WRITE (w_unit,*) 'Pas de calcul d''erreur possible en multiprocs'
+     CALL FLUSH(w_unit)
+   ENDIF !if npes = 1
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION 

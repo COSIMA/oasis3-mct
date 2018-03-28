@@ -97,7 +97,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 !-----------------------------------------------------------------------
 
-      LOGICAL ::
+      LOGICAL :: 
      &           lextrapdone   ! logical, true if EXTRAP done on field
       LOGICAL :: ll_nnei        ! true (default) if extra search is done
 
@@ -362,6 +362,7 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                   CALL OASIS_FLUSH_SCRIP(nulou)
               ENDIF
               src_latsnn = bignum
+              src_addnn = 0
 !cdir novector
               do srch_add = min_add,max_add
                 if (grid1_mask(srch_add) .or.
@@ -383,6 +384,35 @@ C %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     endif
                 endif
               end DO
+              IF (src_addnn == 0) THEN
+              src_latsnn = bignum
+!cdir novector
+              do srch_add = 1, grid1_size
+                if (grid1_mask(srch_add) .or.
+     &          (.not. grid1_mask(srch_add) .and. lextrapdone)) THEN
+                    arg = coslat_dst*cos(grid1_center_lat(srch_add))*
+     &                  (coslon_dst*cos(grid1_center_lon(srch_add)) +
+     &                  sinlon_dst*sin(grid1_center_lon(srch_add)))+
+     &                  sinlat_dst*sin(grid1_center_lat(srch_add))
+                    IF (arg < -1.0d0) THEN
+                        arg = -1.0d0
+                    ELSE IF (arg > 1.0d0) THEN
+                        arg = 1.0d0
+                    END IF
+                    distance=acos(arg)
+
+                    if (distance < src_latsnn) then
+                        src_addnn = srch_add
+                        src_latsnn = distance
+                    endif
+                endif
+              end DO
+              endif
+              IF (src_addnn == 0) THEN
+                 WRITE(nulou,*) 'Problem with target grid point'
+                 WRITE(nulou,*) 'with address = ',dst_add 
+                 call abort
+              ENDIF 
               IF (nlogprt .ge. 2) THEN
                   WRITE(nulou,*) 
      &                'Nearest non masked neighbour is source point '

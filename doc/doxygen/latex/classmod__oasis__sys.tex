@@ -1,0 +1,290 @@
+\hypertarget{classmod__oasis__sys}{\section{mod\+\_\+oasis\+\_\+sys Module Reference}
+\label{classmod__oasis__sys}\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+}
+
+
+System type methods.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__sys_ae6bc2703e627d5a9491338c9569f8f4e}{oasis\+\_\+abort} (id\+\_\+compid, cd\+\_\+routine, cd\+\_\+message)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S abort method, publically available to users. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}{oasis\+\_\+flush} (nu)
+\begin{DoxyCompactList}\small\item\em Flushes output to file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}{oasis\+\_\+unitget} (uio)
+\begin{DoxyCompactList}\small\item\em Get a free unit number. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_a063a41b73546564afd294fd5708b6667}{oasis\+\_\+unitsetmin} (uio)
+\begin{DoxyCompactList}\small\item\em Set the minimum unit number allowed. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}{oasis\+\_\+unitfree} (uio)
+\begin{DoxyCompactList}\small\item\em Release a unit number for reuse. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}{oasis\+\_\+debug\+\_\+enter} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is entered, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_a349f71cba2df935179d78f3858992c83}{oasis\+\_\+debug\+\_\+exit} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is exited, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__sys_a8e488f6a9a829762324519c6dd493912}{oasis\+\_\+debug\+\_\+note} (string)
+\begin{DoxyCompactList}\small\item\em Used to write information from a subroutine, write info to log file at some debug level. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=$\ast$), parameter, public \hyperlink{classmod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}{astr} = ' A\+B\+O\+R\+T\+: '
+\item 
+character(len=$\ast$), parameter, public \hyperlink{classmod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}{estr} = ' E\+R\+R\+O\+R\+: '
+\item 
+character(len=$\ast$), parameter, public \hyperlink{classmod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}{wstr} = ' W\+A\+R\+N\+I\+N\+G\+: '
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__sys_a7e34042b8f7e733f15516c7d544338a2}{muni} = 20
+\item 
+integer(ip\+\_\+intwp\+\_\+p), dimension(\hyperlink{classmod__oasis__sys_a7e34042b8f7e733f15516c7d544338a2}{muni}), \\*
+save \hyperlink{classmod__oasis__sys_a0fc21eee7f67c5be26a90e23d8c346db}{unitno} = -\/1
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{classmod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}{maxion}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}{tree\+\_\+delta} = 2
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{classmod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}{tree\+\_\+indent} = 0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+System type methods. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__sys_ae6bc2703e627d5a9491338c9569f8f4e}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+abort@{oasis\+\_\+abort}}
+\index{oasis\+\_\+abort@{oasis\+\_\+abort}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+abort}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+abort (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{id\+\_\+compid, }
+\item[{character(len=$\ast$), intent(in), optional}]{cd\+\_\+routine, }
+\item[{character(len=$\ast$), intent(in), optional}]{cd\+\_\+message}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_ae6bc2703e627d5a9491338c9569f8f4e}
+
+
+O\+A\+S\+I\+S abort method, publically available to users. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+compid} & component id\\
+\hline
+\mbox{\tt in}  & {\em cd\+\_\+routine} & string defining calling routine\\
+\hline
+\mbox{\tt in}  & {\em cd\+\_\+message} & error message string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 40 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+enter@{oasis\+\_\+debug\+\_\+enter}}
+\index{oasis\+\_\+debug\+\_\+enter@{oasis\+\_\+debug\+\_\+enter}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+debug\+\_\+enter}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+enter (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}
+
+
+Used when a subroutine is entered, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & name of the subroutine \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 174 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a349f71cba2df935179d78f3858992c83}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+exit@{oasis\+\_\+debug\+\_\+exit}}
+\index{oasis\+\_\+debug\+\_\+exit@{oasis\+\_\+debug\+\_\+exit}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+debug\+\_\+exit}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+exit (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_a349f71cba2df935179d78f3858992c83}
+
+
+Used when a subroutine is exited, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & name of subroutine \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 201 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a8e488f6a9a829762324519c6dd493912}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+note@{oasis\+\_\+debug\+\_\+note}}
+\index{oasis\+\_\+debug\+\_\+note@{oasis\+\_\+debug\+\_\+note}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+debug\+\_\+note}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+note (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_a8e488f6a9a829762324519c6dd493912}
+
+
+Used to write information from a subroutine, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & string to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 228 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+flush@{oasis\+\_\+flush}}
+\index{oasis\+\_\+flush@{oasis\+\_\+flush}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+flush}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+flush (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nu}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}
+
+
+Flushes output to file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nu} & unit number of file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 77 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitfree@{oasis\+\_\+unitfree}}
+\index{oasis\+\_\+unitfree@{oasis\+\_\+unitfree}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+unitfree}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitfree (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{uio}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}
+
+
+Release a unit number for reuse. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 149 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitget@{oasis\+\_\+unitget}}
+\index{oasis\+\_\+unitget@{oasis\+\_\+unitget}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+unitget}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitget (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{uio}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}
+
+
+Get a free unit number. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 95 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a063a41b73546564afd294fd5708b6667}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitsetmin@{oasis\+\_\+unitsetmin}}
+\index{oasis\+\_\+unitsetmin@{oasis\+\_\+unitsetmin}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{oasis\+\_\+unitsetmin}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitsetmin (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{uio}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__sys_a063a41b73546564afd294fd5708b6667}
+
+
+Set the minimum unit number allowed. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 130 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!astr@{astr}}
+\index{astr@{astr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{astr}]{\setlength{\rightskip}{0pt plus 5cm}character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::astr = ' A\+B\+O\+R\+T\+: '}}\label{classmod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}
+
+
+Definition at line 11 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!estr@{estr}}
+\index{estr@{estr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{estr}]{\setlength{\rightskip}{0pt plus 5cm}character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::estr = ' E\+R\+R\+O\+R\+: '}}\label{classmod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}
+
+
+Definition at line 12 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!maxion@{maxion}}
+\index{maxion@{maxion}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{maxion}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+sys\+::maxion\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}
+
+
+Definition at line 28 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a7e34042b8f7e733f15516c7d544338a2}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!muni@{muni}}
+\index{muni@{muni}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{muni}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+sys\+::muni = 20\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__sys_a7e34042b8f7e733f15516c7d544338a2}
+
+
+Definition at line 26 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!tree\+\_\+delta@{tree\+\_\+delta}}
+\index{tree\+\_\+delta@{tree\+\_\+delta}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{tree\+\_\+delta}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+delta = 2\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}
+
+
+Definition at line 29 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!tree\+\_\+indent@{tree\+\_\+indent}}
+\index{tree\+\_\+indent@{tree\+\_\+indent}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{tree\+\_\+indent}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+indent = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}
+
+
+Definition at line 30 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a0fc21eee7f67c5be26a90e23d8c346db}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!unitno@{unitno}}
+\index{unitno@{unitno}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{unitno}]{\setlength{\rightskip}{0pt plus 5cm}integer(ip\+\_\+intwp\+\_\+p), dimension({\bf muni}), save mod\+\_\+oasis\+\_\+sys\+::unitno = -\/1\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__sys_a0fc21eee7f67c5be26a90e23d8c346db}
+
+
+Definition at line 27 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\hypertarget{classmod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}{\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!wstr@{wstr}}
+\index{wstr@{wstr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection[{wstr}]{\setlength{\rightskip}{0pt plus 5cm}character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::wstr = ' W\+A\+R\+N\+I\+N\+G\+: '}}\label{classmod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}
+
+
+Definition at line 13 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__sys_8_f90}{mod\+\_\+oasis\+\_\+sys.\+F90}\end{DoxyCompactItemize}

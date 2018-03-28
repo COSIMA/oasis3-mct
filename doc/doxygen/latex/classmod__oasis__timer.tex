@@ -1,0 +1,284 @@
+\hypertarget{classmod__oasis__timer}{\section{mod\+\_\+oasis\+\_\+timer Module Reference}
+\label{classmod__oasis__timer}\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+}
+
+
+Performance timer methods.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structmod__oasis__timer_1_1timer__details}{timer\+\_\+details}
+\begin{DoxyCompactList}\small\item\em Storage for timer data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__timer_a44a1bb64d1d892a9710d8c94d0ed0e3a}{oasis\+\_\+timer\+\_\+init} (app, file, nt)
+\begin{DoxyCompactList}\small\item\em Initializes the timer methods, called once in an application. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__timer_a13a16c07778911b45f3f42a542348019}{oasis\+\_\+timer\+\_\+start} (timer\+\_\+label, barrier)
+\begin{DoxyCompactList}\small\item\em Start a timer. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__timer_a01a76142a72cc6bc845736e79ad99bd3}{oasis\+\_\+timer\+\_\+stop} (timer\+\_\+label)
+\begin{DoxyCompactList}\small\item\em Stop a timer. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__timer_a3071ad54f61d88f16ad98ad7c0303915}{oasis\+\_\+timer\+\_\+print} (timer\+\_\+label)
+\begin{DoxyCompactList}\small\item\em Print timers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__timer_a23df8ae4894ac3fde178fe17292b317b}{oasis\+\_\+timer\+\_\+c2i} (tname, tid)
+\begin{DoxyCompactList}\small\item\em Convert a timer name to the timer id number. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=ic\+\_\+med) \hyperlink{classmod__oasis__timer_ad73dfe7213bbfab6212b9617000f4ce3}{app\+\_\+name}
+\item 
+character(len=ic\+\_\+med) \hyperlink{classmod__oasis__timer_a12dc3f95f8178d2ea46037a33da0e823}{file\+\_\+name}
+\item 
+character(len=ic\+\_\+med) \hyperlink{classmod__oasis__timer_a25a9f5f978c475475b48d782c4ad279c}{file\+\_\+hold}
+\item 
+integer \hyperlink{classmod__oasis__timer_acb04b78110e512ad551f7a500af70ef7}{mtimer}
+\item 
+type(\hyperlink{structmod__oasis__timer_1_1timer__details}{timer\+\_\+details}), dimension(\+:), \\*
+pointer \hyperlink{classmod__oasis__timer_a8a4b64983bdf68b795ab2112bc02b8bc}{timer}
+\item 
+double precision, dimension(\+:), \\*
+pointer \hyperlink{classmod__oasis__timer_a88e3c8171551da0ee64d10270484f6bf}{sum\+\_\+ctime}
+\item 
+double precision, dimension(\+:), \\*
+pointer \hyperlink{classmod__oasis__timer_ab4d27b8be5c21939ab8d8e32d5582e9e}{sum\+\_\+wtime}
+\item 
+integer, dimension(\+:), pointer \hyperlink{classmod__oasis__timer_a225db1b2b8bd57f0567d37b5c4d00ca3}{timer\+\_\+count}
+\item 
+integer \hyperlink{classmod__oasis__timer_aa92116f5ed11fd498b11b37e368e7b72}{ntimer}
+\item 
+integer \hyperlink{classmod__oasis__timer_a80e0bc610eb9e9b0aa07e926d5a9fde8}{output\+\_\+unit} = 901
+\item 
+logical, save \hyperlink{classmod__oasis__timer_a3733877ab9fa9d07df0ff70f21cd08b0}{single\+\_\+timer\+\_\+header}
+\item 
+character(len=1), parameter \hyperlink{classmod__oasis__timer_aceca66a08f073eb12f2643edc7c400fe}{t\+\_\+stopped} = ' '
+\item 
+character(len=1), parameter \hyperlink{classmod__oasis__timer_a110185cdca99e2889419692182b0440a}{t\+\_\+running} = '$\ast$'
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Performance timer methods. 
+
+This is used to measure the time consumed in specific parts of the code. Timers are defined by character strings that are stored in an internal datatype. 
+
+Definition at line 39 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__timer_a23df8ae4894ac3fde178fe17292b317b}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!oasis\+\_\+timer\+\_\+c2i@{oasis\+\_\+timer\+\_\+c2i}}
+\index{oasis\+\_\+timer\+\_\+c2i@{oasis\+\_\+timer\+\_\+c2i}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{oasis\+\_\+timer\+\_\+c2i}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+timer\+::oasis\+\_\+timer\+\_\+c2i (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{tname, }
+\item[{integer, intent(out)}]{tid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a23df8ae4894ac3fde178fe17292b317b}
+
+
+Convert a timer name to the timer id number. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tname} & timer name\\
+\hline
+\mbox{\tt out}  & {\em tid} & timer id \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 660 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a44a1bb64d1d892a9710d8c94d0ed0e3a}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!oasis\+\_\+timer\+\_\+init@{oasis\+\_\+timer\+\_\+init}}
+\index{oasis\+\_\+timer\+\_\+init@{oasis\+\_\+timer\+\_\+init}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{oasis\+\_\+timer\+\_\+init}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+timer\+::oasis\+\_\+timer\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{character (len=$\ast$), intent(in)}]{app, }
+\item[{character (len=$\ast$), intent(in)}]{file, }
+\item[{integer, intent(in)}]{nt}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__timer_a44a1bb64d1d892a9710d8c94d0ed0e3a}
+
+
+Initializes the timer methods, called once in an application. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em app} & name of application\\
+\hline
+\mbox{\tt in}  & {\em file} & output filename\\
+\hline
+\mbox{\tt in}  & {\em nt} & number of timers \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 91 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a3071ad54f61d88f16ad98ad7c0303915}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!oasis\+\_\+timer\+\_\+print@{oasis\+\_\+timer\+\_\+print}}
+\index{oasis\+\_\+timer\+\_\+print@{oasis\+\_\+timer\+\_\+print}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{oasis\+\_\+timer\+\_\+print}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+timer\+::oasis\+\_\+timer\+\_\+print (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in), optional}]{timer\+\_\+label}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__timer_a3071ad54f61d88f16ad98ad7c0303915}
+
+
+Print timers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timer\+\_\+label} & if unset, print all timers \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 221 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a13a16c07778911b45f3f42a542348019}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!oasis\+\_\+timer\+\_\+start@{oasis\+\_\+timer\+\_\+start}}
+\index{oasis\+\_\+timer\+\_\+start@{oasis\+\_\+timer\+\_\+start}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{oasis\+\_\+timer\+\_\+start}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+timer\+::oasis\+\_\+timer\+\_\+start (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{timer\+\_\+label, }
+\item[{logical, intent(in), optional}]{barrier}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__timer_a13a16c07778911b45f3f42a542348019}
+
+
+Start a timer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timer\+\_\+label} & timer name\\
+\hline
+\mbox{\tt in}  & {\em barrier} & flag to barrier this timer \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 133 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a01a76142a72cc6bc845736e79ad99bd3}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!oasis\+\_\+timer\+\_\+stop@{oasis\+\_\+timer\+\_\+stop}}
+\index{oasis\+\_\+timer\+\_\+stop@{oasis\+\_\+timer\+\_\+stop}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{oasis\+\_\+timer\+\_\+stop}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+timer\+::oasis\+\_\+timer\+\_\+stop (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{timer\+\_\+label}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__timer_a01a76142a72cc6bc845736e79ad99bd3}
+
+
+Stop a timer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timer\+\_\+label} & timer name \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 177 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__timer_ad73dfe7213bbfab6212b9617000f4ce3}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!app\+\_\+name@{app\+\_\+name}}
+\index{app\+\_\+name@{app\+\_\+name}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{app\+\_\+name}]{\setlength{\rightskip}{0pt plus 5cm}character (len=ic\+\_\+med) mod\+\_\+oasis\+\_\+timer\+::app\+\_\+name\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_ad73dfe7213bbfab6212b9617000f4ce3}
+
+
+Definition at line 54 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a25a9f5f978c475475b48d782c4ad279c}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!file\+\_\+hold@{file\+\_\+hold}}
+\index{file\+\_\+hold@{file\+\_\+hold}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{file\+\_\+hold}]{\setlength{\rightskip}{0pt plus 5cm}character (len=ic\+\_\+med) mod\+\_\+oasis\+\_\+timer\+::file\+\_\+hold\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a25a9f5f978c475475b48d782c4ad279c}
+
+
+Definition at line 58 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a12dc3f95f8178d2ea46037a33da0e823}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!file\+\_\+name@{file\+\_\+name}}
+\index{file\+\_\+name@{file\+\_\+name}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{file\+\_\+name}]{\setlength{\rightskip}{0pt plus 5cm}character (len=ic\+\_\+med) mod\+\_\+oasis\+\_\+timer\+::file\+\_\+name\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a12dc3f95f8178d2ea46037a33da0e823}
+
+
+Definition at line 57 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_acb04b78110e512ad551f7a500af70ef7}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!mtimer@{mtimer}}
+\index{mtimer@{mtimer}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{mtimer}]{\setlength{\rightskip}{0pt plus 5cm}integer mod\+\_\+oasis\+\_\+timer\+::mtimer\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_acb04b78110e512ad551f7a500af70ef7}
+
+
+Definition at line 72 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_aa92116f5ed11fd498b11b37e368e7b72}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!ntimer@{ntimer}}
+\index{ntimer@{ntimer}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{ntimer}]{\setlength{\rightskip}{0pt plus 5cm}integer mod\+\_\+oasis\+\_\+timer\+::ntimer\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_aa92116f5ed11fd498b11b37e368e7b72}
+
+
+Definition at line 78 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a80e0bc610eb9e9b0aa07e926d5a9fde8}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!output\+\_\+unit@{output\+\_\+unit}}
+\index{output\+\_\+unit@{output\+\_\+unit}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{output\+\_\+unit}]{\setlength{\rightskip}{0pt plus 5cm}integer mod\+\_\+oasis\+\_\+timer\+::output\+\_\+unit = 901\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a80e0bc610eb9e9b0aa07e926d5a9fde8}
+
+
+Definition at line 80 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a3733877ab9fa9d07df0ff70f21cd08b0}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!single\+\_\+timer\+\_\+header@{single\+\_\+timer\+\_\+header}}
+\index{single\+\_\+timer\+\_\+header@{single\+\_\+timer\+\_\+header}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{single\+\_\+timer\+\_\+header}]{\setlength{\rightskip}{0pt plus 5cm}logical, save mod\+\_\+oasis\+\_\+timer\+::single\+\_\+timer\+\_\+header\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a3733877ab9fa9d07df0ff70f21cd08b0}
+
+
+Definition at line 81 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a88e3c8171551da0ee64d10270484f6bf}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!sum\+\_\+ctime@{sum\+\_\+ctime}}
+\index{sum\+\_\+ctime@{sum\+\_\+ctime}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{sum\+\_\+ctime}]{\setlength{\rightskip}{0pt plus 5cm}double precision, dimension(\+:), pointer mod\+\_\+oasis\+\_\+timer\+::sum\+\_\+ctime\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a88e3c8171551da0ee64d10270484f6bf}
+
+
+Definition at line 74 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_ab4d27b8be5c21939ab8d8e32d5582e9e}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!sum\+\_\+wtime@{sum\+\_\+wtime}}
+\index{sum\+\_\+wtime@{sum\+\_\+wtime}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{sum\+\_\+wtime}]{\setlength{\rightskip}{0pt plus 5cm}double precision, dimension(\+:), pointer mod\+\_\+oasis\+\_\+timer\+::sum\+\_\+wtime\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_ab4d27b8be5c21939ab8d8e32d5582e9e}
+
+
+Definition at line 75 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a110185cdca99e2889419692182b0440a}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!t\+\_\+running@{t\+\_\+running}}
+\index{t\+\_\+running@{t\+\_\+running}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{t\+\_\+running}]{\setlength{\rightskip}{0pt plus 5cm}character(len=1), parameter mod\+\_\+oasis\+\_\+timer\+::t\+\_\+running = '$\ast$'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a110185cdca99e2889419692182b0440a}
+
+
+Definition at line 83 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_aceca66a08f073eb12f2643edc7c400fe}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!t\+\_\+stopped@{t\+\_\+stopped}}
+\index{t\+\_\+stopped@{t\+\_\+stopped}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{t\+\_\+stopped}]{\setlength{\rightskip}{0pt plus 5cm}character(len=1), parameter mod\+\_\+oasis\+\_\+timer\+::t\+\_\+stopped = ' '\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_aceca66a08f073eb12f2643edc7c400fe}
+
+
+Definition at line 82 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a8a4b64983bdf68b795ab2112bc02b8bc}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!timer@{timer}}
+\index{timer@{timer}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{timer}]{\setlength{\rightskip}{0pt plus 5cm}type ({\bf timer\+\_\+details}), dimension(\+:), pointer mod\+\_\+oasis\+\_\+timer\+::timer\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a8a4b64983bdf68b795ab2112bc02b8bc}
+
+
+Definition at line 73 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+\hypertarget{classmod__oasis__timer_a225db1b2b8bd57f0567d37b5c4d00ca3}{\index{mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}!timer\+\_\+count@{timer\+\_\+count}}
+\index{timer\+\_\+count@{timer\+\_\+count}!mod\+\_\+oasis\+\_\+timer@{mod\+\_\+oasis\+\_\+timer}}
+\subsubsection[{timer\+\_\+count}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\+:), pointer mod\+\_\+oasis\+\_\+timer\+::timer\+\_\+count\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__timer_a225db1b2b8bd57f0567d37b5c4d00ca3}
+
+
+Definition at line 76 of file mod\+\_\+oasis\+\_\+timer.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__timer_8_f90}{mod\+\_\+oasis\+\_\+timer.\+F90}\end{DoxyCompactItemize}

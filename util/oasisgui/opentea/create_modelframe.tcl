@@ -1,0 +1,84 @@
+#  This program is under CECILL_B licence. See footer for details.
+
+
+#####################
+# create a 'float' container able to display
+# several parameters and some help
+# the validity status could be shown, but is not
+# displayed for the moment to reduce the number
+# of informations for the user.
+#####################
+
+proc modelframe_create { args } {
+    
+    set mandatory_arguments { path_father address style}
+    initWidget
+    
+    set widgetInfo($address-status) 1
+    
+    set style [dTree_tryGetAttribute $XMLtree $full_address_XML_clean "layout" $style]
+    
+    
+    smartpacker_setup_modelframe $win $address
+    
+   
+    
+    finishWidget    
+    append widgetInfo($address-refreshStatus) [ subst { modelframe_refreshStatus $win $address}]    
+    
+    
+    help_add_desc_docu_to_widget
+    
+    
+    
+    
+    if {$style == "onrequest"} {
+        return $win.snap
+    } else {
+        return $win
+    }
+    
+}
+
+
+# existif behavior
+proc modelframe_refreshStatus {win address} {
+    global widgetInfo
+    smartpacker_update_visibility $win $address
+}
+
+
+
+
+#  Copyright CERFACS 2014
+#   
+#  antoine.dauptain@cerfacs.fr
+#   
+#  This software is a computer program whose purpose is to ensure technology
+#  transfer between academia and industry.
+#   
+#  This software is governed by the CeCILL-B license under French law and
+#  abiding by the rules of distribution of free software.  You can  use, 
+#  modify and/ or redistribute the software under the terms of the CeCILL-B
+#  license as circulated by CEA, CNRS and INRIA at the following URL
+#  "http://www.cecill.info". 
+#   
+#  As a counterpart to the access to the source code and  rights to copy,
+#  modify and redistribute granted by the license, users are provided only
+#  with a limited warranty  and the software's author,  the holder of the
+#  economic rights,  and the successive licensors  have only  limited
+#  liability. 
+#   
+#  In this respect, the user's attention is drawn to the risks associated
+#  with loading,  using,  modifying and/or developing or reproducing the
+#  software by the user in light of its specific status of free software,
+#  that may mean  that it is complicated to manipulate,  and  that  also
+#  therefore means  that it is reserved for developers  and  experienced
+#  professionals having in-depth computer knowledge. Users are therefore
+#  encouraged to load and test the software's suitability as regards their
+#  requirements in conditions enabling the security of their systems and/or 
+#  data to be ensured and,  more generally, to use and operate it in the 
+#  same conditions as regards security. 
+#   
+#  The fact that you are presently reading this means that you have had
+#  knowledge of the CeCILL-B license and that you accept its terms.

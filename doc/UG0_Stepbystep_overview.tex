@@ -5,15 +5,15 @@
 In 1991, CERFACS started the development of
 a software interface to couple existing ocean and atmosphere numerical General
 Circulation Models. Today, different versions of the 
-OASIS coupler are used by about 35 modelling groups in Europe, Australia, Asia and
-North America on the different computing platforms \citep{valcke8}\footnote{The list of
+OASIS coupler are used by about 45 modelling groups all around the
+world on different computing platforms\footnote{A list of
 coupled models realized with OASIS can be found at https://verc.enes.org/oasis/oasis-dedicated-user-support-1/some-current-users}.
 OASIS sustained development is ensured by a collaboration
 between CERFACS and the Centre National de la Recherche Scientifique
 (CNRS) and its maintainance and user support is presently reinforced
-with additional resources coming from the IS-ENES2 project funded by the EU.
+with additional resources coming from the IS-ENES2 European project (\# 312979).
 
-The current OASIS3-MCT is interfaced with MCT, the Model
+The current OASIS3-MCT internally uses MCT, the Model
 Coupling Toolkit\footnote{www.mcs.anl.gov/research/projects/mct/} \citep{mct_larson} \newline \citep{mct_jacob}, developed by the Argonne National Laboratory in the USA. MCT implements fully parallel regridding, as a parallel matrix vector 
 multiplication, and parallel distributed exchanges of the coupling
 fields, based on pre-computed regridding weights and addresses. 
@@ -21,22 +21,56 @@ Its design philosophy, based on flexibility and minimal invasiveness,
 is close to the OASIS approach. 
 MCT has proven parallel performance and is, most notably, the
 underlying coupling software used in National Center for Atmospheric
-Research Community Earth System Model 1 (NCAR CESM1).
+Research Community Earth System Model (NCAR CESM).
 
-OASIS3-MCT is a portable set of Fortran 77, Fortran 90 and C routines. Low-intrusiveness, portability and flexibility are OASIS3-MCT key design concepts. After compilation OASIS3-MCT is a coupling library that needs to be linked to the component models, and which main function is to interpolate and exchange the coupling fields between them to form a coupled system.  OASIS3-MCT supports  coupling of 2D logically-rectangular fields but 3D fields and 1D fields expressed on unstructured grids are also supported using a one dimension degeneration of the structures. Thanks to MCT, all transformations, including regridding, are executed in parallel on the set of source or target component processes and all couplings are now executed in parallel directly between the components via Message Passing Interface
-(MPI). OASIS3-MCT also supports file I/O using netcdf.  
+OASIS3-MCT is a portable set of Fortran 77, Fortran 90 and C
+routines. Low-intrusiveness, portability and flexibility are
+OASIS3-MCT key design concepts. After compilation OASIS3-MCT is a
+coupling library to be linked to the component models, and which main
+function is to interpolate and exchange the coupling fields between
+them to form a coupled system.  OASIS3-MCT supports  coupling of 2D
+logically-rectangular fields but 3D fields and 1D fields expressed on
+unstructured grids are also supported using a one dimension
+degeneration of the structures. Thanks to MCT, all transformations,
+including regridding, are performed in parallel on the set of source or
+target component processes and all coupling echanges are now executed
+in parallel directly between the component processes via Message Passing Interface
+(MPI). OASIS3-MCT also supports file I/O using netcdf. 
 
-In spite of the significant changes in underlying implementation, usage of OASIS3-MCT in the codes has largely remained unchanged with respect to OASIS3.3.
-To communicate with another model, or to perform I/O actions, a component model needs to include few specific calls to the OASIS3-MCT coupling library, which Application Programmig Interface (API) used in component models is unchanged.  The use 
-statement has been updated and now requires a single ``use\ mod\_prism'' or ``use mod\_oasis'' statement instead of the various use statements required in prior
-OASIS3 versions.  The {\it namcouple} configuration file is also largely unchanged
-relative to OASIS3, although several options are either not used
-or not supported.  There is a new transformation in {\it namcouple}
-i.e. {\tt MAPPING} which allows a user to specify a mapping
-file generated externally.  The changes between OASIS3.3 and OASIS3-MCT are lilsted in appendix \ref{sec_changes}.
+The new version, OASIS3-MCT\_3.0 supports coupling exchanges between
+components deployed in much more diverse configurations than
+before. It is of course possible to implement coupling exchanges
+between two components corresponding to two different executables
+running concurrently on separate sets of tasks, as before, but also
+between two components running concurrently on separate sets of tasks
+within one same executable, or between different
+sub-components defined on separate or overlapping sets of tasks within
+one executable. It is also now possible to
+have some or all tasks of a component not participating to the
+coupling exchanges. 
+
+In spite of the significant changes in underlying implementation,
+usage of OASIS3-MCT in the codes has largely remained unchanged with
+respect to previous OASIS3 versions.
+To communicate with another component, or to perform I/O actions, a
+component model needs to include few specific calls of the Application Programmig Interface (API)  OASIS3-MCT coupling library.  The {\it namcouple} configuration file is also largely unchanged
+relative to OASIS3, although several options are either deprecated, not used
+or not supported. 
+
+A Graphical User Interface is now available to build
+the {\it namcouple} configuration file for one's specific coupled
+system. The OASIS3-MCT GUI is an application of OPENTEA, a graphical
+interface used by different codes and developed at CERFACS. The
+sources of the GUI are located in the {\tt oasis3-mct/util/oasisgui}
+directory; a short description of the OASIS GUI is given in the README
+file therein and the GUI itself includes all relevant explanations on-line.
+
+The changes between previous versions and the
+current one are listed in appendix \ref{sec_changes}.
  
 First tests done with up to
-8000 cores on the Bullx Curie machine at the TGCC are very encouraging
+16000 cores on the Bullx Curie machine at the {\it Tr\`es Grand Centre de
+Calcul} near Paris are very encouraging
 and it is therefore very likely that OASIS3-MCT will provide an efficient and
 easy-to-use coupling solution for many climate modelling groups in the few years to come. 
 
@@ -49,25 +83,28 @@ actions), one has to follow these steps:
 \begin{enumerate}
 \item Obtain OASIS3-MCT source code (see chapter \ref{sec_Obtaining}).
 \item Get familiar with OASIS3-MCT by going through the tutorial steps. The tutorial sources are given in directory {\tt
-  examples/tutorial} and all explanations are provided in the document {\tt tutorial\_oasis3-mct.pdf} therein. 
+  examples/tutorial} and all explanations are provided in the document
+{\tt tutorial.pdf} therein. The tutorial also helps one to
+practice with the Graphical User Interface.
 
-\item Identify the coupling or I/O fields and adapt the component
-  models to allow their exchange with the OASIS3-MCT coupling library based on MPI1 message passing.
-  The OASIS3-MCT coupling library uses NetCDF and therefore can be used to perform I/O actions
-  from/to disk files.  For more detail on how to interface a model
-  with OASIS3-MCT, see chapter \ref{sec_modelinterfacing}.
+\item Identify the coupling or I/O fields and adapt the codes to
+  implement the coupling exchanges with the OASIS3-MCT coupling library based on MPI message passing.
+  The OASIS3-MCT coupling library uses NetCDF and therefore can also be used to perform I/O actions
+  from/to disk files.  For more detail on how to use the 
+  OASIS3-MCT API in the codes, see chapter \ref{sec_modelinterfacing}.
 
 \item Define all coupling and I/O parameters and the transformations
   required to adapt each coupling field from the source model grid to
   the target model grid; on this basis, prepare OASIS3-MCT configuring file 
-  {\it namcouple} (see chapter \ref{sec_namcouple}). 
+  {\it namcouple} preferably using the
+  Graphical User Interface  (see chapter \ref{sec_namcouple}). 
   OASIS3-MCT supports different interpolation algorithms as described in
   chapter \ref{sec_transformations}.  Regridding files can be computed
-  online using the SCRIP options or offline and read using the MAPPING
+  online using the SCRIP options, or offline and read in during the run using the MAPPING
   transformation.
 
 {\bf We strongly recommend to tests off-line the quality of the chosen transformations and regriddings} using the environment available in {\tt
-  examples/test\_interpolation} and explanations provided in the document {\tt test\_interpolation\_oasis3-mct.pdf} therein. 
+  examples/test\_interpolation} and explanations provided in the document {\tt test\_interpolation.pdf} therein. 
 
 \item Generate required auxiliary data files (see chapter
   \ref{sec_auxiliary}).
@@ -95,16 +132,19 @@ OASIS3-MCT directory structure is the following one:
  - oasis3-mct/doc                OASIS3-MCT User Guide
 
  - oasis3-mct/util/make_dir      Utilities to compile OASIS3-MCT
+                  /oasisgui      Graphical User Interface to the
+                                 namcouple configuration file
+                  /lucia         Tool for load balancing analysis (XXX)
 
- - oasis3-mct/examples           Environment to run the tutorial and
-                                 test_interpolation toy coupled models. 
+ - oasis3-mct/examples           Environment to compile, run and use
+                                 different toy coupled models. 
 \end{verbatim}
 \newpage
-\section{Licenses and Copyrights}
+\section{Licenss and Copyrights}
  
 \subsection{OASIS3-MCT license and copyright statement}
 
-Copyright © 2013 Centre Europ\'een de Recherche et Formation
+Copyright © 2015 Centre Europ\'een de Recherche et Formation
 Avanc\'ee en Calcul Scientifique (CERFACS).  
 
 This software and ancillary information called OASIS3-MCT is free
@@ -122,7 +162,7 @@ build a modular and user-friendly coupler accessible to the climate
 modelling community. Although we use the tool ourselves and have made
 every effort to ensure its accuracy, we can not make any
 guarantees. We provide the software to you for free. In return,
-you--the user--assume full responsibility for use of the software. The
+you --the user-- assume full responsibility for use of the software. The
 OASIS3-MCT software comes without any warranties (implied or expressed) and
 is not guaranteed to work for you or on your computer. Specifically,
 CERFACS and the various individuals involved in development and

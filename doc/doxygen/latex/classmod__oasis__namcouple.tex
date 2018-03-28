@@ -1,0 +1,2254 @@
+\hypertarget{classmod__oasis__namcouple}{\section{mod\+\_\+oasis\+\_\+namcouple Module Reference}
+\label{classmod__oasis__namcouple}\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+}
+
+
+Reads the namcouple file for use in O\+A\+S\+I\+S.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__namcouple_ab57c69ae534734f92a85e24a3389e972}{oasis\+\_\+namcouple\+\_\+init} ()
+\begin{DoxyCompactList}\small\item\em Reads the namcouple. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__namcouple_a5ca7cd6a5b9f939b68492200aa92bab4}{nnamcpl}
+\begin{DoxyCompactList}\small\item\em number of namcouple inputs \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__namcouple_a14505eaa91b2c8ba308c63ff78652206}{namruntim}
+\begin{DoxyCompactList}\small\item\em namcouple runtime \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__namcouple_a46affda5336f60a1eeb1badaaccd3cfd}{namlogprt}
+\begin{DoxyCompactList}\small\item\em namcouple nlogprt value \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__namcouple_a45fbbd2941f5d71991d409f63e31cf02}{namtlogprt}
+\begin{DoxyCompactList}\small\item\em namcouple ntlogprt value \end{DoxyCompactList}\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a5fcb5a4f2a49f414fafe38b03c5c089d}{namsrcfld}
+\begin{DoxyCompactList}\small\item\em list of src fields \end{DoxyCompactList}\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ac4cfec209e4169b6098f9a8b9be1ffb1}{namdstfld}
+\begin{DoxyCompactList}\small\item\em list of dst fields \end{DoxyCompactList}\item 
+character(len=ic\+\_\+lvar), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a589c1bae58b10bcb0cfb30c0893a7895}{namsrcgrd}
+\begin{DoxyCompactList}\small\item\em src grid name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ac8f6c8fe3720739f3d26431a8a600506}{namsrc\+\_\+nx}
+\begin{DoxyCompactList}\small\item\em src nx grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ab82c80f007b37865172ddb033a1abb36}{namsrc\+\_\+ny}
+\begin{DoxyCompactList}\small\item\em src ny grid size \end{DoxyCompactList}\item 
+character(len=ic\+\_\+lvar), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a7a2ed64b0670db38d2287f5d452060e4}{namdstgrd}
+\begin{DoxyCompactList}\small\item\em dst grid name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a6add94418eefdaefd78cd971888a5826}{namdst\+\_\+nx}
+\begin{DoxyCompactList}\small\item\em dst nx grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a9035fc89396bad9574c88642d3aac5f0}{namdst\+\_\+ny}
+\begin{DoxyCompactList}\small\item\em dst ny grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a54ccfe0380fc1c89d085f37a044a297e}{namfldseq}
+\begin{DoxyCompactList}\small\item\em S\+E\+Q value. \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a4841e350d91926f5f8403e73442c76ad}{namfldops}
+\begin{DoxyCompactList}\small\item\em operation, ip\+\_\+expout,... \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a9080617143dacb027f74c4c5158b5e58}{namflddti}
+\begin{DoxyCompactList}\small\item\em coupling period (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a6a4406ca14f91ef6514a18eb154e648f}{namfldlag}
+\begin{DoxyCompactList}\small\item\em coupling lag (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a5f81bc00e6dc045770edd4093f68278c}{namfldtrn}
+\begin{DoxyCompactList}\small\item\em fields transform, ip\+\_\+instant,... \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a96aa6a31ef021468f807819a84b327c3}{namfldcon}
+\begin{DoxyCompactList}\small\item\em conserv fld operation \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a119b86702766d5392cb44856448bcd3e}{namfldcoo}
+\begin{DoxyCompactList}\small\item\em conserv fld option (bfb, opt) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+long), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a9fc6ac674a8cfa68d9d15ad13213e21d}{nammapfil}
+\begin{DoxyCompactList}\small\item\em mapping file name \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a7316d7d322da7cf10f315e38c145ebbb}{nammaploc}
+\begin{DoxyCompactList}\small\item\em mapping location (src or dst pes) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ad2554b4881fa63780dd5e6fe78d705ef}{nammapopt}
+\begin{DoxyCompactList}\small\item\em mapping option (bfb, sum, or opt) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a54f4b8262f809a20928092782bc78345}{namrstfil}
+\begin{DoxyCompactList}\small\item\em restart file name \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a15fc11ff1c1d5718ff127a06a205a82c}{naminpfil}
+\begin{DoxyCompactList}\small\item\em input file name \end{DoxyCompactList}\item 
+logical, dimension(\+:), pointer, \\*
+public \hyperlink{classmod__oasis__namcouple_a7c88a329c97aea020e9b135bdca8d160}{namchecki}
+\begin{DoxyCompactList}\small\item\em checkin flag \end{DoxyCompactList}\item 
+logical, dimension(\+:), pointer, \\*
+public \hyperlink{classmod__oasis__namcouple_a58c011820e55c9af9f306fbb1d45eb23}{namchecko}
+\begin{DoxyCompactList}\small\item\em checkout flag \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ab52824ec91491253e02556a68ab31b09}{namfldsmu}
+\begin{DoxyCompactList}\small\item\em src multiplier term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a1729dba99742412a1e07a479cb7f7921}{namfldsad}
+\begin{DoxyCompactList}\small\item\em src additive term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ad81bb4f19a71f0fcf8655cb9d39a3380}{namflddmu}
+\begin{DoxyCompactList}\small\item\em dst multipler term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_af1e31f45ea1cd7a7b64a8a7dc2cec4ee}{namflddad}
+\begin{DoxyCompactList}\small\item\em dst additive term \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a51c19e0892a72acc3dca2adb046ed175}{namscrmet}
+\begin{DoxyCompactList}\small\item\em scrip method (C\+O\+N\+S\+E\+R\+V, D\+I\+S\+T\+W\+G\+T, B\+I\+L\+I\+N\+E\+A\+R, B\+I\+C\+U\+B\+I\+C, G\+A\+U\+S\+W\+G\+T) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a392f40531007d5dcc084e6ad4a393fd7}{namscrnor}
+\begin{DoxyCompactList}\small\item\em scrip conserv normalization (F\+R\+A\+C\+A\+R\+E\+A, D\+E\+S\+T\+A\+R\+E\+A, F\+R\+A\+C\+N\+N\+E\+I) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a8ddbaabd22bbf485888b1df5f3578909}{namscrtyp}
+\begin{DoxyCompactList}\small\item\em scrip mapping type (S\+C\+A\+L\+A\+R, V\+E\+C\+T\+O\+R) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_ac881ced105604879ada860fabd677481}{namscrord}
+\begin{DoxyCompactList}\small\item\em scrip conserve order (F\+I\+R\+S\+T, S\+E\+C\+O\+N\+D) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a6a95ddbbbc615e0257d93d05e4546239}{namscrres}
+\begin{DoxyCompactList}\small\item\em scrip search restriction (L\+A\+T\+L\+O\+N, L\+A\+T\+I\+T\+U\+D\+E) \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a45b410743ce74a9824d44b329ba323ba}{namscrvam}
+\begin{DoxyCompactList}\small\item\em scrip gauss weight distance weighting for G\+A\+U\+S\+W\+G\+T \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a20d614468823744b82118ee8cf2df852}{namscrnbr}
+\begin{DoxyCompactList}\small\item\em scrip number of neighbors for G\+A\+U\+S\+W\+G\+T and D\+I\+S\+T\+W\+G\+T \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a728405e8f669b58d00c189abf8b62437}{namscrbin}
+\begin{DoxyCompactList}\small\item\em script number of search bins \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a4555b14f38928b7f0fb7f77b9c42d0a0}{namsort2nn}
+\begin{DoxyCompactList}\small\item\em sorted namcpl for sort, define nn order, computed later \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__namcouple_a0ace7c451d8658759b9c8d871926a76e}{namnn2sort}
+\begin{DoxyCompactList}\small\item\em sorted namcpl for nn, define sort number, computed later \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_acb43892c17b5f8c8b360effb5a811c27}{inipar\+\_\+alloc} ()
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a6da9d2285766ceb22ea8449f55201d84}{inipar}
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a0d85a5dcb3fab17a680cceed332b9668}{alloc} ()
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_afaf98d4eb96cd6fbe191febd1efef8a4}{dealloc}
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_aee06276b65463fb85340dcc2ab9d67dc}{prtout} (cdtext, kvalue, kstyle)
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a7c0f9c95bde8993d68aac2e7158e813c}{prcout} (cdtext, cdstring, kstyle)
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a16fb5fe473d7aeb0cc4a3908b267485b}{parse} (cdone, cdtwo, knumb, klen, kleng, endflag)
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a1078922274499dbda36db4dd1707d6de}{parseblk} (cdone, cdtwo, knumb, klen, kleng)
+\item 
+subroutine \hyperlink{classmod__oasis__namcouple_a75ba5c3a95a17e9c9af9c6e00e53c0f6}{skip} (cd\+\_\+one, id\+\_\+len, endflag)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty} = 5000
+\begin{DoxyCompactList}\small\item\em max number of characters to be read in each line of the file namcouple \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{classmod__oasis__namcouple_a36ef9483c332254e38c52b1d78d26f1f}{nulin}
+\item 
+character(len=$\ast$), parameter \hyperlink{classmod__oasis__namcouple_ae023a43e29bb32ebf11f193e34d8bd85}{cl\+\_\+namcouple} = 'namcouple'
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a18b7a14f095f3cb6ace40afc06e2a5b9}{il\+\_\+err}
+\item 
+logical \hyperlink{classmod__oasis__namcouple_a5d6add8b958acc8b865b898d9e54ac73}{lncdfgrd}
+\item 
+logical \hyperlink{classmod__oasis__namcouple_a645168dae20a0c24786c3e6dcea9f2ab}{lncdfrst}
+\item 
+character(len=5), parameter \hyperlink{classmod__oasis__namcouple_afaa0549951c43335a2f8e75c7b1d2846}{cgrdnam} = 'grids'
+\item 
+character(len=5), parameter \hyperlink{classmod__oasis__namcouple_aeeda85bec8a449e87411d4ed404322c5}{cmsknam} = 'masks'
+\item 
+character(len=5), parameter \hyperlink{classmod__oasis__namcouple_a49e79935fc2421fe3e4e7422f17b34ea}{csurnam} = 'areas'
+\item 
+character(len=5), parameter \hyperlink{classmod__oasis__namcouple_a161fc23acf442c75c9d6ba7758937d59}{crednam} = 'maskr'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_ac1a557cecb41295e7d5cb004a7937ea4}{cglonsuf} = '.lon'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_a2036218f05c62fc672bd07ece34f26db}{cglatsuf} = '.lat'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_ae56f031c6d9a819a39fe5170f42d7ce1}{crnlonsuf} = '.clo'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_acdc7f0d582616ee9e18470aad433ed3a}{crnlatsuf} = '.cla'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_aeea3ba680d5ba05a432c12d64c68c8af}{cmsksuf} = '.msk'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_adf2c151a84c37bd7cd93867305b4f70b}{csursuf} = '.srf'
+\item 
+character(len=4), parameter \hyperlink{classmod__oasis__namcouple_a4b921aeee4d921557ab0cd2f0e541dad}{cangsuf} = '.ang'
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a8eca7c715a39c523e00ed2be0612950d}{lmapp}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_acda1605129987d656360e1ed81e8d199}{lsubg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a57f1b6f111a5257a4d6f5a4b18fa6250}{nfcoast}
+\item 
+logical \hyperlink{classmod__oasis__namcouple_a7657e0f9b495e291f26dc31b4f6145aa}{lcoast}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a8a962108487c3ca092633bd4292dbfd6}{ntime}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a6246780a56635119fd8f7935456b06cf}{niter}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a1e5b5efd046e5ab959fba026bd645945}{nitfn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a66c36f23a77081749dc9e7993b0277f3}{nstep}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a674f201daa7f2e1ba4c71221bda91d9c}{ig\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a531825c07a164f6139e5eebd59e295a2}{ig\+\_\+direct\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a3de3e6eb2bf1e81d77e9c117b7d5985f}{ig\+\_\+total\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a7cf04d6fb678ee65b7fbedc56a0d680a}{ig\+\_\+final\+\_\+nfield}
+\item 
+logical \hyperlink{classmod__oasis__namcouple_aaf6b923ffc7763fd37a5c4c72bdfa34d}{lg\+\_\+oasis\+\_\+field}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_abba00866a740567bc1d93cf5850042fd}{ig\+\_\+maxcomb}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_ae66cf9f63b6c440406c9b675caef7759}{ig\+\_\+maxnoa}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_aab2d4bcc2dc767df51f99f907f4f3e6e}{ig\+\_\+maxnfg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a7b8c924fdea622759b99d8f61e03ade5}{nlogprt}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a49bd874b06648257f7ce70da19a678b4}{ntlogprt}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a12e1621f5697a0cdbde11d3e25f43b54}{numlab}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ab0b9a7822ec44010e8652ed2d6abc0db}{ig\+\_\+numlab}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac6216c78a2779e49f90a9a95a39c27d7}{nfexch}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac4549f9f5bbb37fce3edc9a208e0d48b}{ig\+\_\+ntrans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_abbd7bd184bb2a3860063dbb9f109f427}{ig\+\_\+total\+\_\+ntrans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a6e774d31f16b513b1d604e72a82dff40}{nlonbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a9b09ac96dad78313003a9436fe2f9aec}{nlatbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ae413f2dc402b7c018e341081b8d6e208}{nlonaf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a80d81b2f026a2d0dc2de27b9ee04f7af}{nlataf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a20e9486f3e8bbdcee0de935e9be3a2e8}{nseqn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a09ed8be682296ef584f0d5777b2c6482}{ig\+\_\+total\+\_\+nseqn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_affa727bb033c0f4d09962f2b4d1b4ab5}{ig\+\_\+freq}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ae2c74692147a54b3f7534301d509f766}{ig\+\_\+lag}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_aad06af35c92de78d71671d39bcbb1690}{nlagn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a0b8948452bbd8cf1dc9f0fccc17c344d}{ig\+\_\+invert}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_adc4dcf30da2b88fb1798dd02e7833bc1}{ig\+\_\+reverse}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a0751f74f7ce6520d8e860b9da14d1d9d}{ig\+\_\+number\+\_\+field}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a1cc3d37d7819c112f14b6cec03266561}{ig\+\_\+no\+\_\+rstfile}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a7c783457d0e759e3af98b92146fa4ec3}{ig\+\_\+total\+\_\+state}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a510a13e57f2f65d5ddc70c729d54c0f6}{ig\+\_\+local\+\_\+trans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ae81f2e658bbaeae20badef0fad425a69}{ig\+\_\+grid\+\_\+nbrbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a8e8c38746c6c35b13d2d9b934835188c}{ig\+\_\+grid\+\_\+nbraf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a05148b30ca97c536b40a896153c8921f}{ig\+\_\+nbr\+\_\+rstfile}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_a839912711f8d2f44a825689e2673d0dd}{ig\+\_\+total\+\_\+frqmin}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac1be1629c1369b96a4ff08c07200a05d}{lg\+\_\+state}
+\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a1f6ff08cee0c3c5deb262c1447d88328}{cnaminp}
+\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a71ba84b9a7a813ca2551bcde99a0b5b5}{cnamout}
+\item 
+character(len=8), dimension(\+:,\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a5eaa67fd4db1a3cde074adedd984ffbe}{canal}
+\item 
+character(len=8) \hyperlink{classmod__oasis__namcouple_a8a7387f27c409ea27aa53b616805f0fa}{cg\+\_\+c}
+\item 
+character(len=32), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ac79429a9522aabddbe4ed68fd9571bec}{cg\+\_\+name\+\_\+rstfile}
+\item 
+character(len=32), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a6eec7fe795bfb9c2058c7953c072d442}{cg\+\_\+restart\+\_\+file}
+\item 
+character(len=32), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_af17e746f51dcf0110428ebe55f6d7285}{cficinp}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a62f96a372f013fc37713f8ba1728e3de}{cficout}
+\item 
+character(len=32), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a24f56cf88d79190f229d3fd1d62d17de}{cg\+\_\+input\+\_\+file}
+\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_aad4d4857b4c424e1b0f0bcc0a01aa6e3}{cg\+\_\+input\+\_\+field}
+\item 
+character(len=\hyperlink{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{jpeighty}), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a1b680bf476776f3db085dc1f0009736c}{cg\+\_\+output\+\_\+field}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a9e90e47fd11ff4dd95c61dcf3ec872ff}{cficbf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a9b3c7c879a3ff2b5eb15cbcaf5a8a1d9}{cficaf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a4b507ab44ad62713c9e3d83ded6be3f4}{cstate}
+\item 
+character(len=4), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ac22155599e9b49d57514dd1f7dc9928a}{cga\+\_\+locatorbf}
+\item 
+character(len=4), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a6f4080d45f0b9be5a0466967f535b83b}{cga\+\_\+locatoraf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a298c9165785ae1a41f89597cadd211e7}{neighbor}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_aaf9fd5eaa5d115f2548b8f78cdcd172d}{ntronca}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a9f8a2a4f44b1c56860fef8df014339d3}{ncofld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a883d88938c50264711c53af2b555c3db}{neighborg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a21400200658d24cbf7484b5eb177c911}{nbofld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_af0c7b1e7e49159c6b9c0dc3663264346}{nbnfld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{classmod__oasis__namcouple_abb7c2cd3a371bbb8ccd6a272d0e9b60f}{nludat}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a31f62f64cbcf344e529d0576386d0751}{nlufil}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a42367b4984c6ac4c69cbdcd315cb54e6}{nlumap}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac623e3e0906f57983efc1ab912ce9674}{nmapfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_adb1f8ce6bf94f488c10ef36b3afb8eca}{nmapvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_aefed5eaa9924d249e979a5a772a46979}{nlusub}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a6a94577996b440c31cac5b7d39e7f47a}{nsubfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a0f31605257bfe125aafb6488a5065d4d}{nsubvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a7510ecfe3d0f141252450e4ba66209ba}{nluext}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a8302411d5a02efd9a6dc7f784fbb0d4d}{nextfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a484a71c213c89416924a0e23cfd46269}{nosper}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac154fc90756832bc90d02ea21f7c7e17}{notper}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a4c609c48a20205e1d2aa9938d7babc92}{nbins}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{classmod__oasis__namcouple_aee9f6849ec644ee40f465976bc6c7b96}{nlucor}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_abb6f67bfba2cba424dabee3a465fdfd5}{nscripvoi}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a92d43fa5eaaff81f0e3f73b303377c02}{amskval}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a3598202174da65117caf675065f8b160}{amskvalnew}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{classmod__oasis__namcouple_a115cdfe0e05679107363605a992c6386}{acocoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{classmod__oasis__namcouple_a1b3f80e8e19f950b806636caadeb704b}{abocoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{classmod__oasis__namcouple_a211c98282b89859bee6da0ef60f0d484}{abncoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a19fb86d643bb8761d5a8e32d645d5963}{afldcoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_aa9d178659282698ffb6c186ff48bed3c}{afldcobo}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a207709166cd4d719d65d76e6c043fd6c}{afldcobn}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a2ee5f8ec71ebae64c3d14445345d7545}{cxordbf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ae1debe43f1c5cffeeb1d0d9ab563f4c4}{cyordbf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ab52bc27bf5898cc85dce0fc60feb9320}{cxordaf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a68de802180c51365e7d4bcc5180ac93b}{cyordaf}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a1066d92e6c9301bdb46ddda7edd7d29a}{cextmet}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ac9b9bb442cf77881bef2157c85e23495}{cintmet}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a795db0909c85ffadb601b744b5189ff5}{cgrdtyp}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ab139e7bad0413c79a5ad8e0837d3e0ef}{cfldtyp}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a6a69d927924d3fa391fdc3ec6cb78197}{cfilfic}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_adf402f22f61893178fadcefe43b91102}{cfilmet}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a535fadd17426c228698e3a51fd54b605}{cconmet}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a240979dfe7369da899b0cfe2aeba4f9d}{cconopt}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_af3a308fee2e4b00a1380035e41113d36}{cfldcoa}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_aa387fcfde8c2538e22897b243ff5024c}{cfldfin}
+\item 
+character(len=8), dimension(\+:,\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_af8d81a53bd28ddf6bfe19f5e05f1d867}{ccofld}
+\item 
+character(len=8), dimension(\+:,\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ab0f93bb917e445dc4e55fc2326168a42}{cbofld}
+\item 
+character(len=8), dimension(\+:,\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_af5bfb0fe58a77461130b9967fa7a4d5e}{cbnfld}
+\item 
+character(len=8), dimension(\+:,\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a009543dda4495ab9b5ac3fcf15767682}{ccofic}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a9c5a3b3a864f3feb95eddc08616b998e}{cdqdt}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_affa01947af89e5cdad5f33fba2a53d22}{cgrdmap}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a28c3f9e076a686c8ef916221e8fe4e10}{cmskrd}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ac7f3cff3406912fe6e48c3cc7cf5436b}{cgrdsub}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ad8f8aca3a6fa885e4edf027b79a93305}{ctypsub}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a5db101d0bffaf6fbd5ae10d1d0069108}{cgrdext}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a348612422a03e478041ca5bdfd7201ae}{csper}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_aa179b0a473551b48ef895497515d021c}{ctper}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_ac8c1f0014f2c3cbe0cc4fcb09e54dde3}{cmap\+\_\+method}
+\item 
+character(len=ic\+\_\+long), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a6dbd7bccbfa28b209a4bc58131f8cf11}{cmap\+\_\+file}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a82b32aa4c78713443daf65a3dfbc75dc}{cmaptyp}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a3d7b34ed13d4ad8f86bbab3ad9956b6b}{cmapopt}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a070f65b97986d1075f1deed9224cd89b}{corder}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a205e8ba5863c6bf6de5c8450fb060c7a}{cnorm\+\_\+opt}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_af6d77b87036aa40faa1ae1ed1b2a0866}{cfldtype}
+\item 
+character(len=8), dimension(\+:), \\*
+allocatable \hyperlink{classmod__oasis__namcouple_a7cbf27327f01748c4f87803ccff71b61}{crsttype}
+\item 
+character(len=8) \hyperlink{classmod__oasis__namcouple_a5e1d0d9b3d9f438102623d9643fbc704}{cfldcor}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a902fe007f6c2505858bf72dbc64e43a2}{lsurf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a4a7cad8814c7811b364fd7d70b60b576}{naismfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ada0ad7614eba9cc3a1e168484a520c33}{naisgfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ae3d7c72b2f2f3ece9583cc0b25edbaba}{naismvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a87c0bb7c0a2cccbb673dcaf35e3dec50}{naisgvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a90e4ce86f77bf89c71a9277ff9b5dcbb}{niwtm}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a28e887d61cc4b10c00c33a7d0f51a275}{niwtg}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ab7c38fd6bd90bb8e6ebfb539ead1f1a9}{varmul}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_ac124af3aecadc7ba436f2ee6caffee9a}{linit}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a63c2f2977f9cc4839f6bdec7bbbc5fa7}{niwtn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a579387e570e26f2d6c6c2159824cf8a3}{nninnfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a3379333e7d0f24b776c81b1087f3a3b4}{niwtng}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), \\*
+dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a6526a92cd5fa662f9da229806d062dc2}{nninnflg}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a2febd0d97dea9ecc3ce4a8c5088a8d1f}{lextra}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{classmod__oasis__namcouple_a8d88d0c1b22ea43a9429f9e3a653a64b}{lweight}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Reads the namcouple file for use in O\+A\+S\+I\+S. 
+
+This code reads in the namcouple file and sets several variables that are available to the rest of O\+A\+S\+I\+S. Some of this code is obsolete, and several input settings are deprecated. This code is based on the original Oasis3 version and will be rewritten at some point. 
+
+Definition at line 10 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__namcouple_a0d85a5dcb3fab17a680cceed332b9668}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!alloc@{alloc}}
+\index{alloc@{alloc}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{alloc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::alloc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a0d85a5dcb3fab17a680cceed332b9668}
+
+
+Definition at line 2904 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_afaf98d4eb96cd6fbe191febd1efef8a4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!dealloc@{dealloc}}
+\index{dealloc@{dealloc}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{dealloc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::dealloc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_afaf98d4eb96cd6fbe191febd1efef8a4}
+
+
+Definition at line 3175 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6da9d2285766ceb22ea8449f55201d84}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!inipar@{inipar}}
+\index{inipar@{inipar}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{inipar}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::inipar (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6da9d2285766ceb22ea8449f55201d84}
+
+
+Definition at line 1593 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_acb43892c17b5f8c8b360effb5a811c27}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!inipar\+\_\+alloc@{inipar\+\_\+alloc}}
+\index{inipar\+\_\+alloc@{inipar\+\_\+alloc}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{inipar\+\_\+alloc}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::inipar\+\_\+alloc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_acb43892c17b5f8c8b360effb5a811c27}
+
+
+Definition at line 680 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab57c69ae534734f92a85e24a3389e972}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!oasis\+\_\+namcouple\+\_\+init@{oasis\+\_\+namcouple\+\_\+init}}
+\index{oasis\+\_\+namcouple\+\_\+init@{oasis\+\_\+namcouple\+\_\+init}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{oasis\+\_\+namcouple\+\_\+init}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+namcouple\+::oasis\+\_\+namcouple\+\_\+init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__namcouple_ab57c69ae534734f92a85e24a3389e972}
+
+
+Reads the namcouple. 
+
+
+
+Definition at line 256 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a16fb5fe473d7aeb0cc4a3908b267485b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!parse@{parse}}
+\index{parse@{parse}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{parse}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::parse (
+\begin{DoxyParamCaption}
+\item[{character (len=klen), intent(inout)}]{cdone, }
+\item[{character (len=klen), intent(out)}]{cdtwo, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{knumb, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{klen, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{kleng, }
+\item[{logical, intent(inout), optional}]{endflag}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a16fb5fe473d7aeb0cc4a3908b267485b}
+
+
+Definition at line 3574 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1078922274499dbda36db4dd1707d6de}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!parseblk@{parseblk}}
+\index{parseblk@{parseblk}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{parseblk}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::parseblk (
+\begin{DoxyParamCaption}
+\item[{character (len=klen), intent(inout)}]{cdone, }
+\item[{character (len=klen), intent(out)}]{cdtwo, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{knumb, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{klen, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{kleng}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1078922274499dbda36db4dd1707d6de}
+
+
+Definition at line 3743 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7c0f9c95bde8993d68aac2e7158e813c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!prcout@{prcout}}
+\index{prcout@{prcout}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{prcout}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::prcout (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cdtext, }
+\item[{character(len=$\ast$), intent(in)}]{cdstring, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{kstyle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7c0f9c95bde8993d68aac2e7158e813c}
+
+
+Definition at line 3470 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aee06276b65463fb85340dcc2ab9d67dc}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!prtout@{prtout}}
+\index{prtout@{prtout}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{prtout}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::prtout (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cdtext, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{kvalue, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{kstyle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aee06276b65463fb85340dcc2ab9d67dc}
+
+
+Definition at line 3365 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a75ba5c3a95a17e9c9af9c6e00e53c0f6}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!skip@{skip}}
+\index{skip@{skip}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{skip}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+namcouple\+::skip (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(inout)}]{cd\+\_\+one, }
+\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{id\+\_\+len, }
+\item[{logical, intent(inout), optional}]{endflag}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a75ba5c3a95a17e9c9af9c6e00e53c0f6}
+
+
+Definition at line 3900 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__namcouple_a211c98282b89859bee6da0ef60f0d484}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!abncoef@{abncoef}}
+\index{abncoef@{abncoef}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{abncoef}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::abncoef\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a211c98282b89859bee6da0ef60f0d484}
+
+
+Definition at line 193 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1b3f80e8e19f950b806636caadeb704b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!abocoef@{abocoef}}
+\index{abocoef@{abocoef}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{abocoef}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::abocoef\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1b3f80e8e19f950b806636caadeb704b}
+
+
+Definition at line 192 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a115cdfe0e05679107363605a992c6386}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!acocoef@{acocoef}}
+\index{acocoef@{acocoef}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{acocoef}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::acocoef\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a115cdfe0e05679107363605a992c6386}
+
+
+Definition at line 191 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a207709166cd4d719d65d76e6c043fd6c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!afldcobn@{afldcobn}}
+\index{afldcobn@{afldcobn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{afldcobn}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::afldcobn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a207709166cd4d719d65d76e6c043fd6c}
+
+
+Definition at line 196 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aa9d178659282698ffb6c186ff48bed3c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!afldcobo@{afldcobo}}
+\index{afldcobo@{afldcobo}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{afldcobo}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::afldcobo\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aa9d178659282698ffb6c186ff48bed3c}
+
+
+Definition at line 195 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a19fb86d643bb8761d5a8e32d645d5963}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!afldcoef@{afldcoef}}
+\index{afldcoef@{afldcoef}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{afldcoef}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::afldcoef\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a19fb86d643bb8761d5a8e32d645d5963}
+
+
+Definition at line 194 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a92d43fa5eaaff81f0e3f73b303377c02}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!amskval@{amskval}}
+\index{amskval@{amskval}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{amskval}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::amskval\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a92d43fa5eaaff81f0e3f73b303377c02}
+
+
+Definition at line 189 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a3598202174da65117caf675065f8b160}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!amskvalnew@{amskvalnew}}
+\index{amskvalnew@{amskvalnew}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{amskvalnew}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::amskvalnew\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a3598202174da65117caf675065f8b160}
+
+
+Definition at line 190 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5eaa67fd4db1a3cde074adedd984ffbe}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!canal@{canal}}
+\index{canal@{canal}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{canal}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::canal\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a5eaa67fd4db1a3cde074adedd984ffbe}
+
+
+Definition at line 153 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4b921aeee4d921557ab0cd2f0e541dad}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cangsuf@{cangsuf}}
+\index{cangsuf@{cangsuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cangsuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::cangsuf = '.ang'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a4b921aeee4d921557ab0cd2f0e541dad}
+
+
+Definition at line 100 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af5bfb0fe58a77461130b9967fa7a4d5e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cbnfld@{cbnfld}}
+\index{cbnfld@{cbnfld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cbnfld}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cbnfld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af5bfb0fe58a77461130b9967fa7a4d5e}
+
+
+Definition at line 213 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab0f93bb917e445dc4e55fc2326168a42}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cbofld@{cbofld}}
+\index{cbofld@{cbofld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cbofld}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cbofld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ab0f93bb917e445dc4e55fc2326168a42}
+
+
+Definition at line 212 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a009543dda4495ab9b5ac3fcf15767682}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ccofic@{ccofic}}
+\index{ccofic@{ccofic}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ccofic}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ccofic\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a009543dda4495ab9b5ac3fcf15767682}
+
+
+Definition at line 214 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af8d81a53bd28ddf6bfe19f5e05f1d867}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ccofld@{ccofld}}
+\index{ccofld@{ccofld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ccofld}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ccofld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af8d81a53bd28ddf6bfe19f5e05f1d867}
+
+
+Definition at line 211 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a535fadd17426c228698e3a51fd54b605}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cconmet@{cconmet}}
+\index{cconmet@{cconmet}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cconmet}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cconmet\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a535fadd17426c228698e3a51fd54b605}
+
+
+Definition at line 207 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a240979dfe7369da899b0cfe2aeba4f9d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cconopt@{cconopt}}
+\index{cconopt@{cconopt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cconopt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cconopt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a240979dfe7369da899b0cfe2aeba4f9d}
+
+
+Definition at line 208 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9c5a3b3a864f3feb95eddc08616b998e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cdqdt@{cdqdt}}
+\index{cdqdt@{cdqdt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cdqdt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cdqdt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a9c5a3b3a864f3feb95eddc08616b998e}
+
+
+Definition at line 215 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1066d92e6c9301bdb46ddda7edd7d29a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cextmet@{cextmet}}
+\index{cextmet@{cextmet}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cextmet}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cextmet\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1066d92e6c9301bdb46ddda7edd7d29a}
+
+
+Definition at line 201 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9b3c7c879a3ff2b5eb15cbcaf5a8a1d9}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cficaf@{cficaf}}
+\index{cficaf@{cficaf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cficaf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cficaf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a9b3c7c879a3ff2b5eb15cbcaf5a8a1d9}
+
+
+Definition at line 163 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9e90e47fd11ff4dd95c61dcf3ec872ff}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cficbf@{cficbf}}
+\index{cficbf@{cficbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cficbf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cficbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a9e90e47fd11ff4dd95c61dcf3ec872ff}
+
+
+Definition at line 162 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af17e746f51dcf0110428ebe55f6d7285}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cficinp@{cficinp}}
+\index{cficinp@{cficinp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cficinp}]{\setlength{\rightskip}{0pt plus 5cm}character(len=32), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cficinp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af17e746f51dcf0110428ebe55f6d7285}
+
+
+Definition at line 157 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a62f96a372f013fc37713f8ba1728e3de}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cficout@{cficout}}
+\index{cficout@{cficout}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cficout}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cficout\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a62f96a372f013fc37713f8ba1728e3de}
+
+
+Definition at line 158 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6a69d927924d3fa391fdc3ec6cb78197}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfilfic@{cfilfic}}
+\index{cfilfic@{cfilfic}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfilfic}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfilfic\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6a69d927924d3fa391fdc3ec6cb78197}
+
+
+Definition at line 205 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_adf402f22f61893178fadcefe43b91102}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfilmet@{cfilmet}}
+\index{cfilmet@{cfilmet}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfilmet}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfilmet\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_adf402f22f61893178fadcefe43b91102}
+
+
+Definition at line 206 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af3a308fee2e4b00a1380035e41113d36}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfldcoa@{cfldcoa}}
+\index{cfldcoa@{cfldcoa}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfldcoa}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfldcoa\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af3a308fee2e4b00a1380035e41113d36}
+
+
+Definition at line 209 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5e1d0d9b3d9f438102623d9643fbc704}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfldcor@{cfldcor}}
+\index{cfldcor@{cfldcor}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfldcor}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8) mod\+\_\+oasis\+\_\+namcouple\+::cfldcor\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a5e1d0d9b3d9f438102623d9643fbc704}
+
+
+Definition at line 231 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aa387fcfde8c2538e22897b243ff5024c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfldfin@{cfldfin}}
+\index{cfldfin@{cfldfin}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfldfin}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfldfin\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aa387fcfde8c2538e22897b243ff5024c}
+
+
+Definition at line 210 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab139e7bad0413c79a5ad8e0837d3e0ef}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfldtyp@{cfldtyp}}
+\index{cfldtyp@{cfldtyp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfldtyp}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfldtyp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ab139e7bad0413c79a5ad8e0837d3e0ef}
+
+
+Definition at line 204 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af6d77b87036aa40faa1ae1ed1b2a0866}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cfldtype@{cfldtype}}
+\index{cfldtype@{cfldtype}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cfldtype}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cfldtype\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af6d77b87036aa40faa1ae1ed1b2a0866}
+
+
+Definition at line 229 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8a7387f27c409ea27aa53b616805f0fa}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+c@{cg\+\_\+c}}
+\index{cg\+\_\+c@{cg\+\_\+c}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+c}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8) mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+c\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8a7387f27c409ea27aa53b616805f0fa}
+
+
+Definition at line 154 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aad4d4857b4c424e1b0f0bcc0a01aa6e3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+input\+\_\+field@{cg\+\_\+input\+\_\+field}}
+\index{cg\+\_\+input\+\_\+field@{cg\+\_\+input\+\_\+field}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+input\+\_\+field}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+input\+\_\+field\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aad4d4857b4c424e1b0f0bcc0a01aa6e3}
+
+
+Definition at line 160 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a24f56cf88d79190f229d3fd1d62d17de}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+input\+\_\+file@{cg\+\_\+input\+\_\+file}}
+\index{cg\+\_\+input\+\_\+file@{cg\+\_\+input\+\_\+file}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+input\+\_\+file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=32), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+input\+\_\+file\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a24f56cf88d79190f229d3fd1d62d17de}
+
+
+Definition at line 159 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac79429a9522aabddbe4ed68fd9571bec}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+name\+\_\+rstfile@{cg\+\_\+name\+\_\+rstfile}}
+\index{cg\+\_\+name\+\_\+rstfile@{cg\+\_\+name\+\_\+rstfile}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+name\+\_\+rstfile}]{\setlength{\rightskip}{0pt plus 5cm}character(len=32), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+name\+\_\+rstfile\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac79429a9522aabddbe4ed68fd9571bec}
+
+
+Definition at line 155 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1b680bf476776f3db085dc1f0009736c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+output\+\_\+field@{cg\+\_\+output\+\_\+field}}
+\index{cg\+\_\+output\+\_\+field@{cg\+\_\+output\+\_\+field}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+output\+\_\+field}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+output\+\_\+field\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1b680bf476776f3db085dc1f0009736c}
+
+
+Definition at line 161 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6eec7fe795bfb9c2058c7953c072d442}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cg\+\_\+restart\+\_\+file@{cg\+\_\+restart\+\_\+file}}
+\index{cg\+\_\+restart\+\_\+file@{cg\+\_\+restart\+\_\+file}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cg\+\_\+restart\+\_\+file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=32), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+restart\+\_\+file\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6eec7fe795bfb9c2058c7953c072d442}
+
+
+Definition at line 156 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6f4080d45f0b9be5a0466967f535b83b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cga\+\_\+locatoraf@{cga\+\_\+locatoraf}}
+\index{cga\+\_\+locatoraf@{cga\+\_\+locatoraf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cga\+\_\+locatoraf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cga\+\_\+locatoraf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6f4080d45f0b9be5a0466967f535b83b}
+
+
+Definition at line 166 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac22155599e9b49d57514dd1f7dc9928a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cga\+\_\+locatorbf@{cga\+\_\+locatorbf}}
+\index{cga\+\_\+locatorbf@{cga\+\_\+locatorbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cga\+\_\+locatorbf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cga\+\_\+locatorbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac22155599e9b49d57514dd1f7dc9928a}
+
+
+Definition at line 165 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a2036218f05c62fc672bd07ece34f26db}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cglatsuf@{cglatsuf}}
+\index{cglatsuf@{cglatsuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cglatsuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::cglatsuf = '.lat'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a2036218f05c62fc672bd07ece34f26db}
+
+
+Definition at line 95 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac1a557cecb41295e7d5cb004a7937ea4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cglonsuf@{cglonsuf}}
+\index{cglonsuf@{cglonsuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cglonsuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::cglonsuf = '.lon'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac1a557cecb41295e7d5cb004a7937ea4}
+
+
+Definition at line 94 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5db101d0bffaf6fbd5ae10d1d0069108}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cgrdext@{cgrdext}}
+\index{cgrdext@{cgrdext}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cgrdext}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cgrdext\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a5db101d0bffaf6fbd5ae10d1d0069108}
+
+
+Definition at line 220 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_affa01947af89e5cdad5f33fba2a53d22}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cgrdmap@{cgrdmap}}
+\index{cgrdmap@{cgrdmap}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cgrdmap}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cgrdmap\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_affa01947af89e5cdad5f33fba2a53d22}
+
+
+Definition at line 216 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_afaa0549951c43335a2f8e75c7b1d2846}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cgrdnam@{cgrdnam}}
+\index{cgrdnam@{cgrdnam}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cgrdnam}]{\setlength{\rightskip}{0pt plus 5cm}character(len=5), parameter mod\+\_\+oasis\+\_\+namcouple\+::cgrdnam = 'grids'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_afaa0549951c43335a2f8e75c7b1d2846}
+
+
+Definition at line 90 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac7f3cff3406912fe6e48c3cc7cf5436b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cgrdsub@{cgrdsub}}
+\index{cgrdsub@{cgrdsub}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cgrdsub}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cgrdsub\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac7f3cff3406912fe6e48c3cc7cf5436b}
+
+
+Definition at line 218 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a795db0909c85ffadb601b744b5189ff5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cgrdtyp@{cgrdtyp}}
+\index{cgrdtyp@{cgrdtyp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cgrdtyp}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cgrdtyp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a795db0909c85ffadb601b744b5189ff5}
+
+
+Definition at line 203 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac9b9bb442cf77881bef2157c85e23495}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cintmet@{cintmet}}
+\index{cintmet@{cintmet}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cintmet}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cintmet\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac9b9bb442cf77881bef2157c85e23495}
+
+
+Definition at line 202 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae023a43e29bb32ebf11f193e34d8bd85}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cl\+\_\+namcouple@{cl\+\_\+namcouple}}
+\index{cl\+\_\+namcouple@{cl\+\_\+namcouple}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cl\+\_\+namcouple}]{\setlength{\rightskip}{0pt plus 5cm}character(len=$\ast$), parameter mod\+\_\+oasis\+\_\+namcouple\+::cl\+\_\+namcouple = 'namcouple'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae023a43e29bb32ebf11f193e34d8bd85}
+
+
+Definition at line 82 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6dbd7bccbfa28b209a4bc58131f8cf11}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmap\+\_\+file@{cmap\+\_\+file}}
+\index{cmap\+\_\+file@{cmap\+\_\+file}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmap\+\_\+file}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+long), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cmap\+\_\+file\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6dbd7bccbfa28b209a4bc58131f8cf11}
+
+
+Definition at line 224 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac8c1f0014f2c3cbe0cc4fcb09e54dde3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmap\+\_\+method@{cmap\+\_\+method}}
+\index{cmap\+\_\+method@{cmap\+\_\+method}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmap\+\_\+method}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cmap\+\_\+method\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac8c1f0014f2c3cbe0cc4fcb09e54dde3}
+
+
+Definition at line 223 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a3d7b34ed13d4ad8f86bbab3ad9956b6b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmapopt@{cmapopt}}
+\index{cmapopt@{cmapopt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmapopt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cmapopt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a3d7b34ed13d4ad8f86bbab3ad9956b6b}
+
+
+Definition at line 226 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a82b32aa4c78713443daf65a3dfbc75dc}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmaptyp@{cmaptyp}}
+\index{cmaptyp@{cmaptyp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmaptyp}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cmaptyp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a82b32aa4c78713443daf65a3dfbc75dc}
+
+
+Definition at line 225 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aeeda85bec8a449e87411d4ed404322c5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmsknam@{cmsknam}}
+\index{cmsknam@{cmsknam}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmsknam}]{\setlength{\rightskip}{0pt plus 5cm}character(len=5), parameter mod\+\_\+oasis\+\_\+namcouple\+::cmsknam = 'masks'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aeeda85bec8a449e87411d4ed404322c5}
+
+
+Definition at line 91 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a28c3f9e076a686c8ef916221e8fe4e10}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmskrd@{cmskrd}}
+\index{cmskrd@{cmskrd}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmskrd}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cmskrd\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a28c3f9e076a686c8ef916221e8fe4e10}
+
+
+Definition at line 217 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aeea3ba680d5ba05a432c12d64c68c8af}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cmsksuf@{cmsksuf}}
+\index{cmsksuf@{cmsksuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cmsksuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::cmsksuf = '.msk'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aeea3ba680d5ba05a432c12d64c68c8af}
+
+
+Definition at line 98 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1f6ff08cee0c3c5deb262c1447d88328}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cnaminp@{cnaminp}}
+\index{cnaminp@{cnaminp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cnaminp}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cnaminp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1f6ff08cee0c3c5deb262c1447d88328}
+
+
+Definition at line 151 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a71ba84b9a7a813ca2551bcde99a0b5b5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cnamout@{cnamout}}
+\index{cnamout@{cnamout}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cnamout}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cnamout\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a71ba84b9a7a813ca2551bcde99a0b5b5}
+
+
+Definition at line 152 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a205e8ba5863c6bf6de5c8450fb060c7a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cnorm\+\_\+opt@{cnorm\+\_\+opt}}
+\index{cnorm\+\_\+opt@{cnorm\+\_\+opt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cnorm\+\_\+opt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cnorm\+\_\+opt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a205e8ba5863c6bf6de5c8450fb060c7a}
+
+
+Definition at line 228 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a070f65b97986d1075f1deed9224cd89b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!corder@{corder}}
+\index{corder@{corder}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{corder}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::corder\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a070f65b97986d1075f1deed9224cd89b}
+
+
+Definition at line 227 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a161fc23acf442c75c9d6ba7758937d59}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!crednam@{crednam}}
+\index{crednam@{crednam}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{crednam}]{\setlength{\rightskip}{0pt plus 5cm}character(len=5), parameter mod\+\_\+oasis\+\_\+namcouple\+::crednam = 'maskr'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a161fc23acf442c75c9d6ba7758937d59}
+
+
+Definition at line 93 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_acdc7f0d582616ee9e18470aad433ed3a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!crnlatsuf@{crnlatsuf}}
+\index{crnlatsuf@{crnlatsuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{crnlatsuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::crnlatsuf = '.cla'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_acdc7f0d582616ee9e18470aad433ed3a}
+
+
+Definition at line 97 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae56f031c6d9a819a39fe5170f42d7ce1}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!crnlonsuf@{crnlonsuf}}
+\index{crnlonsuf@{crnlonsuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{crnlonsuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::crnlonsuf = '.clo'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae56f031c6d9a819a39fe5170f42d7ce1}
+
+
+Definition at line 96 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7cbf27327f01748c4f87803ccff71b61}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!crsttype@{crsttype}}
+\index{crsttype@{crsttype}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{crsttype}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::crsttype\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7cbf27327f01748c4f87803ccff71b61}
+
+
+Definition at line 230 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a348612422a03e478041ca5bdfd7201ae}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!csper@{csper}}
+\index{csper@{csper}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{csper}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::csper\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a348612422a03e478041ca5bdfd7201ae}
+
+
+Definition at line 221 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4b507ab44ad62713c9e3d83ded6be3f4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cstate@{cstate}}
+\index{cstate@{cstate}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cstate}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cstate\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a4b507ab44ad62713c9e3d83ded6be3f4}
+
+
+Definition at line 164 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a49e79935fc2421fe3e4e7422f17b34ea}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!csurnam@{csurnam}}
+\index{csurnam@{csurnam}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{csurnam}]{\setlength{\rightskip}{0pt plus 5cm}character(len=5), parameter mod\+\_\+oasis\+\_\+namcouple\+::csurnam = 'areas'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a49e79935fc2421fe3e4e7422f17b34ea}
+
+
+Definition at line 92 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_adf2c151a84c37bd7cd93867305b4f70b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!csursuf@{csursuf}}
+\index{csursuf@{csursuf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{csursuf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=4), parameter mod\+\_\+oasis\+\_\+namcouple\+::csursuf = '.srf'\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_adf2c151a84c37bd7cd93867305b4f70b}
+
+
+Definition at line 99 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aa179b0a473551b48ef895497515d021c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ctper@{ctper}}
+\index{ctper@{ctper}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ctper}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ctper\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aa179b0a473551b48ef895497515d021c}
+
+
+Definition at line 222 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ad8f8aca3a6fa885e4edf027b79a93305}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ctypsub@{ctypsub}}
+\index{ctypsub@{ctypsub}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ctypsub}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ctypsub\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ad8f8aca3a6fa885e4edf027b79a93305}
+
+
+Definition at line 219 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab52bc27bf5898cc85dce0fc60feb9320}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cxordaf@{cxordaf}}
+\index{cxordaf@{cxordaf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cxordaf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cxordaf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ab52bc27bf5898cc85dce0fc60feb9320}
+
+
+Definition at line 199 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a2ee5f8ec71ebae64c3d14445345d7545}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cxordbf@{cxordbf}}
+\index{cxordbf@{cxordbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cxordbf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cxordbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a2ee5f8ec71ebae64c3d14445345d7545}
+
+
+Definition at line 197 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a68de802180c51365e7d4bcc5180ac93b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cyordaf@{cyordaf}}
+\index{cyordaf@{cyordaf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cyordaf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cyordaf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a68de802180c51365e7d4bcc5180ac93b}
+
+
+Definition at line 200 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae1debe43f1c5cffeeb1d0d9ab563f4c4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!cyordbf@{cyordbf}}
+\index{cyordbf@{cyordbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{cyordbf}]{\setlength{\rightskip}{0pt plus 5cm}character(len=8), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::cyordbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae1debe43f1c5cffeeb1d0d9ab563f4c4}
+
+
+Definition at line 198 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a531825c07a164f6139e5eebd59e295a2}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+direct\+\_\+nfield@{ig\+\_\+direct\+\_\+nfield}}
+\index{ig\+\_\+direct\+\_\+nfield@{ig\+\_\+direct\+\_\+nfield}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+direct\+\_\+nfield}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+direct\+\_\+nfield\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a531825c07a164f6139e5eebd59e295a2}
+
+
+Definition at line 114 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7cf04d6fb678ee65b7fbedc56a0d680a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+final\+\_\+nfield@{ig\+\_\+final\+\_\+nfield}}
+\index{ig\+\_\+final\+\_\+nfield@{ig\+\_\+final\+\_\+nfield}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+final\+\_\+nfield}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+final\+\_\+nfield\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7cf04d6fb678ee65b7fbedc56a0d680a}
+
+
+Definition at line 116 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_affa727bb033c0f4d09962f2b4d1b4ab5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+freq@{ig\+\_\+freq}}
+\index{ig\+\_\+freq@{ig\+\_\+freq}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+freq\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_affa727bb033c0f4d09962f2b4d1b4ab5}
+
+
+Definition at line 137 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8e8c38746c6c35b13d2d9b934835188c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+grid\+\_\+nbraf@{ig\+\_\+grid\+\_\+nbraf}}
+\index{ig\+\_\+grid\+\_\+nbraf@{ig\+\_\+grid\+\_\+nbraf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+grid\+\_\+nbraf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+grid\+\_\+nbraf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8e8c38746c6c35b13d2d9b934835188c}
+
+
+Definition at line 147 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae81f2e658bbaeae20badef0fad425a69}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+grid\+\_\+nbrbf@{ig\+\_\+grid\+\_\+nbrbf}}
+\index{ig\+\_\+grid\+\_\+nbrbf@{ig\+\_\+grid\+\_\+nbrbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+grid\+\_\+nbrbf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+grid\+\_\+nbrbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae81f2e658bbaeae20badef0fad425a69}
+
+
+Definition at line 146 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a0b8948452bbd8cf1dc9f0fccc17c344d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+invert@{ig\+\_\+invert}}
+\index{ig\+\_\+invert@{ig\+\_\+invert}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+invert}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+invert\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a0b8948452bbd8cf1dc9f0fccc17c344d}
+
+
+Definition at line 140 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae2c74692147a54b3f7534301d509f766}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+lag@{ig\+\_\+lag}}
+\index{ig\+\_\+lag@{ig\+\_\+lag}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+lag}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+lag\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae2c74692147a54b3f7534301d509f766}
+
+
+Definition at line 138 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a510a13e57f2f65d5ddc70c729d54c0f6}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+local\+\_\+trans@{ig\+\_\+local\+\_\+trans}}
+\index{ig\+\_\+local\+\_\+trans@{ig\+\_\+local\+\_\+trans}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+local\+\_\+trans}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+local\+\_\+trans\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a510a13e57f2f65d5ddc70c729d54c0f6}
+
+
+Definition at line 145 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_abba00866a740567bc1d93cf5850042fd}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+maxcomb@{ig\+\_\+maxcomb}}
+\index{ig\+\_\+maxcomb@{ig\+\_\+maxcomb}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+maxcomb}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxcomb\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_abba00866a740567bc1d93cf5850042fd}
+
+
+Definition at line 118 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aab2d4bcc2dc767df51f99f907f4f3e6e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+maxnfg@{ig\+\_\+maxnfg}}
+\index{ig\+\_\+maxnfg@{ig\+\_\+maxnfg}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+maxnfg}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxnfg\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aab2d4bcc2dc767df51f99f907f4f3e6e}
+
+
+Definition at line 120 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae66cf9f63b6c440406c9b675caef7759}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+maxnoa@{ig\+\_\+maxnoa}}
+\index{ig\+\_\+maxnoa@{ig\+\_\+maxnoa}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+maxnoa}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxnoa\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae66cf9f63b6c440406c9b675caef7759}
+
+
+Definition at line 119 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a05148b30ca97c536b40a896153c8921f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+nbr\+\_\+rstfile@{ig\+\_\+nbr\+\_\+rstfile}}
+\index{ig\+\_\+nbr\+\_\+rstfile@{ig\+\_\+nbr\+\_\+rstfile}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+nbr\+\_\+rstfile}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+nbr\+\_\+rstfile\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a05148b30ca97c536b40a896153c8921f}
+
+
+Definition at line 148 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a674f201daa7f2e1ba4c71221bda91d9c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+nfield@{ig\+\_\+nfield}}
+\index{ig\+\_\+nfield@{ig\+\_\+nfield}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+nfield}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+nfield\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a674f201daa7f2e1ba4c71221bda91d9c}
+
+
+Definition at line 113 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1cc3d37d7819c112f14b6cec03266561}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+no\+\_\+rstfile@{ig\+\_\+no\+\_\+rstfile}}
+\index{ig\+\_\+no\+\_\+rstfile@{ig\+\_\+no\+\_\+rstfile}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+no\+\_\+rstfile}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+no\+\_\+rstfile\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1cc3d37d7819c112f14b6cec03266561}
+
+
+Definition at line 143 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac4549f9f5bbb37fce3edc9a208e0d48b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+ntrans@{ig\+\_\+ntrans}}
+\index{ig\+\_\+ntrans@{ig\+\_\+ntrans}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+ntrans}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+ntrans\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac4549f9f5bbb37fce3edc9a208e0d48b}
+
+
+Definition at line 129 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a0751f74f7ce6520d8e860b9da14d1d9d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+number\+\_\+field@{ig\+\_\+number\+\_\+field}}
+\index{ig\+\_\+number\+\_\+field@{ig\+\_\+number\+\_\+field}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+number\+\_\+field}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+number\+\_\+field\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a0751f74f7ce6520d8e860b9da14d1d9d}
+
+
+Definition at line 142 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab0b9a7822ec44010e8652ed2d6abc0db}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+numlab@{ig\+\_\+numlab}}
+\index{ig\+\_\+numlab@{ig\+\_\+numlab}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+numlab}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+numlab\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ab0b9a7822ec44010e8652ed2d6abc0db}
+
+
+Definition at line 127 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_adc4dcf30da2b88fb1798dd02e7833bc1}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+reverse@{ig\+\_\+reverse}}
+\index{ig\+\_\+reverse@{ig\+\_\+reverse}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+reverse}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+reverse\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_adc4dcf30da2b88fb1798dd02e7833bc1}
+
+
+Definition at line 141 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a839912711f8d2f44a825689e2673d0dd}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+total\+\_\+frqmin@{ig\+\_\+total\+\_\+frqmin}}
+\index{ig\+\_\+total\+\_\+frqmin@{ig\+\_\+total\+\_\+frqmin}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+total\+\_\+frqmin}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+frqmin\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a839912711f8d2f44a825689e2673d0dd}
+
+
+Definition at line 149 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a3de3e6eb2bf1e81d77e9c117b7d5985f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+total\+\_\+nfield@{ig\+\_\+total\+\_\+nfield}}
+\index{ig\+\_\+total\+\_\+nfield@{ig\+\_\+total\+\_\+nfield}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+total\+\_\+nfield}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+nfield\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a3de3e6eb2bf1e81d77e9c117b7d5985f}
+
+
+Definition at line 115 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a09ed8be682296ef584f0d5777b2c6482}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+total\+\_\+nseqn@{ig\+\_\+total\+\_\+nseqn}}
+\index{ig\+\_\+total\+\_\+nseqn@{ig\+\_\+total\+\_\+nseqn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+total\+\_\+nseqn}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+nseqn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a09ed8be682296ef584f0d5777b2c6482}
+
+
+Definition at line 136 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_abbd7bd184bb2a3860063dbb9f109f427}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+total\+\_\+ntrans@{ig\+\_\+total\+\_\+ntrans}}
+\index{ig\+\_\+total\+\_\+ntrans@{ig\+\_\+total\+\_\+ntrans}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+total\+\_\+ntrans}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+ntrans\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_abbd7bd184bb2a3860063dbb9f109f427}
+
+
+Definition at line 130 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7c783457d0e759e3af98b92146fa4ec3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ig\+\_\+total\+\_\+state@{ig\+\_\+total\+\_\+state}}
+\index{ig\+\_\+total\+\_\+state@{ig\+\_\+total\+\_\+state}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ig\+\_\+total\+\_\+state}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+state\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7c783457d0e759e3af98b92146fa4ec3}
+
+
+Definition at line 144 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a18b7a14f095f3cb6ace40afc06e2a5b9}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!il\+\_\+err@{il\+\_\+err}}
+\index{il\+\_\+err@{il\+\_\+err}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{il\+\_\+err}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::il\+\_\+err\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a18b7a14f095f3cb6ace40afc06e2a5b9}
+
+
+Definition at line 85 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!jpeighty@{jpeighty}}
+\index{jpeighty@{jpeighty}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{jpeighty}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+namcouple\+::jpeighty = 5000\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}
+
+
+max number of characters to be read in each line of the file namcouple 
+
+
+
+Definition at line 29 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7657e0f9b495e291f26dc31b4f6145aa}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lcoast@{lcoast}}
+\index{lcoast@{lcoast}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lcoast}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+namcouple\+::lcoast\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7657e0f9b495e291f26dc31b4f6145aa}
+
+
+Definition at line 106 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a2febd0d97dea9ecc3ce4a8c5088a8d1f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lextra@{lextra}}
+\index{lextra@{lextra}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lextra}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lextra\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a2febd0d97dea9ecc3ce4a8c5088a8d1f}
+
+
+Definition at line 247 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aaf6b923ffc7763fd37a5c4c72bdfa34d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lg\+\_\+oasis\+\_\+field@{lg\+\_\+oasis\+\_\+field}}
+\index{lg\+\_\+oasis\+\_\+field@{lg\+\_\+oasis\+\_\+field}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lg\+\_\+oasis\+\_\+field}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+namcouple\+::lg\+\_\+oasis\+\_\+field\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aaf6b923ffc7763fd37a5c4c72bdfa34d}
+
+
+Definition at line 117 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac1be1629c1369b96a4ff08c07200a05d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lg\+\_\+state@{lg\+\_\+state}}
+\index{lg\+\_\+state@{lg\+\_\+state}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lg\+\_\+state}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lg\+\_\+state\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac1be1629c1369b96a4ff08c07200a05d}
+
+
+Definition at line 150 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac124af3aecadc7ba436f2ee6caffee9a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!linit@{linit}}
+\index{linit@{linit}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{linit}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::linit\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac124af3aecadc7ba436f2ee6caffee9a}
+
+
+Definition at line 241 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8eca7c715a39c523e00ed2be0612950d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lmapp@{lmapp}}
+\index{lmapp@{lmapp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lmapp}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lmapp\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8eca7c715a39c523e00ed2be0612950d}
+
+
+Definition at line 102 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5d6add8b958acc8b865b898d9e54ac73}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lncdfgrd@{lncdfgrd}}
+\index{lncdfgrd@{lncdfgrd}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lncdfgrd}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+namcouple\+::lncdfgrd\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a5d6add8b958acc8b865b898d9e54ac73}
+
+
+Definition at line 87 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a645168dae20a0c24786c3e6dcea9f2ab}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lncdfrst@{lncdfrst}}
+\index{lncdfrst@{lncdfrst}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lncdfrst}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+namcouple\+::lncdfrst\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a645168dae20a0c24786c3e6dcea9f2ab}
+
+
+Definition at line 88 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_acda1605129987d656360e1ed81e8d199}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lsubg@{lsubg}}
+\index{lsubg@{lsubg}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lsubg}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lsubg\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_acda1605129987d656360e1ed81e8d199}
+
+
+Definition at line 103 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a902fe007f6c2505858bf72dbc64e43a2}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lsurf@{lsurf}}
+\index{lsurf@{lsurf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lsurf}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lsurf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a902fe007f6c2505858bf72dbc64e43a2}
+
+
+Definition at line 232 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8d88d0c1b22ea43a9429f9e3a653a64b}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!lweight@{lweight}}
+\index{lweight@{lweight}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{lweight}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::lweight\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8d88d0c1b22ea43a9429f9e3a653a64b}
+
+
+Definition at line 248 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ada0ad7614eba9cc3a1e168484a520c33}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!naisgfl@{naisgfl}}
+\index{naisgfl@{naisgfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{naisgfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::naisgfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ada0ad7614eba9cc3a1e168484a520c33}
+
+
+Definition at line 235 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a87c0bb7c0a2cccbb673dcaf35e3dec50}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!naisgvoi@{naisgvoi}}
+\index{naisgvoi@{naisgvoi}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{naisgvoi}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::naisgvoi\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a87c0bb7c0a2cccbb673dcaf35e3dec50}
+
+
+Definition at line 237 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4a7cad8814c7811b364fd7d70b60b576}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!naismfl@{naismfl}}
+\index{naismfl@{naismfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{naismfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::naismfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a4a7cad8814c7811b364fd7d70b60b576}
+
+
+Definition at line 234 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae3d7c72b2f2f3ece9583cc0b25edbaba}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!naismvoi@{naismvoi}}
+\index{naismvoi@{naismvoi}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{naismvoi}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::naismvoi\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae3d7c72b2f2f3ece9583cc0b25edbaba}
+
+
+Definition at line 236 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7c88a329c97aea020e9b135bdca8d160}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namchecki@{namchecki}}
+\index{namchecki@{namchecki}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namchecki}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namchecki}}\label{classmod__oasis__namcouple_a7c88a329c97aea020e9b135bdca8d160}
+
+
+checkin flag 
+
+
+
+Definition at line 57 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a58c011820e55c9af9f306fbb1d45eb23}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namchecko@{namchecko}}
+\index{namchecko@{namchecko}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namchecko}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namchecko}}\label{classmod__oasis__namcouple_a58c011820e55c9af9f306fbb1d45eb23}
+
+
+checkout flag 
+
+
+
+Definition at line 58 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6add94418eefdaefd78cd971888a5826}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namdst\+\_\+nx@{namdst\+\_\+nx}}
+\index{namdst\+\_\+nx@{namdst\+\_\+nx}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namdst\+\_\+nx}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namdst\+\_\+nx}}\label{classmod__oasis__namcouple_a6add94418eefdaefd78cd971888a5826}
+
+
+dst nx grid size 
+
+
+
+Definition at line 43 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9035fc89396bad9574c88642d3aac5f0}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namdst\+\_\+ny@{namdst\+\_\+ny}}
+\index{namdst\+\_\+ny@{namdst\+\_\+ny}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namdst\+\_\+ny}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namdst\+\_\+ny}}\label{classmod__oasis__namcouple_a9035fc89396bad9574c88642d3aac5f0}
+
+
+dst ny grid size 
+
+
+
+Definition at line 44 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac4cfec209e4169b6098f9a8b9be1ffb1}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namdstfld@{namdstfld}}
+\index{namdstfld@{namdstfld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namdstfld}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namdstfld}}\label{classmod__oasis__namcouple_ac4cfec209e4169b6098f9a8b9be1ffb1}
+
+
+list of dst fields 
+
+
+
+Definition at line 38 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7a2ed64b0670db38d2287f5d452060e4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namdstgrd@{namdstgrd}}
+\index{namdstgrd@{namdstgrd}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namdstgrd}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+lvar), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namdstgrd}}\label{classmod__oasis__namcouple_a7a2ed64b0670db38d2287f5d452060e4}
+
+
+dst grid name 
+
+
+
+Definition at line 42 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a96aa6a31ef021468f807819a84b327c3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldcon@{namfldcon}}
+\index{namfldcon@{namfldcon}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldcon}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldcon}}\label{classmod__oasis__namcouple_a96aa6a31ef021468f807819a84b327c3}
+
+
+conserv fld operation 
+
+
+
+Definition at line 50 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a119b86702766d5392cb44856448bcd3e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldcoo@{namfldcoo}}
+\index{namfldcoo@{namfldcoo}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldcoo}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldcoo}}\label{classmod__oasis__namcouple_a119b86702766d5392cb44856448bcd3e}
+
+
+conserv fld option (bfb, opt) 
+
+
+
+Definition at line 51 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af1e31f45ea1cd7a7b64a8a7dc2cec4ee}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namflddad@{namflddad}}
+\index{namflddad@{namflddad}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namflddad}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namflddad}}\label{classmod__oasis__namcouple_af1e31f45ea1cd7a7b64a8a7dc2cec4ee}
+
+
+dst additive term 
+
+
+
+Definition at line 62 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ad81bb4f19a71f0fcf8655cb9d39a3380}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namflddmu@{namflddmu}}
+\index{namflddmu@{namflddmu}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namflddmu}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namflddmu}}\label{classmod__oasis__namcouple_ad81bb4f19a71f0fcf8655cb9d39a3380}
+
+
+dst multipler term 
+
+
+
+Definition at line 61 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9080617143dacb027f74c4c5158b5e58}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namflddti@{namflddti}}
+\index{namflddti@{namflddti}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namflddti}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namflddti}}\label{classmod__oasis__namcouple_a9080617143dacb027f74c4c5158b5e58}
+
+
+coupling period (secs) 
+
+
+
+Definition at line 47 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6a4406ca14f91ef6514a18eb154e648f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldlag@{namfldlag}}
+\index{namfldlag@{namfldlag}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldlag}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldlag}}\label{classmod__oasis__namcouple_a6a4406ca14f91ef6514a18eb154e648f}
+
+
+coupling lag (secs) 
+
+
+
+Definition at line 48 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4841e350d91926f5f8403e73442c76ad}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldops@{namfldops}}
+\index{namfldops@{namfldops}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldops}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldops}}\label{classmod__oasis__namcouple_a4841e350d91926f5f8403e73442c76ad}
+
+
+operation, ip\+\_\+expout,... 
+
+
+
+Definition at line 46 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1729dba99742412a1e07a479cb7f7921}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldsad@{namfldsad}}
+\index{namfldsad@{namfldsad}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldsad}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldsad}}\label{classmod__oasis__namcouple_a1729dba99742412a1e07a479cb7f7921}
+
+
+src additive term 
+
+
+
+Definition at line 60 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a54ccfe0380fc1c89d085f37a044a297e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldseq@{namfldseq}}
+\index{namfldseq@{namfldseq}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldseq}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldseq}}\label{classmod__oasis__namcouple_a54ccfe0380fc1c89d085f37a044a297e}
+
+
+S\+E\+Q value. 
+
+
+
+Definition at line 45 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab52824ec91491253e02556a68ab31b09}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldsmu@{namfldsmu}}
+\index{namfldsmu@{namfldsmu}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldsmu}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldsmu}}\label{classmod__oasis__namcouple_ab52824ec91491253e02556a68ab31b09}
+
+
+src multiplier term 
+
+
+
+Definition at line 59 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5f81bc00e6dc045770edd4093f68278c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namfldtrn@{namfldtrn}}
+\index{namfldtrn@{namfldtrn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namfldtrn}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namfldtrn}}\label{classmod__oasis__namcouple_a5f81bc00e6dc045770edd4093f68278c}
+
+
+fields transform, ip\+\_\+instant,... 
+
+
+
+Definition at line 49 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a15fc11ff1c1d5718ff127a06a205a82c}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!naminpfil@{naminpfil}}
+\index{naminpfil@{naminpfil}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{naminpfil}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::naminpfil}}\label{classmod__oasis__namcouple_a15fc11ff1c1d5718ff127a06a205a82c}
+
+
+input file name 
+
+
+
+Definition at line 56 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a46affda5336f60a1eeb1badaaccd3cfd}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namlogprt@{namlogprt}}
+\index{namlogprt@{namlogprt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namlogprt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+namcouple\+::namlogprt}}\label{classmod__oasis__namcouple_a46affda5336f60a1eeb1badaaccd3cfd}
+
+
+namcouple nlogprt value 
+
+
+
+Definition at line 34 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9fc6ac674a8cfa68d9d15ad13213e21d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nammapfil@{nammapfil}}
+\index{nammapfil@{nammapfil}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nammapfil}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+long), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::nammapfil}}\label{classmod__oasis__namcouple_a9fc6ac674a8cfa68d9d15ad13213e21d}
+
+
+mapping file name 
+
+
+
+Definition at line 52 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7316d7d322da7cf10f315e38c145ebbb}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nammaploc@{nammaploc}}
+\index{nammaploc@{nammaploc}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nammaploc}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::nammaploc}}\label{classmod__oasis__namcouple_a7316d7d322da7cf10f315e38c145ebbb}
+
+
+mapping location (src or dst pes) 
+
+
+
+Definition at line 53 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ad2554b4881fa63780dd5e6fe78d705ef}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nammapopt@{nammapopt}}
+\index{nammapopt@{nammapopt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nammapopt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::nammapopt}}\label{classmod__oasis__namcouple_ad2554b4881fa63780dd5e6fe78d705ef}
+
+
+mapping option (bfb, sum, or opt) 
+
+
+
+Definition at line 54 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a0ace7c451d8658759b9c8d871926a76e}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namnn2sort@{namnn2sort}}
+\index{namnn2sort@{namnn2sort}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namnn2sort}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namnn2sort}}\label{classmod__oasis__namcouple_a0ace7c451d8658759b9c8d871926a76e}
+
+
+sorted namcpl for nn, define sort number, computed later 
+
+
+
+Definition at line 75 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a54f4b8262f809a20928092782bc78345}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namrstfil@{namrstfil}}
+\index{namrstfil@{namrstfil}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namrstfil}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namrstfil}}\label{classmod__oasis__namcouple_a54f4b8262f809a20928092782bc78345}
+
+
+restart file name 
+
+
+
+Definition at line 55 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a14505eaa91b2c8ba308c63ff78652206}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namruntim@{namruntim}}
+\index{namruntim@{namruntim}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namruntim}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+namcouple\+::namruntim}}\label{classmod__oasis__namcouple_a14505eaa91b2c8ba308c63ff78652206}
+
+
+namcouple runtime 
+
+
+
+Definition at line 33 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a728405e8f669b58d00c189abf8b62437}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrbin@{namscrbin}}
+\index{namscrbin@{namscrbin}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrbin}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrbin}}\label{classmod__oasis__namcouple_a728405e8f669b58d00c189abf8b62437}
+
+
+script number of search bins 
+
+
+
+Definition at line 71 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a51c19e0892a72acc3dca2adb046ed175}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrmet@{namscrmet}}
+\index{namscrmet@{namscrmet}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrmet}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrmet}}\label{classmod__oasis__namcouple_a51c19e0892a72acc3dca2adb046ed175}
+
+
+scrip method (C\+O\+N\+S\+E\+R\+V, D\+I\+S\+T\+W\+G\+T, B\+I\+L\+I\+N\+E\+A\+R, B\+I\+C\+U\+B\+I\+C, G\+A\+U\+S\+W\+G\+T) 
+
+
+
+Definition at line 64 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a20d614468823744b82118ee8cf2df852}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrnbr@{namscrnbr}}
+\index{namscrnbr@{namscrnbr}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrnbr}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrnbr}}\label{classmod__oasis__namcouple_a20d614468823744b82118ee8cf2df852}
+
+
+scrip number of neighbors for G\+A\+U\+S\+W\+G\+T and D\+I\+S\+T\+W\+G\+T 
+
+
+
+Definition at line 70 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a392f40531007d5dcc084e6ad4a393fd7}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrnor@{namscrnor}}
+\index{namscrnor@{namscrnor}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrnor}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrnor}}\label{classmod__oasis__namcouple_a392f40531007d5dcc084e6ad4a393fd7}
+
+
+scrip conserv normalization (F\+R\+A\+C\+A\+R\+E\+A, D\+E\+S\+T\+A\+R\+E\+A, F\+R\+A\+C\+N\+N\+E\+I) 
+
+
+
+Definition at line 65 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac881ced105604879ada860fabd677481}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrord@{namscrord}}
+\index{namscrord@{namscrord}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrord}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrord}}\label{classmod__oasis__namcouple_ac881ced105604879ada860fabd677481}
+
+
+scrip conserve order (F\+I\+R\+S\+T, S\+E\+C\+O\+N\+D) 
+
+
+
+Definition at line 67 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6a95ddbbbc615e0257d93d05e4546239}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrres@{namscrres}}
+\index{namscrres@{namscrres}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrres}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrres}}\label{classmod__oasis__namcouple_a6a95ddbbbc615e0257d93d05e4546239}
+
+
+scrip search restriction (L\+A\+T\+L\+O\+N, L\+A\+T\+I\+T\+U\+D\+E) 
+
+
+
+Definition at line 68 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8ddbaabd22bbf485888b1df5f3578909}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrtyp@{namscrtyp}}
+\index{namscrtyp@{namscrtyp}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrtyp}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrtyp}}\label{classmod__oasis__namcouple_a8ddbaabd22bbf485888b1df5f3578909}
+
+
+scrip mapping type (S\+C\+A\+L\+A\+R, V\+E\+C\+T\+O\+R) 
+
+
+
+Definition at line 66 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a45b410743ce74a9824d44b329ba323ba}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namscrvam@{namscrvam}}
+\index{namscrvam@{namscrvam}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namscrvam}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namscrvam}}\label{classmod__oasis__namcouple_a45b410743ce74a9824d44b329ba323ba}
+
+
+scrip gauss weight distance weighting for G\+A\+U\+S\+W\+G\+T 
+
+
+
+Definition at line 69 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4555b14f38928b7f0fb7f77b9c42d0a0}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namsort2nn@{namsort2nn}}
+\index{namsort2nn@{namsort2nn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namsort2nn}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namsort2nn}}\label{classmod__oasis__namcouple_a4555b14f38928b7f0fb7f77b9c42d0a0}
+
+
+sorted namcpl for sort, define nn order, computed later 
+
+
+
+Definition at line 74 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac8f6c8fe3720739f3d26431a8a600506}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namsrc\+\_\+nx@{namsrc\+\_\+nx}}
+\index{namsrc\+\_\+nx@{namsrc\+\_\+nx}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namsrc\+\_\+nx}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namsrc\+\_\+nx}}\label{classmod__oasis__namcouple_ac8f6c8fe3720739f3d26431a8a600506}
+
+
+src nx grid size 
+
+
+
+Definition at line 40 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab82c80f007b37865172ddb033a1abb36}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namsrc\+\_\+ny@{namsrc\+\_\+ny}}
+\index{namsrc\+\_\+ny@{namsrc\+\_\+ny}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namsrc\+\_\+ny}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namsrc\+\_\+ny}}\label{classmod__oasis__namcouple_ab82c80f007b37865172ddb033a1abb36}
+
+
+src ny grid size 
+
+
+
+Definition at line 41 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5fcb5a4f2a49f414fafe38b03c5c089d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namsrcfld@{namsrcfld}}
+\index{namsrcfld@{namsrcfld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namsrcfld}]{\setlength{\rightskip}{0pt plus 5cm}character(len={\bf jpeighty}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namsrcfld}}\label{classmod__oasis__namcouple_a5fcb5a4f2a49f414fafe38b03c5c089d}
+
+
+list of src fields 
+
+
+
+Definition at line 37 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a589c1bae58b10bcb0cfb30c0893a7895}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namsrcgrd@{namsrcgrd}}
+\index{namsrcgrd@{namsrcgrd}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namsrcgrd}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+lvar), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+namcouple\+::namsrcgrd}}\label{classmod__oasis__namcouple_a589c1bae58b10bcb0cfb30c0893a7895}
+
+
+src grid name 
+
+
+
+Definition at line 39 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a45fbbd2941f5d71991d409f63e31cf02}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!namtlogprt@{namtlogprt}}
+\index{namtlogprt@{namtlogprt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{namtlogprt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+namcouple\+::namtlogprt}}\label{classmod__oasis__namcouple_a45fbbd2941f5d71991d409f63e31cf02}
+
+
+namcouple ntlogprt value 
+
+
+
+Definition at line 35 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a4c609c48a20205e1d2aa9938d7babc92}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nbins@{nbins}}
+\index{nbins@{nbins}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nbins}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nbins\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a4c609c48a20205e1d2aa9938d7babc92}
+
+
+Definition at line 186 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_af0c7b1e7e49159c6b9c0dc3663264346}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nbnfld@{nbnfld}}
+\index{nbnfld@{nbnfld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nbnfld}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nbnfld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_af0c7b1e7e49159c6b9c0dc3663264346}
+
+
+Definition at line 173 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a21400200658d24cbf7484b5eb177c911}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nbofld@{nbofld}}
+\index{nbofld@{nbofld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nbofld}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nbofld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a21400200658d24cbf7484b5eb177c911}
+
+
+Definition at line 172 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9f8a2a4f44b1c56860fef8df014339d3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ncofld@{ncofld}}
+\index{ncofld@{ncofld}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ncofld}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ncofld\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a9f8a2a4f44b1c56860fef8df014339d3}
+
+
+Definition at line 170 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a298c9165785ae1a41f89597cadd211e7}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!neighbor@{neighbor}}
+\index{neighbor@{neighbor}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{neighbor}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::neighbor\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a298c9165785ae1a41f89597cadd211e7}
+
+
+Definition at line 168 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a883d88938c50264711c53af2b555c3db}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!neighborg@{neighborg}}
+\index{neighborg@{neighborg}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{neighborg}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::neighborg\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a883d88938c50264711c53af2b555c3db}
+
+
+Definition at line 171 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8302411d5a02efd9a6dc7f784fbb0d4d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nextfl@{nextfl}}
+\index{nextfl@{nextfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nextfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nextfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8302411d5a02efd9a6dc7f784fbb0d4d}
+
+
+Definition at line 183 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a57f1b6f111a5257a4d6f5a4b18fa6250}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nfcoast@{nfcoast}}
+\index{nfcoast@{nfcoast}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nfcoast}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nfcoast\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a57f1b6f111a5257a4d6f5a4b18fa6250}
+
+
+Definition at line 105 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac6216c78a2779e49f90a9a95a39c27d7}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nfexch@{nfexch}}
+\index{nfexch@{nfexch}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nfexch}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nfexch\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac6216c78a2779e49f90a9a95a39c27d7}
+
+
+Definition at line 128 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6246780a56635119fd8f7935456b06cf}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!niter@{niter}}
+\index{niter@{niter}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{niter}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::niter\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6246780a56635119fd8f7935456b06cf}
+
+
+Definition at line 109 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a1e5b5efd046e5ab959fba026bd645945}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nitfn@{nitfn}}
+\index{nitfn@{nitfn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nitfn}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nitfn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a1e5b5efd046e5ab959fba026bd645945}
+
+
+Definition at line 110 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a28e887d61cc4b10c00c33a7d0f51a275}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!niwtg@{niwtg}}
+\index{niwtg@{niwtg}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{niwtg}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::niwtg\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a28e887d61cc4b10c00c33a7d0f51a275}
+
+
+Definition at line 239 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a90e4ce86f77bf89c71a9277ff9b5dcbb}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!niwtm@{niwtm}}
+\index{niwtm@{niwtm}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{niwtm}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::niwtm\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a90e4ce86f77bf89c71a9277ff9b5dcbb}
+
+
+Definition at line 238 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a63c2f2977f9cc4839f6bdec7bbbc5fa7}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!niwtn@{niwtn}}
+\index{niwtn@{niwtn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{niwtn}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::niwtn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a63c2f2977f9cc4839f6bdec7bbbc5fa7}
+
+
+Definition at line 243 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a3379333e7d0f24b776c81b1087f3a3b4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!niwtng@{niwtng}}
+\index{niwtng@{niwtng}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{niwtng}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::niwtng\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a3379333e7d0f24b776c81b1087f3a3b4}
+
+
+Definition at line 245 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aad06af35c92de78d71671d39bcbb1690}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlagn@{nlagn}}
+\index{nlagn@{nlagn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlagn}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlagn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aad06af35c92de78d71671d39bcbb1690}
+
+
+Definition at line 139 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a80d81b2f026a2d0dc2de27b9ee04f7af}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlataf@{nlataf}}
+\index{nlataf@{nlataf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlataf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlataf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a80d81b2f026a2d0dc2de27b9ee04f7af}
+
+
+Definition at line 134 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a9b09ac96dad78313003a9436fe2f9aec}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlatbf@{nlatbf}}
+\index{nlatbf@{nlatbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlatbf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlatbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a9b09ac96dad78313003a9436fe2f9aec}
+
+
+Definition at line 132 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7b8c924fdea622759b99d8f61e03ade5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlogprt@{nlogprt}}
+\index{nlogprt@{nlogprt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlogprt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nlogprt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7b8c924fdea622759b99d8f61e03ade5}
+
+
+Definition at line 122 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ae413f2dc402b7c018e341081b8d6e208}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlonaf@{nlonaf}}
+\index{nlonaf@{nlonaf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlonaf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlonaf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ae413f2dc402b7c018e341081b8d6e208}
+
+
+Definition at line 133 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6e774d31f16b513b1d604e72a82dff40}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlonbf@{nlonbf}}
+\index{nlonbf@{nlonbf}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlonbf}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlonbf\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6e774d31f16b513b1d604e72a82dff40}
+
+
+Definition at line 131 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aee9f6849ec644ee40f465976bc6c7b96}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlucor@{nlucor}}
+\index{nlucor@{nlucor}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlucor}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nlucor\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aee9f6849ec644ee40f465976bc6c7b96}
+
+
+Definition at line 187 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_abb7c2cd3a371bbb8ccd6a272d0e9b60f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nludat@{nludat}}
+\index{nludat@{nludat}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nludat}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nludat\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_abb7c2cd3a371bbb8ccd6a272d0e9b60f}
+
+
+Definition at line 174 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a7510ecfe3d0f141252450e4ba66209ba}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nluext@{nluext}}
+\index{nluext@{nluext}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nluext}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nluext\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a7510ecfe3d0f141252450e4ba66209ba}
+
+
+Definition at line 182 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a31f62f64cbcf344e529d0576386d0751}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlufil@{nlufil}}
+\index{nlufil@{nlufil}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlufil}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlufil\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a31f62f64cbcf344e529d0576386d0751}
+
+
+Definition at line 175 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a42367b4984c6ac4c69cbdcd315cb54e6}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlumap@{nlumap}}
+\index{nlumap@{nlumap}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlumap}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlumap\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a42367b4984c6ac4c69cbdcd315cb54e6}
+
+
+Definition at line 176 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aefed5eaa9924d249e979a5a772a46979}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nlusub@{nlusub}}
+\index{nlusub@{nlusub}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nlusub}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nlusub\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aefed5eaa9924d249e979a5a772a46979}
+
+
+Definition at line 179 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac623e3e0906f57983efc1ab912ce9674}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nmapfl@{nmapfl}}
+\index{nmapfl@{nmapfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nmapfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nmapfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac623e3e0906f57983efc1ab912ce9674}
+
+
+Definition at line 177 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_adb1f8ce6bf94f488c10ef36b3afb8eca}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nmapvoi@{nmapvoi}}
+\index{nmapvoi@{nmapvoi}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nmapvoi}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nmapvoi\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_adb1f8ce6bf94f488c10ef36b3afb8eca}
+
+
+Definition at line 178 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a5ca7cd6a5b9f939b68492200aa92bab4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nnamcpl@{nnamcpl}}
+\index{nnamcpl@{nnamcpl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nnamcpl}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+namcouple\+::nnamcpl}}\label{classmod__oasis__namcouple_a5ca7cd6a5b9f939b68492200aa92bab4}
+
+
+number of namcouple inputs 
+
+
+
+Definition at line 32 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a579387e570e26f2d6c6c2159824cf8a3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nninnfl@{nninnfl}}
+\index{nninnfl@{nninnfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nninnfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nninnfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a579387e570e26f2d6c6c2159824cf8a3}
+
+
+Definition at line 244 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6526a92cd5fa662f9da229806d062dc2}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nninnflg@{nninnflg}}
+\index{nninnflg@{nninnflg}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nninnflg}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nninnflg\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6526a92cd5fa662f9da229806d062dc2}
+
+
+Definition at line 246 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a484a71c213c89416924a0e23cfd46269}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nosper@{nosper}}
+\index{nosper@{nosper}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nosper}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nosper\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a484a71c213c89416924a0e23cfd46269}
+
+
+Definition at line 184 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ac154fc90756832bc90d02ea21f7c7e17}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!notper@{notper}}
+\index{notper@{notper}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{notper}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::notper\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ac154fc90756832bc90d02ea21f7c7e17}
+
+
+Definition at line 185 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_abb6f67bfba2cba424dabee3a465fdfd5}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nscripvoi@{nscripvoi}}
+\index{nscripvoi@{nscripvoi}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nscripvoi}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nscripvoi\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_abb6f67bfba2cba424dabee3a465fdfd5}
+
+
+Definition at line 188 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a20e9486f3e8bbdcee0de935e9be3a2e8}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nseqn@{nseqn}}
+\index{nseqn@{nseqn}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nseqn}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nseqn\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a20e9486f3e8bbdcee0de935e9be3a2e8}
+
+
+Definition at line 135 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a66c36f23a77081749dc9e7993b0277f3}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nstep@{nstep}}
+\index{nstep@{nstep}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nstep}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nstep\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a66c36f23a77081749dc9e7993b0277f3}
+
+
+Definition at line 111 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a6a94577996b440c31cac5b7d39e7f47a}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nsubfl@{nsubfl}}
+\index{nsubfl@{nsubfl}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nsubfl}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nsubfl\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a6a94577996b440c31cac5b7d39e7f47a}
+
+
+Definition at line 180 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a0f31605257bfe125aafb6488a5065d4d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nsubvoi@{nsubvoi}}
+\index{nsubvoi@{nsubvoi}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nsubvoi}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::nsubvoi\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a0f31605257bfe125aafb6488a5065d4d}
+
+
+Definition at line 181 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a8a962108487c3ca092633bd4292dbfd6}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ntime@{ntime}}
+\index{ntime@{ntime}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ntime}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ntime\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a8a962108487c3ca092633bd4292dbfd6}
+
+
+Definition at line 108 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a49bd874b06648257f7ce70da19a678b4}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ntlogprt@{ntlogprt}}
+\index{ntlogprt@{ntlogprt}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ntlogprt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::ntlogprt\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a49bd874b06648257f7ce70da19a678b4}
+
+
+Definition at line 124 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_aaf9fd5eaa5d115f2548b8f78cdcd172d}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!ntronca@{ntronca}}
+\index{ntronca@{ntronca}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{ntronca}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::ntronca\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_aaf9fd5eaa5d115f2548b8f78cdcd172d}
+
+
+Definition at line 169 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a36ef9483c332254e38c52b1d78d26f1f}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!nulin@{nulin}}
+\index{nulin@{nulin}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{nulin}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+namcouple\+::nulin\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a36ef9483c332254e38c52b1d78d26f1f}
+
+
+Definition at line 81 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_a12e1621f5697a0cdbde11d3e25f43b54}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!numlab@{numlab}}
+\index{numlab@{numlab}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{numlab}]{\setlength{\rightskip}{0pt plus 5cm}integer (kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::numlab\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_a12e1621f5697a0cdbde11d3e25f43b54}
+
+
+Definition at line 126 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+\hypertarget{classmod__oasis__namcouple_ab7c38fd6bd90bb8e6ebfb539ead1f1a9}{\index{mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}!varmul@{varmul}}
+\index{varmul@{varmul}!mod\+\_\+oasis\+\_\+namcouple@{mod\+\_\+oasis\+\_\+namcouple}}
+\subsubsection[{varmul}]{\setlength{\rightskip}{0pt plus 5cm}real (kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable mod\+\_\+oasis\+\_\+namcouple\+::varmul\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__namcouple_ab7c38fd6bd90bb8e6ebfb539ead1f1a9}
+
+
+Definition at line 240 of file mod\+\_\+oasis\+\_\+namcouple.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__namcouple_8_f90}{mod\+\_\+oasis\+\_\+namcouple.\+F90}\end{DoxyCompactItemize}

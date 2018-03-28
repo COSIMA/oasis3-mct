@@ -1,0 +1,1711 @@
+\hypertarget{classmod__oasis__mpi}{\section{mod\+\_\+oasis\+\_\+mpi Module Reference}
+\label{classmod__oasis__mpi}\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+}
+
+
+Provides a generic and simpler interface into M\+P\+I calls for O\+A\+S\+I\+S.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__bcast}{oasis\+\_\+mpi\+\_\+bcast}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I broadcast. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv}
+\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+P\+I vector gather. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{oasis\+\_\+mpi\+\_\+gathscatvinit}
+\begin{DoxyCompactList}\small\item\em Generic interface to oasis\+\_\+mpi\+\_\+gath\+Scat\+V\+Init. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__max}{oasis\+\_\+mpi\+\_\+max}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I max reduction. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min}{oasis\+\_\+mpi\+\_\+min}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I min reduction. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__recv}{oasis\+\_\+mpi\+\_\+recv}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I receive. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}
+\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+P\+I vector scatter. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__send}{oasis\+\_\+mpi\+\_\+send}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I send. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum}{oasis\+\_\+mpi\+\_\+sum}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I sum reduction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a15ba68764a1f4dd07d403e46afae824c}{oasis\+\_\+mpi\+\_\+chkerr} (rcode, string)
+\begin{DoxyCompactList}\small\item\em Checks M\+P\+I error codes and aborts. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_adac784196d7af85611752214137dd4db}{oasis\+\_\+mpi\+\_\+commsize} (comm, size, string)
+\begin{DoxyCompactList}\small\item\em Get the total number of tasks associated with a communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a2690a841a331f4398cc4b5a244bbc52e}{oasis\+\_\+mpi\+\_\+commrank} (comm, rank, string)
+\begin{DoxyCompactList}\small\item\em Get the rank (task I\+D) for a task in a communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a384f170e63ac03f25d3bd549245b43f3}{oasis\+\_\+mpi\+\_\+initialized} (flag, string)
+\begin{DoxyCompactList}\small\item\em Check whether M\+P\+I has been initialized. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_aa3786c2cab131c3834583e7943ba28c8}{oasis\+\_\+mpi\+\_\+wtime} (wtime)
+\begin{DoxyCompactList}\small\item\em Return a timestamp from M\+P\+I\+\_\+\+W\+T\+I\+M\+E. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a5b21b6d8732d5f7b70d8b20cefe0072f}{oasis\+\_\+mpi\+\_\+abort} (string, rcode)
+\begin{DoxyCompactList}\small\item\em Write error messages and Call M\+P\+I\+\_\+\+A\+B\+O\+R\+T. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_aaf477847380fbbbc1341520b0b3e66da}{oasis\+\_\+mpi\+\_\+barrier} (comm, string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+B\+A\+R\+R\+I\+E\+R for a particular communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}{oasis\+\_\+mpi\+\_\+init} (string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+I\+N\+I\+T. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}{oasis\+\_\+mpi\+\_\+finalize} (string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+Z\+E. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}{oasis\+\_\+mpi\+\_\+reducelists} (linp1, comm, cntout, lout1, callstr, fastcheck, fastcheckout, linp2, lout2, spval2, linp3, lout3, spval3)
+\begin{DoxyCompactList}\small\item\em Custom method for reducing M\+P\+I lists across pes for O\+A\+S\+I\+S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__mpi_aa5078962eee157f52878f711c0a29afb}{oasis\+\_\+mpi\+\_\+sendi0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_aab4cc0d2b50e8e73697e6d88d23b03cd}{oasis\+\_\+mpi\+\_\+sendi1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ab38f15fbce57555ea66ccbc1aa477dd1}{oasis\+\_\+mpi\+\_\+sendr0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a948cd001c0955ae19f4b410d4cca9f9b}{oasis\+\_\+mpi\+\_\+sendr1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ac8809a8b29b3ffa246612b9c25cd05eb}{oasis\+\_\+mpi\+\_\+sendr3} (array, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 3\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ad89796f10a2225d4930cdec65546cf98}{oasis\+\_\+mpi\+\_\+recvi0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_acf13ea626ed09fe98123f23d0990879d}{oasis\+\_\+mpi\+\_\+recvi1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a2578d560c80d608340b5a49b327642ba}{oasis\+\_\+mpi\+\_\+recvr0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a2bbd8de453167b4c73aa09c3c44c0ca8}{oasis\+\_\+mpi\+\_\+recvr1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a2c3b82d2346a69cd20be3d35c5e70be6}{oasis\+\_\+mpi\+\_\+recvr3} (array, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 3\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_af8bc029a22d59f1188b7f8a1a2645c40}{oasis\+\_\+mpi\+\_\+bcasti0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a1426590a36b24f1770381b9c35563cff}{oasis\+\_\+mpi\+\_\+bcastl0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar logical. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a6d10e1673748a91dc7ec955ef16d771a}{oasis\+\_\+mpi\+\_\+bcastc0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a character string. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a99b3a1ab4c7617b5bc83d3c6360aaef3}{oasis\+\_\+mpi\+\_\+bcastc1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1\+D character strings. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a3b21bebef1b56b31bd6d07e83d7a59a6}{oasis\+\_\+mpi\+\_\+bcastr0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a6f9140637f29d3939dc9c53930101e2e}{oasis\+\_\+mpi\+\_\+bcasti1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a8b03787549fba5faff499c946d521db0}{oasis\+\_\+mpi\+\_\+bcastl1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1\+D logicals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a6f12178b027ff30cb87f9f8313b459d5}{oasis\+\_\+mpi\+\_\+bcastr1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ab14018fe59cd737067e4f4202a3eeb39}{oasis\+\_\+mpi\+\_\+bcastr2} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 2\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ad6918adccdd62a278066f41b0b8edf57}{oasis\+\_\+mpi\+\_\+bcasti2} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 2\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ac01edbda3e33b1feff9b797f83f82e8c}{oasis\+\_\+mpi\+\_\+bcastr3} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 3\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a68afb4ab4136545faeaa2c37a1eb294a}{oasis\+\_\+mpi\+\_\+gathscatvinitr1} (comm, rootid, loc\+Arr, glob1\+D\+Arr, glob\+Size, displs, string)
+\begin{DoxyCompactList}\small\item\em Initialize variables for \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a88a13ea3b4f96074669fdc872fe41728}{oasis\+\_\+mpi\+\_\+gathervr1} (locarr, loc\+Size, glob1\+D\+Arr, glob\+Size, displs, rootid, comm, string)
+\begin{DoxyCompactList}\small\item\em Gather a vector of distributed data to a rootid. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a9d0d807b92d39c9789eea4744d331612}{oasis\+\_\+mpi\+\_\+scattervr1} (locarr, loc\+Size, glob1\+Darr, glob\+Size, displs, rootid, comm, string)
+\begin{DoxyCompactList}\small\item\em Scatter a vector of global data from a rootid. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_adbb3963310e45ac012e5e28f13d5781e}{oasis\+\_\+mpi\+\_\+sumi0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global Sum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a507bb5e0ae088d68bb68c566e8965bef}{oasis\+\_\+mpi\+\_\+sumi1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ae4d2818f21f445e594aad97598f49d8e}{oasis\+\_\+mpi\+\_\+sumb0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar 8 byte integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a3f32594b15b9ae3629969839ab952012}{oasis\+\_\+mpi\+\_\+sumb1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D 8 byte integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a02b0555479a3d54e1c3d42219af9b991}{oasis\+\_\+mpi\+\_\+sumr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_aac62148bc912b158aff769572f27b8d3}{oasis\+\_\+mpi\+\_\+sumr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1\+D array of global sums for an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_afbc665ae71c97d0b0467323cd86a5973}{oasis\+\_\+mpi\+\_\+sumr2} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 2\+D array of global sums for an array of 2\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a41836fe23aeb81e65b4d24f6f0c90953}{oasis\+\_\+mpi\+\_\+sumr3} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 3\+D array of global sums for an array of 3\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a2832568cd4d34db40cdcc39ffa876474}{oasis\+\_\+mpi\+\_\+mini0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global minimum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_aed0c20d56fdab764f0ad8e48e3a7209f}{oasis\+\_\+mpi\+\_\+mini1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_af3628ad005b1a21e8f33e3dc2be38635}{oasis\+\_\+mpi\+\_\+minr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an global minimum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a29c460b836ae9ad77ee1ac21f684d188}{oasis\+\_\+mpi\+\_\+minr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1\+D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a0b469347d40c78c317042fa069d9baa5}{oasis\+\_\+mpi\+\_\+maxi0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global maximum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a2ba8d76b016ddde4013aecc2ca0b1d9f}{oasis\+\_\+mpi\+\_\+maxi1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global maximums for an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_a7f46e23956ff948e039c5c1cdde0f6f3}{oasis\+\_\+mpi\+\_\+maxr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global maximum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__mpi_ae57151fc4714e33d7e0e1cf0aa65ae64}{oasis\+\_\+mpi\+\_\+maxr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global maximums for an array of 1\+D doubles. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Provides a generic and simpler interface into M\+P\+I calls for O\+A\+S\+I\+S. 
+
+Definition at line 3 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__mpi_a5b21b6d8732d5f7b70d8b20cefe0072f}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+abort@{oasis\+\_\+mpi\+\_\+abort}}
+\index{oasis\+\_\+mpi\+\_\+abort@{oasis\+\_\+mpi\+\_\+abort}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+abort}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+abort (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer, intent(in), optional}]{rcode}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a5b21b6d8732d5f7b70d8b20cefe0072f}
+
+
+Write error messages and Call M\+P\+I\+\_\+\+A\+B\+O\+R\+T. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em rcode} & optional code \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2382 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aaf477847380fbbbc1341520b0b3e66da}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+barrier@{oasis\+\_\+mpi\+\_\+barrier}}
+\index{oasis\+\_\+mpi\+\_\+barrier@{oasis\+\_\+mpi\+\_\+barrier}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+barrier}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+barrier (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_aaf477847380fbbbc1341520b0b3e66da}
+
+
+Call M\+P\+I\+\_\+\+B\+A\+R\+R\+I\+E\+R for a particular communicator. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2421 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a6d10e1673748a91dc7ec955ef16d771a}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastc0@{oasis\+\_\+mpi\+\_\+bcastc0}}
+\index{oasis\+\_\+mpi\+\_\+bcastc0@{oasis\+\_\+mpi\+\_\+bcastc0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastc0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastc0 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a6d10e1673748a91dc7ec955ef16d771a}
+
+
+Broadcast a character string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 652 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a99b3a1ab4c7617b5bc83d3c6360aaef3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastc1@{oasis\+\_\+mpi\+\_\+bcastc1}}
+\index{oasis\+\_\+mpi\+\_\+bcastc1@{oasis\+\_\+mpi\+\_\+bcastc1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastc1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastc1 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), dimension(\+:), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a99b3a1ab4c7617b5bc83d3c6360aaef3}
+
+
+Broadcast an array of 1\+D character strings. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 694 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_af8bc029a22d59f1188b7f8a1a2645c40}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti0@{oasis\+\_\+mpi\+\_\+bcasti0}}
+\index{oasis\+\_\+mpi\+\_\+bcasti0@{oasis\+\_\+mpi\+\_\+bcasti0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcasti0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_af8bc029a22d59f1188b7f8a1a2645c40}
+
+
+Broadcast a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 568 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a6f9140637f29d3939dc9c53930101e2e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti1@{oasis\+\_\+mpi\+\_\+bcasti1}}
+\index{oasis\+\_\+mpi\+\_\+bcasti1@{oasis\+\_\+mpi\+\_\+bcasti1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcasti1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a6f9140637f29d3939dc9c53930101e2e}
+
+
+Broadcast an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 778 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ad6918adccdd62a278066f41b0b8edf57}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcasti2@{oasis\+\_\+mpi\+\_\+bcasti2}}
+\index{oasis\+\_\+mpi\+\_\+bcasti2@{oasis\+\_\+mpi\+\_\+bcasti2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcasti2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti2 (
+\begin{DoxyParamCaption}
+\item[{integer, dimension(\+:,\+:), intent(inout)}]{arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ad6918adccdd62a278066f41b0b8edf57}
+
+
+Broadcast an array of 2\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em arr} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 948 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a1426590a36b24f1770381b9c35563cff}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastl0@{oasis\+\_\+mpi\+\_\+bcastl0}}
+\index{oasis\+\_\+mpi\+\_\+bcastl0@{oasis\+\_\+mpi\+\_\+bcastl0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastl0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastl0 (
+\begin{DoxyParamCaption}
+\item[{logical, intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a1426590a36b24f1770381b9c35563cff}
+
+
+Broadcast a scalar logical. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 610 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a8b03787549fba5faff499c946d521db0}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastl1@{oasis\+\_\+mpi\+\_\+bcastl1}}
+\index{oasis\+\_\+mpi\+\_\+bcastl1@{oasis\+\_\+mpi\+\_\+bcastl1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastl1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastl1 (
+\begin{DoxyParamCaption}
+\item[{logical, dimension(\+:), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a8b03787549fba5faff499c946d521db0}
+
+
+Broadcast an array of 1\+D logicals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 820 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a3b21bebef1b56b31bd6d07e83d7a59a6}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr0@{oasis\+\_\+mpi\+\_\+bcastr0}}
+\index{oasis\+\_\+mpi\+\_\+bcastr0@{oasis\+\_\+mpi\+\_\+bcastr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a3b21bebef1b56b31bd6d07e83d7a59a6}
+
+
+Broadcast a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 736 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a6f12178b027ff30cb87f9f8313b459d5}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr1@{oasis\+\_\+mpi\+\_\+bcastr1}}
+\index{oasis\+\_\+mpi\+\_\+bcastr1@{oasis\+\_\+mpi\+\_\+bcastr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(inout)}]{vec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a6f12178b027ff30cb87f9f8313b459d5}
+
+
+Broadcast an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em vec} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 862 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ab14018fe59cd737067e4f4202a3eeb39}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr2@{oasis\+\_\+mpi\+\_\+bcastr2}}
+\index{oasis\+\_\+mpi\+\_\+bcastr2@{oasis\+\_\+mpi\+\_\+bcastr2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastr2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr2 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(inout)}]{arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ab14018fe59cd737067e4f4202a3eeb39}
+
+
+Broadcast an array of 2\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em arr} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 904 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ac01edbda3e33b1feff9b797f83f82e8c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+bcastr3@{oasis\+\_\+mpi\+\_\+bcastr3}}
+\index{oasis\+\_\+mpi\+\_\+bcastr3@{oasis\+\_\+mpi\+\_\+bcastr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+bcastr3}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr3 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(inout)}]{arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in), optional}]{pebcast}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ac01edbda3e33b1feff9b797f83f82e8c}
+
+
+Broadcast an array of 3\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em arr} & values to broadcast\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em pebcast} & bcast pe, default is task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 992 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a15ba68764a1f4dd07d403e46afae824c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+chkerr@{oasis\+\_\+mpi\+\_\+chkerr}}
+\index{oasis\+\_\+mpi\+\_\+chkerr@{oasis\+\_\+mpi\+\_\+chkerr}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+chkerr}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+chkerr (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rcode, }
+\item[{character($\ast$), intent(in)}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a15ba68764a1f4dd07d403e46afae824c}
+
+
+Checks M\+P\+I error codes and aborts. 
+
+This method compares rcode to M\+P\+I\+\_\+\+S\+U\+C\+C\+E\+S\+S. If rcode is an error, it queries M\+P\+I\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+T\+R\+I\+N\+G for the error string associated with rcode, writes it out, and aborts with the string passed through the interface.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rcode} & M\+P\+I error code\\
+\hline
+\mbox{\tt in}  & {\em string} & abort message \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 128 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2690a841a331f4398cc4b5a244bbc52e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+commrank@{oasis\+\_\+mpi\+\_\+commrank}}
+\index{oasis\+\_\+mpi\+\_\+commrank@{oasis\+\_\+mpi\+\_\+commrank}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+commrank}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+commrank (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{comm, }
+\item[{integer, intent(out)}]{rank, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a2690a841a331f4398cc4b5a244bbc52e}
+
+
+Get the rank (task I\+D) for a task in a communicator. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em rank} & output task I\+D\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2286 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_adac784196d7af85611752214137dd4db}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+commsize@{oasis\+\_\+mpi\+\_\+commsize}}
+\index{oasis\+\_\+mpi\+\_\+commsize@{oasis\+\_\+mpi\+\_\+commsize}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+commsize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+commsize (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{comm, }
+\item[{integer, intent(out)}]{size, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_adac784196d7af85611752214137dd4db}
+
+
+Get the total number of tasks associated with a communicator. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em size} & output comm size\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2251 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+finalize@{oasis\+\_\+mpi\+\_\+finalize}}
+\index{oasis\+\_\+mpi\+\_\+finalize@{oasis\+\_\+mpi\+\_\+finalize}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+finalize}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+finalize (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}
+
+
+Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+Z\+E. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2488 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a88a13ea3b4f96074669fdc872fe41728}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}}
+\index{oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+gathervr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathervr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{locarr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{loc\+Size, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(inout)}]{glob1\+D\+Arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{glob\+Size, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{displs, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a88a13ea3b4f96074669fdc872fe41728}
+
+
+Gather a vector of distributed data to a rootid. 
+
+This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{oasis\+\_\+mpi\+\_\+gathscatvinit} routine and uses that information to gather the loc\+Arr into the glob1\+Darr on processor rootid in communicator comm.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em locarr} & Local array\\
+\hline
+\mbox{\tt in,out}  & {\em glob1darr} & Global 1\+D array to receive in on\\
+\hline
+\mbox{\tt in}  & {\em locsize} & Number to send from this P\+E\\
+\hline
+\mbox{\tt in}  & {\em globsize} & Number to receive from each P\+E\\
+\hline
+\mbox{\tt in}  & {\em displs} & Displacements for receives\\
+\hline
+\mbox{\tt in}  & {\em rootid} & M\+P\+I task to gather on\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1134 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a68afb4ab4136545faeaa2c37a1eb294a}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}}
+\index{oasis\+\_\+mpi\+\_\+gathscatvinitr1@{oasis\+\_\+mpi\+\_\+gathscatvinitr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+gathscatvinitr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinitr1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{loc\+Arr, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), pointer}]{glob1\+D\+Arr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), pointer}]{glob\+Size, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), pointer}]{displs, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a68afb4ab4136545faeaa2c37a1eb294a}
+
+
+Initialize variables for \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}. 
+
+This method initializes glob1\+D\+Arr, glob\+Size, and displs for use in the \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv} routines. loc\+Arr is the distributed array to gather from or scatter to.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em rootid} & M\+P\+I task to gather/scatter on\\
+\hline
+\mbox{\tt in}  & {\em locarr} & Local array of distributed data\\
+\hline
+ & {\em glob1darr} & Global 1\+D array of gathered data\\
+\hline
+ & {\em globsize} & Size of each distributed piece\\
+\hline
+ & {\em displs} & Displacements for receive\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1040 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+init@{oasis\+\_\+mpi\+\_\+init}}
+\index{oasis\+\_\+mpi\+\_\+init@{oasis\+\_\+mpi\+\_\+init}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+init}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}
+
+
+Call M\+P\+I\+\_\+\+I\+N\+I\+T. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2455 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a384f170e63ac03f25d3bd549245b43f3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+initialized@{oasis\+\_\+mpi\+\_\+initialized}}
+\index{oasis\+\_\+mpi\+\_\+initialized@{oasis\+\_\+mpi\+\_\+initialized}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+initialized}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+initialized (
+\begin{DoxyParamCaption}
+\item[{logical, intent(out)}]{flag, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a384f170e63ac03f25d3bd549245b43f3}
+
+
+Check whether M\+P\+I has been initialized. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em flag} & true if M\+P\+I\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+E\+D has been called\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2321 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a0b469347d40c78c317042fa069d9baa5}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxi0@{oasis\+\_\+mpi\+\_\+maxi0}}
+\index{oasis\+\_\+mpi\+\_\+maxi0@{oasis\+\_\+mpi\+\_\+maxi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+maxi0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxi0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a0b469347d40c78c317042fa069d9baa5}
+
+
+Compute a global maximum for a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1999 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2ba8d76b016ddde4013aecc2ca0b1d9f}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxi1@{oasis\+\_\+mpi\+\_\+maxi1}}
+\index{oasis\+\_\+mpi\+\_\+maxi1@{oasis\+\_\+mpi\+\_\+maxi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+maxi1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxi1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a2ba8d76b016ddde4013aecc2ca0b1d9f}
+
+
+Compute an array of global maximums for an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2062 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a7f46e23956ff948e039c5c1cdde0f6f3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxr0@{oasis\+\_\+mpi\+\_\+maxr0}}
+\index{oasis\+\_\+mpi\+\_\+maxr0@{oasis\+\_\+mpi\+\_\+maxr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+maxr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a7f46e23956ff948e039c5c1cdde0f6f3}
+
+
+Compute a global maximum for a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2125 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ae57151fc4714e33d7e0e1cf0aa65ae64}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+maxr1@{oasis\+\_\+mpi\+\_\+maxr1}}
+\index{oasis\+\_\+mpi\+\_\+maxr1@{oasis\+\_\+mpi\+\_\+maxr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+maxr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ae57151fc4714e33d7e0e1cf0aa65ae64}
+
+
+Compute an array of global maximums for an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2188 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2832568cd4d34db40cdcc39ffa876474}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}}
+\index{oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+mini0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+mini0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a2832568cd4d34db40cdcc39ffa876474}
+
+
+Compute a global minimum for a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1747 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aed0c20d56fdab764f0ad8e48e3a7209f}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}}
+\index{oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+mini1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+mini1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_aed0c20d56fdab764f0ad8e48e3a7209f}
+
+
+Compute an array of global minimums for an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1810 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_af3628ad005b1a21e8f33e3dc2be38635}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}}
+\index{oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+minr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+minr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_af3628ad005b1a21e8f33e3dc2be38635}
+
+
+Compute an global minimum for a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1873 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a29c460b836ae9ad77ee1ac21f684d188}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}}
+\index{oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+minr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+minr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a29c460b836ae9ad77ee1ac21f684d188}
+
+
+Compute an array of global minimums for an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1936 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ad89796f10a2225d4930cdec65546cf98}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvi0@{oasis\+\_\+mpi\+\_\+recvi0}}
+\index{oasis\+\_\+mpi\+\_\+recvi0@{oasis\+\_\+mpi\+\_\+recvi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+recvi0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvi0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ad89796f10a2225d4930cdec65546cf98}
+
+
+Receive a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em lvec} & receive values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to recv from\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 363 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_acf13ea626ed09fe98123f23d0990879d}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvi1@{oasis\+\_\+mpi\+\_\+recvi1}}
+\index{oasis\+\_\+mpi\+\_\+recvi1@{oasis\+\_\+mpi\+\_\+recvi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+recvi1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvi1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_acf13ea626ed09fe98123f23d0990879d}
+
+
+Receive an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em lvec} & receive values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to recv from\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 404 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2578d560c80d608340b5a49b327642ba}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr0@{oasis\+\_\+mpi\+\_\+recvr0}}
+\index{oasis\+\_\+mpi\+\_\+recvr0@{oasis\+\_\+mpi\+\_\+recvr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+recvr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a2578d560c80d608340b5a49b327642ba}
+
+
+Receive a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em lvec} & receive values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to recv from\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 445 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2bbd8de453167b4c73aa09c3c44c0ca8}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr1@{oasis\+\_\+mpi\+\_\+recvr1}}
+\index{oasis\+\_\+mpi\+\_\+recvr1@{oasis\+\_\+mpi\+\_\+recvr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+recvr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a2bbd8de453167b4c73aa09c3c44c0ca8}
+
+
+Receive an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em lvec} & receive values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to recv from\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 486 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a2c3b82d2346a69cd20be3d35c5e70be6}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+recvr3@{oasis\+\_\+mpi\+\_\+recvr3}}
+\index{oasis\+\_\+mpi\+\_\+recvr3@{oasis\+\_\+mpi\+\_\+recvr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+recvr3}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr3 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(out)}]{array, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a2c3b82d2346a69cd20be3d35c5e70be6}
+
+
+Receive an array of 3\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em array} & receive values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to recv from\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 527 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+reducelists@{oasis\+\_\+mpi\+\_\+reducelists}}
+\index{oasis\+\_\+mpi\+\_\+reducelists@{oasis\+\_\+mpi\+\_\+reducelists}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+reducelists}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+reducelists (
+\begin{DoxyParamCaption}
+\item[{character($\ast$), dimension(\+:), intent(in), pointer}]{linp1, }
+\item[{integer, intent(in)}]{comm, }
+\item[{integer, intent(out)}]{cntout, }
+\item[{character($\ast$), dimension(\+:), intent(inout), pointer}]{lout1, }
+\item[{character($\ast$), intent(in)}]{callstr, }
+\item[{logical, intent(in), optional}]{fastcheck, }
+\item[{logical, intent(out), optional}]{fastcheckout, }
+\item[{character($\ast$), dimension(\+:), intent(in), optional, pointer}]{linp2, }
+\item[{character($\ast$), dimension(\+:), intent(inout), optional, pointer}]{lout2, }
+\item[{character($\ast$), intent(in), optional}]{spval2, }
+\item[{integer, dimension(\+:), intent(in), optional, pointer}]{linp3, }
+\item[{integer, dimension(\+:), intent(inout), optional, pointer}]{lout3, }
+\item[{integer, intent(in), optional}]{spval3}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_a52ceb1f5d86efec2d94dcc7a18e90216}
+
+
+Custom method for reducing M\+P\+I lists across pes for O\+A\+S\+I\+S. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em linp1} & input list on each task\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em cntout} & size of lout1 list\\
+\hline
+\mbox{\tt in,out}  & {\em lout1} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em callstr} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em fastcheck} & run a fastcheck first\\
+\hline
+\mbox{\tt out}  & {\em fastcheckout} & true if fastcheck worked\\
+\hline
+\mbox{\tt in}  & {\em linp2} & input list on each task\\
+\hline
+\mbox{\tt in,out}  & {\em lout2} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em spval2} & unset value for linp2\\
+\hline
+\mbox{\tt in}  & {\em linp3} & input list on each task\\
+\hline
+\mbox{\tt in,out}  & {\em lout3} & reduced output list, same on all tasks\\
+\hline
+\mbox{\tt in}  & {\em spval3} & unset value for linp3 \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check argument consistency
+\item Fast compare on all tasks
+\item Generate initial unique local name list
+\item Log2 reduction of linp over tasks to root
+\begin{DoxyItemize}
+\item Send list
+\item Recv list
+\item Determine the unique list
+\end{DoxyItemize}
+\item Broadcast the list information to all tasks from root 
+\end{DoxyItemize}
+
+Definition at line 2521 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a9d0d807b92d39c9789eea4744d331612}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}}
+\index{oasis\+\_\+mpi\+\_\+scattervr1@{oasis\+\_\+mpi\+\_\+scattervr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+scattervr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scattervr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{locarr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{loc\+Size, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{glob1\+Darr, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{glob\+Size, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{displs, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a9d0d807b92d39c9789eea4744d331612}
+
+
+Scatter a vector of global data from a rootid. 
+
+This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{oasis\+\_\+mpi\+\_\+gathscatvinit} routine and uses that information to scatter glob1\+Darr on processor rootid in communicator comm to locarr on other processors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em locarr} & Local array\\
+\hline
+\mbox{\tt in}  & {\em glob1darr} & Global 1\+D array to send from\\
+\hline
+\mbox{\tt in}  & {\em locsize} & Number to receive this P\+E\\
+\hline
+\mbox{\tt in}  & {\em globsize} & Number to send to each P\+E\\
+\hline
+\mbox{\tt in}  & {\em displs} & Displacements for send\\
+\hline
+\mbox{\tt in}  & {\em rootid} & M\+P\+I task to scatter on\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1183 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aa5078962eee157f52878f711c0a29afb}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendi0@{oasis\+\_\+mpi\+\_\+sendi0}}
+\index{oasis\+\_\+mpi\+\_\+sendi0@{oasis\+\_\+mpi\+\_\+sendi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sendi0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendi0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_aa5078962eee157f52878f711c0a29afb}
+
+
+Send a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & send value\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to send to\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 163 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aab4cc0d2b50e8e73697e6d88d23b03cd}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendi1@{oasis\+\_\+mpi\+\_\+sendi1}}
+\index{oasis\+\_\+mpi\+\_\+sendi1@{oasis\+\_\+mpi\+\_\+sendi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sendi1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendi1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_aab4cc0d2b50e8e73697e6d88d23b03cd}
+
+
+Send an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & send values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to send to\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 203 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ab38f15fbce57555ea66ccbc1aa477dd1}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr0@{oasis\+\_\+mpi\+\_\+sendr0}}
+\index{oasis\+\_\+mpi\+\_\+sendr0@{oasis\+\_\+mpi\+\_\+sendr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sendr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ab38f15fbce57555ea66ccbc1aa477dd1}
+
+
+Send a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & send values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to send to\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 243 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a948cd001c0955ae19f4b410d4cca9f9b}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr1@{oasis\+\_\+mpi\+\_\+sendr1}}
+\index{oasis\+\_\+mpi\+\_\+sendr1@{oasis\+\_\+mpi\+\_\+sendr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sendr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a948cd001c0955ae19f4b410d4cca9f9b}
+
+
+Send an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & send values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to send to\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 283 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ac8809a8b29b3ffa246612b9c25cd05eb}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sendr3@{oasis\+\_\+mpi\+\_\+sendr3}}
+\index{oasis\+\_\+mpi\+\_\+sendr3@{oasis\+\_\+mpi\+\_\+sendr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sendr3}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr3 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{array, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{pid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{tag, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ac8809a8b29b3ffa246612b9c25cd05eb}
+
+
+Send an array of 3\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em array} & send values\\
+\hline
+\mbox{\tt in}  & {\em pid} & pid to send to\\
+\hline
+\mbox{\tt in}  & {\em tag} & tag\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 323 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_ae4d2818f21f445e594aad97598f49d8e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}}
+\index{oasis\+\_\+mpi\+\_\+sumb0@{oasis\+\_\+mpi\+\_\+sumb0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumb0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumb0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i8\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i8\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_ae4d2818f21f445e594aad97598f49d8e}
+
+
+Compute a global sum for a scalar 8 byte integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1357 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a3f32594b15b9ae3629969839ab952012}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}}
+\index{oasis\+\_\+mpi\+\_\+sumb1@{oasis\+\_\+mpi\+\_\+sumb1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumb1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumb1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i8\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i8\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a3f32594b15b9ae3629969839ab952012}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D 8 byte integers. 
+
+This sums an array of local integers to an array of summed integers. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1423 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_adbb3963310e45ac012e5e28f13d5781e}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}}
+\index{oasis\+\_\+mpi\+\_\+sumi0@{oasis\+\_\+mpi\+\_\+sumi0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumi0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumi0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_adbb3963310e45ac012e5e28f13d5781e}
+
+
+Compute a global Sum for a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1228 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a507bb5e0ae088d68bb68c566e8965bef}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}}
+\index{oasis\+\_\+mpi\+\_\+sumi1@{oasis\+\_\+mpi\+\_\+sumi1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumi1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumi1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a507bb5e0ae088d68bb68c566e8965bef}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D integers. 
+
+This sums an array of local integers to an array of summed integers. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1294 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a02b0555479a3d54e1c3d42219af9b991}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}}
+\index{oasis\+\_\+mpi\+\_\+sumr0@{oasis\+\_\+mpi\+\_\+sumr0}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a02b0555479a3d54e1c3d42219af9b991}
+
+
+Compute a global sum for a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1486 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aac62148bc912b158aff769572f27b8d3}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}}
+\index{oasis\+\_\+mpi\+\_\+sumr1@{oasis\+\_\+mpi\+\_\+sumr1}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_aac62148bc912b158aff769572f27b8d3}
+
+
+Compute a 1\+D array of global sums for an array of 1\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1552 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_afbc665ae71c97d0b0467323cd86a5973}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}}
+\index{oasis\+\_\+mpi\+\_\+sumr2@{oasis\+\_\+mpi\+\_\+sumr2}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr2}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr2 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_afbc665ae71c97d0b0467323cd86a5973}
+
+
+Compute a 2\+D array of global sums for an array of 2\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1618 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_a41836fe23aeb81e65b4d24f6f0c90953}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}}
+\index{oasis\+\_\+mpi\+\_\+sumr3@{oasis\+\_\+mpi\+\_\+sumr3}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+sumr3}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr3 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__mpi_a41836fe23aeb81e65b4d24f6f0c90953}
+
+
+Compute a 3\+D array of global sums for an array of 3\+D doubles. 
+
+This sums an array of local doubles to an array of summed doubles. This does not reduce the array to a scalar.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1684 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{classmod__oasis__mpi_aa3786c2cab131c3834583e7943ba28c8}{\index{mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}!oasis\+\_\+mpi\+\_\+wtime@{oasis\+\_\+mpi\+\_\+wtime}}
+\index{oasis\+\_\+mpi\+\_\+wtime@{oasis\+\_\+mpi\+\_\+wtime}!mod\+\_\+oasis\+\_\+mpi@{mod\+\_\+oasis\+\_\+mpi}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+wtime}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+wtime (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+r8\+\_\+p), intent(out)}]{wtime}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__mpi_aa3786c2cab131c3834583e7943ba28c8}
+
+
+Return a timestamp from M\+P\+I\+\_\+\+W\+T\+I\+M\+E. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em wtime} & time in M\+P\+I\+\_\+\+W\+T\+I\+M\+E units \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 2355 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

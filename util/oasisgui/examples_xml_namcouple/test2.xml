@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <dataset>
+        <oasis3-mct value="">
+            <param value="">
+                <intro value="" />
+                <generaldesc value="" />
+                <guidesc value="" />
+            </param>
+            <printruns value="">
+                <descprint value="" />
+                <runtime value="">
+                    <duration value="21600" />
+                </runtime>
+                <debug value="">
+                    <nlogprt value="ptr_1">
+                        <ptr_1 value="" />
+                    </nlogprt>
+                </debug>
+                <timestat value="">
+                    <opttime value="none">
+                        <none value="" />
+                    </opttime>
+                </timestat>
+                <generalgroup value="">
+                    <groups_onoff value="1" />
+                    <mult_fields_name value="single;INPUTGROUP;INPUTG2" />
+                </generalgroup>
+            </printruns>
+            <grids value="">
+                <modelgrids value="" />
+                <defgrids value="">
+                    <gridsline value="">
+                        <item_1445319 value="torc">
+                            <gridstatus value="periodical_grid" />
+                            <grid_overlap value="2" />
+                            <dimsgrid value="dims_on">
+                                <dims_on value="">
+                                    <ni_grid value="182" />
+                                    <nj_grid value="149" />
+                                </dims_on>
+                            </dimsgrid>
+                        </item_1445319>
+                        <item_1462948 value="lmdz">
+                            <gridstatus value="periodical_grid" />
+                            <grid_overlap value="0" />
+                            <dimsgrid value="dims_on">
+                                <dims_on value="">
+                                    <ni_grid value="96" />
+                                    <nj_grid value="72" />
+                                </dims_on>
+                            </dimsgrid>
+                        </item_1462948>
+                    </gridsline>
+                    <grid_names_list value="torc;lmdz" />
+                </defgrids>
+            </grids>
+            <groups value="">
+                <groupedfld value="" />
+                <gpfld value="">
+                    <group value="">
+                        <item_1734452 value="INPUTGROUP">
+                            <group_comment value="Fields read from a file" />
+                        </item_1734452>
+                        <item_7020836 value="INPUTG2">
+                            <group_comment value="" />
+                        </item_7020836>
+                    </group>
+                </gpfld>
+            </groups>
+            <fielddef value="">
+                <flddesc value="" />
+                <fldname value="">
+                    <flddef value="">
+                        <item_1594179 value="FSENDOCN">
+                            <namefldgui value="FSENDOCN" />
+                            <fldnamebef value="FSENDOCN" />
+                            <srcgrid value="torc" />
+                            <fldnameaft value="FRECVATM" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="single" />
+                        </item_1594179>
+                        <item_1620245 value="FSENDATM">
+                            <namefldgui value="FSENDATM" />
+                            <fldnamebef value="FSENDATM" />
+                            <srcgrid value="lmdz" />
+                            <fldnameaft value="FRECVOCN" />
+                            <tgtgrid value="torc" />
+                            <fldmult value="single" />
+                        </item_1620245>
+                        <item_1650209 value="FSENDOC2">
+                            <namefldgui value="FSENDOC2" />
+                            <fldnamebef value="FSENDOC2" />
+                            <srcgrid value="torc" />
+                            <fldnameaft value="FRECVAT2" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="single" />
+                        </item_1650209>
+                        <item_2253601 value="INPUTAT1">
+                            <namefldgui value="INPUTGROUP" />
+                            <fldnamebef value="INPUTAT1" />
+                            <srcgrid value="lmdz" />
+                            <fldnameaft value="RECVAT1" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="INPUTGROUP" />
+                        </item_2253601>
+                        <item_2641752 value="INPUTAT2">
+                            <namefldgui value="INPUTGROUP" />
+                            <fldnamebef value="INPUTAT2" />
+                            <srcgrid value="lmdz" />
+                            <fldnameaft value="RECVAT2" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="INPUTGROUP" />
+                        </item_2641752>
+                        <item_2668314 value="INPUTAT3">
+                            <namefldgui value="INPUTGROUP" />
+                            <fldnamebef value="INPUTAT3" />
+                            <srcgrid value="lmdz" />
+                            <fldnameaft value="RECVAT3" />
+                            <tgtgrid value="lmdz" />
+                            <fldmult value="INPUTGROUP" />
+                        </item_2668314>
+                        <item_7338235 value="INPUTOCN">
+                            <namefldgui value="INPUTOCN" />
+                            <fldnamebef value="INPUTOCN" />
+                            <srcgrid value="torc" />
+                            <fldnameaft value="INPUTOC1" />
+                            <tgtgrid value="torc" />
+                            <fldmult value="single" />
+                        </item_7338235>
+                    </flddef>
+                    <field_names_list value="FSENDOCN;FSENDATM;FSENDOC2;INPUTGROUP;INPUTOCN" />
+                </fldname>
+            </fielddef>
+            <cplrststatus value="">
+                <fldproper value="" />
+                <cplrststatus value="">
+                    <crs value="">
+                        <item_1770013 value="FSENDOCN">
+                            <cpl value="7200" />
+                            <restart value="rsto.nc" />
+                            <status value="exported" />
+                        </item_1770013>
+                        <item_1770024 value="FSENDATM">
+                            <cpl value="3600" />
+                            <restart value="rsta.nc" />
+                            <status value="exported" />
+                        </item_1770024>
+                        <item_1888365 value="FSENDOC2">
+                            <cpl value="3600" />
+                            <restart value="av.nc" />
+                            <status value="output" />
+                        </item_1888365>
+                        <item_2608836 value="INPUTGROUP">
+                            <cpl value="7200" />
+                            <restart value="av2.nc" />
+                            <status value="input" />
+                        </item_2608836>
+                        <item_9265585 value="INPUTOCN">
+                            <cpl value="3600" />
+                            <restart value="av3.nc" />
+                            <status value="input" />
+                        </item_9265585>
+                    </crs>
+                </cplrststatus>
+            </cplrststatus>
+            <seqlag value="">
+                <defineseqlag value="" />
+                <defseqlag value="">
+                    <seqlag value="">
+                        <item_1510148 value="FSENDOCN">
+                            <lag value="lag_on">
+                                <lag_on value="">
+                                    <lag_fld value="3600" />
+                                </lag_on>
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_1510148>
+                        <item_1510159 value="FSENDATM">
+                            <lag value="lag_on">
+                                <lag_on value="">
+                                    <lag_fld value="3600" />
+                                </lag_on>
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_1510159>
+                        <item_1891028 value="FSENDOC2">
+                            <lag value="lag_off">
+                                <lag_off value="" />
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_1891028>
+                        <item_2611612 value="INPUTGROUP">
+                            <lag value="lag_off">
+                                <lag_off value="" />
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_2611612>
+                        <item_9268698 value="INPUTOCN">
+                            <lag value="lag_off">
+                                <lag_off value="" />
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_9268698>
+                    </seqlag>
+                </defseqlag>
+            </seqlag>
+            <timetransfo value="">
+                <timetransfo value="" />
+                <transftime value="">
+                    <time value="">
+                        <item_1530650 value="FSENDOCN">
+                            <loctrans value="loctrans_on">
+                                <loctrans_on value="">
+                                    <loctransdef value="average" />
+                                </loctrans_on>
+                            </loctrans>
+                        </item_1530650>
+                        <item_1530661 value="FSENDATM">
+                            <loctrans value="loctrans_on">
+                                <loctrans_on value="">
+                                    <loctransdef value="accumul" />
+                                </loctrans_on>
+                            </loctrans>
+                        </item_1530661>
+                        <item_1894996 value="FSENDOC2">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_1894996>
+                        <item_2615730 value="INPUTGROUP">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_2615730>
+                        <item_9273226 value="INPUTOCN">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_9273226>
+                    </time>
+                </transftime>
+            </timetransfo>
+            <checktransfo value="">
+                <cicotransfo value="" />
+                <transfcico value="">
+                    <checkinoutminmax value="">
+                        <item_1534445 value="FSENDOCN">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_1534445>
+                        <item_1534456 value="FSENDATM">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_1534456>
+                        <item_1897132 value="FSENDOC2">
+                            <checkin value="checkin_off">
+                                <checkin_off value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_1897132>
+                        <item_2617961 value="INPUTGROUP">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_off">
+                                <checkout_off value="" />
+                            </checkout>
+                        </item_2617961>
+                        <item_9275716 value="INPUTOCN">
+                            <checkin value="checkin_off">
+                                <checkin_off value="" />
+                            </checkin>
+                            <checkout value="checkout_off">
+                                <checkout_off value="" />
+                            </checkout>
+                        </item_9275716>
+                    </checkinoutminmax>
+                </transfcico>
+            </checktransfo>
+            <blastransfo value="">
+                <transfblas value="" />
+                <transfblon value="">
+                    <multaddoldnew value="">
+                        <item_1558897 value="FSENDOCN">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_1558897>
+                        <item_1558908 value="FSENDATM">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_1558908>
+                        <item_1900787 value="FSENDOC2">
+                            <blasold value="blasold_on">
+                                <blasold_on value="">
+                                    <xmult_blso value="1." />
+                                    <xadd_blso value="3" />
+                                </blasold_on>
+                            </blasold>
+                            <blasnew value="blasnew_on">
+                                <blasnew_on value="">
+                                    <xmult_blsn value="10" />
+                                    <xadd_blsn value="1." />
+                                </blasnew_on>
+                            </blasnew>
+                        </item_1900787>
+                        <item_2621766 value="INPUTGROUP">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_2621766>
+                        <item_9279929 value="INPUTOCN">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_9279929>
+                    </multaddoldnew>
+                </transfblon>
+            </blastransfo>
+            <interpolation value="">
+                <scriptransfo value="" />
+                <transfinterp value="">
+                    <interp value="">
+                        <item_1565614 value="FSENDOCN">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_1565614>
+                        <item_1565625 value="FSENDATM">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_1565625>
+                        <item_1904442 value="FSENDOC2">
+                            <scrip value="scrip_on">
+                                <scrip_on value="">
+                                    <scriprinterp value="bilinear">
+                                        <bilinear value="">
+                                            <cgrs_bili value="lr_bili" />
+                                            <rest_bili value="latlon_bili" />
+                                            <nbin_bili value="1" />
+                                        </bilinear>
+                                    </scriprinterp>
+                                </scrip_on>
+                            </scrip>
+                        </item_1904442>
+                        <item_2625571 value="INPUTGROUP">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_2625571>
+                        <item_9284132 value="INPUTOCN">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_9284132>
+                    </interp>
+                </transfinterp>
+            </interpolation>
+            <mapping value="">
+                <mappingtransfo value="" />
+                <transfmap value="">
+                    <map value="">
+                        <item_1587037 value="FSENDOCN">
+                            <mapremapping value="mapping_on">
+                                <mapping_on value="">
+                                    <filename value="map1.nc" />
+                                    <maploc value="src" />
+                                    <mapstrategy value="bfb" />
+                                </mapping_on>
+                            </mapremapping>
+                        </item_1587037>
+                        <item_1587048 value="FSENDATM">
+                            <mapremapping value="mapping_on">
+                                <mapping_on value="">
+                                    <filename value="map2.nc" />
+                                    <maploc value="src" />
+                                    <mapstrategy value="bfb" />
+                                </mapping_on>
+                            </mapremapping>
+                        </item_1587048>
+                        <item_1906578 value="FSENDOC2">
+                            <mapremapping value="mapping_off">
+                                <mapping_off value="" />
+                            </mapremapping>
+                        </item_1906578>
+                        <item_2627802 value="INPUTGROUP">
+                            <mapremapping value="mapping_on">
+                                <mapping_on value="">
+                                    <filename value="myf3.nc" />
+                                    <maploc value="src" />
+                                    <mapstrategy value="bfb" />
+                                </mapping_on>
+                            </mapremapping>
+                        </item_2627802>
+                        <item_9286622 value="INPUTOCN">
+                            <mapremapping value="mapping_off">
+                                <mapping_off value="" />
+                            </mapremapping>
+                        </item_9286622>
+                    </map>
+                </transfmap>
+            </mapping>
+            <conservtransof value="">
+                <conservtransfo value="" />
+                <transfconserv value="">
+                    <conservation value="">
+                        <item_1606394 value="FSENDOCN">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_1606394>
+                        <item_1606405 value="FSENDATM">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_1606405>
+                        <item_1908714 value="FSENDOC2">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_1908714>
+                        <item_2630033 value="INPUTGROUP">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_2630033>
+                        <item_9289118 value="INPUTOCN">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_9289118>
+                    </conservation>
+                </transfconserv>
+            </conservtransof>
+            <summary value="">
+                <scriptsummary value="">
+                    <summaryscript value="******************************************************************BREAKLINE*** Summary of the coupling fields and their transformations: BREAKLINE******************************************************************BREAKLINE******************************************************************BREAKLINEFSENDOCN-FRECVATM:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : lmdzBREAKLINEDimensions : 96x72BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: rsto.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:AVERAGEBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDATM-FRECVOCN:BREAKLINESource grid : lmdzBREAKLINEDimensions : 96x72BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: rsta.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=3600BREAKLINETime transformation:ACCUMULBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINEMAPPING is used with options: src and bfbBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEFSENDOC2-FSENDOC2:BREAKLINESource grid : torcBREAKLINEDimensions : 182x149BREAKLINETarget grid : torcBREAKLINEDimensions : 182x149BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av.ncBREAKLINEField status: OUTPUTBREAKLINEBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3-INPUTAT1:INPUTAT2:INPUTAT3BREAKLINESource grid periodical with  0 overlapping pointsBREAKLINETarget grid periodical with  0 overlapping points BREAKLINECoupling period=7200BREAKLINERestart file: av2.ncBREAKLINEField status: INPUTBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEINPUTOCN-INPUTOCN:BREAKLINESource grid periodical with  2 overlapping pointsBREAKLINETarget grid periodical with  2 overlapping points BREAKLINECoupling period=3600BREAKLINERestart file: av3.ncBREAKLINEField status: INPUTBREAKLINE********************************************************BREAKLINE********************************************************" />
+                </scriptsummary>
+            </summary>
+            <write value="">
+                <scriptnamcouple value="">
+                    <namcouplescript value="$NFIELDS BREAKLINE7BREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE21600BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE1 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEFSENDOCN FRECVATM 1 7200 4 rsto.nc EXPORTEDBREAKLINE182 149 96 72 torc lmdz LAG=3600BREAKLINEP 2 P 0 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEAVERAGE BREAKLINEINT=1BREAKLINEmap1.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDATM FRECVOCN 1 3600 4 rsta.nc EXPORTEDBREAKLINE96 72 182 149 lmdz torc LAG=3600BREAKLINEP 0 P 2 BREAKLINELOCTRANS CHECKIN MAPPING CHECKOUT BREAKLINEACCUMUL BREAKLINEINT=1BREAKLINEmap2.nc src bfb BREAKLINEINT=1BREAKLINE####BREAKLINEFSENDOC2 FSENDOC2 1 3600 0 av.nc OUTPUTBREAKLINEtorc torcBREAKLINE####BREAKLINEINPUTAT1:INPUTAT2:INPUTAT3 RECVAT1:RECVAT2:RECVAT3 1 7200 0 av2.nc INPUTBREAKLINE####BREAKLINEINPUTOCN INPUTOCN 1 3600 0 av3.nc INPUTBREAKLINE####BREAKLINE $END" />
+                </scriptnamcouple>
+            </write>
+        </oasis3-mct>
+        <meta>
+            <solver>
+                <name value="oasis3-mct" />
+            </solver>
+            <project>
+                <name value="test2" />
+                <address value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/examples_xml_namcouple/test2.xml" />
+                <username value="myName" />
+                <company value="myCompany" />
+            </project>
+            <action>
+                <callingAddress value="root.oasis3-mct.write" />
+            </action>
+            <temporary />
+            <scriptSuccess value="1" />
+            <engine>
+                <name value="OpenTEA" />
+                <launchCommand value="/usr/bin/wish /space/coquart/oasis3-mct_buildbot/util/oasisgui/opentea/opentea.tcl  -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -library /space/coquart/oasis3-mct_buildbot/util/oasisgui/library -config /space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml -plugins /space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <pluginsPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library/DATA/pluginscripts" />
+                <libraryPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/library" />
+                <configPath value="/space/coquart/oasis3-mct_buildbot/util/oasisgui/myconfig.xml" />
+            </engine>
+        </meta>
+    </dataset>

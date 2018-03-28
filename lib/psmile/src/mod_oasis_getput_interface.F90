@@ -1,3 +1,6 @@
+
+!> OASIS send/receive (put/get) user interfaces
+
 MODULE mod_oasis_getput_interface
 !---------------------------------------------------------------------
 
@@ -19,6 +22,7 @@ MODULE mod_oasis_getput_interface
 
     integer(kind=ip_i4_p)     istatus(MPI_STATUS_SIZE)
 
+!> Generic overloaded interface for data put (send)
   interface oasis_put
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_put_r14
@@ -28,6 +32,7 @@ MODULE mod_oasis_getput_interface
      module procedure oasis_put_r28
   end interface
 
+!> Generic overloaded interface for data get (receive)
   interface oasis_get
 #ifndef __NO_4BYTE_REALS
      module procedure oasis_get_r14
@@ -40,34 +45,54 @@ MODULE mod_oasis_getput_interface
 !---------------------------------------------------------------------
 contains
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
+
+!> Send 4 byte real 1D data
+
   SUBROUTINE oasis_put_r14(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p) :: fld1(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), optional :: fld2(:)
-    real(kind=ip_single_p), optional :: fld3(:)
-    real(kind=ip_single_p), optional :: fld4(:)
-    real(kind=ip_single_p), optional :: fld5(:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p)             :: fld1(:)     !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_single_p), optional :: fld2(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld3(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld4(:)       !< higher order field data
+    real(kind=ip_single_p), optional :: fld5(:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r14'
+    character(len=*),parameter :: subname = '(oasis_put_r14)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -92,10 +117,9 @@ contains
        a2on = .true.
        nsx = size(fld2,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -103,10 +127,9 @@ contains
        a3on = .true.
        nsx = size(fld3,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -114,10 +137,9 @@ contains
        a4on = .true.
        nsx = size(fld4,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR array4 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -125,10 +147,9 @@ contains
        a5on = .true.
        nsx = size(fld5,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld1 ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld1 ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -166,37 +187,57 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_put_r14
+#endif
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+
+!> Send 8 byte real 1D data
+
   SUBROUTINE oasis_put_r18(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p)             :: fld1(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), optional :: fld2(:)
-    real(kind=ip_double_p), optional :: fld3(:)
-    real(kind=ip_double_p), optional :: fld4(:)
-    real(kind=ip_double_p), optional :: fld5(:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p)             :: fld1(:)     !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_double_p), optional :: fld2(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld3(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld4(:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld5(:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nsx
     integer(kind=ip_i4_p) :: n
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r18'
+    character(len=*),parameter :: subname = '(oasis_put_r18)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -221,10 +262,9 @@ contains
        a2on = .true.
        nsx = size(fld2,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -232,10 +272,9 @@ contains
        a3on = .true.
        nsx = size(fld3,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -243,10 +282,9 @@ contains
        a4on = .true.
        nsx = size(fld4,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -254,10 +292,9 @@ contains
        a5on = .true.
        nsx = size(fld5,dim=1)
        if (nsx /= ns) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -297,34 +334,54 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
+
+!> Send 4 byte real 2D data
+
   SUBROUTINE oasis_put_r24(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p) :: fld1(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_single_p), optional :: fld2(:,:)
-    real(kind=ip_single_p), optional :: fld3(:,:)
-    real(kind=ip_single_p), optional :: fld4(:,:)
-    real(kind=ip_single_p), optional :: fld5(:,:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p) :: fld1(:,:)               !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_single_p), optional :: fld2(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld3(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld4(:,:)     !< higher order field data
+    real(kind=ip_single_p), optional :: fld5(:,:)     !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r24'
+    character(len=*),parameter :: subname = '(oasis_put_r24)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -352,10 +409,9 @@ contains
        nisx = size(fld2,dim=1)
        njsx = size(fld2,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -364,10 +420,9 @@ contains
        nisx = size(fld3,dim=1)
        njsx = size(fld3,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -376,10 +431,9 @@ contains
        nisx = size(fld4,dim=1)
        njsx = size(fld4,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -388,10 +442,9 @@ contains
        nisx = size(fld5,dim=1)
        njsx = size(fld5,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -429,37 +482,57 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_put_r24
+#endif
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+
+!> Send 8 byte real 2D data
+
   SUBROUTINE oasis_put_r28(id_port_id,kstep,fld1,kinfo, &
     fld2, fld3, fld4, fld5)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p) :: fld1(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
-    real(kind=ip_double_p), optional :: fld2(:,:)
-    real(kind=ip_double_p), optional :: fld3(:,:)
-    real(kind=ip_double_p), optional :: fld4(:,:)
-    real(kind=ip_double_p), optional :: fld5(:,:)
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p) :: fld1(:,:)               !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
+    real(kind=ip_double_p), optional :: fld2(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld3(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld4(:,:)       !< higher order field data
+    real(kind=ip_double_p), optional :: fld5(:,:)       !< higher order field data
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs,nisx,njsx
     integer(kind=ip_i4_p) :: n,ni,nj
     logical :: a2on, a3on, a4on, a5on
-    character(len=*),parameter :: subname = 'oasis_put_r28'
+    character(len=*),parameter :: subname = '(oasis_put_r28)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_put is called for a variable not in namcouple: it will not be sent'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not in namcouple'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_put is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -487,10 +560,9 @@ contains
        nisx = size(fld2,dim=1)
        njsx = size(fld2,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld2 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld2 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -499,10 +571,9 @@ contains
        nisx = size(fld3,dim=1)
        njsx = size(fld3,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld3 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld3 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -511,10 +582,9 @@ contains
        nisx = size(fld4,dim=1)
        njsx = size(fld4,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld4 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld4 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -523,10 +593,9 @@ contains
        nisx = size(fld5,dim=1)
        njsx = size(fld5,dim=2)
        if (nisx /= nis .or. njsx /= njs) then
-          write(nulprt,*) subname,' ERROR fld5 size does not match fld ', &
+          write(nulprt,*) subname,estr,'fld5 size does not match fld ', &
                           trim(prism_var(nfld)%name)
-          CALL oasis_flush(nulprt)
-          CALL oasis_abort_noarg()
+          CALL oasis_abort()
        endif
     endif
 
@@ -567,30 +636,50 @@ contains
 
 !-------------------------------------------------------------------
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS 
+
+!> Receive 4 byte real 1D data
+
   SUBROUTINE oasis_get_r14(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: rd_field(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p), intent(inout) :: rd_field(:) !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
     real(kind=ip_r8_p), allocatable :: array(:)
-    character(len=*),parameter :: subname = 'oasis_get_r14'
+    character(len=*),parameter :: subname = '(oasis_get_r14)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -618,31 +707,51 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r14
+#endif
 
 !---------------------------------------------------------------------
+
+!> Receive 8 byte real 1D data
+
   SUBROUTINE oasis_get_r18(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: rd_field(:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p), intent(inout) :: rd_field(:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
-    character(len=*),parameter :: subname = 'oasis_get_r18'
+    character(len=*),parameter :: subname = '(oasis_get_r18)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -663,30 +772,50 @@ contains
   END SUBROUTINE oasis_get_r18
 
 !---------------------------------------------------------------------
+#ifndef __NO_4BYTE_REALS
+
+!> Receive 4 byte real 2D data
+
   SUBROUTINE oasis_get_r24(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_single_p), intent(inout) :: rd_field(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_single_p), intent(inout) :: rd_field(:,:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
     REAL(kind=ip_r8_p), ALLOCATABLE :: array(:,:)
-    character(len=*),parameter :: subname = 'oasis_get_r24'
+    character(len=*),parameter :: subname = '(oasis_get_r24)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
-       if (OASIS_debug >= 1) write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 
@@ -716,34 +845,51 @@ contains
     call oasis_debug_exit(subname)
 
   END SUBROUTINE oasis_get_r24
+#endif
 
 !---------------------------------------------------------------------
+
+!> Receive 8 byte real 2D data
+
   SUBROUTINE oasis_get_r28(id_port_id,kstep,rd_field,kinfo)
 
     IMPLICIT none
     !-------------------------------------
-    integer(kind=ip_i4_p) , intent(in) :: id_port_id,kstep
-    real(kind=ip_double_p), intent(inout) :: rd_field(:,:)
-    integer(kind=ip_i4_p) , intent(out), optional :: kinfo
+    integer(kind=ip_i4_p) , intent(in) :: id_port_id  !< variable id
+    integer(kind=ip_i4_p) , intent(in) :: kstep       !< model time in seconds
+    real(kind=ip_double_p), intent(inout) :: rd_field(:,:)  !< field data
+    integer(kind=ip_i4_p) , intent(out), optional :: kinfo  !< return code
     !-------------------------------------
     integer(kind=ip_i4_p) :: nfld,ncpl
     integer(kind=ip_i4_p) :: ns,nis,njs
     integer(kind=ip_i4_p) :: n,ni,nj
-    character(len=*),parameter :: subname = 'oasis_get_r28'
+    character(len=*),parameter :: subname = '(oasis_get_r28)'
     !-------------------------------------
 
     call oasis_debug_enter(subname)
-
     kinfo = OASIS_OK
+    if (.not. oasis_coupled) then
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (.not. enddef_called) then
+       write(nulprt,*) subname,estr,'called before oasis_enddef'
+       call oasis_abort()
+    endif
 
     if (id_port_id == OASIS_Var_Uncpl) then
-       if (OASIS_debug >= 1) then
-         write(nulprt,*) subname, &
-          ' Routine oasis_get is called for variable not in namcouple; it will not be received'
-         write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
-         flush(nulprt)
-       endif
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not in namcouple'
+       write(nulprt,*) subname,' BE CAREFUL NOT TO USE IT !!!!!'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
+       return
+    endif
+
+    if (id_port_id < 1 .or. id_port_id > prism_nvar) then
+       write(nulprt,*) subname,estr,'oasis_get is called for a variable not defined'
+       call oasis_abort()
+       call oasis_debug_exit(subname)
        return
     endif
 

@@ -1,0 +1,18 @@
+<model name="cerfacs_corail_ssh" title="Cerfacs, code execution on CORAIL" >
+    <param name="login" title="Login" type="ascii" default="mylogin"/>
+    <param name="directory" title="Distant directory" type="ascii" default="/lustre/cfd/mylogin" />
+    <param name="nbprocs" title="Procs number" type="integer" default="24"/>
+    <param name="jobname" title="Job name" type="string_strmax10" default="C3Sm_job" />
+     <desc>
+        This plugin is for Cerfacs only
+        It allows to execute a code on CORAIL from an external computer, or from the Cerfacs NFS system.
+        []
+        On a production run, you can request a maximum of 192 processes (8 nodes , 24 procs each)
+        []
+        Check that you can log on the distant machine without password!!!
+        []
+        [logo=plugin_ssh;caption=execution through ssh ]
+        []
+        [logo=cerfacs;caption=Cerfacs only]
+    </desc>
+</model>

@@ -66,12 +66,6 @@ contains
 
   call MP_initialized(initialized,ier)
 
-#if defined(__INTEL_COMPILER)
-      call TRACEBACKQQ()
-#elif defined(__GFORTRAN__)
-      call BACKTRACE()
-#endif
-
   if (initialized) then
 
 	!-------------------------------------------------
@@ -84,7 +78,6 @@ contains
 
     write(stderr,'(z3.3,5a)') myrank,'.',myname_,	&
       ': from ',trim(where),'()'
-    flush(stderr)
 
 	! raise a condition to the OS
 
@@ -98,7 +91,6 @@ contains
 
     write(stderr,'(5a)') 'unknown rank .',myname_,	&
       ': from ',trim(where),'()'
-    flush(stderr)
 
     call abort
 
@@ -146,12 +138,6 @@ end subroutine die_
 
   logical :: initialized
 
-#if defined(__INTEL_COMPILER)
-      call TRACEBACKQQ()
-#elif defined(__GFORTRAN__)
-      call BACKTRACE()
-#endif
-
   write(lineno,'(i16)') line
 
   call MP_initialized(initialized,ier)
@@ -169,7 +155,6 @@ end subroutine die_
       ': from ',trim(where),'()',	&
       ', line ',trim(adjustl(lineno)),	&
       ' of file ',fnam
-      flush(stderr)
 
 	! raise a condition to the OS
 
@@ -186,7 +171,6 @@ end subroutine die_
       ': from ',trim(where),'()',	&
       ', line ',trim(adjustl(lineno)),	&
       ' of file ',fnam
-      flush(stderr)
 
     call abort
   endif

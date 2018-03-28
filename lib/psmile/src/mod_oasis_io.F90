@@ -1,3 +1,6 @@
+
+!> Provides reusable IO routines for OASIS
+
 MODULE mod_oasis_io
 
    USE mod_oasis_kinds
@@ -32,27 +35,26 @@ CONTAINS
 
 !===============================================================================
 
-subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
+!> Reads single field from a file into an attribute Vector
 
-   ! ---------------------------------------
-   ! Reads single field from file to av
-   ! ---------------------------------------
+subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
 
    implicit none
 
-   character(len=*), intent(in) :: filename   ! filename
-   type(mct_aVect) , intent(inout) :: av      ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   character(len=*), intent(in) :: avfld      ! av field name
-   character(len=*), intent(in) :: filefld    ! file field name
-   character(len=*), intent(in),optional :: fldtype       ! int or real
+   character(len=*), intent(in) :: filename   !< filename
+   type(mct_aVect) , intent(inout) :: av      !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   character(len=*), intent(in) :: avfld      !< av field name
+   character(len=*), intent(in) :: filefld    !< file field name
+   character(len=*), intent(in),optional :: fldtype       !< kind
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
    integer(ip_i4_p)    :: nx          ! 2d global size nx
    integer(ip_i4_p)    :: ny          ! 2d global size ny
    type(mct_aVect)     :: av_g        ! avect global data
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid ! netcdf info
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
@@ -61,11 +63,13 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
    integer(ip_i4_p) ,allocatable :: array2i(:,:)
    integer(ip_i4_p)    :: ifldtype     ! field type int (1) or real (2)
 
-   character(len=*),parameter :: subname = 'oasis_io_read_avfld'
+   character(len=*),parameter :: subname = '(oasis_io_read_avfld)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   IF (mpicom == MPI_COMM_NULL) return
 
    ! empty filename, just return
 
@@ -75,9 +79,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       return
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    ifldtype = 2   ! real default
    if (present(fldtype)) then
@@ -85,10 +88,8 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
       if (trim(fldtype) == 'int')  ifldtype = 1
       if (trim(fldtype) == 'real') ifldtype = 2
       if (ifldtype == 0) then
-          WRITE(nulprt,*) subname,' ERROR in fldtype argument'
-          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-          CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+          WRITE(nulprt,*) subname,estr,'in fldtype argument'
+          call oasis_abort()
       endif
    endif
 
@@ -102,28 +103,22 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
-         write(nulprt,*) subname,' ERROR: file missing ',trim(filename)
-         WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         write(nulprt,*) subname,estr,'file missing ',trim(filename)
+         call oasis_abort()
       endif
 
       status = nf90_inq_varid(ncid,trim(filefld),varid)
       if (status /= nf90_noerr) then
          write(nulprt,*) subname,':',trim(nf90_strerror(status))
-         WRITE(nulprt,*) subname,' ERROR: filefld variable not found '//trim(filefld)
-         WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         WRITE(nulprt,*) subname,estr,'filefld variable not found '//trim(filefld)
+         call oasis_abort()
       endif
       status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid2)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
       if (dlen /= 2) then
-         write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(filefld),dlen
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         write(nulprt,*) subname,estr,'variable ndims ne 2 ',trim(filefld),dlen
+         call oasis_abort()
       endif
       status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -133,10 +128,9 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,avfld,filefld,fldtype)
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
 
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                       TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
+         call oasis_abort()
       endif
 
       if (ifldtype == 1) then
@@ -190,20 +184,19 @@ end subroutine oasis_io_read_avfld
 
 !===============================================================================
 
-subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
+!> Writes all fields from an attribute vector to a file
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   type(mct_aVect) , intent(in) :: av         ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
-   character(len=*), intent(in),optional :: nampre  ! name prepend string
+   character(len=*), intent(in) :: rstfile    !< filename
+   type(mct_aVect) , intent(in) :: av         !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
+   character(len=*), intent(in),optional :: nampre  !< field name prepend string on file
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -213,18 +206,20 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
    character(ic_med)   :: itemc       ! string converted to char
    character(ic_med)   :: lnampre     ! local nampre
    character(ic_med)   :: lstring     ! local filename
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid ! netcdf info
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
    real(ip_double_p),allocatable :: array2(:,:)
 
-   character(len=*),parameter :: subname = 'oasis_io_write_avfile'
+   character(len=*),parameter :: subname = '(oasis_io_write_avfile)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   IF (mpicom == MPI_COMM_NULL) return
 
    call oasis_debug_enter(subname)
 
@@ -240,19 +235,16 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
       lnampre = trim(nampre)
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
 
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',&
-                         size(av_g%rAttr,dim=2),nx,ny
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         write(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                         TRIM(lstring),SIZE(av_g%rAttr,dim=2),nx,ny
+         call oasis_abort()
       endif
 
       inquire(file=trim(rstfile),exist=exists)
@@ -287,20 +279,18 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= nx) then
-            write(nulprt,*) subname,' ERROR: dlen ne nx ',dlen,nx
+            write(nulprt,*) subname,wstr,'dlen ne nx ',dlen,nx
             CALL oasis_flush(nulprt)
-!            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-!            call oasis_abort_noarg()
+!            call oasis_abort()
          endif
 
          status = nf90_inquire_dimension(ncid,dimid2(2),len=dlen)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ny) then
-            write(nulprt,*) subname,' ERROR: dlen ne ny ',dlen,ny
+            write(nulprt,*) subname,wstr,'dlen ne ny ',dlen,ny
             CALL oasis_flush(nulprt)
-!            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-!            call oasis_abort_noarg()
+!            call oasis_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -337,11 +327,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,nx,ny,nampre)
             IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                       mpi_rank_local,':',TRIM(nf90_strerror(status))
             if (dlen /= 2 .or. nx*ny /= nxf*nyf) then
-               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               WRITE(nulprt,*) subname,' abort ERROR: ndims and size does not match on file'
-               WRITE(nulprt,*) subname,' ndims: ',dlen, ' sizes: ', nx*ny, ',', nxf*nyf, ' file: ', trim(rstfile)
-               CALL oasis_flush(nulprt)
-               call oasis_abort_noarg()
+               WRITE(nulprt,*) subname,estr,'ndims and size does not match on file'
+               call oasis_abort()
             endif
             allocate(array2(nxf,nyf))
          endif
@@ -373,20 +360,19 @@ end subroutine oasis_io_write_avfile
 
 !===============================================================================
 
-subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
+!> Reads all fields for an attribute vector from a file
 
-   ! ---------------------------------------
-   ! Reads all fields for av from file
-   ! ---------------------------------------
+subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   type(mct_aVect) , intent(inout) :: av      ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   logical         , intent(in) ,optional :: abort   ! abort on fail flag
-   character(len=*), intent(in) ,optional :: nampre  ! name prepend string
-   logical         , intent(out),optional :: didread ! was something read
+   character(len=*), intent(in) :: rstfile    !< filename
+   type(mct_aVect) , intent(inout) :: av      !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   logical         , intent(in) ,optional :: abort   !< abort on error flag, default is true
+   character(len=*), intent(in) ,optional :: nampre  !< name prepend string for fields on file
+   logical         , intent(out),optional :: didread !< flag indicating that read was successful
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -397,7 +383,7 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
    character(ic_med)   :: itemc       ! string converted to char
    character(ic_med)   :: lnampre     ! local nampre
    character(ic_med)   :: lstring     ! local filename
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid ! netcdf info
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
@@ -405,13 +391,14 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
    logical             :: labort      ! local abort flag
    real(ip_double_p),allocatable :: array2(:,:)
 
-   character(len=*),parameter :: subname = 'oasis_io_read_avfile'
+   character(len=*),parameter :: subname = '(oasis_io_read_avfile)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   IF (mpi_comm_local /= MPI_COMM_NULL) THEN
+   IF (mpicom == MPI_COMM_NULL) return
+
    call oasis_debug_enter(subname)
 
    if (present(didread)) didread = .false.
@@ -433,9 +420,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
       lnampre = trim(nampre)
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
 
@@ -443,13 +429,12 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
 
       inquire(file=trim(rstfile),exist=exists)
       if (.not.exists) then
-         write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
-         WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
          IF (labort) THEN
-             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'file missing ',trim(rstfile)
+            CALL oasis_abort()
+         ELSE
+            write(nulprt,*) subname,wstr,'file missing ',trim(rstfile)
+            CALL oasis_flush(nulprt)
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
@@ -465,14 +450,12 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
             status = nf90_inq_varid(ncid,trim(itemc),varid)
 
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(itemc),':',trim(nf90_strerror(status))
-               WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
                IF (labort) THEN
-                   WRITE(nulprt,*) subname,'ERROR: var missing'
-                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                   CALL oasis_flush(nulprt)
-                   CALL oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
+                  CALL oasis_abort()
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(itemc),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
 
             else
@@ -480,10 +463,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 2) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 2 ',trim(itemc),dlen
-                  WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'variable ndims ne 2 on file ',trim(itemc),dlen
+                  call oasis_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid2(1),len=nx)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
@@ -493,10 +474,9 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (size(av_g%rAttr,dim=2) /= nx*ny) then
-                  write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-                  WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file = ',&
+                                               TRIM(rstfile),SIZE(av_g%rAttr,dim=2),nx,ny
+                  call oasis_abort()
                endif
 
                allocate(array2(nx,ny))
@@ -531,43 +511,42 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,abort,nampre,didread)
    endif
 
    call oasis_debug_exit(subname)
-   ENDIF
 
 end subroutine oasis_io_read_avfile
 
 !===============================================================================
 
-subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
+!> Reads an integer or real field from a file into an array
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,abort)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   integer(ip_i4_p), intent(inout),optional :: iarray(:) ! data on root
-   character(len=*), intent(in),optional :: ivarname     ! variable name on file
-   real(ip_double_p),intent(inout),optional :: rarray(:) ! data on root
-   character(len=*), intent(in),optional :: rvarname     ! variable name on file
-   logical         , intent(in),optional :: abort        ! abort flag
+   character(len=*), intent(in) :: rstfile    !< filename
+   integer(ip_i4_p), intent(in) :: mpicom     !<  mpicom
+   integer(ip_i4_p), intent(inout),optional :: iarray(:) !< integer data on root
+   character(len=*), intent(in),optional :: ivarname     !< integer variable name on file
+   real(ip_double_p),intent(inout),optional :: rarray(:) !< real data on root
+   character(len=*), intent(in),optional :: rvarname     !< real variable name on file
+   logical         , intent(in),optional :: abort        !< abort on error flag, default is true
 
    !--- local ---
    integer(ip_i4_p)    :: ncnt
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid1(1),varid ! netcdf info
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
    logical             :: labort      ! local abort flag
 
-   character(len=*),parameter :: subname = 'oasis_io_read_array'
+   character(len=*),parameter :: subname = '(oasis_io_read_array)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   IF (mpi_comm_local /= MPI_COMM_NULL) THEN
+   if (mpicom == MPI_COMM_NULL) return
+
    call oasis_debug_enter(subname)
 
    ! empty filename, just return
@@ -582,21 +561,19 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
       labort = abort
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    if (iam == master_task) then
 
       inquire(file=trim(rstfile),exist=exists)
       if (.not.exists) then
-         write(nulprt,*) subname,' ERROR: file missing ',trim(rstfile)
-         WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
          IF (labort) THEN
-             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             CALL oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'file missing ',trim(rstfile)
+            CALL oasis_abort()
+         ELSE
+            write(nulprt,*) subname,wstr,'file missing ',trim(rstfile)
+            CALL oasis_flush(nulprt)
          ENDIF
       else
          status = nf90_open(trim(rstfile),NF90_NOWRITE,ncid)
@@ -605,44 +582,36 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
 
          if (present(iarray)) then
             if (.not. present(ivarname)) then
-               write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
-               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
-               call oasis_abort_noarg()
+               write(nulprt,*) subname,estr,'iarray must have ivarname set'
+               call oasis_abort()
             endif
 
             ncnt = size(iarray)
 
             status = nf90_inq_varid(ncid,trim(ivarname),varid)
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(ivarname),':',trim(nf90_strerror(status))
-               WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
                IF (labort) THEN
-                   WRITE(nulprt,*) subname,'ERROR: var missing'
-                   WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                   CALL oasis_flush(nulprt)
-                   CALL oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
+                  CALL oasis_abort()
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(ivarname),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(ivarname),dlen
-                  WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'variable ndims ne 1 ',trim(ivarname),dlen
+                  call oasis_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (ncnt /= dlen) then
-                  write(nulprt,*) subname,' ERROR: iarray ncnt dlen mismatch ',ncnt,dlen
-                  WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'iarray ncnt dlen mismatch ',ncnt,dlen
+                  call oasis_abort()
                endif
 
                status = nf90_get_var(ncid,varid,iarray)
@@ -653,44 +622,36 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
 
          if (present(rarray)) then
             if (.not. present(rvarname)) then
-               write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
-               WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
-               call oasis_abort_noarg()
+               write(nulprt,*) subname,estr,'rarray must have rvarname set'
+               call oasis_abort()
             endif
 
             ncnt = size(rarray)
 
             status = nf90_inq_varid(ncid,trim(rvarname),varid)
             if (status /= nf90_noerr) then
-               write(nulprt,*) subname,':',trim(rvarname),':',trim(nf90_strerror(status))
-               WRITE(nulprt,*) subname,' model :',compid,' proc :',mpi_rank_local
-               CALL oasis_flush(nulprt)
                IF (labort) THEN
-                   WRITE(nulprt,*) subname,'ERROR: var missing'
-                   WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-                   CALL oasis_flush(nulprt)
-                   CALL oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
+                  CALL oasis_abort()
+!               ELSE
+!                  write(nulprt,*) subname,wstr,'var missing on file = ',trim(rvarname),':',trim(nf90_strerror(status))
+!                  CALL oasis_flush(nulprt)
                ENDIF
             else
                status = nf90_inquire_variable(ncid,varid,ndims=dlen,dimids=dimid1)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
                if (dlen /= 1) then
-                  write(nulprt,*) subname,' ERROR: variable ndims ne 1 ',trim(rvarname),dlen
-                  WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'variable ndims ne 1 ',trim(rvarname),dlen
+                  call oasis_abort()
                endif
                status = nf90_inquire_dimension(ncid,dimid1(1),len=dlen)
                IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                          mpi_rank_local,':',TRIM(nf90_strerror(status))
 
                if (ncnt /= dlen) then
-                  write(nulprt,*) subname,' ERROR: rarray ncnt dlen mismatch ',ncnt,dlen
-                  WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-                  CALL oasis_flush(nulprt)
-                  call oasis_abort_noarg()
+                  write(nulprt,*) subname,estr,'rarray ncnt dlen mismatch ',ncnt,dlen
+                  call oasis_abort()
                endif
 
                status = nf90_get_var(ncid,varid,rarray)
@@ -715,39 +676,39 @@ subroutine oasis_io_read_array(rstfile,iarray,ivarname,rarray,rvarname,abort)
    endif
 
    call oasis_debug_exit(subname)
-   ENDIF
 
 end subroutine oasis_io_read_array
 
 !===============================================================================
 
-subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
+!> Writes a real or integer array to a file
 
-   ! ---------------------------------------
-   ! Writes all fields from av to file
-   ! ---------------------------------------
+subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
 
    implicit none
 
-   character(len=*), intent(in) :: rstfile    ! restart filename
-   integer(ip_i4_p), intent(in),optional :: iarray(:)   ! data on root
-   character(len=*), intent(in),optional :: ivarname    ! variable name on file
-   real(ip_double_p),intent(in),optional :: rarray(:)   ! data on root
-   character(len=*), intent(in),optional :: rvarname    ! variable name on file
+   character(len=*), intent(in) :: rstfile    !< filename
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   integer(ip_i4_p), intent(in),optional :: iarray(:)   !< integer data on root
+   character(len=*), intent(in),optional :: ivarname    !< integer  variable name on file
+   real(ip_double_p),intent(in),optional :: rarray(:)   !< real data on root
+   character(len=*), intent(in),optional :: rvarname    !< real variable name on file
 
    !--- local ---
    integer(ip_i4_p)    :: ncnt
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid1(1),varid ! netcdf info
    integer(ip_i4_p)    :: dlen        ! dimension length
    integer(ip_i4_p)    :: status      ! error code
    logical             :: exists      ! file existance
 
-   character(len=*),parameter :: subname = 'oasis_io_write_array'
+   character(len=*),parameter :: subname = '(oasis_io_write_array)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   IF (mpicom == MPI_COMM_NULL) return
 
    call oasis_debug_enter(subname)
 
@@ -758,9 +719,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
       return
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    if (iam == master_task) then
 
@@ -778,10 +738,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
 
       if (present(iarray)) then
          if (.not. present(ivarname)) then
-            write(nulprt,*) subname,' ERROR: iarray must have ivarname set'
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'iarray must have ivarname set'
+            call oasis_abort()
          endif
 
          ncnt = size(iarray)
@@ -795,10 +753,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
-            write(nulprt,*) subname,' ERROR: iarray dlen ne ncnt ',dlen,ncnt
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'iarray dlen ne ncnt ',dlen,ncnt
+            call oasis_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(ivarname),varid)
@@ -811,10 +767,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
 
       if (present(rarray)) then
          if (.not. present(rvarname)) then
-            write(nulprt,*) subname,' ERROR: rarray must have rvarname set'
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'rarray must have rvarname set'
+            call oasis_abort()
          endif
 
          ncnt = size(rarray)
@@ -828,10 +782,8 @@ subroutine oasis_io_write_array(rstfile,iarray,ivarname,rarray,rvarname)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
          if (dlen /= ncnt) then
-            write(nulprt,*) subname,' ERROR: rarray dlen ne ncnt ',dlen,ncnt
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'rarray dlen ne ncnt ',dlen,ncnt
+            call oasis_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(rvarname),varid)
@@ -876,23 +828,25 @@ end subroutine oasis_io_write_array
 
 !===============================================================================
 
-subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
+!> Write each field in an attribute vector to an individual files
+
+subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
 
    ! ---------------------------------------
-   ! Write all fields from av to individual field files
    ! This works only for a single av to a file
    ! Optionally can specify time info, and filename info
    ! ---------------------------------------
 
    implicit none
 
-   type(mct_aVect) , intent(in) :: av         ! avect
-   type(mct_gsmap) , intent(in) :: gsmap      ! gsmap
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
-   integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
-   character(len=*), intent(in),optional :: filename   ! optional output filename
+   type(mct_aVect) , intent(in) :: av         !< avect
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
+   integer(ip_i4_p), intent(in),optional :: msec      !< optional time info in seconds
+   character(len=*), intent(in),optional :: f_string  !< optional f_string to append to filename
+   character(len=*), intent(in),optional :: filename  !< optional output filename
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -901,7 +855,7 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
    character(ic_med)   :: itemc       ! f_string converted to char
    character(ic_med)   :: lfn         ! local filename
    character(ic_med)   :: lstring     ! local filename
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid3(3),varid ! netcdf info
    integer(ip_i4_p)    :: start3(3),count3(3)        ! netcdf info
    integer(ip_i4_p)    :: start1(1),count1(1)        ! netcdf info
@@ -913,11 +867,13 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
    real(ip_double_p),allocatable :: array3(:,:,:)
    real(ip_double_p)   :: tbnds(2)
 
-   character(len=*),parameter :: subname = 'oasis_io_write_avfbf'
+   character(len=*),parameter :: subname = '(oasis_io_write_avfbf)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   IF (mpicom == MPI_COMM_NULL) return
 
    call oasis_debug_enter(subname)
 
@@ -931,9 +887,8 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
       lstring = trim(f_string)
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
 #if (PIO_DEFINED)
 ! tcraig, not working as of Oct 2011
@@ -947,9 +902,8 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
          whead = .false.
          wdata = .true.
       else
-          WRITE(nulprt,*) subname,'ERROR: fk illegal'
-          WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         call oasis_abort_noarg()
+         WRITE(nulprt,*) subname,estr,'fk illegal'
+         call oasis_abort()
       end if
 
       call oasis_ioshr_write(lfn,&
@@ -969,10 +923,9 @@ subroutine oasis_io_write_avfbf(av,gsmap,nx,ny,msec,f_string,filename)
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
    if (iam == master_task) then
       if (size(av_g%rAttr,dim=2) /= nx*ny) then
-         write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                      TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
+         call oasis_abort()
       endif
 
       allocate(array3(nx,ny,1))
@@ -1067,21 +1020,23 @@ end subroutine oasis_io_write_avfbf
 
 !===============================================================================
 
-subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
+!> Read each field in an attribute vector from individual files
+
+subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
 
    ! ---------------------------------------
-   ! Read all fields to av from individual field files
    ! This works only for a single av from a file
    ! Optionally can specify time info, and filename info
    ! ---------------------------------------
 
    implicit none
 
-   type(mct_aVect) , intent(inout) :: av     ! avect
-   type(mct_gsmap) , intent(in) :: gsmap     ! gsmap
-   integer(ip_i4_p), intent(in),optional :: msec    ! time info
-   character(len=*), intent(in),optional :: f_string  ! optional f_string to append to filename
-   character(len=*), intent(in),optional :: filename   ! optional input filename
+   type(mct_aVect) , intent(inout) :: av     !< avect
+   type(mct_gsmap) , intent(in) :: gsmap     !< gsmap
+   integer(ip_i4_p), intent(in) :: mpicom    !< mpicom
+   integer(ip_i4_p), intent(in),optional :: msec     !< optional time info in seconds
+   character(len=*), intent(in),optional :: f_string !< optional f_string to append to filename
+   character(len=*), intent(in),optional :: filename !< optional input filename
 
    !--- local ---
    integer(ip_i4_p)    :: n,n1,i,j,fk,fk1    ! index
@@ -1091,7 +1046,7 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
    character(ic_med)   :: itemc       ! f_string converted to char
    character(ic_med)   :: lfn         ! local filename
    character(ic_med)   :: lstring     ! local filename
-   integer(ip_i4_p)    :: mpicom,master_task,iam     ! mpi info
+   integer(ip_i4_p)    :: master_task,iam,ierr     ! mpi info
    integer(ip_i4_p)    :: ncid,dimid,dimid3(3),varid ! netcdf info
    integer(ip_i4_p)    :: start3(3),count3(3)        ! netcdf info
    integer(ip_i4_p)    :: lmsec(1)    ! local msec value
@@ -1103,11 +1058,13 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
    integer(ip_i4_p) ,allocatable :: time(:)
    real(ip_double_p)   :: tbnds(2)
 
-   character(len=*),parameter :: subname = 'oasis_io_read_avfbf'
+   character(len=*),parameter :: subname = '(oasis_io_read_avfbf)'
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
+
+   IF (mpicom == MPI_COMM_NULL) return
 
    call oasis_debug_enter(subname)
 
@@ -1121,9 +1078,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
       lstring = trim(f_string)
    endif
 
-   mpicom = mpi_comm_local
    master_task = 0
-   iam = mpi_rank_local
+   call MPI_COMM_RANK(mpicom,iam,ierr)
 
    call mct_aVect_gather(av,av_g,gsmap,master_task,mpicom)
    if (iam == master_task) then
@@ -1139,10 +1095,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
 
          inquire(file=trim(lfn),exist=exists)
          if (.not.exists) then
-            write(nulprt,*) subname,' ERROR: file not found ',trim(lfn)
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'file not found ',trim(lfn)
+            call oasis_abort()
          endif
 
          status = nf90_open(lfn,NF90_NOWRITE,ncid)
@@ -1168,10 +1122,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
          enddo
          deallocate(time)
          if (n1 < 1) then
-            write(nulprt,*) subname,' ERROR: time not found on file ',trim(lfn),lmsec
-            WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-            CALL oasis_flush(nulprt)
-            call oasis_abort_noarg()
+            write(nulprt,*) subname,estr,'time not found on file ',trim(lfn),lmsec
+            call oasis_abort()
          endif
 
          status = nf90_inq_varid(ncid,trim(itemc),varid)
@@ -1188,10 +1140,9 @@ subroutine oasis_io_read_avfbf(av,gsmap,msec,f_string,filename)
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
 
          if (size(av_g%rAttr,dim=2) /= nx*ny) then
-             write(nulprt,*) subname,' ERROR: av gsize nx ny mismatch ',size(av_g%rAttr,dim=2),nx,ny
-             WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-             CALL oasis_flush(nulprt)
-             call oasis_abort_noarg()
+             WRITE(nulprt,*) subname,estr,'av gsize nx ny mismatch in file :',&
+                                           TRIM(filename),SIZE(av_g%rAttr,dim=2),nx,ny
+             call oasis_abort()
          endif
 
          start3 = 1
@@ -1232,23 +1183,24 @@ end subroutine oasis_io_read_avfbf
 
 !===============================================================================
 
+!> Read a field on the root task from a file into an array.
+
 subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,nz)
 
    ! ---------------------------------------
-   ! Write real fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Supports 2d integer or real and 3d real arrays.
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*) , intent(in) :: filename
-   character(len=*) , intent(in) :: fldname
-   integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)
-   real(ip_realwp_p), intent(inout),optional :: fld2(:,:)
-   real(ip_realwp_p), intent(inout),optional :: fld3(:,:,:)
-   integer(ip_i4_p) , intent(inout),optional :: nx         ! global size nx
-   integer(ip_i4_p) , intent(inout),optional :: ny         ! global size ny
-   integer(ip_i4_p) , intent(inout),optional :: nz         ! global size nz
+   character(len=*) , intent(in) :: filename   !< filename
+   character(len=*) , intent(in) :: fldname    !< field name
+   integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)  !< 2d integer array
+   real(ip_realwp_p), intent(inout),optional :: fld2(:,:)   !< 2d real array
+   real(ip_realwp_p), intent(inout),optional :: fld3(:,:,:) !< 3d real array
+   integer(ip_i4_p) , intent(inout),optional :: nx          !< global nx size
+   integer(ip_i4_p) , intent(inout),optional :: ny          !< global ny size
+   integer(ip_i4_p) , intent(inout),optional :: nz          !< global nz size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,varid  ! cdf info
@@ -1259,7 +1211,7 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'oasis_io_read_field_fromroot'
+   character(len=*),parameter :: subname = '(oasis_io_read_field_fromroot)'
 
 !-------------------------------------------------------------------------------
 !
@@ -1270,25 +1222,24 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+   if (OASIS_debug >= 5) then
+      write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname)
+   endif
+
    inquire(file=trim(filename),exist=exists)
    if (exists) then
       status = nf90_open(filename,NF90_NOWRITE,ncid)
       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
-      status = nf90_redef(ncid)
    else
-      write(nulprt,*) subname,' ERROR: in filename ',trim(filename)
-      WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      write(nulprt,*) subname,estr,'in filename ',trim(filename)
+      call oasis_abort()
    endif
 
    status = nf90_inq_varid(ncid,trim(fldname),varid)
    if (status /= nf90_noerr) then
-      write(nulprt,*) subname,' ERROR: in variable name ',trim(fldname)
-      WRITE(nulprt,*) subname,' abort by  model :',compid,' proc :',mpi_rank_local
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      write(nulprt,*) subname,estr,'in variable name ',trim(fldname)
+      call oasis_abort()
    endif
 
    status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
@@ -1320,11 +1271,8 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
       else
-         write(nulprt,*) subname,' ERROR: mismatch in field and data in: filename, fieldname: ',&
-                         trim(filename), ',', trim(fldname)
-         WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-         CALL oasis_flush(nulprt)
-         call oasis_abort_noarg()
+         write(nulprt,*) subname,estr,'mismatch in field and data'
+         call oasis_abort()
       endif
    endif
     
@@ -1354,20 +1302,21 @@ end subroutine oasis_io_read_field_fromroot
 
 !===============================================================================
 
+!> Write a real array named field from the root task to a file.
+
 subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
-   ! Write real fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Designed to work with oasis3 write_grid .
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   real(ip_realwp_p), intent(in) :: fld(:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   real(ip_realwp_p),intent(in) :: fld(:,:)   !< 2d real field
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid  ! cdf info
@@ -1376,7 +1325,7 @@ subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'oasis_io_write_2dgridfld_fromroot'
+   character(len=*),parameter :: subname = '(oasis_io_write_2dgridfld_fromroot)'
 
 !-------------------------------------------------------------------------------
 !
@@ -1387,12 +1336,14 @@ subroutine oasis_io_write_2dgridfld_fromroot(filename,fldname,fld,nx,ny)
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny
+    endif
+
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
+       call oasis_abort()
     endif
     gridname = fldname(1:ind-1)
 
@@ -1454,20 +1405,21 @@ end subroutine oasis_io_write_2dgridfld_fromroot
 
 !===============================================================================
 
+!> Write an integer array named field from the root task to a file.
+
 subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 
    ! ---------------------------------------
-   ! Write int fld on rootpe to file
-   ! Designed to work with oasis3 write_grid 
+   ! Designed to work with oasis3 write_grid .
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   integer(ip_i4_p), intent(in) :: fld(:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 2d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 2d global size ny
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   integer(ip_i4_p), intent(in) :: fld(:,:)   !< integer field
+   integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid2(2),varid  ! cdf info
@@ -1476,7 +1428,7 @@ subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'oasis_io_write_2dgridint_fromroot'
+   character(len=*),parameter :: subname = '(oasis_io_write_2dgridint_fromroot)'
 
 !-------------------------------------------------------------------------------
 !
@@ -1487,12 +1439,14 @@ subroutine oasis_io_write_2dgridint_fromroot(filename,fldname,fld,nx,ny)
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny
+    endif
+
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
+       call oasis_abort()
     endif
     gridname = fldname(1:ind-1)
 
@@ -1554,21 +1508,22 @@ end subroutine oasis_io_write_2dgridint_fromroot
 
 !===============================================================================
 
+!> Write a 3d real array named field from the root task to a file.
+
 subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
  
    ! ---------------------------------------
-   ! Write real 3d fld on rootpe to file
-   ! Designed to work with oasis3 write_grid (corners)
+   ! Designed to work with oasis3 write_grid.
    ! ---------------------------------------
 
    implicit none
 
-   character(len=*), intent(in) :: filename
-   character(len=*), intent(in) :: fldname
-   real(ip_realwp_p), intent(in) :: fld(:,:,:)
-   integer(ip_i4_p), intent(in) :: nx         ! 3d global size nx
-   integer(ip_i4_p), intent(in) :: ny         ! 3d global size ny
-   integer(ip_i4_p), intent(in) :: nc         ! 3d global size nc ncorners
+   character(len=*), intent(in) :: filename   !< file name
+   character(len=*), intent(in) :: fldname    !< field name
+   real(ip_realwp_p), intent(in) :: fld(:,:,:)!< 3d real array
+   integer(ip_i4_p), intent(in) :: nx         !< 3d global nx size
+   integer(ip_i4_p), intent(in) :: ny         !< 3d global ny size
+   integer(ip_i4_p), intent(in) :: nc         !< 3d global nz size or nc size for corners
 
    !--- local ---
    integer(ip_i4_p)    :: ncid,dimid,dimid3(3),varid  ! cdf info
@@ -1577,7 +1532,7 @@ subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
    logical             :: exists      ! file existance
    character(len=ic_med) :: gridname  ! grid name derived from fldname
 
-   character(len=*),parameter :: subname = 'oasis_io_write_3dgridfld_fromroot'
+   character(len=*),parameter :: subname = '(oasis_io_write_3dgridfld_fromroot)'
 
 !-------------------------------------------------------------------------------
 !
@@ -1588,12 +1543,14 @@ subroutine oasis_io_write_3dgridfld_fromroot(filename,fldname,fld,nx,ny,nc)
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
+    if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' write ',trim(filename),' ',trim(fldname),nx,ny,nc
+    endif
+
     ind = index(trim(fldname),'.')
     if (ind < 2) then
-       write(nulprt,*) subname,' ERROR: in fldname ',trim(fldname)
-       WRITE(nulprt,*) subname,' abort by model :',compid,' proc :',mpi_rank_local
-       CALL oasis_flush(nulprt)
-       call oasis_abort_noarg()
+       write(nulprt,*) subname,estr,'in fldname ',trim(fldname)
+       call oasis_abort()
     endif
     gridname = fldname(1:ind-1)
 

@@ -1,0 +1,8 @@
+<model name="scriptnamcouple" title="Configuration file" layout="flat">
+    <comment name="namcouplescript" title="Namcouple (Click on the Process button)" size="3;5"/>
+    <docu>
+[section=Configuration file Nacmouple]
+When processing the window, the namcouple will appear in the window. It will be also saved at the
+same time where the xml file, containing the data of the coupling configuration, is saved (in RES_C3SM).
+    </docu>
+</model>

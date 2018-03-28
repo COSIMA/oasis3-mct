@@ -104,6 +104,6 @@ m_SpatialIntegral.o: m_SpatialIntegralV.o m_GeneralGrid.o m_AttrVect.o m_AttrVec
 m_SpatialIntegralV.o: m_AttrVect.o m_AttrVectReduce.o
 m_Transfer.o: m_AttrVect.o m_Router.o m_MCTWorld.o
 m_SparseMatrixPlus.o: m_GlobalSegMap.o m_Rearranger.o m_SparseMatrix.o m_SparseMatrixComms.o m_SparseMatrixToMaps.o m_GlobalToLocal.o
-
+mct_mod.o:  m_Accumulator.o  m_AttrVect.o  m_AttrVectComms.o m_GeneralGrid.o m_GeneralGridComms.o m_GlobalSegMap.o m_GlobalSegMapComms.o m_GlobalToLocal.o m_MatAttrVectMul.o m_MCTWorld.o m_Rearranger.o m_Router.o m_SparseMatrix.o m_SparseMatrixComms.o m_SparseMatrixPlus.o m_SparseMatrixToMaps.o m_Transfer.o
 
 

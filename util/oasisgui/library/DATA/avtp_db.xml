@@ -1,0 +1,80 @@
+<model layout="flat" name="avtp_db" version="25.02.13">
+  <xor default="astm310" groups="on" name="materials">
+    <model name="astm310">
+      <info default="astm310" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="plexiglas">
+      <info default="plexiglas" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="z12cns25">
+      <info default="z12cns25" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="nimonic75">
+      <info default="nimonic75" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="fer">
+      <info default="fer" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="fer_varie">
+      <info default="fer_varie" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="qpf_cpl">
+      <info default="qpf_cpl" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="nc20t">
+      <info default="nc20t" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="ceramic">
+      <info default="ceramic" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="z10cnt18-11">
+      <info default="z10cnt18-11" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="z25cnws22">
+      <info default="z25cnws22" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="inconel718">
+      <info default="inconel718" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="inconel738">
+      <info default="inconel738" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="kcn22w">
+      <info default="kcn22w" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="nc22dnb">
+      <info default="nc22dnb" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="nc22fed">
+      <info default="nc22fed" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="cuco02">
+      <info default="cuco02" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="cuco02_1">
+      <info default="cuco02_1" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+    <model name="t800">
+      <info default="t800" name="species_name" type="string" visibility="hidden"/>
+      <info default="0.0d0" name="adnum_species" type="string" visibility="hidden"/>
+    </model>
+  </xor>
+</model>

@@ -1,0 +1,575 @@
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type}{\section{mod\+\_\+oasis\+\_\+coupler\+:\+:prism\+\_\+coupler\+\_\+type Type Reference}
+\label{structmod__oasis__coupler_1_1prism__coupler__type}\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+}
+
+
+Coupler data for managing all aspects of coupling in O\+A\+S\+I\+S.  
+
+
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a153e0bf9e28c0a8ff4d8bb27c83f598e}{avect1}
+\begin{DoxyCompactList}\small\item\em primary a\+Vect \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ab5626722caee601622658134916f12bf}{avect1m}
+\begin{DoxyCompactList}\small\item\em extra a\+Vect needed for mapping \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a7cd1aa8e520cf036f4dd72ad2445b774}{avect2}
+\begin{DoxyCompactList}\small\item\em higher order mapping data \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ac923618471bb31902062be4107d9bbf3}{avect3}
+\begin{DoxyCompactList}\small\item\em higher order mapping data \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a478dda1acb9e270efda23a7275b21b83}{avect4}
+\begin{DoxyCompactList}\small\item\em higher order mapping data \end{DoxyCompactList}\item 
+type(mct\+\_\+avect) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a939d1987d5c66c2352ff40709f255980}{avect5}
+\begin{DoxyCompactList}\small\item\em higher order mapping data \end{DoxyCompactList}\item 
+logical, dimension(\hyperlink{classmod__oasis__coupler_a6f166f099a134dffba97a168d28a3c01}{prism\+\_\+coupler\+\_\+avsmax}) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_aa2090cc6941c0dbbbf4bdb5c68cff873}{avon}
+\begin{DoxyCompactList}\small\item\em flags indicating whether a\+Vects 2-\/5 are active \end{DoxyCompactList}\item 
+character(len=ic\+\_\+xl) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a8a660e192210d1e8ff71f7dded631dce}{rstfile}
+\begin{DoxyCompactList}\small\item\em restart file \end{DoxyCompactList}\item 
+character(len=ic\+\_\+xl) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a0ecb3c23d7b761aa9bfad0fbb59e40d3}{inpfile}
+\begin{DoxyCompactList}\small\item\em input file if data is read \end{DoxyCompactList}\item 
+character(len=ic\+\_\+xl) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a559f90a9b77db151a2a39802a66ddf2b}{fldlist}
+\begin{DoxyCompactList}\small\item\em field list \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a08fa25cab6817cfbc0c660a4f51d3857}{nflds}
+\begin{DoxyCompactList}\small\item\em number of fields \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a9e31592685ea4cb2da222187ee2ffa4b}{varid}
+\begin{DoxyCompactList}\small\item\em varid for each field \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_aceee78ca0ec709406b404ff29e1fcf18}{valid}
+\begin{DoxyCompactList}\small\item\em is this coupler valid \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a68ccbd8305f8c1016a9025558ab8dea5}{namid}
+\begin{DoxyCompactList}\small\item\em namcouple I\+D \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a5506dc46a0c8def7417a6e2a9c046474}{partid}
+\begin{DoxyCompactList}\small\item\em local variable partition I\+D \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a1bf4a986a745318b93d46612b95b0489}{rpartid}
+\begin{DoxyCompactList}\small\item\em router partition I\+D \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ab6ce21d836e3fc511fcb028f99b0abd7}{routerid}
+\begin{DoxyCompactList}\small\item\em router I\+D \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ada880a13e931db47e72859515208ec1d}{mapperid}
+\begin{DoxyCompactList}\small\item\em mapper I\+D \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_aab6763e489b8ace8cff0fbe9e62cbcd8}{maploc}
+\begin{DoxyCompactList}\small\item\em map location setting, src or dst \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ac041ba5de191fa34468f61a674dd5bac}{ops}
+\begin{DoxyCompactList}\small\item\em namcouple operation (ip\+\_\+exported,...) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a77cc2858814776053af5f3958d29fee2}{comp}
+\begin{DoxyCompactList}\small\item\em other model compid to couple \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a3b8e0d2cd3f3001b4c82e7a911008a37}{tag}
+\begin{DoxyCompactList}\small\item\em communcation tag \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_af1766ab1d9fe55670c551a9d0c7f2e00}{seq}
+\begin{DoxyCompactList}\small\item\em sequence number \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ae1c1191f9aa4664aac2b819d1648320d}{dt}
+\begin{DoxyCompactList}\small\item\em coupling period (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a5f95dd90844b18f8c619df9371a556c6}{lag}
+\begin{DoxyCompactList}\small\item\em put lag positive is put sooner (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_abe7dd91c4d011f5717e203191b7788e3}{maxtime}
+\begin{DoxyCompactList}\small\item\em max time for the coupler \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ad9fad1fec923d4db974f94fd0bca5697}{trans}
+\begin{DoxyCompactList}\small\item\em transformation (ip\+\_\+average,...) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a6ae875acb2785153668c3e773ed9682f}{conserv}
+\begin{DoxyCompactList}\small\item\em conserve operation (ip\+\_\+cnone,ip\+\_\+cglobal,...) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ab539821ab680aa56c81cb541c093f50f}{consopt}
+\begin{DoxyCompactList}\small\item\em conserve option (bfb, opt) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a72f8ada57213a9c0e6ab85742c521f86}{getput}
+\begin{DoxyCompactList}\small\item\em get/put flag \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a45db2da67a23b8a4b693d0b7882996b5}{sndrcv}
+\begin{DoxyCompactList}\small\item\em send recv flag \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a56fc19e4619dd8224859f222566ea7ca}{output}
+\begin{DoxyCompactList}\small\item\em output flag \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a1cda09cced2782af8cdccae35a00107d}{input}
+\begin{DoxyCompactList}\small\item\em input flag \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ae0ad5bd2dfbc17cbdceeda23c92dbebe}{snddiag}
+\begin{DoxyCompactList}\small\item\em diagnose src fields as part of coupling \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a05d7a7317dd4b063ced94cebd4dfedc7}{rcvdiag}
+\begin{DoxyCompactList}\small\item\em diagnose rcv fields as part of coupling \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+double\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ad17bb1c791d2ef48cf7b4abf955bf43b}{sndmult}
+\begin{DoxyCompactList}\small\item\em send field multiplier term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+double\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_ad0176e1d6bdcb0f50fc5889921aec8dc}{sndadd}
+\begin{DoxyCompactList}\small\item\em send field addition term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+double\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a9733b71cc0ade029f7f19be6ad114596}{rcvmult}
+\begin{DoxyCompactList}\small\item\em receive field multiplier term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+double\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_adee95ace457db5ccaacc0195f3327277}{rcvadd}
+\begin{DoxyCompactList}\small\item\em receive field addition term \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_a5d93a8e5b39d3b713e8f1bf4760b10f9}{ltime}
+\begin{DoxyCompactList}\small\item\em time at last coupling \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_accd8eb166c6aac75690be947dec43ccc}{avcnt}
+\begin{DoxyCompactList}\small\item\em counter for averaging \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:), pointer \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type_aee26373fa4a84f3c4e1841ba702f161c}{status}
+\begin{DoxyCompactList}\small\item\em status of variables in coupler \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Coupler data for managing all aspects of coupling in O\+A\+S\+I\+S. 
+
+Definition at line 45 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_accd8eb166c6aac75690be947dec43ccc}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avcnt@{avcnt}}
+\index{avcnt@{avcnt}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avcnt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avcnt\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_accd8eb166c6aac75690be947dec43ccc}
+
+
+counter for averaging 
+
+
+
+Definition at line 88 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a153e0bf9e28c0a8ff4d8bb27c83f598e}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect1@{avect1}}
+\index{avect1@{avect1}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect1}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect1\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a153e0bf9e28c0a8ff4d8bb27c83f598e}
+
+
+primary a\+Vect 
+
+
+
+Definition at line 47 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ab5626722caee601622658134916f12bf}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect1m@{avect1m}}
+\index{avect1m@{avect1m}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect1m}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect1m\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ab5626722caee601622658134916f12bf}
+
+
+extra a\+Vect needed for mapping 
+
+
+
+Definition at line 48 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a7cd1aa8e520cf036f4dd72ad2445b774}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect2@{avect2}}
+\index{avect2@{avect2}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect2}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect2\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a7cd1aa8e520cf036f4dd72ad2445b774}
+
+
+higher order mapping data 
+
+
+
+Definition at line 49 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ac923618471bb31902062be4107d9bbf3}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect3@{avect3}}
+\index{avect3@{avect3}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect3}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect3\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ac923618471bb31902062be4107d9bbf3}
+
+
+higher order mapping data 
+
+
+
+Definition at line 50 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a478dda1acb9e270efda23a7275b21b83}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect4@{avect4}}
+\index{avect4@{avect4}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect4}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect4\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a478dda1acb9e270efda23a7275b21b83}
+
+
+higher order mapping data 
+
+
+
+Definition at line 51 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a939d1987d5c66c2352ff40709f255980}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avect5@{avect5}}
+\index{avect5@{avect5}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avect5}]{\setlength{\rightskip}{0pt plus 5cm}type(mct\+\_\+avect) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avect5\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a939d1987d5c66c2352ff40709f255980}
+
+
+higher order mapping data 
+
+
+
+Definition at line 52 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_aa2090cc6941c0dbbbf4bdb5c68cff873}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!avon@{avon}}
+\index{avon@{avon}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{avon}]{\setlength{\rightskip}{0pt plus 5cm}logical, dimension({\bf prism\+\_\+coupler\+\_\+avsmax}) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::avon\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_aa2090cc6941c0dbbbf4bdb5c68cff873}
+
+
+flags indicating whether a\+Vects 2-\/5 are active 
+
+
+
+Definition at line 53 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a77cc2858814776053af5f3958d29fee2}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!comp@{comp}}
+\index{comp@{comp}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{comp}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::comp\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a77cc2858814776053af5f3958d29fee2}
+
+
+other model compid to couple 
+
+
+
+Definition at line 67 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a6ae875acb2785153668c3e773ed9682f}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!conserv@{conserv}}
+\index{conserv@{conserv}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{conserv}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::conserv\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a6ae875acb2785153668c3e773ed9682f}
+
+
+conserve operation (ip\+\_\+cnone,ip\+\_\+cglobal,...) 
+
+
+
+Definition at line 74 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ab539821ab680aa56c81cb541c093f50f}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!consopt@{consopt}}
+\index{consopt@{consopt}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{consopt}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::consopt\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ab539821ab680aa56c81cb541c093f50f}
+
+
+conserve option (bfb, opt) 
+
+
+
+Definition at line 75 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ae1c1191f9aa4664aac2b819d1648320d}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!dt@{dt}}
+\index{dt@{dt}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{dt}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::dt\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ae1c1191f9aa4664aac2b819d1648320d}
+
+
+coupling period (secs) 
+
+
+
+Definition at line 70 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a559f90a9b77db151a2a39802a66ddf2b}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!fldlist@{fldlist}}
+\index{fldlist@{fldlist}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{fldlist}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+xl) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::fldlist\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a559f90a9b77db151a2a39802a66ddf2b}
+
+
+field list 
+
+
+
+Definition at line 56 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a72f8ada57213a9c0e6ab85742c521f86}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!getput@{getput}}
+\index{getput@{getput}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{getput}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::getput\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a72f8ada57213a9c0e6ab85742c521f86}
+
+
+get/put flag 
+
+
+
+Definition at line 76 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a0ecb3c23d7b761aa9bfad0fbb59e40d3}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!inpfile@{inpfile}}
+\index{inpfile@{inpfile}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{inpfile}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+xl) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::inpfile\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a0ecb3c23d7b761aa9bfad0fbb59e40d3}
+
+
+input file if data is read 
+
+
+
+Definition at line 55 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a1cda09cced2782af8cdccae35a00107d}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!input@{input}}
+\index{input@{input}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{input}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::input\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a1cda09cced2782af8cdccae35a00107d}
+
+
+input flag 
+
+
+
+Definition at line 79 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a5f95dd90844b18f8c619df9371a556c6}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!lag@{lag}}
+\index{lag@{lag}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{lag}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::lag\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a5f95dd90844b18f8c619df9371a556c6}
+
+
+put lag positive is put sooner (secs) 
+
+
+
+Definition at line 71 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a5d93a8e5b39d3b713e8f1bf4760b10f9}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!ltime@{ltime}}
+\index{ltime@{ltime}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{ltime}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::ltime\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a5d93a8e5b39d3b713e8f1bf4760b10f9}
+
+
+time at last coupling 
+
+
+
+Definition at line 87 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_aab6763e489b8ace8cff0fbe9e62cbcd8}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!maploc@{maploc}}
+\index{maploc@{maploc}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{maploc}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::maploc\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_aab6763e489b8ace8cff0fbe9e62cbcd8}
+
+
+map location setting, src or dst 
+
+
+
+Definition at line 65 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ada880a13e931db47e72859515208ec1d}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!mapperid@{mapperid}}
+\index{mapperid@{mapperid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{mapperid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::mapperid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ada880a13e931db47e72859515208ec1d}
+
+
+mapper I\+D 
+
+
+
+Definition at line 64 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_abe7dd91c4d011f5717e203191b7788e3}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!maxtime@{maxtime}}
+\index{maxtime@{maxtime}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{maxtime}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::maxtime\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_abe7dd91c4d011f5717e203191b7788e3}
+
+
+max time for the coupler 
+
+
+
+Definition at line 72 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a68ccbd8305f8c1016a9025558ab8dea5}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!namid@{namid}}
+\index{namid@{namid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{namid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::namid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a68ccbd8305f8c1016a9025558ab8dea5}
+
+
+namcouple I\+D 
+
+
+
+Definition at line 60 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a08fa25cab6817cfbc0c660a4f51d3857}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!nflds@{nflds}}
+\index{nflds@{nflds}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{nflds}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::nflds\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a08fa25cab6817cfbc0c660a4f51d3857}
+
+
+number of fields 
+
+
+
+Definition at line 57 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ac041ba5de191fa34468f61a674dd5bac}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!ops@{ops}}
+\index{ops@{ops}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{ops}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::ops\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ac041ba5de191fa34468f61a674dd5bac}
+
+
+namcouple operation (ip\+\_\+exported,...) 
+
+
+
+Definition at line 66 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a56fc19e4619dd8224859f222566ea7ca}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!output@{output}}
+\index{output@{output}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{output}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::output\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a56fc19e4619dd8224859f222566ea7ca}
+
+
+output flag 
+
+
+
+Definition at line 78 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a5506dc46a0c8def7417a6e2a9c046474}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!partid@{partid}}
+\index{partid@{partid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{partid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::partid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a5506dc46a0c8def7417a6e2a9c046474}
+
+
+local variable partition I\+D 
+
+
+
+Definition at line 61 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_adee95ace457db5ccaacc0195f3327277}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!rcvadd@{rcvadd}}
+\index{rcvadd@{rcvadd}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{rcvadd}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+double\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::rcvadd\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_adee95ace457db5ccaacc0195f3327277}
+
+
+receive field addition term 
+
+
+
+Definition at line 85 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a05d7a7317dd4b063ced94cebd4dfedc7}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!rcvdiag@{rcvdiag}}
+\index{rcvdiag@{rcvdiag}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{rcvdiag}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::rcvdiag\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a05d7a7317dd4b063ced94cebd4dfedc7}
+
+
+diagnose rcv fields as part of coupling 
+
+
+
+Definition at line 81 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a9733b71cc0ade029f7f19be6ad114596}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!rcvmult@{rcvmult}}
+\index{rcvmult@{rcvmult}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{rcvmult}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+double\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::rcvmult\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a9733b71cc0ade029f7f19be6ad114596}
+
+
+receive field multiplier term 
+
+
+
+Definition at line 84 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ab6ce21d836e3fc511fcb028f99b0abd7}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!routerid@{routerid}}
+\index{routerid@{routerid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{routerid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::routerid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ab6ce21d836e3fc511fcb028f99b0abd7}
+
+
+router I\+D 
+
+
+
+Definition at line 63 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a1bf4a986a745318b93d46612b95b0489}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!rpartid@{rpartid}}
+\index{rpartid@{rpartid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{rpartid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::rpartid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a1bf4a986a745318b93d46612b95b0489}
+
+
+router partition I\+D 
+
+
+
+Definition at line 62 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a8a660e192210d1e8ff71f7dded631dce}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!rstfile@{rstfile}}
+\index{rstfile@{rstfile}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{rstfile}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+xl) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::rstfile\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a8a660e192210d1e8ff71f7dded631dce}
+
+
+restart file 
+
+
+
+Definition at line 54 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_af1766ab1d9fe55670c551a9d0c7f2e00}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!seq@{seq}}
+\index{seq@{seq}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{seq}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::seq\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_af1766ab1d9fe55670c551a9d0c7f2e00}
+
+
+sequence number 
+
+
+
+Definition at line 69 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ad0176e1d6bdcb0f50fc5889921aec8dc}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!sndadd@{sndadd}}
+\index{sndadd@{sndadd}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{sndadd}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+double\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::sndadd\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ad0176e1d6bdcb0f50fc5889921aec8dc}
+
+
+send field addition term 
+
+
+
+Definition at line 83 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ae0ad5bd2dfbc17cbdceeda23c92dbebe}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!snddiag@{snddiag}}
+\index{snddiag@{snddiag}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{snddiag}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::snddiag\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ae0ad5bd2dfbc17cbdceeda23c92dbebe}
+
+
+diagnose src fields as part of coupling 
+
+
+
+Definition at line 80 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ad17bb1c791d2ef48cf7b4abf955bf43b}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!sndmult@{sndmult}}
+\index{sndmult@{sndmult}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{sndmult}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+double\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::sndmult\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ad17bb1c791d2ef48cf7b4abf955bf43b}
+
+
+send field multiplier term 
+
+
+
+Definition at line 82 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a45db2da67a23b8a4b693d0b7882996b5}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!sndrcv@{sndrcv}}
+\index{sndrcv@{sndrcv}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{sndrcv}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::sndrcv\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a45db2da67a23b8a4b693d0b7882996b5}
+
+
+send recv flag 
+
+
+
+Definition at line 77 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_aee26373fa4a84f3c4e1841ba702f161c}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!status@{status}}
+\index{status@{status}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{status}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::status\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_aee26373fa4a84f3c4e1841ba702f161c}
+
+
+status of variables in coupler 
+
+
+
+Definition at line 89 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a3b8e0d2cd3f3001b4c82e7a911008a37}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!tag@{tag}}
+\index{tag@{tag}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{tag}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::tag\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a3b8e0d2cd3f3001b4c82e7a911008a37}
+
+
+communcation tag 
+
+
+
+Definition at line 68 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_ad9fad1fec923d4db974f94fd0bca5697}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!trans@{trans}}
+\index{trans@{trans}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{trans}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::trans\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_ad9fad1fec923d4db974f94fd0bca5697}
+
+
+transformation (ip\+\_\+average,...) 
+
+
+
+Definition at line 73 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_aceee78ca0ec709406b404ff29e1fcf18}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!valid@{valid}}
+\index{valid@{valid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{valid}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::valid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_aceee78ca0ec709406b404ff29e1fcf18}
+
+
+is this coupler valid 
+
+
+
+Definition at line 59 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{structmod__oasis__coupler_1_1prism__coupler__type_a9e31592685ea4cb2da222187ee2ffa4b}{\index{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}!varid@{varid}}
+\index{varid@{varid}!mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type@{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}}
+\subsubsection[{varid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type\+::varid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__coupler_1_1prism__coupler__type_a9e31592685ea4cb2da222187ee2ffa4b}
+
+
+varid for each field 
+
+
+
+Definition at line 58 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+
+
+The documentation for this type was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__coupler_8_f90}{mod\+\_\+oasis\+\_\+coupler.\+F90}\end{DoxyCompactItemize}

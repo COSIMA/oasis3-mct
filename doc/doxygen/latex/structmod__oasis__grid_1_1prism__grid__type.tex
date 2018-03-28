@@ -1,0 +1,280 @@
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type}{\section{mod\+\_\+oasis\+\_\+grid\+:\+:prism\+\_\+grid\+\_\+type Type Reference}
+\label{structmod__oasis__grid_1_1prism__grid__type}\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+}
+
+
+Model grid data for creating mapping data and conserving fields.  
+
+
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=ic\+\_\+med) \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a51bf2e1319c04ec74a7787da72a0535b}{gridname}
+\begin{DoxyCompactList}\small\item\em grid name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a8638cf8b735e72872be089682d0f8340}{partid}
+\begin{DoxyCompactList}\small\item\em partition I\+D \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__grid_1_1prism__grid__type_ad27a1fc4d01d2b69f95d7cf9bcdbe571}{nx}
+\begin{DoxyCompactList}\small\item\em global nx size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__grid_1_1prism__grid__type_ad12673fd6c928ed6441e5584c16d0a3e}{ny}
+\begin{DoxyCompactList}\small\item\em global ny size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a9a562f1211ac03c0b308f156a9c88e39}{nc}
+\begin{DoxyCompactList}\small\item\em number of corners per gridcell \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a41b62a294b04765a04f6f0d70c261df7}{grid\+\_\+set}
+\begin{DoxyCompactList}\small\item\em flag to track user calls for grid \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a852b381de47913b96e3fa28ade472579}{corner\+\_\+set}
+\begin{DoxyCompactList}\small\item\em flag to track user calls for corner \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a4a357fd1eb4b19d1beea5968dd783882}{angle\+\_\+set}
+\begin{DoxyCompactList}\small\item\em flag to track user calls for angle \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a369c091ef9af0281c5b4f92390f4265f}{area\+\_\+set}
+\begin{DoxyCompactList}\small\item\em flag to track user calls for area \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_ae44525ecb0b2dfe8d4a4a8cf4abd4e1f}{mask\+\_\+set}
+\begin{DoxyCompactList}\small\item\em flag to track user calls for mask \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a48d243ede1b306ac35bb9bbeff48785a}{written}
+\begin{DoxyCompactList}\small\item\em flag to indicate grid has been written \end{DoxyCompactList}\item 
+logical \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a2dcbbc51a20f881a1d06609688d72734}{terminated}
+\begin{DoxyCompactList}\small\item\em flag to indicate user grid calls complete \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a4f7fb8a71335506209709cfbe939ef7b}{lon}
+\begin{DoxyCompactList}\small\item\em user specified longitudes \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_aa3a8ae208948be24ac3964c9d660afed}{lat}
+\begin{DoxyCompactList}\small\item\em user specified latitudes \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a7aac140b1875e0ecae3a816c0cd6d45e}{clon}
+\begin{DoxyCompactList}\small\item\em user specified corner longitudes \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a59d5122daaab45ad6578c7cc8f4fffc8}{clat}
+\begin{DoxyCompactList}\small\item\em user specified corner latitudes \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a3d12bed9920fed609d83b04ab3fbc5b2}{angle}
+\begin{DoxyCompactList}\small\item\em user specified angle \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_a7dad88f99d9648097a29b6b6f1e25d2e}{area}
+\begin{DoxyCompactList}\small\item\em user specified area \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+dimension(\+:,\+:), allocatable \hyperlink{structmod__oasis__grid_1_1prism__grid__type_ae50e83035d6214d862be48a5060887ae}{mask}
+\begin{DoxyCompactList}\small\item\em user specified mask \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Model grid data for creating mapping data and conserving fields. 
+
+Definition at line 117 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a3d12bed9920fed609d83b04ab3fbc5b2}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!angle@{angle}}
+\index{angle@{angle}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{angle}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::angle\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a3d12bed9920fed609d83b04ab3fbc5b2}
+
+
+user specified angle 
+
+
+
+Definition at line 134 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a4a357fd1eb4b19d1beea5968dd783882}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!angle\+\_\+set@{angle\+\_\+set}}
+\index{angle\+\_\+set@{angle\+\_\+set}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{angle\+\_\+set}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::angle\+\_\+set\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a4a357fd1eb4b19d1beea5968dd783882}
+
+
+flag to track user calls for angle 
+
+
+
+Definition at line 125 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a7dad88f99d9648097a29b6b6f1e25d2e}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!area@{area}}
+\index{area@{area}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{area}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::area\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a7dad88f99d9648097a29b6b6f1e25d2e}
+
+
+user specified area 
+
+
+
+Definition at line 135 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a369c091ef9af0281c5b4f92390f4265f}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!area\+\_\+set@{area\+\_\+set}}
+\index{area\+\_\+set@{area\+\_\+set}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{area\+\_\+set}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::area\+\_\+set\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a369c091ef9af0281c5b4f92390f4265f}
+
+
+flag to track user calls for area 
+
+
+
+Definition at line 126 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a59d5122daaab45ad6578c7cc8f4fffc8}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!clat@{clat}}
+\index{clat@{clat}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{clat}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::clat\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a59d5122daaab45ad6578c7cc8f4fffc8}
+
+
+user specified corner latitudes 
+
+
+
+Definition at line 133 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a7aac140b1875e0ecae3a816c0cd6d45e}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!clon@{clon}}
+\index{clon@{clon}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{clon}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::clon\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a7aac140b1875e0ecae3a816c0cd6d45e}
+
+
+user specified corner longitudes 
+
+
+
+Definition at line 132 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a852b381de47913b96e3fa28ade472579}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!corner\+\_\+set@{corner\+\_\+set}}
+\index{corner\+\_\+set@{corner\+\_\+set}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{corner\+\_\+set}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::corner\+\_\+set\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a852b381de47913b96e3fa28ade472579}
+
+
+flag to track user calls for corner 
+
+
+
+Definition at line 124 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a41b62a294b04765a04f6f0d70c261df7}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!grid\+\_\+set@{grid\+\_\+set}}
+\index{grid\+\_\+set@{grid\+\_\+set}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{grid\+\_\+set}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::grid\+\_\+set\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a41b62a294b04765a04f6f0d70c261df7}
+
+
+flag to track user calls for grid 
+
+
+
+Definition at line 123 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a51bf2e1319c04ec74a7787da72a0535b}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!gridname@{gridname}}
+\index{gridname@{gridname}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{gridname}]{\setlength{\rightskip}{0pt plus 5cm}character(len=ic\+\_\+med) mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::gridname\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a51bf2e1319c04ec74a7787da72a0535b}
+
+
+grid name 
+
+
+
+Definition at line 118 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_aa3a8ae208948be24ac3964c9d660afed}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!lat@{lat}}
+\index{lat@{lat}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{lat}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::lat\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_aa3a8ae208948be24ac3964c9d660afed}
+
+
+user specified latitudes 
+
+
+
+Definition at line 131 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a4f7fb8a71335506209709cfbe939ef7b}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!lon@{lon}}
+\index{lon@{lon}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{lon}]{\setlength{\rightskip}{0pt plus 5cm}real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::lon\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a4f7fb8a71335506209709cfbe939ef7b}
+
+
+user specified longitudes 
+
+
+
+Definition at line 130 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_ae50e83035d6214d862be48a5060887ae}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!mask@{mask}}
+\index{mask@{mask}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{mask}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:,\+:), allocatable mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::mask\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_ae50e83035d6214d862be48a5060887ae}
+
+
+user specified mask 
+
+
+
+Definition at line 136 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_ae44525ecb0b2dfe8d4a4a8cf4abd4e1f}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!mask\+\_\+set@{mask\+\_\+set}}
+\index{mask\+\_\+set@{mask\+\_\+set}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{mask\+\_\+set}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::mask\+\_\+set\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_ae44525ecb0b2dfe8d4a4a8cf4abd4e1f}
+
+
+flag to track user calls for mask 
+
+
+
+Definition at line 127 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a9a562f1211ac03c0b308f156a9c88e39}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!nc@{nc}}
+\index{nc@{nc}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{nc}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::nc\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a9a562f1211ac03c0b308f156a9c88e39}
+
+
+number of corners per gridcell 
+
+
+
+Definition at line 122 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_ad27a1fc4d01d2b69f95d7cf9bcdbe571}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!nx@{nx}}
+\index{nx@{nx}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{nx}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::nx\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_ad27a1fc4d01d2b69f95d7cf9bcdbe571}
+
+
+global nx size 
+
+
+
+Definition at line 120 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_ad12673fd6c928ed6441e5584c16d0a3e}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!ny@{ny}}
+\index{ny@{ny}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{ny}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::ny\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_ad12673fd6c928ed6441e5584c16d0a3e}
+
+
+global ny size 
+
+
+
+Definition at line 121 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a8638cf8b735e72872be089682d0f8340}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!partid@{partid}}
+\index{partid@{partid}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{partid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::partid\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a8638cf8b735e72872be089682d0f8340}
+
+
+partition I\+D 
+
+
+
+Definition at line 119 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a2dcbbc51a20f881a1d06609688d72734}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!terminated@{terminated}}
+\index{terminated@{terminated}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{terminated}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::terminated\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a2dcbbc51a20f881a1d06609688d72734}
+
+
+flag to indicate user grid calls complete 
+
+
+
+Definition at line 129 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{structmod__oasis__grid_1_1prism__grid__type_a48d243ede1b306ac35bb9bbeff48785a}{\index{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}!written@{written}}
+\index{written@{written}!mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type@{mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type}}
+\subsubsection[{written}]{\setlength{\rightskip}{0pt plus 5cm}logical mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid\+\_\+type\+::written\hspace{0.3cm}{\ttfamily [private]}}}\label{structmod__oasis__grid_1_1prism__grid__type_a48d243ede1b306ac35bb9bbeff48785a}
+
+
+flag to indicate grid has been written 
+
+
+
+Definition at line 128 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+The documentation for this type was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

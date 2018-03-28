@@ -1,0 +1,69 @@
+ <model name="conservtransfo" title="Conservation transformation" layout="flat">
+     <desc>
+Please define the redistribution, if any, for the different coupling fields
+selecting the different rows available.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+     </desc>
+ </model>
+ <model name="transfconserv" title="Conservation option" layout="flat">
+    <multiple name="conservation" title="Conserv option" require="field_names_list" custom_label="Fields">
+         <xor name="conservopt" title="Conserv or not" default="conserv_off">
+	   <model name="conserv_off" title="NO CONSERV">
+	   </model>
+	   <model name="conserv_on" title="CONSERV">
+	     <choice name="conservstrategy" title="How to do the redistribution" type="string" default="global">
+               <option value="global" title="GLOBAL"/>
+               <option value="glbpos" title="GLBPOS"/>
+               <option value="basbal" title="BASBAL"/>
+               <option value="baspos" title="BASPOS"/>
+	     </choice>
+	     <choice name="conservalgo" title="Algorithm" type="string" default="bfb_conserv_on">
+	       <option value="bfb_conserv_on" title="Bit-for-bit reproductibility"/>
+               <option value="opt_conserv_on" title="Optimized"/>
+	     </choice>
+           </model>
+	 </xor>
+       </multiple>
+    <docu> 
+[section=CONSERV option]
+CONSERV ensures a global modification of the coupling field. This analysis requires the source and target 
+grid mesh areas to be transfered to the coupler with oasis_write_area and oasis_write_mask. For a correct 
+CONSERV operation, overlapping grid cells on the source grid or on the target grid must be masked. [] 
+
+[section=Types of redistribution]
+The following types of options are available: []
+- GLOBAL, the field is integrated on both source and target grids, without considering values of masked points, 
+and the residual (target - source) is uniformly distributed on the target grid; this option ensures 
+global conservation of the field []
+- GLBPOS, the same operation is performed except that the residual is distributed proportionally to the value 
+of the original field; this option ensures the global conservation of the field and does not change 
+the sign of the field []
+- BASBAL, the operation is analogous to GLOBAL except that the non masked surface of the source and the 
+target grids are taken into account in the calculation of the residual; this option does not ensure global 
+conservation of the field but ensures that the energy received is proportional to the non masked surface 
+of the target grid []
+- BASPOS, the non masked surface of the source and the target grids are taken into account and the residual 
+is distributed proportionally to the value of the original field; therefore, this option does not ensure 
+global conservation of the field but ensures that the energy received is proportional to the non masked 
+surface of the target grid and it does not change the sign of the field. []
+
+More information is available in the User Guide section 4.4.
+
+<docuold>
+[section=Algorithm]
+The algorithm used to perform the redistribution can be "Bit-for-bit reproductibility" (bfb) 
+or "Optimized" (opt). The bfb option enforces a bit-for-bit transformation regardless of 
+the grid decomposition or process count. The opt option carries out the conservation using an optimal algorithm 
+using less memory and a faster approach. Option bfb is the default setting.
+</docuold>
+    </docu>
+</model>
+
+
+
+
+
+
+
+

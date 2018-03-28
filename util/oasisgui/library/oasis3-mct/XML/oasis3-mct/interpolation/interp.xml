@@ -1,0 +1,216 @@
+<model name="scriptransfo" title="SCRIP Interpolation" layout="flat">
+     <desc>
+Please enter if the remapping is done with the SCRIP library, for the different coupling fields,
+selecting the different rows available.
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+     </desc>
+</model>
+<model name="transfinterp" title="Remapping" layout="flat">
+    <multiple name="interp" title="Scripr options" require="field_names_list" custom_label="Fields">
+        <xor name="scrip" title="SCRIPR" default="scrip_off">
+            <model name="scrip_off" title="NO SCRIP">
+            </model>
+            <model name="scrip_on" title="SCRIP">
+                <xor name="scriprinterp" title="Type of interpolation" default="bilinear">
+                    <model name="distwgt" title="DISTWGT">
+                        <choice name="cgrs_dist" title="Type of source grid" type="string">
+                            <option value="lr_dist" title="LR"/>
+                            <option value="d_dist" title="D"/>
+                            <option value="u_dist" title="U"/>
+                        </choice>
+                        <choice name="rest_dist" title="Search restriction type" type="string">
+                            <option value="latlon_dist" title="LATLON"/>
+                            <option value="latitude_dist" title="LATITUDE"/>
+                        </choice>
+                        <param name="nbin_dist" title="Nb of restriction bins (integer)" type="integer"/>
+                        <param name="nv_dist" title="Nb of neighbours used (integer)" type="integer"/>
+                        <desc> Distance weighted nearest-neighbour interpolation (N neighbours).
+                        </desc>
+                    </model>
+                    <model name="gauswgt" title="GAUSWGT">
+                        <choice name="cgrs_gaus" title="Type of source grid" type="string">
+                            <option value="lr_gaus" title="LR"/>
+                            <option value="d_gaus" title="D"/>
+                            <option value="u_gaus" title="U"/>
+                        </choice>
+                        <choice name="rest_gaus" title="Search restriction type" type="string">
+                            <option value="latlon_gaus" title="LATLON"/>
+                            <option value="latitude_gaus" title="LATITUDE"/>
+                        </choice>
+                        <param name="nbin_gaus" title="Nb of restriction bins (integer)" type="integer"/>
+                        <param name="nv_gaus" title="Nb of neighbours used (integer)" type="integer" />
+                        <param name="var_gaus" title="Weight given to the neighbour used" type="double"/>
+                        <desc> N nearest-neighbour interpolation weighted by their distance and a gaussian function.
+                               For D and U grids, the restriction bin must be one.
+                        </desc>
+                    </model>
+                    <model name="bilinear" title="BILINEAR">
+                        <choice name="cgrs_bili" title="Type of source grid" type="string" >
+                            <option value="lr_bili" title="LR"/>
+                            <option value="d_bili" title="D"/>
+                        </choice>
+                        <choice name="rest_bili" title="Search restriction type" type="string" >
+                            <option value="latlon_bili" title="LATLON"/>
+                            <option value="latitude_bili" title="LATITUDE"/>
+                        </choice>
+                        <param name="nbin_bili" title="Nb of restriction bins (integer)" type="integer"/>
+	                <desc> Bilinear interpolation. Only LATITUDE is possible with D source grid
+                        </desc>
+                    </model>
+                    <model name="bicubic" title="BICUBIC">
+                        <choice name="cgrs_bicu" title="Type of source grid" type="string">
+                            <option value="lr_bicu" title="LR"/>
+                            <option value="d_bicu" title="D"/>
+                        </choice>
+                        <choice name="rest_bicu" title="Search restriction type" type="string">
+                            <option value="latlon_bicu" title="LATLON"/>
+                            <option value="latitude_bicu" title="LATITUDE"/>
+                        </choice>
+                        <param name="nbin_bicu" title="Nb of restriction bins (integer)" type="integer"/>
+	                <desc> Bicubic interpolation. Only LATITUDE is possible with D source grid
+                        </desc>
+                    </model>
+                    <model name="conserv_interp" title="CONSERV">
+                        <choice name="cgrs_conserv" title="Type of source grid" type="string" >
+                            <option value="lr_conserv" title="LR"/>
+                            <option value="d_conserv" title="D"/>
+                            <option value="u_conserv" title="U"/>
+                        </choice>
+                        <choice name="rest_conserv" title="Search restriction type" type="string">
+                            <option value="latlon_conserv" title="LATLON"/>
+                            <option value="latitude_conserv" title="LATITUDE"/>
+                        </choice>
+                        <param name="nbin_conserv" title="Nb of restriction bins (integer)" type="integer" />
+                        <choice name="norm_conserv" title="Normalization option" type="string" >
+                            <option value="fracnnei_conserv" title="FRACNNEI"/>
+                            <option value="fracarea_conserv" title="FRACAREA"/>
+                            <option value="destarea_conserv" title="DESTAREA"/>
+                        </choice>
+                        <choice name="order_conserv" title="Order of the interpolation" type="string" >
+                            <option value="first_conserv" title="FIRST"/>
+                            <option value="second_conserv" title="SECOND"/>
+                        </choice>
+	                <desc> Conservative interpolation. 
+                        </desc>
+                    </model>
+                </xor> 
+            </model>
+        </xor>
+    </multiple>
+    <docu> 
+[section=SCRIP library]
+The SCRIP1.4 library gather the interpolation techniques offered by Los Alamos National Laboratory (Jones 1999). 
+The SCRIP library routines are in oasis3-mct/lib/scrip/src. See the documentation in oasis3-mct/doc/SCRIPusers.pdf for more 
+details on the interpolation algorithms. 
+
+
+When the SCRIP library performs a remapping, it first checks if the file containing the corresponding remapping weights 
+and addresses exists; if it exists, it reads them from the file; if not, it calculates them and store them in a file. 
+The file is created in the working directory and is called rmp_srcg_to_ tgtg_INTTYPE_NORMAOPT.nc, where srcg and tgtg 
+are the acronyms of respetively the source and the target grids, INTTYPE is the interpolation type, i.e. DISTWGT, GAUSWGT, 
+BILINEAR (not BILINEA as in OASIS3.3) or CONSERV -see below, and NORMAOPT is the normalization option, i.e. DESTAREA, 
+FRACAREA or FRACNNEI for CONSERV only -see below). One has to take care that the remapping file will have the same 
+name even if other details, like the grid masks, are changed. When reusing a remapping file, one has to be sure that 
+it was generated in exactly the same conditions than the ones it is used for. []
+
+More details on the types interpolations that are available can be found in the User Guide section 4.3.
+
+<docuold>
+The following types of interpolations are available: []
+
+[section=DISTWGT] 
+Performs a distance weighted nearest-neighbour interpolation (N neighbours). All types of grids are supported. []
+- Masked target grid points: the zero value is associated to masked target grid points. []
+- Non-masked target grid points having some of the N source nearest neighbours masked: a 
+nearest neighbour algorithm using the remaining non masked source nearest neighbours is applied. []
+- Non-masked target grid points having all of the N source nearest neighbours masked: by default, the 
+nearest non-masked source neighbour is used (logical ll_nnei hard-coded to .true. in 
+oasis3-mct/lib/scrip/src/remap_distwgt.F; same default behaviour as OASIS3.3). []
+
+[section=GAUSWGT] 
+Performs a N nearest-neighbour interpolation weighted by their distance and a gaussian function. All grid types are supported. []
+- Masked target grid points: the zero value is associated to masked target grid points. []
+- Non-masked target grid points having some of the N source nearest neighbours masked: a nearest neighbour 
+algorithm using the remaining non masked source nearest neighbours is applied. []
+- Non-masked target grid points having all of the N source nearest neighbours masked: by default, the nearest 
+non-masked source neighbour is used (logical ll_nnei hard-coded to .true. in oasis3-mct/lib/scrip/src/remap_gauswgt.F); 
+this is NOT the same default behaviour as OASIS3.3; to have the same default behaviour as in OASIS3.3, put ll_nnei=.false.. []
+
+[section=BILINEAR and BICUBIC] 
+BILINEAR performs an interpolation based on a local bilinear approximation (see details in chapter 4 of SCRIP 1.4 documentation SCRIPusers.pdf). 
+Logically-Rectangular (LR) and Reduced (D) source grid types are supported. []
+
+BICUBIC performs an interpolation based on a local bicubic approximation for Logically-Rectangular (LR) grids, 
+and on a 16-point stencil for Gaussian Reduced (D) grids. 
+Note that for Logically-Rectangular grids, 4 weights for each of the 4 enclosing source neighbours are required corresponding 
+to the field value at the point, the gradient of the field with respect to i, the gradient of the field with respect to j, 
+and the cross gradient with respect to i and j in that order. OASIS3-MCT will calculate the remapping weights and addresses 
+(if they are not already provided) but will not, at run time, calculate the two gradients and the cross-gradient of the 
+source field (as was the case with OASIS3.3). These 3 extra fields need to be calculated by the source code and transfered 
+as extra arguments of the oasis_put. []
+
+- Masked target grid points: the zero value is associated to masked target grid points. []
+- Non-masked target grid points having some of the source points normally used in the bilinear or bicubic 
+interpolation masked: a N nearest neighbour algorithm using the remaining non masked source points is applied. []
+- Non-masked target grid points having all bilinear or bicubic neighbours masked: by default, the nearest 
+non-masked source neighbour is used (ll_nnei hard-coded to .true. in oasis3-mct/lib/scrip/src/remap_bilinear.f, 
+remap_bicubic.f and remap_bicubic_reduced.f); this is not the same default behaviour as OASIS3.3; to have the same 
+default behaviour as in OASIS3.3, put ll_nnei=.false. in the appropriate routine. []  
+
+[section=CONSERV] 
+Performs 1st or 2nd order conservative remapping, which means that the weight of a source cell is proportional to 
+area intersected by the target cell (plus some other terms proportional to the gradient of the field in the longitudinal 
+and latitudinal directions for the second order). []
+
+Note that the grid corners have to given by the user in the grid data file grids.nc or by the code itself in the 
+initialisation phase by calling routine oasis_write_corner ; OASIS3-MCT will not attempt to automatically calculate 
+them as OASIS3.3. []
+
+The following types of normalisations are available: []
+- FRACAREA: The sum of the non-masked source cell intersected areas is used to NORMalise 
+each target cell field value: the flux is not locally conserved, but the flux value itself is reasonable. []
+- DESTAREA: The total target cell area is used to NORMalise each target cell field value even if it only 
+partly intersects non-masked source grid cells: local flux conservation is ensured, but unreasonable flux 
+values may result. []
+- FRACNNEI: as FRACAREA, except that at least the source nearest unmasked neighbour is used for unmasked 
+target cells that intersect only masked source cells. Note that a zero value will be assigned to a target 
+cell that does not intersect any source cells (masked or unmasked), even with FRACNNEI option. []
+
+For CONSERV/SECOND, 3 weigths are needed; OASIS3-MCT will calculate these weights and corresponding addresses 
+(if they are not already provided) but will not, at run time, calculate the two extra terms to which the 
+second and third weights should be applied; these terms, respectively the gradient of the field with respect 
+to the longitude and the gradient of the field with respect to the latitude,
+need to be calculated by the source code and transfered as extra arguments of the oasis_put. []
+
+Note that CONSERV/SECOND is not positive definite and has not been fully validated yet. []
+
+[section=Precautions related to the use of the SCRIPR/CONSERV remapping]
+- For the 1st order conservative remapping: the weight of a source cell is proportional to area of the 
+source cell intersected by target cell. Using the divergence theorem, the SCRIP library evaluates this  
+area with the line integral along the cell borders enclosing the area. As the real shape of the borders  
+is not known (only the location of the 4 corners of each cell is known), the library assumes that the  
+borders are linear in latitude and longitude between two corners. This assumption becomes less valid 
+closer to the pole and for latitudes above the north_thresh or below the south_thresh values 
+(see oasis3-mct/lib/scrip/src/remap_conserv.F, the library evaluates the intersection between two border 
+segments using a Lambert equivalent azimuthal projection. Problems were observed in some cases for 
+the grid cell located around this north_thresh or south_thresh latitude. []
+- Another limitation of the SCRIP 1st order conservative remapping algorithm is that is also supposes, 
+for line integral calculation, that sin(latitude) is linear in longitude on the cell borders which 
+again is in general not valid close to the pole. []
+- For a proper consevative remapping, the corners of a cell have to coincide with the corners of 
+its neighbour cell, with no ``holes'' between the cells. []
+- If two cells of one same grid overlay, at least the one with the greater numerical index must be 
+masked for a proper conservative remapping. For example, if the grid cells with i=1 overlays the 
+grid cells with i=imax, the latter must be masked. If this is not the case given the mask defined 
+in masks.nc, OASIS3-MCT must be compiled with the CPP key TREAT_OVERLAY which will ensure that these 
+rules are respected. This CPP key was introduced in OASIS3.3. []
+- A target grid cell intersecting no source cell (either masked or non masked) at all i.e. falling 
+in a ``hole'' of the source grid will in all cases get a zero value. []
+- If a target grid cell intersects only masked source cells, it will still get a zero value unless 
+the FRACNNEI normalisation option is used, in which case it will get the nearest non masked neighbour 
+value. Note that the option of having the value 1.0E+20 assigned to these target grid cell intersecting 
+only masked source cells (for easier identification) is not yet availble in OASIS3-MCT.
+</docuold>
+    </docu>
+</model>

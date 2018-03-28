@@ -1,0 +1,12 @@
+<model name="cerfacs_formation_local" title="Cerfacs, formation room" >
+  <param name="nbprocs" title="Procs number" type="integer_ge1_le8" default="2" />
+  <param name="login" title="login" type="string" default="form01" />
+<desc>
+Execution at Cerfacs, in the formation room
+for form_XX
+[]
+[logo=plugin_local;caption=local execution]
+[]
+[logo=cerfacs;caption=Cerfacs only]</desc>
+
+</model>

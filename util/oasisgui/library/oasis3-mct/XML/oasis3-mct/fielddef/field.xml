@@ -1,0 +1,52 @@
+ <model name="flddesc" title="Coupling field names" layout="flat">
+  <desc> 
+Define here the coupling fields using the button "Add Coupling fields" 
+and double clicking in the new row created. A "user reference name" must be given to each
+coupling field under "Field label" by filling the part "no label" 
+and validated using the button "Enter" of the keyboard. This name will not appear in the namcouple and is only
+used by the GUI.
+The "load" button is useless for the OASIS3-MCT application.[] 
+For each field, the symbolic name used in the source model and the symbolic name used in the target model
+must be specified as well as the associated source and target grids.
+It is also necessary to specify for each field if it is grouped or not and to which group it belongs using the names 
+already defined in the Group window. 
+Only the source and target symbolic field names and grid names will appear in the namcouple configuration text file.[] 
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up.
+  </desc>
+ </model>
+ <model name="fldname" title="Field names" layout="flat">
+    <multiple name="flddef" title="Coupling fields" custom_label="Field label" size="1.5;1.5">
+	     <info name="namefldgui" title="GUI Id (automatic)" default ="-"/>
+             <param name="fldnamebef" title="Source symbolic name" type="string" />
+             <choice name="srcgrid" title="Source grid" type="string" require="grid_names_list"/>
+	     <param name="fldnameaft" title="Target symbolic name" type="string" />
+             <choice name="tgtgrid" title="Target grid" type="string" require="grid_names_list"/>
+             <choice name="fldmult" title="Single or Group" default="single" require="mult_fields_name">
+             </choice>
+    </multiple>
+    <info name="field_names_list" title="List of the coupling fields" type="liststring" visibility="hidden"/> 
+    <docu>
+[section=Field names definition]
+In this window, you must enter  the coupling fields exchanged by all the models. 
+For each coupling field you must first enter a "user reference name" in the "no label" part.
+This "user reference name" is only used by the GUI and will not appear in the namcouple. 
+Then for each coupling field, you must enter the symbolic name of the field used in the source model 
+and the corresponding symbolic name of the field used in the target model. 
+These names will appear in the configuration file.[]  
+You must also specify for each field if it will be grouped or not and to which group it belongs using the names 
+already defined in the Group window. 
+
+If the field is read or written from/to a file, the target field name will be renamed automatically when writting the 
+configuration file as the source and target symbolic names must be identical. In this case no transformations or
+only LOCTRANS transformations are allowed. 
+
+More details on coupling fields are avalaible in the User Guide section 3.3 and section 5.3.
+    </docu>
+</model>
+
+
+
+
+
+
+

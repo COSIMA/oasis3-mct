@@ -1,0 +1,412 @@
+\hypertarget{classmod__oasis__coupler}{\section{mod\+\_\+oasis\+\_\+coupler Module Reference}
+\label{classmod__oasis__coupler}\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+}
+
+
+Initialize the O\+A\+S\+I\+S coupler infrastructure.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type}{prism\+\_\+coupler\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Coupler data for managing all aspects of coupling in O\+A\+S\+I\+S. \end{DoxyCompactList}\item 
+type \hyperlink{structmod__oasis__coupler_1_1prism__router__type}{prism\+\_\+router\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Router information for rearranging data on tasks. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__coupler_ab48c4d4ee118f948ccc286eec5b509ec}{oasis\+\_\+coupler\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Main routine to setup couplers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), \\*
+parameter, public \hyperlink{classmod__oasis__coupler_a6f166f099a134dffba97a168d28a3c01}{prism\+\_\+coupler\+\_\+avsmax} =5
+\begin{DoxyCompactList}\small\item\em maximum number of higher order terms in mapping \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__coupler_1_1prism__router__type}{prism\+\_\+router\+\_\+type}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__coupler_a33dbf692ad73f83f73fe083e252badd8}{prism\+\_\+router}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+router array \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__coupler_aaa019c39b0f657e7c37820697ecf354a}{prism\+\_\+mcoupler}
+\begin{DoxyCompactList}\small\item\em max couplers \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__coupler_1_1prism__coupler__type}{prism\+\_\+coupler\+\_\+type}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__coupler_ae59d8823993d9ca8610efd9770393271}{prism\+\_\+coupler\+\_\+put}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+coupler put array \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__coupler_1_1prism__coupler__type}{prism\+\_\+coupler\+\_\+type}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__coupler_a96df3ef2ec1b53597bb9beca43fe8349}{prism\+\_\+coupler\+\_\+get}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+coupler get array \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__coupler_a2e4d905b50abb50cea9382a8b58e3e0c}{lcouplerid}
+\begin{DoxyCompactList}\small\item\em last coupler id \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__coupler_a477b53431b7aa1d2b311a78e5db7f00f}{lcouplertime}
+\begin{DoxyCompactList}\small\item\em last coupler time \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__coupler_a0cb9b8a96c10385d38fa244d920c7eaf}{lastseq}
+\begin{DoxyCompactList}\small\item\em last coupler sequence \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__coupler_a47f4727f94719892d837f6a1545d3d08}{lastseqtime}
+\begin{DoxyCompactList}\small\item\em last coupler sequence time \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__coupler_a5cb96db0ae7b837db934689a49df3da6}{oasis\+\_\+coupler\+\_\+print} (cplid, pcprint)
+\begin{DoxyCompactList}\small\item\em Print routine for oasis\+\_\+couplers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__coupler_a2748a288ff923c3b9c1aa5d0df6c8a30}{cplsort} (num, fld, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort a character array using a sort key. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__coupler_a5604cb46a58d69c208b4bc166b2b28d8}{cplsortkey} (num, arr, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort an integer array using a sort key. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__coupler_a773e323d2275aff227e05e98ce97def1}{cplfind} (num, fldlist, fld, ifind, nfind)
+\begin{DoxyCompactList}\small\item\em Search a character field list for a matching values. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__coupler_aaef001fff7e7f3cb23eb913433efcb87}{merge} (A, X, N\+A, B, Y, N\+B, C, Z, N\+C)
+\begin{DoxyCompactList}\small\item\em Merge routine needed for mergesort. \end{DoxyCompactList}\item 
+recursive subroutine \hyperlink{classmod__oasis__coupler_a31a0d796e69ec189baf149ad806f97c6}{mergesort} (N, A, T, S, Z)
+\begin{DoxyCompactList}\small\item\em Generic mergesort routine. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{classmod__oasis__coupler_a6d46883e9df70ab9cdafaf607afacacb}{prism\+\_\+mrouter}
+\begin{DoxyCompactList}\small\item\em max routers \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{classmod__oasis__coupler_a2ebdb255598e1b004de2533f16b06e04}{prism\+\_\+nrouter} = 0
+\begin{DoxyCompactList}\small\item\em router counter \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Initialize the O\+A\+S\+I\+S coupler infrastructure. 
+
+Definition at line 4 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__coupler_a773e323d2275aff227e05e98ce97def1}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!cplfind@{cplfind}}
+\index{cplfind@{cplfind}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{cplfind}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+coupler\+::cplfind (
+\begin{DoxyParamCaption}
+\item[{integer(in), intent(in)}]{num, }
+\item[{character(len=cl), dimension(\+:), intent(in)}]{fldlist, }
+\item[{character(len=cl), intent(in)}]{fld, }
+\item[{integer(in), intent(out)}]{ifind, }
+\item[{integer(in), intent(out)}]{nfind}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a773e323d2275aff227e05e98ce97def1}
+
+
+Search a character field list for a matching values. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in}  & {\em fldlist} & sorted field list\\
+\hline
+\mbox{\tt in}  & {\em fld} & field to search for\\
+\hline
+\mbox{\tt out}  & {\em ifind} & first match index\\
+\hline
+\mbox{\tt out}  & {\em nfind} & number that match \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1860 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a2748a288ff923c3b9c1aa5d0df6c8a30}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!cplsort@{cplsort}}
+\index{cplsort@{cplsort}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{cplsort}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+coupler\+::cplsort (
+\begin{DoxyParamCaption}
+\item[{integer(in), intent(in)}]{num, }
+\item[{character(len=cl), dimension(\+:), intent(inout)}]{fld, }
+\item[{integer(in), dimension(\+:), intent(inout)}]{sortkey}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a2748a288ff923c3b9c1aa5d0df6c8a30}
+
+
+Sort a character array using a sort key. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in,out}  & {\em fld} & sort field\\
+\hline
+\mbox{\tt in,out}  & {\em sortkey} & sortkey \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1751 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a5604cb46a58d69c208b4bc166b2b28d8}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!cplsortkey@{cplsortkey}}
+\index{cplsortkey@{cplsortkey}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{cplsortkey}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+coupler\+::cplsortkey (
+\begin{DoxyParamCaption}
+\item[{integer(in), intent(in)}]{num, }
+\item[{integer(in), dimension(\+:), intent(inout)}]{arr, }
+\item[{integer(in), dimension(\+:), intent(in)}]{sortkey}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a5604cb46a58d69c208b4bc166b2b28d8}
+
+
+Sort an integer array using a sort key. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in,out}  & {\em arr} & field to sort\\
+\hline
+\mbox{\tt in}  & {\em sortkey} & sortkey \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1803 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_aaef001fff7e7f3cb23eb913433efcb87}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!merge@{merge}}
+\index{merge@{merge}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{merge}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+coupler\+::merge (
+\begin{DoxyParamCaption}
+\item[{character(cl), dimension(na), intent(inout)}]{A, }
+\item[{integer(in), dimension(na), intent(inout)}]{X, }
+\item[{integer, intent(in)}]{N\+A, }
+\item[{character(cl), dimension(nb), intent(in)}]{B, }
+\item[{integer(in), dimension(nb), intent(in)}]{Y, }
+\item[{integer, intent(in)}]{N\+B, }
+\item[{character(cl), dimension(nc), intent(inout)}]{C, }
+\item[{integer(in), dimension(nc), intent(inout)}]{Z, }
+\item[{integer, intent(in)}]{N\+C}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_aaef001fff7e7f3cb23eb913433efcb87}
+
+
+Merge routine needed for mergesort. 
+
+
+
+Definition at line 1955 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a31a0d796e69ec189baf149ad806f97c6}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!mergesort@{mergesort}}
+\index{mergesort@{mergesort}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{mergesort}]{\setlength{\rightskip}{0pt plus 5cm}recursive subroutine mod\+\_\+oasis\+\_\+coupler\+::mergesort (
+\begin{DoxyParamCaption}
+\item[{integer, intent(in)}]{N, }
+\item[{character(cl), dimension(n), intent(inout)}]{A, }
+\item[{character(cl), dimension((n+1)/2), intent(out)}]{T, }
+\item[{integer(in), dimension(n), intent(inout)}]{S, }
+\item[{integer(in), dimension((n+1)/2), intent(out)}]{Z}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a31a0d796e69ec189baf149ad806f97c6}
+
+
+Generic mergesort routine. 
+
+
+
+Definition at line 2002 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a5cb96db0ae7b837db934689a49df3da6}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!oasis\+\_\+coupler\+\_\+print@{oasis\+\_\+coupler\+\_\+print}}
+\index{oasis\+\_\+coupler\+\_\+print@{oasis\+\_\+coupler\+\_\+print}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{oasis\+\_\+coupler\+\_\+print}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+print (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{cplid, }
+\item[{type({\bf prism\+\_\+coupler\+\_\+type}), intent(in)}]{pcprint}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a5cb96db0ae7b837db934689a49df3da6}
+
+
+Print routine for oasis\+\_\+couplers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cplid} & coupler id\\
+\hline
+\mbox{\tt in}  & {\em pcprint} & specific prism\+\_\+coupler \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1651 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_ab48c4d4ee118f948ccc286eec5b509ec}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!oasis\+\_\+coupler\+\_\+setup@{oasis\+\_\+coupler\+\_\+setup}}
+\index{oasis\+\_\+coupler\+\_\+setup@{oasis\+\_\+coupler\+\_\+setup}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{oasis\+\_\+coupler\+\_\+setup}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+setup (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__coupler_ab48c4d4ee118f948ccc286eec5b509ec}
+
+
+Main routine to setup couplers. 
+
+This routine initializes all the coupler data based on the namcouple inputs and the calls into the O\+A\+S\+I\+S initialization interfaces from models. It reconciles everything. This is called from oasis\+\_\+enddef. 
+\begin{DoxyItemize}
+\item Allocate and zero prism\+\_\+router, prism\+\_\+mapper, prism\+\_\+coupler based on nnamcpl
+\item Generate model variable lists across all models based on def\+\_\+var calls. These will be reconciled with the namcouple input. These are sorted to improve search performance later.
+\item Setup couplers based on namcouple and model variable info.
+\item Preprocess namcouple strings and sort for faster searches
+\item Loop over all my model variables
+\begin{DoxyItemize}
+\item Get parition and field information
+\item Check if variable is In or Out and then find namcouple matches
+\item Loop over the namcouple matches
+\begin{DoxyItemize}
+\item Migrate namcouple info into part
+\item Make sure it's either an In or Out, sanity check
+\item Determine matching field name from namcouple
+\item Search for list of models with other variable
+\item Loop over those other matching variable names
+\begin{DoxyItemize}
+\item Check that one side is In and other side is Out for communication
+\item Check if input or output, field name should match on both sides.
+\item Generate field list, multiple field support
+\item Add this coupler to list of prism\+\_\+var couplers
+\item Copy namcouple settings into this coupler or check that coupler is consistent with prior setting
+\item Set prism\+\_\+coupler input and output flags
+\item Setup prism\+\_\+coupler router
+\item Setup prism\+\_\+coupler mapper
+\item Try to reuse mapper already defined, must match mapping file and partition
+\item Or get ready to initialize a new mapper
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}
+\item Initialize coupling infrastructure based on initial coupler setup above
+\item Loop over all couplers
+\begin{DoxyItemize}
+\item Initialize avect1 which stores the get/put data
+\item Compute nflds for this coupling and initialize avcnt and status
+\item Initialize the mapper data
+\item Read mapper mask and area if not already done
+\item Initialize avect1m, the data in avect1 mapped to another grid
+\item Initialize router based on rpart\+I\+D
+\end{DoxyItemize}
+\item Diagnostics for all couplers 
+\end{DoxyItemize}
+
+Definition at line 118 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__coupler_a0cb9b8a96c10385d38fa244d920c7eaf}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!lastseq@{lastseq}}
+\index{lastseq@{lastseq}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{lastseq}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+coupler\+::lastseq}}\label{classmod__oasis__coupler_a0cb9b8a96c10385d38fa244d920c7eaf}
+
+
+last coupler sequence 
+
+
+
+Definition at line 102 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a47f4727f94719892d837f6a1545d3d08}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!lastseqtime@{lastseqtime}}
+\index{lastseqtime@{lastseqtime}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{lastseqtime}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+coupler\+::lastseqtime}}\label{classmod__oasis__coupler_a47f4727f94719892d837f6a1545d3d08}
+
+
+last coupler sequence time 
+
+
+
+Definition at line 103 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a2e4d905b50abb50cea9382a8b58e3e0c}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!lcouplerid@{lcouplerid}}
+\index{lcouplerid@{lcouplerid}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{lcouplerid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+coupler\+::lcouplerid}}\label{classmod__oasis__coupler_a2e4d905b50abb50cea9382a8b58e3e0c}
+
+
+last coupler id 
+
+
+
+Definition at line 100 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a477b53431b7aa1d2b311a78e5db7f00f}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!lcouplertime@{lcouplertime}}
+\index{lcouplertime@{lcouplertime}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{lcouplertime}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+coupler\+::lcouplertime}}\label{classmod__oasis__coupler_a477b53431b7aa1d2b311a78e5db7f00f}
+
+
+last coupler time 
+
+
+
+Definition at line 101 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a6f166f099a134dffba97a168d28a3c01}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+coupler\+\_\+avsmax@{prism\+\_\+coupler\+\_\+avsmax}}
+\index{prism\+\_\+coupler\+\_\+avsmax@{prism\+\_\+coupler\+\_\+avsmax}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+coupler\+\_\+avsmax}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), parameter, public mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+avsmax =5}}\label{classmod__oasis__coupler_a6f166f099a134dffba97a168d28a3c01}
+
+
+maximum number of higher order terms in mapping 
+
+
+
+Definition at line 42 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a96df3ef2ec1b53597bb9beca43fe8349}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+coupler\+\_\+get@{prism\+\_\+coupler\+\_\+get}}
+\index{prism\+\_\+coupler\+\_\+get@{prism\+\_\+coupler\+\_\+get}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+coupler\+\_\+get}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+coupler\+\_\+type}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+get}}\label{classmod__oasis__coupler_a96df3ef2ec1b53597bb9beca43fe8349}
+
+
+prism\+\_\+coupler get array 
+
+
+
+Definition at line 98 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_ae59d8823993d9ca8610efd9770393271}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+coupler\+\_\+put@{prism\+\_\+coupler\+\_\+put}}
+\index{prism\+\_\+coupler\+\_\+put@{prism\+\_\+coupler\+\_\+put}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+coupler\+\_\+put}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+coupler\+\_\+type}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+put}}\label{classmod__oasis__coupler_ae59d8823993d9ca8610efd9770393271}
+
+
+prism\+\_\+coupler put array 
+
+
+
+Definition at line 97 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_aaa019c39b0f657e7c37820697ecf354a}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+mcoupler@{prism\+\_\+mcoupler}}
+\index{prism\+\_\+mcoupler@{prism\+\_\+mcoupler}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+mcoupler}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+mcoupler}}\label{classmod__oasis__coupler_aaa019c39b0f657e7c37820697ecf354a}
+
+
+max couplers 
+
+
+
+Definition at line 96 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a6d46883e9df70ab9cdafaf607afacacb}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+mrouter@{prism\+\_\+mrouter}}
+\index{prism\+\_\+mrouter@{prism\+\_\+mrouter}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+mrouter}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+mrouter\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a6d46883e9df70ab9cdafaf607afacacb}
+
+
+max routers 
+
+
+
+Definition at line 92 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a2ebdb255598e1b004de2533f16b06e04}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+nrouter@{prism\+\_\+nrouter}}
+\index{prism\+\_\+nrouter@{prism\+\_\+nrouter}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+nrouter}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p) mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+nrouter = 0\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__coupler_a2ebdb255598e1b004de2533f16b06e04}
+
+
+router counter 
+
+
+
+Definition at line 93 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+\hypertarget{classmod__oasis__coupler_a33dbf692ad73f83f73fe083e252badd8}{\index{mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}!prism\+\_\+router@{prism\+\_\+router}}
+\index{prism\+\_\+router@{prism\+\_\+router}!mod\+\_\+oasis\+\_\+coupler@{mod\+\_\+oasis\+\_\+coupler}}
+\subsubsection[{prism\+\_\+router}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+router\+\_\+type}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+router}}\label{classmod__oasis__coupler_a33dbf692ad73f83f73fe083e252badd8}
+
+
+prism\+\_\+router array 
+
+
+
+Definition at line 94 of file mod\+\_\+oasis\+\_\+coupler.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__coupler_8_f90}{mod\+\_\+oasis\+\_\+coupler.\+F90}\end{DoxyCompactItemize}

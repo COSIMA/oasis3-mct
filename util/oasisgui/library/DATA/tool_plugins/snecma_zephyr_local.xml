@@ -1,0 +1,9 @@
+<model name="snecma_zephyr_local" title="Execution en local sur Zephyr" >
+<desc>
+Execution at Snecma, on Zephyr via vnc session.
+[]
+[logo=plugin_local;caption=local execution]
+[]
+[logo=snecma;caption=Snecma only]
+</desc>
+</model>

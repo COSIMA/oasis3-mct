@@ -41,7 +41,7 @@ ARFLAGS     = -r
 #
 # compiler options and cpp keys
 # 
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 #
 F90FLAGS_1  = -EP -Pstack  -Wf,-pvctl noassume loopcnt=5000000  -Wl,-h lib_cyclic  -Wf,-L fmtlist transform $(PSMILE_INCDIR) $(CPPDEF) -I$(NETCDF_INCLUDE)

@@ -1,0 +1,120 @@
+#  This program is under CECILL_B licence. See footer for details.
+
+proc info_create { args } {
+    set mandatory_arguments { path_father address }
+    initWidget
+    
+    
+    
+    set widgetInfo($address-status) 1
+    set widgetInfo($address-status_txt) ""
+    set title [dTree_getAttribute $XMLtree $full_address_XML "title"]
+    set widgetInfo($address-type) [dTree_tryGetAttribute $XMLtree $full_address_XML "type" "string"]
+    set widgetInfo($address-visibility) [dTree_tryGetAttribute $XMLtree $full_address_XML "visibility" "visible"]
+    
+    ttk::frame $win
+    
+    
+    
+    
+    
+    ttk::label $win.title  -text $title -style "Multiple.TLabel" 
+    
+    switch $widgetInfo($address-type) {
+        "liststring" {
+            ttk::frame $win.result
+            listbox $win.result.lb -listvariable widgetInfo($address-content) -yscrollcommand [list $win.result.sby set] -height 5 -activestyle none -state disabled -background [ThemeColor 1.0]
+              # avoid tab scrolling for mousewheel
+            bind $win.result.lb <MouseWheel> {+set tabscroll 0}
+            bind $win.result.lb  <Leave> {+set tabscroll 1}            
+            
+            ttk::scrollbar $win.result.sby -orient vertical -command [list $win.result.lb yview]
+            grid $win.result.lb -sticky news -column 0 -row 0
+            grid $win.result.sby -sticky news -column 1 -row 0
+            # avoid tab scrolling for mousewheel
+            bind $win.result.sby <MouseWheel> {+set tabscroll 0}
+            bind $win.result.sby <Leave> {+set tabscroll 1}
+        }
+        default {
+            ttk::label $win.result -textvariable widgetInfo($address-variable) -relief sunken -wraplength $widgetInfo(guiSmallWidgetWidth)
+        }
+    }
+    
+    #ttk::label $win.status -textvariable widgetInfo($address-status_txt) -foreground  red
+   
+    if {$widgetInfo($address-visibility) != "hidden"} {
+        eval $widgetInfo(packme-$win)
+       
+    } else {   
+        set widgetInfo(packme-$win) ""
+        eval $widgetInfo(packme-$win)
+    }
+    pack $win.title -side top
+    pack $win.result -side top
+    
+    
+    append widgetInfo($address-refresh) [subst { info_refresh $win $address }]
+    append widgetInfo($address-check) [ subst {  info_check $win $address }]
+    
+    finishWidget
+    
+   
+    
+    # clean the widget callBack on dstruction
+    bind $win <Destroy> [ subst {widget_destroy $win $address}]
+    
+    return $win
+}
+
+
+proc info_check {win address} {
+    global widgetInfo
+    
+    if {$widgetInfo($address-type) == "liststring"} {
+        set widgetInfo($address-variable) [join $widgetInfo($address-content) ";"]
+    }
+}
+
+proc info_refresh {win address} {
+    global widgetInfo
+    if {$widgetInfo($address-type) == "liststring"} {
+        set widgetInfo($address-content) [split $widgetInfo($address-variable) ";"]
+    }
+}
+
+
+
+
+
+#  Copyright CERFACS 2014
+#   
+#  antoine.dauptain@cerfacs.fr
+#   
+#  This software is a computer program whose purpose is to ensure technology
+#  transfer between academia and industry.
+#   
+#  This software is governed by the CeCILL-B license under French law and
+#  abiding by the rules of distribution of free software.  You can  use, 
+#  modify and/ or redistribute the software under the terms of the CeCILL-B
+#  license as circulated by CEA, CNRS and INRIA at the following URL
+#  "http://www.cecill.info". 
+#   
+#  As a counterpart to the access to the source code and  rights to copy,
+#  modify and redistribute granted by the license, users are provided only
+#  with a limited warranty  and the software's author,  the holder of the
+#  economic rights,  and the successive licensors  have only  limited
+#  liability. 
+#   
+#  In this respect, the user's attention is drawn to the risks associated
+#  with loading,  using,  modifying and/or developing or reproducing the
+#  software by the user in light of its specific status of free software,
+#  that may mean  that it is complicated to manipulate,  and  that  also
+#  therefore means  that it is reserved for developers  and  experienced
+#  professionals having in-depth computer knowledge. Users are therefore
+#  encouraged to load and test the software's suitability as regards their
+#  requirements in conditions enabling the security of their systems and/or 
+#  data to be ensured and,  more generally, to use and operate it in the 
+#  same conditions as regards security. 
+#   
+#  The fact that you are presently reading this means that you have had
+#  knowledge of the CeCILL-B license and that you accept its terms.

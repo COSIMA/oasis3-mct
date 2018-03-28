@@ -21,7 +21,7 @@ PROGRAM model2
   ! and the model with CPP key "NO_USE_DOUBLE_PRECISION"
 #ifdef NO_USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(6,37)   ! real
-#elif USE_DOUBLE_PRECISION
+#elif defined USE_DOUBLE_PRECISION
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 #endif
   !
@@ -34,11 +34,12 @@ PROGRAM model2
   ! Global grid parameters : 
   INTEGER :: nlon, nlat     ! dimensions in the 2 directions of space
   INTEGER :: ntot           ! total dimension
-  INTEGER :: il_size
+  INTEGER :: il_paral_size
   INTEGER :: nc ! number of corners in the (i,j) plan
   INTEGER :: indi_beg, indi_end, indj_beg, indj_end
   !
   DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_lon,globalgrid_lat
+  DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: localgrid_lon,localgrid_lat
   DOUBLE PRECISION, DIMENSION(:,:,:), POINTER :: globalgrid_clo,globalgrid_cla
   DOUBLE PRECISION, DIMENSION(:,:), POINTER   :: globalgrid_srf
   INTEGER, DIMENSION(:,:), POINTER            :: indice_mask ! mask, 0 == valid point, 1 == masked point 
@@ -199,17 +200,19 @@ PROGRAM model2
   ! Definition of the partition of the grid (calling oasis_def_partition)
   ntot=nlon*nlat
 #ifdef DECOMP_APPLE
-  il_size = 3
+  il_paral_size = 3
 #elif defined DECOMP_BOX
-  il_size = 5
+  il_paral_size = 5
 #endif
-  ALLOCATE(il_paral(il_size))
-  WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
+  ALLOCATE(il_paral(il_paral_size))
+  WRITE(w_unit,*) 'After allocate il_paral, il_paral_size', il_paral_size
   call flush(w_unit)
   !
-  CALL decomp_def (il_paral,il_size,nlon,nlat,mype,npes,w_unit)
+  CALL decomp_def (il_paral,il_paral_size,nlon,nlat,mype,npes,w_unit)
   WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
   call flush(w_unit)
+  ! The data are exchanged in the global grid so you do not need to pass 
+  ! isize to oasis_def_partition
   CALL oasis_def_partition (part_id, il_paral, ierror)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -273,6 +276,12 @@ PROGRAM model2
   ALLOCATE(field2_send(var_actual_shape(2), var_actual_shape(4)),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field2_send'
   !
+  ALLOCATE(localgrid_lon(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lon'
+  !
+  ALLOCATE(localgrid_lat(var_actual_shape(2), var_actual_shape(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating localgrid_lat'
+  !
   DEALLOCATE(il_paral)
   !
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!OASIS_PUT/OASIS_GET !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -285,6 +294,13 @@ PROGRAM model2
   ELSE
       indj_end = nlat 
   ENDIF
+  !
+  ! Local grid
+  !
+  localgrid_lon=RESHAPE(globalgrid_lon(indi_beg:indi_end,indj_beg:indj_end),&
+                               (/ var_actual_shape(2), var_actual_shape(4) /))
+  localgrid_lat=RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
+                               (/ var_actual_shape(2), var_actual_shape(4) /))
   !
   ! Data exchange
   !
@@ -304,11 +320,7 @@ PROGRAM model2
     ! Send the field FSENDATM
     !
     CALL function_sent(var_actual_shape(2), var_actual_shape(4), &
-                       RESHAPE(globalgrid_lon(indi_beg:indi_end,indj_beg:indj_end),&
-                               (/ var_actual_shape(2), var_actual_shape(4) /)), &
-                       RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
-                               (/ var_actual_shape(2), var_actual_shape(4) /)), &
-                                field2_send,ib)
+                       localgrid_lon, localgrid_lat, field2_send,ib)
 
     !		       
     write(w_unit,*) 'tcx sendf2 ',itap_sec,minval(field2_send),maxval(field2_send)
@@ -328,7 +340,7 @@ PROGRAM model2
   !         TERMINATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!! OASIS_TERMINATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Collective call to terminate the coupling exchanges
   !

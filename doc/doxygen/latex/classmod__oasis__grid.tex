@@ -1,0 +1,579 @@
+\hypertarget{classmod__oasis__grid}{\section{mod\+\_\+oasis\+\_\+grid Module Reference}
+\label{classmod__oasis__grid}\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+}
+
+
+O\+A\+S\+I\+S grid data and methods.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+interface \hyperlink{interfacemod__oasis__grid_1_1oasis__write__angle}{oasis\+\_\+write\+\_\+angle}
+\begin{DoxyCompactList}\small\item\em Generic interface to support writing 4 or 8 byte reals. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__grid_1_1oasis__write__area}{oasis\+\_\+write\+\_\+area}
+\begin{DoxyCompactList}\small\item\em Generic interface to support writing 4 or 8 byte reals. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__grid_1_1oasis__write__corner}{oasis\+\_\+write\+\_\+corner}
+\begin{DoxyCompactList}\small\item\em Generic interface to support writing 4 or 8 byte reals. \end{DoxyCompactList}\item 
+interface \hyperlink{interfacemod__oasis__grid_1_1oasis__write__grid}{oasis\+\_\+write\+\_\+grid}
+\begin{DoxyCompactList}\small\item\em Generic interface to support writing 4 or 8 byte reals. \end{DoxyCompactList}\item 
+type \hyperlink{structmod__oasis__grid_1_1prism__grid__type}{prism\+\_\+grid\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Model grid data for creating mapping data and conserving fields. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__grid_a4bc230ba4aa317f666bdab2416b4f6da}{oasis\+\_\+print\+\_\+grid\+\_\+data} ()
+\begin{DoxyCompactList}\small\item\em Print grid information to log file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__grid_acb0569d8677f0762559ed6b211945d9b}{oasis\+\_\+start\+\_\+grids\+\_\+writing} (iwrite)
+\begin{DoxyCompactList}\small\item\em User interface to initialize grid writing. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__grid_a16906db2b252a3a5ce85e21aa1336e3b}{oasis\+\_\+write\+\_\+mask} (cgrid, nx, ny, mask, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set integer mask values. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__grid_a59755e271ccdd0c98807b5938ef33e78}{oasis\+\_\+terminate\+\_\+grids\+\_\+writing} ()
+\begin{DoxyCompactList}\small\item\em User interface to indicate user defined grids are done. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__grid_a275791c512cefae9799e188d92b6f9d4}{oasis\+\_\+write2files} ()
+\begin{DoxyCompactList}\small\item\em Interface that actually writes fields to grid files. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), save, \\*
+public \hyperlink{classmod__oasis__grid_ad6e65eb9872825ac98db6ce1f7dcd618}{prism\+\_\+ngrid} = 0
+\begin{DoxyCompactList}\small\item\em counter for grids \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__grid_1_1prism__grid__type}{prism\+\_\+grid\+\_\+type}), \\*
+dimension(\hyperlink{classmod__oasis__grid_a9df267c5d7acbb73eb35d6aaf10ab59e}{mgrid}), save, public \hyperlink{classmod__oasis__grid_a43b75282e77fd687bd7173f4f78abcb1}{prism\+\_\+grid}
+\begin{DoxyCompactList}\small\item\em array of grid datatypes \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classmod__oasis__grid_a61a1b9209b5012b58fadf2a79284e1e7}{oasis\+\_\+write\+\_\+grid\+\_\+r8} (cgrid, nx, ny, lon, lat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set latitudes and longitudes for 8 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_a74137e0541f8a9e2b1f05918b7f8da17}{oasis\+\_\+write\+\_\+grid\+\_\+r4} (cgrid, nx, ny, lon, lat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set latitudes and longitudes for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_a5ffeb1d150d305f2868114faf7ebddb2}{oasis\+\_\+write\+\_\+angle\+\_\+r8} (cgrid, nx, ny, angle, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set angle for 8 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_aa4f44626552980d5418d77447e1ce058}{oasis\+\_\+write\+\_\+angle\+\_\+r4} (cgrid, nx, ny, angle, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set angle for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_af6953999aa6fb1d0190187052bf52671}{oasis\+\_\+write\+\_\+corner\+\_\+r8} (cgrid, nx, ny, nc, clon, clat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set corner latitudes and longitudes for 8 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_a30e5d9c4766b2f323d4b930499e0f23b}{oasis\+\_\+write\+\_\+corner\+\_\+r4} (cgrid, nx, ny, nc, clon, clat, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set corner latitudes and longitudes for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_ae54eaec7b4e9d4877af0ce8537b0b256}{oasis\+\_\+write\+\_\+area\+\_\+r8} (cgrid, nx, ny, area, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set area values for 8 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_ad1d3e95cf63a2277b82167ec6c8148d4}{oasis\+\_\+write\+\_\+area\+\_\+r4} (cgrid, nx, ny, area, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set area values for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_aa1b2c3dc81299472185c1e7142d143e0}{oasis\+\_\+findgrid} (cgrid, nx, ny, grid\+I\+D)
+\begin{DoxyCompactList}\small\item\em Local interface to find grid\+I\+D for a specified grid name. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__grid_a5aba1fce549be5f9db2fda5374d588e1}{oasis\+\_\+grid\+\_\+loc2glo} (aloc, aglo, partid, taskid)
+\begin{DoxyCompactList}\small\item\em Local routine that gathers the local array using partition information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{classmod__oasis__grid_a9df267c5d7acbb73eb35d6aaf10ab59e}{mgrid} = 100
+\begin{DoxyCompactList}\small\item\em maximum number of grids allowed \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), save \hyperlink{classmod__oasis__grid_a587c160986cc015e4367b1cca13babfb}{writing\+\_\+grids\+\_\+call} =0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+O\+A\+S\+I\+S grid data and methods. 
+
+These interfaces support both grid data specified globally on the root task as required in Oasis3 and grid data decomposed across tasks. If grid data is decomposed across tasks, the optional partid argument must be specified when it exists in the interface. 
+
+Definition at line 9 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__grid_aa1b2c3dc81299472185c1e7142d143e0}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+findgrid@{oasis\+\_\+findgrid}}
+\index{oasis\+\_\+findgrid@{oasis\+\_\+findgrid}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+findgrid}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+findgrid (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{grid\+I\+D}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_aa1b2c3dc81299472185c1e7142d143e0}
+
+
+Local interface to find grid\+I\+D for a specified grid name. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt out}  & {\em gridid} & grid\+I\+D matching cgrid \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1174 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a5aba1fce549be5f9db2fda5374d588e1}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+grid\+\_\+loc2glo@{oasis\+\_\+grid\+\_\+loc2glo}}
+\index{oasis\+\_\+grid\+\_\+loc2glo@{oasis\+\_\+grid\+\_\+loc2glo}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+grid\+\_\+loc2glo}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+grid\+\_\+loc2glo (
+\begin{DoxyParamCaption}
+\item[{real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), intent(in)}]{aloc, }
+\item[{real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), intent(inout)}]{aglo, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{partid, }
+\item[{integer(kind=ip\+\_\+i4\+\_\+p), intent(in)}]{taskid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a5aba1fce549be5f9db2fda5374d588e1}
+
+
+Local routine that gathers the local array using partition information. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em aloc} & local array\\
+\hline
+\mbox{\tt in,out}  & {\em aglo} & global array\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id for local data\\
+\hline
+\mbox{\tt in}  & {\em taskid} & task id to gather data to \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1222 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a4bc230ba4aa317f666bdab2416b4f6da}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+print\+\_\+grid\+\_\+data@{oasis\+\_\+print\+\_\+grid\+\_\+data}}
+\index{oasis\+\_\+print\+\_\+grid\+\_\+data@{oasis\+\_\+print\+\_\+grid\+\_\+data}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+print\+\_\+grid\+\_\+data}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+print\+\_\+grid\+\_\+data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__grid_a4bc230ba4aa317f666bdab2416b4f6da}
+
+
+Print grid information to log file. 
+
+
+
+Definition at line 155 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_acb0569d8677f0762559ed6b211945d9b}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+start\+\_\+grids\+\_\+writing@{oasis\+\_\+start\+\_\+grids\+\_\+writing}}
+\index{oasis\+\_\+start\+\_\+grids\+\_\+writing@{oasis\+\_\+start\+\_\+grids\+\_\+writing}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+start\+\_\+grids\+\_\+writing}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+start\+\_\+grids\+\_\+writing (
+\begin{DoxyParamCaption}
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{iwrite}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__grid_acb0569d8677f0762559ed6b211945d9b}
+
+
+User interface to initialize grid writing. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em iwrite} & flag, obsolete \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 208 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a59755e271ccdd0c98807b5938ef33e78}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+terminate\+\_\+grids\+\_\+writing@{oasis\+\_\+terminate\+\_\+grids\+\_\+writing}}
+\index{oasis\+\_\+terminate\+\_\+grids\+\_\+writing@{oasis\+\_\+terminate\+\_\+grids\+\_\+writing}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+terminate\+\_\+grids\+\_\+writing}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+terminate\+\_\+grids\+\_\+writing (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__grid_a59755e271ccdd0c98807b5938ef33e78}
+
+
+User interface to indicate user defined grids are done. 
+
+
+
+Definition at line 797 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a275791c512cefae9799e188d92b6f9d4}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write2files@{oasis\+\_\+write2files}}
+\index{oasis\+\_\+write2files@{oasis\+\_\+write2files}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write2files}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write2files (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__grid_a275791c512cefae9799e188d92b6f9d4}
+
+
+Interface that actually writes fields to grid files. 
+
+Write fields to grid files. Only write fields that have been buffered and if prism\+\_\+grid\+\_\+terminate\+\_\+grids\+\_\+writing has been called. This is called by all tasks from oasis\+\_\+enddef.
+
+
+\begin{DoxyItemize}
+\item Check that a grid defined on a partitition is defined on all tasks on that partition.
+\item Write grid information
+\begin{DoxyItemize}
+\item Determine which tasks are associated with the grid information
+\item Check that array sizes match for all fields
+\item Gather longitudes if needed and write from root
+\item Gather latitudes if needed and write from root
+\item Gather corner longitudes if needed and write from root
+\item Gather corner latitudes if needed and write from root
+\item Gather areas if needed and write from root
+\item Gather angles if needed and write from root
+\item Gather masks if needed and write from root 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 828 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_aa4f44626552980d5418d77447e1ce058}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+angle\+\_\+r4@{oasis\+\_\+write\+\_\+angle\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+angle\+\_\+r4@{oasis\+\_\+write\+\_\+angle\+\_\+r4}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+angle\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{angle, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_aa4f44626552980d5418d77447e1ce058}
+
+
+User interface to set angle for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em angle} & angles\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 437 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a5ffeb1d150d305f2868114faf7ebddb2}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+angle\+\_\+r8@{oasis\+\_\+write\+\_\+angle\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+angle\+\_\+r8@{oasis\+\_\+write\+\_\+angle\+\_\+r8}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+angle\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{angle, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a5ffeb1d150d305f2868114faf7ebddb2}
+
+
+User interface to set angle for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em angle} & angles\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 381 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_ad1d3e95cf63a2277b82167ec6c8148d4}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+area\+\_\+r4@{oasis\+\_\+write\+\_\+area\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+area\+\_\+r4@{oasis\+\_\+write\+\_\+area\+\_\+r4}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+area\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{area, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_ad1d3e95cf63a2277b82167ec6c8148d4}
+
+
+User interface to set area values for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em area} & areas\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 741 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_ae54eaec7b4e9d4877af0ce8537b0b256}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+area\+\_\+r8@{oasis\+\_\+write\+\_\+area\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+area\+\_\+r8@{oasis\+\_\+write\+\_\+area\+\_\+r8}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+area\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+area\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{area, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_ae54eaec7b4e9d4877af0ce8537b0b256}
+
+
+User interface to set area values for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em area} & areas\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 684 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a30e5d9c4766b2f323d4b930499e0f23b}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+corner\+\_\+r4@{oasis\+\_\+write\+\_\+corner\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+corner\+\_\+r4@{oasis\+\_\+write\+\_\+corner\+\_\+r4}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+corner\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+corner\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nc, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{clon, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{clat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a30e5d9c4766b2f323d4b930499e0f23b}
+
+
+User interface to set corner latitudes and longitudes for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em nc} & number of corners per cell\\
+\hline
+\mbox{\tt in}  & {\em clon} & corner longitudes\\
+\hline
+\mbox{\tt in}  & {\em clat} & corner latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 560 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_af6953999aa6fb1d0190187052bf52671}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+corner\+\_\+r8@{oasis\+\_\+write\+\_\+corner\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+corner\+\_\+r8@{oasis\+\_\+write\+\_\+corner\+\_\+r8}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+corner\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+corner\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nc, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{clon, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:,\+:), intent(in)}]{clat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_af6953999aa6fb1d0190187052bf52671}
+
+
+User interface to set corner latitudes and longitudes for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em nc} & number of corners per cell\\
+\hline
+\mbox{\tt in}  & {\em clon} & corner longitudes\\
+\hline
+\mbox{\tt in}  & {\em clat} & corner latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 492 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a74137e0541f8a9e2b1f05918b7f8da17}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+grid\+\_\+r4@{oasis\+\_\+write\+\_\+grid\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+grid\+\_\+r4@{oasis\+\_\+write\+\_\+grid\+\_\+r4}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+grid\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{lon, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{lat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a74137e0541f8a9e2b1f05918b7f8da17}
+
+
+User interface to set latitudes and longitudes for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em lon} & longitudes\\
+\hline
+\mbox{\tt in}  & {\em lat} & latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 315 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a61a1b9209b5012b58fadf2a79284e1e7}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+grid\+\_\+r8@{oasis\+\_\+write\+\_\+grid\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+grid\+\_\+r8@{oasis\+\_\+write\+\_\+grid\+\_\+r8}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+grid\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+grid\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lon, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{lat, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a61a1b9209b5012b58fadf2a79284e1e7}
+
+
+User interface to set latitudes and longitudes for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em lon} & longitudes\\
+\hline
+\mbox{\tt in}  & {\em lat} & latitudes\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 248 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a16906db2b252a3a5ce85e21aa1336e3b}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!oasis\+\_\+write\+\_\+mask@{oasis\+\_\+write\+\_\+mask}}
+\index{oasis\+\_\+write\+\_\+mask@{oasis\+\_\+write\+\_\+mask}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{oasis\+\_\+write\+\_\+mask}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+mask (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:,\+:), intent(in)}]{mask, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__grid_a16906db2b252a3a5ce85e21aa1336e3b}
+
+
+User interface to set integer mask values. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em mask} & mask\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 627 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__grid_a9df267c5d7acbb73eb35d6aaf10ab59e}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!mgrid@{mgrid}}
+\index{mgrid@{mgrid}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{mgrid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+grid\+::mgrid = 100\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a9df267c5d7acbb73eb35d6aaf10ab59e}
+
+
+maximum number of grids allowed 
+
+
+
+Definition at line 113 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a43b75282e77fd687bd7173f4f78abcb1}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!prism\+\_\+grid@{prism\+\_\+grid}}
+\index{prism\+\_\+grid@{prism\+\_\+grid}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{prism\+\_\+grid}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+grid\+\_\+type}), dimension({\bf mgrid}), save, public mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+grid}}\label{classmod__oasis__grid_a43b75282e77fd687bd7173f4f78abcb1}
+
+
+array of grid datatypes 
+
+
+
+Definition at line 140 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_ad6e65eb9872825ac98db6ce1f7dcd618}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!prism\+\_\+ngrid@{prism\+\_\+ngrid}}
+\index{prism\+\_\+ngrid@{prism\+\_\+ngrid}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{prism\+\_\+ngrid}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), save, public mod\+\_\+oasis\+\_\+grid\+::prism\+\_\+ngrid = 0}}\label{classmod__oasis__grid_ad6e65eb9872825ac98db6ce1f7dcd618}
+
+
+counter for grids 
+
+
+
+Definition at line 139 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{classmod__oasis__grid_a587c160986cc015e4367b1cca13babfb}{\index{mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}!writing\+\_\+grids\+\_\+call@{writing\+\_\+grids\+\_\+call}}
+\index{writing\+\_\+grids\+\_\+call@{writing\+\_\+grids\+\_\+call}!mod\+\_\+oasis\+\_\+grid@{mod\+\_\+oasis\+\_\+grid}}
+\subsubsection[{writing\+\_\+grids\+\_\+call}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+grid\+::writing\+\_\+grids\+\_\+call =0\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__grid_a587c160986cc015e4367b1cca13babfb}
+
+
+Definition at line 114 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

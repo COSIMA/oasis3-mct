@@ -39,7 +39,7 @@ ARFLAGS     = -ruv
 #
 # compiler options and cpp keys
 # 
-CPPDEF    =  -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -Ucray -UCRAY -U_CRAY -U_CRAYIEEE
+CPPDEF    =  -Duse_comm_$(CHAN) -D__VERBOSE -Ucray -UCRAY -U_CRAY -U_CRAYIEEE
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 

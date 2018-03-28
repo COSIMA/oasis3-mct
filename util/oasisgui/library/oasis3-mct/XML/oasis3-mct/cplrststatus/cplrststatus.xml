@@ -1,0 +1,85 @@
+ <model name="fldproper" title="Coupling fields properties" layout="flat">
+  <desc> 
+Please enter the coupling period, the name of the restart files and the status for 
+the different coupling fields, selecting the different rows available.
+If you have many fields, it is possible to propagate the properties of one field 
+to the others using the button "copy". 
+The "load" button is useless for the OASIS3-MCT application.[]
+A blue (?), located at the right bottom of this window, gives more information on the data to fill up, specially on the
+INPUT and OUTPUT field properties.
+  </desc>
+ </model>
+
+ <model name="cplrststatus" title="Coupling fields properties" layout="flat">
+    <multiple name="crs" title="Coupling period, restarts, status" require="field_names_list" custom_label="Fields" size="1.5;1.5">
+         <param name="cpl" title="Coupling or IO period in s (integer)" type="integer" />
+         <param name="restart" title="Restart file (NetCDF)" type="string" />
+         <choice name="status" title="Status" type="string" default="exported">
+               <option value="exported" title="EXPORTED"/>
+               <option value="expout" title="EXPOUT"/>
+               <option value="input" title="INPUT"/>
+               <option value="output" title="OUTPUT"/>
+         </choice>
+    </multiple>
+    <docu> 
+[section=NetCDF Restart files]
+The name of the coupling restart file for the field is mandatory even if no coupling restart file is effectively used. []
+
+More information on the restart files can be found in the User Guide section 2.10 and section 5.2.
+
+[section=Status of the fields]
+[item=EXPORTED:] The field is exchanged between component models and transformed by OASIS3-MC
+[item=EXPOUT:] The field is exchanged, transformed and also written to two debug NetCDF files (after LOCTRANS and BLASOLD before 
+remapping and after all transformations after remapping).
+[item=INPUT:] The field is read in from the input file by the target model.
+[item=OUTPUT:] The field is written out to an output debug NetCDF file by the source model. 
+
+More information is available in section 3.3 of the User Guide.
+
+<docuold>
+[section=NetCDF Restart files]
+The name of the coupling restart file for the field is mandatory even if no coupling restart file is effectively used. []
+
+At the beginning of a coupled run, some coupling fields may have to be initially read from their coupling restart 
+file on their source grid. When needed, these files are also automatically updated by the last active oasis_put 
+call of the run. Warning: the date is not written or read to/from the restart file; therefore, the 
+user has to make sure that the appropriate coupling restart file is present in the working directory. The coupling 
+restart files must follow the NetCDF format. []
+
+Coupling fields coming from different models cannot be in the same coupling restart files, 
+but for each model, there can be an arbitrary number of fields written in one coupling restart file. The only exception 
+is when a coupling field sent by a source component model is associated with more than one target field and model; 
+in that case, if coupling restart files are required, it is mandatory to specify different files for the different fields. []
+
+In the coupling restart files, the fields must be provided on the source grid in single or double precision REAL arrays and, 
+as the grid data files, must be dimensioned (nx, ny), where nx and ny are the grid first and second dimension. The shape and 
+orientation of each restart field (and of the corresponding coupling fields exchanged during the simulation) must be coherent 
+with the shape of its grid data arrays. []
+
+The coupling restart files are also used automatically by OASIS3-MCT to allow partial LOCTRANS time transformation 
+to be saved at the end of a run for exact restart at the start of the next run. For that reason, coupling restart 
+filenames are now required for all namcouple transformations that use LOCTRANS (with non INSTANT values).
+
+[section=Status of the fields]
+The field may be : []
+- EXPORTED: exchanged between component models and transformed by OASIS3-MCT []
+- EXPOUT: exchanged, transformed and also written to two debug NetCDF files, one before the sending action in 
+the source model below the oasis_put call (after local transformations LOCTRANS and BLASOLD if present), and one 
+after the receiving action in the target model below the oasis_get call (after all transformations). EXPOUT should 
+be used when debugging the coupled model only. The name of the debug NetCDF file (one per field) is automatically 
+defined based on the field and component model names. []
+- INPUT: read in from the input file by the target model below the oasis_get call at appropriate times corresponding 
+to the input period indicated by the user in the namcouple. []
+- OUTPUT: written out to an output debug NetCDF file by the source model below the oasis_put call, after local
+transformations LOCTRANS and BLASOLD, at appropriate times corresponding to the output period indicated by 
+the user in the configuration file. 
+</docuold>
+    </docu>
+</model>
+
+
+
+
+
+
+

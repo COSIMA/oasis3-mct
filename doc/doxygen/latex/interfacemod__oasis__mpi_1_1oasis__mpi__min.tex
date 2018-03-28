@@ -1,0 +1,162 @@
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__min}{\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+min Interface Reference}
+\label{interfacemod__oasis__mpi_1_1oasis__mpi__min}\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}}
+}
+
+
+Generic overloaded interface into M\+P\+I min reduction.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min_a1deee0fc506aeabafcf4a33866694934}{oasis\+\_\+mpi\+\_\+mini0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global minimum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min_a7f514ac7a5701f4a5ce8612d2e8bcb16}{oasis\+\_\+mpi\+\_\+mini1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1\+D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min_a18098e0abd7924b31d64e06c789aa0c4}{oasis\+\_\+mpi\+\_\+minr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an global minimum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min_a62604730fbe7bf0dc21cf9fb9d83e981}{oasis\+\_\+mpi\+\_\+minr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1\+D doubles. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic overloaded interface into M\+P\+I min reduction. 
+
+Definition at line 100 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__min_a1deee0fc506aeabafcf4a33866694934}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}!oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}}
+\index{oasis\+\_\+mpi\+\_\+mini0@{oasis\+\_\+mpi\+\_\+mini0}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+mini0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min\+::oasis\+\_\+mpi\+\_\+mini0 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__min_a1deee0fc506aeabafcf4a33866694934}
+
+
+Compute a global minimum for a scalar integer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1747 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__min_a7f514ac7a5701f4a5ce8612d2e8bcb16}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}!oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}}
+\index{oasis\+\_\+mpi\+\_\+mini1@{oasis\+\_\+mpi\+\_\+mini1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+mini1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min\+::oasis\+\_\+mpi\+\_\+mini1 (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__min_a7f514ac7a5701f4a5ce8612d2e8bcb16}
+
+
+Compute an array of global minimums for an array of 1\+D integers. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1810 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__min_a18098e0abd7924b31d64e06c789aa0c4}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}!oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}}
+\index{oasis\+\_\+mpi\+\_\+minr0@{oasis\+\_\+mpi\+\_\+minr0}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+minr0}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min\+::oasis\+\_\+mpi\+\_\+minr0 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__min_a18098e0abd7924b31d64e06c789aa0c4}
+
+
+Compute an global minimum for a scalar double. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1873 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__min_a62604730fbe7bf0dc21cf9fb9d83e981}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}!oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}}
+\index{oasis\+\_\+mpi\+\_\+minr1@{oasis\+\_\+mpi\+\_\+minr1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}}
+\subsubsection[{oasis\+\_\+mpi\+\_\+minr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min\+::oasis\+\_\+mpi\+\_\+minr1 (
+\begin{DoxyParamCaption}
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{lvec, }
+\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(out)}]{gvec, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
+\item[{character($\ast$), intent(in), optional}]{string, }
+\item[{logical, intent(in), optional}]{all}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__min_a62604730fbe7bf0dc21cf9fb9d83e981}
+
+
+Compute an array of global minimums for an array of 1\+D doubles. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em lvec} & local values\\
+\hline
+\mbox{\tt out}  & {\em gvec} & global values\\
+\hline
+\mbox{\tt in}  & {\em comm} & mpi communicator\\
+\hline
+\mbox{\tt in}  & {\em string} & to identify caller\\
+\hline
+\mbox{\tt in}  & {\em all} & if true call allreduce, otherwise reduce to task 0 \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1936 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

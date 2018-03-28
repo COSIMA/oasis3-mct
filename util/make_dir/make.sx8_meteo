@@ -41,8 +41,8 @@ ARFLAGS   = -ruv
 #
 # compiler options and cpp keys
 #
-CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
-CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CCPPDEF   = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 #
 #COMFLAGS  =  -clear -Cvsafe  -Wf"-init stack=nan heap=nan -K a" -EP 

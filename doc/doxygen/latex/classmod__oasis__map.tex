@@ -1,0 +1,452 @@
+\hypertarget{classmod__oasis__map}{\section{mod\+\_\+oasis\+\_\+map Module Reference}
+\label{classmod__oasis__map}\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+}
+
+
+O\+A\+S\+I\+S map (interpolation) data and methods.  
+
+
+\subsection*{Data Types}
+\begin{DoxyCompactItemize}
+\item 
+type \hyperlink{structmod__oasis__map_1_1prism__mapper__type}{prism\+\_\+mapper\+\_\+type}
+\begin{DoxyCompactList}\small\item\em Mapper data for interpolating data between grids. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{classmod__oasis__map_a6f27846fb1dcb2db3095b9ace4fa3c5b}{oasis\+\_\+map\+\_\+genmap} (mapid, namid)
+\begin{DoxyCompactList}\small\item\em Routine to generate mapping weights data via a direct S\+C\+R\+I\+P call. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__map_acbe7b9e25c19dbbd2fbebd3895a87d64}{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig} (s\+Mat, Sgs\+Map, Dgs\+Map, newdom, file\+Name, mytask, mpicom, nwgts, areasrc, areadst, ni\+\_\+i, nj\+\_\+i, ni\+\_\+o, nj\+\_\+o)
+\begin{DoxyCompactList}\small\item\em Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F weights file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{classmod__oasis__map_a3345e2fc3d74cc1221d6c6d993233990}{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg} (s\+Mat, Sgs\+Map, Dgs\+Map, newdom, file\+Name, mytask, mpicom, nwgts, areasrc, areadst, ni\+\_\+i, nj\+\_\+i, ni\+\_\+o, nj\+\_\+o)
+\begin{DoxyCompactList}\small\item\em Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F file using smart scatter (ceg) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__map_ab15f72e9f33a67181edc977c06b951e2}{prism\+\_\+mmapper}
+\begin{DoxyCompactList}\small\item\em max mappers \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{classmod__oasis__map_af543b83ec5bed63a4448ff641137b0c5}{prism\+\_\+nmapper} = 0
+\begin{DoxyCompactList}\small\item\em mapper counter \end{DoxyCompactList}\item 
+type(\hyperlink{structmod__oasis__map_1_1prism__mapper__type}{prism\+\_\+mapper\+\_\+type}), \\*
+dimension(\+:), pointer, public \hyperlink{classmod__oasis__map_a00ad53f61b6998938fca792455487f7e}{prism\+\_\+mapper}
+\begin{DoxyCompactList}\small\item\em list of defined mappers \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+logical function \hyperlink{classmod__oasis__map_a2528f60bde618dd4840d3adb5a569996}{check\+\_\+myindex} (index, starti, counti)
+\begin{DoxyCompactList}\small\item\em Function that checks whether an index is part of a start and count list. \end{DoxyCompactList}\item 
+subroutine \hyperlink{classmod__oasis__map_a84a573c180be2a5dc8a14fd18b2dc4b7}{augment\+\_\+arrays} (cnt, reclen, bsize, nwgts)
+\item 
+integer function \hyperlink{classmod__oasis__map_a8889e0dcab8e1e894d3203c480110bed}{get\+\_\+cegindex} (index, starti, counti, peloci)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+integer, parameter, private \hyperlink{classmod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}{r8} = ip\+\_\+double\+\_\+p
+\item 
+integer, parameter, private \hyperlink{classmod__oasis__map_aa58997467050224f6db2bc93fe5f7ca1}{in} = ip\+\_\+i4\+\_\+p
+\item 
+real(\hyperlink{classmod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}{r8}), dimension(\+:,\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a28b59479c467c58995c6300071ca140a}{snew}
+\item 
+real(\hyperlink{classmod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}{r8}), dimension(\+:,\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a1fc7e7f295910352524d442c5d0dbf79}{sold}
+\item 
+integer, dimension(\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a2575785d3ea5e1a37c7f6303f00eb727}{rnew}
+\item 
+integer, dimension(\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a2931a6f582d0173cc0e6b155b8cb55b7}{rold}
+\item 
+integer, dimension(\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a8ae737bd62499fe60ebb48d04ad3b6dd}{cnew}
+\item 
+integer, dimension(\+:), \\*
+allocatable, private \hyperlink{classmod__oasis__map_a479ecc5b0be5d1adf3973cb08c40d30a}{cold}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+O\+A\+S\+I\+S map (interpolation) data and methods. 
+
+Definition at line 5 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{classmod__oasis__map_a84a573c180be2a5dc8a14fd18b2dc4b7}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!augment\+\_\+arrays@{augment\+\_\+arrays}}
+\index{augment\+\_\+arrays@{augment\+\_\+arrays}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{augment\+\_\+arrays}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+map\+::augment\+\_\+arrays (
+\begin{DoxyParamCaption}
+\item[{integer, intent(inout)}]{cnt, }
+\item[{integer, intent({\bf in})}]{reclen, }
+\item[{integer, intent(inout)}]{bsize, }
+\item[{integer, intent({\bf in})}]{nwgts}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a84a573c180be2a5dc8a14fd18b2dc4b7}
+
+
+Definition at line 1528 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a2528f60bde618dd4840d3adb5a569996}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!check\+\_\+myindex@{check\+\_\+myindex}}
+\index{check\+\_\+myindex@{check\+\_\+myindex}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{check\+\_\+myindex}]{\setlength{\rightskip}{0pt plus 5cm}logical function mod\+\_\+oasis\+\_\+map\+::check\+\_\+myindex (
+\begin{DoxyParamCaption}
+\item[{integer({\bf in})}]{index, }
+\item[{integer({\bf in}), dimension(\+:)}]{starti, }
+\item[{integer({\bf in}), dimension(\+:)}]{counti}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a2528f60bde618dd4840d3adb5a569996}
+
+
+Function that checks whether an index is part of a start and count list. 
+
+Does a binary search on a sorted start and count list to determine whether index is a value in the list. The list values consist of the values start(i)\+:start(i)+count(i)-\/1 for all i.
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & index to search\\
+\hline
+{\em starti} & start list\\
+\hline
+{\em counti} & count list \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 845 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a8889e0dcab8e1e894d3203c480110bed}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!get\+\_\+cegindex@{get\+\_\+cegindex}}
+\index{get\+\_\+cegindex@{get\+\_\+cegindex}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{get\+\_\+cegindex}]{\setlength{\rightskip}{0pt plus 5cm}integer function mod\+\_\+oasis\+\_\+map\+::get\+\_\+cegindex (
+\begin{DoxyParamCaption}
+\item[{integer({\bf in})}]{index, }
+\item[{integer({\bf in}), dimension(\+:)}]{starti, }
+\item[{integer({\bf in}), dimension(\+:)}]{counti, }
+\item[{integer({\bf in}), dimension(\+:)}]{peloci}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a8889e0dcab8e1e894d3203c480110bed}
+
+\begin{DoxyParams}{Parameters}
+{\em index} & index to search\\
+\hline
+{\em starti} & start list\\
+\hline
+{\em counti} & count list\\
+\hline
+{\em peloci} & pe list \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1585 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a6f27846fb1dcb2db3095b9ace4fa3c5b}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!oasis\+\_\+map\+\_\+genmap@{oasis\+\_\+map\+\_\+genmap}}
+\index{oasis\+\_\+map\+\_\+genmap@{oasis\+\_\+map\+\_\+genmap}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{oasis\+\_\+map\+\_\+genmap}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+genmap (
+\begin{DoxyParamCaption}
+\item[{integer(ip\+\_\+i4\+\_\+p), intent({\bf in})}]{mapid, }
+\item[{integer(ip\+\_\+i4\+\_\+p), intent({\bf in})}]{namid}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__map_a6f27846fb1dcb2db3095b9ace4fa3c5b}
+
+
+Routine to generate mapping weights data via a direct S\+C\+R\+I\+P call. 
+
+This routine reads in grid data from files and passes that data to S\+C\+R\+I\+P. Mapping weights are generated and written to a file. This entire operation is done on a single task.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mapid} & map id\\
+\hline
+\mbox{\tt in}  & {\em namid} & namcouple id \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 78 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a3345e2fc3d74cc1221d6c6d993233990}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg@{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg}}
+\index{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg@{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+smat), dimension(\+:), intent(out), pointer}]{s\+Mat, }
+\item[{type(mct\+\_\+gsmap), intent({\bf in}), target}]{Sgs\+Map, }
+\item[{type(mct\+\_\+gsmap), intent({\bf in}), target}]{Dgs\+Map, }
+\item[{character($\ast$), intent({\bf in})}]{newdom, }
+\item[{character($\ast$), intent({\bf in})}]{file\+Name, }
+\item[{integer({\bf in}), intent({\bf in})}]{mytask, }
+\item[{integer({\bf in}), intent({\bf in})}]{mpicom, }
+\item[{integer({\bf in}), intent(out)}]{nwgts, }
+\item[{type(mct\+\_\+avect), intent(out), optional}]{areasrc, }
+\item[{type(mct\+\_\+avect), intent(out), optional}]{areadst, }
+\item[{integer({\bf in}), intent(out), optional}]{ni\+\_\+i, }
+\item[{integer({\bf in}), intent(out), optional}]{nj\+\_\+i, }
+\item[{integer({\bf in}), intent(out), optional}]{ni\+\_\+o, }
+\item[{integer({\bf in}), intent(out), optional}]{nj\+\_\+o}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__map_a3345e2fc3d74cc1221d6c6d993233990}
+
+
+Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F file using smart scatter (ceg) 
+
+Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F data file using a low memory method and then scatter to all pes using a smart method where only select data is sent to tasks. Based on the s\+Mat\+Readdnc method from C\+E\+S\+M1.\+0.\+3 This routine leverages gsmaps to determine scatter pattern
+
+The scatter is implemented via the root task reading the data and then determining which task gets which weights from the gsmap. The root the sends specific data to each task.
+
+The algorithm to determine which task a weigth belongs to involves checking the task ownership for a given global index.
+
+The local buffer sizes are estimated up front based on ngridcell/npes plus 20\% (see 1.\+2 below). If the local buffer size fills up, then the buffer is reallocated 50\% larger (see 1.\+5 below) and the fill continues. The idea is to trade off memory reallocation and copy with memory usage. 1.\+2 and 1.\+5 are arbitary, other values may result in better performance.
+
+Once all the matrix weights have been read, the s\+Mat is initialized, the values from the buffers are copied in, and everything is deallocated.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em smat} & mapping data\\
+\hline
+\mbox{\tt in}  & {\em sgsmap} & src gsmap\\
+\hline
+\mbox{\tt in}  & {\em dgsmap} & dst gsmap\\
+\hline
+\mbox{\tt in}  & {\em newdom} & type of s\+Mat (src or dst) src = rearrange and map (bfb), dst = map and rearrange (partial sums)\\
+\hline
+\mbox{\tt in}  & {\em filename} & net\+C\+D\+F file to read\\
+\hline
+\mbox{\tt in}  & {\em mytask} & processor id\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em nwgts} & number of weights\\
+\hline
+\mbox{\tt out}  & {\em areasrc} & area of src grid from mapping file\\
+\hline
+\mbox{\tt out}  & {\em areadst} & area of dst grid from mapping file\\
+\hline
+\mbox{\tt out}  & {\em ni\+\_\+i} & number of lons on input grid\\
+\hline
+\mbox{\tt out}  & {\em nj\+\_\+i} & number of lats on input grid\\
+\hline
+\mbox{\tt out}  & {\em ni\+\_\+o} & number of lons on output grid\\
+\hline
+\mbox{\tt out}  & {\em nj\+\_\+o} & number of lats on output grid \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Open and read the file S\+C\+R\+I\+P weights size on the root task
+\item Read and load area\+\_\+a on root task
+\item Read and load area\+\_\+b on root task
+\item Broadcast ni and nj if requested
+\item Broadcast array sizes and allocate arrays for local storage
+\item Compute the number of chunks to read, read size is rbuf\+\_\+size
+\item Allocate arrays for local weights plus row and column indices
+\item On the root task
+\begin{DoxyItemize}
+\item Initialize lsstart and lscount, the sorted list of local indices
+\item Allocate arrays for reading data on the root
+\item Loop over the chunks of weights data
+\item Read chunk of data
+\item Determine which process owns each weight and count them
+\item Determine offsets in the array
+\item Determine which process owns each weight and fill arrays
+\item Send select data from root to other processes
+\item Deallocate memory on root process
+\end{DoxyItemize}
+\item On non-\/root processes
+\begin{DoxyItemize}
+\item Receive data from root
+\item Reallocate local weights arrays if they need to be bigger
+\end{DoxyItemize}
+\item Clean up arrays
+\item Initialize the mct s\+Mat data type
+\item More clean up 
+\end{DoxyItemize}
+
+Definition at line 941 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_acbe7b9e25c19dbbd2fbebd3895a87d64}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig@{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig}}
+\index{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig@{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig}]{\setlength{\rightskip}{0pt plus 5cm}subroutine, public mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig (
+\begin{DoxyParamCaption}
+\item[{type(mct\+\_\+smat), dimension(\+:), intent(out), pointer}]{s\+Mat, }
+\item[{type(mct\+\_\+gsmap), intent({\bf in}), target}]{Sgs\+Map, }
+\item[{type(mct\+\_\+gsmap), intent({\bf in}), target}]{Dgs\+Map, }
+\item[{character($\ast$), intent({\bf in})}]{newdom, }
+\item[{character($\ast$), intent({\bf in})}]{file\+Name, }
+\item[{integer({\bf in}), intent({\bf in})}]{mytask, }
+\item[{integer({\bf in}), intent({\bf in})}]{mpicom, }
+\item[{integer({\bf in}), intent(out)}]{nwgts, }
+\item[{type(mct\+\_\+avect), intent(out), optional}]{areasrc, }
+\item[{type(mct\+\_\+avect), intent(out), optional}]{areadst, }
+\item[{integer({\bf in}), intent(out), optional}]{ni\+\_\+i, }
+\item[{integer({\bf in}), intent(out), optional}]{nj\+\_\+i, }
+\item[{integer({\bf in}), intent(out), optional}]{ni\+\_\+o, }
+\item[{integer({\bf in}), intent(out), optional}]{nj\+\_\+o}
+\end{DoxyParamCaption}
+)}}\label{classmod__oasis__map_acbe7b9e25c19dbbd2fbebd3895a87d64}
+
+
+Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F weights file. 
+
+Read in mapping matrix data from a S\+C\+R\+I\+P net\+C\+D\+F data file using a low memory method and then scatter to all pes. Based on the s\+Mat\+Readdnc method from C\+E\+S\+M1.\+0.\+3. This routine leverages gsmaps to determine scatter pattern.
+
+The scatter is implemented as a broadcast of all weights then a local computation on each pe to determine with weights to keep based on gsmap information.
+
+The algorithm to determine whether a weight belongs on a pe involves creating a couple local arrays (lsstart and lscount) which are the local values of start and length from the gsmap. These are sorted via a bubble sort and then searched via a binary search to check whether a global index is on the local pe.
+
+The local buffer sizes are estimated up front based on ngridcell/npes plus 20\% (search for 1.\+2 below). If the local buffer size fills up, then the buffer is reallocated 50\% larger (search for 1.\+5 below) and the fill continues. The idea is to trade off memory reallocation and copy with memory usage. 1.\+2 and 1.\+5 are arbitary, other values may result in better performance.
+
+Once all the matrix weights have been read, the s\+Mat is initialized, the values from the buffers are copied in, and everything is deallocated.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em smat} & mapping data\\
+\hline
+\mbox{\tt in}  & {\em sgsmap} & src gsmap\\
+\hline
+\mbox{\tt in}  & {\em dgsmap} & dst gsmap\\
+\hline
+\mbox{\tt in}  & {\em newdom} & type of s\+Mat (src or dst) src = rearrange and map (bfb), dst = map and rearrange (partial sums)\\
+\hline
+\mbox{\tt in}  & {\em filename} & net\+C\+D\+F file to read\\
+\hline
+\mbox{\tt in}  & {\em mytask} & processor id\\
+\hline
+\mbox{\tt in}  & {\em mpicom} & mpi communicator\\
+\hline
+\mbox{\tt out}  & {\em nwgts} & number of weights\\
+\hline
+\mbox{\tt out}  & {\em areasrc} & area of src grid from mapping file\\
+\hline
+\mbox{\tt out}  & {\em areadst} & area of dst grid from mapping file\\
+\hline
+\mbox{\tt out}  & {\em ni\+\_\+i} & number of lons on input grid\\
+\hline
+\mbox{\tt out}  & {\em nj\+\_\+i} & number of lats on input grid\\
+\hline
+\mbox{\tt out}  & {\em ni\+\_\+o} & number of lons on output grid\\
+\hline
+\mbox{\tt out}  & {\em nj\+\_\+o} & number of lats on output grid \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Open and read the file S\+C\+R\+I\+P weights size on the root task
+\item Read and load area\+\_\+a on root task
+\item Read and load area\+\_\+b on root task
+\item Broadcast ni and nj if requested
+\item Broadcast array sizes and allocate arrays for local storage
+\item Initialize lsstart and lscount, the sorted list of local indices
+\item Compute the number of chunks to read, read size is rbuf\+\_\+size
+\item Allocate arrays for local weights plus row and column indices
+\item Loop over the chunks of weights data
+\begin{DoxyItemize}
+\item Read chunk of data on root pe
+\item Broadcast S, row, col to all tasks
+\item Each task keeps only the data required
+\item Reallocate local weights arrays if they need to be bigger
+\end{DoxyItemize}
+\item Clean up arrays
+\item Initialize the mct s\+Mat data type
+\item More clean up 
+\end{DoxyItemize}
+
+Definition at line 368 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmod__oasis__map_a8ae737bd62499fe60ebb48d04ad3b6dd}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!cnew@{cnew}}
+\index{cnew@{cnew}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{cnew}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::cnew\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a8ae737bd62499fe60ebb48d04ad3b6dd}
+
+
+Definition at line 64 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a479ecc5b0be5d1adf3973cb08c40d30a}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!cold@{cold}}
+\index{cold@{cold}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{cold}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::cold\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a479ecc5b0be5d1adf3973cb08c40d30a}
+
+
+Definition at line 64 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_aa58997467050224f6db2bc93fe5f7ca1}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!in@{in}}
+\index{in@{in}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{in}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter, private mod\+\_\+oasis\+\_\+map\+::in = ip\+\_\+i4\+\_\+p\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_aa58997467050224f6db2bc93fe5f7ca1}
+
+
+Definition at line 58 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a00ad53f61b6998938fca792455487f7e}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!prism\+\_\+mapper@{prism\+\_\+mapper}}
+\index{prism\+\_\+mapper@{prism\+\_\+mapper}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{prism\+\_\+mapper}]{\setlength{\rightskip}{0pt plus 5cm}type({\bf prism\+\_\+mapper\+\_\+type}), dimension(\+:), pointer, public mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper}}\label{classmod__oasis__map_a00ad53f61b6998938fca792455487f7e}
+
+
+list of defined mappers 
+
+
+
+Definition at line 53 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_ab15f72e9f33a67181edc977c06b951e2}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!prism\+\_\+mmapper@{prism\+\_\+mmapper}}
+\index{prism\+\_\+mmapper@{prism\+\_\+mmapper}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{prism\+\_\+mmapper}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mmapper}}\label{classmod__oasis__map_ab15f72e9f33a67181edc977c06b951e2}
+
+
+max mappers 
+
+
+
+Definition at line 51 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_af543b83ec5bed63a4448ff641137b0c5}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!prism\+\_\+nmapper@{prism\+\_\+nmapper}}
+\index{prism\+\_\+nmapper@{prism\+\_\+nmapper}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{prism\+\_\+nmapper}]{\setlength{\rightskip}{0pt plus 5cm}integer(kind=ip\+\_\+i4\+\_\+p), public mod\+\_\+oasis\+\_\+map\+::prism\+\_\+nmapper = 0}}\label{classmod__oasis__map_af543b83ec5bed63a4448ff641137b0c5}
+
+
+mapper counter 
+
+
+
+Definition at line 52 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!r8@{r8}}
+\index{r8@{r8}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{r8}]{\setlength{\rightskip}{0pt plus 5cm}integer, parameter, private mod\+\_\+oasis\+\_\+map\+::r8 = ip\+\_\+double\+\_\+p\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}
+
+
+Definition at line 57 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a2575785d3ea5e1a37c7f6303f00eb727}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!rnew@{rnew}}
+\index{rnew@{rnew}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{rnew}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::rnew\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a2575785d3ea5e1a37c7f6303f00eb727}
+
+
+Definition at line 63 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a2931a6f582d0173cc0e6b155b8cb55b7}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!rold@{rold}}
+\index{rold@{rold}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{rold}]{\setlength{\rightskip}{0pt plus 5cm}integer, dimension(\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::rold\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a2931a6f582d0173cc0e6b155b8cb55b7}
+
+
+Definition at line 63 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a28b59479c467c58995c6300071ca140a}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!snew@{snew}}
+\index{snew@{snew}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{snew}]{\setlength{\rightskip}{0pt plus 5cm}real({\bf r8}), dimension(\+:,\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::snew\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a28b59479c467c58995c6300071ca140a}
+
+
+Definition at line 62 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+\hypertarget{classmod__oasis__map_a1fc7e7f295910352524d442c5d0dbf79}{\index{mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}!sold@{sold}}
+\index{sold@{sold}!mod\+\_\+oasis\+\_\+map@{mod\+\_\+oasis\+\_\+map}}
+\subsubsection[{sold}]{\setlength{\rightskip}{0pt plus 5cm}real({\bf r8}), dimension(\+:,\+:), allocatable, private mod\+\_\+oasis\+\_\+map\+::sold\hspace{0.3cm}{\ttfamily [private]}}}\label{classmod__oasis__map_a1fc7e7f295910352524d442c5d0dbf79}
+
+
+Definition at line 62 of file mod\+\_\+oasis\+\_\+map.\+F90.
+
+
+
+The documentation for this module was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__map_8_f90}{mod\+\_\+oasis\+\_\+map.\+F90}\end{DoxyCompactItemize}

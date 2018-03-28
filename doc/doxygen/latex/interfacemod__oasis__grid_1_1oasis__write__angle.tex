@@ -1,0 +1,94 @@
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__angle}{\section{mod\+\_\+oasis\+\_\+grid\+:\+:oasis\+\_\+write\+\_\+angle Interface Reference}
+\label{interfacemod__oasis__grid_1_1oasis__write__angle}\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle}}
+}
+
+
+Generic interface to support writing 4 or 8 byte reals.  
+
+
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__angle_ad29c223ca87f1f54d042bce0a9b9e90d}{oasis\+\_\+write\+\_\+angle\+\_\+r4} (cgrid, nx, ny, angle, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set angle for 4 byte reals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{interfacemod__oasis__grid_1_1oasis__write__angle_a82a80c2eeb39ddca783d7868d92b6f6d}{oasis\+\_\+write\+\_\+angle\+\_\+r8} (cgrid, nx, ny, angle, partid)
+\begin{DoxyCompactList}\small\item\em User interface to set angle for 8 byte reals. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Generic interface to support writing 4 or 8 byte reals. 
+
+Definition at line 87 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+\subsection{Member Function/\+Subroutine Documentation}
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__angle_ad29c223ca87f1f54d042bce0a9b9e90d}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle}!oasis\+\_\+write\+\_\+angle\+\_\+r4@{oasis\+\_\+write\+\_\+angle\+\_\+r4}}
+\index{oasis\+\_\+write\+\_\+angle\+\_\+r4@{oasis\+\_\+write\+\_\+angle\+\_\+r4}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle}}
+\subsubsection[{oasis\+\_\+write\+\_\+angle\+\_\+r4}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle\+::oasis\+\_\+write\+\_\+angle\+\_\+r4 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+single\+\_\+p), dimension(\+:,\+:), intent(in)}]{angle, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__angle_ad29c223ca87f1f54d042bce0a9b9e90d}
+
+
+User interface to set angle for 4 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em angle} & angles\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 437 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+\hypertarget{interfacemod__oasis__grid_1_1oasis__write__angle_a82a80c2eeb39ddca783d7868d92b6f6d}{\index{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle}!oasis\+\_\+write\+\_\+angle\+\_\+r8@{oasis\+\_\+write\+\_\+angle\+\_\+r8}}
+\index{oasis\+\_\+write\+\_\+angle\+\_\+r8@{oasis\+\_\+write\+\_\+angle\+\_\+r8}!mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle@{mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle}}
+\subsubsection[{oasis\+\_\+write\+\_\+angle\+\_\+r8}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+grid\+::oasis\+\_\+write\+\_\+angle\+::oasis\+\_\+write\+\_\+angle\+\_\+r8 (
+\begin{DoxyParamCaption}
+\item[{character(len=$\ast$), intent(in)}]{cgrid, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nx, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{ny, }
+\item[{real(kind=ip\+\_\+double\+\_\+p), dimension(\+:,\+:), intent(in)}]{angle, }
+\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{partid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__grid_1_1oasis__write__angle_a82a80c2eeb39ddca783d7868d92b6f6d}
+
+
+User interface to set angle for 8 byte reals. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em cgrid} & grid name\\
+\hline
+\mbox{\tt in}  & {\em nx} & global nx size\\
+\hline
+\mbox{\tt in}  & {\em ny} & global ny size\\
+\hline
+\mbox{\tt in}  & {\em angle} & angles\\
+\hline
+\mbox{\tt in}  & {\em partid} & partition id if nonglobal data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 381 of file mod\+\_\+oasis\+\_\+grid.\+F90.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__grid_8_f90}{mod\+\_\+oasis\+\_\+grid.\+F90}\end{DoxyCompactItemize}

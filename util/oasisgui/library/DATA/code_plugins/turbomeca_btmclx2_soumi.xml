@@ -1,0 +1,18 @@
+<model name="turbomeca_btmclx2_soumi" title="Turbomeca, code execution by soumi on BTMCLX2" >
+    <param name="external" title="Exterieur a TM" type="onoff" default="0"/>
+    <param name="duration" title="Duree (HH)" type="integer" default="02"/>
+    <param name="memory" title="Memoire (1G,3k...)" type="ascii" default="1G"/>
+    <param name="nbprocs" title="Procs number" type="integer" default="1" />
+    <param name="directory" title="working directory" type="ascii" default="~" />
+    <desc>
+	(note de A Dauptain : en relisant rapidement, il me semble qiue la mise a jour Yales a rendu inoperant le lancement d'AVSP. A reverifier par T Lederlin... )
+	Ce profil est a l'usage de Safran Turbomeca.
+	[]
+	Il permet de lancer des jobs sur le cluster BTMCLX2, au travers de l'outil SOUMI.
+	Il n'est pas necessaire d'utiliser Taucade.
+	[]
+        [logo=plugin_robot;caption=execution par robot]
+        []
+        [logo=turbomeca;caption=Uniquement pour Turbomeca]
+    </desc>
+</model>

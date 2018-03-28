@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>         
+          <config value="">    
+                <gui value="">      
+                      <appearance value="">        
+                            <width value="1300"/>        
+                            <height value="800"/>        
+                            <theme value="clam"/>        
+                            <mode value="multicolumn"/>        
+                            <focusCorrection value="1"/>        
+                      </appearance>      
+                      <paths value="">        
+                            <workingDir value="."/>        
+                      </paths>      
+                      <python value="">        
+                            <interpreter value=""/>        
+                      </python>      
+                </gui>    
+                <id value="">      
+                      <user value="">        
+                            <name value="myName"/>        
+                            <company value="myCompany"/>        
+                            <expert value="0"/>        
+                      </user>      
+                </id>    
+                <accounts value="">      
+                      <code_plugins value="local_unix">        
+                            <local_unix value="">          
+                                  <nbprocs value="1"/>          
+                            </local_unix>        
+                      </code_plugins>      
+                      <tool_plugins value="local_unix">        
+                            <local_unix value="">          
+                                  <nbprocs value="1"/>          
+                            </local_unix>        
+                      </tool_plugins>      
+                </accounts>    
+          </config>  
+      <meta/></dataset>

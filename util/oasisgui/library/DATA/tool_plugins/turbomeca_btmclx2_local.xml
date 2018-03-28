@@ -1,0 +1,9 @@
+<model name="turbomeca_btmclx2_local" title="Turbomeca, tools on BTMCLX2" >
+<info name="nbprocs" title="Procs number" type="integer" default="1" visibility="hidden" />
+<desc>
+Execution at Turbomeca, on the cluster BTMCLX2
+[]
+[logo=plugin_local;caption=local execution]
+[]
+[logo=turbomeca;caption=Turbomeca only]</desc>
+</model>
