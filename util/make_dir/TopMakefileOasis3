@@ -71,7 +71,7 @@ makepsmile:
 	@echo "=> Compiling library psmile"
 	(cd $(ARCHDIR)/build/lib/psmile.$(CHAN) ; \
          cp -f $(LIBSRC)/psmile/src/Makefile . ; $(modifmakefile) ; \
-         $(MAKE) all 1>> $(LOG) 2>> $(ERR) )
+         $(MAKE) all > >(tee -a $(LOG)) 2> >(tee -a $(ERR) >&2) )
 #
 # Rules for cleaning
 #
