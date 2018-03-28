@@ -41,7 +41,7 @@ CONTAINS
 
 !> OASIS user init method
 
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,runtime)
 
    !> * This is COLLECTIVE, all pes must call
 
@@ -51,6 +51,7 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam        !< model name
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime !< override model runtime found in namcouple
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -140,6 +141,11 @@ CONTAINS
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
+
+   ! Override runtime in namecouple
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
@@ -364,6 +370,11 @@ CONTAINS
    ikey = 0
    icolor = compid
    call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_local,ierr)
+   IF (ierr /= 0) THEN
+      WRITE (nulprt1,*) subname,' ERROR: MPI_Comm_Split abort ',ierr
+      CALL oasis_flush(nulprt)
+      call oasis_abort()
+   ENDIF
 
    !------------------------
    !>   * Set mpi_comm_global based on oasis_coupled flag
@@ -373,6 +384,12 @@ CONTAINS
    icolor = 1
    if (.not.oasis_coupled) icolor = 0
    call MPI_COMM_SPLIT(MPI_COMM_WORLD,icolor,ikey,mpi_comm_global,ierr)
+   IF (ierr /= 0) THEN
+      WRITE (nulprt1,*) subname,' ERROR: MPI_Comm_Split abort ',ierr
+      CALL oasis_flush(nulprt)
+      call oasis_abort()
+   ENDIF
+
 !tcx   if (.not.oasis_coupled) mpi_comm_global = MPI_COMM_NULL
 
 #elif defined use_comm_MPI2

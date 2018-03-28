@@ -328,6 +328,7 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
                                       mpi_rank_local,':',TRIM(nf90_strerror(status))
             if (dlen /= 2 .or. nx*ny /= nxf*nyf) then
                WRITE(nulprt,*) subname,estr,'ndims and size does not match on file'
+               WRITE(nulprt,*) subname,' ndims: ',dlen, ' sizes: ', nx*ny, ',', nxf*nyf, ' file: ', trim(rstfile)
                call oasis_abort()
             endif
             allocate(array2(nxf,nyf))
