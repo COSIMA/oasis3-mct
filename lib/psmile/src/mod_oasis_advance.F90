@@ -692,10 +692,11 @@ contains
        do npc = 1,2
        if (npc == 1) pcpointmp => prism_coupler_put(n)
        if (npc == 2) pcpointmp => prism_coupler_get(n)
-       if (pcpointmp%valid) then
+       if (pcpointmp%valid .and. prism_part(pcpointmp%partID)%lsize > 0) then
 
           if (OASIS_debug >= 20) then
-             write(nulprt,'(2a,4i6,2l3,5i8)') subname,'deadlock_chk',varid,nc,n,npc,sndrcv,pcpointmp%sndrcv,msec,pcpointer%ltime,pcpointer%dt,pcpointmp%ltime,pcpointmp%dt
+             write(nulprt,'(2a,4i6,2l3,i8)') subname,'deadlock_chkA ',varid,nc,n,npc,sndrcv,pcpointmp%sndrcv,msec
+             write(nulprt,'(2a,1x,a,2i8,1x,a,2i8)') subname,'deadlock_chkB ',trim(pcpointer%fldlist),pcpointer%ltime,pcpointer%dt,trim(pcpointmp%fldlist),pcpointmp%ltime,pcpointmp%dt
           endif
 
           if ((sndrcv .and. pcpointmp%sndrcv .and. time_now) .and. &

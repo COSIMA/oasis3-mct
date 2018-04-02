@@ -30,6 +30,7 @@ MODULE mod_oasis_part
       character(len=ic_lvar2):: partname !< partition name
       type(mct_gsmap)        :: gsmap    !< gsmap on mpi_comm_local
       integer(kind=ip_i4_p)  :: gsize    !< global size of grid
+      integer(kind=ip_i4_p)  :: lsize    !< local size of grid
       integer(kind=ip_i4_p)  :: nx       !< global nx size
       integer(kind=ip_i4_p)  :: ny       !< global ny size
       character(len=ic_lvar) :: gridname !< grid name
@@ -307,6 +308,7 @@ CONTAINS
                                 mpi_comm_local,compid,numel=numel)
          endif
          prism_part(m)%gsize = mct_gsmap_gsize(prism_part(m)%gsmap)
+         prism_part(m)%lsize = mct_gsmap_lsize(prism_part(m)%gsmap,mpi_comm_local)
          icpl = MPI_UNDEFINED
          if (numel > 0) icpl = 1
          CALL MPI_COMM_Split(mpi_comm_local,icpl,1,prism_part(m)%mpicom,ierr)
@@ -368,6 +370,7 @@ CONTAINS
 
    s_prism_part%partname = trim(cspval)
    s_prism_part%gsize    = -1
+   s_prism_part%lsize    = -1
    s_prism_part%nx       = -1
    s_prism_part%ny       = -1
    s_prism_part%gridname = trim(cspval)

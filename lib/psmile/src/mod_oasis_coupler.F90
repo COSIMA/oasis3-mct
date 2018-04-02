@@ -1953,11 +1953,12 @@ CONTAINS
      write(nulprt,*) subname,'   dt, lag          ',pcprint%dt,pcprint%lag
 !     write(nulprt,*) subname,'   partid, size ',parid,trim(prism_part(parid)%gridname),&
 !                                               prism_part(parid)%gsize
-     write(nulprt,*) subname,'   partid, size     ',parid,prism_part(parid)%gsize                                                
+     write(nulprt,*) subname,'   partid, gsize    ',parid,prism_part(parid)%gsize
+     write(nulprt,*) subname,'   partid, lsize    ',parid,prism_part(parid)%lsize
      write(nulprt,*) subname,'   partid, nx,ny    ',prism_part(parid)%nx,prism_part(parid)%ny
 !     write(nulprt,*) subname,'   rpartid,size ',rpard,trim(prism_part(rpard)%gridname),&
 !                                                prism_part(rpard)%gsize
-     write(nulprt,*) subname,'   rpartid,size     ',rpard,prism_part(rpard)%gsize
+     write(nulprt,*) subname,'   rpartid,gsize    ',rpard,prism_part(rpard)%gsize
      write(nulprt,*) subname,'   rpartid,nx,ny    ',prism_part(rpard)%nx,prism_part(rpard)%ny
      write(nulprt,*) subname,'   maploc           ',trim(pcprint%maploc)
 
