@@ -692,7 +692,8 @@ contains
        do npc = 1,2
        if (npc == 1) pcpointmp => prism_coupler_put(n)
        if (npc == 2) pcpointmp => prism_coupler_get(n)
-       if (pcpointmp%valid .and. prism_part(pcpointmp%partID)%lsize > 0) then
+       if (pcpointmp%valid) then
+       if (prism_part(pcpointmp%partID)%lsize > 0) then
 
           if (OASIS_debug >= 20) then
              write(nulprt,'(2a,4i6,2l3,i8)') subname,'deadlock_chkA ',varid,nc,n,npc,sndrcv,pcpointmp%sndrcv,msec
@@ -713,6 +714,7 @@ contains
                              pcpointmp%ltime,pcpointmp%dt
              call oasis_abort(file=__FILE__,line=__LINE__)
           endif
+       endif  ! part lsize
        endif  ! valid
        enddo  ! npc
        enddo  ! prism_mcoupler
