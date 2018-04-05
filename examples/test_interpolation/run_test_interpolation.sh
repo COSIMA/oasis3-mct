@@ -8,17 +8,20 @@ user=`whoami`
 ## - Define paths
 srcdir=`pwd`
 datadir=$srcdir/data_oasis3
+datagrid=$srcdir/data_oasis3
 casename=`basename $srcdir`
+echo $datadir
+echo $datagrid
 #
 ############### User's section #######################################
 # Source and target grids
-SRC_GRID=lmdz # nogt ssea bggd icos
-TGT_GRID=torc # nogt ssea bggd icos
+SRC_GRID=torc # nogt ssea bggd icos
+TGT_GRID=lmdz # nogt ssea bggd icos
 # Interpolation = nn, bili, bicu, fracarea, fracnnei, fracarea2nd
-interp=bili
+interp=fracnnei
 #
 ## - Define architecture and coupler 
-arch=romulus_pgi_mpich   
+arch=nemo_lenovo_gfortran_openmpi   
 #
 # - Define number of processes to run each executable 
 #   The toy only runs in monoprocessor
@@ -34,7 +37,7 @@ elif [ ${arch} == training_computer ]; then
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == nemo_lenovo_gfortran_openmpi ]; then
     MPIRUN=/data/softs/mpi/openmpi/1.8.4/bin/mpirun
-    rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
+    rundir=/scratch/globc/coquart/COMPARE_ERROR_TRUNK2187_BR_GABI/oasis3-mct_trunk_2187/examples/${casename}/work_${casename}_${SRC_GRID}_${TGT_GRID}_${interp}
 elif [ ${arch} == nemo_lenovo_intel_impi ] || [ ${arch} == nemo_lenovo_intel_impi_openmp ]; then
     MPIRUN=/data/softs/intel/impi/5.0.3.048/intel64/bin/mpirun
     rundir=/scratch/globc/$USER/OASIS3-MCT/oasis3-mct_3.0/examples/${casename}/work_${casename}
@@ -91,9 +94,9 @@ echo ''
 \rm -fr $rundir/*
 mkdir -p $rundir
 
-ln -sf $datagrids/grids.nc  $rundir/grids.nc
-ln -sf $datagrids/masks.nc  $rundir/masks.nc
-ln -sf $datagrids/areas.nc  $rundir/areas.nc
+ln -sf $datagrid/grids.nc  $rundir/grids.nc
+ln -sf $datagrid/masks.nc  $rundir/masks.nc
+ln -sf $datagrid/areas.nc  $rundir/areas.nc
 
 cp -f $srcdir/$exe1 $rundir/.
 cp -f $srcdir/$exe2 $rundir/.
@@ -237,9 +240,8 @@ cd $rundir
 
 ulimit -s unlimited
 module purge
-module load compiler/gcc 
+module load compiler/gcc/4.8.4 
 module load mpi/openmpi/1.8.4
-#
 #
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
