@@ -39,7 +39,6 @@ CONTAINS
 !--------------------------------------------------------------------
 
 !> OASIS abort method, publically available to users
-
 SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, file, line, rcode)
 
    IMPLICIT NONE
@@ -77,12 +76,6 @@ SUBROUTINE oasis_abort(id_compid, cd_routine, cd_message, file, line, rcode)
    WRITE (nulprt,*) subname,astr,'on local  rank = ',mpi_rank_local
    WRITE (nulprt,*) subname,astr,'CALLING ABORT FROM OASIS LAYER NOW'
    CALL oasis_flush(nulprt)
-
-#if defined(__INTEL_COMPILER)
-    CALL TRACEBACKQQ()
-#elif defined(__GFORTRAN__)
-    CALL BACKTRACE()
-#endif
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
    CALL MPI_ABORT (mpi_comm_global, errcode, ierror)
