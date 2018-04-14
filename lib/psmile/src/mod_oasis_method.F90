@@ -41,8 +41,7 @@ CONTAINS
 
 !----------------------------------------------------------------------
 !> OASIS user init method
-
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld,runtime)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld)
 
    !> * This is COLLECTIVE, all pes must call
 
@@ -53,7 +52,6 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
    integer (kind=ip_intwp_p),intent(in)   ,optional :: commworld  !< user defined mpi_comm_world to use in oasis
-   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -166,12 +164,7 @@ CONTAINS
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
 
-   if (present(runtime)) then
-      namruntim = runtime
-   endif
-
-   !------------------------
-   !> * Check if NFIELDS=0, there is no coupling.
+   ! If NFIELDS=0 there is no coupling
    ! No information must be written in the debug files as
    ! the different structures are not allocated
    !------------------------
@@ -742,11 +735,12 @@ CONTAINS
 
 !> OASIS user interface specifying the OASIS definition phase is complete
 
-   SUBROUTINE oasis_enddef(kinfo)
+   SUBROUTINE oasis_enddef(kinfo, runtime)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -757,6 +751,12 @@ CONTAINS
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
+
+   ! Override some values in the namcouple, needs to be done before
+   ! oasis_coupler_setup()
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    if (.not. oasis_coupled) then
       call oasis_debug_exit(subname)
@@ -956,6 +956,12 @@ CONTAINS
    INTEGER(kind=ip_intwp_p) :: n, ierr
    INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
    character(len=*),parameter :: subname = '(oasis_setrootglobal)'
+
+   ! Override some values in the namcouple, needs to be done before
+   ! oasis_coupler_setup()
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    !------------------------
    !--- set mpi_root_global
