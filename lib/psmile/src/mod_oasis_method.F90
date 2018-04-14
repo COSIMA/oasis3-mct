@@ -40,7 +40,7 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,runtime)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo)
 
    ! This is COLLECTIVE, all pes must call
 
@@ -49,7 +49,6 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(out)   :: mynummod     
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
-   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -127,11 +126,6 @@ CONTAINS
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
-
-   ! Override runtime in namecouple
-   if (present(runtime)) then
-      namruntim = runtime
-   endif
 
    ! If NFIELDS=0 there is no coupling
    ! No information must be written in the debug files as
@@ -676,11 +670,12 @@ CONTAINS
 
  END SUBROUTINE oasis_get_intracomm
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_enddef(kinfo)
+   SUBROUTINE oasis_enddef(kinfo, runtime)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -689,6 +684,12 @@ CONTAINS
 
    call oasis_debug_enter(subname)
    lkinfo = OASIS_OK
+
+   ! Override some values in the namcouple, needs to be done before
+   ! oasis_coupler_setup()
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
 
    !------------------------
    !--- write grid info to files one model at a time
