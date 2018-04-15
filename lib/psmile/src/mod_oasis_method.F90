@@ -40,7 +40,7 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo, config_dir)
 
    ! This is COLLECTIVE, all pes must call
 
@@ -49,6 +49,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(out)   :: mynummod     
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
+   CHARACTER(len=*),intent(in),optional :: config_dir
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -118,11 +119,19 @@ CONTAINS
    !------------------------
 
    IF (mpi_rank_global == 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    call oasis_mpi_barrier(mpi_comm_global)
    IF (mpi_rank_global /= 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
