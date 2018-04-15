@@ -41,8 +41,7 @@ CONTAINS
 
 !----------------------------------------------------------------------
 !> OASIS user init method
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld)
-
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld,config_dir)
    !> * This is COLLECTIVE, all pes must call
 
    IMPLICIT NONE
@@ -52,6 +51,7 @@ CONTAINS
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
    integer (kind=ip_intwp_p),intent(in)   ,optional :: commworld  !< user defined mpi_comm_world to use in oasis
+   CHARACTER(len=*),intent(in),optional :: config_dir
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -149,11 +149,19 @@ CONTAINS
    !------------------------
 
    IF (mpi_rank_world == 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    call oasis_mpi_barrier(mpi_comm_global_world)
    IF (mpi_rank_world /= 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
