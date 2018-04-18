@@ -320,7 +320,7 @@ SUBROUTINE oasis_namcouple_init(config_dir)
   !-----------------------------------------------------------
 
   if (present(config_dir)) then
-    cl_namcouple = trim(config_dir)//'namcouple'
+    cl_namcouple = trim(config_dir)//'/namcouple'
   else
     cl_namcouple = 'namcouple'
   endif
