@@ -10,21 +10,22 @@ CHAN            = MPI1
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3 main directory
-COUPLE          = $(HOME)/oasis3-mct
+COUPLE          = /wkdir/globc/coquart/oasis3-mct_tc18a
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = $(COUPLE)/compile_oa3-mct_gfopenmpi
+ARCHDIR         = $(COUPLE)/compile_oa3-mct_gfopenmpi_gcc
 #
-# MPI library
-MPIDIR      = /usr/local/openmpi163_gcc
+# MPI library ((see the file /etc/modulefiles/mpi/openmpi-x86_64)
+MPIDIR      = /usr/lib64/openmpi
 MPIBIN      = $(MPIDIR)/bin
-MPI_INCLUDE = $(MPIDIR)/include
-MPILIB      = -L$(MPIDIR)/lib -lmpi_f90 -lmpi_f77 -lmpi
+MPI_INCLUDE = /usr/include/openmpi-x86_64
+MPILIB      = -L$(MPIDIR)/lib -lmpi
 #
-# NETCDF library
-NETCDF_INCLUDE1  = /usr/include 
-NETCDF_INCLUDE2  = /usr/lib64/gfortran/modules
-NETCDF_LIBRARY  = -L/usr/lib64 -lnetcdff -lnetcdf -L/usr/local/HDF5-1.8.6/lib -lhdf5_hl -lhdf5 -lz -lm -lhdf5_hl -lhdf5 -lz -lcurl
+# NETCDF library of the system
+NETCDF_INCLUDE1 = /usr/include
+# netcdf.mod and hdf5.mod
+NETCDF_INCLUDE2 = /usr/lib64/gfortran/modules
+NETCDF_LIBRARY  =  -L/usr/lib64 -lnetcdff -lnetcdf
 #
 # Compiling and other commands
 MAKE        = gmake
@@ -62,10 +63,10 @@ LIBBUILD        = $(ARCHDIR)/build/lib
 # INCPSMILE     : includes all *o and *mod for each library
 INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct 
 
-F90FLAGS  = $(F90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE2) -I$(NETCDF_INCLUDE1)
-f90FLAGS  = $(f90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE2) -I$(NETCDF_INCLUDE1)
-FFLAGS    = $(FFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE2) -I$(NETCDF_INCLUDE1)
-fFLAGS    = $(fFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE2) -I$(NETCDF_INCLUDE1)
-CCFLAGS   = $(CCFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE2) -I$(NETCDF_INCLUDE1)
+F90FLAGS  = $(F90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+f90FLAGS  = $(f90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+FFLAGS    = $(FFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+fFLAGS    = $(fFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+CCFLAGS   = $(CCFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
 #
 #############################################################################
