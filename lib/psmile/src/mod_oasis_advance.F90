@@ -675,16 +675,17 @@ contains
        ! msec >= 0 does the check only in run mode, not in initialization
        !------------------------------------------------
 
-       if (lcouplertime /= ispval .and. msec >= 0 .and. msec < lcouplertime) then
+       if (pcpointer%ctime /= ispval .and. msec >= 0 .and. msec < pcpointer%ctime) then
           write(nulprt,*) subname,estr,'at ',msec,mseclag,' for var = ',trim(vname)
-          write(nulprt,*) subname,estr,'model seems to be running backwards = ',lcouplertime
+          write(nulprt,*) subname,estr,'model seems to be running backwards = ',pcpointer%ctime
           call oasis_abort(file=__FILE__,line=__LINE__)
        endif
 
        !------------------------------------------------
        !>   * check that variable didn't miss a coupling period 
        ! check only for send recv operations where deadlock 
-       ! is possible
+       ! is possible.  Allow 1*dt for synchronous operations,
+       ! 2*dt for asynchronous operations
        !------------------------------------------------
 
        do n = 1,prism_mcoupler
@@ -692,20 +693,28 @@ contains
        if (npc == 1) pcpointmp => prism_coupler_put(n)
        if (npc == 2) pcpointmp => prism_coupler_get(n)
        if (pcpointmp%valid) then
-          if ((pcpointmp%ltime /= ispval) .and. &
-              (sndrcv .and. pcpointmp%sndrcv) .and. &
-              (msec >  pcpointmp%ltime + pcpointmp%dt)) then
-             write(nulprt,*) subname,estr,'coupling skipped at earlier time, potential deadlock '
-             write(nulprt,*) subname,estr,'my coupler = ',cplid,' variable = ',&
+       if (prism_part(pcpointmp%partID)%lsize > 0) then
+
+          if (OASIS_debug >= 20) then
+             write(nulprt,'(2a,4i6,2l3,i8)') subname,'deadlock_chkA ',varid,nc,n,npc,sndrcv,pcpointmp%sndrcv,msec
+             write(nulprt,'(2a,1x,a,2i8,1x,a,2i8)') subname,'deadlock_chkB ',trim(pcpointer%fldlist),pcpointer%ltime,pcpointer%dt,trim(pcpointmp%fldlist),pcpointmp%ltime,pcpointmp%dt
+          endif
+
+          if ((sndrcv .and. pcpointmp%sndrcv .and. time_now) .and. &
+              ((pcpointmp%ltime /= ispval .and. msec >  pcpointmp%ltime + pcpointmp%dt) .or. &
+               (pcpointmp%ltime == ispval .and. pcpointer%ltime /= ispval .and. msec >= pcpointmp%dt ))) then
+             write(nulprt,'(3a)') subname,estr,'coupling skipped at earlier time, potential deadlock '
+             write(nulprt,'(3a,i8,2a)') subname,estr,'my coupler = ',cplid,' variable = ',&
                              trim(pcpointer%fldlist)
-             write(nulprt,*) subname,estr,'current time = ',msec,' mseclag = ',mseclag
-             write(nulprt,*) subname,estr,'skipped coupler = ',n,' variable = ',&
+             write(nulprt,'(3a,i12,a,i12)') subname,estr,'current time = ',msec,' mseclag = ',mseclag
+             write(nulprt,'(3a,2i12)') subname,estr,'my coupler last time and dt = ',pcpointer%ltime,pcpointer%dt
+             write(nulprt,'(3a,i8,2a)') subname,estr,'skipped coupler = ',n,' variable = ',&
                              trim(pcpointmp%fldlist)
-             write(nulprt,*) subname,estr,'skipped coupler last time and dt = ',&
+             write(nulprt,'(3a,2i12)') subname,estr,'skipped coupler last time and dt = ',&
                              pcpointmp%ltime,pcpointmp%dt
-             WRITE(nulprt,*) subname,estr,'model timestep does not match coupling timestep'
              call oasis_abort(file=__FILE__,line=__LINE__)
           endif
+       endif  ! part lsize
        endif  ! valid
        enddo  ! npc
        enddo  ! prism_mcoupler
@@ -1487,6 +1496,8 @@ contains
 
        endif   ! comm_now
 
+       pcpointer%ctime = msec
+
        !------------------------------------------------
        !>   * at the end of the run only,  save fields associated
        !>     with non-instant loctrans operations to restart files
@@ -1615,13 +1626,6 @@ contains
          ENDIF
           if (time_now) pcpointer%status(nfav) = OASIS_COMM_READY
        endif
-
-       !------------------------------------------------
-       !>   * always remember last id and last coupler time
-       !------------------------------------------------
-
-       lcouplerid = cplid
-       lcouplertime = msec
 
        if (OASIS_debug >= 2) then
           write(nulprt,*) subname,' at ',msec,mseclag,' KINF: ',trim(vname),kinfo
