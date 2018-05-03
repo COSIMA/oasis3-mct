@@ -40,7 +40,7 @@ MODULE mod_oasis_method
 CONTAINS
 
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo, config_dir)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo, config_dir, num_cpl_fields)
 
    ! This is COLLECTIVE, all pes must call
 
@@ -50,6 +50,7 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
    CHARACTER(len=*),intent(in),optional :: config_dir
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: num_cpl_fields
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: mpi_err
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -165,6 +166,10 @@ CONTAINS
    ENDIF
 
    ALLOCATE(prism_var(mvar))
+
+   if (present(num_cpl_fields)) then
+      num_cpl_fields = mvar
+   endif
 
    ! Store all the names of the fields exchanged in the namcouple
    ! which can be different of namsrcfld(:) and namdstfld(:) if multiple 
@@ -679,12 +684,13 @@ CONTAINS
 
  END SUBROUTINE oasis_get_intracomm
 !----------------------------------------------------------------------
-   SUBROUTINE oasis_enddef(kinfo, runtime)
+   SUBROUTINE oasis_enddef(kinfo, runtime, coupling_field_timesteps)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo
    INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
+   INTEGER (kind=ip_i4_p), dimension(:), intent(in), optional :: coupling_field_timesteps
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -698,6 +704,17 @@ CONTAINS
    ! oasis_coupler_setup()
    if (present(runtime)) then
       namruntim = runtime
+   endif
+
+   if (present(coupling_field_timesteps)) then
+      if (size(coupling_field_timesteps) /= size(namflddti)) then
+        write(nulprt,*) subname,' ERROR: wrong number of coupling field timesteps'
+        write(nulprt,*) subname, size(coupling_field_timesteps), size(namflddti)
+        call oasis_flush(nulprt)
+        call oasis_abort_noarg()
+      endif
+
+      namflddti(:) = coupling_field_timesteps(:)
    endif
 
    !------------------------
