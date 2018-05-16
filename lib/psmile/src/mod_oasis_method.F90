@@ -41,7 +41,8 @@ CONTAINS
 
 !> OASIS user init method
 
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,runtime)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled, &
+                              config_dir, num_cpl_fields)
 
    !> * This is COLLECTIVE, all pes must call
 
@@ -51,7 +52,9 @@ CONTAINS
    CHARACTER(len=*)         ,intent(in)    :: cdnam        !< model name
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
-   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime !< override model runtime found in namcouple
+   CHARACTER(len=*),intent(in),optional :: config_dir
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: num_cpl_fields
+
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -133,19 +136,22 @@ CONTAINS
    !------------------------
 
    IF (mpi_rank_world == 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    call oasis_mpi_barrier(MPI_COMM_WORLD)
    IF (mpi_rank_world /= 0) THEN
+    if (present(config_dir)) then
+      call oasis_namcouple_init(config_dir=config_dir)
+    else
       call oasis_namcouple_init()
+    endif
    endif
    OASIS_debug = namlogprt
    TIMER_debug = namtlogprt
-
-   ! Override runtime in namecouple
-   if (present(runtime)) then
-      namruntim = runtime
-   endif
 
    ! If TIMER_debug < 0 activate LUCIA load balancing analysis
    LUCIA_debug = ABS(MIN(namtlogprt,0))
@@ -184,6 +190,10 @@ CONTAINS
    ENDIF
 
    ALLOCATE(prism_var(maxvar))
+
+   if (present(num_cpl_fields)) then
+      num_cpl_fields = maxvar
+   endif
 
    !------------------------
    !> * Store all the names of the fields exchanged in the namcouple
@@ -635,11 +645,13 @@ CONTAINS
 
 !> OASIS user interface specifying the OASIS definition phase is complete
 
-   SUBROUTINE oasis_enddef(kinfo)
+   SUBROUTINE oasis_enddef(kinfo, runtime, coupling_field_timesteps)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
+   INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
+   INTEGER (kind=ip_i4_p), dimension(:), intent(in), optional :: coupling_field_timesteps
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -666,6 +678,23 @@ CONTAINS
    endif
 
    lkinfo = OASIS_OK
+
+   ! Override some values in the namcouple, needs to be done before
+   ! oasis_coupler_setup()
+   if (present(runtime)) then
+      namruntim = runtime
+   endif
+
+   if (present(coupling_field_timesteps)) then
+      if (size(coupling_field_timesteps) /= size(namflddti)) then
+        write(nulprt,*) subname,' ERROR: wrong number of coupling field timesteps'
+        write(nulprt,*) subname, size(coupling_field_timesteps), size(namflddti)
+        call oasis_flush(nulprt)
+        call oasis_abort_noarg()
+      endif
+
+      namflddti(:) = coupling_field_timesteps(:)
+   endif
 
    CALL oasis_timer_start ('oasis_enddef')
    IF (OASIS_debug >= 2)  THEN

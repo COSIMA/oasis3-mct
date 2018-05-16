@@ -79,7 +79,7 @@ MODULE mod_oasis_namcouple
 !----------------------------------------------------------------
 
   integer(kind=ip_i4_p) :: nulin     ! namcouple IO unit number
-  character(len=*),parameter :: cl_namcouple = 'namcouple'
+  character(len=jpeighty) :: cl_namcouple
 
 ! --- alloc_src
   INTEGER (kind=ip_intwp_p) :: il_err
@@ -253,9 +253,10 @@ CONTAINS
 
 !> Reads the namcouple
 
-  SUBROUTINE oasis_namcouple_init()
+  SUBROUTINE oasis_namcouple_init(config_dir)
 
   IMPLICIT NONE
+  character(len=*), optional, intent(in) :: config_dir
 
   !-----------------------------------------------------------
   integer(kind=ip_i4_p) :: n, nv, n1, n2, loc
@@ -264,6 +265,12 @@ CONTAINS
   integer(kind=ip_i4_p) :: maxunit
   character(len=*),parameter :: subname='(oasis_namcouple_init)'
   !-----------------------------------------------------------
+
+  if (present(config_dir)) then
+    cl_namcouple = trim(config_dir)//'/namcouple'
+  else
+    cl_namcouple = 'namcouple'
+  endif
 
   CALL oasis_unitget(nulin)
   OPEN (UNIT = nulin,FILE =cl_namcouple,STATUS='OLD', &
