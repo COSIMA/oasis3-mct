@@ -49,6 +49,7 @@ SUBROUTINE gradient_conserv(NX1, NY1, src_array, sou_mask, &
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 IMPLICIT NONE
+
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 !-----------------------------------------------------------------------
 !     INTENT(IN)
@@ -85,7 +86,7 @@ IMPLICIT NONE
            ip1, jp1, im1, jm1
 
       REAL (kind=wp) :: &
-           distance             ! distance in rad
+           distance_rad           ! distance in rad
      
       REAL (kind=wp) :: &
            dVar_i, dVar_j, &      ! difference of Var in i / j direction
@@ -103,7 +104,7 @@ IMPLICIT NONE
            pi  = 3.14159265358979323846, &  ! PI
            pi2 = 2.0d0*pi                   ! 2PI
 
-      INTEGER ::  il_maskval= 1 ! in our grids sea_value = 0 and land_value = 1
+      INTEGER, PARAMETER ::  il_maskval= 1 ! in our grids sea_value = 0 and land_value = 1
 
 !-----------------------------------------------------------------------
 !
@@ -169,10 +170,10 @@ IMPLICIT NONE
                dlon_j = dlon_j * lat_factor
  
 !              distance
-               dist_i = distance(src_lon(ip1,j), src_lat(ip1,j), &
-                                 src_lon(im1,j), src_lat(im1,j))
-               dist_j = distance(src_lon(i,jp1), src_lat(i,jp1), &
-                                 src_lon(i,jm1), src_lat(i,jm1))
+               dist_i = distance_rad(src_lon(ip1,j), src_lat(ip1,j), &
+                                     src_lon(im1,j), src_lat(im1,j))
+               dist_j = distance_rad(src_lon(i,jp1), src_lat(i,jp1), &
+                                     src_lon(i,jm1), src_lat(i,jm1))
 
 !              gradients: dVar / distance (= vector lenght)
                IF (dist_i /= 0.) THEN

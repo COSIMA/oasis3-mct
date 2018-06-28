@@ -1,4 +1,4 @@
-MODULE write_all_fields
+MODULE write_all_fields  
   !
   USE netcdf
   IMPLICIT NONE
@@ -28,6 +28,8 @@ MODULE write_all_fields
   REAL (kind=wp), DIMENSION(nlon,nlat)  :: gridlon,gridlat
   REAL (kind=wp), DIMENSION(nlon,nlat)  :: array
   !
+  REAL (kind=wp) :: dl_missing_value, dl_FillValue
+  !
   ! Dimensions
   !
   CALL hdlerr(NF90_CREATE(data_filename, NF90_CLOBBER, il_file_id), __LINE__ )
@@ -43,6 +45,20 @@ MODULE write_all_fields
   CALL hdlerr( NF90_PUT_ATT(il_file_id, il_lat_id, "standard_name", "latitude"), __LINE__ )
   !
   CALL hdlerr( NF90_DEF_VAR(il_file_id, TRIM(field_name), NF90_DOUBLE, (/LONID, LATID/), il_array_id), __LINE__ )
+  SELECT CASE (field_name)
+  CASE ("FRECVANA")
+      dl_missing_value = 10000.d0
+      dl_FillValue = 1.d+20
+  CASE ("error_interp")
+      CALL hdlerr( NF90_PUT_ATT(il_file_id, il_array_id, "units", "%"), __LINE__ )
+      dl_missing_value = -10000.d0
+      dl_FillValue = -1.d+20
+  CASE DEFAULT
+      dl_missing_value = -1.d+34 ! Ferret default missing value
+      dl_FillValue = -1.d+34
+  END SELECT
+  !gjoffCALL hdlerr( NF90_PUT_ATT(il_file_id, il_array_id, "missing_value", dl_missing_value),__LINE__ )
+  !gjoffCALL hdlerr( NF90_PUT_ATT(il_file_id, il_array_id, "_FillValue", dl_FillValue),__LINE__ )
   !
   CALL hdlerr( NF90_ENDDEF(il_file_id), __LINE__ )
   !
@@ -62,7 +78,7 @@ MODULE write_all_fields
   CALL hdlerr( NF90_PUT_VAR (il_file_id, il_array_id, array, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid mask reading done'
+      WRITE(w_unit,*) 'Local fields writing done'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -131,7 +147,7 @@ END SUBROUTINE write_field
   CALL hdlerr( NF90_PUT_VAR (il_file_id, il_array_id, array, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid mask reading done'
+      WRITE(w_unit,*) 'Local fields writing done'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -143,5 +159,4 @@ END SUBROUTINE write_field
   ENDIF
   !
 END SUBROUTINE write_field_i2
-
 END MODULE write_all_fields

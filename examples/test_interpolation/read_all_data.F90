@@ -142,14 +142,14 @@ END SUBROUTINE read_dimgrid
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lon_id, gridlon, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid longitudes reading done'
+      WRITE(w_unit,*) '... global grid longitudes reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_lat_id, gridlat, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid latitudes reading done'
+      WRITE(w_unit,*) '... global grid latitudes reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -202,7 +202,7 @@ END SUBROUTINE read_grid
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_indice_id, indice_mask, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid mask reading done'
+      WRITE(w_unit,*) '... global grid mask reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -256,7 +256,7 @@ END SUBROUTINE read_mask
   CALL hdlerr( NF90_GET_VAR (il_file_id, il_srf_id, gridsrf, &
      ila_what, ila_dim), __LINE__ )
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Global grid mask reading done'
+      WRITE(w_unit,*) '... global grid mask reading done'
       CALL FLUSH(w_unit)
   ENDIF
   !

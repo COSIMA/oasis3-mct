@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------
-! Copyright 2017, CERFACS, Toulouse, France.
+! Copyright 2018/03, CERFACS, Toulouse, France.
 ! All rights reserved. Use is subject to OASIS3 license terms.
 !=============================================================================
 !
@@ -23,23 +23,26 @@ PROGRAM model2
   ! Component name (6 characters) same as in the namcouple
   CHARACTER(len=6)   :: comp_name = 'model2'
   CHARACTER(len=128) :: comp_out ! name of the output log file
+  CHARACTER(len=3)   :: chout
   CHARACTER(len=4)   :: cl_grd_tgt ! name of the target grid
   !
   NAMELIST /grid_target_characteristics/cl_grd_tgt
   !
   ! Global grid parameters : 
   INTEGER :: nlon, nlat    ! dimensions in the 2 directions of space
+  INTEGER :: il_size
   INTEGER, PARAMETER :: echelle=1            ! To calculate th delta error for plot
   REAL (kind=wp), DIMENSION(:,:), POINTER    :: gg_lon,gg_lat
   INTEGER, DIMENSION(:,:), POINTER           :: gg_mask ! mask, 0 == valid point, 1 == masked point 
   !
+  INTEGER :: mype, npes ! rank and number of pe
   INTEGER :: localComm  ! local MPI communicator and Initialized
   INTEGER :: comp_id    ! component identification
   !
-  INTEGER, DIMENSION(3) :: il_paral ! Decomposition for each proc
+  INTEGER, DIMENSION(:), ALLOCATABLE :: il_paral ! Decomposition for each proc
   !
-  INTEGER :: w_unit=100
-  INTEGER :: ierror, i, j, ic_nmsk, ic_nmskrv
+  INTEGER :: ierror, rank, w_unit
+  INTEGER :: ic_nmsk, ic_nmskrv
   INTEGER :: FILE_Debug=2
   !
   ! Names of exchanged Fields
@@ -50,19 +53,15 @@ PROGRAM model2
   INTEGER                       :: var_nodims(2) 
   INTEGER                       :: var_type
   !
-  REAL (kind=wp), PARAMETER    :: coef = 2.
-  REAL (kind=wp), PARAMETER    :: dp_pi=3.14159265359
-  REAL (kind=wp), PARAMETER    :: dp_length= 1.2*dp_pi
-  REAL (kind=wp), PARAMETER    :: dp_conv = dp_pi/180.
-  !
   REAL (kind=wp), PARAMETER     :: field_ini = -1. ! initialisation of received fields
   !
   ! Grid parameter definition
   INTEGER                       :: part_id  ! use to connect the partition to the variables
   INTEGER                       :: var_sh(4) ! local dimensions of the arrays; 2 x rank (=4)
+  INTEGER :: ibeg, iend, jbeg, jend
   !
   ! Local fields arrays used in routines oasis_put and oasis_get
-  REAL (kind=wp), POINTER       :: field_recv(:,:), field_ana(:,:), gg_error(:,:)
+  REAL (kind=wp), POINTER       :: field_recv1d(:,:), field_recv(:,:), field_ana(:,:), gg_error(:,:)
   INTEGER, POINTER              :: mask_error(:,:) ! error mask, 0 == masked point, 1 == valid point 
   !
   ! Min and Max of the error of interpolation
@@ -80,19 +79,63 @@ PROGRAM model2
       CALL oasis_abort(comp_id,comp_name,'Problem at line 109')
   ENDIF
   !
+  ! Unit for output messages : one file for each process
+  CALL MPI_Comm_Rank ( MPI_COMM_WORLD, rank, ierror )
+  IF (ierror /= 0) THEN
+      WRITE(0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 116')
+  ENDIF
+  !
+  !
+  !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
   CALL oasis_get_localcomm ( localComm, ierror )
   IF (ierror /= 0) THEN
       WRITE (0,*) 'oasis_get_localcomm abort by model2 compid ',comp_id
       CALL oasis_abort(comp_id,comp_name,'Problem at line 125')
   ENDIF
   !
-  IF (FILE_Debug >= 2) THEN
-      comp_out=comp_name//'.out'
+  ! Get MPI size and rank
+  CALL MPI_Comm_Size ( localComm, npes, ierror )
+  IF (ierror /= 0) THEN
+      WRITE(0,*) 'MPI_comm_size abort by model2 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 132')
+  ENDIF
+  !
+  CALL MPI_Comm_Rank ( localComm, mype, ierror )
+  IF (ierror /= 0) THEN
+      WRITE (0,*) 'MPI_Comm_Rank abort by model2 compid ',comp_id
+      CALL oasis_abort(comp_id,comp_name,'Problem at line 138')
+  ENDIF
+  !
+  IF ((FILE_Debug == 1) .AND. (mype == 0)) FILE_Debug=2
+  !
+  IF (FILE_Debug <= 1) THEN
+      IF (mype == 0) THEN
+          w_unit = 100 + rank
+          WRITE(chout,'(I3)') w_unit
+          comp_out=comp_name//'.root_'//chout
+          OPEN(w_unit,file=TRIM(comp_out),form='formatted')
+      ELSE
+          w_unit = 15
+          comp_out=comp_name//'.notroot'
+          OPEN(w_unit,file=TRIM(comp_out),form='formatted',position='append')
+      ENDIF
+  ELSE
+      w_unit = 100 + rank
+      WRITE(chout,'(I3)') w_unit
+      comp_out=comp_name//'.out_'//chout
       OPEN(w_unit,file=TRIM(comp_out),form='formatted')
+  ENDIF
+  !
+  IF (FILE_Debug >= 2) THEN
       WRITE (w_unit,*) '-----------------------------------------------------------'
-      WRITE (w_unit,*) TRIM(comp_name), ' Running with reals compiled as kind =',wp
+      WRITE (w_unit,*) TRIM(comp_name), ' running with reals compiled as kind ',wp
+      WRITE (w_unit,*) 'I am component ', TRIM(comp_name), ' global rank :',rank
       WRITE (w_unit,*) '----------------------------------------------------------'
-      WRITE(w_unit,*) 'I am the', TRIM(comp_name), ' ', comp_id
+      WRITE(w_unit,*) 'I am the ', TRIM(comp_name), ' ', 'component identifier', comp_id, 'local rank', mype
+      WRITE (w_unit,*) 'Number of processors :',npes
+      WRITE (w_unit,*) '----------------------------------------------------------'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -108,7 +151,7 @@ PROGRAM model2
   CLOSE(70)
   !
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'Target grid name :',cl_grd_tgt
+      WRITE(w_unit,*) 'Target grid name : ',cl_grd_tgt
       CALL flush(w_unit)
   ENDIF
   !
@@ -125,7 +168,7 @@ PROGRAM model2
   ALLOCATE(gg_error(nlon,nlat),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_error'
   ALLOCATE(mask_error(nlon,nlat),STAT=ierror )
-  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gg_error'
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating mask_error'
   !
   ! Read global grid longitudes, latitudes and mask 
   !
@@ -133,7 +176,7 @@ PROGRAM model2
   CALL read_mask(nlon,nlat, data_maskname, cl_grd_tgt, w_unit, FILE_Debug, gg_mask)
   !
   IF (FILE_Debug >= 2) THEN
-      WRITE(w_unit,*) 'After grid abd mask reading'
+      WRITE(w_unit,*) 'After grid and mask reading'
       CALL FLUSH(w_unit)
   ENDIF
   !
@@ -141,9 +184,25 @@ PROGRAM model2
   !  PARTITION DEFINITION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
+  il_size = 3
+  ALLOCATE(il_paral(il_size))
+  IF (FILE_Debug >= 2) THEN
+      WRITE(w_unit,*) 'After allocate il_paral, il_size', il_size
+      CALL FLUSH(w_unit)
+  ENDIF
+  !
   il_paral(1)=0
   il_paral(2)=0
-  il_paral(3)=nlon*nlat
+  IF (mype == 0) THEN
+     il_paral(3)=nlon*nlat
+  ELSE
+     il_paral(3)=0
+  END IF
+  !       
+  IF (FILE_Debug >= 2) THEN
+      WRITE(w_unit,*) 'il_paral = ', il_paral(:)
+      CALL FLUSH(w_unit)
+  ENDIF
   !       
   CALL oasis_def_partition (part_id, il_paral, ierror)
   IF (FILE_Debug >= 2) THEN
@@ -152,7 +211,7 @@ PROGRAM model2
   ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  ! COUPLING FIELD DECLARATION 
+  ! COUPLING LOCAL FIELD DECLARATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   var_nodims(1) = 2    ! Rank of the field array is 2
@@ -160,9 +219,9 @@ PROGRAM model2
   var_type = OASIS_Real
   !
   var_sh(1) = 1
-  var_sh(2) = nlon
+  var_sh(2) = il_paral(3)
   var_sh(3) = 1 
-  var_sh(4) = nlat
+  var_sh(4) = 1
   !
   CALL oasis_def_var (var_id,var_name, part_id, &
      var_nodims, OASIS_In, var_sh, var_type, ierror)
@@ -175,6 +234,8 @@ PROGRAM model2
       CALL FLUSH(w_unit)
   ENDIF
   !
+  DEALLOCATE(il_paral)
+  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -184,29 +245,32 @@ PROGRAM model2
       WRITE (w_unit,*) 'oasis_enddef abort by model2 compid ',comp_id
       CALL oasis_abort(comp_id,comp_name,'Problem at line 281')
   ENDIF
+  IF (FILE_Debug >= 2) THEN
+      WRITE(w_unit,*) 'After enddef'
+      CALL FLUSH(w_unit)
+  ENDIF
   !
+IF (mype == 0) THEN
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   ! RECEIVE ARRAYS AND CALCULATE THE ERROR 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   ! Allocate the fields send and received by the model
   !
+  ALLOCATE(field_recv1d(var_sh(2), var_sh(4)), STAT=ierror )
+  IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field_recv1d'
   ALLOCATE(field_recv(nlon,nlat), STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field_recv'
   ALLOCATE(field_ana(nlon,nlat),STAT=ierror )
   IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating field_ana'
   !
-  ! Calculate analytical field on target grid
-  DO j=1,nlat
-   DO i=1,nlon
-      field_ana(i,j) =  coef - COS(dp_pi*(ACOS(COS(gg_lon(i,j)* dp_conv)* &
-         COS(gg_lat(i,j)* dp_conv))/dp_length))
-    ENDDO
-  ENDDO
+  CALL function_ana(nlon, nlat, gg_lon, gg_lat, field_ana)
   !
   ! Get the field FRECVANA
-  field_recv=field_ini
-  CALL oasis_get(var_id, 0, field_recv, ierror)
+  field_recv1d=field_ini
+  CALL oasis_get(var_id, 0, field_recv1d, ierror)
+  field_recv = RESHAPE(field_recv1d,(/nlon,nlat/))
+  DEALLOCATE(field_recv1d)
   !
   IF (ierror .NE. OASIS_Ok .AND. ierror .LT. OASIS_Recvd) THEN
       WRITE (w_unit,*) 'oasis_get abort by model2 compid ',comp_id
@@ -243,7 +307,7 @@ PROGRAM model2
   ENDIF
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  !  Write the error and the field in a NetCDF file  
+  !  Write the error and the field in a NetCDF file by proc0
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   data_filename='error_interp.nc'
@@ -282,6 +346,9 @@ PROGRAM model2
       WRITE(w_unit,*) 'End calculation of stat on the error'
       CALL FLUSH(w_unit)
   ENDIF
+
+  CALL SYSTEM("ln -s "//TRIM(comp_out)//" model2.out")
+ENDIF ! of proc0
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION 

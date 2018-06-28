@@ -48,6 +48,7 @@ subroutine gradient_bicubic(NX1, NY1, src_array, sou_mask, &
 ! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 IMPLICIT NONE
+      
   INTEGER, PARAMETER :: wp = SELECTED_REAL_KIND(12,307) ! double
 !-----------------------------------------------------------------------
 !     INTENT(IN)
@@ -94,7 +95,7 @@ REAL (kind=wp), DIMENSION(NX1,NY1) :: &
           src_lat,   &          ! source grid latitudes [radiants]
           pi180                 ! conversion factor: deg -> rad
 
-INTEGER ::  il_maskval= 1 ! in our grids sea_value = 0 and land_value = 1
+INTEGER, PARAMETER ::  il_maskval= 1 ! in our grids sea_value = 0 and land_value = 1
 
 !----------------------------------------------------------------------
 !
