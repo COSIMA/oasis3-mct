@@ -1585,7 +1585,7 @@ SUBROUTINE inipar
   CHARACTER*3 clinfo, clind
   CHARACTER*1 clequa
   CHARACTER*64 cl_cfname,cl_cfunit
-  CHARACTER(len=15) :: cvarmul
+  CHARACTER(len=15) :: cvarmul,cafldcobo,cabocoef,cafldcobn,cabncoef
   INTEGER (kind=ip_intwp_p) iind, il_aux
   INTEGER (kind=ip_intwp_p) il_file_unit, id_error
   INTEGER (kind=ip_intwp_p) il_max_entry_id, il_no_of_entries
@@ -1596,7 +1596,7 @@ SUBROUTINE inipar
   INTEGER (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
   INTEGER (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
   INTEGER (kind=ip_intwp_p) :: icofld,imodel, ios
-  INTEGER (kind=ip_intwp_p) :: ivarmul
+  INTEGER (kind=ip_intwp_p) :: ivarmul,iafldcobo,iabocoef,iafldcobn,iabncoef
   CHARACTER(len=32) :: keyword
   LOGICAL :: found
   CHARACTER(len=*),parameter :: subname='(mod_oasis_namcouple:inipar)'
@@ -2441,7 +2441,14 @@ SUBROUTINE inipar
 !     * Get linear combination parameters for initial fields
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
 !     * Get main field multiplicative coefficient
-              READ(clvari, FMT=2006) afldcobo(ig_number_field(jf))
+              READ(clvari, FMT=2012) cafldcobo
+              ! and convert it accordingly
+              IF ( INDEX(cafldcobo,'.') == 0 ) then
+                  READ(cafldcobo,FMT=2013) iafldcobo
+                  afldcobo(ig_number_field(jf)) = REAL(iafldcobo)
+               ELSE
+                  READ(cafldcobo,FMT=2006) afldcobo(ig_number_field(jf))
+               ENDIF
               DO jc = 1, nbofld(ig_number_field(jf))
                  READ(nulin, FMT=rform) clline   
                  CALL skip(clline, jpeighty)
@@ -2450,13 +2457,26 @@ SUBROUTINE inipar
                  cbofld(jc,ig_number_field(jf)) = clvari
                  CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
 !     * Get multiplicative coefficients for  additional fields
-                 READ(clvari, FMT=2006) abocoef (jc,ig_number_field(jf))
+                 READ(clvari, FMT=2012) cabocoef
+                 IF ( INDEX(cabocoef,'.') == 0 ) THEN
+                  READ(cabocoef,FMT=2013) iabocoef
+                  abocoef(jc,ig_number_field(jf)) = REAL(iabocoef)
+               ELSE
+                  READ(cabocoef,FMT=2006) abocoef(jc,ig_number_field(jf))
+               ENDIF
               ENDDO  ! DO jc
            ELSEIF (canal(ja,ig_number_field(jf)) .EQ. 'BLASNEW')THEN
 !     * Get linear combination parameters for final fields
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
 !     * Get main field multiplicative coefficient
-              READ(clvari, FMT=2006) afldcobn(ig_number_field(jf))
+              READ(clvari, FMT=2006) cafldcobn
+              ! and convert it accordingly
+              IF ( INDEX(cafldcobn,'.') == 0 ) then
+                  READ(cafldcobn,FMT=2013) iafldcobn
+                  afldcobn(ig_number_field(jf)) = REAL(iafldcobn)
+               ELSE
+                  READ(cafldcobn,FMT=2006) afldcobn(ig_number_field(jf))
+               ENDIF              
               DO jc = 1, nbnfld(ig_number_field(jf))
                  READ(nulin, FMT=rform) clline   
                  CALL skip(clline, jpeighty)
@@ -2465,7 +2485,13 @@ SUBROUTINE inipar
                  cbnfld(jc,ig_number_field(jf)) = clvari
                  CALL parse(clline, clvari, 2, jpeighty, ilen, __LINE__)
 !     * Get multiplicative coefficients for  additional fields
-                 READ(clvari, FMT=2006) abncoef (jc,ig_number_field(jf))
+                 READ(clvari, FMT=2012) cabncoef
+                 IF ( INDEX(cabncoef,'.') == 0 ) THEN
+                  READ(cabocoef,FMT=2013) iabncoef
+                  abncoef(jc,ig_number_field(jf)) = REAL(iabncoef)
+               ELSE
+                  READ(cabncoef,FMT=2006) abncoef(jc,ig_number_field(jf))
+               ENDIF
               ENDDO  ! DO jc
            ELSE 
               WRITE(tmpstr1,*) ' Type of analysis not implemented yet '
