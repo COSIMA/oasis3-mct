@@ -60,6 +60,7 @@ rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tut
 elif [ ${arch} == beaufix ]; then
 # The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
     rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
+    MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun
 elif [ ${arch} == ada ]; then
   MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
   rundir=/workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct/examples/tutorial/work_${casename}
@@ -180,7 +181,7 @@ elif [ $arch == beaufix ] ; then
   cat <<EOF > $rundir/run_$casename.$arch
 #!/bin/bash
 #SBATCH --time=01:00:00
-#SBATCH -p  normal32        # partition/queue
+#SBATCH --partition=normal64 # queue
 #SBATCH --job-name=toys     # job name
 #SBATCH -N 1                # number of nodes
 #SBATCH -n $nproc                # number of procs
@@ -191,16 +192,13 @@ elif [ $arch == beaufix ] ; then
 ulimit -s unlimited
 # rundir must be in the TMPDIR
 cd $rundir
-module load intel/13.1.4.183
-module load intelmpi/4.1.1.036
-module load netcdf/4.3.0 
-#
+module load netcdf/4.4.0 
 #
 # Activate next line to run in coupled mode
-#time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 # Activate next two lines to run both models stand alone
-time mpirun -np $nproc_exe1 ./$exe1
-time mpirun -np $nproc_exe2 ./$exe2
+time $MPIRUN -np $nproc_exe1 ./$exe1
+time $MPIRUN -np $nproc_exe2 ./$exe2
 #
 EOF
 
