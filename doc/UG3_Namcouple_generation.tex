@@ -6,15 +6,6 @@ The OASIS3-MCT configuration file {\it namcouple} contains, below
 pre-defined keywords, all user-defined information necessary to
 configure a particular coupled run.
 
-A Graphical User Interface is now available to build
-the {\it namcouple} for one's specific coupled
-system. The OASIS3-MCT GUI is an application of OPENTEA, a graphical
-interface used by different codes and developed at CERFACS. The
-sources of the GUI are located in the {\tt oasis3-mct/util/oasisgui}
-directory; a short description of the OASIS GUI is given in the README
-file therein and the GUI itself includes all relevant explanations
-on-line.
-
 The {\it namcouple} is a text file with the following characteristics:
 
 \begin{itemize}
@@ -24,14 +15,14 @@ The {\it namcouple} is a text file with the following characteristics:
   non-significant;
 \item all lines beginning with \# are ignored and considered as
   comments;
-\item blank lines are supported, but only since OASIS3-MCT4.0 version.
+\item blank lines are supported, but only since OASIS3-MCT\_4.0 version.
 \end{itemize}
 
 The first part of {\it namcouple } is devoted to configuration of
 general parameters such as the total run time or the desired debug level.  
 The second part gathers specific
 information on each coupling (or I/O) field, e.g. their coupling
-period, the list of transformations or interpolations to be performed
+period, the list of transformations or remapping to be performed
 by OASIS3-MCT and associated configuring lines (described in more
 details in chapter \ref{sec_transformations}).
 
@@ -39,7 +30,7 @@ In OASIS3-MCT, several {\it namcouple} inputs have been deprecated
 but, for backwards compatibility, they are still allowed.  These
 inputs will be noted in the following text using the notation
 ``UNUSED'' and not fully described. Information below these keywords
-is obsolete; it will not be read and will not be used.
+is obsolete; they will not be read and will not be used.
 
 In the next sections, a {\it namcouple} example is given and
 all configuring parameters are described. Additional lines
@@ -221,52 +212,51 @@ tool that can be used to perform an analysis of the coupled components
 load balance. More information can be found in the README file in {\tt
   oasis3-mct/util/lucia} directory and report mentioned therein.
  
-\item {\tt \$NUNITNO}: Optional; on the line below this keyword are two integers
+\item {\tt \$NUNITNO}: Optional (new in OASIS3-MCT\_4.0); on the line below this keyword are two integers
   that indicate the minimum and maximum unit numbers to be used for
   input and output files in the coupling layer.  The user should
   choose values that will NOT conflict or overlap with unit numbers in 
   use in any of the component models. The defaults are 1024 for the minimum and 9999
   for the maximum unit number if not explicitly set by the user.
 
-\item {\tt \$NMAPDEC}: Optional; on the line below this keyword is a character string
+\item {\tt \$NMAPDEC}: Optional (new in OASIS3-MCT\_4.0); on the line below this keyword is a character string
   that indicates the mapping decomposition value to be used during local mapping.  The
-  options are decomp\_1d and decomp\_wghtfile.  decomp\_1d decomposes the grid in a simple
-  one dimensional, 1 chunk per pe.  decomp\_wghtfile decomposes the grid using the
-  information in the weight file to reduced mapping communication. decomp\_wghtfile
+  options are {\tt decomp\_1d} and {\tt decomp\_wghtfile}.  Option {\tt decomp\_1d} decomposes the grid in a simple
+  one dimensional way while {\tt decomp\_wghtfile} decomposes the grid using the
+  information in the remapping weight file to reduced mapping communication. Option {\tt decomp\_wghtfile}
   will take some extra time in initialization but it should result in faster mapping.
-  The default in decomp\_1d.  It is worth testing decomp\_wghtfile to see if that
-  option improves performance.
+  The default is {\tt decomp\_1d} but it is recommended to test {\tt decomp\_wghtfile} to see if that
+  option improves performance. More details can be found in \cite {craig 18} and in \cite{valcke11}.
 
-\item {\tt \$NMATXRD}: Optional; on the line below this keyword is a character string
-  that indicates the method used to read mapping weights.  There are two options, orig
-  and ceg.  In both, the weights are read in chunks on the root pe.  In the orig option, 
-  the weights are then broadcast to all pes and each pe then saves the weights needed in
-  order to be consistent with the mapping decomposition.  In the ceg option, the root pe 
-  reads the weights and then decides which pes each weight should be assigned too.  A
-  series or sends and recvs are then done with all pes and just the weights needed on
-  each pe are sent.  The orig method sends much more data but is more parallel.  The ceg
-  method does most of the work on the root pe but less data is communicated.  The default
-  is ceg.
+\item {\tt \$NMATXRD}: Optional (new in OASIS3-MCT\_4.0); on the line below this keyword is a character string
+  that indicates the method used to read remapping weights.  There are two options, {\tt orig}
+  and {\tt ceg}.  In both, the weights are read in chunks by the root process.  In the {\tt orig} option, 
+  the weights are then broadcasted to all processes and each process then saves the weights needed in
+  order to be consistent with the mapping decomposition.  In the {\tt ceg} option, the root process 
+  reads the weights and then decides which process each weight should be assigned to.  A
+  series of exchanges are then done and just the weights needed on
+  each process are sent.  The {\tt orig} method sends much more data but is more parallel.  The {\tt ceg}
+  method does most of the work on the root process but less data is communicated.  The default option
+  is {\tt ceg}. More details can be found in \cite {craig 18}.
 
-\item {\tt \$NWGTOPT}: Optional; on the line below this keyword is a character string
-  that indicates how to handle bad interpolation weights.  There are four options, 
-  abort\_on\_bad\_index, ignore\_bad\_index, ignore\_bad\_index\_silently, and
-  use\_bad\_index.  Bad weights are defined as weights in the mapping file where either 
-  the source or destination index are out of bounds relative to the number of gridcells
-  in the grid.  In that case, the weight is referencing a gridcell that does not physically
+\item {\tt \$NWGTOPT} : Optional (new in OASIS3-MCT\_4.0); on the line below this keyword is a character string
+  that indicates how to handle bad remapping weights.  There are four options \newline
+  {\tt abort\_on\_bad\_index}, {\tt ignore\_bad\_index}, {\tt ignore\_bad\_index\_silently}, and
+ \newline  {\tt use\_bad\_index}.  Bad weights are defined as weights in the mapping file for which either 
+  the source or destination index are out of bounds relative to the number of grid cells
+  in the grid; in that case, the weight is referencing a gridcell that does not physically
   exist.  Note that an index equal to zero will not be considered as a bad index if the associated weight 
   is also zero. There are other situations where the value of the actual mapping weight is 
   scientifically incorrect, but this is not easy to detect and is not dealt with in OASIS3-MCT.
   \begin{itemize}
-  \item abort\_on\_bad\_index will write error messages to the log files and abort if a bad weight
+  \item {\tt abort\_on\_bad\_index} will write error messages to the log files and abort if a bad weight
   index is detected. This is the default option. 
-  \item ignore\_bad\_index will write an error message and then remove bad
+  \item {\tt ignore\_bad\_index} will write an error message and then remove bad
   weights internally before continuing.  
-  \item ignore\_bad\_index\_silently will remove bad weights and continue without writing an error
+  \item {\tt ignore\_bad\_index\_silently} will remove bad weights and continue without writing an error
   message.  
-  \item use\_bad\_index will attempt to keep bad weights in the interpolation computation, 
-  but this can result in memory corruption, silent dropping of weights, and incorrect results
-  and is not recommended. 
+  \item {\tt use\_bad\_index} will attempt to keep bad weights in the interpolation computation, 
+  but this can result in memory corruption, silent dropping of weights, and incorrect results ; this is not recommended. 
   \end{itemize} 
 
   Note that the ability to check mapping files at runtime in OASIS3-MCT is limited.  It is always
@@ -277,14 +267,14 @@ load balance. More information can be found in the README file in {\tt
   In addition, offline tests can be run with analytical functions to verify conservation, gradient 
   preserving features and other characteristics associated with the particular mapping approach.
 
-\item {\tt \$NNOREST}: Optional; on the line below this keyword is a character
+\item {\tt \$NNOREST}: Optional (new in OASIS3-MCT\_4.0); on the line below this keyword is a character
   string that can override the requirement that restart files must exist
   if they are needed.  If the character string value starts with T, t, .T, 
   or .t (as in true), then OASIS3-MCT will initialise with zero any variable that normally requires
-  a restart (for instance, variables with LAG > 0) if the restart file does not exist. By default, missing
+  a restart (for instance, variables with LAG $>$ 0) if the restart file does not exist. By default, missing
   restart files will cause the model to abort.  It is strongly recommended
   that this keyword NOT be used in production runs.  It exists to provide a 
-  quick shortcut for generating initial restarts or running technical tests. 
+  quick shortcut for running technical tests. 
   Note that if {\tt \$NNOREST} is true but the restart file nonetheless exists, it will be used.
  
 \item {\tt \$SEQMODE, \$CHANNEL, \$JOBNAME, \$NBMODEL, \$INIDATE, \$MODINFO, \$CALTYPE:} UNUSED
@@ -300,10 +290,9 @@ The second part of the {\it namcouple}, starting after the keyword
 {\tt \$STRINGS}, contains coupling information for each coupling (or
 I/O) field.  Its format depends on the field status given by the last
 entry on the field first line ({\tt EXPORTED}, {\tt IGNOUT} or {\tt
-  INPUT} in the example above). The field may be :
+  INPUT} in the example above). The field may be (status {\tt AUXILARY} is now UNUSED) :
 
 \begin{itemize}
-\item {\tt AUXILARY}: UNUSED
 \item {\tt EXPORTED}: exchanged between components and
   transformed by OASIS3-MCT
 \item {\tt EXPOUT}: exchanged, transformed and also written to two
@@ -403,21 +392,20 @@ where the different entries are:
     points.
   \end{itemize}
      
-\end{itemize}
-    
-The fourth line gives the list of transformations to be performed for
+\item The fourth line gives the list of transformations to be performed for
 this field. In addition, there is one or more configuring lines
 describing some parameters for each transformation. These additional
 lines are described in more details in the chapter
 \ref{sec_transformations}.
 
+\end{itemize}
+
 {\bf Support to couple multiple fields via a single communication}
 
-With OASIS3-MCT, it is possible to couple mutilple fields via a
+With OASIS3-MCT, it is possible to couple mutiple fields via a
 single communication. To activate this option, the user must list the
-related fields on a single entry line through a colon
-delimited list in the {\it namcouple}\footnote{The maximum length of a line in the
-{\it namcouple} is of 5000 characters.}, for example:
+related fields on a single entry line (with a maximum of 5000 characters on one line) through a colon
+delimited list in the {\it namcouple}, for example:
 
 {\tt ATMTAUX:ATMTAUY:ATMHFLUX  TAUX:TAUY:HEATFLUX 1 3600 3 rstrt.nc EXPORTED}
 
@@ -440,7 +428,7 @@ but this restart file may contain other fields.
 \label{subsubsec_secondOUTPUT}
 The first 2 lines for fields with status {\tt OUTPUT} are as follows:
   \begin{verbatim}
-  COSHFTOT  COSHFTOT   7   86400  0  fldhftot.nc OUTPUT 
+  COSHFTOT  COSHFTOT   1   86400  0  fldhftot.nc OUTPUT 
   atmo   atmo 
 \end{verbatim}
 % \vspace{-0.2cm}
@@ -451,8 +439,8 @@ that:
   first line,
 \item the restart file name (here {\tt fldhftot.nc}) is needed only if
   a {\tt LOCTRANS} transformation is present,
-\item there is no grid dimension\footnote{This means that all output
-    fields will be written out in the output files as 1D arrays.} and no LAG or SEQ
+\item there is no grid dimension (which means that all output
+    fields will be written out in the output files as 1D arrays) and no LAG or SEQ
   index on the second line; ;
 \end{itemize}
 The name of the output file is automatically defined based on the
@@ -468,15 +456,15 @@ supported for {\tt OUTPUT} fields.
 The first and only line for fields with status {\tt INPUT} is:
 
   \begin{verbatim}
-  SOALBEDO SOALBEDO  17  86400  0  SOALBEDO.nc  INPUT
+  SOALBEDO SOALBEDO  1  86400  0  SOALBEDO.nc  INPUT
   \end{verbatim}
 \vspace{-0.5cm}
 where the different entries are:
 \begin{itemize}
 \item {\tt SOALBEDO}: symbolic name for the field in the target component
   (80 characters maximum, repeated twice)
-\item 17: index in auxiliary file cf\_name\_table.txt (see above for
-  EXPORTED fields)
+\item 1: UNUSED but still required for parsing (as for
+  EXPORTED fields above)
 \item 86400: input period in seconds
 \item 0: number of transformations (always 0 for {\tt INPUT} fields)
 \item {\tt SOALBEDO.nc}:  the input file name (32 characters maximum)

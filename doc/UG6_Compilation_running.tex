@@ -58,9 +58,9 @@ For double precision coupling field, there is no need anymore to promote REAL va
 \section{CPP keys}
 \label{subsec_cpp}
 
-The first CPP key coded in OASIS3-MCT and that can be specified in
-{\tt CPPDEF} in {\tt make.{\it your\_platform}} file is {\tt
-  TREAT\_OVERLAY} that ensures, in {\tt SCRIPR/CONSERV}
+The following OASIS3-MCT CPP keys can be specified in {\tt CPPDEF} in {\tt make.{\it your\_platform}} file:
+\begin{itemize}
+\item {\tt TREAT\_OVERLAY}:  ensures, in {\tt SCRIPR/CONSERV}
   remapping (see section \ref{subsec_interp}), that if two cells of
   the source grid overlay and none is masked a priori, the one with the greater numerical
   index will not be considered (they also can be both masked); this is mandatory
@@ -69,9 +69,9 @@ The first CPP key coded in OASIS3-MCT and that can be specified in
   when this is not the case with the mask defined in {\it masks.nc},
   this CPP key forces these rules to be respected.
 
-The second CPP key coded in OASIS3-MCT and that {\bf must} be specified in
-{\tt CPPDEF} in {\tt make.{\it your\_platform}} file if you compile
-with {\bf PGF90} is {\tt \_\_NO\_16BYTE\_REALS}.
+\item {\tt \_\_NO\_16BYTE\_REALS}:  {\bf must} be specified  if you compile
+with {\bf PGF90}.
+\end{itemize}
 
 %\item {\tt balance}: Add a MPI\_Wtime() function before and after
 %  mct\_isend (MPI put) and mct\_recv (MPI get) to calculate the time
@@ -132,29 +132,8 @@ target grid. For more details, see also the document {\tt test\_interpolation.pd
 \subsection{Debug files}
 If you experience problems while running your coupled model with
 OASIS3-MCT, you can obtain more information on what is happening by
-increasing the {\tt \$NLOGPRT} value in your {\it namcouple} (see also section
-\ref{subsec_namcouplefirst}).
-
-Different outputs are written depending on {\tt \$NLOGPRT} value:
-\begin{itemize}
-\item {0} : production mode. One file debug.root.xx is opened by the master process of
-  each model and one file debug\_notroot.xx is opened for all the other
-  processes of each model to write only error information if an error
-  occurs.
-\item {1} : one file debug.root.xx is opened by the master process of
-  each model to write information equivalent to level 10 (see below)
-  and also to write memory usage information;
-  one file debug\_notroot.xx is opened for all the other processes of
-  each model to write only error information if an error occurs.
-\item {2} : one file debug.xx.xxxxxx is opened by each process of each
-  model to write normal production diagnostics .
-\item {5} : as for 2 with in addition some initial debug info.
-\item {10} : as for 5 with in addition the routine calling tree.
-\item {12} : as for 10 with in addition some routine calling notes.
-\item {15} : as for 12 with even more debug diagnostics and memory usage information.
-\item {20} : as for 15 with in addition some extra runtime analysis.
-\item {30} : full debug information.
-\end{itemize}
+increasing the {\tt \$NLOGPRT} value in your {\it namcouple}, see section
+\ref{subsec_namcouplefirst} for details.
 
 \subsection{Time statistics files}
 \label{timestat}
@@ -190,9 +169,8 @@ calls to {\tt oasis\_timer\_start()} and {\tt oasis\_timer\_stop()}
 and is the accumulated time over the entire run. Here is an overview
 of the meaning of the different timers as implemented by default.
 \footnote{Many other measures can be obtained by defining the logical
-{\tt local\_timer} XXXX as {\tt .true.} in different routines or by
-implementing other timers. Of course, OASIS3\_MCT and the model code
-would then have to be recompiled.}
+{\tt local\_timers\_on} as {\tt .true.} in different routines or by
+implementing other timers. Of course, OASIS3\_MCT and the model code then have to be recompiled.}
 
 \begin{itemize}
 
@@ -212,7 +190,7 @@ would then have to be recompiled.}
   important steps to initialize the coupling exchanges, e.g. the
   internal management of the partition and variable definition, the
   definition of the patterns of communication between the source and
-  target processes, the reading of the regridding weight-and-address
+  target processes, the reading of the remapping weight-and-address
   file and the initialisation of the sparse matrix vector multiplication.
 \item {'grcv\_00x'} : time spent in the reception of field x in {\tt
     mct\_recv} (including communication and possible waiting time
