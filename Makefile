@@ -3,6 +3,7 @@
 
 export OASIS_HOME=$(shell pwd)
 SHELL=/bin/bash
+export DEBUG=yes
 
 nci:
 	echo "include $(shell pwd)/util/make_dir/make.nci" > util/make_dir/make.inc
