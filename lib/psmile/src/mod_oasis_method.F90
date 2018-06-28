@@ -76,6 +76,11 @@ CONTAINS
    logical                  :: tmp_modcpl
    character(len=ic_lvar)   :: i_name
    character(len=*),parameter :: subname = '(oasis_init_comp)'
+
+   character(len=MPI_MAX_PROCESSOR_NAME), dimension(:), allocatable :: cla_nodes
+   character(len=MPI_MAX_PROCESSOR_NAME) :: cl_node
+   integer :: il_nodelen
+   integer, dimension(:), allocatable :: ila_colors
 !  ---------------------------------------------------------
 
    if (present(kinfo)) then
@@ -421,6 +426,81 @@ CONTAINS
    CALL MPI_Comm_Rank(mpi_comm_local,mpi_rank_local,ierr)
    mpi_root_local = 0
 
+#ifdef use_comm_MPI1
+
+   !------------------------
+   !>   * Set mpi_comm_map based on node association
+   !------------------------
+
+   CALL MPI_Get_processor_name(mpi_node_name, il_nodelen, ierr)
+
+   IF (mpi_rank_local == mpi_root_local) THEN
+
+      ! Prepare working memory on local root
+
+      ALLOCATE(cla_nodes(mpi_size_local))
+      ALLOCATE(ila_colors(mpi_size_local))
+      cla_nodes(:) = ''
+      ila_colors(:) = -1
+   ELSE
+      ALLOCATE(cla_nodes(1))
+      ALLOCATE(ila_colors(1))
+   END IF
+
+   CALL MPI_Gather (mpi_node_name,MPI_MAX_PROCESSOR_NAME,MPI_CHAR,&
+      &             cla_nodes,    MPI_MAX_PROCESSOR_NAME,MPI_CHAR,&
+      &             mpi_root_local, mpi_comm_local, ierr)
+
+   IF (mpi_rank_local == mpi_root_local) THEN
+
+      ! Pick only on proc per node
+
+      DO WHILE (ANY(ila_colors == -1))
+         cl_node = cla_nodes(MINLOC(ila_colors,DIM=1))
+         ila_colors(MINLOC(ila_colors,DIM=1)) = 1
+         DO i = MINLOC(ila_colors,DIM=1), mpi_size_local
+            IF (ila_colors(i) == -1 .AND. cla_nodes(i) == cl_node)&
+               & ila_colors(i) = 0
+         END DO
+      END DO
+   END IF
+
+   icolor = 0
+   CALL MPI_Scatter (ila_colors,1,MPI_INT,&
+      &              icolor,    1,MPI_INT,&
+      &              mpi_root_local, mpi_comm_local, ierr)
+
+   mpi_in_map = icolor == 1
+
+   ikey = 1
+   CALL MPI_Comm_split(mpi_comm_local,icolor,ikey,mpi_comm_map,ierr)
+
+   IF (mpi_in_map) THEN
+      CALL MPI_Comm_size(mpi_comm_map,mpi_size_map,ierr)
+      CALL MPI_Comm_rank(mpi_comm_map,mpi_rank_map,ierr)
+   END IF
+
+   IF (mpi_rank_local == mpi_root_local) THEN
+
+      ! Set the root of the mapping subcommunicator on the
+      ! local communicator root process
+
+      mpi_root_map = mpi_rank_map
+
+   END IF
+
+   ! Free work memory on local root
+
+   DEALLOCATE(cla_nodes)
+   DEALLOCATE(ila_colors)
+
+
+#elif defined use_comm_MPI2
+
+   mpi_comm_map = ??
+   mpi_in_map   = ??
+
+#endif
    !------------------------
    !> * Open log files
    !------------------------
@@ -536,6 +616,7 @@ CONTAINS
    if (OASIS_debug >= 15)  then
       write(nulprt,*) subname,' compid         = ',compid
       write(nulprt,*) subname,' compnm         = ',trim(compnm)
+      write(nulprt,*) subname,' node name      = ',trim(mpi_node_name)
       write(nulprt,*) subname,' mpi_comm_world = ',mpi_comm_global_world
       write(nulprt,*) subname,' mpi_comm_global= ',mpi_comm_global
       write(nulprt,*) subname,'     size_global= ',mpi_size_global
@@ -544,6 +625,11 @@ CONTAINS
       write(nulprt,*) subname,'     size_local = ',mpi_size_local
       write(nulprt,*) subname,'     rank_local = ',mpi_rank_local
       write(nulprt,*) subname,'     root_local = ',mpi_root_local
+      write(nulprt,*) subname,' mpi_in_map     = ',mpi_in_map
+      write(nulprt,*) subname,' mpi_comm_map   = ',mpi_comm_map
+      write(nulprt,*) subname,'     size_map   = ',mpi_size_map
+      write(nulprt,*) subname,'     rank_map   = ',mpi_rank_map
+      write(nulprt,*) subname,'     root_map   = ',mpi_root_map
       write(nulprt,*) subname,' OASIS_debug    = ',OASIS_debug
       do n = 1,prism_amodels
          write(nulprt,*) subname,'   n,prism_model,root = ',&

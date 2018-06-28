@@ -1585,6 +1585,7 @@ SUBROUTINE inipar
   CHARACTER*3 clinfo, clind
   CHARACTER*1 clequa
   CHARACTER*64 cl_cfname,cl_cfunit
+  CHARACTER(len=15) :: cvarmul
   INTEGER (kind=ip_intwp_p) iind, il_aux
   INTEGER (kind=ip_intwp_p) il_file_unit, id_error
   INTEGER (kind=ip_intwp_p) il_max_entry_id, il_no_of_entries
@@ -1595,6 +1596,7 @@ SUBROUTINE inipar
   INTEGER (kind=ip_intwp_p) :: ja,jf,jfn,jz,jm,ilen,idum
   INTEGER (kind=ip_intwp_p) :: ifca,ifcb,ilab,jff,jc
   INTEGER (kind=ip_intwp_p) :: icofld,imodel, ios
+  INTEGER (kind=ip_intwp_p) :: ivarmul
   CHARACTER(len=32) :: keyword
   LOGICAL :: found
   CHARACTER(len=*),parameter :: subname='(mod_oasis_namcouple:inipar)'
@@ -2380,7 +2382,15 @@ SUBROUTINE inipar
                     WRITE(tmpstr1,*) '==> Variance must be indicated at end of line'
                     CALL namcouple_abort(subname,__LINE__,tmpstr1)
                  ELSE
-                    READ(clvari, FMT=2006) varmul(ig_number_field(jf))
+                    ! Read a string
+                    READ(clvari, FMT=2012) cvarmul
+                    ! and convert it accordingly
+                    IF ( INDEX(cvarmul,'.') == 0 ) then
+                       READ(cvarmul,FMT=2013) ivarmul
+                       varmul(ig_number_field(jf)) = REAL(ivarmul)
+                    ELSE
+                       READ(cvarmul,FMT=2006) varmul(ig_number_field(jf))
+                    ENDIF                    
                  ENDIF
               ENDIF
 
@@ -2488,6 +2498,8 @@ SUBROUTINE inipar
 2009 FORMAT(A8)
 2010 FORMAT(A3,A1,I2)
 2011 FORMAT(A3,A1,I8)
+2012 FORMAT(A15)
+2013 FORMAT(I15)
 
 !*    3. Printing
 !        --------
@@ -2739,7 +2751,7 @@ SUBROUTINE alloc()
   !--- alloc_anais1
   ALLOCATE (varmul(ig_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "varmul"allocation of anais module',il_err,1)
-  varmul(:)=0
+  varmul(:)=0.
   ALLOCATE (niwtm(ig_nfield), stat=il_err)
   IF (il_err.NE.0) CALL prtout('Error in "niwtm"allocation of anais module',il_err,1)
   niwtm(:)=0

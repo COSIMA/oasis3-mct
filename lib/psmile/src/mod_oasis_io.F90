@@ -1287,77 +1287,101 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
 !   expects to run only on 1 pe.
 !   if (iam == master_task) then
 
-   if (OASIS_debug >= 5) then
-      write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname)
-   endif
+! EM Since parallel version, must be run only on 1 pe.
+   if ( mpi_rank_local  == 0 ) then
 
-   inquire(file=trim(filename),exist=exists)
-   if (exists) then
-      status = nf90_open(filename,NF90_NOWRITE,ncid)
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+     if (OASIS_debug >= 5) then
+       write(nulprt,*) subname,' read ',trim(filename),' ',trim(fldname)
+     endif
+
+     inquire(file=trim(filename),exist=exists)
+     if (exists) then
+       status = nf90_open(filename,NF90_NOWRITE,ncid)
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
-   else
-      write(nulprt,*) subname,estr,'in filename ',trim(filename)
-      call oasis_abort(file=__FILE__,line=__LINE__)
-   endif
+     else
+       write(nulprt,*) subname,estr,'in filename ',trim(filename)
+       call oasis_abort(file=__FILE__,line=__LINE__)
+     endif
 
-   status = nf90_inq_varid(ncid,trim(fldname),varid)
-   if (status /= nf90_noerr) then
-      write(nulprt,*) subname,estr,'in variable name ',trim(fldname)
-      call oasis_abort(file=__FILE__,line=__LINE__)
-   endif
+     status = nf90_inq_varid(ncid,trim(fldname),varid)
+     if (status /= nf90_noerr) then
+       write(nulprt,*) subname,estr,'in variable name ',trim(fldname)
+       call oasis_abort(file=__FILE__,line=__LINE__)
+     endif
 
-   status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
+     status = nf90_inquire_variable(ncid,varid,ndims=ndims,xtype=xtype)
+     IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                               mpi_rank_local,':',TRIM(nf90_strerror(status))
 
-   allocate(dimid(ndims),nd(ndims))
+     allocate(dimid(ndims),nd(ndims))
 
-   status = nf90_inquire_variable(ncid,varid,dimids=dimid)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
-   do n = 1,ndims
-      status = nf90_inquire_dimension(ncid,dimid(n),len=nd(n))
-      IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                                mpi_rank_local,':',TRIM(nf90_strerror(status))
-   enddo
+     status = nf90_inquire_variable(ncid,varid,dimids=dimid)
+     IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                               mpi_rank_local,':',TRIM(nf90_strerror(status))
+     do n = 1,ndims
+       status = nf90_inquire_dimension(ncid,dimid(n),len=nd(n))
+       IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                                 mpi_rank_local,':',TRIM(nf90_strerror(status))
+     enddo
 
-   if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
-      if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
+     if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
+       if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
          status = nf90_get_var(ncid,varid,ifld2)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
-      elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
+       elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
          status = nf90_get_var(ncid,varid,fld2)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
-      elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
+       elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
          status = nf90_get_var(ncid,varid,fld3)
          IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
                                                    mpi_rank_local,':',TRIM(nf90_strerror(status))
-      else
+       else
          write(nulprt,*) subname,estr,'mismatch in field and data'
          call oasis_abort(file=__FILE__,line=__LINE__)
-      endif
-   endif
+       endif
+     endif
     
-   status = nf90_close(ncid)
-   IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
-                                             mpi_rank_local,':',TRIM(nf90_strerror(status))
+     status = nf90_close(ncid)
+     IF (status /= nf90_noerr) WRITE(nulprt,*) subname,' model :',compid,' proc :',&
+                                               mpi_rank_local,':',TRIM(nf90_strerror(status))
 
-   if (present(nx)) then
+     if (present(nx)) then
       nx = nd(1)
-   endif
+     endif
 
-   if (present(ny)) then
+     if (present(ny)) then
       ny = nd(2)
-   endif
+     endif
 
-   if (present(nz)) then
+     if (present(nz)) then
       nz = nd(3)
+     endif
+
+     deallocate(dimid,nd)
+
    endif
 
-   deallocate(dimid,nd)
+! Scatter info
+! EM Since parallel version, must be broadcasted on a subset of mpi ranks
+   call oasis_mpi_bcast(xtype,mpi_comm_map,subname//' xtype')
+   call oasis_mpi_bcast(ndims,mpi_comm_map,subname//' ndims')
+
+   if (present(ifld2) .or. present(fld2) .or. present(fld3)) then
+     if (xtype == NF90_INT .and. ndims == 2 .and. present(ifld2)) then
+       call oasis_mpi_bcast(ifld2,mpi_comm_map,subname//' mask')
+     elseif (xtype /= NF90_INT .and. ndims == 2 .and. present(fld2)) then
+       call oasis_mpi_bcast(fld2,mpi_comm_map,subname//' others')
+     elseif (xtype /= NF90_INT .and. ndims == 3 .and. present(fld3)) then
+       call oasis_mpi_bcast(fld3,mpi_comm_map,subname//' corners')
+     endif
+   endif
+
+   if (present(nx)) call oasis_mpi_bcast(nx,mpi_comm_map,subname//' nx')
+   if (present(ny)) call oasis_mpi_bcast(ny,mpi_comm_map,subname//' nx')
+   if (present(nz)) call oasis_mpi_bcast(nz,mpi_comm_map,subname//' nx')
 
 !   endif
 

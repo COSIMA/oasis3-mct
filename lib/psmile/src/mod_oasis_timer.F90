@@ -296,7 +296,7 @@ module mod_oasis_timer
                single_timer_header = .TRUE.
             ENDIF
             n = timer_id
-            WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+            WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f11.4,i8,i13,4x))') &
                n, timer(n)%label, timer(n)%runflag, &
                sum_wtime(n), mpi_rank_local, TIMER_COUNT(n), &
                sum_ctime(n), mpi_rank_local, TIMER_COUNT(n)
@@ -326,7 +326,7 @@ module mod_oasis_timer
                      ' wtime ','on pe','count',' ctime ','on pe','count'
                   single_timer_header = .TRUE.
                ENDIF
-               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f11.4,i8,i13,4x))') &
                   n, timer(n)%label, timer(n)%runflag, &
                   sum_wtime(n), mpi_rank_local, TIMER_COUNT(n), &
                   sum_ctime(n), mpi_rank_local, TIMER_COUNT(n)
@@ -557,7 +557,7 @@ module mod_oasis_timer
                      maxpe = k
                   endif
                enddo
-               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x))') &
+               WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f11.4,i8,i13,4x))') &
                   n, label_list(n), timer(n)%runflag, &
                   sum_ctime_global(n,minpe), minpe, count_global(n,minpe), &
                   sum_ctime_global(n,maxpe), maxpe, count_global(n,maxpe)
@@ -597,7 +597,7 @@ module mod_oasis_timer
                   enddo
                   if (mcnt > 0) then
                      meantime = meantime / float(mcnt)
-                     WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f10.4,i8,i12,4x),f10.4)') &
+                     WRITE(output_unit,'(1x,i4,2x,a24,a1,1x,2(f11.4,i8,i13,4x),f11.4)') &
                         n, label_list(n), timer(n)%runflag, &
                         sum_wtime_global(n,minpe), minpe-1, count_global(n,minpe), &
                         sum_wtime_global(n,maxpe), maxpe-1, count_global(n,maxpe), &
@@ -630,7 +630,7 @@ module mod_oasis_timer
                      WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
                      WRITE(output_unit,'(3x,i8,5x)')(k-1)
                      DO n = 1, nlabels
-                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f11.4))') n, label_list(n), timer(n)%runflag, &
                                          (sum_ctime_global(n,k))
                      ENDDO
                   ENDDO
@@ -644,7 +644,7 @@ module mod_oasis_timer
                      WRITE(output_unit,'(a)',advance="NO") " P r o c e s s o r    ----------> "
                      WRITE(output_unit,'(3x,i8,5x)')(k-1)
                      DO n = 1, nlabels
-                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f10.4))') n, label_list(n), timer(n)%runflag, &
+                        WRITE(output_unit,'(1x,i8,2x,a24,a1,1x,(f11.4))') n, label_list(n), timer(n)%runflag, &
                                            (sum_wtime_global(n,k))
                      ENDDO
                   ENDDO

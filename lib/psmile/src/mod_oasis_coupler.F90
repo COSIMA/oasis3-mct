@@ -1371,22 +1371,27 @@ CONTAINS
                                  trim(prism_mapper(mapID)%file),exists
                  call oasis_flush(nulprt)
               endif
-              if (.not.exists) then
-                 if (trim(namscrmet(namID)) /= trim(cspval)) then
-                    !--------------------------------
-                    ! generate mapping file on root pe
-                    ! taken from oasis3 scriprmp
-                    !--------------------------------
+           endif
+           call oasis_mpi_bcast(exists,mpi_comm_local,subname//' exists')
+           if (.not.exists) then
+              if (trim(namscrmet(namID)) /= trim(cspval)) then
+                 !--------------------------------
+                 ! generate mapping file on map group/communicator
+                 ! taken from oasis3 scriprmp
+                 !--------------------------------
+                 if (mpi_in_map) then
                     if (local_timers_on > 2) call oasis_timer_start('cpl_setup_genmap')
                     call oasis_map_genmap(mapID,namID)
                     if (local_timers_on > 2) call oasis_timer_stop('cpl_setup_genmap')
-                 else
-                    write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
-                                    trim(prism_mapper(mapID)%file)
-                    call oasis_abort(file=__FILE__,line=__LINE__)
-                 endif
+                 end if
+              else
+                 write(nulprt,*) subname,estr,'map file does not exist and SCRIPR not set = ',&
+                                 trim(prism_mapper(mapID)%file)
+                 call oasis_abort(file=__FILE__,line=__LINE__)
               endif
-
+           endif
+           !
+           if (mpi_rank_local == 0) then
               !--------------------------------
               ! open mapping file
               !--------------------------------

@@ -297,7 +297,7 @@ CONTAINS
        src_lat,  src_lon,  dst_lat,  dst_lon, &
        src_corner_lat, src_corner_lon, &
        dst_corner_lat, dst_corner_lon, &
-       logunit=nulprt)
+       ilogunit=nulprt,ilogprt=OASIS_debug)
   if (OASIS_debug >= 15) then
       WRITE(nulprt,*) subname,' done grid_init '
       CALL oasis_flush(nulprt)
@@ -307,8 +307,11 @@ CONTAINS
       WRITE(nulprt,*) subname,' call scrip '
       CALL oasis_flush(nulprt)
   ENDIF
+  if (local_timers_on) call oasis_timer_start('cpl_genmap_scrip')
   call scrip(prism_mapper(mapid)%file,prism_mapper(mapid)%file,namscrmet(namID), &
-             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID),namscrord(namID))
+             namscrnor(namID),lextrapdone,namscrvam(namID),namscrnbr(namID),namscrord(namID), &
+             mpi_comm_map, mpi_size_map, mpi_rank_map, mpi_root_map)
+  if (local_timers_on) call oasis_timer_stop('cpl_genmap_scrip') 
   IF (OASIS_debug >= 15) THEN
       WRITE(nulprt,*) subname,' done scrip '
       CALL oasis_flush(nulprt)
