@@ -10,7 +10,7 @@
 # Note: Choose one of these includes files and modify it according to your
 #       local settings. Replace the currently active file with your own.
 #
-#include  $(HOME)/oasis3-mct/util/make_dir/make.intel_corail
-include  $(HOME)/oasis3-mct/util/make_dir/make.intel_nemo_lenovo
+#include  $(HOME)/oasis3-mct/util/make_dir/make.intel_nemo_lenovo
+include  $(HOME)/oasis3-mct/util/make_dir/make.intel_impi_nemo_lenovo_openmp
 #
 ### End User configurable options ###

@@ -1,6 +1,6 @@
 #
-# Include file for OASIS3 Makefile for nemo lenovo at Cerfacs with OpenMP
-#
+# Include file for OASIS3 Makefile for a Bull system using 
+# Intel Compiler and impi and OpenMP
 ###############################################################################
 #
 # CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
@@ -9,25 +9,23 @@ CHAN            = MPI1
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3-mct main directory
-COUPLE          = /scratch/globc/valcke/OASIS3-MCT_before4/oasis3-mct/
+COUPLE          = $(HOME)/oasis3-mct
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = $(COUPLE)/NEMO_LENOVO_INTEL
+ARCHDIR         = $(COUPLE)/BEAUFIX_oa3-mct_openmp
 #
 # MPI library
-#MPIDIR           = ${MPICOMPILER}
-MPIDIR           = /data/softs/intel/impi/5.0.3.048/intel64
+MPIDIR           = /opt/softs/intel/impi/5.1.2.150/intel64
 MPIBIN           = $(MPIDIR)/bin
 MPI_INCLUDE      = $(MPIDIR)/include
 MPILIB           = -L$(MPIDIR)/lib
 #
 # NETCDF library
-NETCDF_LIB_DIR=/data/softs/local_intel/PNETCDF-4.3.3/lib
-NETCDF_INC_DIR=/data/softs/local_intel/PNETCDF-4.3.3/include
-NETCDF_INCLUDE  = ${NETCDF_INC_DIR}
-NETCDF_LIBRARY  = -L${NETCDF_LIB_DIR} -lnetcdff -lnetcdf -L/data/softs/local_intel/PHDF5-1.8.14/lib  -lhdf5_hl -lhdf5 -lz -lcurl
+NETCDF_INCLUDE  = /opt/softs/libraries/ICC16.1.150/netcdf-4.4.0/include
+NETCDF_LIBRARY  = -L/opt/softs/libraries/ICC16.1.150/netcdf-4.4.0/lib -lnetcdff -lnetcdf -L/opt/softs/libraries/ICC16.1.150/hdf5-1.8.16_par_thrsaf/lib -lhdf5hl_fortran -lhdf5_fortran -lhdf5 -lz -lcurl
 #
 # Compiling and other commands
+# You may have to load the corresponding intel module to compile
 MAKE        = gmake
 F90         = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
 F           = $(F90)
@@ -45,14 +43,15 @@ CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
-F90FLAGS_1  = -O2 -xCORE-AVX2 -I. -assume byterecl -mt_mpi -qopenmp
-#F90FLAGS_1  = -g -traceback -fpe0 -O0 -I. -assume byterecl -mt_mpi -qopenmp
+F90FLAGS_1  = -O2 -xAVX -I.  -assume byterecl -openmp
+#F90FLAGS_1  = -g -traceback -O0 -check all -I. -assume byterecl
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
 CCFLAGS_1   = 
-LDFLAGS     = $(F90FLAGS_1)
+LDFLAGS     = -openmp
 #
+MPP_IOOPT = -i4 -r8
 ###################
 #
 

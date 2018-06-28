@@ -220,7 +220,7 @@ end type FIELD_SEQUENCE
           ! Count number of log file per model
           i_file_count(i) = i_file_count(i) + 1
 
-          write(log_file_name,'("lucia.",a2,".",i6.6)'),model_code(i),j
+          write(log_file_name,'("lucia.",a2,".",i6.6)') model_code(i),j
           write(6,'(TL16,A,1X)', advance='no') TRIM(log_file_name)
           call flush(6)
 
@@ -509,7 +509,7 @@ end type FIELD_SEQUENCE
           ! Count number of log file
           log_nb = log_nb + 1
 
-          write(log_file_name,'("lucia.",a2,".",i6.6)'),model_code(i),j
+          write(log_file_name,'("lucia.",a2,".",i6.6)') model_code(i),j
 
           OPEN (unit=10, &
                 file=TRIM(log_file_name), &
@@ -911,28 +911,28 @@ end type FIELD_SEQUENCE
     ENDDO
 !
     WRITE(6,*) ' '
-    WRITE(6,*), ' Load balance analysis '
+    WRITE(6,*) ' Load balance analysis '
     WRITE(6,*) ' '
-    WRITE(6,*), ' Component -         Calculations   -     Waiting time (s) - # cpl step :'
+    WRITE(6,*) ' Component -         Calculations   -     Waiting time (s) - # cpl step :'
 !
 !   WRITE INFO ON DAT FILE FOR GNUPLOT AND STANDARD OUTPUT
 !
     WRITE(6,*) ' '
     OPEN (10, file="info.dat")
     DO i = 1, nb_models
-       WRITE(10,'(I2, 2X, F10.3, 2X, F10.3, 2X, A6)'), &
+       WRITE(10,'(I2, 2X, F10.3, 2X, F10.3, 2X, A6)') &
                   i, calc_time(i), noncalc_time(i), model_name(i)
-       WRITE(6,'(2X, A6, 16X, F10.2, 12X, F10.2, 10X, I4)'), &
+       WRITE(6,'(2X, A6, 16X, F10.2, 12X, F10.2, 10X, I4)') &
                     model_name(i), calc_time(i), noncalc_time(i), valid_comm_nb(i)-first_valid_comm(i)+1
     ENDDO
     CLOSE (10)
           
     WRITE (6,*) ' '
 !
-    WRITE(6,*), ' Additional informations'
-    WRITE(6,*), ' Component -  OASIS mean interpolation time -    Jitter  (s): '
+    WRITE(6,*) ' Additional informations'
+    WRITE(6,*) ' Component -  OASIS mean interpolation time -    Jitter  (s): '
     DO i = 1, nb_models
-       WRITE(6,'(2X, A6, 12X, F10.2, 18X, F10.2 )'), &
+       WRITE(6,'(2X, A6, 12X, F10.2, 18X, F10.2 )') &
                   model_name(i), r_interp_time(i), r_jitter_time(i)
     END DO
 !
