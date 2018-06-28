@@ -44,13 +44,11 @@
 
 !-----------------------------------------------------------------------
 
-      logical (kind=log_kind), dimension(99), save ::
-     &    unit_free   ! flags to determine whether unit is free for use
+      logical (kind=log_kind), dimension(99), save :: unit_free   ! flags to determine whether unit is free for use
 
-      integer (kind=int_kind), parameter ::
-     &    stdin  = 5, ! reserves unit for standard input
-     &    stdout = 6, ! reserves unit for standard output
-     &    stderr = 6  ! reserves unit for standard error
+      integer (kind=int_kind), parameter :: stdin  = 5,  & ! reserves unit for standard input
+                                            stdout = 6,  & ! reserves unit for standard output
+                                            stderr = 6  ! reserves unit for standard error
 
 !***********************************************************************
 
@@ -72,8 +70,7 @@
 !
 !-----------------------------------------------------------------------
 
-      integer (kind=int_kind), intent(out) ::
-     &     iunit   ! next free I/O unit
+      integer (kind=int_kind), intent(out) :: iunit   ! next free I/O unit
 
 !-----------------------------------------------------------------------
 !
@@ -146,8 +143,7 @@
 !
 !-----------------------------------------------------------------------
 
-      integer (kind=int_kind), intent(in) ::
-     &     iunit   ! I/O unit to release
+      integer (kind=int_kind), intent(in) :: iunit   ! I/O unit to release
 
 !-----------------------------------------------------------------------
 !

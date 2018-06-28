@@ -1,10 +1,10 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-!     This module defines common constants used in many routines.
+!     This module defines the F90 kind parameter for common data types.
 !
 !-----------------------------------------------------------------------
 !
-!     CVS:$Id: constants.f 818 2006-03-10 17:18:31Z valcke $
+!     CVS:$Id: kinds_mod.f 818 2006-03-10 17:18:31Z valcke $
 !
 !     Copyright (c) 1997, 1998 the Regents of the University of 
 !       California.
@@ -31,35 +31,52 @@
 !
 !***********************************************************************
 
-      module constants
+      module kinds_mod
 
 !-----------------------------------------------------------------------
 
-      use kinds_mod  ! defines common data types
-
       implicit none
-
       save
 
 !-----------------------------------------------------------------------
 
-      real (kind = dbl_kind), parameter :: 
-     &                        zero   = 0.0_dbl_kind,
-     &                        one    = 1.0_dbl_kind,
-     &                        two    = 2.0_dbl_kind,
-     &                        three  = 3.0_dbl_kind,
-     &                        four   = 4.0_dbl_kind,
-     &                        five   = 5.0_dbl_kind,
-     &                        half   = 0.5_dbl_kind,
-     &                        quart  = 0.25_dbl_kind,
-     &                        bignum = 1.e+20_dbl_kind,
-     &                        tiny   = 1.e-14_dbl_kind,
-     &                        pi     = 3.14159265358979323846_dbl_kind,
-     &                        pi2    = two*pi,
-     &                        pih    = half*pi
-
+      integer, parameter :: char_len  = 80
+      integer, parameter :: int_kind  = SELECTED_INT_KIND(9)
+      integer, parameter :: log_kind  = kind(.true.)
+      integer, parameter :: real_kind = SELECTED_REAL_KIND(12,307)
+      integer, parameter :: dbl_kind  = SELECTED_REAL_KIND(12,307)
 !-----------------------------------------------------------------------
+! hardwire for now, tcraig
 
-      end module constants
+      INTEGER           :: nlogprt = 0
+      INTEGER           :: nulou = 6
+      logical,parameter :: ll_single = .false.   ! single reals
+      logical,parameter :: lncdfgrd = .true.     ! grid files netcdf
+      integer,parameter :: jpeight = 8
+      character(len=*),parameter :: cgrdnam = 'grids'
+      character(len=*),parameter :: cglonsuf  = '.lon'
+      character(len=*),parameter :: cglatsuf  = '.lat'
+      character(len=*),parameter :: crnlonsuf = '.clo'
+      character(len=*),parameter :: crnlatsuf = '.cla'
+
+      INTEGER, DIMENSION (:), ALLOCATABLE :: snum_links, snum_wgts
+      LOGICAL, DIMENSION (:), ALLOCATABLE :: sweight_flag
+
+      TYPE wp
+         REAL(kind=dbl_kind), POINTER :: warray(:,:)
+      END TYPE wp
+      type(wp), allocatable :: sweigth(:)
+
+      TYPE sp
+        INTEGER, POINTER :: srcarray(:)
+      END TYPE sp
+      type(sp), allocatable :: ssrc_addr(:)
+
+      TYPE dp
+        INTEGER, POINTER :: dstarray(:)
+      END TYPE dp
+      type(dp), allocatable :: sdst_addr(:)
+
+      end module kinds_mod
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
