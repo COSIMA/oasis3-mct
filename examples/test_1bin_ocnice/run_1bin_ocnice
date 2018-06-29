@@ -5,8 +5,8 @@
 ############### User's section #######################################
 #
 ## - Define architecture and coupler 
-arch=tioman_pgi_mpich  #tioman_pgi_mpich/corail/curie(CEA)/jade/neptune_gfortran
-MPILIB=MPI1  #MPI1/MPI2
+arch=beaufix  #tioman_pgi_mpich/corail/curie(CEA)/jade/neptune_gfortran
+MPILIB=MPI1  #MPI1
 user=`whoami`
 #
 ## - Define paths
@@ -42,8 +42,8 @@ elif [ ${arch} == ubuntu ]; then
 elif [ ${arch} == crayXE6 ]; then
 rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == beaufix ]; then
-# The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
-    rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
+    rundir=/scratch/work/cglo765/trunk_r2348/examples/test_1bin_ocnice/work_${casename}
+    MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun    
 elif [ ${arch} == ada ]; then
   MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
   rundir=/workgpfs/rech/ces/rces980/modBRETAGNE/oasis3-mct/examples/tutorial/work_${casename}
@@ -150,12 +150,12 @@ EOF
 ###---------------------------------------------------------------------
 elif [ $arch == beaufix ] ; then
 
-   (( nproc = $nproc_exe1 + $nproc_exe2 ))
+   (( nproc = $nproc_exe1 ))
 
   cat <<EOF > $rundir/run_$casename.$arch
 #!/bin/bash
 #SBATCH --time=01:00:00
-#SBATCH -p  normal32        # partition/queue
+#SBATCH -p  normal64        # partition/queue
 #SBATCH --job-name=toys     # job name
 #SBATCH -N 1                # number of nodes
 #SBATCH -n $nproc                # number of procs
@@ -166,16 +166,13 @@ elif [ $arch == beaufix ] ; then
 ulimit -s unlimited
 # rundir must be in the TMPDIR
 cd $rundir
-module load intel/13.1.4.183
-module load intelmpi/4.1.1.036
-module load netcdf/4.3.0 
+module load netcdf/4.4.0 
 #
 #
 # Activate next line to run in coupled mode
 #time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 # Activate next two lines to run both models stand alone
 time mpirun -np $nproc_exe1 ./$exe1
-time mpirun -np $nproc_exe2 ./$exe2
 #
 EOF
 
@@ -379,6 +376,10 @@ elif [ $arch == neptune_gfortran ]; then
     echo 'Submitting the job to queue using qsub'
     qsub $rundir/run_$casename.$arch
     qstat | grep $user
+elif [ $arch == beaufix ]; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $user
 fi
 
 echo $casename 'is executed or submitted to queue.'
