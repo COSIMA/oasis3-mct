@@ -17,12 +17,12 @@ casename=`basename $srcdir`
 ############### User's section #######################################
 #
 ## - Define architecture and coupler 
-arch=training_computer   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
+arch=beaufix   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
                         #crayXE6, beaufix, ada 
 #
 # - Define number of processes to run each executable
-    nproc_exe1=1
-    nproc_exe2=1
+    nproc_exe1=3
+    nproc_exe2=3
 #
 ## - Define rundir
 if [ ${arch} == tioman_pgi_mpich ]; then
@@ -59,7 +59,7 @@ elif [ ${arch} == crayXE6 ]; then
 rundir=/zhome/academic/HLRS/imk/imkbreil/Programme/oasis/oasis3-mct/examples/tutorial/work_${casename}
 elif [ ${arch} == beaufix ]; then
 # The toy must be directly in the TMPDIRs the jobs can only run in the TMPDIR
-    rundir=/scratch/utmp/cglo355/oasis3-mct/examples/tutorial/work_${casename}
+    rundir=/scratch/work/cglo765/trunk_r2348/examples/tutorial/work_${casename}
     MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun
 elif [ ${arch} == ada ]; then
   MPIRUN=/opt/intel/impi/4.1.0.024/intel64/bin/mpirun
@@ -195,10 +195,7 @@ cd $rundir
 module load netcdf/4.4.0 
 #
 # Activate next line to run in coupled mode
-#time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
-# Activate next two lines to run both models stand alone
-time $MPIRUN -np $nproc_exe1 ./$exe1
-time $MPIRUN -np $nproc_exe2 ./$exe2
+time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
 
@@ -411,9 +408,7 @@ if [ $arch == training_computer ]; then
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == tioman_pgi_mpich ] || [ $arch == napali ]; then
     echo 'Executing the model using '$MPIRUN 
-#    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
-    $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
-    $MPIRUN -np $nproc_exe2 ./$exe2 >> runjob.err 
+    $MPIRUN -p4pg appl-linux.conf ./$exe1 > runjob.err
 elif [ $arch == ubuntu ] || [ $arch == tioman_intel_openmpi ] ; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
