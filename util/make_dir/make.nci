@@ -13,7 +13,7 @@ NETCDF_LIBRARY = -L$(NETCDF_ROOT)/lib -lnetcdf -lnetcdff
 #
 # Compiling and other commands
 MAKE        = /usr/bin/make
-F90         = mpif90
+F90         = mpifort
 CC          = mpicc
 F           = $(F90)
 f90         = $(F90)
