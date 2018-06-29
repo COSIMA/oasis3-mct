@@ -644,8 +644,10 @@ SUBROUTINE oasis_namcouple_init()
         WRITE(nulprt1,*) subname,n,'namchecki ',namchecki(n)
         WRITE(nulprt1,*) subname,n,'namchecko ',namchecko(n)
         WRITE(nulprt1,*) subname,n,'namfldsmu ',namfldsmu(n)
+        WRITE(nulprt1,*) subname,n,'nbofld    ',nbofld(n)
         WRITE(nulprt1,*) subname,n,'namfldsad ',namfldsad(n)
         WRITE(nulprt1,*) subname,n,'namflddmu ',namflddmu(n)
+        WRITE(nulprt1,*) subname,n,'nbnfld    ',nbnfld(n)
         WRITE(nulprt1,*) subname,n,'namflddad ',namflddad(n)
         WRITE(nulprt1,*) subname,n,'namscrmet ',TRIM(namscrmet(n))
         WRITE(nulprt1,*) subname,n,'namscrnor ',TRIM(namscrnor(n))
@@ -2487,7 +2489,7 @@ SUBROUTINE inipar
 !     * Get multiplicative coefficients for  additional fields
                  READ(clvari, FMT=2012) cabncoef
                  IF ( INDEX(cabncoef,'.') == 0 ) THEN
-                  READ(cabocoef,FMT=2013) iabncoef
+                  READ(cabncoef,FMT=2013) iabncoef
                   abncoef(jc,ig_number_field(jf)) = REAL(iabncoef)
                ELSE
                   READ(cabncoef,FMT=2006) abncoef(jc,ig_number_field(jf))
@@ -2525,7 +2527,7 @@ SUBROUTINE inipar
 2010 FORMAT(A3,A1,I2)
 2011 FORMAT(A3,A1,I8)
 2012 FORMAT(A15)
-2013 FORMAT(I15)
+2013 FORMAT(I10)
 
 !*    3. Printing
 !        --------
