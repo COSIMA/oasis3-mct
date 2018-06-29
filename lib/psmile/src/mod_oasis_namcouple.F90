@@ -2469,7 +2469,7 @@ SUBROUTINE inipar
 !     * Get linear combination parameters for final fields
               CALL parse(clline, clvari, 1, jpeighty, ilen, __LINE__)
 !     * Get main field multiplicative coefficient
-              READ(clvari, FMT=2006) cafldcobn
+              READ(clvari, FMT=2012) cafldcobn
               ! and convert it accordingly
               IF ( INDEX(cafldcobn,'.') == 0 ) then
                   READ(cafldcobn,FMT=2013) iafldcobn
