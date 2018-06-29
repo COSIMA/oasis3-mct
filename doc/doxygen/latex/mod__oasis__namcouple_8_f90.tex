@@ -1,8 +1,503 @@
-\hypertarget{mod__oasis__namcouple_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.F90 File Reference}
-\label{mod__oasis__namcouple_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__namcouple_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.F90 File Reference}
+\label{mod__oasis__namcouple_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+namcouple.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__namcouple}{mod\+\_\+oasis\+\_\+namcouple}
-\begin{DoxyCompactList}\small\item\em Reads the namcouple file for use in O\+A\+S\+I\+S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+module \hyperlink{namespacemod__oasis__namcouple}{mod\+\_\+oasis\+\_\+namcouple}
+\begin{DoxyCompactList}\small\item\em Reads the namcouple file for use in O\+A\+S\+IS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__namcouple_ab57c69ae534734f92a85e24a3389e972}{mod\+\_\+oasis\+\_\+namcouple\+::oasis\+\_\+namcouple\+\_\+init} ()
+\begin{DoxyCompactList}\small\item\em Reads the namcouple. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_acb43892c17b5f8c8b360effb5a811c27}{mod\+\_\+oasis\+\_\+namcouple\+::inipar\+\_\+alloc} ()
+\begin{DoxyCompactList}\small\item\em Reads the namcouple to allocate arrays. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_a6da9d2285766ceb22ea8449f55201d84}{mod\+\_\+oasis\+\_\+namcouple\+::inipar}
+\begin{DoxyCompactList}\small\item\em Reads, sets, and prints the namcouple file. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_a0d85a5dcb3fab17a680cceed332b9668}{mod\+\_\+oasis\+\_\+namcouple\+::alloc} ()
+\begin{DoxyCompactList}\small\item\em Allocates temporary arrays for namcouple input. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_abf09a0e902f44f77874a75bb4a7fba33}{mod\+\_\+oasis\+\_\+namcouple\+::dealloc} ()
+\begin{DoxyCompactList}\small\item\em Deallocates temporary arrays for namcouple input. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_aee06276b65463fb85340dcc2ab9d67dc}{mod\+\_\+oasis\+\_\+namcouple\+::prtout} (cdtext, kvalue, kstyle)
+\begin{DoxyCompactList}\small\item\em Prints information passed by argument. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_a5f87ffd480c100a94dcdf02f69b23080}{mod\+\_\+oasis\+\_\+namcouple\+::findkeyword} (keyword, line, found)
+\begin{DoxyCompactList}\small\item\em Searches for a particular keyword in the namcouple file. \end{DoxyCompactList}\item 
+logical function \hyperlink{namespacemod__oasis__namcouple_a4551fbe4bcd69bc6d0d4f6e1ee52ea86}{mod\+\_\+oasis\+\_\+namcouple\+::checkcomment} (line)
+\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_a743cf58ab4240aca9ed3e0e2bf1b873c}{mod\+\_\+oasis\+\_\+namcouple\+::parse} (cdone, cdtwo, knumb, klen, kleng, line)
+\begin{DoxyCompactList}\small\item\em Subroutine to parse string. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_a951e3cbd0a1f031399779b6ab3a52112}{mod\+\_\+oasis\+\_\+namcouple\+::skip} (cd\+\_\+one, id\+\_\+len, endflag, ios)
+\item 
+subroutine \hyperlink{namespacemod__oasis__namcouple_aefebb1d6fd8ac62ea91f9e03265440a3}{mod\+\_\+oasis\+\_\+namcouple\+::namcouple\+\_\+abort} (isubname, lineno, string1, string2, string3, string4)
+\begin{DoxyCompactList}\small\item\em Subroutine that calls abort in this module. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__namcouple_a4fb10ad6e864dcbe34c4a8b02204a523}{mod\+\_\+oasis\+\_\+namcouple\+::jpeighty} = 5000
+\begin{DoxyCompactList}\small\item\em max number of characters to be read in each line of the file namcouple \end{DoxyCompactList}\item 
+character(len= $\ast$), parameter \hyperlink{namespacemod__oasis__namcouple_a32ce50ab82412ce502420b56a4e47d71}{mod\+\_\+oasis\+\_\+namcouple\+::rform} = \textquotesingle{}(A5000)\textquotesingle{}
+\begin{DoxyCompactList}\small\item\em formatted line read format \end{DoxyCompactList}\item 
+character(len= $\ast$), parameter \hyperlink{namespacemod__oasis__namcouple_a88ddb8ab5304da53ddf232e72b31cd45}{mod\+\_\+oasis\+\_\+namcouple\+::nmapdec\+\_\+default} = \textquotesingle{}decomp\+\_\+1d\textquotesingle{}
+\item 
+character(len= $\ast$), parameter \hyperlink{namespacemod__oasis__namcouple_a81f8b2668d8970564e85db2ac2465866}{mod\+\_\+oasis\+\_\+namcouple\+::nmatxrd\+\_\+default} = \textquotesingle{}ceg\textquotesingle{}
+\item 
+character(len= $\ast$), parameter \hyperlink{namespacemod__oasis__namcouple_a3b0f98a2f8fc07f944af7fc650ea3eff}{mod\+\_\+oasis\+\_\+namcouple\+::nwgtopt\+\_\+default} = \textquotesingle{}abort\+\_\+on\+\_\+bad\+\_\+index\textquotesingle{}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_a5ca7cd6a5b9f939b68492200aa92bab4}{mod\+\_\+oasis\+\_\+namcouple\+::nnamcpl}
+\begin{DoxyCompactList}\small\item\em number of namcouple inputs \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_a14505eaa91b2c8ba308c63ff78652206}{mod\+\_\+oasis\+\_\+namcouple\+::namruntim}
+\begin{DoxyCompactList}\small\item\em namcouple runtime \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_a46affda5336f60a1eeb1badaaccd3cfd}{mod\+\_\+oasis\+\_\+namcouple\+::namlogprt}
+\begin{DoxyCompactList}\small\item\em namcouple nlogprt value \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_a45fbbd2941f5d71991d409f63e31cf02}{mod\+\_\+oasis\+\_\+namcouple\+::namtlogprt}
+\begin{DoxyCompactList}\small\item\em namcouple ntlogprt value \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_a1b8c7ce28c62fa0b15076b7169d8b454}{mod\+\_\+oasis\+\_\+namcouple\+::namuntmin}
+\begin{DoxyCompactList}\small\item\em namcouple min IO unit value \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__namcouple_ae750107f9401fd3c7348088ad3095b45}{mod\+\_\+oasis\+\_\+namcouple\+::namuntmax}
+\begin{DoxyCompactList}\small\item\em namcouple max IO unit value \end{DoxyCompactList}\item 
+logical, public \hyperlink{namespacemod__oasis__namcouple_ad1bd3ea485ad5f5114eb4b7f8c831ccb}{mod\+\_\+oasis\+\_\+namcouple\+::namnorest}
+\begin{DoxyCompactList}\small\item\em namcouple allow no restarts \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), public \hyperlink{namespacemod__oasis__namcouple_a484aaf8a6d7eaa0675a8249fa94509cf}{mod\+\_\+oasis\+\_\+namcouple\+::nammapdec}
+\begin{DoxyCompactList}\small\item\em namcouple map decomp value \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), public \hyperlink{namespacemod__oasis__namcouple_ad9ac6585de157a05d793636addf672a5}{mod\+\_\+oasis\+\_\+namcouple\+::nammatxrd}
+\begin{DoxyCompactList}\small\item\em namcouple matrix read option \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), public \hyperlink{namespacemod__oasis__namcouple_a03a63fe10e98e695e556ee190cd3accc}{mod\+\_\+oasis\+\_\+namcouple\+::namwgtopt}
+\begin{DoxyCompactList}\small\item\em namcouple weights handling option \end{DoxyCompactList}\item 
+character(len=jpeighty), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a5fcb5a4f2a49f414fafe38b03c5c089d}{mod\+\_\+oasis\+\_\+namcouple\+::namsrcfld}
+\begin{DoxyCompactList}\small\item\em list of src fields \end{DoxyCompactList}\item 
+character(len=jpeighty), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ac4cfec209e4169b6098f9a8b9be1ffb1}{mod\+\_\+oasis\+\_\+namcouple\+::namdstfld}
+\begin{DoxyCompactList}\small\item\em list of dst fields \end{DoxyCompactList}\item 
+character(len=ic\+\_\+lvar), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a589c1bae58b10bcb0cfb30c0893a7895}{mod\+\_\+oasis\+\_\+namcouple\+::namsrcgrd}
+\begin{DoxyCompactList}\small\item\em src grid name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ac8f6c8fe3720739f3d26431a8a600506}{mod\+\_\+oasis\+\_\+namcouple\+::namsrc\+\_\+nx}
+\begin{DoxyCompactList}\small\item\em src nx grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ab82c80f007b37865172ddb033a1abb36}{mod\+\_\+oasis\+\_\+namcouple\+::namsrc\+\_\+ny}
+\begin{DoxyCompactList}\small\item\em src ny grid size \end{DoxyCompactList}\item 
+character(len=ic\+\_\+lvar), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a7a2ed64b0670db38d2287f5d452060e4}{mod\+\_\+oasis\+\_\+namcouple\+::namdstgrd}
+\begin{DoxyCompactList}\small\item\em dst grid name \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a6add94418eefdaefd78cd971888a5826}{mod\+\_\+oasis\+\_\+namcouple\+::namdst\+\_\+nx}
+\begin{DoxyCompactList}\small\item\em dst nx grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a9035fc89396bad9574c88642d3aac5f0}{mod\+\_\+oasis\+\_\+namcouple\+::namdst\+\_\+ny}
+\begin{DoxyCompactList}\small\item\em dst ny grid size \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a54ccfe0380fc1c89d085f37a044a297e}{mod\+\_\+oasis\+\_\+namcouple\+::namfldseq}
+\begin{DoxyCompactList}\small\item\em S\+EQ value. \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a4841e350d91926f5f8403e73442c76ad}{mod\+\_\+oasis\+\_\+namcouple\+::namfldops}
+\begin{DoxyCompactList}\small\item\em operation, ip\+\_\+expout,... \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a9080617143dacb027f74c4c5158b5e58}{mod\+\_\+oasis\+\_\+namcouple\+::namflddti}
+\begin{DoxyCompactList}\small\item\em coupling period (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a6a4406ca14f91ef6514a18eb154e648f}{mod\+\_\+oasis\+\_\+namcouple\+::namfldlag}
+\begin{DoxyCompactList}\small\item\em coupling lag (secs) \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a5f81bc00e6dc045770edd4093f68278c}{mod\+\_\+oasis\+\_\+namcouple\+::namfldtrn}
+\begin{DoxyCompactList}\small\item\em fields transform, ip\+\_\+instant,... \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a96aa6a31ef021468f807819a84b327c3}{mod\+\_\+oasis\+\_\+namcouple\+::namfldcon}
+\begin{DoxyCompactList}\small\item\em conserv fld operation \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a119b86702766d5392cb44856448bcd3e}{mod\+\_\+oasis\+\_\+namcouple\+::namfldcoo}
+\begin{DoxyCompactList}\small\item\em conserv fld option (bfb, opt) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+long), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a9fc6ac674a8cfa68d9d15ad13213e21d}{mod\+\_\+oasis\+\_\+namcouple\+::nammapfil}
+\begin{DoxyCompactList}\small\item\em mapping file name \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a7316d7d322da7cf10f315e38c145ebbb}{mod\+\_\+oasis\+\_\+namcouple\+::nammaploc}
+\begin{DoxyCompactList}\small\item\em mapping location (src or dst pes) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ad2554b4881fa63780dd5e6fe78d705ef}{mod\+\_\+oasis\+\_\+namcouple\+::nammapopt}
+\begin{DoxyCompactList}\small\item\em mapping option (bfb, sum, or opt) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a54f4b8262f809a20928092782bc78345}{mod\+\_\+oasis\+\_\+namcouple\+::namrstfil}
+\begin{DoxyCompactList}\small\item\em restart file name \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a15fc11ff1c1d5718ff127a06a205a82c}{mod\+\_\+oasis\+\_\+namcouple\+::naminpfil}
+\begin{DoxyCompactList}\small\item\em input file name \end{DoxyCompactList}\item 
+logical, dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a7c88a329c97aea020e9b135bdca8d160}{mod\+\_\+oasis\+\_\+namcouple\+::namchecki}
+\begin{DoxyCompactList}\small\item\em checkin flag \end{DoxyCompactList}\item 
+logical, dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a58c011820e55c9af9f306fbb1d45eb23}{mod\+\_\+oasis\+\_\+namcouple\+::namchecko}
+\begin{DoxyCompactList}\small\item\em checkout flag \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ab52824ec91491253e02556a68ab31b09}{mod\+\_\+oasis\+\_\+namcouple\+::namfldsmu}
+\begin{DoxyCompactList}\small\item\em src multiplier term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a1729dba99742412a1e07a479cb7f7921}{mod\+\_\+oasis\+\_\+namcouple\+::namfldsad}
+\begin{DoxyCompactList}\small\item\em src additive term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ad81bb4f19a71f0fcf8655cb9d39a3380}{mod\+\_\+oasis\+\_\+namcouple\+::namflddmu}
+\begin{DoxyCompactList}\small\item\em dst multipler term \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_af1e31f45ea1cd7a7b64a8a7dc2cec4ee}{mod\+\_\+oasis\+\_\+namcouple\+::namflddad}
+\begin{DoxyCompactList}\small\item\em dst additive term \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a51c19e0892a72acc3dca2adb046ed175}{mod\+\_\+oasis\+\_\+namcouple\+::namscrmet}
+\begin{DoxyCompactList}\small\item\em scrip method (C\+O\+N\+S\+E\+RV, D\+I\+S\+T\+W\+GT, B\+I\+L\+I\+N\+E\+AR, B\+I\+C\+U\+B\+IC, G\+A\+U\+S\+W\+GT) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a392f40531007d5dcc084e6ad4a393fd7}{mod\+\_\+oasis\+\_\+namcouple\+::namscrnor}
+\begin{DoxyCompactList}\small\item\em scrip conserv normalization (F\+R\+A\+C\+A\+R\+EA, D\+E\+S\+T\+A\+R\+EA, F\+R\+A\+C\+N\+N\+EI) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a8ddbaabd22bbf485888b1df5f3578909}{mod\+\_\+oasis\+\_\+namcouple\+::namscrtyp}
+\begin{DoxyCompactList}\small\item\em scrip mapping type (S\+C\+A\+L\+AR, V\+E\+C\+T\+OR) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_ac881ced105604879ada860fabd677481}{mod\+\_\+oasis\+\_\+namcouple\+::namscrord}
+\begin{DoxyCompactList}\small\item\em scrip conserve order (F\+I\+R\+ST, S\+E\+C\+O\+ND) \end{DoxyCompactList}\item 
+character(len=ic\+\_\+med), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a6a95ddbbbc615e0257d93d05e4546239}{mod\+\_\+oasis\+\_\+namcouple\+::namscrres}
+\begin{DoxyCompactList}\small\item\em scrip search restriction (L\+A\+T\+L\+ON, L\+A\+T\+I\+T\+U\+DE) \end{DoxyCompactList}\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a45b410743ce74a9824d44b329ba323ba}{mod\+\_\+oasis\+\_\+namcouple\+::namscrvam}
+\begin{DoxyCompactList}\small\item\em scrip gauss weight distance weighting for G\+A\+U\+S\+W\+GT \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a20d614468823744b82118ee8cf2df852}{mod\+\_\+oasis\+\_\+namcouple\+::namscrnbr}
+\begin{DoxyCompactList}\small\item\em scrip number of neighbors for G\+A\+U\+S\+W\+GT and D\+I\+S\+T\+W\+GT \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a728405e8f669b58d00c189abf8b62437}{mod\+\_\+oasis\+\_\+namcouple\+::namscrbin}
+\begin{DoxyCompactList}\small\item\em script number of search bins \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a4555b14f38928b7f0fb7f77b9c42d0a0}{mod\+\_\+oasis\+\_\+namcouple\+::namsort2nn}
+\begin{DoxyCompactList}\small\item\em sorted namcpl for sort, define nn order, computed later \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__namcouple_a0ace7c451d8658759b9c8d871926a76e}{mod\+\_\+oasis\+\_\+namcouple\+::namnn2sort}
+\begin{DoxyCompactList}\small\item\em sorted namcpl for nn, define sort number, computed later \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a36ef9483c332254e38c52b1d78d26f1f}{mod\+\_\+oasis\+\_\+namcouple\+::nulin}
+\item 
+character(len= $\ast$), parameter \hyperlink{namespacemod__oasis__namcouple_ae023a43e29bb32ebf11f193e34d8bd85}{mod\+\_\+oasis\+\_\+namcouple\+::cl\+\_\+namcouple} = \textquotesingle{}namcouple\textquotesingle{}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a18b7a14f095f3cb6ace40afc06e2a5b9}{mod\+\_\+oasis\+\_\+namcouple\+::il\+\_\+err}
+\item 
+logical \hyperlink{namespacemod__oasis__namcouple_a5d6add8b958acc8b865b898d9e54ac73}{mod\+\_\+oasis\+\_\+namcouple\+::lncdfgrd}
+\item 
+logical \hyperlink{namespacemod__oasis__namcouple_a645168dae20a0c24786c3e6dcea9f2ab}{mod\+\_\+oasis\+\_\+namcouple\+::lncdfrst}
+\item 
+character(len=5), parameter \hyperlink{namespacemod__oasis__namcouple_afaa0549951c43335a2f8e75c7b1d2846}{mod\+\_\+oasis\+\_\+namcouple\+::cgrdnam} = \textquotesingle{}grids\textquotesingle{}
+\item 
+character(len=5), parameter \hyperlink{namespacemod__oasis__namcouple_aeeda85bec8a449e87411d4ed404322c5}{mod\+\_\+oasis\+\_\+namcouple\+::cmsknam} = \textquotesingle{}masks\textquotesingle{}
+\item 
+character(len=5), parameter \hyperlink{namespacemod__oasis__namcouple_a49e79935fc2421fe3e4e7422f17b34ea}{mod\+\_\+oasis\+\_\+namcouple\+::csurnam} = \textquotesingle{}areas\textquotesingle{}
+\item 
+character(len=5), parameter \hyperlink{namespacemod__oasis__namcouple_a161fc23acf442c75c9d6ba7758937d59}{mod\+\_\+oasis\+\_\+namcouple\+::crednam} = \textquotesingle{}maskr\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_ac1a557cecb41295e7d5cb004a7937ea4}{mod\+\_\+oasis\+\_\+namcouple\+::cglonsuf} = \textquotesingle{}.lon\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_a2036218f05c62fc672bd07ece34f26db}{mod\+\_\+oasis\+\_\+namcouple\+::cglatsuf} = \textquotesingle{}.lat\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_ae56f031c6d9a819a39fe5170f42d7ce1}{mod\+\_\+oasis\+\_\+namcouple\+::crnlonsuf} = \textquotesingle{}.clo\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_acdc7f0d582616ee9e18470aad433ed3a}{mod\+\_\+oasis\+\_\+namcouple\+::crnlatsuf} = \textquotesingle{}.cla\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_aeea3ba680d5ba05a432c12d64c68c8af}{mod\+\_\+oasis\+\_\+namcouple\+::cmsksuf} = \textquotesingle{}.msk\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_adf2c151a84c37bd7cd93867305b4f70b}{mod\+\_\+oasis\+\_\+namcouple\+::csursuf} = \textquotesingle{}.srf\textquotesingle{}
+\item 
+character(len=4), parameter \hyperlink{namespacemod__oasis__namcouple_a4b921aeee4d921557ab0cd2f0e541dad}{mod\+\_\+oasis\+\_\+namcouple\+::cangsuf} = \textquotesingle{}.ang\textquotesingle{}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a8eca7c715a39c523e00ed2be0612950d}{mod\+\_\+oasis\+\_\+namcouple\+::lmapp}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_acda1605129987d656360e1ed81e8d199}{mod\+\_\+oasis\+\_\+namcouple\+::lsubg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a57f1b6f111a5257a4d6f5a4b18fa6250}{mod\+\_\+oasis\+\_\+namcouple\+::nfcoast}
+\item 
+logical \hyperlink{namespacemod__oasis__namcouple_a7657e0f9b495e291f26dc31b4f6145aa}{mod\+\_\+oasis\+\_\+namcouple\+::lcoast}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a8a962108487c3ca092633bd4292dbfd6}{mod\+\_\+oasis\+\_\+namcouple\+::ntime}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a6246780a56635119fd8f7935456b06cf}{mod\+\_\+oasis\+\_\+namcouple\+::niter}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a1e5b5efd046e5ab959fba026bd645945}{mod\+\_\+oasis\+\_\+namcouple\+::nitfn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a66c36f23a77081749dc9e7993b0277f3}{mod\+\_\+oasis\+\_\+namcouple\+::nstep}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a674f201daa7f2e1ba4c71221bda91d9c}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a531825c07a164f6139e5eebd59e295a2}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+direct\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a3de3e6eb2bf1e81d77e9c117b7d5985f}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+nfield}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a7cf04d6fb678ee65b7fbedc56a0d680a}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+final\+\_\+nfield}
+\item 
+logical \hyperlink{namespacemod__oasis__namcouple_aaf6b923ffc7763fd37a5c4c72bdfa34d}{mod\+\_\+oasis\+\_\+namcouple\+::lg\+\_\+oasis\+\_\+field}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_abba00866a740567bc1d93cf5850042fd}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxcomb}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_ae66cf9f63b6c440406c9b675caef7759}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxnoa}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_aab2d4bcc2dc767df51f99f907f4f3e6e}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+maxnfg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a7b8c924fdea622759b99d8f61e03ade5}{mod\+\_\+oasis\+\_\+namcouple\+::nlogprt}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a49bd874b06648257f7ce70da19a678b4}{mod\+\_\+oasis\+\_\+namcouple\+::ntlogprt}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a9add83d816dc5cdb41c84747f4ee8962}{mod\+\_\+oasis\+\_\+namcouple\+::nuntmin}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_ab47490a015fa09cf75a760dadfeb0ff9}{mod\+\_\+oasis\+\_\+namcouple\+::nuntmax}
+\item 
+logical \hyperlink{namespacemod__oasis__namcouple_adb02545191d2ca9c1daff1a3ced2223f}{mod\+\_\+oasis\+\_\+namcouple\+::nnorest}
+\item 
+character(len=ic\+\_\+med) \hyperlink{namespacemod__oasis__namcouple_af56d31837b48a43e234bccbf1a3e2954}{mod\+\_\+oasis\+\_\+namcouple\+::nmapdec}
+\item 
+character(len=ic\+\_\+med) \hyperlink{namespacemod__oasis__namcouple_a7cb9d88a57224d84d97afc29b0e606bf}{mod\+\_\+oasis\+\_\+namcouple\+::nmatxrd}
+\item 
+character(len=ic\+\_\+med) \hyperlink{namespacemod__oasis__namcouple_ad7829e2434eb8214b599ba49395c9fc5}{mod\+\_\+oasis\+\_\+namcouple\+::nwgtopt}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a12e1621f5697a0cdbde11d3e25f43b54}{mod\+\_\+oasis\+\_\+namcouple\+::numlab}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ab0b9a7822ec44010e8652ed2d6abc0db}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+numlab}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac6216c78a2779e49f90a9a95a39c27d7}{mod\+\_\+oasis\+\_\+namcouple\+::nfexch}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac4549f9f5bbb37fce3edc9a208e0d48b}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+ntrans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_abbd7bd184bb2a3860063dbb9f109f427}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+ntrans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6e774d31f16b513b1d604e72a82dff40}{mod\+\_\+oasis\+\_\+namcouple\+::nlonbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a9b09ac96dad78313003a9436fe2f9aec}{mod\+\_\+oasis\+\_\+namcouple\+::nlatbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ae413f2dc402b7c018e341081b8d6e208}{mod\+\_\+oasis\+\_\+namcouple\+::nlonaf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a80d81b2f026a2d0dc2de27b9ee04f7af}{mod\+\_\+oasis\+\_\+namcouple\+::nlataf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a20e9486f3e8bbdcee0de935e9be3a2e8}{mod\+\_\+oasis\+\_\+namcouple\+::nseqn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a09ed8be682296ef584f0d5777b2c6482}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+nseqn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_affa727bb033c0f4d09962f2b4d1b4ab5}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+freq}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ae2c74692147a54b3f7534301d509f766}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+lag}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aad06af35c92de78d71671d39bcbb1690}{mod\+\_\+oasis\+\_\+namcouple\+::nlagn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a0b8948452bbd8cf1dc9f0fccc17c344d}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+invert}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_adc4dcf30da2b88fb1798dd02e7833bc1}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+reverse}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a0751f74f7ce6520d8e860b9da14d1d9d}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+number\+\_\+field}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a1cc3d37d7819c112f14b6cec03266561}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+no\+\_\+rstfile}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a7c783457d0e759e3af98b92146fa4ec3}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+state}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a510a13e57f2f65d5ddc70c729d54c0f6}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+local\+\_\+trans}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ae81f2e658bbaeae20badef0fad425a69}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+grid\+\_\+nbrbf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a8e8c38746c6c35b13d2d9b934835188c}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+grid\+\_\+nbraf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a05148b30ca97c536b40a896153c8921f}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+nbr\+\_\+rstfile}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_a839912711f8d2f44a825689e2673d0dd}{mod\+\_\+oasis\+\_\+namcouple\+::ig\+\_\+total\+\_\+frqmin}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac1be1629c1369b96a4ff08c07200a05d}{mod\+\_\+oasis\+\_\+namcouple\+::lg\+\_\+state}
+\item 
+character(len=jpeighty), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a1f6ff08cee0c3c5deb262c1447d88328}{mod\+\_\+oasis\+\_\+namcouple\+::cnaminp}
+\item 
+character(len=jpeighty), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a71ba84b9a7a813ca2551bcde99a0b5b5}{mod\+\_\+oasis\+\_\+namcouple\+::cnamout}
+\item 
+character(len=8), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a5eaa67fd4db1a3cde074adedd984ffbe}{mod\+\_\+oasis\+\_\+namcouple\+::canal}
+\item 
+character(len=8) \hyperlink{namespacemod__oasis__namcouple_a8a7387f27c409ea27aa53b616805f0fa}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+c}
+\item 
+character(len=32), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac79429a9522aabddbe4ed68fd9571bec}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+name\+\_\+rstfile}
+\item 
+character(len=32), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6eec7fe795bfb9c2058c7953c072d442}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+restart\+\_\+file}
+\item 
+character(len=32), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af17e746f51dcf0110428ebe55f6d7285}{mod\+\_\+oasis\+\_\+namcouple\+::cficinp}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a62f96a372f013fc37713f8ba1728e3de}{mod\+\_\+oasis\+\_\+namcouple\+::cficout}
+\item 
+character(len=32), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a24f56cf88d79190f229d3fd1d62d17de}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+input\+\_\+file}
+\item 
+character(len=jpeighty), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aad4d4857b4c424e1b0f0bcc0a01aa6e3}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+input\+\_\+field}
+\item 
+character(len=jpeighty), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a1b680bf476776f3db085dc1f0009736c}{mod\+\_\+oasis\+\_\+namcouple\+::cg\+\_\+output\+\_\+field}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a9e90e47fd11ff4dd95c61dcf3ec872ff}{mod\+\_\+oasis\+\_\+namcouple\+::cficbf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a9b3c7c879a3ff2b5eb15cbcaf5a8a1d9}{mod\+\_\+oasis\+\_\+namcouple\+::cficaf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a4b507ab44ad62713c9e3d83ded6be3f4}{mod\+\_\+oasis\+\_\+namcouple\+::cstate}
+\item 
+character(len=4), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac22155599e9b49d57514dd1f7dc9928a}{mod\+\_\+oasis\+\_\+namcouple\+::cga\+\_\+locatorbf}
+\item 
+character(len=4), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6f4080d45f0b9be5a0466967f535b83b}{mod\+\_\+oasis\+\_\+namcouple\+::cga\+\_\+locatoraf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a298c9165785ae1a41f89597cadd211e7}{mod\+\_\+oasis\+\_\+namcouple\+::neighbor}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aaf9fd5eaa5d115f2548b8f78cdcd172d}{mod\+\_\+oasis\+\_\+namcouple\+::ntronca}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a9f8a2a4f44b1c56860fef8df014339d3}{mod\+\_\+oasis\+\_\+namcouple\+::ncofld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a883d88938c50264711c53af2b555c3db}{mod\+\_\+oasis\+\_\+namcouple\+::neighborg}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a21400200658d24cbf7484b5eb177c911}{mod\+\_\+oasis\+\_\+namcouple\+::nbofld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af0c7b1e7e49159c6b9c0dc3663264346}{mod\+\_\+oasis\+\_\+namcouple\+::nbnfld}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_abb7c2cd3a371bbb8ccd6a272d0e9b60f}{mod\+\_\+oasis\+\_\+namcouple\+::nludat}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a31f62f64cbcf344e529d0576386d0751}{mod\+\_\+oasis\+\_\+namcouple\+::nlufil}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a42367b4984c6ac4c69cbdcd315cb54e6}{mod\+\_\+oasis\+\_\+namcouple\+::nlumap}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac623e3e0906f57983efc1ab912ce9674}{mod\+\_\+oasis\+\_\+namcouple\+::nmapfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_adb1f8ce6bf94f488c10ef36b3afb8eca}{mod\+\_\+oasis\+\_\+namcouple\+::nmapvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aefed5eaa9924d249e979a5a772a46979}{mod\+\_\+oasis\+\_\+namcouple\+::nlusub}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6a94577996b440c31cac5b7d39e7f47a}{mod\+\_\+oasis\+\_\+namcouple\+::nsubfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a0f31605257bfe125aafb6488a5065d4d}{mod\+\_\+oasis\+\_\+namcouple\+::nsubvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a7510ecfe3d0f141252450e4ba66209ba}{mod\+\_\+oasis\+\_\+namcouple\+::nluext}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a8302411d5a02efd9a6dc7f784fbb0d4d}{mod\+\_\+oasis\+\_\+namcouple\+::nextfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a484a71c213c89416924a0e23cfd46269}{mod\+\_\+oasis\+\_\+namcouple\+::nosper}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac154fc90756832bc90d02ea21f7c7e17}{mod\+\_\+oasis\+\_\+namcouple\+::notper}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a4c609c48a20205e1d2aa9938d7babc92}{mod\+\_\+oasis\+\_\+namcouple\+::nbins}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__namcouple_aee9f6849ec644ee40f465976bc6c7b96}{mod\+\_\+oasis\+\_\+namcouple\+::nlucor}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_abb6f67bfba2cba424dabee3a465fdfd5}{mod\+\_\+oasis\+\_\+namcouple\+::nscripvoi}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a92d43fa5eaaff81f0e3f73b303377c02}{mod\+\_\+oasis\+\_\+namcouple\+::amskval}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a3598202174da65117caf675065f8b160}{mod\+\_\+oasis\+\_\+namcouple\+::amskvalnew}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a115cdfe0e05679107363605a992c6386}{mod\+\_\+oasis\+\_\+namcouple\+::acocoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a1b3f80e8e19f950b806636caadeb704b}{mod\+\_\+oasis\+\_\+namcouple\+::abocoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a211c98282b89859bee6da0ef60f0d484}{mod\+\_\+oasis\+\_\+namcouple\+::abncoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a19fb86d643bb8761d5a8e32d645d5963}{mod\+\_\+oasis\+\_\+namcouple\+::afldcoef}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aa9d178659282698ffb6c186ff48bed3c}{mod\+\_\+oasis\+\_\+namcouple\+::afldcobo}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a207709166cd4d719d65d76e6c043fd6c}{mod\+\_\+oasis\+\_\+namcouple\+::afldcobn}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a2ee5f8ec71ebae64c3d14445345d7545}{mod\+\_\+oasis\+\_\+namcouple\+::cxordbf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ae1debe43f1c5cffeeb1d0d9ab563f4c4}{mod\+\_\+oasis\+\_\+namcouple\+::cyordbf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ab52bc27bf5898cc85dce0fc60feb9320}{mod\+\_\+oasis\+\_\+namcouple\+::cxordaf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a68de802180c51365e7d4bcc5180ac93b}{mod\+\_\+oasis\+\_\+namcouple\+::cyordaf}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a1066d92e6c9301bdb46ddda7edd7d29a}{mod\+\_\+oasis\+\_\+namcouple\+::cextmet}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac9b9bb442cf77881bef2157c85e23495}{mod\+\_\+oasis\+\_\+namcouple\+::cintmet}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a795db0909c85ffadb601b744b5189ff5}{mod\+\_\+oasis\+\_\+namcouple\+::cgrdtyp}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ab139e7bad0413c79a5ad8e0837d3e0ef}{mod\+\_\+oasis\+\_\+namcouple\+::cfldtyp}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6a69d927924d3fa391fdc3ec6cb78197}{mod\+\_\+oasis\+\_\+namcouple\+::cfilfic}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_adf402f22f61893178fadcefe43b91102}{mod\+\_\+oasis\+\_\+namcouple\+::cfilmet}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a535fadd17426c228698e3a51fd54b605}{mod\+\_\+oasis\+\_\+namcouple\+::cconmet}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a240979dfe7369da899b0cfe2aeba4f9d}{mod\+\_\+oasis\+\_\+namcouple\+::cconopt}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af3a308fee2e4b00a1380035e41113d36}{mod\+\_\+oasis\+\_\+namcouple\+::cfldcoa}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aa387fcfde8c2538e22897b243ff5024c}{mod\+\_\+oasis\+\_\+namcouple\+::cfldfin}
+\item 
+character(len=8), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af8d81a53bd28ddf6bfe19f5e05f1d867}{mod\+\_\+oasis\+\_\+namcouple\+::ccofld}
+\item 
+character(len=8), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ab0f93bb917e445dc4e55fc2326168a42}{mod\+\_\+oasis\+\_\+namcouple\+::cbofld}
+\item 
+character(len=8), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af5bfb0fe58a77461130b9967fa7a4d5e}{mod\+\_\+oasis\+\_\+namcouple\+::cbnfld}
+\item 
+character(len=8), dimension(\+:,\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a009543dda4495ab9b5ac3fcf15767682}{mod\+\_\+oasis\+\_\+namcouple\+::ccofic}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a9c5a3b3a864f3feb95eddc08616b998e}{mod\+\_\+oasis\+\_\+namcouple\+::cdqdt}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_affa01947af89e5cdad5f33fba2a53d22}{mod\+\_\+oasis\+\_\+namcouple\+::cgrdmap}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a28c3f9e076a686c8ef916221e8fe4e10}{mod\+\_\+oasis\+\_\+namcouple\+::cmskrd}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac7f3cff3406912fe6e48c3cc7cf5436b}{mod\+\_\+oasis\+\_\+namcouple\+::cgrdsub}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ad8f8aca3a6fa885e4edf027b79a93305}{mod\+\_\+oasis\+\_\+namcouple\+::ctypsub}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a5db101d0bffaf6fbd5ae10d1d0069108}{mod\+\_\+oasis\+\_\+namcouple\+::cgrdext}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a348612422a03e478041ca5bdfd7201ae}{mod\+\_\+oasis\+\_\+namcouple\+::csper}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_aa179b0a473551b48ef895497515d021c}{mod\+\_\+oasis\+\_\+namcouple\+::ctper}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac8c1f0014f2c3cbe0cc4fcb09e54dde3}{mod\+\_\+oasis\+\_\+namcouple\+::cmap\+\_\+method}
+\item 
+character(len=ic\+\_\+long), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6dbd7bccbfa28b209a4bc58131f8cf11}{mod\+\_\+oasis\+\_\+namcouple\+::cmap\+\_\+file}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a82b32aa4c78713443daf65a3dfbc75dc}{mod\+\_\+oasis\+\_\+namcouple\+::cmaptyp}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a3d7b34ed13d4ad8f86bbab3ad9956b6b}{mod\+\_\+oasis\+\_\+namcouple\+::cmapopt}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a070f65b97986d1075f1deed9224cd89b}{mod\+\_\+oasis\+\_\+namcouple\+::corder}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a205e8ba5863c6bf6de5c8450fb060c7a}{mod\+\_\+oasis\+\_\+namcouple\+::cnorm\+\_\+opt}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_af6d77b87036aa40faa1ae1ed1b2a0866}{mod\+\_\+oasis\+\_\+namcouple\+::cfldtype}
+\item 
+character(len=8), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a7cbf27327f01748c4f87803ccff71b61}{mod\+\_\+oasis\+\_\+namcouple\+::crsttype}
+\item 
+character(len=8) \hyperlink{namespacemod__oasis__namcouple_a5e1d0d9b3d9f438102623d9643fbc704}{mod\+\_\+oasis\+\_\+namcouple\+::cfldcor}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a902fe007f6c2505858bf72dbc64e43a2}{mod\+\_\+oasis\+\_\+namcouple\+::lsurf}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a4a7cad8814c7811b364fd7d70b60b576}{mod\+\_\+oasis\+\_\+namcouple\+::naismfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ada0ad7614eba9cc3a1e168484a520c33}{mod\+\_\+oasis\+\_\+namcouple\+::naisgfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ae3d7c72b2f2f3ece9583cc0b25edbaba}{mod\+\_\+oasis\+\_\+namcouple\+::naismvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a87c0bb7c0a2cccbb673dcaf35e3dec50}{mod\+\_\+oasis\+\_\+namcouple\+::naisgvoi}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a90e4ce86f77bf89c71a9277ff9b5dcbb}{mod\+\_\+oasis\+\_\+namcouple\+::niwtm}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a28e887d61cc4b10c00c33a7d0f51a275}{mod\+\_\+oasis\+\_\+namcouple\+::niwtg}
+\item 
+real(kind=ip\+\_\+realwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ab7c38fd6bd90bb8e6ebfb539ead1f1a9}{mod\+\_\+oasis\+\_\+namcouple\+::varmul}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_ac124af3aecadc7ba436f2ee6caffee9a}{mod\+\_\+oasis\+\_\+namcouple\+::linit}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a63c2f2977f9cc4839f6bdec7bbbc5fa7}{mod\+\_\+oasis\+\_\+namcouple\+::niwtn}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a579387e570e26f2d6c6c2159824cf8a3}{mod\+\_\+oasis\+\_\+namcouple\+::nninnfl}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a3379333e7d0f24b776c81b1087f3a3b4}{mod\+\_\+oasis\+\_\+namcouple\+::niwtng}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a6526a92cd5fa662f9da229806d062dc2}{mod\+\_\+oasis\+\_\+namcouple\+::nninnflg}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a2febd0d97dea9ecc3ce4a8c5088a8d1f}{mod\+\_\+oasis\+\_\+namcouple\+::lextra}
+\item 
+logical, dimension(\+:), allocatable \hyperlink{namespacemod__oasis__namcouple_a8d88d0c1b22ea43a9429f9e3a653a64b}{mod\+\_\+oasis\+\_\+namcouple\+::lweight}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a1c3afcba25a8ba41738104d42a59e423}{mod\+\_\+oasis\+\_\+namcouple\+::clfield} = \textquotesingle{}\$N\+F\+I\+E\+L\+DS \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_ac0ead9ca992504e9b580db2678926b68}{mod\+\_\+oasis\+\_\+namcouple\+::clchan} = \textquotesingle{}\$C\+H\+A\+N\+N\+EL \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a4dde076bf8cce410eebbd878f791e32e}{mod\+\_\+oasis\+\_\+namcouple\+::clstring} = \textquotesingle{}\$S\+T\+R\+I\+N\+GS \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_aa5cc4d0530b3e755441ef9ef70d8083b}{mod\+\_\+oasis\+\_\+namcouple\+::clmod} = \textquotesingle{}\$N\+B\+M\+O\+D\+EL \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_afbdcab2dcd637c9c70db27c8c46bd2d7}{mod\+\_\+oasis\+\_\+namcouple\+::cljob} = \textquotesingle{}\$J\+O\+B\+N\+A\+ME \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a21a2ef5048e9fc9551821e8a0b8dec0b}{mod\+\_\+oasis\+\_\+namcouple\+::cltime} = \textquotesingle{}\$R\+U\+N\+T\+I\+ME \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a0d0b7fa2be2a8202344c0ef9085c1309}{mod\+\_\+oasis\+\_\+namcouple\+::clseq} = \textquotesingle{}\$S\+E\+Q\+M\+O\+DE \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a0f2d8d935f9088aec74c4dda3e9f5d9c}{mod\+\_\+oasis\+\_\+namcouple\+::cldate} = \textquotesingle{}\$I\+N\+I\+D\+A\+TE \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a15338be5483b1b392e3e5580be75704d}{mod\+\_\+oasis\+\_\+namcouple\+::clhead} = \textquotesingle{}\$M\+O\+D\+I\+N\+FO \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_aeaab03598b6067fbecd8d8fc0c54443e}{mod\+\_\+oasis\+\_\+namcouple\+::clprint} = \textquotesingle{}\$N\+L\+O\+G\+P\+RT \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_acb6d787969090bd3c10b20775abf6531}{mod\+\_\+oasis\+\_\+namcouple\+::clmapdec} = \textquotesingle{}\$N\+M\+A\+P\+D\+EC \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_ab529642a54ad832b85c11fe4bd843314}{mod\+\_\+oasis\+\_\+namcouple\+::clmatxrd} = \textquotesingle{}\$N\+M\+A\+T\+X\+RD \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a5ddab80f5f002c5cee81e3bbcfcda6be}{mod\+\_\+oasis\+\_\+namcouple\+::clwgtopt} = \textquotesingle{}\$N\+W\+G\+T\+O\+PT \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a003e41234b67967593d94b3dca1a69c3}{mod\+\_\+oasis\+\_\+namcouple\+::clunit} = \textquotesingle{}\$N\+U\+N\+I\+T\+NO \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a283471addd7aefe719c8eb6bc45072b0}{mod\+\_\+oasis\+\_\+namcouple\+::clrest} = \textquotesingle{}\$N\+N\+O\+R\+E\+ST \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_ad027273d67834ba44518cd9825f933b8}{mod\+\_\+oasis\+\_\+namcouple\+::clcal} = \textquotesingle{}\$C\+A\+L\+T\+Y\+PE \textquotesingle{}
+\item 
+character $\ast$9, parameter \hyperlink{namespacemod__oasis__namcouple_a52b0d4b9289219603308d3cb3fcc9eac}{mod\+\_\+oasis\+\_\+namcouple\+::clend} = \textquotesingle{}\$E\+ND \textquotesingle{}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__namcouple_ab629bd69885e9cd058f694b00474333a}{mod\+\_\+oasis\+\_\+namcouple\+::nkeywords} = 17
+\item 
+character $\ast$9, dimension(nkeywords), parameter \hyperlink{namespacemod__oasis__namcouple_acd9594862404b2bbd26a2ce069076b0e}{mod\+\_\+oasis\+\_\+namcouple\+::keyword\+\_\+list} = (/clfield, clchan, clstring, clmod, cljob, cltime, clseq, cldate, clhead, clprint, clmapdec, clmatxrd, clunit, clrest, clcal, clend, clwgtopt /)
+\item 
+character $\ast$512 \hyperlink{namespacemod__oasis__namcouple_aca533555969c4dff9419daac8c70bbda}{mod\+\_\+oasis\+\_\+namcouple\+::tmpstr1}
+\item 
+character $\ast$512 \hyperlink{namespacemod__oasis__namcouple_a675d6fc398ff3a060fbd9949fde4d0e2}{mod\+\_\+oasis\+\_\+namcouple\+::tmpstr2}
+\item 
+character $\ast$512 \hyperlink{namespacemod__oasis__namcouple_a5564b823ced851e25d198f2c300dc138}{mod\+\_\+oasis\+\_\+namcouple\+::tmpstr3}
+\item 
+character $\ast$512 \hyperlink{namespacemod__oasis__namcouple_ada1acbaf7e666b7220e3b7fb8d0f2549}{mod\+\_\+oasis\+\_\+namcouple\+::tmpstr4}
+\end{DoxyCompactItemize}

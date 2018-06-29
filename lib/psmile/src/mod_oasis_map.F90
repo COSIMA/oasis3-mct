@@ -1597,14 +1597,16 @@ end subroutine oasis_map_sMatReaddnc_ceg
 !!!!!!!!!!!!!!!!!!!!!!!!!  Extend array and store data  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+!> Function that increases temporary work array size of Snew, Rnew, Cnew
+
 subroutine augment_arrays(cnt, reclen, bsize, nwgts)
 
 ! !USES:
 
-   integer, intent(inout) :: cnt
-   integer, intent(in)    :: reclen
-   integer, intent(inout) :: bsize
-   integer, intent(in)    :: nwgts
+   integer, intent(inout) :: cnt  !< elements in current array
+   integer, intent(in)    :: reclen  !< elements of new data
+   integer, intent(inout) :: bsize   !< max size of current array
+   integer, intent(in)    :: nwgts   !< number of weights in S
 
    integer           :: status   ! netCDF routine return code
    !--- formats ---
@@ -1722,7 +1724,7 @@ end function check_myindex
 !------------------------------------------------------------
 ! !BOP ===========================================================================
 !
-! !IROUTINE:  get_cegindex - binary search for index in list
+!> Function that carrys out a binary search for index in list
 !
 ! !DESCRIPTION: 
 !     Do a binary search to see if a value is contained in a list of

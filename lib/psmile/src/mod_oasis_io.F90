@@ -78,10 +78,10 @@ subroutine oasis_io_read_avfld(filename,av,gsmap,mpicom,avfld,filefld,fldtype)
 
    implicit none
 
-   character(len=*), intent(in) :: filename   !< filename
+   character(len=*), intent(in) :: filename   !< file name
    type(mct_aVect) , intent(inout) :: av      !< avect
-   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap decomp
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpi comm
    character(len=*), intent(in) :: avfld      !< av field name
    character(len=*), intent(in) :: filefld    !< file field name
    character(len=*), intent(in),optional :: fldtype       !< kind
@@ -232,8 +232,8 @@ subroutine oasis_io_write_avfile(rstfile,av,gsmap,mpicom,nx,ny,nampre)
 
    character(len=*), intent(in) :: rstfile    !< filename
    type(mct_aVect) , intent(in) :: av         !< avect
-   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap decomp
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpi comm 
    integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
    integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
    character(len=*), intent(in),optional :: nampre  !< field name prepend string on file
@@ -408,8 +408,8 @@ subroutine oasis_io_read_avfile(rstfile,av,gsmap,mpicom,abort,nampre,didread)
 
    character(len=*), intent(in) :: rstfile    !< filename
    type(mct_aVect) , intent(inout) :: av      !< avect
-   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom 
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap decomp
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpi comm 
    logical         , intent(in) ,optional :: abort   !< abort on error flag, default is true
    character(len=*), intent(in) ,optional :: nampre  !< name prepend string for fields on file
    logical         , intent(out),optional :: didread !< flag indicating that read was successful
@@ -566,7 +566,7 @@ subroutine oasis_io_read_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname,ab
    implicit none
 
    character(len=*), intent(in) :: rstfile    !< filename
-   integer(ip_i4_p), intent(in) :: mpicom     !<  mpicom
+   integer(ip_i4_p), intent(in) :: mpicom     !<  mpi comm
    integer(ip_i4_p), intent(inout),optional :: iarray(:) !< integer data on root
    character(len=*), intent(in),optional :: ivarname     !< integer variable name on file
    real(ip_double_p),intent(inout),optional :: rarray(:) !< real data on root
@@ -731,7 +731,7 @@ subroutine oasis_io_write_array(rstfile,mpicom,iarray,ivarname,rarray,rvarname)
    implicit none
 
    character(len=*), intent(in) :: rstfile    !< filename
-   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpi comm
    integer(ip_i4_p), intent(in),optional :: iarray(:)   !< integer data on root
    character(len=*), intent(in),optional :: ivarname    !< integer  variable name on file
    real(ip_double_p),intent(in),optional :: rarray(:)   !< real data on root
@@ -883,8 +883,8 @@ subroutine oasis_io_write_avfbf(av,gsmap,mpicom,nx,ny,msec,f_string,filename)
    implicit none
 
    type(mct_aVect) , intent(in) :: av         !< avect
-   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap
-   integer(ip_i4_p), intent(in) :: mpicom     !< mpicom
+   type(mct_gsmap) , intent(in) :: gsmap      !< gsmap decomp
+   integer(ip_i4_p), intent(in) :: mpicom     !< mpi comm
    integer(ip_i4_p), intent(in) :: nx         !< 2d global nx size
    integer(ip_i4_p), intent(in) :: ny         !< 2d global ny size
    integer(ip_i4_p), intent(in),optional :: msec      !< optional time info in seconds
@@ -1097,8 +1097,8 @@ subroutine oasis_io_read_avfbf(av,gsmap,mpicom,msec,f_string,filename)
    implicit none
 
    type(mct_aVect) , intent(inout) :: av     !< avect
-   type(mct_gsmap) , intent(in) :: gsmap     !< gsmap
-   integer(ip_i4_p), intent(in) :: mpicom    !< mpicom
+   type(mct_gsmap) , intent(in) :: gsmap     !< gsmap decomp
+   integer(ip_i4_p), intent(in) :: mpicom    !< mpi comm
    integer(ip_i4_p), intent(in),optional :: msec     !< optional time info in seconds
    character(len=*), intent(in),optional :: f_string !< optional f_string to append to filename
    character(len=*), intent(in),optional :: filename !< optional input filename
@@ -1258,7 +1258,7 @@ subroutine oasis_io_read_field_fromroot(filename,fldname,ifld2,fld2,fld3,nx,ny,n
 
    implicit none
 
-   character(len=*) , intent(in) :: filename   !< filename
+   character(len=*) , intent(in) :: filename   !< file name
    character(len=*) , intent(in) :: fldname    !< field name
    integer(ip_i4_p) , intent(inout),optional :: ifld2(:,:)  !< 2d integer array
    real(ip_realwp_p), intent(inout),optional :: fld2(:,:)   !< 2d real array

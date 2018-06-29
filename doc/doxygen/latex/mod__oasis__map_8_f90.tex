@@ -1,10 +1,54 @@
-\hypertarget{mod__oasis__map_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.F90 File Reference}
-\label{mod__oasis__map_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.\+F90}}
-}
+\hypertarget{mod__oasis__map_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.F90 File Reference}
+\label{mod__oasis__map_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+map.\+F90}}
 \subsection*{Data Types}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__map}{mod\+\_\+oasis\+\_\+map}
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S map (interpolation) data and methods. \end{DoxyCompactList}\item 
 type \hyperlink{structmod__oasis__map_1_1prism__mapper__type}{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper\+\_\+type}
 \begin{DoxyCompactList}\small\item\em Mapper data for interpolating data between grids. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__map}{mod\+\_\+oasis\+\_\+map}
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS map (interpolation) data and methods. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__map_a6f27846fb1dcb2db3095b9ace4fa3c5b}{mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+genmap} (mapid, namid)
+\begin{DoxyCompactList}\small\item\em Routine to generate mapping weights data via a direct S\+C\+R\+IP call. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__map_acbe7b9e25c19dbbd2fbebd3895a87d64}{mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+smatreaddnc\+\_\+orig} (s\+Mat, Sgs\+Map, Dgs\+Map, newdom, file\+Name, mytask, mpicom, nwgts, areasrc, areadst, ni\+\_\+i, nj\+\_\+i, ni\+\_\+o, nj\+\_\+o)
+\begin{DoxyCompactList}\small\item\em Read in mapping matrix data from a S\+C\+R\+IP net\+C\+DF weights file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__map_a3345e2fc3d74cc1221d6c6d993233990}{mod\+\_\+oasis\+\_\+map\+::oasis\+\_\+map\+\_\+smatreaddnc\+\_\+ceg} (s\+Mat, Sgs\+Map, Dgs\+Map, newdom, file\+Name, mytask, mpicom, nwgts, areasrc, areadst, ni\+\_\+i, nj\+\_\+i, ni\+\_\+o, nj\+\_\+o)
+\begin{DoxyCompactList}\small\item\em Read in mapping matrix data from a S\+C\+R\+IP net\+C\+DF file using smart scatter (ceg) \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__map_a84a573c180be2a5dc8a14fd18b2dc4b7}{mod\+\_\+oasis\+\_\+map\+::augment\+\_\+arrays} (cnt, reclen, bsize, nwgts)
+\begin{DoxyCompactList}\small\item\em Function that increases temporary work array size of Snew, Rnew, Cnew. \end{DoxyCompactList}\item 
+logical function \hyperlink{namespacemod__oasis__map_a2528f60bde618dd4840d3adb5a569996}{mod\+\_\+oasis\+\_\+map\+::check\+\_\+myindex} (index, starti, counti)
+\begin{DoxyCompactList}\small\item\em Function that checks whether an index is part of a start and count list. \end{DoxyCompactList}\item 
+integer function \hyperlink{namespacemod__oasis__map_a8889e0dcab8e1e894d3203c480110bed}{mod\+\_\+oasis\+\_\+map\+::get\+\_\+cegindex} (index, starti, counti, peloci)
+\begin{DoxyCompactList}\small\item\em Function that carrys out a binary search for index in list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__map_ab15f72e9f33a67181edc977c06b951e2}{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mmapper}
+\begin{DoxyCompactList}\small\item\em max mappers \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__map_af543b83ec5bed63a4448ff641137b0c5}{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+nmapper} = 0
+\begin{DoxyCompactList}\small\item\em mapper counter \end{DoxyCompactList}\item 
+type(prism\+\_\+mapper\+\_\+type), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__map_a00ad53f61b6998938fca792455487f7e}{mod\+\_\+oasis\+\_\+map\+::prism\+\_\+mapper}
+\begin{DoxyCompactList}\small\item\em list of defined mappers \end{DoxyCompactList}\item 
+integer, parameter, private \hyperlink{namespacemod__oasis__map_a30ebe320b9e4c06a1ee1f2a0bbacf2c4}{mod\+\_\+oasis\+\_\+map\+::r8} = ip\+\_\+double\+\_\+p
+\item 
+integer, parameter, private \hyperlink{namespacemod__oasis__map_aa58997467050224f6db2bc93fe5f7ca1}{mod\+\_\+oasis\+\_\+map\+::in} = ip\+\_\+i4\+\_\+p
+\item 
+real(r8), dimension(\+:,\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a28b59479c467c58995c6300071ca140a}{mod\+\_\+oasis\+\_\+map\+::snew}
+\item 
+real(r8), dimension(\+:,\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a1fc7e7f295910352524d442c5d0dbf79}{mod\+\_\+oasis\+\_\+map\+::sold}
+\item 
+integer, dimension(\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a2575785d3ea5e1a37c7f6303f00eb727}{mod\+\_\+oasis\+\_\+map\+::rnew}
+\item 
+integer, dimension(\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a2931a6f582d0173cc0e6b155b8cb55b7}{mod\+\_\+oasis\+\_\+map\+::rold}
+\item 
+integer, dimension(\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a8ae737bd62499fe60ebb48d04ad3b6dd}{mod\+\_\+oasis\+\_\+map\+::cnew}
+\item 
+integer, dimension(\+:), allocatable, private \hyperlink{namespacemod__oasis__map_a479ecc5b0be5d1adf3973cb08c40d30a}{mod\+\_\+oasis\+\_\+map\+::cold}
+\item 
+logical, parameter \hyperlink{namespacemod__oasis__map_a0d8a50381f5e15cf11c1c845348c5062}{mod\+\_\+oasis\+\_\+map\+::local\+\_\+timers\+\_\+on} = .false.
+\end{DoxyCompactItemize}

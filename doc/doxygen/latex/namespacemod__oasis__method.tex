@@ -1,0 +1,186 @@
+\hypertarget{namespacemod__oasis__method}{}\section{mod\+\_\+oasis\+\_\+method Module Reference}
+\label{namespacemod__oasis__method}\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+
+
+High level O\+A\+S\+IS user interfaces.  
+
+
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_ad266b77f6e75f2d150c80374a841a43c}{oasis\+\_\+init\+\_\+comp} (mynummod, cdnam, kinfo, coupled, commworld)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user init method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{oasis\+\_\+terminate} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user finalize method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{oasis\+\_\+enddef} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface specifying the O\+A\+S\+IS definition phase is complete. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}{mod\+\_\+oasis\+\_\+setrootglobal} ()
+\begin{DoxyCompactList}\small\item\em Local method to compute each models\textquotesingle{} global task ids, exists for reuse in enddef. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{debug} =1
+\item 
+logical \hyperlink{namespacemod__oasis__method_a405af91a0535e4ce70d55513bb4c3867}{lg\+\_\+mpiflag}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__method_aff65fa61d2762374419fe4c44c0f9282}{mpi\+\_\+comm\+\_\+global\+\_\+world}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+High level O\+A\+S\+IS user interfaces. 
+
+\subsection{Function/\+Subroutine Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}\label{namespacemod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!mod\+\_\+oasis\+\_\+setrootglobal@{mod\+\_\+oasis\+\_\+setrootglobal}}
+\index{mod\+\_\+oasis\+\_\+setrootglobal@{mod\+\_\+oasis\+\_\+setrootglobal}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{mod\+\_\+oasis\+\_\+setrootglobal()}{mod\_oasis\_setrootglobal()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+method\+::mod\+\_\+oasis\+\_\+setrootglobal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Local method to compute each models\textquotesingle{} global task ids, exists for reuse in enddef. 
+
+
+
+Definition at line 939 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}\label{namespacemod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+enddef@{oasis\+\_\+enddef}}
+\index{oasis\+\_\+enddef@{oasis\+\_\+enddef}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{oasis\+\_\+enddef()}{oasis\_enddef()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+enddef (\begin{DoxyParamCaption}\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo }\end{DoxyParamCaption})}
+
+
+
+O\+A\+S\+IS user interface specifying the O\+A\+S\+IS definition phase is complete. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Check enddef called only once per task
+\item Reset mpi\+\_\+comm\+\_\+global because active tasks might have been excluded
+\item For active tasks only
+\begin{DoxyItemize}
+\item Update mpi\+\_\+comm\+\_\+global
+\item Update mpi\+\_\+root\+\_\+global
+\item Document
+\item Reconcile partitions, call part\+\_\+setup
+\item Reconcile variables, call var\+\_\+setup
+\item Write grid info to files one model at a time
+\item M\+CT Initialization
+\item Initialize coupling via call to coupler\+\_\+setup
+\item Call advance\+\_\+init to initialize coupling fields from restarts 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line 730 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__method_ad266b77f6e75f2d150c80374a841a43c}\label{namespacemod__oasis__method_ad266b77f6e75f2d150c80374a841a43c}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}}
+\index{oasis\+\_\+init\+\_\+comp@{oasis\+\_\+init\+\_\+comp}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{oasis\+\_\+init\+\_\+comp()}{oasis\_init\_comp()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+init\+\_\+comp (\begin{DoxyParamCaption}\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{mynummod,  }\item[{character(len=$\ast$), intent(in)}]{cdnam,  }\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo,  }\item[{logical, intent(in), optional}]{coupled,  }\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{commworld }\end{DoxyParamCaption})}
+
+
+
+O\+A\+S\+IS user init method. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em mynummod} & $\ast$ This is C\+O\+L\+L\+E\+C\+T\+I\+VE, all pes must call\\
+\hline
+\mbox{\tt out}  & {\em mynummod} & component model ID\\
+\hline
+\mbox{\tt in}  & {\em cdnam} & model name\\
+\hline
+\mbox{\tt in,out}  & {\em kinfo} & return code\\
+\hline
+\mbox{\tt in}  & {\em coupled} & flag to specify whether this component is coupled in oasis\\
+\hline
+\mbox{\tt in}  & {\em commworld} & user defined mpi\+\_\+comm\+\_\+world to use in oasis \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Initialize M\+PI
+\item Set initial output file, need mpi\+\_\+rank\+\_\+world
+\item Initialize namcouple. First on rank 0 to write error messages then on all other ranks. All tasks will read the namcouple file independently.
+\item Check if N\+F\+I\+E\+L\+DS=0, there is no coupling.
+\item Determine the total number of coupling fields from namcouple. Set maxvar parameter and allocate prism\+\_\+var.
+\item Store all the names of the fields exchanged in the namcouple
+\item Gather model names from all tasks to generate active model list on all tasks.
+\item Broadcast the model list to all M\+PI tasks
+\item Compute compid
+\item Re-\/\+Set M\+PI info based on active model tasks
+\item Reset debug levels
+\item Open log files
+\item Set mpi\+\_\+root\+\_\+global
+\item Memory Initialization
+\item Timer Initialization
+\item Diagnostics 
+\end{DoxyItemize}
+
+Definition at line 46 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}\label{namespacemod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!oasis\+\_\+terminate@{oasis\+\_\+terminate}}
+\index{oasis\+\_\+terminate@{oasis\+\_\+terminate}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{oasis\+\_\+terminate()}{oasis\_terminate()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+terminate (\begin{DoxyParamCaption}\item[{integer (kind=ip\+\_\+intwp\+\_\+p), intent(inout), optional}]{kinfo }\end{DoxyParamCaption})}
+
+
+
+O\+A\+S\+IS user finalize method. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em kinfo} & return code \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyItemize}
+\item Print timer information
+\item Call M\+PI finalize
+\item Write S\+U\+C\+C\+E\+S\+S\+F\+UL R\+UN 
+\end{DoxyItemize}
+
+Definition at line 663 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__method_a390290b92b6af57b2732cb7521532f1c}\label{namespacemod__oasis__method_a390290b92b6af57b2732cb7521532f1c}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!debug@{debug}}
+\index{debug@{debug}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{debug}{debug}}
+{\footnotesize\ttfamily integer(kind=ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+method\+::debug =1\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 34 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__method_a405af91a0535e4ce70d55513bb4c3867}\label{namespacemod__oasis__method_a405af91a0535e4ce70d55513bb4c3867}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!lg\+\_\+mpiflag@{lg\+\_\+mpiflag}}
+\index{lg\+\_\+mpiflag@{lg\+\_\+mpiflag}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{lg\+\_\+mpiflag}{lg\_mpiflag}}
+{\footnotesize\ttfamily logical mod\+\_\+oasis\+\_\+method\+::lg\+\_\+mpiflag\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 36 of file mod\+\_\+oasis\+\_\+method.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__method_aff65fa61d2762374419fe4c44c0f9282}\label{namespacemod__oasis__method_aff65fa61d2762374419fe4c44c0f9282}} 
+\index{mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}!mpi\+\_\+comm\+\_\+global\+\_\+world@{mpi\+\_\+comm\+\_\+global\+\_\+world}}
+\index{mpi\+\_\+comm\+\_\+global\+\_\+world@{mpi\+\_\+comm\+\_\+global\+\_\+world}!mod\+\_\+oasis\+\_\+method@{mod\+\_\+oasis\+\_\+method}}
+\subsubsection{\texorpdfstring{mpi\+\_\+comm\+\_\+global\+\_\+world}{mpi\_comm\_global\_world}}
+{\footnotesize\ttfamily integer(kind=ip\+\_\+intwp\+\_\+p) mod\+\_\+oasis\+\_\+method\+::mpi\+\_\+comm\+\_\+global\+\_\+world\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 37 of file mod\+\_\+oasis\+\_\+method.\+F90.
+

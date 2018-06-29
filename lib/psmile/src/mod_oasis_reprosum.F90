@@ -310,8 +310,8 @@ MODULE mod_oasis_reprosum
                                          !< gbl_max_nsummands instead
 
       logical,  intent(in),    optional :: repro_sum_validate
-         ! flag enabling/disabling testing that gmax and  max_levels are 
-         ! accurate/sufficient. Default is enabled.
+         !< flag enabling/disabling testing that gmax and  max_levels are 
+         !< accurate/sufficient. Default is enabled.
 
       integer,  intent(inout), optional :: repro_sum_stats(5)
                                    !< increment running totals for

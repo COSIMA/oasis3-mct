@@ -1,8 +1,23 @@
-\hypertarget{mod__oasis__mem_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.F90 File Reference}
-\label{mod__oasis__mem_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__mem_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.F90 File Reference}
+\label{mod__oasis__mem_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mem.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__mem}{mod\+\_\+oasis\+\_\+mem}
+module \hyperlink{namespacemod__oasis__mem}{mod\+\_\+oasis\+\_\+mem}
 \begin{DoxyCompactList}\small\item\em Provides methods for querying memory use. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_a104b7e7e85cd79e731a6e12a14358bbb}{mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+init} (iunit)
+\begin{DoxyCompactList}\small\item\em Initialize memory conversion to MB. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_a2e20a40b48c7a7572f72da1b5d109ce3}{mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+getusage} (r\+\_\+msize, r\+\_\+mrss)
+\begin{DoxyCompactList}\small\item\em Determine memory use. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_ac628b504553edbe9345cd070a8db2634}{mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+print} (iunit, string)
+\begin{DoxyCompactList}\small\item\em Print memory use. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+real(ip\+\_\+double\+\_\+p) \hyperlink{namespacemod__oasis__mem_a7c262f1c120ed57d527ee3de91552ee9}{mod\+\_\+oasis\+\_\+mem\+::mb\+\_\+blk} = 1.\+0\+\_\+ip\+\_\+double\+\_\+p
+\item 
+logical \hyperlink{namespacemod__oasis__mem_aad83c95e1a17a31825eb9c4e1c663aa1}{mod\+\_\+oasis\+\_\+mem\+::initset} = .false.
+\end{DoxyCompactItemize}

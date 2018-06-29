@@ -1,0 +1,283 @@
+\hypertarget{namespacemod__oasis__reprosum}{}\section{mod\+\_\+oasis\+\_\+reprosum Module Reference}
+\label{namespacemod__oasis__reprosum}\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+
+
+O\+A\+S\+IS reproducible sum method from P. Worley.  
+
+
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__reprosum_ad6b4914497a4961339a1c95bfb807660}{oasis\+\_\+reprosum\+\_\+setopts} (repro\+\_\+sum\+\_\+use\+\_\+ddpdd\+\_\+in, repro\+\_\+sum\+\_\+rel\+\_\+diff\+\_\+max\+\_\+in, repro\+\_\+sum\+\_\+recompute\+\_\+in, repro\+\_\+sum\+\_\+master, repro\+\_\+sum\+\_\+logunit)
+\begin{DoxyCompactList}\small\item\em Set runtime options. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__reprosum_a398280c78cff126b7622dbd96af675e4}{oasis\+\_\+reprosum\+\_\+calc} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, ddpdd\+\_\+sum, arr\+\_\+gbl\+\_\+max, arr\+\_\+gbl\+\_\+max\+\_\+out, arr\+\_\+max\+\_\+levels, arr\+\_\+max\+\_\+levels\+\_\+out, gbl\+\_\+max\+\_\+nsummands, gbl\+\_\+max\+\_\+nsummands\+\_\+out, gbl\+\_\+count, repro\+\_\+sum\+\_\+validate, repro\+\_\+sum\+\_\+stats, rel\+\_\+diff, commid)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. An alternative is to use an \char`\"{}almost
+ always reproducible\char`\"{} floating point algorithm. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__reprosum_a7ea3c5bad9db10c80eb528453602aed3}{oasis\+\_\+reprosum\+\_\+int} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, arr\+\_\+max\+\_\+shift, arr\+\_\+gmax\+\_\+exp, max\+\_\+levels, max\+\_\+level, validate, recompute, omp\+\_\+nthreads, mpi\+\_\+comm)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. The accuracy of the fixed point algorithm is controlled by the number of \char`\"{}levels\char`\"{} of integer expansion, the maximum value of which is specified by max\+\_\+level. \end{DoxyCompactList}\item 
+logical function, public \hyperlink{namespacemod__oasis__reprosum_a0f773341a7a6883b2f65d395a6b25b08}{oasis\+\_\+reprosum\+\_\+tolexceeded} (name, nflds, master, logunit, rel\+\_\+diff)
+\begin{DoxyCompactList}\small\item\em Test whether distributed sum exceeds tolerance and print out a warning message. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__reprosum_afe237975bf8e718f32523c3929911102}{oasis\+\_\+reprosum\+\_\+ddpdd} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, mpi\+\_\+comm)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on He and Ding\textquotesingle{}s implementation of the double-\/double algorithm. \end{DoxyCompactList}\item 
+subroutine, private \hyperlink{namespacemod__oasis__reprosum_a24f9efa3ca739811888206eaf71d4690}{ddpdd} (dda, ddb, len, itype)
+\item 
+subroutine, private \hyperlink{namespacemod__oasis__reprosum_affb09b4ec9b001bf2ebbc51feebd8004}{split\+\_\+indices} (total, num\+\_\+pieces, ibeg, iend)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+logical, public \hyperlink{namespacemod__oasis__reprosum_a89140c250e34a903bc9aa546574988d6}{oasis\+\_\+reprosum\+\_\+recompute} = .false.
+\item 
+real(r8), public \hyperlink{namespacemod__oasis__reprosum_a6a80f4226d35d0842617e6eb6c9406e1}{oasis\+\_\+reprosum\+\_\+reldiffmax} = -\/1.\+0\+\_\+r8
+\item 
+logical \hyperlink{namespacemod__oasis__reprosum_aab06d0de9a82726d347ac52bb276355d}{repro\+\_\+sum\+\_\+use\+\_\+ddpdd} = .false.
+\item 
+logical \hyperlink{namespacemod__oasis__reprosum_a48a084c213295b9eaa78c0552a10741a}{detailed\+\_\+timing} = .false.
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+O\+A\+S\+IS reproducible sum method from P. Worley. 
+
+\subsection{Function/\+Subroutine Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a24f9efa3ca739811888206eaf71d4690}\label{namespacemod__oasis__reprosum_a24f9efa3ca739811888206eaf71d4690}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!ddpdd@{ddpdd}}
+\index{ddpdd@{ddpdd}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{ddpdd()}{ddpdd()}}
+{\footnotesize\ttfamily subroutine, private mod\+\_\+oasis\+\_\+reprosum\+::ddpdd (\begin{DoxyParamCaption}\item[{complex(r8), dimension(len), intent(in)}]{dda,  }\item[{complex(r8), dimension(len), intent(inout)}]{ddb,  }\item[{integer, intent(in)}]{len,  }\item[{integer, intent(in)}]{itype }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1354 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a398280c78cff126b7622dbd96af675e4}\label{namespacemod__oasis__reprosum_a398280c78cff126b7622dbd96af675e4}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+calc@{oasis\+\_\+reprosum\+\_\+calc}}
+\index{oasis\+\_\+reprosum\+\_\+calc@{oasis\+\_\+reprosum\+\_\+calc}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+calc()}{oasis\_reprosum\_calc()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+calc (\begin{DoxyParamCaption}\item[{real(r8), dimension(dsummands,nflds), intent(in)}]{arr,  }\item[{real(r8), dimension(nflds), intent(out)}]{arr\+\_\+gsum,  }\item[{integer, intent(in)}]{nsummands,  }\item[{integer, intent(in)}]{dsummands,  }\item[{integer, intent(in)}]{nflds,  }\item[{logical, intent(in), optional}]{ddpdd\+\_\+sum,  }\item[{real(r8), dimension(nflds), intent(in), optional}]{arr\+\_\+gbl\+\_\+max,  }\item[{real(r8), dimension(nflds), intent(out), optional}]{arr\+\_\+gbl\+\_\+max\+\_\+out,  }\item[{integer, dimension(nflds), intent(in), optional}]{arr\+\_\+max\+\_\+levels,  }\item[{integer, dimension(nflds), intent(out), optional}]{arr\+\_\+max\+\_\+levels\+\_\+out,  }\item[{integer, intent(in), optional}]{gbl\+\_\+max\+\_\+nsummands,  }\item[{integer, intent(out), optional}]{gbl\+\_\+max\+\_\+nsummands\+\_\+out,  }\item[{integer, intent(in), optional}]{gbl\+\_\+count,  }\item[{logical, intent(in), optional}]{repro\+\_\+sum\+\_\+validate,  }\item[{integer, dimension(5), intent(inout), optional}]{repro\+\_\+sum\+\_\+stats,  }\item[{real(r8), dimension(2,nflds), intent(out), optional}]{rel\+\_\+diff,  }\item[{integer, intent(in), optional}]{commid }\end{DoxyParamCaption})}
+
+
+
+Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. An alternative is to use an \char`\"{}almost
+ always reproducible\char`\"{} floating point algorithm. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nsummands} & number of local summands\\
+\hline
+\mbox{\tt in}  & {\em dsummands} & declared first dimension\\
+\hline
+\mbox{\tt in}  & {\em nflds} & number of fields\\
+\hline
+\mbox{\tt in}  & {\em arr} & input array\\
+\hline
+\mbox{\tt out}  & {\em arr\+\_\+gsum} & global means\\
+\hline
+\mbox{\tt in}  & {\em ddpdd\+\_\+sum} & use ddpdd algorithm instead of fixed precision algorithm\\
+\hline
+\mbox{\tt in}  & {\em arr\+\_\+gbl\+\_\+max} & upper bound on max(abs(arr))\\
+\hline
+\mbox{\tt out}  & {\em arr\+\_\+gbl\+\_\+max\+\_\+out} & calculated upper bound on max(abs(arr))\\
+\hline
+\mbox{\tt in}  & {\em arr\+\_\+max\+\_\+levels} & maximum number of levels of integer expansion to use\\
+\hline
+\mbox{\tt out}  & {\em arr\+\_\+max\+\_\+levels\+\_\+out} & output of number of levels of integer expansion to used\\
+\hline
+\mbox{\tt in}  & {\em gbl\+\_\+max\+\_\+nsummands} & maximum of nsummand over all processes\\
+\hline
+\mbox{\tt out}  & {\em gbl\+\_\+max\+\_\+nsummands\+\_\+out} & calculated maximum nsummands over all processes\\
+\hline
+\mbox{\tt in}  & {\em gbl\+\_\+count} & was total number of summands; now is ignored; use gbl\+\_\+max\+\_\+nsummands instead\\
+\hline
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+validate} & flag enabling/disabling testing that gmax and max\+\_\+levels are accurate/sufficient. Default is enabled.\\
+\hline
+\mbox{\tt in,out}  & {\em repro\+\_\+sum\+\_\+stats} & increment running totals for (1) one-\/reduction repro\+\_\+sum (2) two-\/reduction repro\+\_\+sum (3) both types in one call (4) nonrepro\+\_\+sum (5) global max nsummands reduction\\
+\hline
+\mbox{\tt out}  & {\em rel\+\_\+diff} & relative and absolute differences between fixed and floating point sums\\
+\hline
+\mbox{\tt in}  & {\em commid} & M\+PI communicator \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 267 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_afe237975bf8e718f32523c3929911102}\label{namespacemod__oasis__reprosum_afe237975bf8e718f32523c3929911102}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+ddpdd@{oasis\+\_\+reprosum\+\_\+ddpdd}}
+\index{oasis\+\_\+reprosum\+\_\+ddpdd@{oasis\+\_\+reprosum\+\_\+ddpdd}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+ddpdd()}{oasis\_reprosum\_ddpdd()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+ddpdd (\begin{DoxyParamCaption}\item[{real(r8), dimension(dsummands,nflds), intent(in)}]{arr,  }\item[{real(r8), dimension(nflds), intent(out)}]{arr\+\_\+gsum,  }\item[{integer, intent(in)}]{nsummands,  }\item[{integer, intent(in)}]{dsummands,  }\item[{integer, intent(in)}]{nflds,  }\item[{integer, intent(in)}]{mpi\+\_\+comm }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on He and Ding\textquotesingle{}s implementation of the double-\/double algorithm. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nsummands} & number of local summands\\
+\hline
+\mbox{\tt in}  & {\em dsummands} & declared first dimension\\
+\hline
+\mbox{\tt in}  & {\em nflds} & number of fields\\
+\hline
+\mbox{\tt in}  & {\em arr} & input array\\
+\hline
+\mbox{\tt in}  & {\em mpi\+\_\+comm} & M\+PI subcommunicator\\
+\hline
+\mbox{\tt out}  & {\em arr\+\_\+gsum} & global sums \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1281 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a7ea3c5bad9db10c80eb528453602aed3}\label{namespacemod__oasis__reprosum_a7ea3c5bad9db10c80eb528453602aed3}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+int@{oasis\+\_\+reprosum\+\_\+int}}
+\index{oasis\+\_\+reprosum\+\_\+int@{oasis\+\_\+reprosum\+\_\+int}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+int()}{oasis\_reprosum\_int()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+int (\begin{DoxyParamCaption}\item[{real(r8), dimension(dsummands,nflds), intent(in)}]{arr,  }\item[{real(r8), dimension(nflds), intent(out)}]{arr\+\_\+gsum,  }\item[{integer, intent(in)}]{nsummands,  }\item[{integer, intent(in)}]{dsummands,  }\item[{integer, intent(in)}]{nflds,  }\item[{integer, intent(in)}]{arr\+\_\+max\+\_\+shift,  }\item[{integer, dimension(nflds), intent(in)}]{arr\+\_\+gmax\+\_\+exp,  }\item[{integer, dimension(nflds), intent(in)}]{max\+\_\+levels,  }\item[{integer, intent(in)}]{max\+\_\+level,  }\item[{logical, intent(in)}]{validate,  }\item[{logical, intent(out)}]{recompute,  }\item[{integer, intent(in)}]{omp\+\_\+nthreads,  }\item[{integer, intent(in)}]{mpi\+\_\+comm }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. The accuracy of the fixed point algorithm is controlled by the number of \char`\"{}levels\char`\"{} of integer expansion, the maximum value of which is specified by max\+\_\+level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nsummands} & number of local summands\\
+\hline
+\mbox{\tt in}  & {\em dsummands} & declared first dimension\\
+\hline
+\mbox{\tt in}  & {\em nflds} & number of fields\\
+\hline
+\mbox{\tt in}  & {\em arr\+\_\+max\+\_\+shift} & maximum safe exponent for value $<$ 1 (so that sum does not overflow)\\
+\hline
+\mbox{\tt in}  & {\em arr\+\_\+gmax\+\_\+exp} & exponents of global maxima\\
+\hline
+\mbox{\tt in}  & {\em max\+\_\+levels} & maximum number of levels of integer expansion\\
+\hline
+\mbox{\tt in}  & {\em max\+\_\+level} & maximum value in max\+\_\+levels\\
+\hline
+\mbox{\tt in}  & {\em omp\+\_\+nthreads} & number of Open\+MP threads\\
+\hline
+\mbox{\tt in}  & {\em mpi\+\_\+comm} & M\+PI subcommunicator\\
+\hline
+\mbox{\tt in}  & {\em arr} & input array\\
+\hline
+\mbox{\tt in}  & {\em validate} & flag indicating that accuracy of solution generated from arr\+\_\+gmax\+\_\+exp and max\+\_\+levels should be tested\\
+\hline
+\mbox{\tt out}  & {\em recompute} & flag indicating that either the upper bounds are inaccurate, or max\+\_\+levels and arr\+\_\+gmax\+\_\+exp do not generate accurate enough sums\\
+\hline
+\mbox{\tt out}  & {\em arr\+\_\+gsum} & global means \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 751 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_ad6b4914497a4961339a1c95bfb807660}\label{namespacemod__oasis__reprosum_ad6b4914497a4961339a1c95bfb807660}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+setopts@{oasis\+\_\+reprosum\+\_\+setopts}}
+\index{oasis\+\_\+reprosum\+\_\+setopts@{oasis\+\_\+reprosum\+\_\+setopts}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+setopts()}{oasis\_reprosum\_setopts()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+setopts (\begin{DoxyParamCaption}\item[{logical, intent(in), optional}]{repro\+\_\+sum\+\_\+use\+\_\+ddpdd\+\_\+in,  }\item[{real(r8), intent(in), optional}]{repro\+\_\+sum\+\_\+rel\+\_\+diff\+\_\+max\+\_\+in,  }\item[{logical, intent(in), optional}]{repro\+\_\+sum\+\_\+recompute\+\_\+in,  }\item[{logical, intent(in), optional}]{repro\+\_\+sum\+\_\+master,  }\item[{integer, intent(in), optional}]{repro\+\_\+sum\+\_\+logunit }\end{DoxyParamCaption})}
+
+
+
+Set runtime options. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+use\+\_\+ddpdd\+\_\+in} & Use D\+D\+P\+DD algorithm instead of fixed precision algorithm\\
+\hline
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+rel\+\_\+diff\+\_\+max\+\_\+in} & maximum permissible difference between reproducible and nonreproducible sums\\
+\hline
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+recompute\+\_\+in} & recompute using different algorithm when difference between reproducible and nonreproducible sums is too great\\
+\hline
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+master} & flag indicating whether this process should output log messages\\
+\hline
+\mbox{\tt in}  & {\em repro\+\_\+sum\+\_\+logunit} & unit number for log messages \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 105 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a0f773341a7a6883b2f65d395a6b25b08}\label{namespacemod__oasis__reprosum_a0f773341a7a6883b2f65d395a6b25b08}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+tolexceeded@{oasis\+\_\+reprosum\+\_\+tolexceeded}}
+\index{oasis\+\_\+reprosum\+\_\+tolexceeded@{oasis\+\_\+reprosum\+\_\+tolexceeded}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+tolexceeded()}{oasis\_reprosum\_tolexceeded()}}
+{\footnotesize\ttfamily logical function, public mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+tolexceeded (\begin{DoxyParamCaption}\item[{character(len=$\ast$), intent(in)}]{name,  }\item[{integer, intent(in)}]{nflds,  }\item[{logical, intent(in)}]{master,  }\item[{integer, intent(in), optional}]{logunit,  }\item[{real(r8), dimension(2,nflds), intent(in)}]{rel\+\_\+diff }\end{DoxyParamCaption})}
+
+
+
+Test whether distributed sum exceeds tolerance and print out a warning message. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & distributed sum identifier\\
+\hline
+\mbox{\tt in}  & {\em nflds} & number of fields\\
+\hline
+\mbox{\tt in}  & {\em master} & process that will write warning messages?\\
+\hline
+\mbox{\tt in}  & {\em logunit} & unit warning messages written to\\
+\hline
+\mbox{\tt in}  & {\em rel\+\_\+diff} & relative and absolute differences between fixed and floating point sums \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1195 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_affb09b4ec9b001bf2ebbc51feebd8004}\label{namespacemod__oasis__reprosum_affb09b4ec9b001bf2ebbc51feebd8004}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!split\+\_\+indices@{split\+\_\+indices}}
+\index{split\+\_\+indices@{split\+\_\+indices}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{split\+\_\+indices()}{split\_indices()}}
+{\footnotesize\ttfamily subroutine, private mod\+\_\+oasis\+\_\+reprosum\+::split\+\_\+indices (\begin{DoxyParamCaption}\item[{integer, intent(in)}]{total,  }\item[{integer, intent(in)}]{num\+\_\+pieces,  }\item[{integer, dimension(num\+\_\+pieces), intent(out)}]{ibeg,  }\item[{integer, dimension(num\+\_\+pieces), intent(out)}]{iend }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 1394 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a48a084c213295b9eaa78c0552a10741a}\label{namespacemod__oasis__reprosum_a48a084c213295b9eaa78c0552a10741a}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!detailed\+\_\+timing@{detailed\+\_\+timing}}
+\index{detailed\+\_\+timing@{detailed\+\_\+timing}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{detailed\+\_\+timing}{detailed\_timing}}
+{\footnotesize\ttfamily logical mod\+\_\+oasis\+\_\+reprosum\+::detailed\+\_\+timing = .false.\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 89 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a89140c250e34a903bc9aa546574988d6}\label{namespacemod__oasis__reprosum_a89140c250e34a903bc9aa546574988d6}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+recompute@{oasis\+\_\+reprosum\+\_\+recompute}}
+\index{oasis\+\_\+reprosum\+\_\+recompute@{oasis\+\_\+reprosum\+\_\+recompute}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+recompute}{oasis\_reprosum\_recompute}}
+{\footnotesize\ttfamily logical, public mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+recompute = .false.}
+
+
+
+Definition at line 73 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_a6a80f4226d35d0842617e6eb6c9406e1}\label{namespacemod__oasis__reprosum_a6a80f4226d35d0842617e6eb6c9406e1}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!oasis\+\_\+reprosum\+\_\+reldiffmax@{oasis\+\_\+reprosum\+\_\+reldiffmax}}
+\index{oasis\+\_\+reprosum\+\_\+reldiffmax@{oasis\+\_\+reprosum\+\_\+reldiffmax}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{oasis\+\_\+reprosum\+\_\+reldiffmax}{oasis\_reprosum\_reldiffmax}}
+{\footnotesize\ttfamily real(r8), public mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+reldiffmax = -\/1.\+0\+\_\+r8}
+
+
+
+Definition at line 75 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__reprosum_aab06d0de9a82726d347ac52bb276355d}\label{namespacemod__oasis__reprosum_aab06d0de9a82726d347ac52bb276355d}} 
+\index{mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}!repro\+\_\+sum\+\_\+use\+\_\+ddpdd@{repro\+\_\+sum\+\_\+use\+\_\+ddpdd}}
+\index{repro\+\_\+sum\+\_\+use\+\_\+ddpdd@{repro\+\_\+sum\+\_\+use\+\_\+ddpdd}!mod\+\_\+oasis\+\_\+reprosum@{mod\+\_\+oasis\+\_\+reprosum}}
+\subsubsection{\texorpdfstring{repro\+\_\+sum\+\_\+use\+\_\+ddpdd}{repro\_sum\_use\_ddpdd}}
+{\footnotesize\ttfamily logical mod\+\_\+oasis\+\_\+reprosum\+::repro\+\_\+sum\+\_\+use\+\_\+ddpdd = .false.\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 88 of file mod\+\_\+oasis\+\_\+reprosum.\+F90.
+

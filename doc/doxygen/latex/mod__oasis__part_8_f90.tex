@@ -1,10 +1,36 @@
-\hypertarget{mod__oasis__part_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.F90 File Reference}
-\label{mod__oasis__part_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.\+F90}}
-}
+\hypertarget{mod__oasis__part_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.F90 File Reference}
+\label{mod__oasis__part_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+part.\+F90}}
 \subsection*{Data Types}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__part}{mod\+\_\+oasis\+\_\+part}
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S partition data and methods. \end{DoxyCompactList}\item 
 type \hyperlink{structmod__oasis__part_1_1prism__part__type}{mod\+\_\+oasis\+\_\+part\+::prism\+\_\+part\+\_\+type}
 \begin{DoxyCompactList}\small\item\em Partition (decomposition) data for variables. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__part}{mod\+\_\+oasis\+\_\+part}
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS partition data and methods. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__part_af070605328f2b705735d7fbf8b838ff4}{mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+def\+\_\+partition} (id\+\_\+part, kparal, kinfo, ig\+\_\+size, name)
+\begin{DoxyCompactList}\small\item\em The O\+A\+S\+IS user interface to define partitions. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__part_a80f66cc0ce5857aa53d070861f05b521}{mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Synchronize partitions across all tasks, called at oasis enddef. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__part_a17c747bc29d25b558df42524bd63ac90}{mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+zero} (s\+\_\+prism\+\_\+part)
+\begin{DoxyCompactList}\small\item\em Zero partition information. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__part_a12edb4b0248a3f562fe5f6e16eede06a}{mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+write} (s\+\_\+prism\+\_\+part, npart)
+\begin{DoxyCompactList}\small\item\em Print parition information. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__part_aacc20c24f42edbef4ec2610bf98aadfc}{mod\+\_\+oasis\+\_\+part\+::oasis\+\_\+part\+\_\+create} (id\+\_\+part, T\+Y\+PE, gsize, nx, ny, gridname, gscomm, mpicom, grid\+ID)
+\begin{DoxyCompactList}\small\item\em Create a new partition internally, needed for mapping. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__part_ab68d087792db0351181c9a97025d793b}{mod\+\_\+oasis\+\_\+part\+::mpart} = 100
+\begin{DoxyCompactList}\small\item\em maximum number of partitions allowed \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), public \hyperlink{namespacemod__oasis__part_ac8340e63b159a9786ad8fffabd1d47f8}{mod\+\_\+oasis\+\_\+part\+::prism\+\_\+npart} = 0
+\begin{DoxyCompactList}\small\item\em number of partitions defined \end{DoxyCompactList}\item 
+type(prism\+\_\+part\+\_\+type), dimension(mpart), public \hyperlink{namespacemod__oasis__part_a326ce52f630ba7e71905af864a6cb2dc}{mod\+\_\+oasis\+\_\+part\+::prism\+\_\+part}
+\begin{DoxyCompactList}\small\item\em list of defined partitions \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__part_a8cee930f023feb7bcad4a0cab0b490a1}{mod\+\_\+oasis\+\_\+part\+::part\+\_\+name\+\_\+cnt} = 0
+\begin{DoxyCompactList}\small\item\em used to define partition names internally \end{DoxyCompactList}\end{DoxyCompactItemize}

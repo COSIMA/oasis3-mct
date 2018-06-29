@@ -1,10 +1,32 @@
-\hypertarget{mod__oasis__var_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.F90 File Reference}
-\label{mod__oasis__var_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.\+F90}}
-}
+\hypertarget{mod__oasis__var_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.F90 File Reference}
+\label{mod__oasis__var_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+var.\+F90}}
 \subsection*{Data Types}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__var}{mod\+\_\+oasis\+\_\+var}
-\begin{DoxyCompactList}\small\item\em O\+A\+S\+I\+S variable data and methods. \end{DoxyCompactList}\item 
 type \hyperlink{structmod__oasis__var_1_1prism__var__type}{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var\+\_\+type}
 \begin{DoxyCompactList}\small\item\em Model variable data for model coupling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__var}{mod\+\_\+oasis\+\_\+var}
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS variable data and methods. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__var_a7d16403015304fadc15624773f87d2a0}{mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+def\+\_\+var} (id\+\_\+nports, cdport, id\+\_\+part, id\+\_\+var\+\_\+nodims, kinout, id\+\_\+var\+\_\+shape, ktype, kinfo)
+\begin{DoxyCompactList}\small\item\em The O\+A\+S\+IS user interface to define variables. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__var_ab33b7fbec62bcfd15e9cd7f912f71035}{mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+var\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Synchronize variables across all tasks, called at oasis enddef. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__var_aa780f62e9eded0a55d0077a990bf2443}{mod\+\_\+oasis\+\_\+var\+::oasis\+\_\+var\+\_\+zero} (prism\+\_\+var)
+\begin{DoxyCompactList}\small\item\em Zero variable information. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), public \hyperlink{namespacemod__oasis__var_a151c4be67882fc8d02f66e4a1822b692}{mod\+\_\+oasis\+\_\+var\+::maxvar}
+\begin{DoxyCompactList}\small\item\em number of potential variables, derived from namcouple input \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), parameter, public \hyperlink{namespacemod__oasis__var_a687d6dce16699f36ae3a67accfdba3a9}{mod\+\_\+oasis\+\_\+var\+::mvarcpl} = 10
+\begin{DoxyCompactList}\small\item\em max namcouples per variable \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), public \hyperlink{namespacemod__oasis__var_a095f8ad84e6afbcbe1744d4a9f924e08}{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+nvar} = 0
+\begin{DoxyCompactList}\small\item\em number of variables defined \end{DoxyCompactList}\item 
+type(prism\+\_\+var\+\_\+type), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__var_ae66c490437c2960d795fbd3d2c773a0a}{mod\+\_\+oasis\+\_\+var\+::prism\+\_\+var}
+\begin{DoxyCompactList}\small\item\em list of defined variables \end{DoxyCompactList}\end{DoxyCompactItemize}

@@ -654,7 +654,7 @@ CONTAINS
     character(len=*),         intent (in) :: cgrid       !< grid name
     integer(kind=ip_intwp_p), intent (in) :: nx          !< global nx size
     integer(kind=ip_intwp_p), intent (in) :: ny          !< global ny size
-    integer(kind=ip_intwp_p), intent (in) :: mask(:,:)   !< mask
+    integer(kind=ip_intwp_p), intent (in) :: mask(:,:)   !< mask array
     integer(kind=ip_intwp_p), intent (in),optional :: partid  !< partition id if nonglobal data
     !-------------------------------------------------
     integer(kind=ip_intwp_p) :: GRIDID

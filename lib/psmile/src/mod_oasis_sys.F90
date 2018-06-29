@@ -304,7 +304,7 @@ subroutine oasis_sys_sortC(num, fld, sortkey)
 
    integer(IN),      intent(in)    :: num        !< size of array
    character(len=CL),intent(inout) :: fld(:)     !< sort field
-   integer(IN)      ,intent(inout) :: sortkey(:) !< sortkey
+   integer(IN)      ,intent(inout) :: sortkey(:) !< sort key
 
 ! !EOP
 
@@ -355,7 +355,7 @@ subroutine oasis_sys_sortI(num, fld, sortkey)
 
    integer(IN),intent(in)    :: num        !< size of array
    integer(IN),intent(inout) :: fld(:)     !< sort field
-   integer(IN),intent(inout) :: sortkey(:) !< sortkey
+   integer(IN),intent(inout) :: sortkey(:) !< sort key
 
 ! !EOP
 
@@ -405,7 +405,7 @@ subroutine oasis_sys_sortIkey(num, arr, sortkey)
 
    integer(IN),intent(in)    :: num        !< size of array
    integer(IN),intent(inout) :: arr(:)     !< field to sort
-   integer(IN),intent(in)    :: sortkey(:) !< sortkey
+   integer(IN),intent(in)    :: sortkey(:) !< sort key
 
 ! !EOP
 

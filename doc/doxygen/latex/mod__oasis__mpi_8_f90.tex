@@ -1,27 +1,140 @@
-\hypertarget{mod__oasis__mpi_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.F90 File Reference}
-\label{mod__oasis__mpi_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.\+F90}}
-}
-{\ttfamily \#include $<$mpif.\+h$>$}\\*
+\hypertarget{mod__oasis__mpi_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.F90 File Reference}
+\label{mod__oasis__mpi_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+mpi.\+F90}}
+{\ttfamily \#include $<$mpif.\+h$>$}\newline
 \subsection*{Data Types}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__mpi}{mod\+\_\+oasis\+\_\+mpi}
-\begin{DoxyCompactList}\small\item\em Provides a generic and simpler interface into M\+P\+I calls for O\+A\+S\+I\+S. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__send}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+send}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I send. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI send. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__recv}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recv}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I receive. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI receive. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__bcast}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcast}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I broadcast. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI broadcast. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gathscatvinit}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinit}
 \begin{DoxyCompactList}\small\item\em Generic interface to oasis\+\_\+mpi\+\_\+gath\+Scat\+V\+Init. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv}
-\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+P\+I vector gather. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+PI vector gather. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scatterv}
-\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+P\+I vector scatter. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic interfaces into an M\+PI vector scatter. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__sum}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sum}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I sum reduction. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI sum reduction. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__min}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+min}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I min reduction. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI min reduction. \end{DoxyCompactList}\item 
 interface \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__max}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+max}
-\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+P\+I max reduction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Generic overloaded interface into M\+PI max reduction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__mpi}{mod\+\_\+oasis\+\_\+mpi}
+\begin{DoxyCompactList}\small\item\em Provides a generic and simpler interface into M\+PI calls for O\+A\+S\+IS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a15ba68764a1f4dd07d403e46afae824c}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+chkerr} (rcode, string)
+\begin{DoxyCompactList}\small\item\em Checks M\+PI error codes and aborts. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_aa5078962eee157f52878f711c0a29afb}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendi0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_aab4cc0d2b50e8e73697e6d88d23b03cd}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendi1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ab38f15fbce57555ea66ccbc1aa477dd1}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a948cd001c0955ae19f4b410d4cca9f9b}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ac8809a8b29b3ffa246612b9c25cd05eb}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sendr3} (array, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Send an array of 3D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ad89796f10a2225d4930cdec65546cf98}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvi0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_acf13ea626ed09fe98123f23d0990879d}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvi1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2578d560c80d608340b5a49b327642ba}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr0} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2bbd8de453167b4c73aa09c3c44c0ca8}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr1} (lvec, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2c3b82d2346a69cd20be3d35c5e70be6}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+recvr3} (array, pid, tag, comm, string)
+\begin{DoxyCompactList}\small\item\em Receive an array of 3D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_af8bc029a22d59f1188b7f8a1a2645c40}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a1426590a36b24f1770381b9c35563cff}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastl0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar logical. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a6d10e1673748a91dc7ec955ef16d771a}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastc0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a character string. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a99b3a1ab4c7617b5bc83d3c6360aaef3}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastc1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1D character strings. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a3b21bebef1b56b31bd6d07e83d7a59a6}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr0} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a6f9140637f29d3939dc9c53930101e2e}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a8b03787549fba5faff499c946d521db0}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastl1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1D logicals. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a6f12178b027ff30cb87f9f8313b459d5}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr1} (vec, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ab14018fe59cd737067e4f4202a3eeb39}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr2} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 2D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ad6918adccdd62a278066f41b0b8edf57}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcasti2} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 2D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ac01edbda3e33b1feff9b797f83f82e8c}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+bcastr3} (arr, comm, string, pebcast)
+\begin{DoxyCompactList}\small\item\em Broadcast an array of 3D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a68afb4ab4136545faeaa2c37a1eb294a}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathscatvinitr1} (comm, rootid, loc\+Arr, glob1\+D\+Arr, glob\+Size, displs, string)
+\begin{DoxyCompactList}\small\item\em Initialize variables for \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{oasis\+\_\+mpi\+\_\+gatherv} and \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__scatterv}{oasis\+\_\+mpi\+\_\+scatterv}. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a88a13ea3b4f96074669fdc872fe41728}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gathervr1} (locarr, loc\+Size, glob1\+D\+Arr, glob\+Size, displs, rootid, comm, string)
+\begin{DoxyCompactList}\small\item\em Gather a vector of distributed data to a rootid. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a9d0d807b92d39c9789eea4744d331612}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+scattervr1} (locarr, loc\+Size, glob1\+Darr, glob\+Size, displs, rootid, comm, string)
+\begin{DoxyCompactList}\small\item\em Scatter a vector of global data from a rootid. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_adbb3963310e45ac012e5e28f13d5781e}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumi0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global Sum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a507bb5e0ae088d68bb68c566e8965bef}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumi1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1D array of global sums for an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ae4d2818f21f445e594aad97598f49d8e}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumb0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar 8 byte integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a3f32594b15b9ae3629969839ab952012}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumb1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1D array of global sums for an array of 1D 8 byte integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a02b0555479a3d54e1c3d42219af9b991}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_aac62148bc912b158aff769572f27b8d3}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1D array of global sums for an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_afbc665ae71c97d0b0467323cd86a5973}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr2} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 2D array of global sums for an array of 2D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a41836fe23aeb81e65b4d24f6f0c90953}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumr3} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 3D array of global sums for an array of 3D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2901cf7eaf807b4df7bd82aefadfeed9}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumq0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global sum for a scalar quad. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a4a81062f1345805cdd828552272670c8}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumq1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 1D array of global sums for an array of 1D quads. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_aa9a5264e64523ff85ffb37ddc3b405ae}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumq2} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 2D array of global sums for an array of 2D quads. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a3f989a76dbe1896764d73ffea933130d}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+sumq3} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a 3D array of global sums for an array of 3D quads. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2832568cd4d34db40cdcc39ffa876474}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+mini0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global minimum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_aed0c20d56fdab764f0ad8e48e3a7209f}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+mini1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_af3628ad005b1a21e8f33e3dc2be38635}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+minr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an global minimum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a29c460b836ae9ad77ee1ac21f684d188}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+minr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global minimums for an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a0b469347d40c78c317042fa069d9baa5}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxi0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global maximum for a scalar integer. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a2ba8d76b016ddde4013aecc2ca0b1d9f}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxi1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global maximums for an array of 1D integers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_a7f46e23956ff948e039c5c1cdde0f6f3}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxr0} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute a global maximum for a scalar double. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__mpi_ae57151fc4714e33d7e0e1cf0aa65ae64}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+maxr1} (lvec, gvec, comm, string, all)
+\begin{DoxyCompactList}\small\item\em Compute an array of global maximums for an array of 1D doubles. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_adac784196d7af85611752214137dd4db}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+commsize} (comm, size, string)
+\begin{DoxyCompactList}\small\item\em Get the total number of tasks associated with a communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a2690a841a331f4398cc4b5a244bbc52e}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+commrank} (comm, rank, string)
+\begin{DoxyCompactList}\small\item\em Get the rank (task ID) for a task in a communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a384f170e63ac03f25d3bd549245b43f3}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+initialized} (flag, string)
+\begin{DoxyCompactList}\small\item\em Check whether M\+PI has been initialized. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_aa3786c2cab131c3834583e7943ba28c8}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+wtime} (wtime)
+\begin{DoxyCompactList}\small\item\em Return a timestamp from M\+P\+I\+\_\+\+W\+T\+I\+ME. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a5b21b6d8732d5f7b70d8b20cefe0072f}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+abort} (string, rcode)
+\begin{DoxyCompactList}\small\item\em Write error messages and Call M\+P\+I\+\_\+\+A\+B\+O\+RT. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_aaf477847380fbbbc1341520b0b3e66da}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+barrier} (comm, string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+B\+A\+R\+R\+I\+ER for a particular communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_aaf45f20e0000b32e71ec9ea8e806f57c}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+init} (string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+I\+N\+IT. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a0a601a3f718c0704db99a21b2c43fbcd}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+finalize} (string)
+\begin{DoxyCompactList}\small\item\em Call M\+P\+I\+\_\+\+F\+I\+N\+A\+L\+ZE. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mpi_a95f6540150f7ab4e64697d2eabc2bf79}{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+reducelists} (linp1, comm, cntout, lout1, callstr, fastcheck, fastcheckout, linp2, lout2, spval2, linp3, lout3, spval3, linp4, lout4, spval4)
+\begin{DoxyCompactList}\small\item\em Custom method for reducing M\+PI lists across pes for O\+A\+S\+IS. \end{DoxyCompactList}\end{DoxyCompactItemize}

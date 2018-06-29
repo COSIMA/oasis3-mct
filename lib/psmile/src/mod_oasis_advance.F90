@@ -1662,7 +1662,7 @@ contains
     type(mct_aVect)        ,intent(in),optional :: av3  !< source av3 hot
     type(mct_aVect)        ,intent(in),optional :: av4  !< source av4 hot
     type(mct_aVect)        ,intent(in),optional :: av5  !< source av5 hot
-    character(len=*)       ,intent(in),optional :: tstrinp  ! timer label string
+    character(len=*)       ,intent(in),optional :: tstrinp  !< timer label string
 
     integer(kind=ip_i4_p)  :: fsize,lsizes,lsized,nf,ni,n,m,ierr
     real(kind=ip_r8_p)     :: sumtmp, wts_sums, wts_sumd, zradi, zlagr

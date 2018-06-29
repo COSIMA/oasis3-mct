@@ -752,7 +752,7 @@ subroutine oasis_string_clean(string,rc)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*)             ,intent(inout) :: string  !< string
+   character(*)             ,intent(inout) :: string  !< char string
    integer(ip_i4_p),optional,intent(out)   :: rc      !< return code
 
 !EOP
