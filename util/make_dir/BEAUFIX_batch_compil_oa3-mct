@@ -1,0 +1,35 @@
+#!/bin/ksh
+#set -x
+######################################################################
+##
+##    This script compiles libraries of oasis3-mct
+##    This script performs a batch execution of the TopMakefileOasis3
+##
+############### User's section #######################################
+
+  #
+  # BEAUFIX
+  #
+
+  cat << EOF > batch_compil.beaufix
+#!/bin/bash
+#SBATCH --time=00:30:00
+#SBATCH -p  normal32          # partition/queue
+#SBATCH --job-name=compil   # job name
+#SBATCH -N 1                # number of nodes
+#SBATCH -n 1                # number of procs
+#SBATCH -o job.out%j
+#SBATCH -o job.err%j
+#SBATCH --exclusive
+
+cd $TMPDIR/oasis3-mct_buildbot/util/make_dir
+module load intel/13.1.4.183
+module load intelmpi/4.1.1.036
+module load netcdf/4.3.0 
+
+make realclean -f TopMakefileOasis3
+make -f TopMakefileOasis3
+ 
+EOF
+
+sbatch batch_compil.beaufix

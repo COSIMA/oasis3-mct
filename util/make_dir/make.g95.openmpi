@@ -1,0 +1,71 @@
+#
+# Include file for OASIS3 Makefile for a Linux system using 
+# G95 and OPENMPI
+#
+###############################################################################
+#
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# COUPLE	: path for oasis3 main directory
+COUPLE          = $(HOME)/oasis3-mct
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(COUPLE)/oasis3-mct/bin
+#
+# MPI library
+MPIDIR      = /opt/openmpi-1.3.2-g95/
+MPIBIN      = $(MPIDIR)/bin
+MPI_INCLUDE = $(MPIDIR)/include
+MPILIB      = -L$(MPIDIR)/lib -lmpi_f90 -lmpi_f77 -lmpi
+#
+# NETCDF library
+NETCDF_INCLUDE1  = /opt/netcdf-4.0.1-g95-64-medium/include 
+# NETCDF_INCLUDE2  = 
+NETCDF_LIBRARY  = -L/opt/netcdf-4.0.1-g95-64-medium/lib -lnetcdf -L/opt/hdf5-1.8.3-g95-64/lib -lhdf5_hl -lhdf5 -lz -lm -lhdf5_hl -lhdf5 -lz
+#
+# Compiling and other commands
+MAKE        = make
+F90         = $(MPIBIN)/mpif90 -I$(MPI_INCLUDE)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = gcc -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/mpif90 $(MPILIB)
+AR          = ar
+ARFLAGS     = -ruv
+#
+# CPP keys and compiler options
+# 
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+#
+# 
+F90FLAGS_1  = -g -fbounds-check
+f90FLAGS_1  = $(F90FLAGS_1)
+FFLAGS_1    = $(F90FLAGS_1)
+fFLAGS_1    = $(F90FLAGS_1)
+CCFLAGS_1   = 
+LDFLAGS     =
+#
+#
+###################
+#
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+# INCPSMILE     : includes all *o and *mod for each library
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct 
+
+F90FLAGS  = $(F90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1)
+f90FLAGS  = $(f90FLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1)
+FFLAGS    = $(FFLAGS_1) $(CPPDEF) $(INCPSMILE)  -I$(NETCDF_INCLUDE1)
+fFLAGS    = $(fFLAGS_1) $(CPPDEF) $(INCPSMILE)  -I$(NETCDF_INCLUDE1)
+CCFLAGS   = $(CCFLAGS_1) $(CPPDEF) $(INCPSMILE) -I$(NETCDF_INCLUDE1)
+#
+#############################################################################

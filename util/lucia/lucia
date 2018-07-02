@@ -1,0 +1,151 @@
+#!/bin/bash
+#                              "To make a prairie
+#                               It takes a clover 
+#                               And one bee"
+#                                               E. Dickinson    
+#
+#
+####################################################################
+#                            LUCIA
+####################################################################
+#
+#     Load-balancing Utility and Coupling Implementation Appraisal
+#
+#     - OASIS3-MCT performance analyser -
+#
+#     arguments:
+#
+#     without : processing all lucia.* files in ./ directory
+#
+#     -c : compilation
+#     -V : version
+#     -h : help
+#
+#
+#    Authors: E. Maisonnave (CERFACS)  02/12
+#             U. Fladrich, M. Evaldsson (SMHI)
+#    Modifs:
+#             E.M, Arnaud Caubel (LSCE) 12/13: add interpolation timing         
+#
+#
+#    Version 1.0
+#
+#set -vx
+#
+#
+####################   Do not modifiy below this line ######################
+#
+# Find gnuplot
+#
+GNUPLOT=`which gnuplot 2>oas_dumm`
+#
+if [ ! "$GNUPLOT" ]; then
+    echo "lucia WARNING: Gnuplot not available"
+    echo "Results on text file info.dat only"
+fi
+rm -f oas_dumm
+#
+# Path check
+#
+begin_path=`pwd`
+end_path=$0
+if [ -f ${begin_path}/${end_path} ]; then 
+  complete_path=${begin_path}/${end_path}
+else
+  complete_path=${end_path}
+fi
+lucia_PATH=`dirname $complete_path`
+if [ ! -f ${lucia_PATH}/lucia ]; then
+  echo "lucia ERROR: cannot find \"lucia\" shell script path"
+  exit
+fi
+
+# Arguments check
+if [ $# -gt 1 ]; then
+  echo "Usage: lucia [-c] [-V] [-h] "
+  exit
+fi
+
+# Default
+compil=0
+while getopts chV opt
+do
+   case  $opt in
+   V) echo lucia v1.0. Global Change Team, CERFACS, 2013 ; echo ; exit ;;
+   h) echo "Usage: "; echo "lucia [-V] [-h]" ; echo; exit ;;
+   c) echo "Compiling ..." ; compil=1; echo ;;
+   esac
+done
+
+#  Fortran compilations if required
+if [ "$compil" == "1" -o ! -f ${lucia_PATH}/lucia.exe ]; then
+# 
+# Compilation
+#
+# You could add compiler here
+F90=my_compiler
+#
+# Find a fortran compiler 
+#
+F90_oa=""
+for compilers in pgf90 ifort gfortran mpif90 g95 $F90
+do
+    test_compiler=`which $compilers 2>oas_dumm`
+    if [ "$test_compiler" ]; then
+       F90_oa=$compilers
+    fi
+done
+
+if [ ${F90_oa}"false" == "false" ]; then
+    echo "lucia ERROR: no FORTRAN compiler available"
+    exit
+fi
+
+  echo "lucia compilation needed"
+  echo "Compiler: "$F90_oa
+  cd ${lucia_PATH}
+  $F90_oa main-lucia.F90 -o lucia.exe
+  cd -
+  if [ -f ${lucia_PATH}/lucia.exe ]; then
+    chmod +x ${lucia_PATH}/lucia.exe 
+    echo "Compilation completed successfully"
+    echo "lucia ready to launch"
+    exit
+  else
+    echo "lucia ERROR: Unsuccessfull compilation"
+    echo "Check compilation options in lucia script"
+    exit
+  fi
+fi
+
+# Select information on prt files 
+arg_line=''
+for model_name in 01 02 03 04 05
+do
+  if [ -f lucia.${model_name}.000000 ]; then
+  nb_file=`ls lucia.${model_name}.*|wc -l`
+  if [ $nb_file -lt 1 -a "$model_name" == "01" ]; then
+    echo "lucia ERROR: log files not found"
+    exit
+  fi
+  rank_last=`ls lucia.${model_name}.*|tail -1|sed -e s/lucia....//`
+  arg_line=$arg_line" "$model_name" "$nb_file" "$rank_last
+  fi
+done
+#
+# Fortran code launch
+# 
+#  GOOOOOOOOOOOOOOOOOOOOO !
+#
+${lucia_PATH}/lucia.exe $arg_line
+#
+# gnuplot if possible
+if [ "$GNUPLOT" ]; then
+  gnuplot ${lucia_PATH}/balance.gnu
+  echo "Result on graphical format in oasis_balance.eps file"
+fi
+# Cleaning
+rm -f oas_dumm
+# End 
+echo
+echo lucia: CERFACS -2013-

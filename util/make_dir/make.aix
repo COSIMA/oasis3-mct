@@ -1,0 +1,69 @@
+#
+# Include file for OASIS3 Makefile adapted to  ECMWF's IBM power4 system.
+#
+###############################################################################
+#
+# CHAN : MPI1/MPI2
+CHAN            = MPI1
+# Needed to work with SCE Makefile
+# COUPLE	: path for oasis3-mct main directory
+COUPLE          = $(HOME)/oasis3-mct
+I4mods          = I
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(COUPLE)/ibm_power4
+#
+# MPI library
+MPIDIR      = 
+MPIBIN      = 
+MPI_INCLUDE = /usr/lpp/ppe.poe/include/thread64 
+MPILIB      = 
+#
+#  NETCDF library
+NETCDF_INCLUDE  = /usr/local/lib/netcdf-3.5.0/LP64/include
+NETCDF_LIBRARY  = -L/usr/local/lib/netcdf-3.5.0/LP64/lib -lnetcdf
+#
+# Compiling and other commands
+MAKE        = gmake
+F90         = mpxlf90_r
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = mpcc_r
+LD          = $(F90)
+AR        = ar
+ARFLAGS   = r
+#
+#
+# compiler options and cpp keys
+# 
+CPPDEF    = -WF,-Duse_comm_$(CHAN) -WF,-D__VERBOSE -WF,-DTREAT_OVERLAY
+CCPPDEF   = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+#
+COMFLAGS  =  -Q -qarch=auto -qtune=auto -qcache=auto -qfloat=fltint -qzerosize -qlargepage -qmaxmem=-1 -q64 -O3 -qstrict -qextname
+F90FLAGS_1  = -qsuffix=cpp=F90 $(COMFLAGS) 
+f90FLAGS_1  = -qsuffix=cpp=f90 $(COMFLAGS)
+FFLAGS_1    = -qfixed -qsuffix=cpp=F $(COMFLAGS) 
+fFLAGS_1    = -qfixed -qsuffix=cpp=f $(COMFLAGS) 
+CCFLAGS_1   = $(COMFLAGS) 
+LDFLAGS   =
+#
+###################
+#
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+# INCPSMILE     : includes all *o and *mod for each library
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct 
+
+F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) $(CCPPDEF) -I$(NETCDF_INCLUDE)
+#
+#############################################################################

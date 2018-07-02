@@ -1,0 +1,77 @@
+
+===========================================================
+
+               #      #    #  ####  #   ##
+               #      #    # #    # #  #  #
+               #      #    # #      # #    #
+               #      #    # #      # ######
+               #      #    # #    # # #    #
+               ######  ####   ####  # #    #
+
+===========================================================
+
+===========================================================
+
+This tool was developped by Eric Maisonnave (CERFACS), 
+Uwe Fladrich, Martin Evaldsson (SMHI) and Arnaud Caubel (IPSL) 
+to perform an analysis of the coupled components load balance
+
+        v1.0 :              12/2013
+
+===========================================================
+
+1. Compilation
+--------------
+
+In $(OASIS_DIR)/oasis3-mct/util/lucia, compile main-lucia.F90 :
+* compile using the command : lucia -c
+* if your compiler is not automatically detected,
+  specify your compiler by modifying "F90=my_compiler" in
+  "lucia" script file
+* executable file "lucia.exe" is created in the same directory
+
+
+2. Simulation set up
+--------------------
+
+Before launching your OASIS coupled model, modify your "namcouple" file: the second number on the line below $NLOGPRT must be set to -1. This option enables the production of OASIS-LUCIA log files, named "lucia.MM.PPPPP", with "MM" executable number and "PPPPP" MPI process number in local communicator. It is not possible to produce timer log files at the same time that lucia log files.
+
+
+3. Post processing
+------------------
+
+In your results directory (where executable and model output are located), post-treat the files produced by OASIS-LUCIA log files:
+
+$(OASIS_DIR)/oasis3-mct/util/lucia/lucia
+
+This command will post-treat the OASIS-LUCIA log files located in the directory using lucia.exe
+
+
+4. Analysis
+-----------
+
+Several information related to the coupled simulation are provided on standard output:
+
+* Name and number of "lucia.MM.PPPPP" processed
+For performance reasons (ASCII file reading), LUCIA do not process all OASIS-LUCIA log files, but only a subset, displayed below the comment line "Computed log files for model MM"
+
+* Coupling field names + model exchanging them, ordered by exchange date
+This information is displayed below the comment line "Exchanged fields (based on first exchange)"
+
+* Load balance
+For each model, LUCIA gives the total time spent during calculations, the total time spent to wait information from OASIS and the number of coupling time step used to calculate those values.
+Time is in seconds. Information is displayed below the comment line
+"Component -         Calculations   -     Waiting time (s) - # cpl step "
+
+* Additional information
+LUCIA also provides, for each model, the total time spent to perform OASIS interpolations during simulation, and total process jitter measured at each OASIS send/receive steps.
+This information is displayed below the comment line "Additional informations".
+
+
+Load balance information is also provided on graphical format (using gnuplot, if available) in oasis_balance.eps file.
+
+---------------------------------------------------------------------------------------------------
+
+For more details about lucia, see the document:
+http://www.cerfacs.fr/globc/publication/technicalreport/2014/lucia_documentation.pdf
+

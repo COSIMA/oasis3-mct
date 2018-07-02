@@ -1,0 +1,77 @@
+#
+# Include file for OASIS3-MCT Makefile for a BULL system using 
+# Intel Compiler and MPICH
+#
+###############################################################################
+#
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# COUPLE	: path for oasis3-mct main directory
+COUPLE          = /home/ext/cf/cglo/coquartl/work/oasis3-mct_training
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(COUPLE)/BEAUFIX_oa3-mct
+#
+# MPI library
+MPIDIR           = /opt/softs/intel/impi/4.1.1.036/intel64
+MPIBIN           = $(MPIDIR)/bin
+MPI_INCLUDE      = $(MPIDIR)/include
+MPILIB           = -L$(MPIDIR)/lib
+#
+# NETCDF library
+NETCDF_LIB_DIR=/opt/softs/libraries/ICC13.1.4.183/netcdf-4.3.0
+NETCDF_INC_DIR=/opt/softs/libraries/ICC13.1.4.183/netcdf-4.3.0/include
+NETCDF_INCLUDE  = ${NETCDF_INC_DIR}
+NETCDF_LIBRARY  = -L${NETCDF_LIB_DIR} -lnetcdff -lnetcdf -L/opt/softs/libraries/ICC13.1.4.183/hdf5-1.8.13_parll/lib -lhdf5_hl -lhdf5 -lcurl
+#
+# Compiling and other commands
+MAKE        = gmake
+F90         = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
+MPIF90      = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = $(MPIBIN)/mpicc -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/mpiifort $(MPILIB)
+AR          = ar
+ARFLAGS     = -ruv
+#
+# CPP keys and compiler options
+# 
+CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# 
+#F90FLAGS_1  = -O2 -xAVX -I.  -assume byterecl
+F90FLAGS_1  = -g -traceback -O0 -check all -I. -assume byterecl
+f90FLAGS_1  = $(F90FLAGS_1)
+FFLAGS_1    = $(F90FLAGS_1)
+fFLAGS_1    = $(F90FLAGS_1)
+CCFLAGS_1   = 
+LDFLAGS     = 
+#
+MPP_IOOPT = -i4 -r8
+###################
+#
+
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+# INCPSMILE     : includes all *o and *mod for each library
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct
+
+F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
+#
+#############################################################################
