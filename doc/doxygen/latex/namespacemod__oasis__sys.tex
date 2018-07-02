@@ -1,0 +1,444 @@
+\hypertarget{namespacemod__oasis__sys}{}\section{mod\+\_\+oasis\+\_\+sys Module Reference}
+\label{namespacemod__oasis__sys}\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+
+
+System type methods.  
+
+
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_af1943a0ce0c5765ba8a714379065464f}{oasis\+\_\+abort} (id\+\_\+compid, cd\+\_\+routine, cd\+\_\+message, file, line, rcode)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS abort method, publically available to users. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}{oasis\+\_\+flush} (nu)
+\begin{DoxyCompactList}\small\item\em Flushes output to file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}{oasis\+\_\+unitget} (uio)
+\begin{DoxyCompactList}\small\item\em Get a free unit number. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a063a41b73546564afd294fd5708b6667}{oasis\+\_\+unitsetmin} (uio)
+\begin{DoxyCompactList}\small\item\em Set the minimum unit number allowed. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a6e0a46b41f1b9f0a1dc99b17665f49dc}{oasis\+\_\+unitsetmax} (uio)
+\begin{DoxyCompactList}\small\item\em Set the maximum unit number allowed. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}{oasis\+\_\+unitfree} (uio)
+\begin{DoxyCompactList}\small\item\em Release a unit number for reuse. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}{oasis\+\_\+debug\+\_\+enter} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is entered, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a349f71cba2df935179d78f3858992c83}{oasis\+\_\+debug\+\_\+exit} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is exited, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a8e488f6a9a829762324519c6dd493912}{oasis\+\_\+debug\+\_\+note} (string)
+\begin{DoxyCompactList}\small\item\em Used to write information from a subroutine, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ab2aa592727d1e5bea728281679d5ca8d}{oasis\+\_\+sys\+\_\+sortc} (num, fld, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort a character array and compute a sort key. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a0deb9712f58a255d6ae938af2ed8b35c}{oasis\+\_\+sys\+\_\+sorti} (num, fld, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort a integer array and compute a sort key. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ae73e75ed1a8aaba9da01d79ad3276e13}{oasis\+\_\+sys\+\_\+sortikey} (num, arr, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort an integer array using a sort key. \end{DoxyCompactList}\item 
+recursive subroutine \hyperlink{namespacemod__oasis__sys_a30b91b7cab02c85d85fb7a7debdd5ec2}{oasis\+\_\+sys\+\_\+mergesortc} (N, A, T, S, Z)
+\begin{DoxyCompactList}\small\item\em Generic oasis\+\_\+sys\+\_\+mergesortC routine for character strings. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__sys_a27e13d259fbecbfe09e750d16f50ef25}{oasis\+\_\+sys\+\_\+mergec} (A, X, NA, B, Y, NB, C, Z, NC)
+\begin{DoxyCompactList}\small\item\em Merge routine needed for mergesortC for character strings. \end{DoxyCompactList}\item 
+recursive subroutine \hyperlink{namespacemod__oasis__sys_a298b27e03ff339d56eda3c5b31115781}{oasis\+\_\+sys\+\_\+mergesorti} (N, A, T, S, Z)
+\begin{DoxyCompactList}\small\item\em Generic oasis\+\_\+sys\+\_\+mergesortI routine for an integer array. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__sys_a5384f02abfdf4a5cee0706ddefecde87}{oasis\+\_\+sys\+\_\+mergei} (A, X, NA, B, Y, NB, C, Z, NC)
+\begin{DoxyCompactList}\small\item\em Merge routine needed for mergesortI for integer array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}{astr} = \textquotesingle{} A\+B\+O\+R\+T\+: \textquotesingle{}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}{estr} = \textquotesingle{} E\+R\+R\+O\+R\+: \textquotesingle{}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}{wstr} = \textquotesingle{} W\+A\+R\+N\+I\+N\+G\+: \textquotesingle{}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_aded42e42797afa8d6ee5bdefdf42a812}{minion} = 1024
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}{maxion} = 9999
+\item 
+integer(ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}{tree\+\_\+delta} = 2
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}{tree\+\_\+indent} = 0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+System type methods. 
+
+\subsection{Function/\+Subroutine Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__sys_af1943a0ce0c5765ba8a714379065464f}\label{namespacemod__oasis__sys_af1943a0ce0c5765ba8a714379065464f}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+abort@{oasis\+\_\+abort}}
+\index{oasis\+\_\+abort@{oasis\+\_\+abort}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+abort()}{oasis\_abort()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+abort (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in), optional}]{id\+\_\+compid,  }\item[{character(len=$\ast$), intent(in), optional}]{cd\+\_\+routine,  }\item[{character(len=$\ast$), intent(in), optional}]{cd\+\_\+message,  }\item[{character(len=$\ast$), intent(in), optional}]{file,  }\item[{integer, intent(in), optional}]{line,  }\item[{integer, intent(in), optional}]{rcode }\end{DoxyParamCaption})}
+
+
+
+O\+A\+S\+IS abort method, publically available to users. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id\+\_\+compid} & component id\\
+\hline
+\mbox{\tt in}  & {\em cd\+\_\+routine} & string defining calling routine\\
+\hline
+\mbox{\tt in}  & {\em cd\+\_\+message} & error message string\\
+\hline
+\mbox{\tt in}  & {\em file} & file called from\\
+\hline
+\mbox{\tt in}  & {\em line} & line in file called from\\
+\hline
+\mbox{\tt in}  & {\em rcode} & optional code to return to invoking environment \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 44 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}\label{namespacemod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+enter@{oasis\+\_\+debug\+\_\+enter}}
+\index{oasis\+\_\+debug\+\_\+enter@{oasis\+\_\+debug\+\_\+enter}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+debug\+\_\+enter()}{oasis\_debug\_enter()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+enter (\begin{DoxyParamCaption}\item[{character(len=$\ast$), intent(in)}]{string }\end{DoxyParamCaption})}
+
+
+
+Used when a subroutine is entered, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & name of the subroutine \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 209 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a349f71cba2df935179d78f3858992c83}\label{namespacemod__oasis__sys_a349f71cba2df935179d78f3858992c83}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+exit@{oasis\+\_\+debug\+\_\+exit}}
+\index{oasis\+\_\+debug\+\_\+exit@{oasis\+\_\+debug\+\_\+exit}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+debug\+\_\+exit()}{oasis\_debug\_exit()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+exit (\begin{DoxyParamCaption}\item[{character(len=$\ast$), intent(in)}]{string }\end{DoxyParamCaption})}
+
+
+
+Used when a subroutine is exited, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & name of subroutine \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 236 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a8e488f6a9a829762324519c6dd493912}\label{namespacemod__oasis__sys_a8e488f6a9a829762324519c6dd493912}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+debug\+\_\+note@{oasis\+\_\+debug\+\_\+note}}
+\index{oasis\+\_\+debug\+\_\+note@{oasis\+\_\+debug\+\_\+note}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+debug\+\_\+note()}{oasis\_debug\_note()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+note (\begin{DoxyParamCaption}\item[{character(len=$\ast$), intent(in)}]{string }\end{DoxyParamCaption})}
+
+
+
+Used to write information from a subroutine, write info to log file at some debug level. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em string} & string to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 263 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}\label{namespacemod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+flush@{oasis\+\_\+flush}}
+\index{oasis\+\_\+flush@{oasis\+\_\+flush}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+flush()}{oasis\_flush()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+flush (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{nu }\end{DoxyParamCaption})}
+
+
+
+Flushes output to file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nu} & unit number of file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 94 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a27e13d259fbecbfe09e750d16f50ef25}\label{namespacemod__oasis__sys_a27e13d259fbecbfe09e750d16f50ef25}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+mergec@{oasis\+\_\+sys\+\_\+mergec}}
+\index{oasis\+\_\+sys\+\_\+mergec@{oasis\+\_\+sys\+\_\+mergec}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+mergec()}{oasis\_sys\_mergec()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergec (\begin{DoxyParamCaption}\item[{character(cl), dimension(na), intent(inout)}]{A,  }\item[{integer(in), dimension(na), intent(inout)}]{X,  }\item[{integer, intent(in)}]{NA,  }\item[{character(cl), dimension(nb), intent(in)}]{B,  }\item[{integer(in), dimension(nb), intent(in)}]{Y,  }\item[{integer, intent(in)}]{NB,  }\item[{character(cl), dimension(nc), intent(inout)}]{C,  }\item[{integer(in), dimension(nc), intent(inout)}]{Z,  }\item[{integer, intent(in)}]{NC }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Merge routine needed for mergesortC for character strings. 
+
+
+
+Definition at line 498 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a5384f02abfdf4a5cee0706ddefecde87}\label{namespacemod__oasis__sys_a5384f02abfdf4a5cee0706ddefecde87}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+mergei@{oasis\+\_\+sys\+\_\+mergei}}
+\index{oasis\+\_\+sys\+\_\+mergei@{oasis\+\_\+sys\+\_\+mergei}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+mergei()}{oasis\_sys\_mergei()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergei (\begin{DoxyParamCaption}\item[{integer(in), dimension(na), intent(inout)}]{A,  }\item[{integer(in), dimension(na), intent(inout)}]{X,  }\item[{integer, intent(in)}]{NA,  }\item[{integer(in), dimension(nb), intent(in)}]{B,  }\item[{integer(in), dimension(nb), intent(in)}]{Y,  }\item[{integer, intent(in)}]{NB,  }\item[{integer(in), dimension(nc), intent(inout)}]{C,  }\item[{integer(in), dimension(nc), intent(inout)}]{Z,  }\item[{integer, intent(in)}]{NC }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Merge routine needed for mergesortI for integer array. 
+
+
+
+Definition at line 596 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a30b91b7cab02c85d85fb7a7debdd5ec2}\label{namespacemod__oasis__sys_a30b91b7cab02c85d85fb7a7debdd5ec2}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+mergesortc@{oasis\+\_\+sys\+\_\+mergesortc}}
+\index{oasis\+\_\+sys\+\_\+mergesortc@{oasis\+\_\+sys\+\_\+mergesortc}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+mergesortc()}{oasis\_sys\_mergesortc()}}
+{\footnotesize\ttfamily recursive subroutine mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergesortc (\begin{DoxyParamCaption}\item[{integer, intent(in)}]{N,  }\item[{character(cl), dimension(n), intent(inout)}]{A,  }\item[{character(cl), dimension((n+1)/2), intent(out)}]{T,  }\item[{integer(in), dimension(n), intent(inout)}]{S,  }\item[{integer(in), dimension((n+1)/2), intent(out)}]{Z }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Generic oasis\+\_\+sys\+\_\+mergesortC routine for character strings. 
+
+
+
+Definition at line 447 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a298b27e03ff339d56eda3c5b31115781}\label{namespacemod__oasis__sys_a298b27e03ff339d56eda3c5b31115781}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+mergesorti@{oasis\+\_\+sys\+\_\+mergesorti}}
+\index{oasis\+\_\+sys\+\_\+mergesorti@{oasis\+\_\+sys\+\_\+mergesorti}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+mergesorti()}{oasis\_sys\_mergesorti()}}
+{\footnotesize\ttfamily recursive subroutine mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergesorti (\begin{DoxyParamCaption}\item[{integer, intent(in)}]{N,  }\item[{integer(in), dimension(n), intent(inout)}]{A,  }\item[{integer(in), dimension((n+1)/2), intent(out)}]{T,  }\item[{integer(in), dimension(n), intent(inout)}]{S,  }\item[{integer(in), dimension((n+1)/2), intent(out)}]{Z }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Generic oasis\+\_\+sys\+\_\+mergesortI routine for an integer array. 
+
+
+
+Definition at line 545 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_ab2aa592727d1e5bea728281679d5ca8d}\label{namespacemod__oasis__sys_ab2aa592727d1e5bea728281679d5ca8d}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+sortc@{oasis\+\_\+sys\+\_\+sortc}}
+\index{oasis\+\_\+sys\+\_\+sortc@{oasis\+\_\+sys\+\_\+sortc}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+sortc()}{oasis\_sys\_sortc()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sortc (\begin{DoxyParamCaption}\item[{integer(in), intent(in)}]{num,  }\item[{character(len=cl), dimension(\+:), intent(inout)}]{fld,  }\item[{integer(in), dimension(\+:), intent(inout)}]{sortkey }\end{DoxyParamCaption})}
+
+
+
+Sort a character array and compute a sort key. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in,out}  & {\em fld} & sort field\\
+\hline
+\mbox{\tt in,out}  & {\em sortkey} & sort key \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 295 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a0deb9712f58a255d6ae938af2ed8b35c}\label{namespacemod__oasis__sys_a0deb9712f58a255d6ae938af2ed8b35c}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+sorti@{oasis\+\_\+sys\+\_\+sorti}}
+\index{oasis\+\_\+sys\+\_\+sorti@{oasis\+\_\+sys\+\_\+sorti}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+sorti()}{oasis\_sys\_sorti()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sorti (\begin{DoxyParamCaption}\item[{integer(in), intent(in)}]{num,  }\item[{integer(in), dimension(\+:), intent(inout)}]{fld,  }\item[{integer(in), dimension(\+:), intent(inout)}]{sortkey }\end{DoxyParamCaption})}
+
+
+
+Sort a integer array and compute a sort key. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in,out}  & {\em fld} & sort field\\
+\hline
+\mbox{\tt in,out}  & {\em sortkey} & sort key \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 346 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_ae73e75ed1a8aaba9da01d79ad3276e13}\label{namespacemod__oasis__sys_ae73e75ed1a8aaba9da01d79ad3276e13}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+sys\+\_\+sortikey@{oasis\+\_\+sys\+\_\+sortikey}}
+\index{oasis\+\_\+sys\+\_\+sortikey@{oasis\+\_\+sys\+\_\+sortikey}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+sys\+\_\+sortikey()}{oasis\_sys\_sortikey()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sortikey (\begin{DoxyParamCaption}\item[{integer(in), intent(in)}]{num,  }\item[{integer(in), dimension(\+:), intent(inout)}]{arr,  }\item[{integer(in), dimension(\+:), intent(in)}]{sortkey }\end{DoxyParamCaption})}
+
+
+
+Sort an integer array using a sort key. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em num} & size of array\\
+\hline
+\mbox{\tt in,out}  & {\em arr} & field to sort\\
+\hline
+\mbox{\tt in}  & {\em sortkey} & sort key \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 396 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}\label{namespacemod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitfree@{oasis\+\_\+unitfree}}
+\index{oasis\+\_\+unitfree@{oasis\+\_\+unitfree}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+unitfree()}{oasis\_unitfree()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitfree (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{uio }\end{DoxyParamCaption})}
+
+
+
+Release a unit number for reuse. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 186 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}\label{namespacemod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitget@{oasis\+\_\+unitget}}
+\index{oasis\+\_\+unitget@{oasis\+\_\+unitget}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+unitget()}{oasis\_unitget()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitget (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(out)}]{uio }\end{DoxyParamCaption})}
+
+
+
+Get a free unit number. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 112 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a6e0a46b41f1b9f0a1dc99b17665f49dc}\label{namespacemod__oasis__sys_a6e0a46b41f1b9f0a1dc99b17665f49dc}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitsetmax@{oasis\+\_\+unitsetmax}}
+\index{oasis\+\_\+unitsetmax@{oasis\+\_\+unitsetmax}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+unitsetmax()}{oasis\_unitsetmax()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitsetmax (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{uio }\end{DoxyParamCaption})}
+
+
+
+Set the maximum unit number allowed. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 167 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a063a41b73546564afd294fd5708b6667}\label{namespacemod__oasis__sys_a063a41b73546564afd294fd5708b6667}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!oasis\+\_\+unitsetmin@{oasis\+\_\+unitsetmin}}
+\index{oasis\+\_\+unitsetmin@{oasis\+\_\+unitsetmin}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{oasis\+\_\+unitsetmin()}{oasis\_unitsetmin()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitsetmin (\begin{DoxyParamCaption}\item[{integer(kind=ip\+\_\+intwp\+\_\+p), intent(in)}]{uio }\end{DoxyParamCaption})}
+
+
+
+Set the minimum unit number allowed. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em uio} & unit number \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 148 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}\label{namespacemod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!astr@{astr}}
+\index{astr@{astr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{astr}{astr}}
+{\footnotesize\ttfamily character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::astr = \textquotesingle{} A\+B\+O\+R\+T\+: \textquotesingle{}}
+
+
+
+Definition at line 11 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}\label{namespacemod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!estr@{estr}}
+\index{estr@{estr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{estr}{estr}}
+{\footnotesize\ttfamily character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::estr = \textquotesingle{} E\+R\+R\+O\+R\+: \textquotesingle{}}
+
+
+
+Definition at line 12 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}\label{namespacemod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!maxion@{maxion}}
+\index{maxion@{maxion}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{maxion}{maxion}}
+{\footnotesize\ttfamily integer(ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+sys\+::maxion = 9999\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 31 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_aded42e42797afa8d6ee5bdefdf42a812}\label{namespacemod__oasis__sys_aded42e42797afa8d6ee5bdefdf42a812}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!minion@{minion}}
+\index{minion@{minion}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{minion}{minion}}
+{\footnotesize\ttfamily integer(ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+sys\+::minion = 1024\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 30 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}\label{namespacemod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!tree\+\_\+delta@{tree\+\_\+delta}}
+\index{tree\+\_\+delta@{tree\+\_\+delta}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{tree\+\_\+delta}{tree\_delta}}
+{\footnotesize\ttfamily integer(ip\+\_\+intwp\+\_\+p), parameter mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+delta = 2\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 32 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}\label{namespacemod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!tree\+\_\+indent@{tree\+\_\+indent}}
+\index{tree\+\_\+indent@{tree\+\_\+indent}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{tree\+\_\+indent}{tree\_indent}}
+{\footnotesize\ttfamily integer(ip\+\_\+intwp\+\_\+p), save mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+indent = 0\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 33 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}\label{namespacemod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}} 
+\index{mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}!wstr@{wstr}}
+\index{wstr@{wstr}!mod\+\_\+oasis\+\_\+sys@{mod\+\_\+oasis\+\_\+sys}}
+\subsubsection{\texorpdfstring{wstr}{wstr}}
+{\footnotesize\ttfamily character(len=$\ast$), parameter, public mod\+\_\+oasis\+\_\+sys\+::wstr = \textquotesingle{} W\+A\+R\+N\+I\+N\+G\+: \textquotesingle{}}
+
+
+
+Definition at line 13 of file mod\+\_\+oasis\+\_\+sys.\+F90.
+

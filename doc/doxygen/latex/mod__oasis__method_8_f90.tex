@@ -1,8 +1,27 @@
-\hypertarget{mod__oasis__method_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.F90 File Reference}
-\label{mod__oasis__method_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__method_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.F90 File Reference}
+\label{mod__oasis__method_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+method.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__method}{mod\+\_\+oasis\+\_\+method}
-\begin{DoxyCompactList}\small\item\em High level O\+A\+S\+I\+S user interfaces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+module \hyperlink{namespacemod__oasis__method}{mod\+\_\+oasis\+\_\+method}
+\begin{DoxyCompactList}\small\item\em High level O\+A\+S\+IS user interfaces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_ad266b77f6e75f2d150c80374a841a43c}{mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+init\+\_\+comp} (mynummod, cdnam, kinfo, coupled, commworld)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user init method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_a4fb881336906c9452b6a9f250af9c3d7}{mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+terminate} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user finalize method. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__method_a093552f9f9895ac79a5fefa043fc5881}{mod\+\_\+oasis\+\_\+method\+::oasis\+\_\+enddef} (kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface specifying the O\+A\+S\+IS definition phase is complete. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__method_a13d6e469ea14642a2e1e6cb807d9b7de}{mod\+\_\+oasis\+\_\+method\+::mod\+\_\+oasis\+\_\+setrootglobal} ()
+\begin{DoxyCompactList}\small\item\em Local method to compute each models\textquotesingle{} global task ids, exists for reuse in enddef. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__method_a390290b92b6af57b2732cb7521532f1c}{mod\+\_\+oasis\+\_\+method\+::debug} =1
+\item 
+logical \hyperlink{namespacemod__oasis__method_a405af91a0535e4ce70d55513bb4c3867}{mod\+\_\+oasis\+\_\+method\+::lg\+\_\+mpiflag}
+\item 
+integer(kind=ip\+\_\+intwp\+\_\+p) \hyperlink{namespacemod__oasis__method_aff65fa61d2762374419fe4c44c0f9282}{mod\+\_\+oasis\+\_\+method\+::mpi\+\_\+comm\+\_\+global\+\_\+world}
+\end{DoxyCompactItemize}

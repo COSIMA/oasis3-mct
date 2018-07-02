@@ -1,4 +1,4 @@
-!> @mainpage Oasis3-MCT Version 3.0: April, 2015
+!> @mainpage Oasis3-MCT Version 4.0: June, 2018
 !> This provides documentation of the Oasis3-MCT implementation for developers.
 !> A separate Oasis3-MCT User Guide is available for Oasis users.
 

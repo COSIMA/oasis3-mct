@@ -1,9 +1,36 @@
-\hypertarget{mod__oasis__auxiliary__routines_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.F90 File Reference}
-\label{mod__oasis__auxiliary__routines_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90}}
-}
-{\ttfamily \#include \char`\"{}oasis\+\_\+os.\+h\char`\"{}}\\*
-\subsection*{Data Types}
+\hypertarget{mod__oasis__auxiliary__routines_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.F90 File Reference}
+\label{mod__oasis__auxiliary__routines_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines.\+F90}}
+{\ttfamily \#include \char`\"{}oasis\+\_\+os.\+h\char`\"{}}\newline
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__auxiliary__routines}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}
-\begin{DoxyCompactList}\small\item\em Auxiliary O\+A\+S\+I\+S user interfaces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+module \hyperlink{namespacemod__oasis__auxiliary__routines}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines}
+\begin{DoxyCompactList}\small\item\em Auxiliary O\+A\+S\+IS user interfaces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a905dc11bc7613c7ac94054cf92fc2736}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+localcomm} (localcomm, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user query for the local M\+PI communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a42c3fe19a188de66499094e988c51938}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+set\+\_\+couplcomm} (localcomm, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user call to specify a local communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_aede33b301679f532ecd300488358ab71}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+create\+\_\+couplcomm} (icpl, allcomm, cplcomm, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user call to create a new communicator. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a940777065691d5eab0402b0bb40464c7}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+debug} (debug, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface to query debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a71bf70a87b2d4ce86016bbb93d9edd73}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+set\+\_\+debug} (debug, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface to set debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a589021c0f1427f8e5edb1c7efcd7fa2c}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+intercomm} (new\+\_\+comm, cdnam, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface to establish an intercomm communicator between the root of two models. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_aa1959db40e8c27dea289b97458929526}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+intracomm} (new\+\_\+comm, cdnam, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user interface to establish an intracomm communicator between the root of two models. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a154d3345ef9691e378afdc871086f7eb}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+ncpl} (varid, ncpl, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user query for the number of unique couplings associated with a variable. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a62d1c98c05bcc4bd5e8796866bcce2db}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+get\+\_\+freqs} (varid, mop, ncpl, cpl\+\_\+freqs, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user query for the coupling periods for a given variable. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__auxiliary__routines_a7a95eb579171b6c2f06ff532c7823e2e}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::oasis\+\_\+put\+\_\+inquire} (varid, msec, kinfo)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS user query to indicate put return code expected at a specified time for a given variable. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), dimension(mpi\+\_\+status\+\_\+size) \hyperlink{namespacemod__oasis__auxiliary__routines_a284fcb0384dbbf081a6930256fc12b27}{mod\+\_\+oasis\+\_\+auxiliary\+\_\+routines\+::istatus}
+\end{DoxyCompactItemize}

@@ -1,8 +1,27 @@
-\hypertarget{mod__oasis__advance_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.F90 File Reference}
-\label{mod__oasis__advance_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__advance_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.F90 File Reference}
+\label{mod__oasis__advance_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+advance.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__advance}{mod\+\_\+oasis\+\_\+advance}
-\begin{DoxyCompactList}\small\item\em Advances the O\+A\+S\+I\+S coupling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+module \hyperlink{namespacemod__oasis__advance}{mod\+\_\+oasis\+\_\+advance}
+\begin{DoxyCompactList}\small\item\em Advances the O\+A\+S\+IS coupling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__advance_a480bfe5b333300c1084af8f9c239a81d}{mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+init} (kinfo)
+\begin{DoxyCompactList}\small\item\em Initializes the O\+A\+S\+IS fields. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__advance_a932b0cbe5d1f5fa27c283c6472be7baf}{mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+run} (mop, varid, msec, kinfo, nff, namid, array1din, array1dout, array2dout, readrest, a2on, array2, a3on, array3, a4on, array4, a5on, array5, writrest, varnum)
+\begin{DoxyCompactList}\small\item\em Advances the O\+A\+S\+IS coupling. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__advance_a0514c843d051b8ee16adfb349eaee6a7}{mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+map} (av1, avd, mapper, conserv, consopt, avon, av2, av3, av4, av5, tstrinp)
+\begin{DoxyCompactList}\small\item\em Provides interpolation functionality. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__advance_acf8f4a02082ba2d9f32f0835ad14e11d}{mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+avsum} (av, sum, gsmap, mpicom, mask, wts, consopt)
+\begin{DoxyCompactList}\small\item\em A generic method for summing fields in an attribute vector. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__advance_af611b26fe4601ded488fd5d3c03b12a2}{mod\+\_\+oasis\+\_\+advance\+::oasis\+\_\+advance\+\_\+avdiag} (av, mpicom, mask, wts)
+\begin{DoxyCompactList}\small\item\em A generic method for writing the global sums of fields in an attribute vector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+logical, parameter \hyperlink{namespacemod__oasis__advance_ac617024af9299c27eaeb9156f647b028}{mod\+\_\+oasis\+\_\+advance\+::map\+\_\+barrier} = .false.
+\item 
+logical, parameter \hyperlink{namespacemod__oasis__advance_aad8e5c2e16b0270a7da0800a14ae1e07}{mod\+\_\+oasis\+\_\+advance\+::detailed\+\_\+map\+\_\+timing} = .false.
+\end{DoxyCompactItemize}

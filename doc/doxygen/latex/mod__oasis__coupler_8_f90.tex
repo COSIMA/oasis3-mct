@@ -1,12 +1,50 @@
-\hypertarget{mod__oasis__coupler_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.F90 File Reference}
-\label{mod__oasis__coupler_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.\+F90}}
-}
+\hypertarget{mod__oasis__coupler_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.F90 File Reference}
+\label{mod__oasis__coupler_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+coupler.\+F90}}
 \subsection*{Data Types}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__coupler}{mod\+\_\+oasis\+\_\+coupler}
-\begin{DoxyCompactList}\small\item\em Initialize the O\+A\+S\+I\+S coupler infrastructure. \end{DoxyCompactList}\item 
 type \hyperlink{structmod__oasis__coupler_1_1prism__router__type}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+router\+\_\+type}
 \begin{DoxyCompactList}\small\item\em Router information for rearranging data on tasks. \end{DoxyCompactList}\item 
 type \hyperlink{structmod__oasis__coupler_1_1prism__coupler__type}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+type}
-\begin{DoxyCompactList}\small\item\em Coupler data for managing all aspects of coupling in O\+A\+S\+I\+S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Coupler data for managing all aspects of coupling in O\+A\+S\+IS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__coupler}{mod\+\_\+oasis\+\_\+coupler}
+\begin{DoxyCompactList}\small\item\em Initialize the O\+A\+S\+IS coupler infrastructure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__coupler_ab48c4d4ee118f948ccc286eec5b509ec}{mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+setup} ()
+\begin{DoxyCompactList}\small\item\em Main routine to setup couplers. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__coupler_a5cb96db0ae7b837db934689a49df3da6}{mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+print} (cplid, pcprint)
+\begin{DoxyCompactList}\small\item\em Print routine for oasis\+\_\+couplers. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__coupler_a65adf0558cfd9a9d316bd22ad1f9dc23}{mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+bldvarname} (varid, varnum, vname)
+\begin{DoxyCompactList}\small\item\em Build a consistent variable name based on bundles. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__coupler_ad8c9a74a349ea4420ac38e2da2dc3cd2}{mod\+\_\+oasis\+\_\+coupler\+::oasis\+\_\+coupler\+\_\+unbldvarname} (varid, vname, varnum)
+\begin{DoxyCompactList}\small\item\em Deconstruct the varname based on oasis\+\_\+coupler\+\_\+bldvarname. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__coupler_a773e323d2275aff227e05e98ce97def1}{mod\+\_\+oasis\+\_\+coupler\+::cplfind} (num, fldlist, fld, ifind, nfind)
+\begin{DoxyCompactList}\small\item\em Search a character field list for a matching values. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+integer(kind=ip\+\_\+i4\+\_\+p), parameter, public \hyperlink{namespacemod__oasis__coupler_a6f166f099a134dffba97a168d28a3c01}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+avsmax} =5
+\begin{DoxyCompactList}\small\item\em maximum number of higher order terms in mapping \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{namespacemod__oasis__coupler_a6d46883e9df70ab9cdafaf607afacacb}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+mrouter}
+\begin{DoxyCompactList}\small\item\em max routers \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p) \hyperlink{namespacemod__oasis__coupler_a2ebdb255598e1b004de2533f16b06e04}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+nrouter} = 0
+\begin{DoxyCompactList}\small\item\em router counter \end{DoxyCompactList}\item 
+type(prism\+\_\+router\+\_\+type), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__coupler_a33dbf692ad73f83f73fe083e252badd8}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+router}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+router array \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__coupler_aaa019c39b0f657e7c37820697ecf354a}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+mcoupler}
+\begin{DoxyCompactList}\small\item\em max couplers \end{DoxyCompactList}\item 
+type(prism\+\_\+coupler\+\_\+type), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__coupler_ae59d8823993d9ca8610efd9770393271}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+put}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+coupler put array \end{DoxyCompactList}\item 
+type(prism\+\_\+coupler\+\_\+type), dimension(\+:), pointer, public \hyperlink{namespacemod__oasis__coupler_a96df3ef2ec1b53597bb9beca43fe8349}{mod\+\_\+oasis\+\_\+coupler\+::prism\+\_\+coupler\+\_\+get}
+\begin{DoxyCompactList}\small\item\em prism\+\_\+coupler get array \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__coupler_a0cb9b8a96c10385d38fa244d920c7eaf}{mod\+\_\+oasis\+\_\+coupler\+::lastseq}
+\begin{DoxyCompactList}\small\item\em last coupler sequence \end{DoxyCompactList}\item 
+integer(kind=ip\+\_\+i4\+\_\+p), public \hyperlink{namespacemod__oasis__coupler_a47f4727f94719892d837f6a1545d3d08}{mod\+\_\+oasis\+\_\+coupler\+::lastseqtime}
+\begin{DoxyCompactList}\small\item\em last coupler sequence time \end{DoxyCompactList}\item 
+logical, public \hyperlink{namespacemod__oasis__coupler_ab494fbbb8065f3a006892828f288e44a}{mod\+\_\+oasis\+\_\+coupler\+::allow\+\_\+no\+\_\+restart}
+\begin{DoxyCompactList}\small\item\em flag to allow no restart files at startup \end{DoxyCompactList}\end{DoxyCompactItemize}

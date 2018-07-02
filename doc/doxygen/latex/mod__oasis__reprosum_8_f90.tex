@@ -1,0 +1,37 @@
+\hypertarget{mod__oasis__reprosum_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+reprosum.F90 File Reference}
+\label{mod__oasis__reprosum_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+reprosum.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+reprosum.\+F90}}
+{\ttfamily \#include $<$mpif.\+h$>$}\newline
+\subsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+module \hyperlink{namespacemod__oasis__reprosum}{mod\+\_\+oasis\+\_\+reprosum}
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS reproducible sum method from P. Worley. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__reprosum_ad6b4914497a4961339a1c95bfb807660}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+setopts} (repro\+\_\+sum\+\_\+use\+\_\+ddpdd\+\_\+in, repro\+\_\+sum\+\_\+rel\+\_\+diff\+\_\+max\+\_\+in, repro\+\_\+sum\+\_\+recompute\+\_\+in, repro\+\_\+sum\+\_\+master, repro\+\_\+sum\+\_\+logunit)
+\begin{DoxyCompactList}\small\item\em Set runtime options. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__reprosum_a398280c78cff126b7622dbd96af675e4}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+calc} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, ddpdd\+\_\+sum, arr\+\_\+gbl\+\_\+max, arr\+\_\+gbl\+\_\+max\+\_\+out, arr\+\_\+max\+\_\+levels, arr\+\_\+max\+\_\+levels\+\_\+out, gbl\+\_\+max\+\_\+nsummands, gbl\+\_\+max\+\_\+nsummands\+\_\+out, gbl\+\_\+count, repro\+\_\+sum\+\_\+validate, repro\+\_\+sum\+\_\+stats, rel\+\_\+diff, commid)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. An alternative is to use an \char`\"{}almost
+ always reproducible\char`\"{} floating point algorithm. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__reprosum_a7ea3c5bad9db10c80eb528453602aed3}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+int} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, arr\+\_\+max\+\_\+shift, arr\+\_\+gmax\+\_\+exp, max\+\_\+levels, max\+\_\+level, validate, recompute, omp\+\_\+nthreads, mpi\+\_\+comm)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on a fixed point algorithm. The accuracy of the fixed point algorithm is controlled by the number of \char`\"{}levels\char`\"{} of integer expansion, the maximum value of which is specified by max\+\_\+level. \end{DoxyCompactList}\item 
+logical function, public \hyperlink{namespacemod__oasis__reprosum_a0f773341a7a6883b2f65d395a6b25b08}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+tolexceeded} (name, nflds, master, logunit, rel\+\_\+diff)
+\begin{DoxyCompactList}\small\item\em Test whether distributed sum exceeds tolerance and print out a warning message. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__reprosum_afe237975bf8e718f32523c3929911102}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+ddpdd} (arr, arr\+\_\+gsum, nsummands, dsummands, nflds, mpi\+\_\+comm)
+\begin{DoxyCompactList}\small\item\em Compute the global sum of each field in \char`\"{}arr\char`\"{} using the indicated communicator with a reproducible yet scalable implementation based on He and Ding\textquotesingle{}s implementation of the double-\/double algorithm. \end{DoxyCompactList}\item 
+subroutine, private \hyperlink{namespacemod__oasis__reprosum_a24f9efa3ca739811888206eaf71d4690}{mod\+\_\+oasis\+\_\+reprosum\+::ddpdd} (dda, ddb, len, itype)
+\item 
+subroutine, private \hyperlink{namespacemod__oasis__reprosum_affb09b4ec9b001bf2ebbc51feebd8004}{mod\+\_\+oasis\+\_\+reprosum\+::split\+\_\+indices} (total, num\+\_\+pieces, ibeg, iend)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+logical, public \hyperlink{namespacemod__oasis__reprosum_a89140c250e34a903bc9aa546574988d6}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+recompute} = .false.
+\item 
+real(r8), public \hyperlink{namespacemod__oasis__reprosum_a6a80f4226d35d0842617e6eb6c9406e1}{mod\+\_\+oasis\+\_\+reprosum\+::oasis\+\_\+reprosum\+\_\+reldiffmax} = -\/1.\+0\+\_\+r8
+\item 
+logical \hyperlink{namespacemod__oasis__reprosum_aab06d0de9a82726d347ac52bb276355d}{mod\+\_\+oasis\+\_\+reprosum\+::repro\+\_\+sum\+\_\+use\+\_\+ddpdd} = .false.
+\item 
+logical \hyperlink{namespacemod__oasis__reprosum_a48a084c213295b9eaa78c0552a10741a}{mod\+\_\+oasis\+\_\+reprosum\+::detailed\+\_\+timing} = .false.
+\end{DoxyCompactItemize}

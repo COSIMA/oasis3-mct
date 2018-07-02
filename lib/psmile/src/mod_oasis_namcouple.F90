@@ -706,6 +706,8 @@ END SUBROUTINE oasis_namcouple_init
 
 !===============================================================================
 
+!> Reads the namcouple to allocate arrays
+
 SUBROUTINE inipar_alloc()
 
 !****
@@ -1548,6 +1550,8 @@ SUBROUTINE inipar_alloc()
 END SUBROUTINE inipar_alloc
 
 !===============================================================================
+
+!> Reads, sets, and prints the namcouple file
 
 SUBROUTINE inipar
 
@@ -2768,6 +2772,8 @@ END SUBROUTINE inipar
 
 !===============================================================================
  
+!> Allocates temporary arrays for namcouple input
+
 SUBROUTINE alloc()
 
   IMPLICIT NONE
@@ -3041,7 +3047,9 @@ END SUBROUTINE alloc
 
 !===============================================================================
 
-SUBROUTINE dealloc
+!> Deallocates temporary arrays for namcouple input
+
+SUBROUTINE dealloc()
 
   IMPLICIT NONE
 
@@ -3232,6 +3240,8 @@ END SUBROUTINE dealloc
 
 !===============================================================================
 
+!> Prints information passed by argument
+
 SUBROUTINE prtout(cdtext, kvalue, kstyle)
 
 !****
@@ -3287,8 +3297,9 @@ SUBROUTINE prtout(cdtext, kvalue, kstyle)
 !
 !* ---------------------------- Argument declarations ----------------------
 !
-  CHARACTER(len=*),intent(in) :: cdtext
-  INTEGER (kind=ip_intwp_p),intent(in) :: kvalue, kstyle
+  CHARACTER(len=*),intent(in) :: cdtext  !< character string to be printed
+  INTEGER (kind=ip_intwp_p),intent(in) :: kvalue  !< integer to be printed
+  INTEGER (kind=ip_intwp_p),intent(in) :: kstyle  !< printing style
 
 !* ---------------------------- Local declarations ----------------------
 
@@ -3337,6 +3348,8 @@ END SUBROUTINE prtout
 
 !===============================================================================
 
+!> Searches for a particular keyword in the namcouple file
+
 SUBROUTINE findkeyword (keyword, line, found)
 
 !****
@@ -3379,9 +3392,9 @@ SUBROUTINE findkeyword (keyword, line, found)
 !
 !* ---------------------------- Argument declarations -------------------
 !
-  CHARACTER (len=*)        , INTENT ( in) :: keyword
-  CHARACTER (len=*)        , INTENT (out) :: line
-  LOGICAL                  , INTENT (out) :: found
+  CHARACTER (len=*)        , INTENT ( in) :: keyword  !< keyword string
+  CHARACTER (len=*)        , INTENT (out) :: line     !< line containing keyword
+  LOGICAL                  , INTENT (out) :: found    !< flag if keyword was found
 !
 !* ---------------------------- Local declarations -------------------
 !
@@ -3427,6 +3440,8 @@ END SUBROUTINE findkeyword
 
 !===============================================================================
 
+!< Checks whether a line is a comment line
+
 LOGICAL FUNCTION checkcomment (line)
 
 !****
@@ -3468,7 +3483,7 @@ LOGICAL FUNCTION checkcomment (line)
 !
 !* ---------------------------- Argument declarations -------------------
 !
-  CHARACTER (len=*)        , INTENT (in) :: line
+  CHARACTER (len=*)        , INTENT (in) :: line  !< input character line
 !
 !* ---------------------------- Local declarations -------------------
 !
@@ -3495,6 +3510,8 @@ LOGICAL FUNCTION checkcomment (line)
 END FUNCTION checkcomment
 
 !===============================================================================
+
+!> Subroutine to parse string
 
 SUBROUTINE parse (cdone, cdtwo, knumb, klen, kleng, line)
 
@@ -3556,10 +3573,12 @@ SUBROUTINE parse (cdone, cdtwo, knumb, klen, kleng, line)
 !
 !* ---------------------------- Argument declarations -------------------
 !
-  INTEGER (kind=ip_intwp_p), INTENT ( in) :: knumb, klen, line
-  CHARACTER (len=*), INTENT ( inout) :: cdone 
-  CHARACTER (len=*), INTENT ( out) :: cdtwo
-  INTEGER (kind=ip_intwp_p), INTENT ( out) :: kleng
+  CHARACTER (len=*)      , INTENT (inout) :: cdone !< line to parse
+  INTEGER (kind=ip_intwp_p), INTENT ( in) :: knumb !< rank within line of extracted string
+  INTEGER (kind=ip_intwp_p), INTENT ( in) :: klen  !< length of input line
+  INTEGER (kind=ip_intwp_p), INTENT ( in) :: line  !< file line number of call
+  CHARACTER (len=*)        , INTENT (out) :: cdtwo !< extracted string
+  INTEGER (kind=ip_intwp_p), INTENT (out) :: kleng !< length of extracted string
 !
 !* ---------------------------- Local declarations -------------------
 !
@@ -3635,6 +3654,8 @@ END SUBROUTINE parse
 
 !===============================================================================
 
+!< subroutine to fine next non-comment line
+
 SUBROUTINE skip (cd_one, id_len, endflag, ios)
 
 !**** SKIP
@@ -3675,10 +3696,10 @@ SUBROUTINE skip (cd_one, id_len, endflag, ios)
 !
 !** ++ Argument declarations
 !
-  CHARACTER(len=*),intent(inout)       :: cd_one
-  INTEGER (kind=ip_intwp_p),intent(in) :: id_len
-  LOGICAL, optional, intent(inout)     :: endflag
-  INTEGER (kind=ip_intwp_p), OPTIONAL, INTENT(out) :: ios
+  CHARACTER(len=*),intent(inout)       :: cd_one !< namcouple line
+  INTEGER (kind=ip_intwp_p),intent(in) :: id_len !< length of line
+  LOGICAL, optional, intent(inout)     :: endflag !< flag indicating eof reached
+  INTEGER (kind=ip_intwp_p), OPTIONAL, INTENT(out) :: ios !< return code
 !
 !** ++ Local declarations
 !
@@ -3719,17 +3740,19 @@ END SUBROUTINE skip
 
 !*========================================================================
 
+!> Subroutine that calls abort in this module
+
 SUBROUTINE namcouple_abort(isubname,lineno,string1,string2,string3,string4)
 
   ! * Reusable Abort routine
 
   IMPLICIT NONE
-  CHARACTER(len=*),intent(in) :: isubname
-  INTEGER         ,intent(in) :: lineno
-  CHARACTER(len=*),intent(in),optional :: string1
-  CHARACTER(len=*),intent(in),optional :: string2
-  CHARACTER(len=*),intent(in),optional :: string3
-  CHARACTER(len=*),intent(in),optional :: string4
+  CHARACTER(len=*),intent(in) :: isubname  !< subroutine name of abort
+  INTEGER         ,intent(in) :: lineno    !< file line number
+  CHARACTER(len=*),intent(in),optional :: string1 !< optional output string
+  CHARACTER(len=*),intent(in),optional :: string2 !< optional output string
+  CHARACTER(len=*),intent(in),optional :: string3 !< optional output string
+  CHARACTER(len=*),intent(in),optional :: string4 !< optional output string
 
 !** ++ Local declarations
 

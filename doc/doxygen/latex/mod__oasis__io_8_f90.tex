@@ -1,8 +1,34 @@
-\hypertarget{mod__oasis__io_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.F90 File Reference}
-\label{mod__oasis__io_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__io_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.F90 File Reference}
+\label{mod__oasis__io_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+io.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__io}{mod\+\_\+oasis\+\_\+io}
-\begin{DoxyCompactList}\small\item\em Provides reusable I\+O routines for O\+A\+S\+I\+S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+module \hyperlink{namespacemod__oasis__io}{mod\+\_\+oasis\+\_\+io}
+\begin{DoxyCompactList}\small\item\em Provides reusable IO routines for O\+A\+S\+IS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+logical function, public \hyperlink{namespacemod__oasis__io_a4d0f5cb29eabc798e857127c8c174d85}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+varexists} (filename, fldname)
+\begin{DoxyCompactList}\small\item\em Checks whether the var fldname is in the file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a6c14bebb7b216218e25f599e3469ae0c}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfld} (filename, av, gsmap, mpicom, avfld, filefld, fldtype)
+\begin{DoxyCompactList}\small\item\em Reads single field from a file into an attribute Vector. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_ad8a48d6c36e3fac637a8191c20e514f2}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+avfile} (rstfile, av, gsmap, mpicom, nx, ny, nampre)
+\begin{DoxyCompactList}\small\item\em Writes all fields from an attribute vector to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a65e17e4a065e8e4dea33754fb9c1d32c}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfile} (rstfile, av, gsmap, mpicom, abort, nampre, didread)
+\begin{DoxyCompactList}\small\item\em Reads all fields for an attribute vector from a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a8b604f89345d74c74c6bc3b4760b2e29}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+array} (rstfile, mpicom, iarray, ivarname, rarray, rvarname, abort)
+\begin{DoxyCompactList}\small\item\em Reads an integer or real field from a file into an array. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a9ac8ce0ba3223fb59f7f003b50b229cf}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+array} (rstfile, mpicom, iarray, ivarname, rarray, rvarname)
+\begin{DoxyCompactList}\small\item\em Writes a real or integer array to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a42b325557a774b08d4cba24f387f8b01}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+avfbf} (av, gsmap, mpicom, nx, ny, msec, f\+\_\+string, filename)
+\begin{DoxyCompactList}\small\item\em Write each field in an attribute vector to an individual files. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_ac4a465a698824fb473074bfbd3d92f79}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+avfbf} (av, gsmap, mpicom, msec, f\+\_\+string, filename)
+\begin{DoxyCompactList}\small\item\em Read each field in an attribute vector from individual files. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_af080505b4678a5c68916a700f54ac6e6}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+read\+\_\+field\+\_\+fromroot} (filename, fldname, ifld2, fld2, fld3, nx, ny, nz)
+\begin{DoxyCompactList}\small\item\em Read a field on the root task from a file into an array. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a18912324646473cf8fedd7138cc59a79}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+2dgridfld\+\_\+fromroot} (filename, fldname, fld, nx, ny)
+\begin{DoxyCompactList}\small\item\em Write a real array named field from the root task to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_a432ecb26e0e2d8387c1601ea6cc68668}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+2dgridint\+\_\+fromroot} (filename, fldname, fld, nx, ny)
+\begin{DoxyCompactList}\small\item\em Write an integer array named field from the root task to a file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__io_aa967e930e5d6199bbc6ec9a4f3c7069e}{mod\+\_\+oasis\+\_\+io\+::oasis\+\_\+io\+\_\+write\+\_\+3dgridfld\+\_\+fromroot} (filename, fldname, fld, nx, ny, nc)
+\begin{DoxyCompactList}\small\item\em Write a 3d real array named field from the root task to a file. \end{DoxyCompactList}\end{DoxyCompactItemize}

@@ -1,9 +1,8 @@
-\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+gatherv Interface Reference}
+\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}{}\section{mod\+\_\+oasis\+\_\+mpi\+:\+:oasis\+\_\+mpi\+\_\+gatherv Interface Reference}
 \label{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv}\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv}}
-}
 
 
-Generic interfaces into an M\+P\+I vector gather.  
+Generic interfaces into an M\+PI vector gather.  
 
 
 \subsection*{Private Member Functions}
@@ -14,27 +13,19 @@ subroutine \hyperlink{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv_a8d17b5a33
 
 
 \subsection{Detailed Description}
-Generic interfaces into an M\+P\+I vector gather. 
+Generic interfaces into an M\+PI vector gather. 
 
 Definition at line 78 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 
 
 \subsection{Member Function/\+Subroutine Documentation}
-\hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv_a8d17b5a337d8ebec5160dfb891c6a715}{\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv}!oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}}
+\mbox{\Hypertarget{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv_a8d17b5a337d8ebec5160dfb891c6a715}\label{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv_a8d17b5a337d8ebec5160dfb891c6a715}} 
+\index{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv}!oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}}
 \index{oasis\+\_\+mpi\+\_\+gathervr1@{oasis\+\_\+mpi\+\_\+gathervr1}!mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv@{mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv}}
-\subsubsection[{oasis\+\_\+mpi\+\_\+gathervr1}]{\setlength{\rightskip}{0pt plus 5cm}subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv\+::oasis\+\_\+mpi\+\_\+gathervr1 (
-\begin{DoxyParamCaption}
-\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{locarr, }
-\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{loc\+Size, }
-\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(inout)}]{glob1\+D\+Arr, }
-\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{glob\+Size, }
-\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{displs, }
-\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid, }
-\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm, }
-\item[{character($\ast$), intent(in), optional}]{string}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [private]}}}\label{interfacemod__oasis__mpi_1_1oasis__mpi__gatherv_a8d17b5a337d8ebec5160dfb891c6a715}
+\subsubsection{\texorpdfstring{oasis\+\_\+mpi\+\_\+gathervr1()}{oasis\_mpi\_gathervr1()}}
+{\footnotesize\ttfamily subroutine mod\+\_\+oasis\+\_\+mpi\+::oasis\+\_\+mpi\+\_\+gatherv\+::oasis\+\_\+mpi\+\_\+gathervr1 (\begin{DoxyParamCaption}\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(in)}]{locarr,  }\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{loc\+Size,  }\item[{real(ip\+\_\+double\+\_\+p), dimension(\+:), intent(inout)}]{glob1\+D\+Arr,  }\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{glob\+Size,  }\item[{integer(ip\+\_\+i4\+\_\+p), dimension(\+:), intent(in)}]{displs,  }\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{rootid,  }\item[{integer(ip\+\_\+i4\+\_\+p), intent(in)}]{comm,  }\item[{character($\ast$), intent(in), optional}]{string }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
 
 
 Gather a vector of distributed data to a rootid. 
@@ -45,15 +36,15 @@ This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyp
 \begin{DoxyParams}[1]{Parameters}
 \mbox{\tt in}  & {\em locarr} & Local array\\
 \hline
-\mbox{\tt in,out}  & {\em glob1darr} & Global 1\+D array to receive in on\\
+\mbox{\tt in,out}  & {\em glob1darr} & Global 1D array to receive in on\\
 \hline
-\mbox{\tt in}  & {\em locsize} & Number to send from this P\+E\\
+\mbox{\tt in}  & {\em locsize} & Number to send from this PE\\
 \hline
-\mbox{\tt in}  & {\em globsize} & Number to receive from each P\+E\\
+\mbox{\tt in}  & {\em globsize} & Number to receive from each PE\\
 \hline
 \mbox{\tt in}  & {\em displs} & Displacements for receives\\
 \hline
-\mbox{\tt in}  & {\em rootid} & M\+P\+I task to gather on\\
+\mbox{\tt in}  & {\em rootid} & M\+PI task to gather on\\
 \hline
 \mbox{\tt in}  & {\em comm} & mpi communicator\\
 \hline
@@ -62,10 +53,10 @@ This method passes in glob1\+D\+Arr, glob\+Size, and displs computed in the \hyp
 \end{DoxyParams}
 
 
-Definition at line 1134 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
+Definition at line 1142 of file mod\+\_\+oasis\+\_\+mpi.\+F90.
 
 
 
 The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
-/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}
+/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/\hyperlink{mod__oasis__mpi_8_f90}{mod\+\_\+oasis\+\_\+mpi.\+F90}\end{DoxyCompactItemize}

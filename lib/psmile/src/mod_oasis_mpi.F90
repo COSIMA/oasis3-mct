@@ -173,7 +173,7 @@ SUBROUTINE oasis_mpi_sendi0(lvec,pid,tag,comm,string)
    !----- arguments ---
    integer(ip_i4_p), intent(in) :: lvec     !< send value
    integer(ip_i4_p), intent(in) :: pid      !< pid to send to
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -213,7 +213,7 @@ SUBROUTINE oasis_mpi_sendi1(lvec,pid,tag,comm,string)
    !----- arguments ---
    integer(ip_i4_p), intent(in) :: lvec(:)  !< send values
    integer(ip_i4_p), intent(in) :: pid      !< pid to send to
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -253,7 +253,7 @@ SUBROUTINE oasis_mpi_sendr0(lvec,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(in) :: lvec     !< send values
    integer(ip_i4_p), intent(in) :: pid      !< pid to send to
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -293,7 +293,7 @@ SUBROUTINE oasis_mpi_sendr1(lvec,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(in) :: lvec(:)  !< send values
    integer(ip_i4_p), intent(in) :: pid      !< pid to send to
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -333,7 +333,7 @@ SUBROUTINE oasis_mpi_sendr3(array,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(in) :: array(:,:,:)  !< send values
    integer(ip_i4_p), intent(in) :: pid           !< pid to send to
-   integer(ip_i4_p), intent(in) :: tag           !< tag
+   integer(ip_i4_p), intent(in) :: tag           !< mpi tag
    integer(ip_i4_p), intent(in) :: comm          !< mpi communicator
    character(*),optional,intent(in) :: string        !< to identify caller
 
@@ -373,7 +373,7 @@ SUBROUTINE oasis_mpi_recvi0(lvec,pid,tag,comm,string)
    !----- arguments ---
    integer(ip_i4_p), intent(out):: lvec     !< receive values
    integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -414,7 +414,7 @@ SUBROUTINE oasis_mpi_recvi1(lvec,pid,tag,comm,string)
    !----- arguments ---
    integer(ip_i4_p), intent(out):: lvec(:)  !< receive values
    integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -455,7 +455,7 @@ SUBROUTINE oasis_mpi_recvr0(lvec,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(out):: lvec     !< receive values
    integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -496,7 +496,7 @@ SUBROUTINE oasis_mpi_recvr1(lvec,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(out):: lvec(:)  !< receive values
    integer(ip_i4_p), intent(in) :: pid      !< pid to recv from
-   integer(ip_i4_p), intent(in) :: tag      !< tag
+   integer(ip_i4_p), intent(in) :: tag      !< mpi tag
    integer(ip_i4_p), intent(in) :: comm     !< mpi communicator
    character(*),optional,intent(in) :: string   !< to identify caller
 
@@ -537,7 +537,7 @@ SUBROUTINE oasis_mpi_recvr3(array,pid,tag,comm,string)
    !----- arguments ---
    real(ip_double_p),intent(out):: array(:,:,:)  !< receive values
    integer(ip_i4_p), intent(in) :: pid           !< pid to recv from
-   integer(ip_i4_p), intent(in) :: tag           !< tag
+   integer(ip_i4_p), intent(in) :: tag           !< mpi tag
    integer(ip_i4_p), intent(in) :: comm          !< mpi communicator
    character(*),optional,intent(in) :: string        !< to identify caller
 

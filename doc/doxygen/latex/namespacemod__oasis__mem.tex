@@ -1,0 +1,113 @@
+\hypertarget{namespacemod__oasis__mem}{}\section{mod\+\_\+oasis\+\_\+mem Module Reference}
+\label{namespacemod__oasis__mem}\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+
+
+Provides methods for querying memory use.  
+
+
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_a104b7e7e85cd79e731a6e12a14358bbb}{oasis\+\_\+mem\+\_\+init} (iunit)
+\begin{DoxyCompactList}\small\item\em Initialize memory conversion to MB. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_a2e20a40b48c7a7572f72da1b5d109ce3}{oasis\+\_\+mem\+\_\+getusage} (r\+\_\+msize, r\+\_\+mrss)
+\begin{DoxyCompactList}\small\item\em Determine memory use. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__mem_ac628b504553edbe9345cd070a8db2634}{oasis\+\_\+mem\+\_\+print} (iunit, string)
+\begin{DoxyCompactList}\small\item\em Print memory use. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+real(ip\+\_\+double\+\_\+p) \hyperlink{namespacemod__oasis__mem_a7c262f1c120ed57d527ee3de91552ee9}{mb\+\_\+blk} = 1.\+0\+\_\+ip\+\_\+double\+\_\+p
+\item 
+logical \hyperlink{namespacemod__oasis__mem_aad83c95e1a17a31825eb9c4e1c663aa1}{initset} = .false.
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Provides methods for querying memory use. 
+
+\subsection{Function/\+Subroutine Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__mem_a2e20a40b48c7a7572f72da1b5d109ce3}\label{namespacemod__oasis__mem_a2e20a40b48c7a7572f72da1b5d109ce3}} 
+\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}!oasis\+\_\+mem\+\_\+getusage@{oasis\+\_\+mem\+\_\+getusage}}
+\index{oasis\+\_\+mem\+\_\+getusage@{oasis\+\_\+mem\+\_\+getusage}!mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+\subsubsection{\texorpdfstring{oasis\+\_\+mem\+\_\+getusage()}{oasis\_mem\_getusage()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+getusage (\begin{DoxyParamCaption}\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{r\+\_\+msize,  }\item[{real(ip\+\_\+double\+\_\+p), intent(out)}]{r\+\_\+mrss }\end{DoxyParamCaption})}
+
+
+
+Determine memory use. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em r\+\_\+msize} & memory usage value\\
+\hline
+\mbox{\tt out}  & {\em r\+\_\+mrss} & memory usage value \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 88 of file mod\+\_\+oasis\+\_\+mem.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__mem_a104b7e7e85cd79e731a6e12a14358bbb}\label{namespacemod__oasis__mem_a104b7e7e85cd79e731a6e12a14358bbb}} 
+\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}!oasis\+\_\+mem\+\_\+init@{oasis\+\_\+mem\+\_\+init}}
+\index{oasis\+\_\+mem\+\_\+init@{oasis\+\_\+mem\+\_\+init}!mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+\subsubsection{\texorpdfstring{oasis\+\_\+mem\+\_\+init()}{oasis\_mem\_init()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+init (\begin{DoxyParamCaption}\item[{integer, optional}]{iunit }\end{DoxyParamCaption})}
+
+
+
+Initialize memory conversion to MB. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em iunit} & output unit number for optional writes \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 34 of file mod\+\_\+oasis\+\_\+mem.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__mem_ac628b504553edbe9345cd070a8db2634}\label{namespacemod__oasis__mem_ac628b504553edbe9345cd070a8db2634}} 
+\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}!oasis\+\_\+mem\+\_\+print@{oasis\+\_\+mem\+\_\+print}}
+\index{oasis\+\_\+mem\+\_\+print@{oasis\+\_\+mem\+\_\+print}!mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+\subsubsection{\texorpdfstring{oasis\+\_\+mem\+\_\+print()}{oasis\_mem\_print()}}
+{\footnotesize\ttfamily subroutine, public mod\+\_\+oasis\+\_\+mem\+::oasis\+\_\+mem\+\_\+print (\begin{DoxyParamCaption}\item[{integer, intent(in)}]{iunit,  }\item[{character(len=$\ast$), intent(in), optional}]{string }\end{DoxyParamCaption})}
+
+
+
+Print memory use. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em iunit} & unit number to write to\\
+\hline
+\mbox{\tt in}  & {\em string} & optional string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 119 of file mod\+\_\+oasis\+\_\+mem.\+F90.
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacemod__oasis__mem_aad83c95e1a17a31825eb9c4e1c663aa1}\label{namespacemod__oasis__mem_aad83c95e1a17a31825eb9c4e1c663aa1}} 
+\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}!initset@{initset}}
+\index{initset@{initset}!mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+\subsubsection{\texorpdfstring{initset}{initset}}
+{\footnotesize\ttfamily logical mod\+\_\+oasis\+\_\+mem\+::initset = .false.\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 25 of file mod\+\_\+oasis\+\_\+mem.\+F90.
+
+\mbox{\Hypertarget{namespacemod__oasis__mem_a7c262f1c120ed57d527ee3de91552ee9}\label{namespacemod__oasis__mem_a7c262f1c120ed57d527ee3de91552ee9}} 
+\index{mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}!mb\+\_\+blk@{mb\+\_\+blk}}
+\index{mb\+\_\+blk@{mb\+\_\+blk}!mod\+\_\+oasis\+\_\+mem@{mod\+\_\+oasis\+\_\+mem}}
+\subsubsection{\texorpdfstring{mb\+\_\+blk}{mb\_blk}}
+{\footnotesize\ttfamily real(ip\+\_\+double\+\_\+p) mod\+\_\+oasis\+\_\+mem\+::mb\+\_\+blk = 1.\+0\+\_\+ip\+\_\+double\+\_\+p\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 24 of file mod\+\_\+oasis\+\_\+mem.\+F90.
+

@@ -1,19 +1,87 @@
-\hypertarget{mod__oasis__string_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.F90 File Reference}
-\label{mod__oasis__string_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__string_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.F90 File Reference}
+\label{mod__oasis__string_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+string.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__string}{mod\+\_\+oasis\+\_\+string}
+module \hyperlink{namespacemod__oasis__string}{mod\+\_\+oasis\+\_\+string}
 \begin{DoxyCompactList}\small\item\em Character string manipulation methods. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{mod__oasis__string_8_f90_a732dc6b61280242f5cf9c6b817dfd452}{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}
 \end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+integer function, public \hyperlink{namespacemod__oasis__string_a54c5d197eba9bcb7fa7f71b200f8e5e6}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+countchar} (str, char, rc)
+\begin{DoxyCompactList}\small\item\em Count number of occurances of a single character in a string. \end{DoxyCompactList}\item 
+character(len=len(str)) function, public \hyperlink{namespacemod__oasis__string_a832ff1d26d766bee361ef9669efacda6}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+toupper} (str)
+\begin{DoxyCompactList}\small\item\em Convert the input string to upper-\/case. \end{DoxyCompactList}\item 
+character(len=len(str)) function, public \hyperlink{namespacemod__oasis__string_af339c54c982092a80960a5241ccae1fa}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+tolower} (str)
+\begin{DoxyCompactList}\small\item\em Convert the input string to lower-\/case. \end{DoxyCompactList}\item 
+character(len=len(str)) function, public \hyperlink{namespacemod__oasis__string_a8f2289f6a9d1e9940204bbeb82b89f33}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+getparentdir} (str)
+\begin{DoxyCompactList}\small\item\em Get the parent directory pathname. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{namespacemod__oasis__string_afae0db32f2cf0b6beb00829f8f016e48}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+lastindex} (string, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the index of the last occurance of a substring within a string. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{namespacemod__oasis__string_a600ed4bd6221a0195d242076217377b4}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+endindex} (string, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the ending index of the first occurance of a substring within string. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a1d525e36684a0a574b74a2aace51324a}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+leftalign} (str, rc)
+\begin{DoxyCompactList}\small\item\em Remove leading white space. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_af123aee419f09309d1ded79ae41243bd}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+alphanum} (str, rc)
+\begin{DoxyCompactList}\small\item\em Remove all non alpha numeric characters from string. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a465ffaf8d7c5462f3de8595934d58c8d}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+betweentags} (string, start\+Tag, end\+Tag, substr, rc)
+\begin{DoxyCompactList}\small\item\em Get the substring found between the start and end strings. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a2f7bae9ccc5d2c48c14f3a1525a6c234}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+parsecftunit} (string, unit, bdate, bsec, rc)
+\begin{DoxyCompactList}\small\item\em Parse CF time unit into a delta string name and a base time in yyyymmdd. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_aaf462e055c2c6136ef5d142d03355673}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+clean} (string, rc)
+\begin{DoxyCompactList}\small\item\em Clean a string, set it to blank. \end{DoxyCompactList}\item 
+logical function, public \hyperlink{namespacemod__oasis__string_ae8c50e9742e1f24cc0d7bfa9d476cd95}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listisvalid} (list, rc)
+\begin{DoxyCompactList}\small\item\em Determine whether string is a valid list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a4d3a28944ce786f4d8d8a9555c63f8cd}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetname} (list, k, name, rc)
+\begin{DoxyCompactList}\small\item\em Get name of k-\/th field in list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a8b9648bf4eb3a2373f1fac49e572436f}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listintersect} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Get intersection of two fields lists, write into third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a3482d80f258c8062e8dd0d4eff8135b7}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listunion} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Get union of two fields lists, write into third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_adb1544a078e3abd743749f857fca5aee}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listmerge} (list1, list2, listout, rc)
+\begin{DoxyCompactList}\small\item\em Merge two lists into a third list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a47bd1c6d7ee6ea7dcec169fa140481aa}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listappend} (list, listadd, rc)
+\begin{DoxyCompactList}\small\item\em Append one list to another. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a7df42cce90ae7fa5eceb0b9f2e4bf169}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listprepend} (listadd, list, rc)
+\begin{DoxyCompactList}\small\item\em Prepend one list to another. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{namespacemod__oasis__string_a66bedb9c90f129c44087bf3f3c26bdb7}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetindexf} (string, fld\+Str)
+\begin{DoxyCompactList}\small\item\em Get the index of a field in a list. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a6e2bf29a9030f16e3a58d0302ab793f2}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetindex} (string, fld\+Str, k\+Fld, print, rc)
+\begin{DoxyCompactList}\small\item\em Get the index of a field in a string. \end{DoxyCompactList}\item 
+integer function, public \hyperlink{namespacemod__oasis__string_a15a49e6a71df520424402a753be10bb1}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetnum} (str)
+\begin{DoxyCompactList}\small\item\em return number of fields in string list \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a4229e0726d97fc10f17027caea332daf}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listsetdel} (cflag)
+\begin{DoxyCompactList}\small\item\em Set field delimeter character in lists. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a0ed07993c2e7d09baffe933c6075f154}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+listgetdel} (del)
+\begin{DoxyCompactList}\small\item\em Get field delimeter character in lists. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_a10977c4902f912074ef3effd86630a24}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+setabort} (flag)
+\begin{DoxyCompactList}\small\item\em Set local oasis\+\_\+string abort flag, true = abort, false = print and continue. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__string_af5c49843654a2bc9ccedf2934571329d}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+setdebug} (i\+Flag)
+\begin{DoxyCompactList}\small\item\em Set local oasis\+\_\+string debug level, 0 = production. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__string_a86c2c26b793c41219bc833beb992d0e3}{mod\+\_\+oasis\+\_\+string\+::oasis\+\_\+string\+\_\+abort} (string)
+\begin{DoxyCompactList}\small\item\em Supports aborts in the string module. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+character(len=1), save \hyperlink{namespacemod__oasis__string_aa6f905efb4869a52d8bb2414e82bb0a7}{mod\+\_\+oasis\+\_\+string\+::listdel} = \char`\"{}\+:\char`\"{}
+\item 
+character(len=2), save \hyperlink{namespacemod__oasis__string_a9b40ad6f4785bd4765a24b6337185513}{mod\+\_\+oasis\+\_\+string\+::listdel2} = \char`\"{}\+::\char`\"{}
+\item 
+logical, save \hyperlink{namespacemod__oasis__string_a59e9b1145c7c14506941e6495b237395}{mod\+\_\+oasis\+\_\+string\+::doabort} = .true.
+\item 
+integer(ip\+\_\+i4\+\_\+p), save \hyperlink{namespacemod__oasis__string_a84408befb8bedabf75507eb4d690cea9}{mod\+\_\+oasis\+\_\+string\+::debug} = 0
+\end{DoxyCompactItemize}
 
 
 \subsection{Macro Definition Documentation}
-\hypertarget{mod__oasis__string_8_f90_a732dc6b61280242f5cf9c6b817dfd452}{\index{mod\+\_\+oasis\+\_\+string.\+F90@{mod\+\_\+oasis\+\_\+string.\+F90}!N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a@{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}}
+\mbox{\Hypertarget{mod__oasis__string_8_f90_a732dc6b61280242f5cf9c6b817dfd452}\label{mod__oasis__string_8_f90_a732dc6b61280242f5cf9c6b817dfd452}} 
+\index{mod\+\_\+oasis\+\_\+string.\+F90@{mod\+\_\+oasis\+\_\+string.\+F90}!N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a@{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}}
 \index{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a@{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}!mod\+\_\+oasis\+\_\+string.\+F90@{mod\+\_\+oasis\+\_\+string.\+F90}}
-\subsubsection[{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}}\label{mod__oasis__string_8_f90_a732dc6b61280242f5cf9c6b817dfd452}
+\subsubsection{\texorpdfstring{N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}{NEW\_LGI\_METHOD2a}}
+{\footnotesize\ttfamily \#define N\+E\+W\+\_\+\+L\+G\+I\+\_\+\+M\+E\+T\+H\+O\+D2a}
+

@@ -1,8 +1,59 @@
-\hypertarget{mod__oasis__sys_8_f90}{\section{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.F90 File Reference}
-\label{mod__oasis__sys_8_f90}\index{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.\+F90@{/\+Users/tcraig/\+Desktop/oasis/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.\+F90}}
-}
-\subsection*{Data Types}
+\hypertarget{mod__oasis__sys_8_f90}{}\section{/home/globc2/tcraig/oasis3-\/mct.trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.F90 File Reference}
+\label{mod__oasis__sys_8_f90}\index{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.\+F90@{/home/globc2/tcraig/oasis3-\/mct.\+trunk/lib/psmile/src/mod\+\_\+oasis\+\_\+sys.\+F90}}
+\subsection*{Modules}
 \begin{DoxyCompactItemize}
 \item 
-module \hyperlink{classmod__oasis__sys}{mod\+\_\+oasis\+\_\+sys}
+module \hyperlink{namespacemod__oasis__sys}{mod\+\_\+oasis\+\_\+sys}
 \begin{DoxyCompactList}\small\item\em System type methods. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions/\+Subroutines}
+\begin{DoxyCompactItemize}
+\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_af1943a0ce0c5765ba8a714379065464f}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+abort} (id\+\_\+compid, cd\+\_\+routine, cd\+\_\+message, file, line, rcode)
+\begin{DoxyCompactList}\small\item\em O\+A\+S\+IS abort method, publically available to users. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ad152b6f737a7e06f8f1226af23d66361}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+flush} (nu)
+\begin{DoxyCompactList}\small\item\em Flushes output to file. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_abce4c06d8a999919a2a185c71ab15edd}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitget} (uio)
+\begin{DoxyCompactList}\small\item\em Get a free unit number. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a063a41b73546564afd294fd5708b6667}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitsetmin} (uio)
+\begin{DoxyCompactList}\small\item\em Set the minimum unit number allowed. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a6e0a46b41f1b9f0a1dc99b17665f49dc}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitsetmax} (uio)
+\begin{DoxyCompactList}\small\item\em Set the maximum unit number allowed. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a892ed9f46e2e8f577f1a2670f74695d6}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+unitfree} (uio)
+\begin{DoxyCompactList}\small\item\em Release a unit number for reuse. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ab963e928a34a1521ec2c1921cc956cc5}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+enter} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is entered, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a349f71cba2df935179d78f3858992c83}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+exit} (string)
+\begin{DoxyCompactList}\small\item\em Used when a subroutine is exited, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a8e488f6a9a829762324519c6dd493912}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+debug\+\_\+note} (string)
+\begin{DoxyCompactList}\small\item\em Used to write information from a subroutine, write info to log file at some debug level. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ab2aa592727d1e5bea728281679d5ca8d}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sortc} (num, fld, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort a character array and compute a sort key. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_a0deb9712f58a255d6ae938af2ed8b35c}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sorti} (num, fld, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort a integer array and compute a sort key. \end{DoxyCompactList}\item 
+subroutine, public \hyperlink{namespacemod__oasis__sys_ae73e75ed1a8aaba9da01d79ad3276e13}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+sortikey} (num, arr, sortkey)
+\begin{DoxyCompactList}\small\item\em Sort an integer array using a sort key. \end{DoxyCompactList}\item 
+recursive subroutine \hyperlink{namespacemod__oasis__sys_a30b91b7cab02c85d85fb7a7debdd5ec2}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergesortc} (N, A, T, S, Z)
+\begin{DoxyCompactList}\small\item\em Generic oasis\+\_\+sys\+\_\+mergesortC routine for character strings. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__sys_a27e13d259fbecbfe09e750d16f50ef25}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergec} (A, X, NA, B, Y, NB, C, Z, NC)
+\begin{DoxyCompactList}\small\item\em Merge routine needed for mergesortC for character strings. \end{DoxyCompactList}\item 
+recursive subroutine \hyperlink{namespacemod__oasis__sys_a298b27e03ff339d56eda3c5b31115781}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergesorti} (N, A, T, S, Z)
+\begin{DoxyCompactList}\small\item\em Generic oasis\+\_\+sys\+\_\+mergesortI routine for an integer array. \end{DoxyCompactList}\item 
+subroutine \hyperlink{namespacemod__oasis__sys_a5384f02abfdf4a5cee0706ddefecde87}{mod\+\_\+oasis\+\_\+sys\+::oasis\+\_\+sys\+\_\+mergei} (A, X, NA, B, Y, NB, C, Z, NC)
+\begin{DoxyCompactList}\small\item\em Merge routine needed for mergesortI for integer array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_aad26202d309c5b33de4cddb54c7edc99}{mod\+\_\+oasis\+\_\+sys\+::astr} = \textquotesingle{} A\+B\+O\+R\+T\+: \textquotesingle{}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_a0f6e0376585c6f39d653f5ab05e80e8f}{mod\+\_\+oasis\+\_\+sys\+::estr} = \textquotesingle{} E\+R\+R\+O\+R\+: \textquotesingle{}
+\item 
+character(len= $\ast$), parameter, public \hyperlink{namespacemod__oasis__sys_a4e16ba69c68a3a39c8b8aa3b92234ce1}{mod\+\_\+oasis\+\_\+sys\+::wstr} = \textquotesingle{} W\+A\+R\+N\+I\+N\+G\+: \textquotesingle{}
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_aded42e42797afa8d6ee5bdefdf42a812}{mod\+\_\+oasis\+\_\+sys\+::minion} = 1024
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_a9dc0e2d10d9e8e8c23e391467ae2eee4}{mod\+\_\+oasis\+\_\+sys\+::maxion} = 9999
+\item 
+integer(ip\+\_\+intwp\+\_\+p), parameter \hyperlink{namespacemod__oasis__sys_ad7e3af62b75730bc71be0df8ae50cf0a}{mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+delta} = 2
+\item 
+integer(ip\+\_\+intwp\+\_\+p), save \hyperlink{namespacemod__oasis__sys_a159b60d106efcb1f42722b08c5511ad0}{mod\+\_\+oasis\+\_\+sys\+::tree\+\_\+indent} = 0
+\end{DoxyCompactItemize}

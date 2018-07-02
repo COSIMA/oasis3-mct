@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['unitno',['unitno',['../classmod__oasis__sys.html#a0fc21eee7f67c5be26a90e23d8c346db',1,'mod_oasis_sys']]]
+  ['valid',['valid',['../structmod__oasis__coupler_1_1prism__coupler__type.html#aceee78ca0ec709406b404ff29e1fcf18',1,'mod_oasis_coupler::prism_coupler_type']]],
+  ['varid',['varid',['../structmod__oasis__coupler_1_1prism__coupler__type.html#a9e31592685ea4cb2da222187ee2ffa4b',1,'mod_oasis_coupler::prism_coupler_type']]],
+  ['varmul',['varmul',['../namespacemod__oasis__namcouple.html#ab7c38fd6bd90bb8e6ebfb539ead1f1a9',1,'mod_oasis_namcouple']]]
 ];
