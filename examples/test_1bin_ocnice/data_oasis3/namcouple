@@ -1,0 +1,111 @@
+# This is a typical input file for OASIS3-MCT, using netCDF format
+# for restart input files.  Oasis reads in
+# this file at run-time. Don't hesitate to ask precisions or make
+# suggestions (oasishelp@cerfacs.fr). 
+#
+# Any line beginning with # is ignored. Blank lines are not allowed.
+#########################################################################
+ $NFIELDS
+# Put the number of fields exchanged by OASIS.
+# If it is bigger than twice the number of fields exchanged, put also on 
+# the same line the maximum number of prism_def_var_proto
+# called by one component model in the coupled system (optional).
+# For the definition of the fields, see under $STRINGS keyword
+#
+             20
+ $END
+###########################################################################
+ $RUNTIME
+# This gives you the total simulated time for this run in seconds (here 6 days)
+#
+ 14400
+ $END
+###########################################################################
+ $NLOGPRT
+# Index of printing level in output file cplout: 0 = no printing
+#  1 = main routines and field names when treated, 2 = complete output
+  2 0
+ $END
+###########################################################################
+ $STRINGS
+#
+# The above variables are the general parameters for the experiment.
+# Everything below has to do with the fields being exchanged.
+#
+############################################################################
+# Field 1 : 
+#
+#   First line:
+# 1) and 2) Symbolic names for the field before and after interpolation
+#           (8 characters maximum)
+# 3) Index of field in cf_name_table.txt
+# 4) Exchange frequency for the field in seconds (here 1 day)
+# 5) Number of analysis to be performed
+# 6) Restart input NetCDF file names
+# 7) Field status (EXPORTED, AUXILARY, IGNORED, EXPOUT, IGNOUT, INPUT, OUTPUT)
+#
+#
+############################################################################
+#
+OCN_P1:OCN_P2:OCN_P3 OCN_P1D:OCN_P2D:OCN_P3D  3 3600  2  ocnrst.nc EXPOUT
+96 72 96 72 lmdz lmdz SEQ=2
+P  0  P  0
+CHECKIN  CHECKOUT
+INT=1
+INT=1
+#
+OCN_D1:OCN_D2 OCN_D1P:OCN_D2P  3 3600  2  ocnrst.nc EXPOUT
+96 72 96 72 lmdz lmdz LAG=3600 SEQ=1
+P  0  P  0
+CHECKIN  CHECKOUT
+INT=1
+INT=1
+#
+OCN_P3:OCN_P4 OCN_P3I:OCN_P4I  3 3600  3  ocnrst.nc EXPOUT
+96 72 44 44 lmdz lmd2 SEQ=3
+P  0  P  0
+CHECKIN SCRIPR CHECKOUT
+INT=1
+BILINEAR LR SCALAR LATITUDE 1
+INT=1
+#
+OCN_D3:OCN_D4 OCN_D3I:OCN_D4I  3 3600  3  ocnrst.nc EXPOUT
+96 72 44 44 lmdz lmd2 SEQ=3
+P  0  P  0
+CHECKIN SCRIPR CHECKOUT
+INT=1
+BILINEAR LR SCALAR LATITUDE 1
+INT=1
+#
+ICE_I1:ICE_I2 ICE_I1P:ICE_I2P 3 3600  3  icerst.nc EXPOUT
+44 44 96 72 lmd2 lmdz LAG=3600 SEQ=1
+P  0  P  0
+CHECKIN SCRIPR CHECKOUT
+INT=1
+BILINEAR LR SCALAR LATITUDE 1
+INT=1
+#
+ICE_I3:ICE_I4 ICE_I3O:ICE_I4O 3 3600  2  icerst.nc EXPOUT
+44 44 44 44 lmd2 lmd2 SEQ=4
+P  0  P  0
+CHECKIN CHECKOUT
+INT=1
+INT=1
+#
+OCN_P4:OCN_P5 OCN_P4O:OCN_P5O 3 3600  2  ocnrst.nc EXPOUT
+96 72 96 72 lmdz lmdz SEQ=4
+P  0  P  0
+CHECKIN CHECKOUT
+INT=1
+INT=1
+#
+OCN_D4:OCN_D5 OCN_D4O:OCN_D5O 3 3600  2  ocnrst.nc EXPOUT
+96 72 96 72 lmdz lmdz SEQ=4
+P  0  P  0
+CHECKIN CHECKOUT
+INT=1
+INT=1
+#
+#
+############################################################################
+ $END

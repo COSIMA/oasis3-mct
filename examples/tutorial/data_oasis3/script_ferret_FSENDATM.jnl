@@ -1,0 +1,5 @@
+use FSENDATM_model2_02.nc
+shade FSENDATM[k=1,d=1]
+
+
+
