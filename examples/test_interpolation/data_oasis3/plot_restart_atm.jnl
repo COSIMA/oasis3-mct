@@ -1,3 +1,0 @@
-use fdatm.nc
-shade FSENDATM
-frame/file=restart_atm.gif
