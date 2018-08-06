@@ -564,11 +564,9 @@ compatibility with OASIS3-MCT\_2.0, they may still call it with any {\tt name} a
     \footnote{Parameters OASIS\_In, PRISM\_In, OASIS\_Out, PRISM\_Out
       are defined in
       oasis3-mct/lib/psmile/src/mod\_oasis\_parameters.F90}.
-  \item {\tt var\_actual\_shape [INTEGER, DIMENSION(2*var\_nodims(1));
-      IN]}: vector of integers giving the minimum and maximum index
-    for each dimension of the coupling field array; for the current
-    OASIS3-MCT version, the minimum index has to be 1 and the maximum
-    index has to be the extent of the dimension.
+  \item {\tt var\_actual\_shape [INTEGER, DIMENSION(:), IN]}:
+    not used anymore; vector of integers of any length (for simplicity
+    we advise to pass any simple integer as argument)
   \item {\tt var\_type [INTEGER; IN]}: type of coupling field array;
     put {\tt OASIS\_Real} or {\tt PRISM\_Real} (i.e. = 4) for single
     or double precision real arrays.  All coupling data is treated as
