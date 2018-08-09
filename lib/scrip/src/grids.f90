@@ -617,7 +617,7 @@
 
          end do
 
-         if (ll_error) stop('Wrong corners order')
+         if (ll_error) stop ('Wrong corners order')
 
       end if
 
