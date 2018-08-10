@@ -11,6 +11,6 @@
 #       local settings. Replace the currently active file with your own.
 #
 #include  $(HOME)/oasis3-mct/util/make_dir/make.intel_nemo_lenovo
-include  $(HOME)/oasis3-mct/util/make_dir/make.intel_impi_nemo_lenovo_openmp
+include  /space/coquart/oasis3-mct_buildbot/util/make_dir/make.pgi_openmpi_openmp_linux_buildbot
 #
 ### End User configurable options ###

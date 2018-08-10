@@ -13,18 +13,18 @@ CHAN            = MPI1
 COUPLE          = $(HOME)/oasis3-mct
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = /space/$(USER)/oasis3-mct_comp
+ARCHDIR         = $(COUPLE)/compile_oa3-mct_pgi_openmpi_openmp
 #
 # MPI library
 #For machines in training room, put MPIDIR      = /usr/local/pgi/linux86-64/2011/mpi/mpich/
-MPIDIR      = /usr/local/pgi/linux86-64/2011/mpi/mpich/
+MPIDIR      = /usr/local/pgi/linux86-64/17.10/mpi/openmpi-2.1.2
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
-MPILIB      = -L$(MPIDIR)/lib -lmpichf90 -lmpich
+MPILIB      = -L$(MPIDIR)/lib
 #
 # NETCDF library
-NETCDF_INCLUDE  = /usr/local/include
-NETCDF_LIBRARY  = -L/usr/local/lib -lnetcdff -lnetcdf -L/usr/local/HDF5-1.8.6/lib -lhdf5_hl -lhdf5 -lz -lm -lhdf5_hl -lhdf5 -lz -lcurl
+NETCDF_INCLUDE  = /usr/local/netcdf-fortran/4.4.1/include
+NETCDF_LIBRARY  = -L/usr/local/netcdf-fortran/4.4.1/lib -Wl,-rpath,/usr/local/netcdf-fortran/4.4.1/lib -lnetcdff  -Wl,-rpath,/usr/local/netcdf-c/4.6.1/lib  -L/usr/local/netcdf-c/4.6.1/lib -lnetcdf
 #
 # Compiling and other commands
 MAKE        = gmake
@@ -32,18 +32,18 @@ F90         = $(MPIBIN)/mpif90 -I$(MPI_INCLUDE)
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
-CC          = pgcc -I$(MPI_INCLUDE) -pgf90libs
-LD          = $(MPIBIN)/mpif90 $(MPILIB)
+CC          = $(MPIBIN)/mpicc -I$(MPI_INCLUDE) -pgf90libs
+LD          = $(MPIBIN)/mpif90 $(MPILIB) 
 AR          = ar
 ARFLAGS     = -ruv
 #
 # CPP keys and compiler options
 # 
-CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
+CPPDEF    = -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY -D__NO_16BYTE_REALS
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
-F90FLAGS_1  = -C -g -Mbounds -byteswapio 
+F90FLAGS_1  = -C -g -Mbounds -byteswapio -mp -lpthread
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
