@@ -2799,14 +2799,14 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    IMPLICIT none
 
    !----- arguments ---
-   character(*),pointer,intent(in)    :: linp1(:)  !< input list on each task
+   character(*),pointer,intent(inout) :: linp1(:)  !< input list on each task
    integer             ,intent(in)    :: comm      !< mpi communicator
    integer             ,intent(out)   :: cntout    !< size of lout1 list
    character(*),pointer,intent(inout) :: lout1(:)  !< reduced output list, same on all tasks
    character(*)        ,intent(in)    :: callstr   !< to identify caller
    logical             ,intent(in)   ,optional :: fastcheck !< run a fastcheck first
    logical             ,intent(out)  ,optional :: fastcheckout !< true if fastcheck worked
-   character(*),pointer,intent(in)   ,optional :: linp2(:)  !< input list on each task
+   character(*),pointer,intent(inout) ,optional :: linp2(:)  !< input list on each task
    character(*),pointer,intent(inout),optional :: lout2(:)  !< reduced output list, same on all tasks
    character(*)        ,intent(in)   ,optional :: spval2    !< unset value for linp2
    integer     ,pointer,intent(in)   ,optional :: linp3(:)  !< input list on each task
