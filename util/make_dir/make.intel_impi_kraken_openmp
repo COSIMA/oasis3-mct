@@ -1,0 +1,76 @@
+#
+# Include file for OASIS3 Makefile for nemo lenovo at Cerfacs with OpenMP
+#
+###############################################################################
+#
+# CHAN	: communication technique used in OASIS3 (MPI1/MPI2)
+CHAN            = MPI1
+#
+# Paths for libraries, object files and binaries
+#
+# COUPLE	: path for oasis3-mct main directory
+COUPLE          = /scratch/globc/coquart/oasis3-mct
+#
+# ARCHDIR       : directory created when compiling
+ARCHDIR         = $(COUPLE)/KRAKEN_LENOVO_INTEL_OPENMP
+#
+# MPI library
+#MPIDIR           = ${MPICOMPILER}
+MPIDIR           = /softs/intel/impi/2018.1.163
+MPIBIN           = $(MPIDIR)/bin64
+MPI_INCLUDE      = $(MPIDIR)/include64
+MPILIB           = -L$(MPIDIR)/lib64
+#
+# NETCDF library
+NETCDF_LIB_DIR1=/softs/local_intel/netcdf-fortran/4.4.4_phdf5/lib
+NETCDF_LIB_DIR2=/softs/local_intel/netcdf-c/4.6.1_phdf5/lib
+NETCDF_INCLUDE1=/softs/local_intel/netcdf-fortran/4.4.4_phdf5/include
+NETCDF_INCLUDE2=/softs/local_intel/netcdf-c/4.6.1_phdf5/include
+NETCDF_LIBRARY  =  -Wl,-rpath,/softs/local_intel/netcdf-fortran/4.4.4_phdf5/lib -L/softs/local_intel/netcdf-fortran/4.4.4_phdf5/lib -Wl,-rpath,/softs/local_intel/netcdf-c/4.6.1_phdf5/lib -L/softs/local_intel/netcdf-c/4.6.1_phdf5/lib -lnetcdff -lnetcdf
+#
+# Compiling and other commands
+MAKE        = gmake
+F90         = $(MPIBIN)/mpiifort -I$(MPI_INCLUDE)
+F           = $(F90)
+f90         = $(F90)
+f           = $(F90)
+CC          = $(MPIBIN)/mpiicc -I$(MPI_INCLUDE)
+LD          = $(MPIBIN)/mpiifort $(MPILIB)
+AR          = ar
+ARFLAGS     = -ruv
+#
+# CPP keys and compiler options
+# 
+CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+CCPPDEF   = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE  -DTREAT_OVERLAY
+#
+# -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
+# 
+F90FLAGS_1  = -O2 -xCORE-AVX2 -I. -assume byterecl -mt_mpi -qopenmp
+#F90FLAGS_1  = -g -traceback -fpe0 -O0 -I. -assume byterecl -mt_mpi -qopenmp
+f90FLAGS_1  = $(F90FLAGS_1)
+FFLAGS_1    = $(F90FLAGS_1)
+fFLAGS_1    = $(F90FLAGS_1)
+CCFLAGS_1   = 
+LDFLAGS     = $(F90FLAGS_1)
+#
+###################
+#
+
+# Additional definitions that should not be changed
+#
+FLIBS		= $(NETCDF_LIBRARY)
+# BINDIR        : directory for executables
+BINDIR          = $(ARCHDIR)/bin
+# LIBBUILD      : contains a directory for each library
+LIBBUILD        = $(ARCHDIR)/build/lib
+# INCPSMILE     : includes all *o and *mod for each library
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/scrip  -I$(LIBBUILD)/mct
+
+F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+FFLAGS    = $(FFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE1) -I$(NETCDF_INCLUDE2)
+#
+#############################################################################
