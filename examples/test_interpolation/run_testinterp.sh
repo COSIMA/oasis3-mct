@@ -40,11 +40,12 @@ fi
 ## - User's section
 
 ## - Source & target grids and remapping (corresponding to files and namcouple in data_oasis3)
-SRC_GRID=torc 
-TGT_GRID=lmdz
-remap=fracnnei
+SRC_GRID=bggd 
+TGT_GRID=nogt
+remap=bilinear
 
-arch=nemo_lenovo_intel_impi_openmp   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
+arch=kraken_intel_impi_esmf   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
+                                # kraken_intel_impi, kraken_intel_impi_openmp
 
 rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
 
@@ -244,6 +245,117 @@ export OASIS_OMP_NUM_THREADS=$threads
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
 EOF
 
+###---------------------------------------------------------------------
+### KRAKEN_INTEL_IMPI_ESMF
+###---------------------------------------------------------------------
+elif [ ${arch} == kraken_intel_impi_esmf ]; then
+
+cp $datadir/ESMF_for_OASIS_weights_${SRC_GRID}_to_${TGT_GRID}_${remap}.nc $rundir/.
+
+  (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+#SBATCH --partition bigmem
+# Nom du job
+#SBATCH --job-name scrip
+# Temps limite du job
+#SBATCH --time=02:00:00
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Nombre de noeuds et de processus
+#SBATCH --nodes=1 --ntasks-per-node=18
+
+cd $rundir
+
+ulimit -s unlimited
+module purge
+module load compiler/intel/18.0.1.163
+module load mpi/intelmpi/2018.1.163
+module load lib/netcdf-fortran/4.4.4_impi
+module load lib/netcdf-c/4.6.1_impi
+#
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
+#
+EOF
+
+###---------------------------------------------------------------------
+### KRAKEN_INTEL_IMPI
+###---------------------------------------------------------------------
+elif [ ${arch} == kraken_intel_impi ]; then
+
+  (( nproc = $nproc_exe1 + $nproc_exe2 ))
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+#SBATCH --partition prod
+# Nom du job
+#SBATCH --job-name scrip
+# Temps limite du job
+#SBATCH --time=02:00:00
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Nombre de noeuds et de processus
+#SBATCH --nodes=$nnode --ntasks-per-node=$mpiprocs
+#SBATCH --distribution cyclic
+
+cd $rundir
+
+ulimit -s unlimited
+module purge
+module load compiler/intel/18.0.1.163
+module load mpi/intelmpi/2018.1.163
+module load lib/netcdf-fortran/4.4.4_impi
+module load lib/netcdf-c/4.6.1_impi
+#
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
+#
+EOF
+
+
+###---------------------------------------------------------------------
+### KRAKEN_INTEL_IMPI_OPENMP 
+###---------------------------------------------------------------------
+elif [ ${arch} == kraken_intel_impi_openmp ]; then
+
+  timreq=03:00:00
+
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+#Partition
+#SBATCH --partition prod
+# Nom du job
+#SBATCH --job-name ${n_p_t}
+# Time limit for the job
+#SBATCH --time=$timreq
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Number of nodes
+#SBATCH --nodes=$nnode
+# Number of MPI tasks per node
+#SBATCH --ntasks-per-node=$mpiprocs
+# Number of OpenMP threads per MPI task
+#SBATCH --cpus-per-task=$threads
+
+cd $rundir
+module purge
+module load compiler/intel/18.0.1.163
+module load mpi/intelmpi/2018.1.163
+module load lib/netcdf-fortran/4.4.4_impi
+module load lib/netcdf-c/4.6.1_impi
+
+export KMP_STACKSIZE=1GB
+export I_MPI_PIN_DOMAIN=omp
+#export I_MPI_PIN_DOMAIN=socket
+export I_MPI_WAIT_MODE=enable
+export KMP_AFFINITY=verbose,granularity=fine,compact
+export OASIS_OMP_NUM_THREADS=$threads
+
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
+EOF
+
 fi 
 
 ######################################################################
@@ -254,6 +366,10 @@ if [ $arch == beaufix_intel_impi_openmp ]; then
     sbatch $rundir/run_$casename.$arch
     squeue -u $user
 elif [ $arch == nemo_lenovo_intel_impi_openmp ] || [ $arch == nemo_lenovo_intel_impi ]; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $USER
+elif [ $arch == kraken_intel_impi_openmp ] || [ $arch == kraken_intel_impi ] || [ $arch == kraken_intel_impi_esmf ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $USER
