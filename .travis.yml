@@ -19,11 +19,15 @@ install:
   - sudo apt-get install csh gcc-4.8 gfortran-4.8 libgomp1 openmpi-bin libopenmpi-dev  libnetcdf-dev  netcdf-bin
 script:
   - make $TYPE
+before_deploy:
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
 deploy:
   provider: releases
   api_key:
     secure: jLzUE9fuKptzwSZyNbHXunqy4ltk2P6rXI2a3qIZqKEpHjmXI9fYMEXwSxtDDQAa/RK3aDUaxDJpuZodK4D+D4s2aKsX6IccPNezRl1c4TYxF4QNCfLLykCw/O7Ilb1XcNsXFH4Q6MAkbRVX/3X7myDsNijyFc+SYNFQYz4qL1w=
+  file_glob: true
   file: Linux/lib/*
+  skip_cleanup: true
   on:
     repo: OceansAus/oasis3-mct
     branch: releases
