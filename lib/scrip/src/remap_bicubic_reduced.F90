@@ -114,6 +114,7 @@ CONTAINS
     INTEGER (KIND=int_kind) :: il_splitsize
     INTEGER (KIND=int_kind) :: ib_proc
     INTEGER (KIND=int_kind) :: ib_thread
+    INTEGER (KIND=int_kind) :: buff_base
     INTEGER (KIND=int_kind), DIMENSION(:), ALLOCATABLE :: ila_mpi_sz
     INTEGER (KIND=int_kind), DIMENSION(:), ALLOCATABLE :: ila_mpi_mn
     INTEGER (KIND=int_kind), DIMENSION(:), ALLOCATABLE :: ila_mpi_mx
@@ -227,6 +228,7 @@ CONTAINS
 !$OMP PARALLEL NUM_THREADS(il_envthreads) DEFAULT(NONE) &
 !$OMP SHARED(ld_extrapdone) &
 !$OMP SHARED(grid2_mask) &
+!$OMP SHARED(il_envthreads) &
 !$OMP SHARED(grid2_center_lat,grid2_center_lon) &
 !$OMP SHARED(grid1_center_lat,grid1_center_lon) &
 !$OMP SHARED(grid1_mask) &
@@ -902,15 +904,18 @@ CONTAINS
         ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,4,mpi_size_map-1))
 
         DO ib_i = 1, mpi_size_map-1
-          CALL MPI_IRecv(grid1_add_map1(SUM(ila_num_links_mpi(1:ib_i))+1),&
+        
+          buff_base = SUM( ila_num_links_mpi(1:ib_i) ) + 1
+
+          CALL MPI_IRecv(grid1_add_map1(buff_base),&
                    & ila_num_links_mpi(ib_i+1),MPI_INT,ib_i,1,mpi_comm_map,&
                    & ila_req_mpi(1,ib_i),il_err)
 
-          CALL MPI_IRecv(grid2_add_map1(SUM(ila_num_links_mpi(1:ib_i))+1),&
+          CALL MPI_IRecv(grid2_add_map1(buff_base),&
                    & ila_num_links_mpi(ib_i+1),MPI_INT,ib_i,2,mpi_comm_map,&
                    & ila_req_mpi(2,ib_i),il_err)
  
-          CALL MPI_IRecv(wts_map1(:,SUM(ila_num_links_mpi(1:ib_i))+1),&
+          CALL MPI_IRecv(wts_map1(:,buff_base),&
                    & num_wts*ila_num_links_mpi(ib_i+1),MPI_DOUBLE,ib_i,0,mpi_comm_map,&
                    & ila_req_mpi(3,ib_i),il_err)
 

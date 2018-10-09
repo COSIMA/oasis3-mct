@@ -163,6 +163,7 @@ contains
       integer (kind=int_kind) :: il_splitsize
       integer (kind=int_kind) :: ib_proc
       integer (kind=int_kind) :: ib_thread
+      integer (kind=int_kind) :: buff_base
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_sz
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_mn
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_mx
@@ -336,7 +337,12 @@ contains
       if (ll_timing) call timer_start(3,'remap_conserv grid1 sweep')
 
 !$OMP PARALLEL NUM_THREADS(il_envthreads) DEFAULT(NONE) &
-!$OMP SHARED(num_wts,grid2_overlap) &
+!$OMP SHARED(il_envthreads) &
+!$OMP SHARED(num_wts) &
+#ifdef TREAT_OVERLAY
+!$OMP SHARED(grid2_overlap) &
+#endif
+
 !$OMP SHARED(grid1_corners,grid2_corners) &
 !$OMP SHARED(grid1_bound_box,grid2_bound_box) &
 !$OMP SHARED(grid1_bbox_per,grid2_bbox_per) &
@@ -845,15 +851,16 @@ contains
           ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,6,mpi_size_map-1))
 
           DO n = 1, mpi_size_map-1
-            CALL MPI_IRecv(grid1_add_map1(SUM(ila_num_links_mpi(1:n))+1),&
+            buff_base = SUM(ila_num_links_mpi(1:n))+1
+            CALL MPI_IRecv(grid1_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,1,mpi_comm_map,&
                   & ila_req_mpi(1,n),il_err)
 
-            CALL MPI_IRecv(grid2_add_map1(SUM(ila_num_links_mpi(1:n))+1),&
+            CALL MPI_IRecv(grid2_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,2,mpi_comm_map,&
                   & ila_req_mpi(2,n),il_err)
 
-            CALL MPI_IRecv(wts_map1(:,SUM(ila_num_links_mpi(1:n))+1),&
+            CALL MPI_IRecv(wts_map1(:,buff_base),&
                   & num_wts*ila_num_links_mpi(n+1),MPI_DOUBLE,n,3,mpi_comm_map,&
                   & ila_req_mpi(3,n),il_err)
 
@@ -973,6 +980,7 @@ contains
 
 !$OMP PARALLEL NUM_THREADS(il_envthreads) DEFAULT(NONE) &
 !$OMP SHARED(num_wts) &
+!$OMP SHARED(il_envthreads) &
 !$OMP SHARED(grid1_corners,grid2_corners) &
 !$OMP SHARED(grid1_bound_box,grid2_bound_box) &
 !$OMP SHARED(grid1_bbox_per,grid2_bbox_per) &
@@ -1438,15 +1446,17 @@ contains
           ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,7,mpi_size_map-1))
 
           DO n = 1, mpi_size_map-1
-            CALL MPI_IRecv(grid1_add_map1(num_links_map1_sweep1+SUM(ila_num_links_mpi(1:n))+1),&
+            buff_base = num_links_map1_sweep1+SUM(ila_num_links_mpi(1:n))+1
+                        
+            CALL MPI_IRecv(grid1_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,1,mpi_comm_map,&
                   & ila_req_mpi(1,n),il_err)
 
-            CALL MPI_IRecv(grid2_add_map1(num_links_map1_sweep1+SUM(ila_num_links_mpi(1:n))+1),&
+            CALL MPI_IRecv(grid2_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,2,mpi_comm_map,&
                   & ila_req_mpi(2,n),il_err)
 
-            CALL MPI_IRecv(wts_map1(:,num_links_map1_sweep1+SUM(ila_num_links_mpi(1:n))+1),&
+            CALL MPI_IRecv(wts_map1(:,buff_base),&
                   & num_wts*ila_num_links_mpi(n+1),MPI_DOUBLE,n,3,mpi_comm_map,&
                   & ila_req_mpi(3,n),il_err)
 
@@ -1529,7 +1539,9 @@ contains
          write(nulou,*) 'grid2 end sweep '
          call OASIS_FLUSH_SCRIP(nulou)
       endif
-
+      
+      ll_debug = .false.
+      
       if (ll_debug) then
          do n=1,num_links_map1
             write(nulou,*) 'grid1, grid2, weight= ', grid1_add_map1(n), grid2_add_map1(n), wts_map1(1,n)

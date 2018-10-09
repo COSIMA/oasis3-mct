@@ -67,6 +67,8 @@ elif [ ${arch} == ada ]; then
 elif [ ${arch} == nemo_lenovo_gfortran_openmpi ]; then
     MPIRUN=/data/softs/mpi/openmpi/1.8.4/bin/mpirun
     rundir=/scratch/globc/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+elif [ ${arch} == ukmo_cray_xc40 ] || [ ${arch} == ukmo_cray_xc40_rose ]; then
+    rundir=$PWD/runDir
 fi
 #
 ############### End of user's section ################################
@@ -397,6 +399,45 @@ time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
 EOF
 
+###---------------------------------------------------------------------
+### UKMO_CRAY_XC40 OR UKMO_CRAY_XC40_ROSE
+###---------------------------------------------------------------------
+elif [ ${arch} == ukmo_cray_xc40 ]; then
+
+     (( nproc = $nproc_exe1 + $nproc_exe2 ))
+echo writing arch file to $rundir/run_$casename.$arch
+
+ cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash --login
+#PBS -N ${casename}
+#PBS -l walltime=00:10:00
+#PBS -l select=2
+#PBS -q normal
+
+cd $rundir
+
+module load cray-netcdf-hdf5parallel/4.3.2
+
+aprun -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
+
+EOF
+
+elif [ ${arch} == ukmo_cray_xc40_rose ]; then
+
+    (( nproc = $nproc_exe1 + $nproc_exe2 ))
+echo writing arch file to $rundir/run_$casename.$arch
+
+ cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash 
+
+cd $rundir
+
+module load cray-netcdf-hdf5parallel/4.3.2
+
+aprun -n $nproc_exe1 ./$exe1 : -n $nproc_exe2 ./$exe2
+
+EOF
+chmod u+x $rundir/run_$casename.$arch
 fi 
 
 ######################################################################
@@ -453,6 +494,10 @@ elif [ ${arch} == nemo_lenovo_gfortran_openmpi ] ; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $USER
+elif [ ${arch} == ukmo_cray_xc40 ]; then
+    qsub $rundir/run_$casename.$arch
+elif [ ${arch} == ukmo_cray_xc40_rose ]; then
+    $rundir/run_$casename.$arch
 fi
 echo $casename 'is executed or submitted to queue.'
 echo 'Results are found in rundir : '$rundir 

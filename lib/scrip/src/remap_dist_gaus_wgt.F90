@@ -149,6 +149,7 @@ contains
       integer (kind=int_kind) :: il_splitsize
       integer (kind=int_kind) :: ib_proc
       integer (kind=int_kind) :: ib_thread
+      integer (kind=int_kind) :: buff_base
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_sz
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_mn
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_mx
@@ -280,6 +281,7 @@ contains
       end if
 
 !$OMP PARALLEL NUM_THREADS(il_envthreads) DEFAULT(NONE) &
+!$OMP SHARED(il_envthreads) &
 !$OMP SHARED(lextrapdone,num_neighbors) &
 !$OMP SHARED(grid2_mask,grid2_frac) &
 !$OMP SHARED(grid2_center_lat,grid2_center_lon) &
@@ -650,15 +652,16 @@ contains
             ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,4,mpi_size_map-1))
 
             DO n = 1, mpi_size_map-1
-               CALL MPI_IRecv(grid1_add_map1(SUM(ila_num_links_mpi(1:n))+1),&
+               buff_base = SUM(ila_num_links_mpi(1:n))+1
+               CALL MPI_IRecv(grid1_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,1,mpi_comm_map,&
                   & ila_req_mpi(1,n),il_err)
 
-               CALL MPI_IRecv(grid2_add_map1(SUM(ila_num_links_mpi(1:n))+1),&
+               CALL MPI_IRecv(grid2_add_map1(buff_base),&
                   & ila_num_links_mpi(n+1),MPI_INT,n,2,mpi_comm_map,&
                   & ila_req_mpi(2,n),il_err)
 
-               CALL MPI_IRecv(wts_map1(1,SUM(ila_num_links_mpi(1:n))+1),&
+               CALL MPI_IRecv(wts_map1(1,buff_base),&
                   & num_wts*ila_num_links_mpi(n+1),MPI_DOUBLE,n,0,mpi_comm_map,&
                   & ila_req_mpi(3,n),il_err)
 

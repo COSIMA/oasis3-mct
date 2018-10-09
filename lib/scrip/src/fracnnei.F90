@@ -176,6 +176,7 @@ contains
       end if
 
 !$OMP PARALLEL NUM_THREADS(il_envthreads) DEFAULT(NONE) &
+!$OMP SHARED(il_envthreads)&
 !$OMP SHARED(sga_remap)&
 !$OMP SHARED(il_nbthreads) &
 !$OMP SHARED(ila_thr_sz,ila_thr_mn,ila_thr_mx) &
