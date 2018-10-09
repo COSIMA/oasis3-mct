@@ -30,4 +30,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: OceansAus/oasis3-mct
-    branch: releases
+    branch: master
