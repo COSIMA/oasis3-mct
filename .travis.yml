@@ -21,7 +21,7 @@ script:
   - make $TYPE
 before_deploy:
   - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
-  - tar -cvf binary_release.tar.gz Linux/lib/*
+  - tar -czvf binary_release.tar.gz Linux/lib/*
 deploy:
   provider: releases
   api_key:
