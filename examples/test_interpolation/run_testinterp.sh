@@ -39,13 +39,19 @@ fi
 ######################################################################
 ## - User's section
 
-## - Source & target grids and remapping (corresponding to files and namcouple in data_oasis3)
-SRC_GRID=bggd 
-TGT_GRID=nogt
-remap=bilinear
+## - Source & target grids and remapping (corresponding to files and 
+## namcouple in data_oasis3. Be aware that bicu and fracarea2nd 
+## are used as key word in model1.F90)
+SRC_GRID=torc 
+TGT_GRID=lmdz
+#remap=distwgt
+#remap=bili
+#remap=bicu
+remap=conserv
+#remap=fracarea2nd
 
-arch=kraken_intel_impi_esmf   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
-                                # kraken_intel_impi, kraken_intel_impi_openmp
+arch=training_computer   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
+                              # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
 
 rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
 
@@ -361,7 +367,12 @@ fi
 ######################################################################
 ### - Execute the model
 
-if [ $arch == beaufix_intel_impi_openmp ]; then
+if [ ${arch} == training_computer ]; then
+#    export OMP_NUM_THREADS=1
+    echo 'Executing the model using '$MPIRUN
+    MPIRUN=/usr/lib64/openmpi/bin/mpirun
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+elif [ $arch == beaufix_intel_impi_openmp ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $user
