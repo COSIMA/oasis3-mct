@@ -31,7 +31,7 @@ if [ ${arch} == tioman_pgi_mpich ]; then
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == training_computer ]; then
     MPIRUN=/usr/lib64/openmpi/bin/mpirun
-    rundir=/space/coquart/oasis3-mct_buildbot/examples/${casename}/work_${casename}
+    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
