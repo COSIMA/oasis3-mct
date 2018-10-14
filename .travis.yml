@@ -1,0 +1,33 @@
+language: c
+sudo: required
+git:
+  depth: 3
+  quiet: true
+env:
+  matrix:
+  - TYPE=ubuntu
+  global:
+  - FC=gfortran-4.8
+  - OMPI_FC=${FC}
+matrix:
+  allow_failures:
+  - env: TYPE=ACCESS-OM
+  - env: TYPE=ACCESS-CM
+install:
+  - sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install csh gcc-4.8 gfortran-4.8 libgomp1 openmpi-bin libopenmpi-dev  libnetcdf-dev  netcdf-bin
+script:
+  - make $TYPE
+before_deploy:
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+  - tar -czvf binary_release.tar.gz Linux/*
+deploy:
+  provider: releases
+  api_key:
+    secure: jLzUE9fuKptzwSZyNbHXunqy4ltk2P6rXI2a3qIZqKEpHjmXI9fYMEXwSxtDDQAa/RK3aDUaxDJpuZodK4D+D4s2aKsX6IccPNezRl1c4TYxF4QNCfLLykCw/O7Ilb1XcNsXFH4Q6MAkbRVX/3X7myDsNijyFc+SYNFQYz4qL1w=
+  file: binary_release.tar.gz
+  skip_cleanup: true
+  on:
+    repo: OceansAus/oasis3-mct
+    branch: master
