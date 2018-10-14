@@ -80,10 +80,10 @@ CONTAINS
    lg_mpiflag = .FALSE.
    CALL MPI_Initialized ( lg_mpiflag, mpi_err )
    IF ( .NOT. lg_mpiflag ) THEN
-      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
+      if (OASIS_debug >= 1) WRITE (0,FMT='(A)') subname//': Calling MPI_Init'
       CALL MPI_INIT ( mpi_err )
    else
-      if (OASIS_debug >= 0) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
+      if (OASIS_debug >= 1) WRITE (0,FMT='(A)') subname//': Not Calling MPI_Init'
    ENDIF
 
 #ifdef use_comm_MPI1
