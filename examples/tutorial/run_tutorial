@@ -22,8 +22,8 @@ arch=training_computer   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_compu
                         #crayXE6, beaufix, ada 
 #
 # - Define number of processes to run each executable
-    nproc_exe1=3
-    nproc_exe2=3
+    nproc_exe1=1
+    nproc_exe2=1
 #
 ## - Define rundir
 if [ ${arch} == tioman_pgi_mpich ]; then
