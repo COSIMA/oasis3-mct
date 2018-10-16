@@ -451,6 +451,7 @@ fi
 ### 4. Execute the model
 
 if [ $arch == training_computer ]; then
+    export OMP_NUM_THREADS=1
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == tioman_pgi_mpich ] || [ $arch == napali ]; then
