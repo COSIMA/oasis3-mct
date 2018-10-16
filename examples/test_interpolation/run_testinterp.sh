@@ -368,8 +368,8 @@ fi
 ### - Execute the model
 
 if [ ${arch} == training_computer ]; then
-    export OMP_NUM_THREADS=$threads
-    MPIRUN=/usr/lib64/openmpi/bin/mpirun
+    export OASIS_OMP_NUM_THREADS=$threads
+    MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
     echo 'Executing the model using '$MPIRUN
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == beaufix_intel_impi_openmp ]; then

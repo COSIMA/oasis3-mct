@@ -30,7 +30,7 @@ if [ ${arch} == tioman_pgi_mpich ]; then
     MPIRUN=/usr/local/pgi/linux86-64/2011/mpi/mpich/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == training_computer ]; then
-    MPIRUN=/usr/lib64/openmpi/bin/mpirun
+    MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
