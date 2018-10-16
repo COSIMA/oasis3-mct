@@ -368,9 +368,9 @@ fi
 ### - Execute the model
 
 if [ ${arch} == training_computer ]; then
-#    export OMP_NUM_THREADS=1
-    echo 'Executing the model using '$MPIRUN
+    export OMP_NUM_THREADS=$threads
     MPIRUN=/usr/lib64/openmpi/bin/mpirun
+    echo 'Executing the model using '$MPIRUN
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == beaufix_intel_impi_openmp ]; then
     echo 'Submitting the job to queue using sbatch'
