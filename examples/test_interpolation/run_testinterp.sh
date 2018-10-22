@@ -53,7 +53,11 @@ remap=conserv
 arch=training_computer   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
                               # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
 
-rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
+if [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmpi_openmp ]; then
+   rundir=/space/${user}/OA3_MCT_RES/work_${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
+else
+   rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
+fi
 
 ## - End of user's section
 ######################################################################
@@ -370,6 +374,11 @@ fi
 if [ ${arch} == training_computer ]; then
     export OASIS_OMP_NUM_THREADS=$threads
     MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
+    echo 'Executing the model using '$MPIRUN
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+elif [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmpi_openmp ]; then
+    export OASIS_OMP_NUM_THREADS=$threads
+    MPIRUN=/usr/lib64/openmpi/bin/mpirun
     echo 'Executing the model using '$MPIRUN
     $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
 elif [ $arch == beaufix_intel_impi_openmp ]; then
