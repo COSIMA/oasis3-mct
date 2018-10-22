@@ -794,21 +794,21 @@ contains
 
          num_links_map1 = il_splitsize
          if (num_links_map1 > max_links_map1) &
-            call resize_remap_vars(1,num_links_map1-max_links_map1)
-
+              call resize_remap_vars(1,num_links_map1-max_links_map1)
+         
          do ib_thread = 1, il_nbthreads
             grid1_add_map1(sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+             &
                sga_remap(ib_thread)%num_links-1) =         &
-               sga_remap(ib_thread)%grid1_add
+               sga_remap(ib_thread)%grid1_add(1:sga_remap(ib_thread)%num_links)
             grid2_add_map1(sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+             &
                sga_remap(ib_thread)%num_links-1) =         &
-               sga_remap(ib_thread)%grid2_add
+               sga_remap(ib_thread)%grid2_add(1:sga_remap(ib_thread)%num_links)
             wts_map1     (:,sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+            &
                sga_remap(ib_thread)%num_links-1) =        &
-               sga_remap(ib_thread)%wts
+               sga_remap(ib_thread)%wts(:,1:sga_remap(ib_thread)%num_links)
 
          end do
 
@@ -845,7 +845,7 @@ contains
         IF (mpi_rank_map == mpi_root_map) THEN
           num_links_map1 = SUM(ila_num_links_mpi)
           if (num_links_map1 > max_links_map1) &
-                  call resize_remap_vars(1,num_links_map1-max_links_map1)
+             call resize_remap_vars(1,num_links_map1-max_links_map1)
 
           ALLOCATE(ila_req_mpi(6,mpi_size_map-1))
           ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,6,mpi_size_map-1))
@@ -1398,15 +1398,15 @@ contains
             grid1_add_map1(sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+             &
                sga_remap(ib_thread)%num_links-1) =         &
-               sga_remap(ib_thread)%grid1_add
+               sga_remap(ib_thread)%grid1_add(1:sga_remap(ib_thread)%num_links)
             grid2_add_map1(sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+             &
                sga_remap(ib_thread)%num_links-1) =         &
-               sga_remap(ib_thread)%grid2_add
+               sga_remap(ib_thread)%grid2_add(1:sga_remap(ib_thread)%num_links)
             wts_map1     (:,sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+            &
                sga_remap(ib_thread)%num_links-1) =        &
-               sga_remap(ib_thread)%wts
+               sga_remap(ib_thread)%wts(:,1:sga_remap(ib_thread)%num_links)
 
          end do
 
@@ -1440,7 +1440,7 @@ contains
         IF (mpi_rank_map == mpi_root_map) THEN
           num_links_map1 = num_links_map1_sweep1 + SUM(ila_num_links_mpi)
           if (num_links_map1 > max_links_map1) &
-                  call resize_remap_vars(1,num_links_map1-max_links_map1)
+             call resize_remap_vars(1,num_links_map1-max_links_map1)
 
           ALLOCATE(ila_req_mpi(7,mpi_size_map-1))
           ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,7,mpi_size_map-1))
