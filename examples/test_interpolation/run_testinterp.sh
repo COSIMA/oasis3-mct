@@ -38,17 +38,15 @@ fi
 
 ######################################################################
 ## - User's section
-
-## - Source & target grids and remapping (corresponding to files and 
-## namcouple in data_oasis3. Be aware that bicu and fracarea2nd 
-## are used as key word in model1.F90)
-SRC_GRID=torc 
-TGT_GRID=lmdz
-#remap=distwgt
-#remap=bili
-#remap=bicu
-remap=conserv
-#remap=fracarea2nd
+# For BEAUFIX you have to add in your .bashrc :
+#module load intel
+#module load intelmpi
+#module load netcdf
+#module load hdf5/1.8.16_par_thrsaf
+## - Source & target grids and remapping 
+SRC_GRID=bggd 
+TGT_GRID=teo1
+remap=distwgt #gauswgt, bili, bicu, conserv, fracarea2nd
 
 arch=training_computer   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
                               # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
@@ -110,7 +108,7 @@ ln -sf $datadir/areas.nc  $rundir/areas.nc
 ln -sf $srcdir/$exe1 $rundir/.
 ln -sf $srcdir/$exe2 $rundir/.
 
-cp -f $datadir/namcouple $rundir/namcouple
+cp -f $datadir/namcouple_${SRC_GRID}_${TGT_GRID}_${remap} $rundir/namcouple
 
 ## - Grid source characteristics and create name_grids.dat
 SRC_GRID_TYPE=`sed -n 26p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # source grid type

@@ -1,0 +1,23 @@
+############################################
+# icos is an icosahedral unstructured grid
+$NFIELDS  
+1 
+$END 
+############################################ 
+$RUNTIME  
+21600 
+$END 
+############################################ 
+$NLOGPRT  
+1 0 
+$END 
+############################################ 
+$STRINGS  
+FSENDANA FRECVANA 1 7200 3 rst.nc EXPOUT 
+144 143 15212 1 bggd icos 
+P 0 P 0  
+CHECKIN SCRIPR CHECKOUT 
+INT 
+BILINEAR LR SCALAR LATLON 1   
+INT 
+$END
