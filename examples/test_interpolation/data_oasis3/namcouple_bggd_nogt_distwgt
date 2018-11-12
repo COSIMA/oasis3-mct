@@ -13,7 +13,7 @@ $END
 ############################################ 
 $STRINGS  
 FSENDANA FRECVANA 1 7200 3 rst.nc EXPOUT 
-144 143  362 294 bggd teo1 
+144 143  362 294 bggd nogt 
 P  0  P  2 
 CHECKIN SCRIPR CHECKOUT  
 INT=1 

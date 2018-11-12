@@ -45,7 +45,7 @@ fi
 #module load hdf5/1.8.16_par_thrsaf
 ## - Source & target grids and remapping 
 SRC_GRID=bggd 
-TGT_GRID=teo1
+TGT_GRID=nogt
 remap=distwgt #gauswgt, bili, bicu, conserv, fracarea2nd
 
 arch=training_computer   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
