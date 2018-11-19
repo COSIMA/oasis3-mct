@@ -6,7 +6,7 @@ CHAN            = MPI1
 # Paths for libraries, object files and binaries
 #
 # COUPLE	: path for oasis3-mct main directory
-COUPLE          = $(HOME)/oasis3-mct
+COUPLE          = $(PRISMHOME)
 #
 # ARCHDIR       : directory created when compiling
 ARCHDIR         = $(COUPLE)/crayxc40
@@ -21,6 +21,7 @@ MPILIB      =
 NETCDF_INCLUDE  =
 NETCDF_LIBRARY  =
 #
+
 # Compiling and other commands
 MAKE        = make
 F90         = ftn 
@@ -43,12 +44,13 @@ CCPPDEF   = -Duse_libMPI -Duse_netCDF -Duse_comm_$(CHAN) -DDEBUG
 #
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # 
+
 F90FLAGS_1  = -e m -sreal64 -O2 $(PSMILE_INCDIR) $(CPPDEF)
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
 CCFLAGS_1   = $(PSMILE_INCDIR) $(CPPDEF) 
-LDFLAGS   =  -h byteswapio
+LDFLAGS   =  -h byteswapio 
 #
 ###################
 #

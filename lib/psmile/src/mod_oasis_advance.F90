@@ -387,7 +387,6 @@ contains
     type(prism_coupler_type),pointer :: pcpointmp
     logical, parameter :: local_timers_on = .false.
     character(len=*),parameter :: subname = '(oasis_advance_run)'
-    character(len=*),parameter :: F01 = '(a,i3.3)'
 !   ----------------------------------------------------------------
 
     call oasis_debug_enter(subname)
@@ -853,7 +852,7 @@ contains
        if (getput == OASIS3_PUT) then
 
           call oasis_debug_note(subname//' loctrans operation')
-          write(tstring,F01) 'pcpy_',cplid
+          write(tstring,'(A,I3.3)') 'pcpy_',cplid
 
           if (local_timers_on) call oasis_timer_start(tstring)
 
@@ -1075,7 +1074,7 @@ contains
 
           if (getput == OASIS3_PUT) then
              call oasis_debug_note(subname//' loctrans calc')
-             write(tstring,F01) 'pavg_',cplid
+             write(tstring,'(A,I3.3)') 'pavg_',cplid
              if (local_timers_on) call oasis_timer_start(tstring)
              do nf = 1,pcpointer%nflds
                 if (pcpointer%avcnt(nf) > 1) then
@@ -1155,7 +1154,7 @@ contains
                 write(rstfile2,'(a,i9.9,a,a)') 'TC',msec,'_',trim(rstfile)
              endif
 
-             write(tstring,F01) 'wrst_',cplid
+             write(tstring,'(A,I3.3)') 'wrst_',cplid
              if (local_timers_on) call oasis_timer_start(tstring)
              call oasis_io_write_avfile(rstfile2,pcpointer%avect1, &
                 prism_part(partid)%pgsmap,prism_part(partid)%mpicom,nx,ny)
@@ -1220,7 +1219,7 @@ contains
              endif
              if (snddiag) call oasis_advance_avdiag(pcpointer%avect1,prism_part(partid)%mpicom)
              if (mapid > 0) then
-                write(tstring,F01) 'pmap_',cplid
+                write(tstring,'(A,I3.3)') 'pmap_',cplid
                 call oasis_debug_note(subname//' put map')
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,' DEBUG put av11 b4 map = ',cplid,&
@@ -1270,7 +1269,7 @@ contains
                    WRITE(nullucia, FMT='(A,I3.3,A,F16.5)') &
                               'Balance: ',pcpointer%namID,' After  interpo ', MPI_Wtime()
                 if (local_timers_on) call oasis_timer_stop(tstring)
-                write(tstring,F01) 'psnd_',cplid
+                write(tstring,'(A,I3.3)') 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,' DEBUG put av1m b4 send = ',cplid,&
@@ -1288,7 +1287,7 @@ contains
                               'Balance: ',pcpointer%namID,' After  MPI put ', MPI_Wtime()
                 if (local_timers_on) call oasis_timer_stop(tstring)
              ELSE
-                write(tstring,F01) 'psnd_',cplid
+                write(tstring,'(A,I3.3)') 'psnd_',cplid
                 call oasis_debug_note(subname//' put send')
                 if (OASIS_debug >= 20) then
                    write(nulprt,*) subname,' DEBUG put av1 b4 send = ',cplid,&
@@ -1322,7 +1321,7 @@ contains
              endif
              if (mapid > 0) then
                 call oasis_debug_note(subname//' get recv')
-                write(tstring,F01) 'grcv_',cplid
+                write(tstring,'(A,I3.3)') 'grcv_',cplid
                 if (local_timers_on) call oasis_timer_start(tstring)
                 call mct_avect_zero(pcpointer%avect1m)
                 if (LUCIA_debug > 0) &
@@ -1339,7 +1338,7 @@ contains
                                    maxval(pcpointer%avect1m%rAttr)
                 endif
                 call oasis_debug_note(subname//' get map')
-                write(tstring,F01) 'gmap_',cplid
+                write(tstring,'(A,I3.3)') 'gmap_',cplid
                 if (map_barrier .and. prism_part(partid)%mpicom /= MPI_COMM_NULL) then
                    if (local_timers_on) call oasis_timer_start(trim(tstring)//'_prebarrier')
                    call oasis_mpi_barrier(prism_part(partid)%mpicom, trim(tstring))
@@ -1367,7 +1366,7 @@ contains
                                    maxval(pcpointer%avect1%rAttr)
                 endif
              else
-                write(tstring,F01) 'grcv_',cplid
+                write(tstring,'(A,I3.3)') 'grcv_',cplid
                 call oasis_debug_note(subname//' get recv')
                 call mct_avect_zero(pcpointer%avect1)
                 if (local_timers_on) call oasis_timer_start(tstring)
@@ -1413,7 +1412,7 @@ contains
                 kinfo = OASIS_output
              endif
              call oasis_debug_note(subname//' output')
-             write(tstring,F01) 'wout_',cplid
+             write(tstring,'(A,I3.3)') 'wout_',cplid
              if (local_timers_on) call oasis_timer_start(tstring)
              if (OASIS_debug >= 2) then
                 lstring = mct_avect_exportRList2c(pcpointer%avect1)
@@ -1435,7 +1434,7 @@ contains
              if (OASIS_debug >= 30) then
                 call mct_avect_init(avtest,pcpointer%avect1,&
                                     mct_aVect_lsize(pcpointer%avect1))
-                write(tstring,F01) 'rinp_',cplid
+                write(tstring,'(A,I3.3)') 'rinp_',cplid
                 if (local_timers_on) call oasis_timer_start(tstring)
                 call oasis_io_read_avfbf(avtest,prism_part(partid)%pgsmap,prism_part(partid)%mpicom,msec,fstring)
                 write(nulprt,*) subname,' DEBUG write/read test avfbf should be zero ',&
@@ -1516,7 +1515,7 @@ contains
           endif
 
           call oasis_debug_note(subname//' loctrans restart write')
-          write(tstring,F01) 'wtrn_',cplid
+          write(tstring,'(A,I3.3)') 'wtrn_',cplid
           if (local_timers_on) call oasis_timer_start(tstring)
           WRITE(vstring,'(a,i6.6,a)') 'loc',pcpointer%namID,'_cnt'
           CALL oasis_io_write_array(rstfile2,prism_part(partid)%mpicom,iarray=pcpointer%avcnt,&
@@ -1594,7 +1593,7 @@ contains
                    endif
                    call oasis_flush(nulprt)
                 endif
-                write(tstring,F01) 'grin_',cplid
+                write(tstring,'(A,I3.3)') 'grin_',cplid
                 if (local_timers_on) call oasis_timer_start(tstring)
                 if (trim(inpfile) /= trim(cspval)) then
                    call oasis_io_read_avfbf(pcpointer%avect1,prism_part(partid)%pgsmap,prism_part(partid)%mpicom,&
@@ -1609,7 +1608,7 @@ contains
              if (OASIS_debug >= 2) then
                 write(nulprt,*) subname,' at ',msec,mseclag,' UPCK: ',trim(vname)
              endif
-             write(tstring,F01) 'gcpy_',cplid
+             write(tstring,'(A,I3.3)') 'gcpy_',cplid
              call oasis_debug_note(subname//' get copy to array')
              if (local_timers_on) call oasis_timer_start(tstring)
              if (present(array1dout)) array1dout(:) = &
