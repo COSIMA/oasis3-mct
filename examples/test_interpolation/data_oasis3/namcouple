@@ -1,23 +1,28 @@
-#############################################
-$NFIELDS  
-1 
-$END 
-############################################ 
-$RUNTIME  
-21600 
-$END 
-############################################ 
-$NLOGPRT  
-1 0 
-$END 
-############################################ 
-$STRINGS  
-FSENDANA FRECVANA 1 7200 3 rst.nc EXPOUT 
-144 143  362 294 bggd nogt 
-P  0  P  2 
-CHECKIN SCRIPR CHECKOUT  
-INT=1 
-DISTWGT LR SCALAR LATLON 1 4  
-INT=1 
-#### 
-$END 
+# This is a typical input file for OASIS3-MCT, using NetCDF 
+# format for restart input files. OASIS3-MCT reads in this file 
+# at run time. Don't hesitate to ask precisions or make 
+# suggestions (oasishelp@cerfacs.fr)
+#
+# Any line beginning with # is ignored. Blank lines are not allowed
+####################################################################
+ $NFIELDS 
+1
+ $END
+############################################
+ $RUNTIME 
+21600
+ $END
+############################################
+ $NLOGPRT 
+1 0
+ $END
+############################################
+ $STRINGS 
+FSENDANA FRECVANA 1 7200 3 rst.nc EXPOUT
+182 149 96 72 torc lmdz
+P 2 P 0 
+CHECKIN SCRIPR CHECKOUT 
+INT=1
+CONSERV LR SCALAR LATLON 1 FRACNNEI FIRST
+INT=1
+ $END

@@ -302,7 +302,7 @@ PROGRAM model1
      ENDIF
 
   ! Calculate the gradients and send them for conserv 2nd only if grid is not gaussian reduced
-  ELSE IF (cl_remap == 'conserv2nd') THEN
+  ELSE IF (cl_remap == 'fracarea2nd') THEN
      IF ( trim(cl_type_src) == 'LR') THEN
         ALLOCATE(grad_lat(nlon,nlat), STAT=ierror )
         IF ( ierror /= 0 ) WRITE(w_unit,*) 'Error allocating gradient_i'

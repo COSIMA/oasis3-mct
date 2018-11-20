@@ -38,34 +38,15 @@ fi
 
 ######################################################################
 ## - User's section
-# For BEAUFIX you have to add in your .bashrc :
-#module load intel
-#module load intelmpi
-#module load netcdf
-#module load hdf5/1.8.16_par_thrsaf
-# Some examples of namcouples are given in data_oasis3
-# If you add any additional lines in the namcouples given as examples you will have to
-# change 3the  lines 'SRC_GRID_TYPE=' 'SRC_GRID_PERIOD=' and 'SRC_GRID_OVERLAP=' line 123
-## - Source grids 
-## bggd is an atmosphere structured (LR) grid
-## ssea is an atmosphere gaussian reduced grid (D) : no conserv2nd remapping
-## icos is an atmosphere unstructured grid (U) : no bicu nor conserv2nd remapping
-SRC_GRID=bggd # ssea, icos
-## - Target grid
-## nogt is an ocean structured grid (LR)
-## 
-TGT_GRID=nogt
-## - Remapping
-remap=bicu # bili, conserv1st, conserv2nd, distwgt
 
-arch=kraken_intel_impi_openmp  # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
-                              # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
+## - Source & target grids and remapping (corresponding to files and namcouple in data_oasis3)
+SRC_GRID=torc 
+TGT_GRID=lmdz
+remap=fracnnei
 
-if [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmpi_openmp ]; then
-   rundir=/space/${user}/OA3_MCT_RES/work_${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
-else
-   rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
-fi
+arch=nemo_lenovo_intel_impi_openmp   # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
+
+rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
 
 ## - End of user's section
 ######################################################################
@@ -118,38 +99,13 @@ ln -sf $datadir/areas.nc  $rundir/areas.nc
 ln -sf $srcdir/$exe1 $rundir/.
 ln -sf $srcdir/$exe2 $rundir/.
 
-cp -f $datadir/namcouple_${SRC_GRID}_${TGT_GRID}_${remap} $rundir/namcouple
+cp -f $datadir/namcouple $rundir/namcouple
 
-## - Grid source characteristics 
-# If you add any additional lines in the namcouples given as examples you will have
-# to change the 3 lines below 
-SRC_GRID_TYPE=`sed -n 20p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # source grid type
-SRC_GRID_PERIOD=`sed -n 17p $rundir/namcouple | tr -s ' ' | cut -d" " -f1` # "P" for periodic, "R" for non-periodic
-SRC_GRID_OVERLAP=`sed -n 17p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # Number of overlapping grid points for periodic grids
+## - Grid source characteristics and create name_grids.dat
+SRC_GRID_TYPE=`sed -n 26p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # source grid type
+SRC_GRID_PERIOD=`sed -n 23p $rundir/namcouple | tr -s ' ' | cut -d" " -f1` # "P" for periodic, "R" for non-periodic
+SRC_GRID_OVERLAP=`sed -n 23p $rundir/namcouple | tr -s ' ' | cut -d" " -f2` # Number of overlapping grid points for periodic grids
 
-echo "SRC_GRID_TYPE : $SRC_GRID_TYPE"
-echo "SRC_GRID_PERIOD : $SRC_GRID_PERIOD"
-echo "SRC_GRID_OVERLAP : $SRC_GRID_OVERLAP"
-
-## - Verification source grid type and remapping
-if [ ${SRC_GRID} == "ssea" ]; then
-	if [ ${remap} == "conserv2nd" ]; then
-		echo "Impossible to perform conserv2nd remapping from gaussian reduced grid ssea"
-		exit
-	fi
-fi
-if [ ${SRC_GRID} == "icos" ]; then
-	if [ ${remap} == "conserv2nd" ]; then
-		echo "Impossible to perform conserv2nd remapping from unstrcutred grid icos"
-		exit
-	fi
-	if [ ${remap} == "bicu" ]; then
-		echo "Impossible to perform bicubic remapping from unstrcutred grid icos"
-		exit
-	fi
-fi
-
-## - Create name_grids.dat from namcouple informations
 cat <<EOF >> $rundir/name_grids.dat
 \$grid_source_characteristics
 cl_grd_src='$SRC_GRID'
@@ -288,106 +244,16 @@ export OASIS_OMP_NUM_THREADS=$threads
 time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
 EOF
 
-###---------------------------------------------------------------------
-### KRAKEN_INTEL_IMPI
-###---------------------------------------------------------------------
-elif [ ${arch} == kraken_intel_impi ]; then
-
-  (( nproc = $nproc_exe1 + $nproc_exe2 ))
-
-  cat <<EOF > $rundir/run_$casename.$arch
-#!/bin/bash -l
-#SBATCH --partition prod
-# Nom du job
-#SBATCH --job-name scrip
-# Temps limite du job
-#SBATCH --time=02:00:00
-#SBATCH --output=$rundir/$casename.o
-#SBATCH --error=$rundir/$casename.e
-# Nombre de noeuds et de processus
-#SBATCH --nodes=$nnode --ntasks-per-node=$mpiprocs
-#SBATCH --distribution cyclic
-
-cd $rundir
-
-ulimit -s unlimited
-module purge
-module load compiler/intel/18.0.1.163
-module load mpi/intelmpi/2018.1.163
-module load lib/netcdf-fortran/4.4.4_impi
-module load lib/netcdf-c/4.6.1_impi
-#
-#
-time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
-#
-EOF
-
-
-###---------------------------------------------------------------------
-### KRAKEN_INTEL_IMPI_OPENMP 
-###---------------------------------------------------------------------
-elif [ ${arch} == kraken_intel_impi_openmp ]; then
-
-  timreq=00:30:00
-
-  cat <<EOF > $rundir/run_$casename.$arch
-#!/bin/bash -l
-#Partition
-#SBATCH --partition prod
-# Nom du job
-#SBATCH --job-name ${n_p_t}
-# Time limit for the job
-#SBATCH --time=$timreq
-#SBATCH --output=$rundir/$casename.o
-#SBATCH --error=$rundir/$casename.e
-# Number of nodes
-#SBATCH --nodes=$nnode
-# Number of MPI tasks per node
-#SBATCH --ntasks-per-node=$mpiprocs
-# Number of OpenMP threads per MPI task
-#SBATCH --cpus-per-task=18
-
-cd $rundir
-module purge
-module load compiler/intel/18.0.1.163
-module load mpi/intelmpi/2018.1.163
-module load lib/netcdf-fortran/4.4.4_impi
-module load lib/netcdf-c/4.6.1_impi
-
-export KMP_STACKSIZE=1GB
-export I_MPI_PIN_DOMAIN=omp
-#export I_MPI_PIN_DOMAIN=socket
-export I_MPI_WAIT_MODE=enable
-export KMP_AFFINITY=verbose,granularity=fine,compact
-export OASIS_OMP_NUM_THREADS=$threads
-
-time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
-EOF
-
 fi 
 
 ######################################################################
 ### - Execute the model
 
-if [ ${arch} == training_computer ]; then
-    export OASIS_OMP_NUM_THREADS=$threads
-    MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
-    echo 'Executing the model using '$MPIRUN
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-elif [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmpi_openmp ]; then
-    export OASIS_OMP_NUM_THREADS=$threads
-    MPIRUN=/usr/lib64/openmpi/bin/mpirun
-    echo 'Executing the model using '$MPIRUN
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
-elif [ $arch == beaufix_intel_impi_openmp ]; then
+if [ $arch == beaufix_intel_impi_openmp ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $user
 elif [ $arch == nemo_lenovo_intel_impi_openmp ] || [ $arch == nemo_lenovo_intel_impi ]; then
-    echo 'Submitting the job to queue using sbatch'
-    sbatch $rundir/run_$casename.$arch
-    squeue -u $USER
-elif [ $arch == kraken_intel_impi_openmp ] || [ $arch == kraken_intel_impi ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $USER
