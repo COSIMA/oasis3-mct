@@ -189,10 +189,10 @@
    INTEGER(kind=ip_intwp_p) :: ierr, taskid
    integer(kind=ip_intwp_p) :: vcnt
    logical                  :: found, fastcheckout
-   character(len=ic_lvar)  ,pointer :: vname0(:),vname(:)
-   character(len=ic_lvar2) ,pointer :: pname0(:),pname(:)
-   integer(kind=ip_intwp_p),pointer :: inout0(:),inout(:)
-   integer(kind=ip_intwp_p),pointer :: vanum0(:),vanum(:)
+   character(len=ic_lvar)  ,allocatable :: vname0(:),vname(:)
+   character(len=ic_lvar2) ,allocatable :: pname0(:),pname(:)
+   integer(kind=ip_intwp_p),allocatable :: inout0(:),inout(:)
+   integer(kind=ip_intwp_p),allocatable :: vanum0(:),vanum(:)
    logical, parameter :: local_timers_on = .false.
    character(len=*),parameter :: subname = '(oasis_var_setup)'
    !--------------------------------------------------------

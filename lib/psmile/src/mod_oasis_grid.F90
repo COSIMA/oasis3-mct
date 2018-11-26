@@ -881,8 +881,8 @@ CONTAINS
     integer(kind=ip_i4_p) ,allocatable :: iglo(:,:) ! global array
     integer(kind=ip_intwp_p) :: gcnt
     logical                  :: found
-    character(len=ic_med)   ,pointer :: gname0(:),gname(:)
-    character(len=ic_lvar2) ,pointer :: pname0(:),pname(:)
+    character(len=ic_med)   ,allocatable :: gname0(:),gname(:)
+    character(len=ic_lvar2) ,allocatable :: pname0(:),pname(:)
     character(len=*),parameter :: undefined_partname = '(UnDeFiNeD_PArtnaME)'
     character(len=*),parameter :: subname = '(oasis_write2files)'
     !-------------------------------------------------

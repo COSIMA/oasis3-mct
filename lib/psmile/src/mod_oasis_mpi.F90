@@ -2799,22 +2799,22 @@ SUBROUTINE oasis_mpi_reducelists(linp1,comm,cntout,lout1,callstr,fastcheck,fastc
    IMPLICIT none
 
    !----- arguments ---
-   character(*),pointer,intent(inout) :: linp1(:)  !< input list on each task
-   integer             ,intent(in)    :: comm      !< mpi communicator
-   integer             ,intent(out)   :: cntout    !< size of lout1 list
-   character(*),pointer,intent(inout) :: lout1(:)  !< reduced output list, same on all tasks
-   character(*)        ,intent(in)    :: callstr   !< to identify caller
-   logical             ,intent(in)   ,optional :: fastcheck !< run a fastcheck first
-   logical             ,intent(out)  ,optional :: fastcheckout !< true if fastcheck worked
-   character(*),pointer,intent(inout) ,optional :: linp2(:)  !< input list on each task
-   character(*),pointer,intent(inout),optional :: lout2(:)  !< reduced output list, same on all tasks
-   character(*)        ,intent(in)   ,optional :: spval2    !< unset value for linp2
-   integer     ,pointer,intent(in)   ,optional :: linp3(:)  !< input list on each task
-   integer     ,pointer,intent(inout),optional :: lout3(:)  !< reduced output list, same on all tasks
-   integer             ,intent(in)   ,optional :: spval3    !< unset value for linp3
-   integer     ,pointer,intent(in)   ,optional :: linp4(:)  !< input list on each task
-   integer     ,pointer,intent(inout),optional :: lout4(:)  !< reduced output list, same on all tasks
-   integer             ,intent(in)   ,optional :: spval4    !< unset value for linp4
+   character(*),allocatable,intent(inout) :: linp1(:)  !< input list on each task
+   integer                 ,intent(in)    :: comm      !< mpi communicator
+   integer                 ,intent(out)   :: cntout    !< size of lout1 list
+   character(*),allocatable,intent(inout) :: lout1(:)  !< reduced output list, same on all tasks
+   character(*)            ,intent(in)    :: callstr   !< to identify caller
+   logical                 ,intent(in)   ,optional :: fastcheck !< run a fastcheck first
+   logical                 ,intent(out)  ,optional :: fastcheckout !< true if fastcheck worked
+   character(*),allocatable,intent(inout),optional :: linp2(:)  !< input list on each task
+   character(*),allocatable,intent(inout),optional :: lout2(:)  !< reduced output list, same on all tasks
+   character(*)            ,intent(in)   ,optional :: spval2    !< unset value for linp2
+   integer     ,allocatable,intent(in)   ,optional :: linp3(:)  !< input list on each task
+   integer     ,allocatable,intent(inout),optional :: lout3(:)  !< reduced output list, same on all tasks
+   integer                 ,intent(in)   ,optional :: spval3    !< unset value for linp3
+   integer     ,allocatable,intent(in)   ,optional :: linp4(:)  !< input list on each task
+   integer     ,allocatable,intent(inout),optional :: lout4(:)  !< reduced output list, same on all tasks
+   integer                 ,intent(in)   ,optional :: spval4    !< unset value for linp4
 
    !----- local ---
    integer(kind=ip_i4_p) :: m,n,k,p
