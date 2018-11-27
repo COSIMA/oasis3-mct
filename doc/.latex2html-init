@@ -1,2 +1,2 @@
 $INTERLACE=0;
-$ICONSERVER="/wkdir/globc/coquart/SITE_OASIS_DOC_HTML/icons" 
+$ICONSERVER="http://www.cerfacs.fr/oa4web/oasis3-mct_4.0/icons" 
