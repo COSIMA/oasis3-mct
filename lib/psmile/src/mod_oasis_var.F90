@@ -52,9 +52,9 @@
      INTEGER(kind=ip_i4_p),intent(out) :: id_nports    !< coupling field ID
      CHARACTER(len=*)     ,intent(in)  :: cdport       !< field name as in namcouple
      INTEGER(kind=ip_i4_p),intent(in)  :: id_part      !< partition ID
-     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_nodims(2)  !< rank and number of bundles
+     INTEGER(kind=ip_i4_p),intent(inout)  :: id_var_nodims(2)  !< rank and number of bundles
      INTEGER(kind=ip_i4_p),intent(in)  :: kinout       !< input or output flag
-     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(:) !< size of field
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(2*id_var_nodims(1)) !< size of field
      INTEGER(kind=ip_i4_p),intent(in)  :: ktype        !< type of coupling field
      INTEGER(kind=ip_i4_p),intent(out),optional :: kinfo    !< return code
      !---------------------------------------------------------------
@@ -128,6 +128,7 @@
      enddo
 
      ! tcraig, this is due to i3.3 in the 2d->1d field bundle renaming
+     if (id_var_nodims(2) == 0) id_var_nodims(2)=1 
      if (id_var_nodims(2) > 999) then
         write(nulprt,*) subname,estr,'variable id_var_nodims2 too large.  limit is 999 ',id_var_nodims(2)
         write(nulprt,*) subname,estr,'check oasis_def_var calls in your model'
