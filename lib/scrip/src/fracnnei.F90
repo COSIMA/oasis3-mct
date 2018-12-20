@@ -181,6 +181,7 @@ contains
 !$OMP SHARED(il_nbthreads) &
 !$OMP SHARED(ila_thr_sz,ila_thr_mn,ila_thr_mx) &
 !$OMP SHARED(num_neigh,ll_debug,ila_dst,num_prev_links,nulou) &
+!$OMP SHARED(num_wts) &
 !$OMP SHARED(grid1_add_map1,grid2_add_map1,wts_map1) &
 !$OMP SHARED(grid1_center_lat,grid1_center_lon) &
 !$OMP SHARED(grid2_center_lat,grid2_center_lon) &
@@ -226,7 +227,7 @@ contains
             sga_remap(ib_thread)%num_links = 0
             allocate(sga_remap(ib_thread)%grid1_add(il_splitsize))
             allocate(sga_remap(ib_thread)%grid2_add(il_splitsize))
-!EM            allocate(sga_remap(ib_thread)%wts(num_wts,il_splitsize))
+           !EM allocate(sga_remap(ib_thread)%wts(num_wts,il_splitsize))
          end do
 
          deallocate(ila_thr_sz)
@@ -373,6 +374,10 @@ contains
          if (il_nbthreads .eq. 1) then
            grid1_add_map1(il_add) = il_nneiadd
            wts_map1(1,il_add) = 1.0
+           if (num_wts .gt. 1) then
+              wts_map1(2,il_add) = 0.0
+              wts_map1(3,il_add) = 0.0
+           endif
          else
            sga_remap(ib_thread)%grid1_add(sga_remap(ib_thread)%num_links) = il_nneiadd
          endif
@@ -405,9 +410,15 @@ contains
                sga_remap(ib_thread)%start_pos+             &
                sga_remap(ib_thread)%num_links-1) =         &
                sga_remap(ib_thread)%grid2_add
-            wts_map1     (:,sga_remap(ib_thread)%start_pos: &
+            wts_map1     (1,sga_remap(ib_thread)%start_pos: &
                sga_remap(ib_thread)%start_pos+            &
                sga_remap(ib_thread)%num_links-1) = 1.0
+	    wts_map1     (2,sga_remap(ib_thread)%start_pos: &
+               sga_remap(ib_thread)%start_pos+            &
+               sga_remap(ib_thread)%num_links-1) = 0.0
+	    wts_map1     (3,sga_remap(ib_thread)%start_pos: &
+               sga_remap(ib_thread)%start_pos+            &
+               sga_remap(ib_thread)%num_links-1) = 0.0
          end do
 
          if (nlogprt.ge.2) then
@@ -429,7 +440,7 @@ contains
          do ib_thread = 1, il_nbthreads
             deallocate(sga_remap(ib_thread)%grid1_add)
             deallocate(sga_remap(ib_thread)%grid2_add)
-      !EM      deallocate(sga_remap(ib_thread)%wts)
+            !EM deallocate(sga_remap(ib_thread)%wts)
          end do
          deallocate(sga_remap)
       end if
