@@ -553,18 +553,20 @@ compatibility with OASIS3-MCT\_2.0, they may still call it with any {\tt name} a
     {\it namcouple}); maximum length of 80 characters
   \item {\tt il\_part\_id [INTEGER; IN]}: partition ID returned from {\tt oasis\_def\_partition} (see section
     \ref{subsubsec_Partition})
-  \item {\tt var\_nodims [INTEGER, DIMENSION(2); IN]}: var\_nodims(1)
-    is not used anymore in OASIS3-MCT so its value can be anything but
-    it is still part of the oasis\_def\_var arguments; var\_nodims(2) is the number
-    of fields in a bundle (this will be 1 for unbundled fields or greater
-    than 1 for fields that are bundled).  
+  \item {\tt var\_nodims [INTEGER, DIMENSION(2); INOUT]}: var\_nodims(1)
+    is not used anymore in OASIS3-MCT so its value can be anything
+    but it is still part of the oasis\_def\_var arguments; var\_nodims(2)
+    is the number of fields in a bundle (this will be 1 for unbundled
+    fields or greater than 1 for fields that are bundled; note that
+    if var\_nodims(2)=0, it will be automatically put to 1 in the
+    routine, to ensure upward compatibility).
   \item {\tt kinout [INTEGER; IN]}: {\tt OASIS\_In} or {\tt PRISM\_In}
     (i.e. = 21) for fields received by the component; {\tt OASIS\_Out},
     {\tt PRISM\_Out} (i.e. = 20) for fields sent by the component
     \footnote{Parameters OASIS\_In, PRISM\_In, OASIS\_Out, PRISM\_Out
       are defined in
       oasis3-mct/lib/psmile/src/mod\_oasis\_parameters.F90}.
-  \item {\tt var\_actual\_shape [INTEGER, DIMENSION(:), IN]}:
+  \item {\tt var\_actual\_shape [INTEGER, DIMENSION(2*id\_var\_nodims(1)), IN]}:
     not used anymore; vector of integers of any length (for simplicity
     we advise to pass a vector of length 1)
   \item {\tt var\_type [INTEGER; IN]}: type of coupling field array;
