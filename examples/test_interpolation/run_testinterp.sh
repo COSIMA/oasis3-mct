@@ -39,14 +39,14 @@ fi
 ######################################################################
 ## - User's section
 # Some examples of namcouples are given in data_oasis3
-# If you add any additional lines in the namcouples given as examples you will have to
-# change the  lines 'SRC_GRID_TYPE=' 'SRC_GRID_PERIOD=' and 'SRC_GRID_OVERLAP=' line 123
-## - Source grids 
+# Warning: If you add any extra lines in one of the namcouple given as examples you will have to
+# change the definition of SRC_GRID_TYPE, SRC_GRID_PERIOD and SRC_GRID_OVERLAP in this script (see below lines 140-142)
+## - Source grids (you have the choice between bggd, ssea, icos)
 ## bggd is an atmosphere structured (LR) grid
 ## ssea is an atmosphere gaussian reduced grid (D) : no conserv2nd remapping
 ## icos is an atmosphere unstructured grid (U) : no bili, no bicu nor conserv2nd remapping
 SRC_GRID=icos # bggd, ssea, icos
-## - Target grid
+## - Target grid (the only grid supported in this environment is nogt)
 ## nogt is an ocean structured grid (LR)
 ## 
 TGT_GRID=nogt
@@ -62,7 +62,7 @@ if [ ${SRC_GRID} == "ssea" ]; then
 fi
 if [ ${SRC_GRID} == "icos" ]; then
 	if [ ${remap} == "conserv2nd" ] || [ ${remap} == "bicu" ] || [ ${remap} == "bili" ]; then
-		echo "Impossible to perform ${remap} remapping from unstrcutred grid icos"
+		echo "Impossible to perform ${remap} remapping from unstructured grid icos"
 		exit
 	fi
 fi
