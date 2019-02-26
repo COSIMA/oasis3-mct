@@ -339,7 +339,7 @@
 
    if(ycontiguous) then
      outxmin=yaVindices(1)-1
-!dir$ collapse
+! !dir$ collapse
      do j=1,ysize
        do i=1,numav
          yAV%rAttr(outxmin+i,j)=0._FP
