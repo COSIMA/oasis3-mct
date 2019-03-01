@@ -17,7 +17,7 @@ ARCHDIR         = $(COUPLE)/compile_oa3-mct_pgi_openmpi
 #
 # MPI library
 #For machines in training room, put MPIDIR      = /usr/local/pgi/linux86-64/2011/mpi/mpich/
-MPIDIR      = /usr/local/pgi/linux86-64/17.10/mpi/openmpi-2.1.2
+MPIDIR      = /usr/local/pgi/linux86-64/18.7/mpi/openmpi-2.1.2
 MPIBIN      = $(MPIDIR)/bin
 MPI_INCLUDE = $(MPIDIR)/include
 MPILIB      = -L$(MPIDIR)/lib
