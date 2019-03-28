@@ -18,12 +18,12 @@ casename=`basename $srcdir`
 #
 #
 ## - Define architecture and coupler 
-arch=linux_gfortran_openmpi_openmp   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
+arch=training_computer   #tioman_pgi_mpich/corail/curie(CEA)/jade/training_computer/ubuntu
                         #crayXE6, beaufix, ada 
 #
 # - Define number of processes to run each executable
-    nproc_exe1=3
-    nproc_exe2=2
+    nproc_exe1=1
+    nproc_exe2=1
 #
 ## - Define rundir
 if [ ${arch} == tioman_pgi_mpich ]; then
@@ -34,7 +34,7 @@ elif [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmp
     rundir=/space/${user}/OA3_MCT_RES/work_${casename}_Makefile_namcouple_${exe1}_${nproc_exe1}_${exe2}_${nproc_exe2}
 elif [ ${arch} == training_computer ]; then
     MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
-    rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}
+    rundir=${HOME}/OASIS3-MCT_4.0/oasis3-mct/examples/${casename}/work_${casename}
 elif [ ${arch} == tioman_intel_openmpi ]; then
     MPIRUN=/usr/local_intel12/openmpi143/bin/mpirun
     rundir=${HOME}/oasis3-mct/examples/${casename}/work_${casename}

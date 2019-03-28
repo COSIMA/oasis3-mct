@@ -21,18 +21,36 @@ SUBROUTINE function_sent(ni,nj, &
   !
   INTEGER, INTENT(in) :: ni,nj,ib
   !
-  INTEGER             :: i,j
+  INTEGER             :: i,j,k,l
+  INTEGER,PARAMETER   :: tdim=100
   !
   REAL (kind=wp), INTENT(out)            :: fnc_ana(ni,nj)
   !
   REAL (kind=wp)                         :: coords_1(ni,nj)
   REAL (kind=wp)                         :: coords_2(ni,nj)
   !
+  REAL (kind=wp)                         :: a(tdim,tdim),b(tdim,tdim),c(tdim,tdim)
   !
   DO j=1,nj
     DO i=1,ni
       fnc_ana(i,j) =  ib*(coef - COS(dp_pi*(ACOS(COS(coords_2(i,j)* dp_conv)* &
          COS(coords_1(i,j)* dp_conv))/dp_length)))
+    ENDDO
+  ENDDO
+  !
+  ! Additional computations to test load balancing functions
+  !
+  call random_number(a)
+  call random_number(b)
+
+  DO j=1,ni
+    DO l=1,tdim
+       DO i=1,tdim
+          c(i,l)=0.
+          DO k=1,tdim
+             c(l,i)=a(l,k)*b(k,i)+j
+          ENDDO
+       ENDDO
     ENDDO
   ENDDO
   !

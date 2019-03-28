@@ -64,7 +64,7 @@ PROGRAM model2
   REAL (kind=wp), PARAMETER :: field_ini = -1. ! initialisation of received fields
   !
   INTEGER               ::  ib
-  INTEGER, PARAMETER    ::  il_nb_time_steps = 12 ! number of time steps
+  INTEGER, PARAMETER    ::  il_nb_time_steps = 24 ! number of time steps
   INTEGER, PARAMETER    ::  delta_t = 1800       ! time step
   !
   INTEGER                :: il_flag          ! Flag for grid writing
