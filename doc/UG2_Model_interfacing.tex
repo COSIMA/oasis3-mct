@@ -448,7 +448,7 @@ Must be called to start the grid writing process.
   \item {\tt cgrid [CHARACTER; IN]}: grid name prefix (see
     \ref{subsec_namcouplesecond} and \ref{subsec_griddata}); maximum length of 64 characters (4 are usually used for historical reasons)
   \item {\tt nx\_global [INTEGER; IN]} : first dimension of the global grid 
-  \item {\tt ny\_global [INTEGER; IN]} : second dimension of the global grid ({\tt =0} if the grid is expressed as a 1D vector) 
+  \item {\tt ny\_global [INTEGER; IN]} : second dimension of the global grid ({\tt =1} if the grid is expressed as a 1D vector) 
   \item {\tt lon [REAL, DIMENSION(nx,ny); IN]} : single or double real array of longitudes covering the whole grid ({\tt nx=nx\_global}, {\tt ny=ny\_global}) or only the local partition (degrees East).
   \item {\tt lat [REAL, DIMENSION(nx,ny); IN]} : single or double real array of latitudes covering the whole grid ({\tt nx=nx\_global}, {\tt ny=ny\_global}) or only the local partition (degrees North)
 \item  {\tt il\_part\_id [INTEGER, OPTIONAL; IN]}: partition ID returned by {\tt oasis\_def\_partition}, see \ref{subsubsec_Partition}; needed if each component task holding a part of a decomposed grid writes its own part of the grid.
