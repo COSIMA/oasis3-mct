@@ -19,6 +19,7 @@ reproducibility;
 - Exchange of data on only a subdomain of the global grid;
 - The specification of how time statistics are written out (variable TIMER_Debug) in the configuration file “namcouple”;
 
+
 Please keep us informed of your progress with OASIS3-MCT and do not forget to cite the following latest reference in your paper describing your cou
 pled model results:
 A. Craig, S. Valcke, L. Coquart, 2017: Development and performance of a new version of the OASIS coupler, OASIS3-MCT_3.0, Geosci. Model Dev., 10, 3
