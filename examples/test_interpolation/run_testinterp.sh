@@ -45,11 +45,12 @@ fi
 ## bggd is an atmosphere structured (LR) grid
 ## ssea is an atmosphere gaussian reduced grid (D) : no conserv2nd remapping
 ## icos is an atmosphere unstructured grid (U) : no bili, no bicu nor conserv2nd remapping
-SRC_GRID=icos # bggd, ssea, icos
+SRC_GRID=bggd # bggd, ssea, icos
+##
 ## - Target grid (the only grid supported in this environment is nogt)
 ## nogt is an ocean structured grid (LR)
-## 
 TGT_GRID=nogt
+##
 ## - Remapping (see restrictions above)
 remap=conserv1st #distwgt, bicu, bili, conserv1st, conserv2nd
 
@@ -67,8 +68,9 @@ if [ ${SRC_GRID} == "icos" ]; then
 	fi
 fi
 
-arch=kraken_intel_impi_openmp  # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
-                              # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
+arch=linux_gfortran_openmpi  # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_openmp or beaufix_intel_impi_openmp
+                               # kraken_intel_impi, kraken_intel_impi_openmp, training_computer
+			       # linux_gfortran_openmpi linux_gfortran_openmpi_openmp
 # For arch=beaufix_intel_impi_openmp you must put in your .bashrc 
 #module load intel
 #module load intelmpi
@@ -76,7 +78,7 @@ arch=kraken_intel_impi_openmp  # nemo_lenovo_intel_impi, nemo_lenovo_intel_impi_
 #module load hdf5/1.8.16_par_thrsaf
 
 if [ ${arch} == linux_gfortran_openmpi ] || [ ${arch} == linux_gfortran_openmpi_openmp ]; then
-   rundir=/space/${user}/OA3_MCT_RES/work_${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
+   rundir=/space/${user}/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
 else
    rundir=$srcdir/${casename}_${SRC_GRID}_${TGT_GRID}_${remap}/rundir_${nnode}_${mpiprocs}_${threads}
 fi
