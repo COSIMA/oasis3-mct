@@ -272,11 +272,11 @@ noted with the string UNUSED and not described.
     \begin{itemize}
     \item {\tt \$CMETH = GAUSWGT}
     \item {\tt \$VAR} defines the weight given to a neighbour source grid
-	    point as proportional to $exp(-1/2 \cdot d^2/\sigma^2)$ where
+      point as proportional to $exp(-1/2 \cdot d^2/\sigma^2)$ where
       $d$ is the distance between the source and target grid points,
       and $\sigma^2 = \$VAR \cdot \overline{D}^2$ where
-      $\overline{D}^2$ is the average distance between two source grid points 
-      (calculated automatically but approximatey by OASIS3-MCT).
+      $\overline{D}^2$ is, for each target grid point, the square of average distance between its source grid points  
+      (calculated automatically by OASIS3-MCT).
     \end{itemize}
 
   \item {\tt BILINEAR} performs an interpolation based on a local

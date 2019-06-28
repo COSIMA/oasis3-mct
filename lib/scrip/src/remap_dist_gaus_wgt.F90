@@ -120,7 +120,7 @@ contains
 
       logical (kind=log_kind) :: ll_debug  ! for debug outputs
 
-      integer (kind=int_kind) :: n,            &
+      integer (kind=int_kind) :: i_n,            &
                                  dst_add,      &  ! destination address
                                  nmap,         &  ! index of current map being computed
                                  icount           ! number of non masked nearest neighbour
@@ -141,14 +141,16 @@ contains
       real (kind=dbl_kind) :: distance, plat, plon, src_latsnn, dl_dist   !  angular distance
       real (kind=dbl_kind), dimension (1) :: wgts_new
       real (kind=dbl_kind) :: rl_varmul                                   ! local Gaussian variance
-      real (kind=dbl_kind) :: rl_mean_variance                            ! local mean variance
+      real (kind=dbl_kind) :: rl_local_variance                           ! local mean variance
+      real (kind=dbl_kind) :: rl_nb_distance                              ! local neighbour distance
 
 
       integer (kind=int_kind) :: src_addnn, il_debug_add
 
       integer (kind=int_kind) :: il_splitsize
       integer (kind=int_kind) :: ib_proc
-      integer (kind=int_kind) :: ib_thread
+      integer (kind=int_kind) :: ib_thread, ib_nb
+      integer (kind=int_kind) :: il_nb_pairs
       integer (kind=int_kind) :: buff_base
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_sz
       integer (kind=int_kind), dimension(:), allocatable :: ila_mpi_mn
@@ -160,7 +162,7 @@ contains
       integer (kind=int_kind), dimension(:,:), allocatable :: ila_req_mpi
       integer (kind=int_kind), dimension(:,:,:), allocatable :: ila_sta_mpi
       character (LEN=14) :: cl_envvar
-      integer (kind=int_kind) :: il_envthreads, il_err
+      integer (kind=int_kind) :: il_envthreads, il_err, il_n1_add, il_n2_add
       logical :: ll_gaussian_weights
 #ifdef REMAP_TIMING
       logical :: ll_timing = .true.
@@ -187,17 +189,34 @@ contains
 #endif
 
       if (PRESENT(r_varmul )) then
-        ll_gaussian_weights = .true.
+
         ! Check that variance is not zero
         IF ( r_varmul < epsilon(1.) ) then
+          write (UNIT = nulou,FMT = *) '***** ERROR *****'
           write (UNIT = nulou,FMT = *) 'Namcouple GAUSWGT variance $VAR cannot be zero'
           call OASIS_FLUSH_SCRIP(nulou)
           stop
         ENDIF
-        rl_varmul = r_varmul
+
+        ! if num_neighbors = 1, GAUSWGT not applicable
+        IF ( num_neighbors < 2 ) then
+          write (UNIT = nulou,FMT = *) '***** WARNING *****'
+          write (UNIT = nulou,FMT = *) 'For GAUSWGT, $NV has to be bigger than 1'
+          write (UNIT = nulou,FMT = *) 'DISTWGT performed instead of GAUSWGT'
+          call OASIS_FLUSH_SCRIP(nulou)
+
+          ll_gaussian_weights = .false.
+          rl_varmul = 0.
+        ELSE
+          ll_gaussian_weights = .true.
+          rl_varmul = r_varmul
+        ENDIF
+
       else
+
         ll_gaussian_weights = .false.
         rl_varmul = 0.
+
       endif
 
       dl_test = 0.0
@@ -219,14 +238,6 @@ contains
       coslon = cos(grid1_center_lon)
       sinlat = sin(grid1_center_lat)
       sinlon = sin(grid1_center_lon)
-
-      if ( ll_gaussian_weights ) then
-      ! EM: dist_average wrong if U
-      ! EM: NOT PARALLEL FOR THE MOMENT
-      ! EM: TO BE INVESTIGATED LATER
-        call grid_dist_average(grid1_size, coslat, coslon, sinlat, sinlon, dist_average)
-        rl_mean_variance = rl_varmul * dist_average * dist_average
-      endif
 
 #ifdef REMAP_TIMING
       if (ll_timing) call timer_stop(2)
@@ -296,7 +307,9 @@ contains
 !$OMP SHARED(il_nbthreads) &
 !$OMP SHARED(mpi_rank_map,mpi_root_map,ila_mpi_mn,ila_mpi_mx) &
 !$OMP SHARED(ila_thr_sz,ila_thr_mn,ila_thr_mx) &
-!$OMP SHARED(ll_gaussian_weights,rl_mean_variance) &
+!$OMP SHARED(ll_gaussian_weights,rl_varmul) &
+!$OMP PRIVATE(rl_local_variance,ib_nb,i_n,rl_nb_distance,il_nb_pairs) &
+!$OMP PRIVATE(il_n1_add, il_n2_add) &
 #ifdef REMAP_TIMING
 !$OMP PRIVATE(ib_thread,il_splitsize) &
 !$OMP SHARED(ll_timing,dla_timer) &
@@ -458,18 +471,43 @@ contains
                end if
             end if
 #endif
+            ! now , if gaussian weights, compute local variance in parallel
+            if ( ll_gaussian_weights  ) THEN
+               rl_local_variance = 0.
+               il_nb_pairs = 0
+               do i_n = 1, num_neighbors-1
+                  do ib_nb = 2, num_neighbors
+                     il_n1_add = nbr_add(i_n)
+                     il_n2_add = nbr_add(ib_nb)
+                     if ( grid1_mask(il_n1_add) .and. grid1_mask(il_n2_add) ) then
+                        rl_nb_distance = sinlat(il_n2_add)*sinlat(il_n1_add) +  &
+                                         coslat(il_n2_add)*coslat(il_n1_add)*    &
+                                         ( coslon(il_n2_add)*coslon(il_n1_add) + &
+                                           sinlon(il_n2_add)*sinlon(il_n1_add) )
+                        rl_nb_distance = MAX ( MIN ( rl_nb_distance, 1.), -1. )
+                        rl_local_variance = rl_local_variance + acos ( rl_nb_distance )
+                        il_nb_pairs = il_nb_pairs + 1
+                     end if
+                  enddo
+               enddo
+               ! if less than two neighbours, DISTWGT with one neighbour will be performed
+               ! if not , average distance and calculate variance
+               if ( il_nb_pairs > 0 ) &
+                  rl_local_variance = rl_varmul * ( rl_local_variance / REAL(il_nb_pairs) ) ** 2
+            end if
+
             dist_tot = zero
-            do n=1,num_neighbors
-               if (grid1_mask(nbr_add(n)) .or. lextrapdone) then
+            do i_n=1,num_neighbors
+               if (grid1_mask(nbr_add(i_n)) .or. lextrapdone) then
                  !
-                 ! Change distance if gausswgt option
-                 if ( ll_gaussian_weights  ) &
-                   nbr_dist(n) = exp(.5*nbr_dist(n)*nbr_dist(n)/rl_mean_variance)
-                 nbr_dist(n) = one/(nbr_dist(n) + epsilon(dl_test))
-                 dist_tot = dist_tot + nbr_dist(n)
-                 nbr_mask(n) = .true.
+                 ! Change distance if gausswgt option and more than one neighbour
+                 if ( ll_gaussian_weights .and. il_nb_pairs > 0 ) &
+                   nbr_dist(i_n) = exp(.5*nbr_dist(i_n)*nbr_dist(i_n)/rl_local_variance)
+                 nbr_dist(i_n) = one/(nbr_dist(i_n) + epsilon(dl_test))
+                 dist_tot = dist_tot + nbr_dist(i_n)
+                 nbr_mask(i_n) = .true.
                else
-                 nbr_mask(n) = .false.
+                 nbr_mask(i_n) = .false.
                endif
             end do
 
@@ -505,16 +543,16 @@ contains
             end if
 #endif
             icount = 0
-            do n=1,num_neighbors
-               if (nbr_mask(n)) then
-                  wgtstmp(1) = nbr_dist(n)/dist_tot
+            do i_n=1,num_neighbors
+               if (nbr_mask(i_n)) then
+                  wgtstmp(1) = nbr_dist(i_n)/dist_tot
                   if (ll_debug) then       
                      if (dst_add == il_debug_add) then 
                         write(nulou,*) 'wgtstmp = ', wgtstmp(1)
                         write(nulou,*) 'nbr_dist = ', nbr_dist(:)
                      endif
                   endif
-                  call store_link_nbr(nbr_add(n), dst_add, wgtstmp, nmap, ib_thread)
+                  call store_link_nbr(nbr_add(i_n), dst_add, wgtstmp, nmap, ib_thread)
                   grid2_frac(dst_add) = one
                   icount = icount + 1
                endif
@@ -620,9 +658,9 @@ contains
       else
 
          if (ll_timing.and.nlogprt.ge.2) then
-            do n = 2, 6
-               call timer_print(n)
-               call timer_clear(n)
+            do i_n = 2, 6
+               call timer_print(i_n)
+               call timer_clear(i_n)
             end do
          end if
 #endif
@@ -651,28 +689,28 @@ contains
             ALLOCATE(ila_req_mpi(4,mpi_size_map-1))
             ALLOCATE(ila_sta_mpi(MPI_STATUS_SIZE,4,mpi_size_map-1))
 
-            DO n = 1, mpi_size_map-1
-               buff_base = SUM(ila_num_links_mpi(1:n))+1
+            DO i_n = 1, mpi_size_map-1
+               buff_base = SUM(ila_num_links_mpi(1:i_n))+1
                CALL MPI_IRecv(grid1_add_map1(buff_base),&
-                  & ila_num_links_mpi(n+1),MPI_INT,n,1,mpi_comm_map,&
-                  & ila_req_mpi(1,n),il_err)
+                  & ila_num_links_mpi(i_n+1),MPI_INT,i_n,1,mpi_comm_map,&
+                  & ila_req_mpi(1,i_n),il_err)
 
                CALL MPI_IRecv(grid2_add_map1(buff_base),&
-                  & ila_num_links_mpi(n+1),MPI_INT,n,2,mpi_comm_map,&
-                  & ila_req_mpi(2,n),il_err)
+                  & ila_num_links_mpi(i_n+1),MPI_INT,i_n,2,mpi_comm_map,&
+                  & ila_req_mpi(2,i_n),il_err)
 
                CALL MPI_IRecv(wts_map1(1,buff_base),&
-                  & num_wts*ila_num_links_mpi(n+1),MPI_DOUBLE,n,0,mpi_comm_map,&
-                  & ila_req_mpi(3,n),il_err)
+                  & num_wts*ila_num_links_mpi(i_n+1),MPI_DOUBLE,i_n,0,mpi_comm_map,&
+                  & ila_req_mpi(3,i_n),il_err)
 
-               CALL MPI_IRecv(grid2_frac(ila_mpi_mn(n+1)),&
-                  & ila_mpi_mx(n+1)-ila_mpi_mn(n+1)+1,MPI_DOUBLE,n,0,mpi_comm_map,&
-                  & ila_req_mpi(4,n),il_err)
+               CALL MPI_IRecv(grid2_frac(ila_mpi_mn(i_n+1)),&
+                  & ila_mpi_mx(i_n+1)-ila_mpi_mn(i_n+1)+1,MPI_DOUBLE,i_n,0,mpi_comm_map,&
+                  & ila_req_mpi(4,i_n),il_err)
 
             END DO
 
-            DO n=1,4
-               CALL MPI_Waitall(mpi_size_map-1,ila_req_mpi(n,:),ila_sta_mpi(1,n,1),il_err)
+            DO i_n=1,4
+               CALL MPI_Waitall(mpi_size_map-1,ila_req_mpi(i_n,:),ila_sta_mpi(1,i_n,1),il_err)
             END DO
 
             DEALLOCATE(ila_req_mpi)
@@ -1037,96 +1075,6 @@ contains
    end subroutine store_link_nbr
 
    !***********************************************************************
-
-   subroutine grid_dist_average(grid_size,                 &
-                                coslat_grid, coslon_grid,  &
-                                sinlat_grid, sinlon_grid,  &
-                                dist_average)
-
-!-----------------------------------------------------------------------
-!
-!     this routine computes the average distance between the points of a
-!     grid.
-!
-!-----------------------------------------------------------------------
-
-!-----------------------------------------------------------------------
-!
-!     output variables
-!
-!-----------------------------------------------------------------------
-
-      real (kind=dbl_kind), intent(out) :: dist_average ! distance to each of the closest points
-
-!-----------------------------------------------------------------------
-!
-!     input variables
-!
-!-----------------------------------------------------------------------
-
-      integer (kind=int_kind), intent(in) :: grid_size
-
-      real (kind=dbl_kind), dimension(:), intent(in) ::  &
-              coslat_grid,   & ! cos(lat)  of the grid points
-              coslon_grid,   & ! cos(lon)  of the grid points
-              sinlat_grid,   & ! sin(lat)  of the grid points
-              sinlon_grid      ! sin(lon)  of the grid points
-      REAL (kind=dbl_kind) :: distance
-
-!-----------------------------------------------------------------------
-!
-!     local variables
-!
-!-----------------------------------------------------------------------
-
-      integer (kind=int_kind) :: i
-!
-      IF (nlogprt .GE. 2) THEN
-         WRITE (UNIT = nulou,FMT = *)' '
-         WRITE (UNIT = nulou,FMT = *) 'Entering routine remap_dist_average'
-         CALL OASIS_FLUSH_SCRIP(nulou)
-      ENDIF
-!
-!-----------------------------------------------------------------------
-!
-!     compute the distance over the grid and average
-!
-!-----------------------------------------------------------------------
-
-      dist_average = 0.0
-      distance = sinlat_grid(grid_size)*sinlat_grid(1) +   &
-                 coslat_grid(grid_size)*coslat_grid(1)*    &
-                 (coslon_grid(grid_size)*coslon_grid(1) +  &
-                  sinlon_grid(grid_size)*sinlon_grid(1))
-      IF (distance < -1.0d0) THEN
-        distance = -1.0d0
-      ELSE IF (distance > 1.0d0) THEN
-        distance = 1.0d0
-      END IF
-      dist_average = dist_average + acos(distance)
-      !
-      DO i = 2, grid_size
-        distance = sinlat_grid(i-1)*sinlat_grid(i) +         &
-                   coslat_grid(i-1)*coslat_grid(i)*          &
-                   (coslon_grid(i-1)*coslon_grid(i) +        &
-                   sinlon_grid(i-1)*sinlon_grid(i))
-        IF (distance < -1.0d0) THEN
-          distance = -1.0d0
-        ELSE IF (distance > 1.0d0) THEN
-          distance = 1.0d0
-        END IF
-        dist_average = dist_average + acos(distance)
-      END DO
-      !
-      dist_average = dist_average / grid_size
-!
-      IF (nlogprt .GE. 2) THEN
-         WRITE (UNIT = nulou,FMT = *)' '
-         WRITE (UNIT = nulou,FMT = *) 'Leaving routine remap_dist_average'
-         CALL OASIS_FLUSH_SCRIP(nulou)
-      ENDIF
-!
-      END subroutine grid_dist_average
 
 end module remap_distance_gaussian_weight
 
