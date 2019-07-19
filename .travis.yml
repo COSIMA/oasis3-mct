@@ -1,27 +1,42 @@
 language: c
 sudo: required
+
+dist: xenial
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    update: true
+    packages:
+      - pkg-config csh cmake
+      - gfortran
+      - openmpi-bin libopenmpi-dev libopenmpi1.10
+      - netcdf-bin libnetcdf-dev libnetcdff-dev libnetcdf11
+
 git:
   depth: 3
   quiet: true
+
 env:
   matrix:
   - TYPE=ubuntu
   global:
-  - FC=gfortran-4.8
+  - FC=gfortran
   - OMPI_FC=${FC}
+
 matrix:
   allow_failures:
   - env: TYPE=ACCESS-OM
   - env: TYPE=ACCESS-CM
-install:
-  - sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update
-  - sudo apt-get install csh gcc-4.8 gfortran-4.8 libgomp1 openmpi-bin libopenmpi-dev  libnetcdf-dev  netcdf-bin
+
 script:
   - make $TYPE
+
 before_deploy:
   - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
   - tar -czvf binary_release.tar.gz Linux/*
+
 deploy:
   provider: releases
   api_key:
