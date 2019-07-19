@@ -3,6 +3,17 @@ sudo: required
 
 dist: xenial
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    update: true
+    packages:
+      - pkg-config csh cmake
+      - gfortran
+      - openmpi-bin libopenmpi-dev libopenmpi1.10
+      - netcdf-bin libnetcdf-dev libnetcdff-dev libnetcdf11
+
 git:
   depth: 3
   quiet: true
@@ -18,11 +29,6 @@ matrix:
   allow_failures:
   - env: TYPE=ACCESS-OM
   - env: TYPE=ACCESS-CM
-
-install:
-  - sudo apt-add-repository --yes ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update
-  - sudo apt-get install csh gfortran libgomp1 openmpi-bin libopenmpi-dev  libnetcdf-dev libnetcdff-dev  netcdf-bin
 
 script:
   - make $TYPE
