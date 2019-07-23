@@ -659,9 +659,13 @@
             !*** assume cyclic
             ip1 = 1
             !*** but if it is not, correct
+            dlat = abs(grid1_center_lat(n) - grid1_center_lat(n-1))
+            dlon = abs(grid1_center_lon(n) - grid1_center_lon(n-1))
             e_add = (j - 1)*nx + ip1
             if (abs(grid1_center_lat(e_add) -  &
-                    grid1_center_lat(n   )) > pih) then
+                    grid1_center_lat(n   )) > 10.0 * dlat .or. &
+                abs(grid1_center_lon(e_add) -  &
+                    grid1_center_lon(n   )) > 10.0 * dlon) then
               ip1 = i
             endif
           endif
@@ -672,9 +676,13 @@
             !*** assume cyclic
             jp1 = 1
             !*** but if it is not, correct
+            dlat = abs(grid1_center_lat(n) - grid1_center_lat(n-nx))
+            dlon = abs(grid1_center_lon(n) - grid1_center_lon(n-nx))
             n_add = (jp1 - 1)*nx + i
             if (abs(grid1_center_lat(n_add) -  &
-                    grid1_center_lat(n   )) > pih) then
+                    grid1_center_lat(n   )) > 10.0 * dlat .or. &
+                abs(grid1_center_lon(n_add) -  &
+                    grid1_center_lon(n   )) > 10.0 * dlon) then
               jp1 = j
             endif
           endif
@@ -722,9 +730,13 @@
             !*** assume cyclic
             ip1 = 1
             !*** but if it is not, correct
+            dlat = abs(grid2_center_lat(n) - grid2_center_lat(n-1))
+            dlon = abs(grid2_center_lon(n) - grid2_center_lon(n-1))
             e_add = (j - 1)*nx + ip1
             if (abs(grid2_center_lat(e_add) - &
-                    grid2_center_lat(n   )) > pih) then
+                    grid2_center_lat(n   )) > 10.0 * dlat .or. &
+                abs(grid2_center_lon(e_add) -  &
+                    grid2_center_lon(n   )) > 10.0 * dlon) then
               ip1 = i
             endif
           endif
@@ -735,9 +747,13 @@
             !*** assume cyclic
             jp1 = 1
             !*** but if it is not, correct
+            dlat = abs(grid2_center_lat(n) - grid2_center_lat(n-nx))
+            dlon = abs(grid2_center_lon(n) - grid2_center_lon(n-nx))
             n_add = (jp1 - 1)*nx + i
             if (abs(grid2_center_lat(n_add) -  &
-                    grid2_center_lat(n   )) > pih) then
+                    grid2_center_lat(n   )) > 10.0 * dlat .or. &
+                abs(grid2_center_lon(n_add) -  &
+                    grid2_center_lon(n   )) > 10.0 * dlon) then
               jp1 = j
             endif
           endif
