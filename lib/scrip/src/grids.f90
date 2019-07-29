@@ -655,6 +655,8 @@
 
           if (i < nx) then
             ip1 = i + 1
+          elseif (ny == 1) then
+          	ip1 = i
           else
             !*** assume cyclic
             ip1 = 1
@@ -672,6 +674,8 @@
 
           if (j < ny) then
             jp1 = j+1
+          elseif (ny == 1) then
+          	jp1 = j
           else
             !*** assume cyclic
             jp1 = 1
