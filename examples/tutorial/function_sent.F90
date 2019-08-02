@@ -22,7 +22,7 @@ SUBROUTINE function_sent(ni,nj, &
   INTEGER, INTENT(in) :: ni,nj,ib
   !
   INTEGER             :: i,j,k,l
-  INTEGER,PARAMETER   :: tdim=100
+  INTEGER,PARAMETER   :: tdim=20
   !
   REAL (kind=wp), INTENT(out)            :: fnc_ana(ni,nj)
   !
