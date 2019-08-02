@@ -1,0 +1,121 @@
+#!/bin/ksh
+#set -xv
+######################################################################
+#
+host=`uname -n`
+user=`whoami`
+#
+## - Define paths
+srcdir=`pwd`
+datadir=$srcdir/data_spoc
+casename=`basename $srcdir`
+#
+## - Name of the executables
+    exe1=ocean
+    exe2=atmos
+#
+############### User's section #######################################
+#
+## - Define architecture and coupler 
+arch=nemo_lenovo_intel_impi_openmp  # beaufix, nemo_lenovo_gfortran_openmpi, training_computer
+#
+# - Define number of processes to run each executable
+    nproc_exe1=4
+    nproc_exe2=4
+#
+# - Define rundir
+    rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}
+#
+############### End of user's section ################################
+#
+echo '*****************************************************************'
+echo '*** '$casename' : '$run
+echo ''
+echo 'Rundir       :' $rundir
+echo 'Architecture :' $arch
+echo 'Host         : '$host
+echo 'User         : '$user
+echo ''
+echo $exe1' runs on '$nproc_exe1 'processes'
+echo $exe2' runs on '$nproc_exe2 'processes'
+echo ''
+######################################################################
+### 1. Create rundir and copy everything needed
+#
+\rm -fr $rundir
+mkdir -p $rundir
+cp -f $datadir/*nc  $rundir/.
+cp -f $srcdir/$exe1 $rundir/.
+cp -f $srcdir/$exe2 $rundir/.
+cp -f $datadir/namcouple $rundir/.
+cd $rundir
+######################################################################
+### 2. Creation of configuration of running scripts
+#
+if [ $arch == training_computer ]; then
+    MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
+elif [ $arch == beaufix ] ; then
+    MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun
+   (( nproc = $nproc_exe1 + $nproc_exe2 ))
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash
+#SBATCH --time=00:10:00
+#SBATCH --partition=normal64 # queue
+#SBATCH --job-name=spoc     # job name
+#SBATCH -N 1                # number of nodes
+#SBATCH -n $nproc                # number of procs
+#SBATCH -o job.out%j
+#SBATCH -o job.err%j
+#SBATCH --exclusive
+ulimit -s unlimited
+cd $rundir
+module load netcdf/4.4.0 
+#
+# Activate next line to run in coupled mode
+time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+EOF
+#
+elif [ ${arch} == nemo_lenovo_intel_impi_openmp ] ; then
+  (( nproc = $nproc_exe1 + $nproc_exe2 ))
+  cat <<EOF > $rundir/run_$casename.$arch
+#!/bin/bash -l
+# Nom du job
+#SBATCH --job-name spoc
+# Temps limite du job
+#SBATCH --time=00:10:00
+#SBATCH --output=$rundir/$casename.o
+#SBATCH --error=$rundir/$casename.e
+# Nombre de noeuds et de processus
+#SBATCH --nodes=1 --ntasks-per-node=$nproc
+#SBATCH --distribution cyclic
+cd $rundir
+ulimit -s unlimited
+module purge
+module -s load compiler/intel/2015.2.164 mkl/2015.2.164 mpi/intelmpi/5.0.3.048
+#
+time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+#
+EOF
+fi 
+  
+######################################################################
+### 3. Execute the models
+#
+if [ $arch == training_computer ]; then
+    export OMP_NUM_THREADS=1
+    echo 'Executing the model using '$MPIRUN 
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+elif [ $arch == beaufix ]; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $user
+elif [ ${arch} == nemo_lenovo_intel_impi_openmp ] ; then
+    echo 'Submitting the job to queue using sbatch'
+    sbatch $rundir/run_$casename.$arch
+    squeue -u $USER
+fi
+echo $casename 'is executed or submitted to queue.'
+echo 'Results are found in rundir : '$rundir 
+#
+######################################################################
