@@ -1,6 +1,6 @@
 SUBROUTINE function_sent(ni,nj, &
                          coords_1,coords_2, &
-                         fnc_ana,ib)
+                         fnc_ana,ib,w_unit)
   !*********************************************************************************************************************
   !
   IMPLICIT NONE
@@ -19,10 +19,10 @@ SUBROUTINE function_sent(ni,nj, &
   REAL (kind=wp), PARAMETER    :: dp_length= 1.2*dp_pi
   REAL (kind=wp), PARAMETER    :: dp_conv = dp_pi/180.
   !
-  INTEGER, INTENT(in) :: ni,nj,ib
+  INTEGER, INTENT(in) :: ni,nj,ib,w_unit
   !
   INTEGER             :: i,j,k,l
-  INTEGER,PARAMETER   :: tdim=20
+  INTEGER,PARAMETER   :: tdim=100
   !
   REAL (kind=wp), INTENT(out)            :: fnc_ana(ni,nj)
   !
@@ -46,12 +46,14 @@ SUBROUTINE function_sent(ni,nj, &
   DO j=1,ni
     DO l=1,tdim
        DO i=1,tdim
-          c(i,l)=0.
+          c(l,i)=0.
           DO k=1,tdim
-             c(l,i)=a(l,k)*b(k,i)+j
+             c(l,i)=a(l,k)*b(k,i)+j+ib
           ENDDO
        ENDDO
     ENDDO
+    !write(w_unit,*) 'Indice j end loop:',j
+    !call flush(w_unit)
   ENDDO
   !
   !

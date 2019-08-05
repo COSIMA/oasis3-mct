@@ -284,7 +284,7 @@ PROGRAM model1
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
                        RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
-                                field1_send,ib)
+                                field1_send,ib,w_unit)
     !
     ! Send FSENDOCN
     ! TOCOMPLETE - Put here the OASIS call to send FSENDOCN (field1_send)

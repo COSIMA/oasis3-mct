@@ -18,7 +18,7 @@ casename=`basename $srcdir`
 #
 #
 ## - Define architecture and coupler 
-arch=machine_test   #training_computer/Linux pgi openmpi/Linux gfortran openmpi
+arch=training_computer   #training_computer/Linux pgi openmpi/Linux gfortran openmpi
                     #nemo_lenovo intel impi, kraken intel impi, beaufix intel impi, 
 		    #ada, Cray, machine_test 
 #
