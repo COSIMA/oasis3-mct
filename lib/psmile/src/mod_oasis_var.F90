@@ -52,12 +52,13 @@
      INTEGER(kind=ip_i4_p),intent(out) :: id_nports    !< coupling field ID
      CHARACTER(len=*)     ,intent(in)  :: cdport       !< field name as in namcouple
      INTEGER(kind=ip_i4_p),intent(in)  :: id_part      !< partition ID
-     INTEGER(kind=ip_i4_p),intent(inout)  :: id_var_nodims(2)  !< rank and number of bundles
+     INTEGER(kind=ip_i4_p),intent(in)  :: id_var_nodims(2)  !< rank and number of bundles
      INTEGER(kind=ip_i4_p),intent(in)  :: kinout       !< input or output flag
      INTEGER(kind=ip_i4_p),intent(in)  :: id_var_shape(2*id_var_nodims(1)) !< size of field
      INTEGER(kind=ip_i4_p),intent(in)  :: ktype        !< type of coupling field
      INTEGER(kind=ip_i4_p),intent(out),optional :: kinfo    !< return code
      !---------------------------------------------------------------
+     INTEGER(kind=ip_i4_p)  :: il_var_nodims_temp(2)  !< rank and number of bundles temporary
      INTEGER(kind=ip_i4_p)  :: n
      CHARACTER(len=ic_lvar) :: trimmed_cdport   ! Trimmed version of cdport
      character(len=*),parameter :: subname = '(oasis_def_var)'
@@ -90,7 +91,7 @@
 
      !-------------------------------------------------     
      !> * Search for field in namcouple field lists
-     !-------------------------------------------------     
+     !-------------------------------------------------
 
      ! If either condition ceases to be true then bail out of the loop
      DO WHILE (n < size_namfld .AND. (.NOT.l_field_in_namcouple))
@@ -128,12 +129,18 @@
      enddo
 
      ! tcraig, this is due to i3.3 in the 2d->1d field bundle renaming
-     if (id_var_nodims(2) == 0) id_var_nodims(2)=1 
-     if (id_var_nodims(2) > 999) then
-        write(nulprt,*) subname,estr,'variable id_var_nodims2 too large.  limit is 999 ',id_var_nodims(2)
+     il_var_nodims_temp(:)=id_var_nodims(:)
+     IF (il_var_nodims_temp(2) > 999) THEN
+        write(nulprt,*) subname,estr,'variable id_var_nodims(2) too large.  limit is 999 ',il_var_nodims_temp(2)
         write(nulprt,*) subname,estr,'check oasis_def_var calls in your model'
         call oasis_abort(file=__FILE__,line=__LINE__)
-     endif
+     ENDIF
+         
+     IF (il_var_nodims_temp(2) <= 0) THEN
+         il_var_nodims_temp(2)=1
+         WRITE(nulprt,*) subname,'WARNING id_var_nodim(2) cannot be negative or 0 ; put to 1'
+         call oasis_flush(nulprt)
+     ENDIF
 
      !-------------------------------------------------     
      !> * Increment the variable and store the values
@@ -151,7 +158,7 @@
      call oasis_var_zero(prism_var(prism_nvar))
      prism_var(prism_nvar)%name = trimmed_cdport
      prism_var(prism_nvar)%part = id_part
-     prism_var(prism_nvar)%num  = id_var_nodims(2)
+     prism_var(prism_nvar)%num  = il_var_nodims_temp(2)
      prism_var(prism_nvar)%ops  = kinout
      prism_var(prism_nvar)%type = ktype
      prism_var(prism_nvar)%size = 1
