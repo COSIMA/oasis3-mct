@@ -19,7 +19,7 @@ reproducibility;
 - Exchange of data on only a subdomain of the global grid;
 - The specification of how time statistics are written out (variable TIMER_Debug) in the configuration file “namcouple”;
 
-Bug fixes :
+Bug fixes:
 - Come back to id_var_nodim as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk
 - Fix the treatment of the periodicity of the grids
 - GAUSWGT remapping: exact calculation of average distance
