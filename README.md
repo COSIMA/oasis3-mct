@@ -22,8 +22,10 @@ reproducibility;
 Bug fixes:
 - Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk (commit 28f4fe59)
 - Fix the treatment of the periodicity of the grids (commits 20127fd9, 68021b13, facc08c1) 
-- GAUSWGT remapping: exact calculation of average distance (commit 1df003a1)
-- For the second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI (svn revision 2535)
+- GAUSWGT remapping: exact calculation of average distance (commit 1df003a1) ; RT : https://cerfacs.fr/wp-content/uploads/2019/08/GlobC-TR-maisonnave-gaussian_interpolation-2_2019.pdf
+- Second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI (svn revision 2535)
+- For upward compatibility, declaration of var_actual_shape in oasis_def_var is back to var_actual_shape(2*id_var_nodims(1)) as in OASIS3-MCT_3.0
+- Redefinition of var_nodim(2) to 1 in oasis_def_var if it is equal to 0 in the models, as it represents now the number of bundle fields
 
 Please keep us informed of your progress with OASIS3-MCT and do not forget to cite the following latest reference in your paper describing your cou
 pled model results:
