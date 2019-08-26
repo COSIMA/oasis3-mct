@@ -20,10 +20,10 @@ reproducibility;
 - The specification of how time statistics are written out (variable TIMER_Debug) in the configuration file “namcouple”;
 
 Bug fixes:
-- Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk
-- Fix the treatment of the periodicity of the grids
-- GAUSWGT remapping: exact calculation of average distance
-- For the second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI.
+- Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk (commit 28f4fe59)
+- Fix the treatment of the periodicity of the grids (commits 20127fd9, 68021b13, facc08c1) 
+- GAUSWGT remapping: exact calculation of average distance (commit 1df003a1)
+- For the second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI (svn revision 2535)
 
 Please keep us informed of your progress with OASIS3-MCT and do not forget to cite the following latest reference in your paper describing your cou
 pled model results:
