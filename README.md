@@ -20,7 +20,7 @@ reproducibility;
 - The specification of how time statistics are written out (variable TIMER_Debug) in the configuration file “namcouple”;
 
 Bug fixes:
-- Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk (commit 28f4fe59)
+- Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk with intel (commit 28f4fe59)
 - Fix the treatment of the periodicity of the grids (commits 20127fd9, 68021b13, facc08c1) 
 - GAUSWGT remapping: exact calculation of average distance (commit 1df003a1) ; RT : https://cerfacs.fr/wp-content/uploads/2019/08/GlobC-TR-maisonnave-gaussian_interpolation-2_2019.pdf
 - Second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI (svn revision 2535)
