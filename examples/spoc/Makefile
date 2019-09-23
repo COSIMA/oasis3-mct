@@ -4,7 +4,7 @@ LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR
 #
 ##### User configurable options #####
 #
-# CPP keys for type of decomposition for model 1 (_M1) and for model 2 (_M2)
+# CPP keys for type of decomposition for ocean (_M1) and for atmos (_M2)
 # DECOMP_APPLE for 1D decomposition, DECOMP_BOX for 2D decomposition
 CPPKEYDECOMP_M1=DECOMP_APPLE
 CPPKEYDECOMP_M2=DECOMP_APPLE
