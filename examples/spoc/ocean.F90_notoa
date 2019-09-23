@@ -10,6 +10,7 @@ PROGRAM ocean
   INCLUDE 'mpif.h'   ! Include for MPI
   !
   INTEGER :: mype, npes ! rank and number of pe
+  INTEGER :: localComm  ! local communicator for ocean processes
   CHARACTER(len=128) :: comp_out ! name of the output log file 
   CHARACTER(len=3)   :: chout
   INTEGER :: ierror, w_unit
@@ -44,18 +45,25 @@ PROGRAM ocean
   !
   call MPI_Init(ierror)
   !
-  CALL MPI_Comm_Size ( MPI_COMM_WORLD, npes, ierror )
-  CALL MPI_Comm_Rank ( MPI_COMM_WORLD, mype, ierror )
+  localComm =  MPI_COMM_WORLD
+  !
+  !!!!!!!!!!!!!!!!! OASIS_INIT_COMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
+  ! Get rank in local communicator
+  CALL MPI_Comm_Size ( localComm, npes, ierror )
+  CALL MPI_Comm_Rank ( localComm, mype, ierror )
   !
   ! Unit for output messages : one file for each process
   w_unit = 100 + mype
   WRITE(chout,'(I3)') w_unit
-  comp_out='ocean_component.out_'//chout
+  comp_out='ocean.out_'//chout
   !
   OPEN(w_unit,file=TRIM(comp_out),form='formatted')
   WRITE (w_unit,*) '-----------------------------------------------------------'
-  WRITE (w_unit,*) 'MPI_COMM_WORLD is :',MPI_COMM_WORLD
-  WRITE (w_unit,*) 'In MPI_COMM_WORLD, I am ocean_component process with rank :',mype
+  WRITE (w_unit,*) 'I am ocean process with rank :',mype
+  WRITE (w_unit,*) 'in my local communicator gathering ', npes, 'processes'
   WRITE (w_unit,*) '----------------------------------------------------------'
   CALL flush(w_unit)
   !
@@ -66,8 +74,11 @@ PROGRAM ocean
   ! Definition of the local partition
   call def_local_partition(nlon, nlat, npes, mype, &
   	     		 il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset)
+  WRITE(w_unit,*) 'Local partition definition'
   WRITE(w_unit,*) 'il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset = ', &
                    il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset
+  !
+  !!!!!!!!!!!!!!!!! OASIS_DEF_PARTITION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  GRID DEFINITION 
@@ -86,6 +97,8 @@ PROGRAM ocean
                 'ocean_mesh.nc', w_unit, &
                  grid_lon, grid_lat, grid_clo, grid_cla, grid_srf, grid_msk)
   !
+  !!!!!!!!!!!!!!!!! OASIS_WRITE_GRID  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  DEFINITION OF THE LOCAL FIELDS  
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -94,6 +107,8 @@ PROGRAM ocean
   ALLOCATE(field_send(il_extentx, il_extenty), STAT=ierror )
   ALLOCATE(field_recv(il_extentx, il_extenty), STAT=ierror )
   !
+  !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -101,26 +116,35 @@ PROGRAM ocean
   WRITE(w_unit,*) 'End of initialisation phase'
   call flush(w_unit)
   !
+  !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  TIME STEP LOOP
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
+  write(w_unit,*) 'Timestep, field min and max value'
+  call flush(w_unit)
   DO ib = 1,il_nb_time_steps
     !
     itap_sec = delta_t * (ib-1) ! time in seconds
     field_recv=-1.0
-    write(w_unit,*) 'Field received ',itap_sec,minval(field_recv),maxval(field_recv)
+    !
+    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_GET !!!!!!!!!!!!!!!!!!!!!!
     !
     ! Definition of field produced by the component
     field_send(:,:) =  ib*(2.-COS(dp_pi*(ACOS(COS(grid_lat(:,:)*dp_pi/180.)* &
                            COS(grid_lon(:,:)*dp_pi/180.))/dp_length)))
-    write(w_unit,*) 'Field to send ',itap_sec,minval(field_send),maxval(field_send)
+    write(w_unit,*) itap_sec,minval(field_send),maxval(field_send)
+    !
+    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_PUT !!!!!!!!!!!!!!!!!!!!!! 
     !
   ENDDO
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  !
+  !!!!!!!!!!!!!!!!!! OASIS_TERMINATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
