@@ -4,15 +4,15 @@ PROGRAM ocean
   USE netcdf
   !
   USE def_parallel_decomposition
-  !OA Use for OASIS communication library
+  !!!!!!!!!!!!!!!!! USE mod_oasis !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   USE mod_oasis
-  !endOA
   !
   IMPLICIT NONE
   !
   INCLUDE 'mpif.h'   ! Include for MPI
   !
   INTEGER :: mype, npes ! rank and number of pe
+  INTEGER :: localComm  ! local communicator for ocean processes
   CHARACTER(len=128) :: comp_out ! name of the output log file 
   CHARACTER(len=3)   :: chout
   INTEGER :: ierror, w_unit
@@ -41,57 +41,46 @@ PROGRAM ocean
   DOUBLE PRECISION, POINTER :: field_recv(:,:)
   DOUBLE PRECISION, POINTER :: field_send(:,:)
   !
-  !OA
   ! Used in OASIS3-MCT definition calls
-  INTEGER               :: comp_id 
-  INTEGER               :: localComm  ! local MPI communicator
+  INTEGER               :: comp_id
   INTEGER               :: part_id
   INTEGER               :: il_paral_size
   INTEGER, DIMENSION(:), ALLOCATABLE :: il_paral
-  INTEGER               :: var_id(2) 
-  INTEGER               :: var_nodims(2)
-  INTEGER               :: var_actual_shape(1) ! not used anymore in OASIS3-MCT 
-  INTEGER               :: var_type
   INTEGER               :: il_flag          ! Flag for grid writing
-
-  !endOA
+  INTEGER               :: var_id(2)
+  INTEGER               :: var_nodims(2)
+  INTEGER               :: var_actual_shape(1)
+  INTEGER               :: var_type
   !
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  INITIALISATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   call MPI_Init(ierror)
-  !OA
+  !
+  localComm =  MPI_COMM_WORLD
+  !
   !!!!!!!!!!!!!!!!! OASIS_INIT_COMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   CALL oasis_init_comp (comp_id,'ocean_component',ierror)
-  !endOA
   !
-  CALL MPI_Comm_Size ( MPI_COMM_WORLD, npes, ierror )
-  CALL MPI_Comm_Rank ( MPI_COMM_WORLD, mype, ierror )
+  !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  CALL oasis_get_localcomm ( localComm, ierror )
+  !
+  ! Get rank in local communicator
+  CALL MPI_Comm_Size ( localComm, npes, ierror )
+  CALL MPI_Comm_Rank ( localComm, mype, ierror )
   !
   ! Unit for output messages : one file for each process
   w_unit = 100 + mype
   WRITE(chout,'(I3)') w_unit
-  comp_out='ocean_component.out_'//chout
+  comp_out='ocean.out_'//chout
   !
   OPEN(w_unit,file=TRIM(comp_out),form='formatted')
   WRITE (w_unit,*) '-----------------------------------------------------------'
-  WRITE (w_unit,*) 'MPI_COMM_WORLD is :',MPI_COMM_WORLD
-  WRITE (w_unit,*) 'In MPI_COMM_WORLD, I am ocean_component process with rank :',mype
+  WRITE (w_unit,*) 'I am ocean process with rank :',mype
+  WRITE (w_unit,*) 'in my local communicator gathering ', npes, 'processes'
   WRITE (w_unit,*) '----------------------------------------------------------'
   CALL flush(w_unit)
-  ! 
-  ! OA 
-  !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_get_localcomm ( localComm, ierror )
-  !
-  ! Get MPI size and rank
-  CALL MPI_Comm_Size ( localComm, npes, ierror )
-  CALL MPI_Comm_Rank ( localComm, mype, ierror )
-  WRITE(w_unit,*) 'In my local communicator I am ocean_component process with local rank', mype
-  WRITE (w_unit,*) 'in a number of processes = ',npes
-  CALL flush(w_unit)
-  !endOA
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  PARTITION DEFINITION
@@ -100,19 +89,18 @@ PROGRAM ocean
   ! Definition of the local partition
   call def_local_partition(nlon, nlat, npes, mype, &
   	     		 il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset)
+  WRITE(w_unit,*) 'Local partition definition'
   WRITE(w_unit,*) 'il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset = ', &
                    il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset
-  !   
-  !OA
+  !
+  !!!!!!!!!!!!!!!!! OASIS_DEF_PARTITION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   call def_paral_size (il_paral_size)
   ALLOCATE(il_paral(il_paral_size))
   call def_paral (il_offset, il_size, il_extentx, il_extenty, nlon, il_paral_size, il_paral)
-  WRITE(w_unit,*) 'After decomp_def, il_paral = ', il_paral(:)
+  WRITE(w_unit,*) 'il_paral = ', il_paral(:)
   call flush(w_unit)
-  !!!!!!!!!!!!!!!!! OASIS_DEF_PARTITION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   CALL oasis_def_partition (part_id, il_paral, ierror)
   DEALLOCATE(il_paral)
-  !endOA
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  GRID DEFINITION 
@@ -131,17 +119,15 @@ PROGRAM ocean
                 'ocean_mesh.nc', w_unit, &
                  grid_lon, grid_lat, grid_clo, grid_cla, grid_srf, grid_msk)
   !
-  !OA
   !!!!!!!!!!!!!!!!! OASIS_WRITE_GRID  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! The chosen grid acronym is 'torc'
-  !
   CALL oasis_start_grids_writing(il_flag)
   CALL oasis_write_grid('torc', nlon, nlat, grid_lon, grid_lat)
   CALL oasis_write_corner('torc', nlon, nlat, 4, grid_clo, grid_cla)
   CALL oasis_write_area('torc', nlon, nlat, grid_srf)
   CALL oasis_write_mask('torc', nlon, nlat, grid_msk(:,:))
   CALL oasis_terminate_grids_writing()
-  !endOA
+  WRITE(w_unit,*) 'grid_lat maximum and minimum', MAXVAL(grid_lat), MINVAL(grid_lat)
+  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  DEFINITION OF THE LOCAL FIELDS  
@@ -151,10 +137,7 @@ PROGRAM ocean
   ALLOCATE(field_send(il_extentx, il_extenty), STAT=ierror )
   ALLOCATE(field_recv(il_extentx, il_extenty), STAT=ierror )
   !
-  !OA
-  !!!!!!!!!!!!!!! !!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !  Define coupling fields
-  !
+  !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   var_nodims(1) = 2    ! Rank of the field array ; not used anymore in OASIS3-MCT
   var_nodims(2) = 1    ! Number of bundle fields
   var_actual_shape(1) = 1 ! Not used anymore in OASIS3-MCT
@@ -163,7 +146,8 @@ PROGRAM ocean
   ! Declaration of the coupling fields
   CALL oasis_def_var (var_id(1),'FRECVOCN', part_id, var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
   CALL oasis_def_var (var_id(2),'FSENDOCN', part_id, var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
-  !endOA
+  WRITE(w_unit,*)'var_id FRECVOCN, var_id FSENDOCN', var_id(1), var_id(2)
+  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
@@ -172,37 +156,31 @@ PROGRAM ocean
   WRITE(w_unit,*) 'End of initialisation phase'
   call flush(w_unit)
   !
-  !OA
   !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !  All processes involved in the coupling must call oasis_enddef;
-  !
   CALL oasis_enddef (ierror)
-  !endOA
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  TIME STEP LOOP
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
+  write(w_unit,*) 'Timestep, field min and max value'
+  call flush(w_unit)
   DO ib = 1,il_nb_time_steps
     !
     itap_sec = delta_t * (ib-1) ! time in seconds
     field_recv=-1.0
     !
-    !OA
-    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_GET !!!!!!!!!!!!!!!!!!!!!! 
+    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_GET !!!!!!!!!!!!!!!!!!!!!!
     CALL oasis_get(var_id(1),itap_sec, field_recv, ierror)
-    !endOA
-    write(w_unit,*) 'Field received ',itap_sec,minval(field_recv),maxval(field_recv)
+    write(w_unit,*) itap_sec,minval(field_recv),maxval(field_recv)
     !
     ! Definition of field produced by the component
     field_send(:,:) =  ib*(2.-COS(dp_pi*(ACOS(COS(grid_lat(:,:)*dp_pi/180.)* &
                            COS(grid_lon(:,:)*dp_pi/180.))/dp_length)))
-    write(w_unit,*) 'Field to send ',itap_sec,minval(field_send),maxval(field_send)
+    !write(w_unit,*) itap_sec,minval(field_send),maxval(field_send)
     !
-    !OA
     !!!!!!!!!!!!!!!!!!!!!!!! OASIS_PUT !!!!!!!!!!!!!!!!!!!!!! 
     CALL oasis_put(var_id(2),itap_sec, field_send, ierror)
-    !endOA
     !
   ENDDO
   !
@@ -210,10 +188,8 @@ PROGRAM ocean
   !         TERMINATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
-  !OA
   !!!!!!!!!!!!!!!!!! OASIS_TERMINATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   CALL oasis_terminate (ierror)
-  !endOA
   !
   WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
