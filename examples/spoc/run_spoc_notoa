@@ -17,16 +17,16 @@ casename=`basename $srcdir`
 ############### User's section #######################################
 #
 ## - Define architecture and coupler 
-arch=nemo_lenovo_intel_impi_openmp  # beaufix, nemo_lenovo_gfortran_openmpi, training_computer
+arch=nemo_lenovo  # training, beaufix, nemo_lenovo 
 #
 # - Define number of processes to run each executable
     nproc_exe1=4
     nproc_exe2=4
 #
+############### End of user's section ################################
+#
 # - Define rundir
     rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}_notoa
-#
-############### End of user's section ################################
 #
 echo '*****************************************************************'
 echo '*** '$casename' : '$run
@@ -50,9 +50,9 @@ cp -f $srcdir/$exe2 $rundir/.
 cp -f $datadir/namcouple $rundir/.
 cd $rundir
 ######################################################################
-### 2. Creation of configuration of running scripts
+### 2. Definition of mpirun command and batch script
 #
-if [ $arch == training_computer ]; then
+if [ $arch == training ]; then
     MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
 elif [ $arch == beaufix ] ; then
     MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun
@@ -77,7 +77,7 @@ time $MPIRUN -np $nproc_exe2 ./$exe2
 #
 EOF
 #
-elif [ ${arch} == nemo_lenovo_intel_impi_openmp ] ; then
+elif [ ${arch} == nemo_lenovo ] ; then
   (( nproc = $nproc_exe1 + $nproc_exe2 ))
   cat <<EOF > $rundir/run_$casename.$arch
 #!/bin/bash -l
@@ -85,6 +85,7 @@ elif [ ${arch} == nemo_lenovo_intel_impi_openmp ] ; then
 #SBATCH --job-name spoc
 # Temps limite du job
 #SBATCH --time=00:10:00
+#SBATCH --partition debug
 #SBATCH --output=$rundir/$casename.o
 #SBATCH --error=$rundir/$casename.e
 # Nombre de noeuds et de processus
@@ -102,9 +103,9 @@ EOF
 fi 
   
 ######################################################################
-### 3. Execute the models
+### 3. Model execution or batch submission
 #
-if [ $arch == training_computer ]; then
+if [ $arch == training ]; then
     export OMP_NUM_THREADS=1
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
@@ -113,7 +114,7 @@ elif [ $arch == beaufix ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $user
-elif [ ${arch} == nemo_lenovo_intel_impi_openmp ] ; then
+elif [ ${arch} == nemo_lenovo ] ; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
     squeue -u $USER
