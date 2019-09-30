@@ -120,10 +120,10 @@ PROGRAM atmos
   !
   !!!!!!!!!!!!!!!!! OASIS_WRITE_GRID  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   CALL oasis_start_grids_writing(il_flag)
-  CALL oasis_write_grid('lmdz', nlon, nlat, grid_lon, grid_lat)
-  CALL oasis_write_corner('lmdz', nlon, nlat, 4, grid_clo, grid_cla)
-  CALL oasis_write_area('lmdz', nlon, nlat, grid_srf)
-  CALL oasis_write_mask('lmdz', nlon, nlat, grid_msk(:,:))
+  CALL oasis_write_grid('lmdz', nlon, nlat, grid_lon, grid_lat, part_id)
+  CALL oasis_write_corner('lmdz', nlon, nlat, 4, grid_clo, grid_cla, part_id)
+  CALL oasis_write_area('lmdz', nlon, nlat, grid_srf, part_id)
+  CALL oasis_write_mask('lmdz', nlon, nlat, grid_msk(:,:), part_id)
   CALL oasis_terminate_grids_writing()
   WRITE(w_unit,*) 'grid_lat maximum and minimum', MAXVAL(grid_lat), MINVAL(grid_lat)
   call flush(w_unit)
