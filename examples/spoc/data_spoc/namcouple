@@ -71,7 +71,7 @@ FSENDATM  FRECVOCN  1 7200  1  fdatm.nc EXPOUT
 96 72 182 149 lmdz torc LAG=+1800
 #
 P  0  P  2
-MAPPING
-rmp_lmdz_to_torc_BILINEAR.nc src
+SCRIPR
+BILINEAR LR SCALAR LATLON 1
 #
  $END
