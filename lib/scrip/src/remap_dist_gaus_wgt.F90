@@ -476,7 +476,7 @@ contains
                rl_local_variance = 0.
                il_nb_pairs = 0
                do i_n = 1, num_neighbors-1
-                  do ib_nb = 2, num_neighbors
+                  do ib_nb = i_n+1, num_neighbors
                      il_n1_add = nbr_add(i_n)
                      il_n2_add = nbr_add(ib_nb)
                      if ( grid1_mask(il_n1_add) .and. grid1_mask(il_n2_add) ) then
@@ -484,9 +484,12 @@ contains
                                          coslat(il_n2_add)*coslat(il_n1_add)*    &
                                          ( coslon(il_n2_add)*coslon(il_n1_add) + &
                                            sinlon(il_n2_add)*sinlon(il_n1_add) )
-                        rl_nb_distance = MAX ( MIN ( rl_nb_distance, 1.), -1. )
-                        rl_local_variance = rl_local_variance + acos ( rl_nb_distance )
-                        il_nb_pairs = il_nb_pairs + 1
+                        rl_nb_distance = MAX ( MIN ( rl_nb_distance, 1.), -1.)
+                        rl_nb_distance = acos ( rl_nb_distance )
+                        if ( rl_nb_distance **2 > epsilon(dl_test) ) then
+                          rl_local_variance = rl_local_variance + rl_nb_distance 
+                          il_nb_pairs = il_nb_pairs + 1
+                        endif
                      end if
                   enddo
                enddo
