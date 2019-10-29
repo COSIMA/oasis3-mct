@@ -20,6 +20,7 @@ reproducibility;
 - The specification of how time statistics are written out (variable TIMER_Debug) in the configuration file “namcouple”;
 
 Bug fixes:
+- Avoid false detection of coincident segments by re-initializing LCOINC to false when a tested cell is discarded
 - Come back to id_var_nodim defined as IN in mod_oasis_var.F90 to compile again with NEMO_4.0 and NEMO trunk with intel (commit 28f4fe59)
 - Fix the treatment of the periodicity of the grids (commits 20127fd9, 68021b13, facc08c1) 
 - GAUSWGT remapping: exact calculation of average distance (commit 1df003a1) ; RT : https://cerfacs.fr/wp-content/uploads/2019/08/GlobC-TR-maisonnave-gaussian_interpolation-2_2019.pdf
