@@ -8,7 +8,7 @@
   IMPLICIT NONE
   !
   INTEGER, INTENT(in)             :: nlon, nlat, nc, id_begi, id_begj, id_lon, id_lat
-  CHARACTER(len=30), INTENT(in)   :: data_filename
+  CHARACTER(len=*), INTENT(in)   :: data_filename
   INTEGER, INTENT(in)             :: w_unit
   DOUBLE PRECISION, DIMENSION(id_lon, id_lat), INTENT(out)       :: dda_lon, dda_lat, dda_srf
   DOUBLE PRECISION, DIMENSION(id_lon, id_lat, nc), INTENT(out)   :: dda_clo, dda_cla
