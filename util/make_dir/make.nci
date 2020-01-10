@@ -29,11 +29,11 @@ ARFLAGS     = -ruv
 ifeq ($(DEBUG), yes)
     F90FLAGS_1  = -convert big_endian -i4 -r8 -traceback -O -debug all -g -check all -fpe0 -CB -fno-alias -ip -align all -assume nobuffered_io -check noarg_temp_created
     CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY -DDEBUG -D__VERBOSE
-    MCT_FCFLAGS = -O0 -debug all -g -check all -fpe0 -xHost -ip -align all
+    MCT_FCFLAGS = -O0 -debug all -g -check all -fpe0 -ip -align all
 else
-    F90FLAGS_1  = -convert big_endian -i4 -r8 -O3 -g -traceback -fno-alias -ip -align all -fpe0 -assume buffered_io -check noarg_temp_created
+    F90FLAGS_1  = -convert big_endian -i4 -r8 -O3 -xCORE-AVX2 -axSKYLAKE-AVX512,CASCADELAKE -g -traceback -fno-alias -ip -align all -fpe0 -assume buffered_io -check noarg_temp_created
     CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY
-    MCT_FCFLAGS = -O3 -xHost -ip -align all
+    MCT_FCFLAGS = -O3 -xCORE-AVX2 -axSKYLAKE-AVX512,CASCADELAKE -ip -align all
 endif 
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
