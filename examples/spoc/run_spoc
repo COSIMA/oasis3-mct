@@ -26,7 +26,7 @@ arch=nemo_lenovo  # training, beaufix, nemo_lenovo
 ############### End of user's section ################################
 #
 # - Define rundir
-    rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}_notoa
+    rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}
 #
 echo '*****************************************************************'
 echo '*** '$casename' : '$run
