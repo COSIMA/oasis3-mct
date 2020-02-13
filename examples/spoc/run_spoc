@@ -26,7 +26,7 @@ arch=nemo_lenovo  # training, beaufix, nemo_lenovo
 ############### End of user's section ################################
 #
 # - Define rundir
-    rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}
+    rundir=${srcdir}/work_${casename}_${nproc_exe1}_${nproc_exe2}_notoa
 #
 echo '*****************************************************************'
 echo '*** '$casename' : '$run
@@ -72,11 +72,13 @@ cd $rundir
 module load netcdf/4.4.0 
 #
 # Activate next line to run in coupled mode
-time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+time $MPIRUN -np $nproc_exe1 ./$exe1 
+time $MPIRUN -np $nproc_exe2 ./$exe2
 #
 EOF
 #
 elif [ ${arch} == nemo_lenovo ] ; then
+  MPIRUN=mpirun
   (( nproc = $nproc_exe1 + $nproc_exe2 ))
   cat <<EOF > $rundir/run_$casename.$arch
 #!/bin/bash -l
@@ -95,7 +97,8 @@ ulimit -s unlimited
 module purge
 module -s load compiler/intel/2015.2.164 mkl/2015.2.164 mpi/intelmpi/5.0.3.048
 #
-time mpirun -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
+time $MPIRUN -np $nproc_exe1 ./$exe1
+time $MPIRUN -np $nproc_exe2 ./$exe2
 #
 EOF
 fi 
@@ -106,7 +109,8 @@ fi
 if [ $arch == training ]; then
     export OMP_NUM_THREADS=1
     echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+    $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
+    $MPIRUN -np $nproc_exe2 ./$exe2 >> runjob.err
 elif [ $arch == beaufix ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch

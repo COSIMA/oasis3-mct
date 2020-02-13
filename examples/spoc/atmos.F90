@@ -4,8 +4,6 @@ PROGRAM atmos
   USE netcdf
   !
   USE def_parallel_decomposition
-  !!!!!!!!!!!!!!!!! USE mod_oasis !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  USE mod_oasis
   !
   IMPLICIT NONE
   !
@@ -41,16 +39,6 @@ PROGRAM atmos
   DOUBLE PRECISION, POINTER :: field_recv(:,:)
   DOUBLE PRECISION, POINTER :: field_send(:,:)
   !
-  ! Used in OASIS3-MCT definition calls
-  INTEGER               :: comp_id 
-  INTEGER               :: part_id
-  INTEGER               :: il_paral_size
-  INTEGER, DIMENSION(:), ALLOCATABLE :: il_paral
-  INTEGER               :: il_flag          ! Flag for grid writing
-  INTEGER               :: var_id(2)
-  INTEGER               :: var_nodims(2)
-  INTEGER               :: var_actual_shape(1) ! not used anymore in OASIS3-MCT
-  INTEGER               :: var_type
   !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  INITIALISATION 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -60,10 +48,8 @@ PROGRAM atmos
   localComm =  MPI_COMM_WORLD
   !
   !!!!!!!!!!!!!!!!! OASIS_INIT_COMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_init_comp (comp_id,'atmos_component',ierror)
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_get_localcomm ( localComm, ierror )
   !
   ! Get rank in local communicator
   CALL MPI_Comm_Size ( localComm, npes, ierror )
@@ -93,13 +79,6 @@ PROGRAM atmos
                    il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset
   !
   !!!!!!!!!!!!!!!!! OASIS_DEF_PARTITION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  call def_paral_size (il_paral_size)
-  ALLOCATE(il_paral(il_paral_size))
-  call def_paral (il_offset, il_size, il_extentx, il_extenty, nlon, il_paral_size, il_paral)
-  WRITE(w_unit,*) 'il_paral = ', il_paral(:)
-  call flush(w_unit)
-  CALL oasis_def_partition (part_id, il_paral, ierror)
-  DEALLOCATE(il_paral)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  GRID DEFINITION 
@@ -119,14 +98,6 @@ PROGRAM atmos
                  grid_lon, grid_lat, grid_clo, grid_cla, grid_srf, grid_msk)
   !
   !!!!!!!!!!!!!!!!! OASIS_WRITE_GRID  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_start_grids_writing(il_flag)
-  CALL oasis_write_grid('lmdz', nlon, nlat, grid_lon, grid_lat, part_id)
-  CALL oasis_write_corner('lmdz', nlon, nlat, 4, grid_clo, grid_cla, part_id)
-  CALL oasis_write_area('lmdz', nlon, nlat, grid_srf, part_id)
-  CALL oasis_write_mask('lmdz', nlon, nlat, grid_msk(:,:), part_id)
-  CALL oasis_terminate_grids_writing()
-  WRITE(w_unit,*) 'grid_lat maximum and minimum', MAXVAL(grid_lat), MINVAL(grid_lat)
-  call flush(w_unit)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  DEFINITION OF THE LOCAL FIELDS  
@@ -138,17 +109,6 @@ PROGRAM atmos
   !
   !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
-  var_nodims(1) = 2    ! Rank of the field array ; not used anymore in OASIS3-MCT
-  var_nodims(2) = 1    ! Number of bundle fields
-  var_actual_shape(1) = 1 ! Not used anymore in OASIS3-MCT
-  var_type = OASIS_Real
-  !
-  ! Declaration of the coupling fields
-  CALL oasis_def_var (var_id(1),'FRECVATM', part_id, var_nodims, OASIS_In, var_actual_shape, var_type, ierror)
-  CALL oasis_def_var (var_id(2),'FSENDATM', part_id, var_nodims, OASIS_Out, var_actual_shape, var_type, ierror)
-  WRITE(w_unit,*)'var_id FRECVATM, var_id FSENDATM', var_id(1), var_id(2)
-  call flush(w_unit)
-  !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !         TERMINATION OF DEFINITION PHASE 
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -157,7 +117,6 @@ PROGRAM atmos
   call flush(w_unit)
   !
   !!!!!!!!!!!!!!!!!! OASIS_ENDDEF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_enddef (ierror)
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !  TIME STEP LOOP
@@ -171,16 +130,13 @@ PROGRAM atmos
     field_recv=-1.0
     !
     !!!!!!!!!!!!!!!!!!!!!!!! OASIS_GET !!!!!!!!!!!!!!!!!!!!!!
-    CALL oasis_get(var_id(1),itap_sec, field_recv, ierror)
-    write(w_unit,*) itap_sec,minval(field_recv),maxval(field_recv)
     ! 
     ! Definition of field produced by the component
     field_send(:,:) =  ib*(2.-COS(dp_pi*(ACOS(COS(grid_lat(:,:)*dp_pi/180.)* &
                            COS(grid_lon(:,:)*dp_pi/180.))/dp_length)))
-    !write(w_unit,*) itap_sec,minval(field_send),maxval(field_send)
+    write(w_unit,*) itap_sec,minval(field_send),maxval(field_send)
     !
-    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_PUT !!!!!!!!!!!!!!!!!!!!!!
-    CALL oasis_put(var_id(2),itap_sec, field_send, ierror) 
+    !!!!!!!!!!!!!!!!!!!!!!!! OASIS_PUT !!!!!!!!!!!!!!!!!!!!!! 
     !
   ENDDO
   !
@@ -189,7 +145,6 @@ PROGRAM atmos
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   !
   !!!!!!!!!!!!!!!!!! OASIS_TERMINATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  CALL oasis_terminate (ierror)
   !
   WRITE (w_unit,*) 'End of the program'
   CALL flush(w_unit)
