@@ -46,7 +46,7 @@ P  2  P  0
 MAPPING
 #
 # Specific parameters for each analysis (here only the name of the remapping file for MAPPING)
-my_remapping_file_bilinear.nc src
+my_remapping_file_bilinear.nc
 #
 ######################################################
 #
@@ -64,4 +64,3 @@ SCRIPR
 # Specific parameters for SCRIPR, here specifying the parameter of the BLINEAR interpolation to be used
 BILINEAR LR SCALAR LATLON 1
 #
- $END
