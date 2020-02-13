@@ -92,7 +92,7 @@ PROGRAM atmos
   ALLOCATE(grid_srf(il_extentx, il_extenty), STAT=ierror )
   ALLOCATE(grid_msk(il_extentx, il_extenty), STAT=ierror )
   !
-  ! Reading local grid arrays from input file ocean_mesh.nc
+  ! Reading local grid arrays from input file atmos_mesh.nc
   CALL read_grid(nlon, nlat, nc, il_offsetx+1, il_offsety+1, il_extentx, il_extenty, &
                 'atmos_mesh.nc', w_unit, &
                  grid_lon, grid_lat, grid_clo, grid_cla, grid_srf, grid_msk)
