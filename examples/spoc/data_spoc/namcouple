@@ -30,7 +30,7 @@
 # 5) Number of transformation to be performed by OASIS3-MCT
 # 6) Coupling restart file names
 # 7) Field status: EXPORTED, EXPOUT, INPUT, OUTPUT
-FSENDOCN FRECVATM 1 3600  1  fdocn.nc EXPOUT
+FIELD_SEND_OCN FIELD_RECV_ATM 1 3600  1  fdocn.nc EXPOUT
 #
 #   Second line:
 # 1)-2) and 3)-4) Source and target grid first and 2nd dimensions (optional)
@@ -52,7 +52,7 @@ my_remapping_file_bilinear.nc
 #
 # Field 2: atmos to ocean
 #
-FSENDATM  FRECVOCN  1 7200  1  fdatm.nc EXPOUT
+FIELD_SEND_ATM FIELD_RECV_OCN  1 7200  1  fdatm.nc EXPOUT
 #
 96 72 182 149 lmdz torc LAG=+1800
 #
