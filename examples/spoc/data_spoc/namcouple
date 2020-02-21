@@ -36,7 +36,7 @@ FIELD_SEND_OCN FIELD_RECV_ATM 1 3600  1  fdocn.nc EXPOUT
 # 1)-2) and 3)-4) Source and target grid first and 2nd dimensions (optional)
 # 5) and 6) Source and target grid prefix (4 characters)
 # 7) LAG index if needed
-182 149 96 72 torc  lmdz  LAG=+3600
+182 149 96 72 torc  lmdz
 #
 #   Third line:
 # Overlap (P or R) and nbr of overlap grid points for source and target grids.
@@ -54,7 +54,7 @@ my_remapping_file_bilinear.nc
 #
 FIELD_SEND_ATM FIELD_RECV_OCN  1 7200  1  fdatm.nc EXPOUT
 #
-96 72 182 149 lmdz torc LAG=+1800
+96 72 182 149 lmdz torc
 #
 P  0  P  2
 #
