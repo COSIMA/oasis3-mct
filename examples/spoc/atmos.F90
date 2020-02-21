@@ -10,13 +10,13 @@ PROGRAM atmos
   INCLUDE 'mpif.h'   ! Include for MPI
   !
   INTEGER :: mype, npes ! rank and number of pe
-  INTEGER :: localComm  ! local communicator for atmos processes
+  INTEGER :: local_comm  ! local communicator for atmos processes
   CHARACTER(len=128) :: comp_out_atmos ! name of the output log file 
   CHARACTER(len=3)   :: chout
   INTEGER :: ierror, w_unit
   !
   ! Global grid parameters
-  INTEGER, PARAMETER :: nlon_atmos = 96, nlat = 72    ! dimensions in the 2 spatial directions
+  INTEGER, PARAMETER :: nlon_atmos = 96, nlat_atmos = 72    ! dimensions in the 2 spatial directions
   INTEGER, PARAMETER :: nc_atmos = 4 ! number of grid cell vertices in the (i,j) plan
   !
   ! Local grid dimensions and arrays
@@ -45,15 +45,15 @@ PROGRAM atmos
   !
   call MPI_Init(ierror)
   !
-  localComm =  MPI_COMM_WORLD
+  local_comm =  MPI_COMM_WORLD
   !
   !!!!!!!!!!!!!!!!! OASIS_INIT_COMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Get rank in local communicator
-  CALL MPI_Comm_Size ( localComm, npes, ierror )
-  CALL MPI_Comm_Rank ( localComm, mype, ierror )
+  CALL MPI_Comm_Size ( local_comm, npes, ierror )
+  CALL MPI_Comm_Rank ( local_comm, mype, ierror )
   !  
   ! Unit for output messages : one file for each process
   w_unit = 100 + mype
@@ -72,7 +72,7 @@ PROGRAM atmos
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
   ! Definition of the local partition
-  call def_local_partition(nlon_atmos, nlat, npes, mype, &
+  call def_local_partition(nlon_atmos, nlat_atmos, npes, mype, &
   	     		 il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset)
   WRITE(w_unit,*) 'Local partition definition'
   WRITE(w_unit,*) 'il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset = ', &
@@ -93,7 +93,7 @@ PROGRAM atmos
   ALLOCATE(grid_msk_atmos(il_extentx, il_extenty), STAT=ierror )
   !
   ! Reading local grid arrays from input file atmos_mesh.nc
-  CALL read_grid(nlon_atmos, nlat, nc_atmos, il_offsetx+1, il_offsety+1, il_extentx, il_extenty, &
+  CALL read_grid(nlon_atmos, nlat_atmos, nc_atmos, il_offsetx+1, il_offsety+1, il_extentx, il_extenty, &
                 'atmos_mesh.nc', w_unit, grid_lon_atmos, grid_lat_atmos, grid_clo_atmos, &
                  grid_cla_atmos, grid_srf_atmos, grid_msk_atmos)
   !

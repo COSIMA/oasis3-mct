@@ -10,7 +10,7 @@ PROGRAM ocean
   INCLUDE 'mpif.h'   ! Include for MPI
   !
   INTEGER :: mype, npes ! rank and number of pe
-  INTEGER :: localComm  ! local communicator for ocean processes
+  INTEGER :: local_comm  ! local communicator for ocean processes
   CHARACTER(len=128) :: comp_out_ocean ! name of the output log file 
   CHARACTER(len=3)   :: chout
   INTEGER :: ierror, w_unit
@@ -45,15 +45,15 @@ PROGRAM ocean
   !
   call MPI_Init(ierror)
   !
-  localComm =  MPI_COMM_WORLD
+  local_comm =  MPI_COMM_WORLD
   !
   !!!!!!!!!!!!!!!!! OASIS_INIT_COMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !!!!!!!!!!!!!!!!! OASIS_GET_LOCALCOMM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   ! Get rank in local communicator
-  CALL MPI_Comm_Size ( localComm, npes, ierror )
-  CALL MPI_Comm_Rank ( localComm, mype, ierror )
+  CALL MPI_Comm_Size ( local_comm, npes, ierror )
+  CALL MPI_Comm_Rank ( local_comm, mype, ierror )
   !
   ! Unit for output messages : one file for each process
   w_unit = 100 + mype
