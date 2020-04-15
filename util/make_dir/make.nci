@@ -1,4 +1,3 @@
-
 # 
 COUPLE=$(OASIS_HOME)
 ARCHDIR=$(COUPLE)/Linux
@@ -26,15 +25,19 @@ ARFLAGS     = -ruv
 # -g is necessary in F90FLAGS and LDFLAGS for pgf90 versions lower than 6.1
 # For compiling in double precision, put -r8
 # For compiling in single precision, remove -r8 and add -Duse_realtype_single
+NCI_INTEL_FLAGS = -r8 -i4 -traceback -fpe0 -convert big_endian -fno-alias -ip -check noarg_temp_created
+NCI_REPRO_FLAGS = -fp-model precise -fp-model source -align all
 ifeq ($(DEBUG), yes)
-    F90FLAGS_1  = -convert big_endian -i4 -r8 -traceback -O -debug all -g -check all -fpe0 -CB -fno-alias -ip -align all -assume nobuffered_io -check noarg_temp_created
-    CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY -DDEBUG -D__VERBOSE
-    MCT_FCFLAGS = -O0 -debug all -g -check all -fpe0 -xHost -ip -align all
+    NCI_DEBUG_FLAGS = -g3 -O0 -fpe0 -no-vec -debug all -check all -no-vec -assume nobuffered_io 
+    F90FLAGS_1      = $(NCI_INTEL_FLAGS) $(NCI_REPRO_FLAGS) $(NCI_DEBUG_FLAGS)
+    CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY -DDEBUG -D__VERBOSE
+    MCT_FCFLAGS     = $(NCI_REPRO_FLAGS) $(NCI_DEBUG_FLAGS) -ip
 else
-    F90FLAGS_1  = -convert big_endian -i4 -r8 -O3 -g -traceback -fno-alias -ip -align all -fpe0 -assume buffered_io -check noarg_temp_created
-    CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY
-    MCT_FCFLAGS = -O3 -xHost -ip -align all
-endif 
+    NCI_OPTIM_FLAGS = -g3 -O2 -axCORE-AVX2 -debug all -check none -qopt-report=5 -qopt-report-annotate -assume buffered_io
+    F90FLAGS_1      = $(NCI_INTEL_FLAGS) $(NCI_REPRO_FLAGS) $(NCI_OPTIM_FLAGS)
+    CPPDEF          = -Duse_netCDF -Duse_comm_$(CHAN) -DTREAT_OVERLAY
+    MCT_FCFLAGS     = $(NCI_REPRO_FLAGS) $(NCI_OPTIM_FLAGS) -ip
+endif
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)
@@ -61,3 +64,4 @@ fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
 CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
 #
 #############################################################################
+
