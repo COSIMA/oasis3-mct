@@ -1029,11 +1029,12 @@ This routine returns the number of coupling exchanges in which the field var\_id
 involved. This number is needed to get the coupling frequencies with the
 routine oasis\_get\_freqs, see below.
 
-\item {\tt CALL oasis\_get\_freqs(var\_id, ncpl, cpl\_freqs, kinfo)}
-\item {\tt CALL prism\_get\_freqs\_proto(var\_id, ncpl, cpl\_freqs, kinfo)}
+\item {\tt CALL oasis\_get\_freqs(var\_id, mop, ncpl, cpl\_freqs, kinfo)}
+\item {\tt CALL prism\_get\_freqs\_proto(var\_id, mop, ncpl, cpl\_freqs, kinfo)}
   \begin{itemize}
   \item {\tt var\_id [INTEGER; IN]}: field ID (from
   corresponding oasis\_def\_var)
+  \item {\tt mop [INTEGER; IN]}: OASIS\_Out or OASIS\_In type
   \item {\tt ncpl [INTEGER; IN]}: number of couplings in which the field
   is involved (i.e. when a field is sent to multiple targets)
    \item {\tt cpl\_freqs [INTEGER; DIMENSION(ncpl); OUT]}: coupling period(s) 
