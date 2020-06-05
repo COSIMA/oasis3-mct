@@ -16,7 +16,7 @@ PROGRAM ocean
   INTEGER :: ierror, w_unit
   !
   ! Global grid parameters
-  INTEGER, PARAMETER :: nlon_ocean = 182, nlat = 149    ! dimensions in the 2 spatial directions
+  INTEGER, PARAMETER :: nlon_ocean = 182, nlat_ocean = 149    ! dimensions in the 2 spatial directions
   INTEGER, PARAMETER :: nc_ocean = 4 ! number of grid cell vertices in the (i,j) plan
   !
   ! Local grid dimensions and arrays
@@ -72,7 +72,7 @@ PROGRAM ocean
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ !
   !
   ! Definition of the local partition
-  call def_local_partition(nlon_ocean, nlat, npes, mype, &
+  call def_local_partition(nlon_ocean, nlat_ocean, npes, mype, &
   	     		 il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset)
   WRITE(w_unit,*) 'Local partition definition'
   WRITE(w_unit,*) 'il_extentx, il_extenty, il_size, il_offsetx, il_offsety, il_offset = ', &
@@ -93,7 +93,7 @@ PROGRAM ocean
   ALLOCATE(grid_msk_ocean(il_extentx, il_extenty), STAT=ierror )
   !
   ! Reading local grid arrays from input file ocean_mesh.nc
-  CALL read_grid(nlon_ocean, nlat, nc_ocean, il_offsetx+1, il_offsety+1, il_extentx, il_extenty, &
+  CALL read_grid(nlon_ocean, nlat_ocean, nc_ocean, il_offsetx+1, il_offsety+1, il_extentx, il_extenty, &
                 'ocean_mesh.nc', w_unit, grid_lon_ocean, grid_lat_ocean, grid_clo_ocean, &
                 grid_cla_ocean, grid_srf_ocean, grid_msk_ocean)
   !
@@ -107,6 +107,10 @@ PROGRAM ocean
   ALLOCATE(field_send_ocean(il_extentx, il_extenty), STAT=ierror )
   ALLOCATE(field_recv_ocean(il_extentx, il_extenty), STAT=ierror )
   !
+  !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  !  DECLARATION OF THE COUPLING FIELDS  
+  !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ! 
   !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

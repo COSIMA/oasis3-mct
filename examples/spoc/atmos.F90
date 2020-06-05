@@ -107,6 +107,10 @@ PROGRAM atmos
   ALLOCATE(field_send_atmos(il_extentx, il_extenty), STAT=ierror )
   ALLOCATE(field_recv_atmos(il_extentx, il_extenty), STAT=ierror )
   !
+  !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  !  DECLARATION OF THE COUPLING FIELDS  
+  !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  ! 
   !!!!!!!!!!!!!!!!!! OASIS_DEF_VAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !
   !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
