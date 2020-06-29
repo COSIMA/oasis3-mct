@@ -17,7 +17,7 @@ casename=`basename $srcdir`
 ############### User's section #######################################
 #
 ## - Define architecture and coupler 
-arch=nemo_lenovo  # training, beaufix, nemo_lenovo 
+arch=linux_pgi_openmpi_openmp  # training, beaufix, nemo_lenovo, linux_pgi_openmpi, linux_pgi_openmpi_openmp 
 #
 # - Define number of processes to run each executable
     nproc_exe1=4
@@ -54,6 +54,8 @@ cd $rundir
 #
 if [ $arch == training ]; then
     MPIRUN=/usr/local/intel/impi/2018.1.163/bin64/mpirun
+elif [ $arch == linux_pgi_openmpi ] || [ $arch == linux_pgi_openmpi_openmp ]; then
+    MPIRUN=/usr/local/pgi/linux86-64/18.7/mpi/openmpi-2.1.2/bin/mpirun
 elif [ $arch == beaufix ] ; then
     MPIRUN=/opt/softs/intel/impi/5.1.2.150/intel64/bin/mpirun
    (( nproc = $nproc_exe1 + $nproc_exe2 ))
@@ -111,6 +113,10 @@ if [ $arch == training ]; then
     echo 'Executing the model using '$MPIRUN 
     $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
     $MPIRUN -np $nproc_exe2 ./$exe2 >> runjob.err
+elif [ $arch == linux_pgi_openmpi ] || [ $arch == linux_pgi_openmpi_openmp ]; then
+    export OMP_NUM_THREADS=1
+    $MPIRUN -np $nproc_exe1 ./$exe1 > runjob.err
+    $MPIRUN -np $nproc_exe2 ./$exe2 >> runjob.err 
 elif [ $arch == beaufix ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
