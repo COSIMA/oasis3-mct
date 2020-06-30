@@ -1,6 +1,7 @@
 This version is the last official version, OASIS3-MCT_4.0, of the OASIS3-MCT climate coupler. It is stored on the branch OASIS3-MCT_4.0. It will only contain some important bug fixes until the next official release.
 
 Since the first developments of OASIS3-MCT, it includes:
+- A new tutorial SPOC was added the 29/06/2020 in examples, linked to a Small Private Online Course on OASIS3-MCT
 - A hybrid MPI+OpenMP parallelisation of the SCRIP library (previously fully sequential) leading to great reduction in the offline calculation time
  of the remapping weights; 
 - A new communication method, using the remapping weights to define the intermediate mapping decomposition, offering a significant gain at run time
