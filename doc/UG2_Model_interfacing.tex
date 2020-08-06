@@ -713,7 +713,15 @@ of the following aspects:
     SCRIPR/BICUBIC} remapping for which a $1^{st}$, $2^{nd}$,
   $3^{rd}$, $4^{th}$ set of weights should be respectively applied to
   the field value, its gradient in the first dimension, its gradient
-  in the second dimension, and its cross-gradient. Bicubic and higher order
+  in the second dimension, and its cross-gradient in that order. 
+
+  This will be used also for the CONSERV/SECOND for which a 1st, 2nd, 3rd 
+  set of weights should be respectively applied to the field value, its 
+  gradient with respect to the latitude ($\theta$) $\frac{\delta f}{\delta \theta}$
+  and its gradient with respect to the longitude ($\phi$) $\frac{1}{cos \theta}\frac{\delta f}{\delta \phi}$ 
+  in that order.
+
+  Bicubic and higher order
   remapping are therefore supported given that the higher order fields
   are provided at each time step as {\tt oasis\_put} arguments. Note
   that if {\tt fld3}, or {\tt fld4}, or {\tt fld5} are passed, {\tt fld2}, or {\tt fld3} and 

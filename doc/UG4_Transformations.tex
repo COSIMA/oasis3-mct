@@ -378,17 +378,17 @@ noted with the string UNUSED and not described.
       second order conservative remapping respectively (see SCRIP 1.4
       documentation).
 
-      For {\tt CONSERV/SECOND}, 3 weigths are needed; OASIS3-MCT will
+      For {\tt CONSERV/SECOND}, 3 weights are needed; OASIS3-MCT will
       calculate these weights and corresponding addresses (if they are
       not already provided) but will not, at run time, calculate the
       two extra terms to which the second and third weights should be
-      applied; these terms, respectively the gradient of the field
-      with respect to the longitude ($\theta$) $\frac{\delta f}{\delta
+      applied. These terms, respectively the gradient of the field
+      with respect to the latitude ($\theta$) $\frac{\delta f}{\delta
         \theta}$ and the gradient of the field with respect to the
-      latitude ($\phi$) $\frac{1}{cos \theta}\frac{\delta f}{\delta
-        \phi}$ need to be calculated by the source code and transfered
-      as extra arguments of the {\tt oasis\_put} (see {\tt fld2, fld3}
-      in section \ref{prismput}).  Note that {\tt CONSERV/SECOND} is
+      longitude ($\phi$) $\frac{1}{cos \theta}\frac{\delta f}{\delta
+        \phi}$ need to be calculated by the source code and transferred
+      as extra arguments of the {\tt oasis\_put} as {\tt fld2} and {\tt fld3}
+      respectively (see section \ref{prismput}). Note that {\tt CONSERV/SECOND} is
       not positive definite.
 
     \end{itemize}
