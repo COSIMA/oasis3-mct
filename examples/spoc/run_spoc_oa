@@ -107,7 +107,7 @@ fi
 if [ $arch == training ]; then
     export OMP_NUM_THREADS=1
     echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
 elif [ $arch == beaufix ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
