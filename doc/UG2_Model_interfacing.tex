@@ -471,7 +471,7 @@ Must be called to start the grid writing process.
   \item {\tt cgrid }, {\tt nx\_global }, {\tt ny\_global }, {\tt il\_part\_id }: as for {\tt oasis\_write\_grid}
 
   \item {\tt nc [INTEGER; IN]} : number of corners per grid cell
-    (always 4 in the version)
+    (can be any number)
   \item {\tt clon [REAL, DIMENSION (nx,ny,nc);IN]} : single or double real array of corner
     longitudes covering the whole grid ({\tt nx=nx\_global}, {\tt ny=ny\_global}) or only the local partition (in degrees\_East)
   \item {\tt clat [REAL, DIMENSION (nx,ny,nc);IN]} : single or double real array of corner

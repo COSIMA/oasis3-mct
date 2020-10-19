@@ -40,9 +40,10 @@ points and {\tt ny} to 1.
   If the {\tt SCRIPR/CONSERV} remapping is specified, longitudes and
   latitudes for the source and target grid {\bf corners} must also be
   available in the {\em grids.nc} file as double precision {\tt
-    REAL} arrays dimensioned {\tt (nx,ny,4)} or {\tt (nbr\_pts,1,4)}
-  where {\tt 4} is the number of corners (in the counterclockwize
-  sense, starting by any corner). The names of the arrays must be composed of the grid prefix
+    REAL} arrays dimensioned {\tt (nx,ny,nc)} or {\tt (nbr\_pts,1,nc)}
+  where {\tt nc} is the number of corners (in the counterclockwize
+  sense, starting by any corner) that can by any number. 
+  The names of the arrays must be composed of the grid prefix
   and the suffix ``.clo'' or ``.cla'' for respectively the grid corner
   longitudes or latitudes.  As for the other grid information, the
   corners can be provided in {\em grids.nc} before the run by the user
