@@ -1073,7 +1073,8 @@
                                  i, j, jp1, ip1, n_add, e_add, ne_add  ! addresses
 
       real (kind=dbl_kind) :: & ! vectors for cross-product check
-           vec1_lat, vec1_lon, vec2_lat, vec2_lon, cross_product, cross_product_last
+         vec1_lat, vec1_lon, vec2_lat, vec2_lon, cross_product, cross_product_last, &
+         dlat, dlon
 
 !-----------------------------------------------------------------------
 !
@@ -1129,13 +1130,35 @@
           if (i < nx) then
             ip1 = i + 1
           else
+            !*** assume cyclic
             ip1 = 1
+            !*** but if it is not, correct
+            dlat = abs(src_center_lat(srch_add) - src_center_lat(srch_add-1))
+            dlon = abs(src_center_lon(srch_add) - src_center_lon(srch_add-1))
+            e_add = (j - 1)*nx + ip1
+            if (abs(src_center_lat(e_add   ) - &
+                    src_center_lat(srch_add)) > 10.0 * dlat .or. &
+                abs(src_center_lon(e_add) -  &
+                    src_center_lon(srch_add)) > 10.0 * dlon) then
+              ip1 = i
+            endif
           endif
 
           if (j < ny) then
             jp1 = j+1
           else
+            !*** assume cyclic
             jp1 = 1
+            !*** but if it is not, correct
+            dlat = abs(src_center_lat(srch_add) - src_center_lat(srch_add-nx))
+            dlon = abs(src_center_lon(srch_add) - src_center_lon(srch_add-nx))
+            n_add = (jp1 - 1)*nx + i
+            if (abs(src_center_lat(n_add) -  &
+                    src_center_lat(srch_add)) > 10.0 * dlat .or. &
+                abs(src_center_lon(n_add) -  &
+                    src_center_lon(srch_add)) > 10.0 * dlon) then
+              jp1 = j
+            endif
           endif
 
           n_add = (jp1 - 1)*nx + i

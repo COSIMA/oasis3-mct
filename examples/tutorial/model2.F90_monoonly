@@ -278,7 +278,7 @@ PROGRAM model2
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
                        RESHAPE(globalgrid_lat(indi_beg:indi_end,indj_beg:indj_end),&
                                (/ var_actual_shape(2), var_actual_shape(4) /)), &
-                                field2_send,ib)
+                                field2_send,ib,w_unit)
     !
     ! Send the field FSENDATM
     ! TOCOMPLETE - Put here the OASIS call to send FSENDATM (field2_send)

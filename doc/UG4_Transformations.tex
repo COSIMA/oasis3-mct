@@ -378,17 +378,17 @@ noted with the string UNUSED and not described.
       second order conservative remapping respectively (see SCRIP 1.4
       documentation).
 
-      For {\tt CONSERV/SECOND}, 3 weigths are needed; OASIS3-MCT will
+      For {\tt CONSERV/SECOND}, 3 weights are needed; OASIS3-MCT will
       calculate these weights and corresponding addresses (if they are
       not already provided) but will not, at run time, calculate the
       two extra terms to which the second and third weights should be
-      applied; these terms, respectively the gradient of the field
-      with respect to the longitude ($\theta$) $\frac{\delta f}{\delta
+      applied. These terms, respectively the gradient of the field
+      with respect to the latitude ($\theta$) $\frac{\delta f}{\delta
         \theta}$ and the gradient of the field with respect to the
-      latitude ($\phi$) $\frac{1}{cos \theta}\frac{\delta f}{\delta
-        \phi}$ need to be calculated by the source code and transfered
-      as extra arguments of the {\tt oasis\_put} (see {\tt fld2, fld3}
-      in section \ref{prismput}).  Note that {\tt CONSERV/SECOND} is
+      longitude ($\phi$) $\frac{1}{cos \theta}\frac{\delta f}{\delta
+        \phi}$ need to be calculated by the source code and transferred
+      as extra arguments of the {\tt oasis\_put} as {\tt fld2} and {\tt fld3}
+      respectively (see section \ref{prismput}). Note that {\tt CONSERV/SECOND} is
       not positive definite.
 
     \end{itemize}
@@ -404,7 +404,7 @@ noted with the string UNUSED and not described.
     by target cell.  Using the divergence theorem, the SCRIP library
     evaluates this area with the line integral along the cell borders
     enclosing the area. As the real shape of the borders is not known
-    (only the location of the 4 corners of each cell is known), the
+    (only the location of the corners of each cell is known), the
     library assumes that the borders are linear in latitude and
     longitude between two corners.  This assumption becomes less valid
     closer to the pole; for latitudes above the {\tt north\_thresh}

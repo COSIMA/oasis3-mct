@@ -6,24 +6,22 @@
 # Any line beginning with # is ignored. Blank lines are not allowed.
 #
 #########################################################################
- $NFIELDS
-# The number of fields described in the second part of the namcouple.
-#
-             3
- $END
+$NFIELDS
+ 3
+$END
 ###########################################################################
- $RUNTIME
+$RUNTIME
 # The total simulated time for this run in seconds
 #
   43200
- $END
+$END
 ###########################################################################
- $NLOGPRT
+$NLOGPRT
 # Amount of information written to OASIS3-MCT log files (see User Guide)
-  1  0
- $END
+  30  0
+$END
 ###########################################################################
- $STRINGS
+$STRINGS
 #
 # The above variables are the general parameters for the experiment.
 # Everything below has to do with the fields being exchanged.
@@ -50,7 +48,7 @@ FSENDOCN FRECVATM 1 7200  1  fdocn.nc EXPOUT
 # 7) LAG index if needed
 # 8) SEQ index if needed
 #
-182 149 96 72 torc  lmdz  LAG=+3600
+182 149 96 72 torc lmdz LAG=0
 #
 #   Third line:
 # Overlap (P or R) and nbr of overlap grid points for source and target grids.
@@ -67,9 +65,9 @@ my_remapping_file_bilinear.nc src
 # Field 2: model1 output
 #
 FSENDOCN FSENDOCN 1 7200 1 f2avg.nc OUTPUT
-torc  torc
+torc torc
 LOCTRANS
-  AVERAGE
+AVERAGE
 #
 ######################################################
 #
@@ -77,10 +75,10 @@ LOCTRANS
 #
 FSENDATM  FRECVOCN  1 10800  1  fdatm.nc EXPOUT
 #
-96 72 182 149 lmdz torc LAG=+1800
+96 72 182 149 lmdz torc LAG=0
 #
 P  0  P  2
 SCRIPR
 BILINEAR LR SCALAR LATLON 1
 #
- $END
+$END

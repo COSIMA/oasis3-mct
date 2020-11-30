@@ -40,9 +40,10 @@ points and {\tt ny} to 1.
   If the {\tt SCRIPR/CONSERV} remapping is specified, longitudes and
   latitudes for the source and target grid {\bf corners} must also be
   available in the {\em grids.nc} file as double precision {\tt
-    REAL} arrays dimensioned {\tt (nx,ny,4)} or {\tt (nbr\_pts,1,4)}
-  where {\tt 4} is the number of corners (in the counterclockwize
-  sense, starting by any corner). The names of the arrays must be composed of the grid prefix
+    REAL} arrays dimensioned {\tt (nx,ny,nc)} or {\tt (nbr\_pts,1,nc)}
+  where {\tt nc} is the number of corners (in the counterclockwize
+  sense, starting by any corner) that can by any number. 
+  The names of the arrays must be composed of the grid prefix
   and the suffix ``.clo'' or ``.cla'' for respectively the grid corner
   longitudes or latitudes.  As for the other grid information, the
   corners can be provided in {\em grids.nc} before the run by the user
@@ -190,7 +191,8 @@ where
   of associated source and target grid point pairs in the file.  This field is a netCDF dimension.
 \item {\tt num\_wgts} is a scalar integer indicating the number of
   weights per associated grid point pair (up to 5 are supported, see
-  section \ref{prismput}).  This field is a netCDF dimension.
+  sections \ref{prismput} and \ref{subsec_interp} for BICUBIC and CONSERV/SECOND). 
+  This field is a netCDF dimension.
 \item {\tt src\_address} is a one dimensional array of size {\tt
     num\_links}.  It contains the integer source address associated
   with each weight.  This field is a netCDF variable.
@@ -199,6 +201,7 @@ where
   associated with each weight.  This field is a netCDF variable.
 \item {\tt remap\_matrix} is a two dimensional array of size {\tt
     (num\_links, num\_wgts)}.  It contains the real weight value(s)
-  associated with the source and destination address.  This field is a
-  netCDF variable.
+  associated with the source and destination address. For each link, 
+  up to 5 weights are supported, see sections \ref{prismput} and \ref{subsec_interp} 
+  especially for BICUBIC and CONSERV/SECOND. This field is a netCDF variable.
 \end{itemize}

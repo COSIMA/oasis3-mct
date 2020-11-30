@@ -13,6 +13,27 @@ have your e-mail added to the list of addresses to which the log files
 of the SVN checkins are automatically sent; contact
 oasishelp@cerfacs.fr if you wish to be added to that list.
 
+\section{Bug fixes since official release of OASIS3-MCT\_4.0}
+
+\begin{itemize}
+
+\item Bugfix ``lcoinc''  : ensures that a condition on coincidence of segments is reinitialised to .false. for each cell. A detailed analysis of the bug that lead to this bugfix condition can be found at the end of the page 
+https://inle.cerfacs.fr/projects/oasis3-mct/wiki/Discussion\_about\_specific\_treatments\_of\_polar\_cells\_in\_scrip\_CONSERV\_interpolation (git commit d2239c4f).
+
+\item Argument {\tt id\_var\_nodim} defined as IN in {\tt mod\_oasis\_var.F90} to compile again with NEMO\_4.0 and NEMO trunk (git commit 28f4fe59) 
+
+\item Fix the treatment of the periodicity of the grids (git commits 20127fd9, 68021b13, facc08c1)
+
+\item GAUSWGT remapping: exact calculation of average distance (commit 1df003a1) ; see details in https://cerfacs.fr/wp-content/uploads/2019/08/GlobC-TR-maisonnave-gaussian\_interpolation-2\_2019.pdf
+
+ \item Second order conservative remapping using the option FRACNNEI: the second and third weights used in the second order conservative remapping were not correctly set when using FRACNNEI (svn revision 2535)
+
+\item For upward compatibility, declaration of var\_actual\_shape in oasis\_def\_var is back to var\_actual\_shape(2*id\_var\_nodims(1)) as in OASIS3-MCT\_3.0
+
+\item Redefinition of var\_nodim(2) to 1 in oasis\_def\_var if it is equal to 0 in the models, as it represents now the number of bundle fields
+
+\end{itemize}
+
 \section{Changes between OASIS3-MCT\_4.0 and OASIS3-MCT\_3.0}
 
 Different developments were realised to improve the parallel performance of OASIS3-MCT\_4.0. These developments are detailed in \cite{valcke11} .
@@ -385,8 +406,9 @@ useful in cases where multiple fields have the same coupling
 transformations and to reduce communication costs by aggregating multiple 
 fields into a single communication. If a LOCTRAN transformation is needed
 for these multiple fields, it is necessary to define a restart file for 
-these multiple fields. {\bf The coupling fields must be sent and received in the same order 
-as they are defined in the corresponding single entry of the namcouple}.
+these multiple fields. The coupling fields must be sent and received in the same order 
+as they are defined in the corresponding single entry of the namcouple
+(not relevant in further versions of OASIS3-MCT).
 
 \item Matching one source filed with multiple targets
 
