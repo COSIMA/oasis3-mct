@@ -93,8 +93,8 @@ elif [ ${arch} == nemo_lenovo ] ; then
 #SBATCH --distribution cyclic
 cd $rundir
 ulimit -s unlimited
-module purge
-module -s load compiler/intel/2015.2.164 mkl/2015.2.164 mpi/intelmpi/5.0.3.048
+#SPOC module purge
+#SPOC module -s load compiler/intel/2015.2.164 mkl/2015.2.164 mpi/intelmpi/5.0.3.048
 #
 time $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2
 #
@@ -107,7 +107,7 @@ fi
 if [ $arch == training ]; then
     export OMP_NUM_THREADS=1
     echo 'Executing the model using '$MPIRUN 
-    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 > runjob.err
+    $MPIRUN -np $nproc_exe1 ./$exe1 : -np $nproc_exe2 ./$exe2 
 elif [ $arch == beaufix ]; then
     echo 'Submitting the job to queue using sbatch'
     sbatch $rundir/run_$casename.$arch
