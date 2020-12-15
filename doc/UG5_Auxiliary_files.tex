@@ -41,8 +41,11 @@ points and {\tt ny} to 1.
   latitudes for the source and target grid {\bf corners} must also be
   available in the {\em grids.nc} file as double precision {\tt
     REAL} arrays dimensioned {\tt (nx,ny,nc)} or {\tt (nbr\_pts,1,nc)}
-  where {\tt nc} is the number of corners (in the counterclockwize
-  sense, starting by any corner) that can by any number. 
+  where {\tt nc} is is the maximum number of corners 
+  (in the counterclockwize sense, starting by any corner) over all cells; 
+  nc can be any number. For cells that do not have the maximum 
+  number of distinct corners, we recommend to repeat the last corner 
+  as many times as needed to describe nc corners.
   The names of the arrays must be composed of the grid prefix
   and the suffix ``.clo'' or ``.cla'' for respectively the grid corner
   longitudes or latitudes.  As for the other grid information, the
