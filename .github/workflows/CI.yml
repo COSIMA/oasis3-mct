@@ -28,7 +28,7 @@ jobs:
         OMPI_FC: gfortran
         platform: ubuntu
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out repository code
       - name: Checkout code 
         uses: actions/checkout@v2
 
