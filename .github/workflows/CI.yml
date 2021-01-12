@@ -20,13 +20,13 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    env:
+      FC: gfortran
+      OMPI_FC: gfortran
+      platform: ubuntu
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
-      env:
-        FC: gfortran
-        OMPI_FC: gfortran
-        platform: ubuntu
 
       # Checks-out repository code
       - name: Checkout code 
