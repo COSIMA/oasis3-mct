@@ -23,7 +23,7 @@ jobs:
     env:
       FC: gfortran
       OMPI_FC: gfortran
-      builddir: ${{ github.workspace }}/oasis3-mct/Linux
+      builddir: ${{ github.workspace }}/Linux
       platform: ubuntu
 
     # Steps represent a sequence of tasks that will be executed as part of the job
