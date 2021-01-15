@@ -44,7 +44,7 @@ jobs:
       - name: 'Tar files'
         # run: tar -C ${builddir} --transform 's,build,libaccessom2,' -cvf binary_release.tar build/bin/* build/lib/* build/include/*
         run: | 
-          ls ${builddir}
+          ls -R ${builddir}
           tar -C ${builddir} -cvf binary_release.tar build/bin/* build/lib/* build/include/*
 
       - name: 'Upload Artifact'
