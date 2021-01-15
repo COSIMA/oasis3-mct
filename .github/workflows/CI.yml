@@ -24,6 +24,7 @@ jobs:
       FC: gfortran
       OMPI_FC: gfortran
       platform: ubuntu
+      builddir: {{ github.workspace }}/oasis3-mct/Linux
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -41,10 +42,10 @@ jobs:
         run: make ${platform}
 
       - name: 'Tar files'
-        run: tar -C oasis3-mct/Linux --transform 's,build,libaccessom2,' -cvf binary_release.tar build/bin/* build/lib/* build/include/*
+        run: tar -C ${builddir} --transform 's,build,libaccessom2,' -cvf binary_release.tar build/bin/* build/lib/* build/include/*
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: binary_release
-          path: binary_release.tar  
+          path: binary_release.tar
