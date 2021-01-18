@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    env:
+      FC: gfortran
+      OMPI_FC: gfortran
+      builddir: ${{ github.workspace }}/Linux
+      platform: ubuntu
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+      # Checks-out repository code
+      - name: Checkout code 
+        uses: actions/checkout@v2
+
+      # Install dependencies
+      - name: Install dependencies
+        run: sudo apt-get install -y csh openmpi-bin libopenmpi-dev libopenmpi2 netcdf-bin libnetcdf-dev libnetcdff-dev libnetcdf13 
+
+      # Compile OASIS
+      - name: Compile OASIS3-mct
+        run: make ${platform}
+
+      - name: 'Tar files'
+        run: | 
+          tar -C ${builddir} -cvf binary_release.tar lib build
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: binary_release
+          path: binary_release.tar
