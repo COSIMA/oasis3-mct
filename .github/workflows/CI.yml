@@ -42,9 +42,7 @@ jobs:
         run: make ${platform}
 
       - name: 'Tar files'
-        # run: tar -C ${builddir} --transform 's,build,libaccessom2,' -cvf binary_release.tar build/bin/* build/lib/* build/include/*
         run: | 
-          ls -R ${builddir}
           tar -C ${builddir} -cvf binary_release.tar lib build
 
       - name: 'Upload Artifact'
