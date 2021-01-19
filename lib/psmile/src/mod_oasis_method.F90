@@ -41,7 +41,7 @@ CONTAINS
 
 !----------------------------------------------------------------------
 !> OASIS user init method
-   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld,config_dir)
+   SUBROUTINE oasis_init_comp(mynummod,cdnam,kinfo,coupled,commworld,config_dir, num_cpl_fields)
    !> * This is COLLECTIVE, all pes must call
 
    IMPLICIT NONE
@@ -52,6 +52,7 @@ CONTAINS
    logical                  ,intent(in)   ,optional :: coupled  !< flag to specify whether this component is coupled in oasis
    integer (kind=ip_intwp_p),intent(in)   ,optional :: commworld  !< user defined mpi_comm_world to use in oasis
    CHARACTER(len=*),intent(in),optional :: config_dir
+   INTEGER (kind=ip_intwp_p),intent(inout),optional :: num_cpl_fields
 !  ---------------------------------------------------------
    integer(kind=ip_intwp_p) :: ierr
    INTEGER(kind=ip_intwp_p) :: n,nns,iu
@@ -239,6 +240,10 @@ CONTAINS
    ENDDO
    nvar = m
 
+   if (present(num_cpl_fields)) then
+      num_cpl_fields = nvar
+   endif
+
    IF (OASIS_Debug >= 15 .and. mpi_rank_world == 0) THEN
       DO m=1,nvar
          WRITE (UNIT = nulprt1,FMT = *) subname,'Coupling fields  namsrcfld:',&
@@ -405,8 +410,8 @@ CONTAINS
    IF (ierr /= 0) THEN
       WRITE (nulprt1,*) subname,' ERROR: MPI_Comm_Split abort ',ierr
       PRINT *, subname,' ERROR: MPI_Comm_Split abort ',ierr
-      CALL oasis_flush(nulprt)
-      call oasis_abort_noarg()
+      call oasis_flush(nulprt)
+      call oasis_abort(file=__FILE__,line=__LINE__)
    ENDIF
 
 #elif defined use_comm_MPI2
@@ -743,12 +748,13 @@ CONTAINS
 
 !> OASIS user interface specifying the OASIS definition phase is complete
 
-   SUBROUTINE oasis_enddef(kinfo, runtime)
+   SUBROUTINE oasis_enddef(kinfo, runtime, coupling_field_timesteps)
 
    IMPLICIT NONE
 
    INTEGER (kind=ip_intwp_p),intent(inout),optional :: kinfo  !< return code
    INTEGER (kind=ip_i4_p),intent(in),optional :: runtime
+   INTEGER (kind=ip_i4_p), dimension(:), intent(in), optional :: coupling_field_timesteps
 !  ---------------------------------------------------------
    integer (kind=ip_intwp_p) :: n
    integer (kind=ip_intwp_p) :: lkinfo
@@ -759,6 +765,12 @@ CONTAINS
 !  ---------------------------------------------------------
 
    call oasis_debug_enter(subname)
+   lkinfo = OASIS_OK
+
+   if (.not. oasis_coupled) then
+      call oasis_debug_exit(subname)
+      return
+   endif
 
    ! Override some values in the namcouple, needs to be done before
    ! oasis_coupler_setup()
@@ -766,12 +778,16 @@ CONTAINS
       namruntim = runtime
    endif
 
-   if (.not. oasis_coupled) then
-      call oasis_debug_exit(subname)
-      return
-   endif
+   if (present(coupling_field_timesteps)) then
+      if (size(coupling_field_timesteps) /= size(namflddti)) then
+        write(nulprt,*) subname,' ERROR: wrong number of coupling field timesteps'
+        write(nulprt,*) subname, size(coupling_field_timesteps), size(namflddti)
+        call oasis_flush(nulprt)
+        call oasis_abort(file=__FILE__,line=__LINE__)
+      endif
 
-   lkinfo = OASIS_OK
+      namflddti(:) = coupling_field_timesteps(:)
+   endif
 
    if (local_timers_on .and. mpi_comm_local /= MPI_COMM_NULL) then
       call oasis_timer_start('oasis_enddef_barrier')
