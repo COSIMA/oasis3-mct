@@ -965,12 +965,6 @@ CONTAINS
    INTEGER(kind=ip_intwp_p),ALLOCATABLE :: tmparr(:)
    character(len=*),parameter :: subname = '(oasis_setrootglobal)'
 
-   ! Override some values in the namcouple, needs to be done before
-   ! oasis_coupler_setup()
-   if (present(runtime)) then
-      namruntim = runtime
-   endif
-
    !------------------------
    !--- set mpi_root_global
    !------------------------
