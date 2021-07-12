@@ -2,6 +2,7 @@ MODULE mod_oasis_sys
 
    USE mod_oasis_kinds
    USE mod_oasis_data
+   USE ifcore, only : TRACEBACKQQ
 
    IMPLICIT NONE
 
@@ -37,7 +38,8 @@ CONTAINS
 !--------------------------------------------------------------------
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
-   CALL MPI_ABORT (mpi_comm_global, 1, ierror)
+   CALL TRACEBACKQQ(user_exit_code=-1)
+   CALL MPI_ABORT (mpi_comm_global, 8515, ierror)
 #endif
 
    STOP
@@ -62,7 +64,8 @@ CONTAINS
    WRITE (nulprt,'(a)') subname//' error = '//TRIM(cd_message)
 
 #if defined use_comm_MPI1 || defined use_comm_MPI2
-   CALL MPI_ABORT (mpi_comm_global, 1, ierror)
+   CALL TRACEBACKQQ(user_exit_code=-1)
+   CALL MPI_ABORT (mpi_comm_global, 8515, ierror)
 #endif
 
    STOP
