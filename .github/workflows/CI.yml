@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: [ ubuntu-18.04 ] 
 
     env:
       FC: gfortran
@@ -35,7 +35,9 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: sudo apt-get install -y csh openmpi-bin libopenmpi-dev libopenmpi2 netcdf-bin libnetcdf-dev libnetcdff-dev libnetcdf13 
+        run: | 
+          sudo apt-get update
+          sudo apt-get -yqq install csh gfortran libgomp1 openmpi-bin libopenmpi-dev libnetcdf-dev libnetcdff-dev  netcdf-bin
 
       # Compile OASIS
       - name: Compile OASIS3-mct
