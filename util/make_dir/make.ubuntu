@@ -22,7 +22,7 @@ NETCDF_LIBRARY  = -L/usr/lib -lnetcdff
 #
 # Compiling and other commands
 MAKE        = make
-F90         = mpif90 -Wall
+F90         = mpif90 -Wall -fallow-argument-mismatch
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
