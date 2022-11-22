@@ -13,7 +13,7 @@ CHAN            = MPI1
 COUPLE          = $(OASIS_HOME)
 #
 # ARCHDIR       : directory created when compiling
-ARCHDIR         = $(COUPLE)/Linux
+ARCHDIR         = $(COUPLE)/compile_oa3-mct
 
 #
 # NETCDF library
@@ -22,7 +22,7 @@ NETCDF_LIBRARY  = -L/usr/lib -lnetcdff
 #
 # Compiling and other commands
 MAKE        = make
-F90         = mpif90
+F90         = mpif90 -Wall -fallow-argument-mismatch
 F           = $(F90)
 f90         = $(F90)
 f           = $(F90)
@@ -36,7 +36,7 @@ ARFLAGS     = -ruv
 CPPDEF    = -Duse_netCDF -Duse_comm_$(CHAN) -D__VERBOSE -DTREAT_OVERLAY
 #
 # 
-F90FLAGS_1  = -Wall
+F90FLAGS_1  = 
 f90FLAGS_1  = $(F90FLAGS_1)
 FFLAGS_1    = $(F90FLAGS_1)
 fFLAGS_1    = $(F90FLAGS_1)

@@ -1,12 +1,21 @@
-# 
-COUPLE=$(OASIS_HOME)
-ARCHDIR=$(COUPLE)/Linux
-
+#
+# Include file for OASIS3 Makefile for a Linux system using 
+# Portland Group Fortran Compiler and MPICH
+#
+###############################################################################
+#
 # CHAN	: communication technique used in OASIS3 (MPI1/MPI2/NONE)
 CHAN            = MPI1
 #
 # Paths for libraries, object files and binaries
 #
+# COUPLE	: path for oasis3-mct main directory
+COUPLE=$(OASIS_HOME)
+# ARCHDIR       : directory created when compiling
+ARCHDIR= $(COUPLE)/compile_oa3-mct
+
+#
+# NETCDF library
 NETCDF_INCLUDE = $(NETCDF_ROOT)/include
 NETCDF_LIBRARY = -L$(NETCDF_ROOT)/lib -lnetcdf -lnetcdff
 #
@@ -55,7 +64,7 @@ BINDIR          = $(ARCHDIR)/bin
 # LIBBUILD      : contains a directory for each library
 LIBBUILD        = $(ARCHDIR)/build/lib
 # INCPSMILE     : includes all *o and *mod for each library
-INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/pio -I$(LIBBUILD)/mct
+INCPSMILE       = -I$(LIBBUILD)/psmile.$(CHAN) -I$(LIBBUILD)/pio  -I$(LIBBUILD)/mct 
 
 F90FLAGS  = $(F90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
 f90FLAGS  = $(f90FLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
@@ -64,4 +73,3 @@ fFLAGS    = $(fFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
 CCFLAGS   = $(CCFLAGS_1) $(INCPSMILE) $(CPPDEF) -I$(NETCDF_INCLUDE)
 #
 #############################################################################
-

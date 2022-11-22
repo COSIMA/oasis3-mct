@@ -52,6 +52,11 @@ makedirs:
 # 
 makemct:
 	@echo "=> Compiling library mpeu and mct"
+	# NOTE: Ideally, we shouldn't be overriding FCFLAGS here because
+	#       oasis3-mct chooses FCFLAGS based on the compiler. However,
+	#       we need to remain consistent with previous builds, so leave
+	#       it as is. Refer to:
+	#       https://github.com/ACCESS-NRI/oasis3-mct/issues/4
 	(cd $(ARCHDIR)/build/lib/mctdir; cp -f -r -p $(LIBSRC)/mct/* .;\
          ./configure MPIFC="$(F90)" FC="$(F90)" CC="$(CC)" FCFLAGS="$(MCT_FCFLAGS)" \
           > >(tee -a $(LOG)) 2> >(tee -a $(ERR) >&2) ;\
