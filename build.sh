@@ -11,6 +11,11 @@ then
 	module purge
 	module load intel-compiler/2019.5.281
 	module load netcdf/4.7.4
+	# NOTE: The version of netcdf and netcdf-fortran may be different:
+	# /apps/netcdf/4.7.4/lib/Intel/pkgconfig/netcdf-fortran.pc
+	# Name: netcdf-fortran
+	# ...
+	# Version: 4.5.2
 	module prepend-path PKG_CONFIG_PATH "${NETCDF_BASE}/lib/Intel/pkgconfig/"
 	module load openmpi/4.0.2
 	PLATFORM="nci"
