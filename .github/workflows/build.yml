@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: read
+
+    container:
+      image: ghcr.io/access-nri/oasis3-mct-build-image:latest
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+    - name: Build oasis3-mct via spack
+      run: spack -v install --only package --no-checksum access.nri.oasis3-mct@$GITHUB_REF_NAME
+      if: github.event_name != 'pull_request'
+
+    # Workaround for this issue: https://github.com/github/docs/issues/15319
+    # In the case of a pull request, we need to use GITHUB_HEAD_REF to get the
+    # correct branch name
+    - name: Build oasis3-mct via spack
+      run: spack -v install --only package --no-checksum access.nri.oasis3-mct@$GITHUB_HEAD_REF
+      if: github.event_name == 'pull_request'
